@@ -1,0 +1,28 @@
+@startuml
+hide footbox
+participant "a Handler" as H
+participant "a Query\nCommand" as Q
+participant "a Database\nStatement" as D
+
+[->H: query database
+create Q
+H->Q: new
+note left: 生成
+activate Q
+create D
+Q->D: new
+Q->D: execute
+activate D
+Q<--D: results
+deactivate D
+Q->Q: extract results
+activate Q
+deactivate Q
+Q->D: close
+destroy D
+note right: 他のオブジェクト\nによる削除
+deactivate Q
+H<--Q: results
+note right: 自己削除
+destroy Q
+@enduml

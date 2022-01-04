@@ -1,0 +1,28 @@
+@startuml
+hide footbox
+participant ":Order" as order
+participant "careful :\nDistributor" as careful
+participant "regular :\nDistributor" as regular
+participant ":Messenger" as messenger
+
+[-> order: dispatch
+activate order
+loop for each line item
+  alt value > $10000
+    order -> careful: dispatch
+    activate careful
+    deactivate careful
+  else else
+    order -> regular: dispatch
+    activate regular
+    deactivate regular
+  end
+end
+
+opt needsConfirmation
+  order -> messenger: confirm
+  activate messenger
+  deactivate messenger
+  deactivate order
+end
+@enduml
