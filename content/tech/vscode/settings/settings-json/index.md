@@ -2,6 +2,7 @@
 title: "VS Code の設定ファイルの場所 (settings.json)"
 url: "/p/tfq2cnw"
 date: "2021-07-11"
+lastmod: "2022-01-10"
 tags: ["VS Code"]
 weight: 100
 ---
@@ -114,9 +115,10 @@ VS Code の設定画面 (`Ctrl/Cmd + P`) の右上の {{< image-inline w="32" sr
 
 言語別の設定は、指定できるプロパティが限られていますが、IntelliSense による入力補完機能 (`Ctrl + Space`) を使うと、どのようなプロパティを指定できるかがすぐにわかります。
 
-複数の言語タイプをまとめて `[typescript, typescriptreact]` のように指定することはまだできないようです（2021年7月時点）。
+複数の言語タイプをまとめて指定したいときは、プロパティ名の部分で __`"[typescript][typescriptreact]"`__ のように記述します。
 
-- 参考: [Multiple languages specific editor settings · Issue #51935 · microsoft/vscode](https://github.com/microsoft/vscode/issues/51935)
+<s>複数の言語タイプをまとめて `[typescript, typescriptreact]` のように指定することは [まだできない](https://github.com/microsoft/vscode/issues/51935) ようです（2021年7月時点）。</s>
+→ （2022年1月）できるようになってました！今井さん情報提供ありがとうございます。
 
 
 マニュアル追加する項目は settings.json の上の方に書く
