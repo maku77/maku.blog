@@ -1,6 +1,5 @@
 ---
 title: "Linuxコマンド: パッチファイルを作成・適用する (diff, patch)"
-linkTitle: "パッチファイルを作成・適用する (diff, patch)"
 url: "/p/nyehhfd"
 date: "2007-05-11"
 tags: ["Linux"]

@@ -1,6 +1,5 @@
 ---
 title: "Linuxメモ: デバイスドライバのライセンスについて"
-linkTitle: "デバイスドライバのライセンスについて"
 url: "/p/89tt5ie"
 date: "2011-06-19"
 tags: ["Linux"]

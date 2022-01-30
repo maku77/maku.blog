@@ -1,6 +1,5 @@
 ---
 title: "Linuxコマンド: ディレクトリのサイズを調べる (du)"
-linkTitle: "ディレクトリのサイズを調べる (du)"
 url: "/p/95pkhzc"
 date: "2011-06-29"
 tags: ["Linux"]

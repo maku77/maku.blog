@@ -1,6 +1,5 @@
 ---
 title: "Linuxコマンド: ファイルの内容を8進数や16進数でダンプする (od)"
-linkTitle: "ファイルの内容を8進数や16進数でダンプする (od)"
 url: "/p/cw7ekxc"
 date: "2011-06-20"
 tags: ["Linux"]

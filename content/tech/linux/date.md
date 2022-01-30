@@ -1,5 +1,5 @@
 ---
-title: "date コマンドの使い方"
+title: "Linuxコマンド: date コマンドの使い方"
 url: "/p/ucnv5ck"
 date: "2021-02-23"
 tags: ["Linux"]

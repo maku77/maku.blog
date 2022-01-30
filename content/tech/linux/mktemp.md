@@ -1,6 +1,5 @@
 ---
 title: "Linuxコマンド: テンポラリディレクトリを作成する (mktemp)"
-linkTitle: "テンポラリディレクトリを作成する (mktemp)"
 url: "/p/oo32y2x"
 date: "2011-06-30"
 tags: ["Linux"]

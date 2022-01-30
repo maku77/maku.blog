@@ -1,5 +1,5 @@
 ---
-title: "curl コマンドの使い方メモ"
+title: "Linuxコマンド: curl コマンドの使い方メモ"
 url: "/p/phdp2do"
 date: "2015-04-03"
 tags: ["Linux"]

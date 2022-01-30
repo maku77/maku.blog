@@ -1,6 +1,5 @@
 ---
 title: "Linuxメモ: デバイスドライバ作成の雑多メモ"
-linkTitle: "デバイスドライバ作成の雑多メモ"
 url: "/p/tm4iwbq"
 date: "2012-02-08"
 tags: ["Linux"]
