@@ -124,7 +124,7 @@ Firebase のクライアントアプリにおけるアクセス権限は、[Fire
 この初期化コードは、次のような感じでインポートすることで実行します。
 初期化された `FirebaseApp` インスタンスは Firebase ライブラリ内で保持されているため、いつでも __`getApp()`__ 関数で参照できるようになります。
 
-{{< code lang="tsx" hl_lines="4,7" title="pages/index.tsx" >}}
+{{< code lang="ts" title="pages/index.tsx" >}}
 import type { NextPage } from 'next'
 import { getApp, FirebaseApp } from 'firebase/app'
 
@@ -197,7 +197,7 @@ export default MyApp
 {{% note title="init.ts の中に Auth や Firestore 関連のコードを記述しない" %}}
 アプリのコードを簡潔にするために、`init.ts` の中で `getFirestore()` などを呼び出して
  `Firestore` インスタンスを `export` したくなるかもしれませんが、そのようにすると、`init.ts` をインポートする全てのページのバンドルサイズが大きくなってしまいます。
-`init.ts` 内の処理は `FirestoreApp` インスタンスの初期化にとどめておき、必要に応じて `getAuth()` や `getFirestore()` を呼び出すことをお勧めします。
+`init.ts` 内の処理は `FirebaseApp` インスタンスの初期化にとどめておき、必要に応じて `getAuth()` や `getFirestore()` を呼び出すことをお勧めします。
 {{% /note %}}
 
 {{% reference %}}

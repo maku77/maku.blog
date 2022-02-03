@@ -6,7 +6,7 @@ tags: ["Electron", "React"]
 weight: 103
 ---
 
-{{< image w="500" src="img-001.png" >}}
+{{< image border="true" w="500" src="img-001.png" >}}
 
 概要
 ----
