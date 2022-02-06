@@ -1,15 +1,15 @@
 ---
-title: "React コンポーネントでフォームの入力を処理する"
+title: "React コンポーネントで入力フォームを作成する (1) 自力編"
 url: "/p/tdpybmw"
 date: "2020-07-10"
 tags: ["React", "TypeScript"]
 weight: 301
 ---
 
-{{< private >}}
+{{% private %}}
 - [フォーム – React](https://ja.reactjs.org/docs/forms.html)
 - [フォーム要素別の Synthetic Event の型](https://qiita.com/natsuhiko/items/5d2a526a217e05162a0a)
-{{< /private >}}
+{{% /private %}}
 
 制御コンポーネント (controlled components)
 ----
@@ -296,4 +296,13 @@ export const MyForm: React.FC = () => {
 カスタムフックにも呼び出し順序などの制約が生まれる、標準のフック関数と同様に `use` で始まる名前を付けることが推奨されています。
 
 - 参考: [独自フックの作成 – React](https://ja.reactjs.org/docs/hooks-custom.html)
+
+
+React アプリでフォームを作るなら
+----
+
+React アプリにおけるフォームの扱い方を理解したら、実際には __React Hook Form (react-hook-form)__ のようなライブラリを使ってフォームを作成することをオススメします。
+下手に自力でフォームを処理するよりも、簡潔で高速なコードを記述できます。
+
+- [React Hook Form で入力フォームを作る](/p/k7it5fp)
 
