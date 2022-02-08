@@ -1,6 +1,6 @@
 ---
-title: "TypeScriptサンプル: 文字列内のひらがなとカタカナを変換する"
-linkTitle: "文字列内のひらがなとカタカナを変換する"
+title: "TypeScriptサンプル: 文字列内のひらがなとカタカナを変換する (hiraToKana, kanaToHira)"
+linkTitle: "文字列内のひらがなとカタカナを変換する (hiraToKana, kanaToHira)"
 url: "/p/tzjvcad"
 date: "2020-02-17"
 tags: ["TypeScript"]
