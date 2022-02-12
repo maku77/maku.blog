@@ -123,7 +123,10 @@ Firestore の準備ができたので、Web アプリ (Next.js/React) のコー�
 カスタムフック (`useBooks`) を作って、Firestore の `books` コレクション内のすべてのドキュメントを取得します。
 firebase パッケージのインストールや、`FirebaseApp` インスタンスの初期化用コード `init.ts` の作成は終わっているものとします（参考: [FirebaseApp の初期化](/p/73eq2cm)）。
 
+### Firestore アクセス部分
+
 まずは、Firestore から `books` コレクション内のドキュメントを取得してくるコードを作成します。
+`Book` データ型もここで定義しておきます。
 
 {{< code lang="ts" title="utils/firebase/books.ts" >}}
 import { collection, getDocs, getFirestore } from 'firebase/firestore'
@@ -139,9 +142,9 @@ export type Book = {
 export async function getBooks(): Promise<Book[]> {
   const books = new Array<Book>()
   const db = getFirestore()
-  const querySnapshot = await getDocs(collection(db, '/books'))
+  const booksSnapshot = await getDocs(collection(db, '/books'))
 
-  querySnapshot.forEach((doc) => {
+  booksSnapshot.forEach((doc) => {
     const book = doc.data() as Book
     books.push({ ...book, id: doc.id })
   })
@@ -150,7 +153,10 @@ export async function getBooks(): Promise<Book[]> {
 }
 {{< /code >}}
 
-上記の情報取得を `useBooks` カスタムフックで取得できるようにします。
+### データ取得用のカスタムフック
+
+React コンポーネントからデータ取得したいので、上記で作ったコードを `useBooks` カスタムフックの形にラップします。
+ここでは、直接 `getBooks()` を呼び出していますが、最終的には [useSWR フックを使ってデータフェッチ](/p/vm2ft83) することをお勧めします。
 
 {{< code lang="ts" title="hooks/useBooks.ts" >}}
 import { useEffect, useState } from 'react'
@@ -180,6 +186,8 @@ export function useBooks(): UseBooksOutput {
 }
 {{< /code >}}
 
+### React コンポーネント
+
 あとは、適当なコンポーネントから、`useBooks` フックを使って取得した情報を表示すれば OK です。
 
 {{< code lang="tsx" title="components/BookTable.tsx" >}}
@@ -207,4 +215,34 @@ export const BookTable: FC = () => {
 - Title-1 / Author-1 / 1000
 - Title-2 / Author-2 / 2000
 - Title-3 / Author-3 / 3000
+
+### おまけ: Firestore にドキュメントを追加するコード
+
+上記の例では、Firestore からのドキュメントの読み込みを試しましたが、ドキュメントの追加も似たようなコードで実現できます。
+下記の `addBook` 関数は、渡された `Book` オブジェクトの情報を Firestore の `books` コレクションに追加します。
+
+{{< code lang="ts" title="utils/firebase/books.ts" >}}
+import { collection, doc, getDocs, getFirestore, setDoc } from 'firebase/firestore'
+
+// ...
+// export async function getBooks(): Promise<Book[]> { ... }
+// ...
+
+export async function addBook(book: Book): Promise<void> {
+  const db = getFirestore()
+  const docRef = doc(db, 'books', book.id)
+  await setDoc(docRef,
+    { title: book.title, author: book.author, price: book.price },
+    { merge: true /* ドキュメントが存在する場合はフィールドを追記 */ }
+  )
+}
+{{< /code >}}
+
+実際にこのコードを呼び出すときは、Firestore のセキュリティルールで write 許可しておく必要があります。
+
+
+次のステップ
+----
+
+- [Firestore ドキュメントを TypeScript のユーザー定義型オブジェクトに変換する (withConverter)](/p/bw9kv6g)
 
