@@ -3,7 +3,7 @@ title: "Next.js で Firebase: Cloud Firestore データベースを使う"
 url: "/p/m3bjrz7"
 date: "2021-12-30"
 tags: ["Firebase/Firestore", "Next.js"]
-weight: 3
+weight: 301
 ---
 
 何をするか
@@ -244,5 +244,6 @@ export async function addBook(book: Book): Promise<void> {
 次のステップ
 ----
 
+- [Firebase Auth で admin ユーザーのみ Firestore に書き込みできるようにする](/p/dw9jt4e)
 - [Firestore ドキュメントを TypeScript のユーザー定義型オブジェクトに変換する (withConverter)](/p/bw9kv6g)
 
