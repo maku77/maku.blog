@@ -49,9 +49,9 @@ localhost | SUCCESS => {
 Ansible はデフォルトで SSH 接続しようとするので、ローカルホストを制御対象とするときは __`-c local`__ オプションを指定します。
 __`-m ping`__ オプションは、ping モジュールを使用してタスクを実行することを示しています。
 
-イベントリーファイルで、接続方法オプション __`ansible_connection=local`__ を指定しておくと、`ansible` コマンド実行時の `-c local` の指定を省略できます。
+イベントリーファイルで、ホスト変数として __`ansible_connection=local`__ を指定しておくと、`ansible` コマンド実行時の `-c local` の指定を省略できます。
 
-{{< code title="/etc/ansible/hosts（接続オプションを追加）" >}}
+{{< code title="/etc/ansible/hosts（接続方式をホスト変数で指定）" >}}
 localhost  ansible_connection=local
 192.168.1.20
 {{< /code >}}
@@ -92,7 +92,7 @@ localhost  ansible_connection=local
 192.168.1.20  ansible_ssh_user=maku
 {{< /code >}}
 
-この設定により、`ansible` コマンド実行時にはほとんどのオプションを省略できます。
+これらのホスト変数設定により、`ansible` コマンド実行時にはほとんどのオプションを省略できます。
 
 ```console
 $ ansible localhost -m ping
