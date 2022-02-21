@@ -101,9 +101,9 @@ Next.js の Link コンポーネント (`next/link`) で独自のコンポーネ
 Material-UI は独自のコンポーネントとして、[Link](https://next.material-ui.com/components/links/) や [Button](https://next.material-ui.com/components/buttons/) を持っており、これらに `href` プロパティを指定することによって、`a` 要素としてレンダリングするようになっています（Material-UI の `Link` と Next.js の `Link` は別物なので注意）。
 ダイレクトに `a` 要素を使わないのは、Material-UI が提供する UI 表現を使用するためですね。
 
-{{< code lang="tsx" >}}
-// import Link from '@material-ui/core/Link'
-// import Button from '@material-ui/core/Button'
+{{< code lang="tsx" title="Material-UI のリンク系コンポーネント" >}}
+import Link from '@material-ui/core/Link'
+import Button from '@material-ui/core/Button'
 
 <Link href="/about" underline="none">About us</Link>
 <Button href="/about" variant="contained">About us</Button>
@@ -113,9 +113,9 @@ Material-UI は独自のコンポーネントとして、[Link](https://next.mat
 `next/link` モジュールの `Link` 要素を使って、Material-UI の UI コンポーネントをリンクとして機能させるには、次のように記述します。
 `Link` という名前がコンフリクトするため、ここでは、それぞれ `NextLink`、`MuiLink` という名前でインポートしています（片方だけリネームすれば十分ですが分かりやすくするため両方リネームしています）。
 
-{{< code lang="tsx" >}}
-// import NextLink from 'next/link'
-// import { Button, Link as MuiLink } from '@material-ui/core'
+{{< code lang="tsx" title="next/link と Material-UI を組み合わせて使う" >}}
+import NextLink from 'next/link'
+import { Button, Link as MuiLink } from '@material-ui/core'
 
 <NextLink href="/about" passHref>
   <MuiLink underline="none">About us</MuiLink>
