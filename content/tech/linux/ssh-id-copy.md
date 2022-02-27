@@ -69,6 +69,12 @@ ssh-rsa AAAAB3NzaCn21Bq...(省略)...Qu4cIuQFG92hxMqU= maku@makumac.local
 =-=-=-=-=-=-=-=
 {{< /code >}}
 
+公開鍵ファイルは、デフォルトで __`~/.ssh/id*.pub`__ というファイルが検索されて使用されますが、`-i` オプションで明示することもできます。
+
+```console
+$ ssh-copy-id -n -i ~/.ssh/id_rsa_XXX.pub user@192.168.1.20
+```
+
 登録内容に問題なさそうであれば、今度は `-n` オプションを外して実際に実行します。
 ここでは、まだパスワード認証が使われるので、リモートホスト側のユーザーのパスワードを入力する必要があります。
 
@@ -87,14 +93,20 @@ Now try logging into the machine, with: "ssh 'user@192.168.1.20'"
 and check to make sure that only the key(s) you wanted were added.
 ```
 
-これで、SSH 鍵を使って（公開鍵認証方式で）SSH 接続できるようになります。
+これで、`ssh` コマンド実行時に SSH 鍵を使って（公開鍵認証方式で） 接続するようになります。
 
 ```console
 $ ssh user@192.168.1.20
 Enter passphrase for key '/Users/maku/.ssh/id_rsa': （SSH鍵のパスワードを入力）
 ```
 
-なお、登録する公開鍵ファイルは、デフォルトで上記のように `~/.ssh/id_rsa.pub` が使用されますが、`-i` オプションで明示することもできます。
+`ssh-copy-id` で `-i` オプションを使って標準と異なる名前の公開鍵を登録した場合は、`ssh` で接続するときも `-i` オプションを使って対となる秘密鍵を指定します。
+
+```console
+$ ssh -i ~/.ssh/id_rsa_XXX user@192.168.1.20
+```
+
+SSH 鍵のパスワード入力に失敗すると、従来のリモートホストのパスワード認証が実行されますが、この振る舞いは後述のように無効化することができます。
 
 
 パスワード認証を無効にする

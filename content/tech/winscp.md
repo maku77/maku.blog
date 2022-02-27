@@ -2,7 +2,7 @@
 title: "WinSCP をコマンドラインから利用して2つのディレクトリを同期する"
 url: "/p/eqrmt6x"
 date: "2018-09-21"
-tags: ["Windows", "WinSCP"]
+tags: ["scp", "Windows"]
 description: "Linux で2つのディレクトリを同期するには rsync コマンドが便利ですが、Windows ではフリーソフトの WinSCP を使用すると同様のことを行うことができます。"
 ---
 
