@@ -2,7 +2,7 @@
 title: "Next.js アプリを GitHub Actions でビルドして GitHub Pages で公開する"
 url: "/p/au8ju6g"
 date: "2021-04-24"
-tags: ["Next.js", "React"]
+tags: ["GitHub Actions", "Next.js", "React"]
 weight: 104
 ---
 
