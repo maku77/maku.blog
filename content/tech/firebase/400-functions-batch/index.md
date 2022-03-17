@@ -2,6 +2,7 @@
 title: "Cloud Functions で定期的に Firestore の集計処理を行う"
 url: "/p/vgs4dox"
 date: "2022-03-13"
+lastmod: "2022-03-17"
 tags: ["Firebase"]
 weight: 400
 ---
@@ -85,13 +86,13 @@ exports.updateMetaFunction = functions
 
 /** books コレクション内のドキュメントからタグ情報を抽出します。 */
 async function collectTags(): Promise<string[]> {
-  const tags: Array<string> = []
+  const tags = new Set<string>()
   const snapshot = await booksCollRef.get()
   snapshot.docs.forEach((doc) => {
     const book = doc.data()
-    tags.push(book['tag'])
+    tags.add(book['tag'])
   })
-  return tags.sort()
+  return [...tags].sort() // Set からソート済み文字列配列に変換
 }
 
 /** meta コレクションのタグ一覧情報を更新します。 */
@@ -214,13 +215,13 @@ exports.updateMetaFunction = functions
 
 /** books コレクション内のドキュメントからタグ情報を抽出します。 */
 async function collectTags(): Promise<string[]> {
-  const tags: Array<string> = []
+  const tags = new Set<string>()
   const snapshot = await booksCollRef.get()
   snapshot.docs.forEach((doc) => {
     const book = doc.data()
-    tags.push(book['tag'])
+    tags.add(book['tag'])
   })
-  return tags.sort()
+  return [...tags].sort() // Set からソート済み文字列配列に変換
 }
 
 /** meta コレクションのタグ一覧情報を更新します。 */
