@@ -1,0 +1,52 @@
+// .env ファイルの設定を環境変数 (process.env) とマージし、
+// .bot ファイルを読み込むための情報（パスなど）を返す。
+function loadEnvFile() {
+  const dotenv = require('dotenv');
+  const path = require('path');
+  const ROOT_DIR = __dirname;  // path.dirname(require.main.filename);
+
+  // Merge .env info to process.env
+  dotenv.config({ path: path.join(ROOT_DIR, '.env') });
+
+  return {
+    // Absolute path of .bot file
+    botFilePath: path.join(ROOT_DIR, (process.env.botFilePath || '')),
+    // Secret key of .bot file
+    botFileSecret: process.env.botFileSecret,
+    // Name of the endpoint configuration section from the .bot file
+    botEnv: process.env.NODE_ENV || 'development',
+  }
+}
+
+// 暗号化された .bot ファイルを読み込み、
+// 指定された Endpoint (developement や production) の設定情報を返す。
+function loadBotFile(env) {
+  const { BotConfiguration } = require('botframework-config');
+
+  let botConfig;
+  try {
+      // Read bot configuration from .bot file.
+      botConfig = BotConfiguration.loadSync(env.botFilePath, env.botFileSecret);
+  } catch (err) {
+      console.error(`\nError reading bot file. Please ensure you have valid botFilePath and botFileSecret set for your environment.`);
+      console.error(`\n - You can find the botFilePath and botFileSecret in the Azure App Service application settings.`);
+      console.error(`\n - If you are running this bot locally, consider adding a .env file with botFilePath and botFileSecret.`);
+      console.error(`\n - See https://aka.ms/about-bot-file to learn more about .bot file its use and bot configuration.\n\n`);
+      process.exit();
+  }
+
+  // Get bot endpoint configuration by service name
+  // Bot configuration as defined in .bot file
+  const endpointConfig = botConfig.findServiceByNameOrId(env.botEnv);
+
+  return {
+    appId: endpointConfig.appId || process.env.microsoftAppID,
+    appPassword: endpointConfig.appPassword || process.env.microsoftAppPassword,
+    channelService: process.env.ChannelService,
+    openIdMetadata: process.env.BotOpenIdMetadata,
+  }
+}
+
+const env = loadEnvFile();
+module.exports = loadBotFile(env);
+

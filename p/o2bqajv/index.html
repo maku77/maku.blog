@@ -1,0 +1,816 @@
+<!doctype html><html lang=ja-jp>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>チャットボット: LUIS や QnA Maker サービスへの接続情報を .bot ファイルから取得する｜まくろぐ</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
+<meta property="og:title" content="チャットボット: LUIS や QnA Maker サービスへの接続情報を .bot ファイルから取得する">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maku.blog/p/o2bqajv/">
+<meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/p/vrhjtds/logo-azure.jpg">
+<meta property="og:description" content="Bot Builder SDK v4 からは、LUIS や QnA Maker サービスなどの接続情報を .bot ファイルに記述しておくことが推奨されています。ここでは、.bot ファイルから接続情報を取得するためのクラスを作成します。">
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
+<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
+<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
+<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
+<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
+<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
+</head>
+<body>
+<div id=xRoot>
+<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/vrhjtds/>Azure</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/k43zbd8/>チャットボット</a>
+</span>
+<span class=xBreadcrumb_item>チャットボット: LUIS や QnA Maker サービスへの接続情報を .bot ファイルから取得する
+</span>
+</div>
+</aside>
+<div id=xContainer>
+<nav id=xMenu aria-label=メニュー>
+<div id=sidebar style=height:100%>
+<div id=sidebar_notFixed>
+<a href=../../><img src=../../assets/img/site-logo.png></a>
+<div class=xMenu_box data-sticky>
+<form action=https://cse.google.com/cse target=_blank>
+<div class=xSearchBox>
+<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<input type=hidden name=ie value=UTF-8>
+<input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
+<input type=submit value=検索></input>
+</div>
+</form>
+<div class=xMenu_box_body>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
+<div class=xMenu_box_body>
+<div class=xBoxLink>
+<a href=../../p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う
+<time>2022-03-17</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ryq6it6/>NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ
+<time>2022-03-16</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/un3gu8m/>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする
+<time>2022-02-27</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/m4dmu4c/>Next.js でブラウザ履歴で戻るボタンを表示する (router.back)
+<time>2022-02-22</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ter3doz/>Linuxメモ: Bluetooth 関連コマンドのメモ (hciconfig, bluetoothctl)
+<time>2022-02-20</time></a>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title>フォルダ</h3>
+<div class=xMenu_box_body>
+<div class=xNavTree>
+<ul>
+<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
+<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/xjwakv8/>Cosmos DB</a>
+<li><a class=xNavTree-dir href=../../p/i5ht5fq/>Azure Functions</a>
+<li><a class=xNavTree-dir href=../../p/fe7aiyp/>Azure DevOps</a>
+<li><a class=xNavTree-dir href=../../p/um2wi2o/>Azure Storage のメモ</a>
+<li><a class=xNavTree-dir href=../../p/3u2m6an/>Azure AppServices のメモ</a>
+<li><a class=xNavTree-dir href=../../p/d8apqgw/>LUIS のメモ</a>
+<li><a class=xNavTree-dir href=../../p/joexet9/>QnA Maker のメモ</a>
+<li><a class=xNavTree-dir href=../../p/yya9sbm/>逆引き Azure CLI</a>
+<li><a class=xNavTree-dir href=../../p/k43zbd8/>チャットボット</a>
+<ul>
+</ul>
+</ul>
+<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
+<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
+<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
+<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
+<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
+<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
+<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
+<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
+<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
+<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
+<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
+<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
+<li><a class=xNavTree-dir href=../../p/uo7n4ix/>PowerShell</a>
+<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
+<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
+<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
+<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
+<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
+<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
+<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
+<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
+<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
+<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
+</ul>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
+<div class=xMenu_box_body><div class=xMenu_tag>
+<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (79)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure>azure (58)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/typescript>typescript (57)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws>aws (51)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/next.js>next.js (36)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/chatbot>chatbot (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/react>react (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/gnuplot>gnuplot (27)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github>github (23)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/graphql>graphql (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/node.js>node.js (17)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/electron>electron (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/linux>linux (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vs-code>vs-code (14)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/javascript>javascript (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mongodb>mongodb (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cdk>aws/cdk (12)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/android>android (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/java>java (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/nginx>nginx (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/python>python (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/uml>uml (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/3d>3d (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/lambda>aws/lambda (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sam>aws/sam (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unity>unity (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webgl>webgl (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-cli>azure-cli (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jade>jade (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apollo>apollo (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cognito>aws/cognito (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-storage>azure-storage (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/doxygen>doxygen (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase>firebase (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/luis>luis (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/material-ui>material-ui (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/qna-maker>qna-maker (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ansible>ansible (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cli>aws/cli (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/ssm>aws/ssm (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/c/c++>c/c++ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/eslint>eslint (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/firestore>firebase/firestore (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html/css>html/css (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sql>sql (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/windows>windows (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-functions>azure-functions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/cosmos-db>cosmos-db (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-actions>github-actions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-pages>github-pages (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jekyll>jekyll (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/kotlin>kotlin (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mac>mac (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/powershell>powershell (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/prettier>prettier (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sqlite>sqlite (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/textlint>textlint (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tv>tv (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apache>apache (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/arib>arib (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/amplify>aws/amplify (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/iam>aws/iam (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/kms>aws/kms (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/s3>aws/s3 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sdk>aws/sdk (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-app-service>azure-app-service (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/excel>excel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/hugo>hugo (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/npm>npm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/oauth>oauth (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/opengl>opengl (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/rsync>rsync (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/scp>scp (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/slack>slack (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teraterm>teraterm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unicode>unicode (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vercel>vercel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/zip>zip (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/.net>.net (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/androidstudio>androidstudio (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/atomic-design>atomic-design (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/blender>blender (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bluetooth>bluetooth (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bootstrap>bootstrap (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-framework>bot-framework (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/boto3>boto3 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/css>css (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dns>dns (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dvb>dvb (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/editorconfig>editorconfig (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/evernote>evernote (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/git>git (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/groovy>groovy (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html>html (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/iso>iso (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/json>json (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/macos>macos (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/parcel>parcel (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/raspberrypi>raspberrypi (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ssh>ssh (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teams>teams (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tex>tex (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ubuntu>ubuntu (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vim>vim (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/web>web (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webpack>webpack (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/wsl>wsl (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
+</div></div>
+</div>
+<div class=xMenu_box data-sticky><br></div>
+</div>
+<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
+</div>
+</div>
+</nav>
+<main id=xMain>
+<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_prev>
+<a href=../../p/8choj4w/>チャットボット: MS Bot Framework の .bot ファイルで接続情報を管理する</a>
+</div>
+<div class=xPrevNextLink_next>
+<a href=../../p/asuzg7k/>作成したチャットボットを LINE に接続する</a>
+</div>
+</div>
+</aside>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/vrhjtds/>Azure</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/k43zbd8/>チャットボット</a></span></div>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/o2bqajv/>チャットボット: LUIS や QnA Maker サービスへの接続情報を .bot ファイルから取得する</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/azure>Azure</a></span>
+<span class=xPageTags_item><a href=../../tags/chatbot>Chatbot</a></span>
+<span class=xPageTags_item><a href=../../tags/bot-builder-sdk>Bot Builder SDK</a></span>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2019-04-15>2019-04-15</time><br>
+作成: <time itemprop=datePublished datetime=2019-04-15>2019-04-15</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<div itemprop=description class=xPageDescription>Bot Builder SDK v4 からは、LUIS や QnA Maker サービスなどの接続情報を .bot ファイルに記述しておくことが推奨されています。ここでは、.bot ファイルから接続情報を取得するためのクラスを作成します。</div>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#ここで作るもの>ここで作るもの</a></li>
+<li><a href=#botframework-config-パッケージのインストール>botframework-config パッケージのインストール</a></li>
+<li><a href=#実装>実装</a>
+<ul>
+<li><a href=#configjs-全体のコード>config.js 全体のコード</a></li>
+<li><a href=#botconfigurationloadsync-のエラーについてのメモ>BotConfiguration.loadSync() のエラーについてのメモ</a></li>
+<li><a href=#botconfigurationfindservicebynameorid-で返される接続情報についてのメモ>BotConfiguration#findServiceByNameOrId() で返される接続情報についてのメモ</a></li>
+</ul>
+</li>
+<li><a href=#使用例>使用例</a>
+<ul>
+<li><a href=#botframeworkadapter-の初期化>BotFrameworkAdapter の初期化</a></li>
+<li><a href=#luisrecognizer-の初期化>LuisRecognizer の初期化</a></li>
+<li><a href=#qnamaker-の初期化>QnAMaker の初期化</a></li>
+</ul>
+</li>
+</ul>
+</nav><ul>
+<li>参考: <a href=../../p/8choj4w>MS Bot Framework の .bot ファイルで接続情報を管理する</a></li>
+</ul>
+<h2 id=ここで作るもの>ここで作るもの</h2>
+<p><a href=../../p/iob68qa>こちらの実装</a> では、最初のステップとしてボットサーバ自体 (Azure Web Apps) のエンドポイント情報を <code>.bot</code> ファイルから取得する実装を行いました (<code>config.js</code>)。
+ここでは、さらに、LUIS サービスや QnA Maker サービスを利用することを想定し、これらの情報も <code>.bot</code> ファイルから取得できるように拡張します。</p>
+<p>使用イメージとしては、下記のようにしてそれぞれの接続情報を簡単に読み込めるようにします。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=kr>const</span> <span class=nx>config</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;./config.js&#39;</span><span class=p>);</span>
+
+<span class=kr>const</span> <span class=nx>LUIS_APP_NAME</span> <span class=o>=</span> <span class=s1>&#39;maku-luis-sample&#39;</span><span class=p>;</span>
+<span class=kr>const</span> <span class=nx>QNA_APP_NAME</span> <span class=o>=</span> <span class=s1>&#39;maku-qna-sample&#39;</span><span class=p>;</span>
+
+<span class=kr>const</span> <span class=nx>botEndpoint</span> <span class=o>=</span> <span class=nx>config</span><span class=p>.</span><span class=nx>loadBotEndpoint</span><span class=p>();</span>  <span class=c1>// ボット自体への接続情報
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>luisEndpoint</span> <span class=o>=</span> <span class=nx>config</span><span class=p>.</span><span class=nx>loadLuisEndpoint</span><span class=p>(</span><span class=nx>LUIS_APP_NAME</span><span class=p>);</span>  <span class=c1>// LUIS への接続情報
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>qnaEndpoint</span> <span class=o>=</span> <span class=nx>config</span><span class=p>.</span><span class=nx>loadQnaEndpoint</span><span class=p>(</span><span class=nx>QNA_APP_NAME</span><span class=p>);</span>  <span class=c1>// QnA Maker への接続情報
+</span></code></pre></div></div>
+</figure>
+<p>単一のオブジェクトとしてまとめて取得するように実装することもできるのですが、分かりやすさのために、3 つの情報に分けて取得するようにしています。
+LUIS や QnA Maker は、複数のアプリ（ナレッジベース）を同時に使用する可能性があるので、アプリ名を指定して接続情報を取得できるようにしています。</p>
+<p>取得した情報は、次のように BotBuilder SDK が提供するクラスへの入力として使用することを想定しています。</p>
+<ul>
+<li><code>botEndpoint</code> オブジェクトは、<code>botbuilder</code> パッケージの <code>BotFrameworkAdapter</code> クラスのコンストラクタに渡されます。</li>
+<li><code>luisEndpoint</code> オブジェクトは、<code>botbuilder-ai</code> パッケージの <code>LuisRecognizer</code> クラスのコンストラクタに渡されます。</li>
+<li><code>qnaEndpoint</code> オブジェクトは、<code>botbuilder-ai</code> パッケージの <code>QnAMaker</code> クラスのコンストラクタに渡されます。</li>
+</ul>
+<p>下記は、実際に取得されるオブジェクトの内容の例です。
+これらのオブジェクトは、上記のように SDK のクラスへの入力用に使用するので、各プロパティの値を直接参照することはないと思います。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>上記のコードで得られる情報の例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>botEndpoint</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>appId</span><span class=o>:</span> <span class=s1>&#39;921c6a01-1948-0f4d-9a82-75daf6a6d43c&#39;</span><span class=p>,</span>
+  <span class=nx>appPassword</span><span class=o>:</span> <span class=s1>&#39;16lgoF+phvG:MPeg1eIDma*fcNU#!5jv&#39;</span><span class=p>,</span>
+  <span class=p>...</span>
+<span class=p>}</span>
+
+<span class=nx>luisEndpoint</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>applicationId</span><span class=o>:</span> <span class=s1>&#39;c5514855-fa6b-8f4c-c695-9ac7d3519412&#39;</span><span class=p>,</span>
+  <span class=nx>endpointKey</span><span class=o>:</span> <span class=s1>&#39;9ccff1530f4214fd8e319434a1408fa2&#39;</span><span class=p>,</span>
+  <span class=nx>endpoint</span><span class=o>:</span> <span class=s1>&#39;https://westus.api.cognitive.microsoft.com&#39;</span>
+<span class=p>}</span>
+
+<span class=nx>qnaEndpoint</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>knowledgeBaseId</span><span class=o>:</span> <span class=s1>&#39;c78ec3e7-a58d-ca44-dbb6-e7805d8130c6&#39;</span><span class=p>,</span>
+  <span class=nx>endpointKey</span><span class=o>:</span> <span class=s1>&#39;c9153f6c-980c-bd41-4ba6-370392cda0e8&#39;</span><span class=p>,</span>
+  <span class=nx>host</span><span class=o>:</span> <span class=s1>&#39;https://maku-qna-sample.azurewebsites.net/qnamaker&#39;</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<h2 id=botframework-config-パッケージのインストール>botframework-config パッケージのインストール</h2>
+<p><code>.bot</code> ファイルのロードには、Node の <strong><code>botframework-config</code></strong> パッケージが提供する <code>BotConfiguration</code> クラスを使用します。
+必要があれば、下記のようにインストールして、<code>package.json</code> に依存関係を追記します。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ npm install botframework-config --save</code></pre></div></div>
+</figure>
+<h2 id=実装>実装</h2>
+<h3 id=configjs-全体のコード>config.js 全体のコード</h3>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=kr>class</span> <span class=nx>Config</span> <span class=p>{</span>
+  <span class=cm>/**
+</span><span class=cm>   * コンストラクタ。
+</span><span class=cm>   * 環境変数や .env ファイルに書かれた botFilePath や botFileSecret の
+</span><span class=cm>   * 情報を基に、.bot ファイルを読み込みます。
+</span><span class=cm>   */</span>
+  <span class=nx>constructor</span><span class=p>()</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>env</span> <span class=o>=</span> <span class=k>this</span><span class=p>.</span><span class=nx>_loadEnvFile</span><span class=p>();</span>
+    <span class=k>this</span><span class=p>.</span><span class=nx>botEnv</span> <span class=o>=</span> <span class=nx>env</span><span class=p>.</span><span class=nx>botEnv</span><span class=p>;</span>
+    <span class=k>this</span><span class=p>.</span><span class=nx>botConfig</span> <span class=o>=</span> <span class=k>this</span><span class=p>.</span><span class=nx>_loadBotFile</span><span class=p>(</span><span class=nx>env</span><span class=p>.</span><span class=nx>botFilePath</span><span class=p>,</span> <span class=nx>env</span><span class=p>.</span><span class=nx>botFileSecret</span><span class=p>);</span>
+  <span class=p>}</span>
+
+  <span class=cm>/**
+</span><span class=cm>   * 指定された Bot Endpoint (developement や production) への
+</span><span class=cm>   * 接続情報を取得します。
+</span><span class=cm>   */</span>
+  <span class=nx>loadBotEndpoint</span><span class=p>()</span> <span class=p>{</span>
+    <span class=c1>// Get bot endpoint configuration by service name
+</span><span class=c1></span>    <span class=c1>// Bot configuration as defined in .bot file
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>endpointConfig</span> <span class=o>=</span> <span class=k>this</span><span class=p>.</span><span class=nx>botConfig</span><span class=p>.</span><span class=nx>findServiceByNameOrId</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>botEnv</span><span class=p>);</span>
+
+    <span class=k>return</span> <span class=p>{</span>
+      <span class=nx>appId</span><span class=o>:</span> <span class=nx>endpointConfig</span><span class=p>.</span><span class=nx>appId</span> <span class=o>||</span> <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>microsoftAppID</span><span class=p>,</span>
+      <span class=nx>appPassword</span><span class=o>:</span> <span class=nx>endpointConfig</span><span class=p>.</span><span class=nx>appPassword</span> <span class=o>||</span> <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>microsoftAppPassword</span><span class=p>,</span>
+      <span class=nx>channelService</span><span class=o>:</span> <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>ChannelService</span><span class=p>,</span>
+      <span class=nx>openIdMetadata</span><span class=o>:</span> <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>BotOpenIdMetadata</span><span class=p>,</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+
+  <span class=cm>/**
+</span><span class=cm>   * 指定した LUIS アプリへの接続情報を取得します。
+</span><span class=cm>   * botbuilder-ai パッケージの LuisRecognizer クラスの
+</span><span class=cm>   * 初期化情報として使用することを想定しています。
+</span><span class=cm>   * 設定が見つからない場合は空のオブジェクトを返します。
+</span><span class=cm>   */</span>
+  <span class=nx>loadLuisEndpoint</span><span class=p>(</span><span class=nx>luisAppName</span><span class=p>)</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>luisConfig</span> <span class=o>=</span> <span class=k>this</span><span class=p>.</span><span class=nx>botConfig</span><span class=p>.</span><span class=nx>findServiceByNameOrId</span><span class=p>(</span><span class=nx>luisAppName</span><span class=p>);</span>
+    <span class=k>if</span> <span class=p>(</span><span class=nx>luisConfig</span> <span class=o>==</span> <span class=kc>null</span><span class=p>)</span> <span class=p>{</span>
+      <span class=k>return</span> <span class=p>{};</span>
+    <span class=p>}</span>
+
+    <span class=c1>// Map the contents to the required format for `LuisRecognizer`.
+</span><span class=c1></span>    <span class=k>return</span> <span class=p>{</span>
+      <span class=nx>applicationId</span><span class=o>:</span> <span class=nx>luisConfig</span><span class=p>.</span><span class=nx>appId</span><span class=p>,</span>
+      <span class=nx>endpointKey</span><span class=o>:</span> <span class=nx>luisConfig</span><span class=p>.</span><span class=nx>subscriptionKey</span><span class=p>,</span>
+      <span class=nx>endpoint</span><span class=o>:</span> <span class=nx>luisConfig</span><span class=p>.</span><span class=nx>getEndpoint</span><span class=p>()</span>
+    <span class=p>};</span>
+  <span class=p>}</span>
+
+  <span class=cm>/**
+</span><span class=cm>   * 指定した QnA Maker アプリへの接続情報を取得します。
+</span><span class=cm>   * botbuilder-ai パッケージの QnAMaker クラスの初期化情報として
+</span><span class=cm>   * 使用することを想定しています。
+</span><span class=cm>   * 設定が見つからない場合は空のオブジェクトを返します。
+</span><span class=cm>   */</span>
+  <span class=nx>loadQnaEndpoint</span><span class=p>(</span><span class=nx>qnaAppName</span><span class=p>)</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>qnaConfig</span> <span class=o>=</span> <span class=k>this</span><span class=p>.</span><span class=nx>botConfig</span><span class=p>.</span><span class=nx>findServiceByNameOrId</span><span class=p>(</span><span class=nx>qnaAppName</span><span class=p>);</span>
+    <span class=k>if</span> <span class=p>(</span><span class=nx>qnaConfig</span> <span class=o>==</span> <span class=kc>null</span><span class=p>)</span> <span class=p>{</span>
+      <span class=k>return</span> <span class=p>{};</span>
+    <span class=p>}</span>
+
+    <span class=c1>// Map the contents to the required format for `QnAMaker`.
+</span><span class=c1></span>    <span class=k>return</span> <span class=p>{</span>
+      <span class=nx>knowledgeBaseId</span><span class=o>:</span> <span class=nx>qnaConfig</span><span class=p>.</span><span class=nx>kbId</span><span class=p>,</span>
+      <span class=nx>endpointKey</span><span class=o>:</span> <span class=nx>qnaConfig</span><span class=p>.</span><span class=nx>endpointKey</span><span class=p>,</span>
+      <span class=nx>host</span><span class=o>:</span> <span class=nx>qnaConfig</span><span class=p>.</span><span class=nx>hostname</span>
+    <span class=p>};</span>
+  <span class=p>}</span>
+
+  <span class=cm>/**
+</span><span class=cm>   * .env ファイルの設定を環境変数 (process.env) とマージし、
+</span><span class=cm>   * .bot ファイルを読み込むための情報（パスなど）を返します。
+</span><span class=cm>   */</span>
+  <span class=nx>_loadEnvFile</span><span class=p>()</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>dotenv</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;dotenv&#39;</span><span class=p>);</span>
+    <span class=kr>const</span> <span class=nx>path</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;path&#39;</span><span class=p>);</span>
+    <span class=kr>const</span> <span class=nx>ROOT_DIR</span> <span class=o>=</span> <span class=nx>__dirname</span><span class=p>;</span>
+
+    <span class=c1>// Merge .env info to process.env
+</span><span class=c1></span>    <span class=nx>dotenv</span><span class=p>.</span><span class=nx>config</span><span class=p>({</span> <span class=nx>path</span><span class=o>:</span> <span class=nx>path</span><span class=p>.</span><span class=nx>join</span><span class=p>(</span><span class=nx>ROOT_DIR</span><span class=p>,</span> <span class=s1>&#39;.env&#39;</span><span class=p>)</span> <span class=p>});</span>
+
+    <span class=k>return</span> <span class=p>{</span>
+      <span class=c1>// Absolute path of .bot file
+</span><span class=c1></span>      <span class=nx>botFilePath</span><span class=o>:</span> <span class=nx>path</span><span class=p>.</span><span class=nx>join</span><span class=p>(</span><span class=nx>ROOT_DIR</span><span class=p>,</span> <span class=p>(</span><span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>botFilePath</span> <span class=o>||</span> <span class=s1>&#39;&#39;</span><span class=p>)),</span>
+      <span class=c1>// Secret key of .bot file
+</span><span class=c1></span>      <span class=nx>botFileSecret</span><span class=o>:</span> <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>botFileSecret</span><span class=p>,</span>
+      <span class=c1>// Name of the endpoint configuration section from the .bot file
+</span><span class=c1></span>      <span class=nx>botEnv</span><span class=o>:</span> <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>NODE_ENV</span> <span class=o>||</span> <span class=s1>&#39;development&#39;</span><span class=p>,</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+
+  <span class=cm>/**
+</span><span class=cm>   * 暗号化された .bot ファイルを読み込みます。
+</span><span class=cm>   */</span>
+  <span class=nx>_loadBotFile</span><span class=p>(</span><span class=nx>botFilePath</span><span class=p>,</span> <span class=nx>botFileSecret</span><span class=p>)</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=p>{</span> <span class=nx>BotConfiguration</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;botframework-config&#39;</span><span class=p>);</span>
+    <span class=k>try</span> <span class=p>{</span>
+      <span class=k>return</span> <span class=nx>BotConfiguration</span><span class=p>.</span><span class=nx>loadSync</span><span class=p>(</span><span class=nx>botFilePath</span><span class=p>,</span> <span class=nx>botFileSecret</span><span class=p>);</span>
+    <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+      <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=s1>&#39;Error reading bot file.&#39;</span><span class=p>);</span>
+      <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>.</span><span class=nx>message</span> <span class=o>+</span> <span class=s1>&#39;\n&#39;</span><span class=p>);</span>
+      <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=s1>&#39;Please ensure you have valid botFilePath&#39;</span> <span class=o>+</span>
+                    <span class=s1>&#39; and botFileSecret set for your environment.&#39;</span><span class=p>);</span>
+      <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=s1>&#39;You can find the botFilePath and botFileSecret&#39;</span> <span class=o>+</span>
+                    <span class=s1>&#39; in the Azure App Service application settings.&#39;</span><span class=p>);</span>
+      <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=s1>&#39;If you are running this bot locally, consider adding&#39;</span> <span class=o>+</span>
+                    <span class=s1>&#39; a .env file with botFilePath and botFileSecret.&#39;</span><span class=p>);</span>
+      <span class=nx>process</span><span class=p>.</span><span class=nx>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=nx>module</span><span class=p>.</span><span class=nx>exports</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Config</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<h3 id=botconfigurationloadsync-のエラーについてのメモ>BotConfiguration.loadSync() のエラーについてのメモ</h3>
+<p><code>BotConfiguration.loadSync()</code> でエラーが発生して <code>.bot</code> ファイルがうまく読み込めなかった場合、Microsoft 公式のサンプルコードでは「<code>botFilePath</code> と <code>botFileSecret</code> をちゃんと設定してください」といった感じのメッセージだけ表示して済ませています。
+しかし、実際には <code>.bot</code> ファイルを読み込めても記述内容がおかしい場合にはエラーが発生します（URL が求められているプロパティなのに URL の形式になっていない場合など）。</p>
+<p>このチグハグなエラーメッセージのせいで結構ハマりました。。。
+<code>.bot</code> ファイルの読み込みがエラーになった場合に、その原因を明確にするためには、最低限 Error オブジェクトの内容（<code>err.message</code> など）を出力してあげた方がよいです。</p>
+<h3 id=botconfigurationfindservicebynameorid-で返される接続情報についてのメモ>BotConfiguration#findServiceByNameOrId() で返される接続情報についてのメモ</h3>
+<p><code>BotConfiguration#findServiceByNameOrId()</code> で返される各サービスの接続情報に何が含まれるかは、下記の TypeScript のクラスとして定義されています。</p>
+<ul>
+<li><a href="https://docs.microsoft.com/en-us/javascript/api/botframework-config/endpointservice?view=botbuilder-ts-latest">EndpointService class</a>
+<ul>
+<li><code>appId</code>、<code>appPassword</code>、<code>endpoint</code> プロパティなどを持つ。</li>
+</ul>
+</li>
+<li><a href="https://docs.microsoft.com/en-us/javascript/api/botframework-config/luisservice?view=botbuilder-ts-latest">LuisService class</a>
+<ul>
+<li><code>appId</code>、<code>authoringKey</code>、<code>region</code>、<code>subscriptionKey</code>、<code>version</code> プロパティ、<code>getEndpoint()</code> メソッドなどを持つ。</li>
+<li><code>getEndpoint()</code> メソッドの戻り値を使用すれば、通常は <code>region</code> や <code>version</code> プロパティの値を個別に参照する必要はない。</li>
+<li><code>authoringKey</code> は管理用のキーなので、<strong>実運用では <code>subscriptionKey</code> を LUIS のエンドポイントキーとして使用する</strong>こと。</li>
+</ul>
+</li>
+<li><a href="https://docs.microsoft.com/en-us/javascript/api/botframework-config/qnamakerservice?view=botbuilder-ts-latest">QnaMakerService class</a>
+<ul>
+<li><code>endpointKey</code>、<code>hostname</code>、<code>kbId</code>、<code>subscriptionKey</code> プロパティなどを持つ。</li>
+<li><code>subscriptionKey</code> は管理用のキーなので、<strong>実運用では <code>endpointKey</code> を QnA Maker のエンドポイントキーとして使用する</strong>こと。</li>
+</ul>
+</li>
+</ul>
+<p>LUIS と QnAMaker のキーはそれぞれ 2 種類ずつあって、どちらを実際のエンドポイントキーとして使用するかは注意すべきポイントです。
+キーの区別がよくわからなくなってきた場合は、こちらの記事「<a href=../../p/8myms6s>LUIS と QnA Maker でキーの管理方法が異なるのはなぜか？</a>」を参照してください。</p>
+<p><code>findServiceByNameOrId()</code> の返すオブジェクトには、各種サービスの API を利用するために必要十分な情報が含まれていますが、<code>.bot</code> ファイルに記述した内容をすべて取得できるというわけではないことに注意してください。</p>
+<p>他にも、<a href="https://docs.microsoft.com/en-us/javascript/api/botframework-config/dispatchservice?view=botbuilder-ts-latest">DispatchService</a>、<a href="https://docs.microsoft.com/en-us/javascript/api/botframework-config/fileservice?view=botbuilder-ts-latest">FileService</a>、<a href="https://docs.microsoft.com/en-us/javascript/api/botframework-config/cosmosdbservice?view=botbuilder-ts-latest">CosmosDbService</a>、<a href="https://docs.microsoft.com/en-us/javascript/api/botframework-config/blobstorageservice?view=botbuilder-ts-latest">BlobStorageService</a> など、サービスタイプに応じたクラスが定義されています。
+サービスタイプの一覧は、<a href="https://docs.microsoft.com/en-us/javascript/api/botframework-config/servicetypes?view=botbuilder-ts-latest">ServiceType enum の定義</a>を見れば分かるでしょう。</p>
+<h2 id=使用例>使用例</h2>
+<p>上記の <code>config.js</code> で取得した接続情報の使用例です。
+ボットコード全体を示すと長大になってしまうので、ここでは、<strong><code>BotFrameworkAdapter</code></strong>、<strong><code>LuisRecgonizer</code></strong>、<strong><code>QnAMaker</code></strong> クラスのインスタンスを作成する部分を抜粋して示します。</p>
+<h3 id=botframeworkadapter-の初期化>BotFrameworkAdapter の初期化</h3>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=kr>const</span> <span class=p>{</span> <span class=nx>BotFrameworkAdapter</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;botbuilder&#39;</span><span class=p>);</span>
+<span class=kr>const</span> <span class=nx>config</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;./config.js&#39;</span><span class=p>);</span>
+
+<span class=kr>const</span> <span class=nx>adapter</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>BotFrameworkAdapter</span><span class=p>(</span><span class=nx>config</span><span class=p>.</span><span class=nx>loadBotEndpoint</span><span class=p>());</span></code></pre></div></div>
+</figure>
+<h3 id=luisrecognizer-の初期化>LuisRecognizer の初期化</h3>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=kr>const</span> <span class=p>{</span> <span class=nx>LuisRecognizer</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;botbuilder-ai&#39;</span><span class=p>);</span>
+<span class=kr>const</span> <span class=nx>config</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;./config.js&#39;</span><span class=p>);</span>
+<span class=kr>const</span> <span class=nx>LUIS_APP_NAME</span> <span class=o>=</span> <span class=s1>&#39;your-luis-app-name&#39;</span><span class=p>;</span>
+
+<span class=kr>const</span> <span class=nx>luisEndpoint</span> <span class=o>=</span> <span class=nx>config</span><span class=p>.</span><span class=nx>loadLuisEndpoint</span><span class=p>(</span><span class=nx>LUIS_APP_NAME</span><span class=p>);</span>
+<span class=kr>const</span> <span class=nx>luisOptions</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>includeAllIntents</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+  <span class=nx>log</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+  <span class=nx>staging</span><span class=o>:</span> <span class=kc>false</span>
+<span class=p>};</span>
+<span class=kr>const</span> <span class=nx>luisRecognizer</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>LuisRecognizer</span><span class=p>(</span><span class=nx>luisEndpoint</span><span class=p>,</span> <span class=nx>luisOptions</span><span class=p>,</span> <span class=kc>true</span><span class=p>);</span></code></pre></div></div>
+</figure>
+<h3 id=qnamaker-の初期化>QnAMaker の初期化</h3>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=kr>const</span> <span class=p>{</span> <span class=nx>QnAMaker</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;botbuilder-ai&#39;</span><span class=p>);</span>
+<span class=kr>const</span> <span class=nx>config</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;./config.js&#39;</span><span class=p>);</span>
+<span class=kr>const</span> <span class=nx>QNA_APP_NAME</span> <span class=o>=</span> <span class=s1>&#39;your-qna-app-name&#39;</span><span class=p>;</span>
+
+<span class=kr>const</span> <span class=nx>qnaEndpoint</span> <span class=o>=</span> <span class=nx>config</span><span class=p>.</span><span class=nx>loadQnaEndpoint</span><span class=p>(</span><span class=nx>QNA_APP_NAME</span><span class=p>);</span>
+<span class=kr>const</span> <span class=nx>qnaOptions</span> <span class=o>=</span> <span class=p>{};</span>
+<span class=kr>const</span> <span class=nx>qnaMaker</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>QnAMaker</span><span class=p>(</span><span class=nx>qnaEndpoint</span><span class=p>,</span> <span class=nx>qnaOptions</span><span class=p>);</span></code></pre></div></div>
+</figure>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=../../p/8choj4w/>チャットボット: MS Bot Framework の .bot ファイルで接続情報を管理する</a></li>
+<li><a href=../../p/iob68qa/>チャットボット: Azure ポータルで生成されるボットのテンプレートコードを解読＆リファクタしてみる</a></li>
+<li><a href=../../p/bpqkm2o/>チャットボット (2-2) Web App Bot で生成されたボットのコードを編集する</a></li>
+<li><a href=../../p/gxm9shf/>チャットボット (2-3) Azure の Web App Bot リソースにボットをデプロイする</a></li>
+<li><a href=../../p/tttou4o/>チャットボット (2-1) Azure でボットをホストするための Web App Bot リソースを作成する</a></li>
+<li><a href=../../p/tzaeb9x/>チャットボット (1-1) Bot Builder SDK とは</a></li>
+<li><a href=../../p/you6q5r/>チャットボット (1-2) Bot Builder SDK で Echo ボットを作成する</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/azure>Azure</a></span>
+<span class=xPageTags_item><a href=../../tags/chatbot>Chatbot</a></span>
+<span class=xPageTags_item><a href=../../tags/bot-builder-sdk>Bot Builder SDK</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=../../p/k43zbd8/><span class=xArticle_up_label>チャットボットの作り方</span><br>へ戻る</a>
+</div>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_prev>
+<a href=../../p/8choj4w/>チャットボット: MS Bot Framework の .bot ファイルで接続情報を管理する</a>
+</div>
+<div class=xPrevNextLink_next>
+<a href=../../p/asuzg7k/>作成したチャットボットを LINE に接続する</a>
+</div>
+</div>
+</aside>
+</article>
+<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
+</main>
+</div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/vrhjtds/>Azure</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/k43zbd8/>チャットボット</a>
+</span>
+<span class=xBreadcrumb_item>チャットボット: LUIS や QnA Maker サービスへの接続情報を .bot ファイルから取得する
+</span>
+</div>
+</aside>
+<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
+<div id=xSiteFooter2>
+<a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
+</div>
+</div>
+<script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c];b.setAttribute('target','_blank'),b.setAttribute('rel','noopener');const d=b.getElementsByTagName('img');if(d.length>0)continue;b.classList.add('xExternalLinkIcon')}})</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"Azure","item":"https://maku.blog/p/vrhjtds/"},{"@type":"ListItem","position":4,"name":"チャットボット","item":"https://maku.blog/p/k43zbd8/"},{"@type":"ListItem","position":5,"name":"チャットボット: LUIS や QnA Maker サービスへの接続情報を .bot ファイルから取得する","item":"https://maku.blog/p/o2bqajv/"}]}</script>
+</body>
+</html>

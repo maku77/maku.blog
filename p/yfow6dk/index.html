@@ -1,0 +1,893 @@
+<!doctype html><html lang=ja-jp>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>ESLint + Prettier の設定方法まとめ｜まくろぐ</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
+<meta property="og:title" content="ESLint + Prettier の設定方法まとめ">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maku.blog/p/yfow6dk/">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://maku.blog/assets/img/site-logo-large.png">
+<meta property="og:description" content="ここでは、とにかく混乱しがちな ESLint + Prettier の設定方法をまとめておきます。 まず、基本的な構成として、TypeScript (with React) の Lint をかけられるようにして、必要に応じて Airbnb スタイル を追加で設定する、という流れにしたいと思います。
+TypeScript プロジェクトの準備 前提条件として、TypeScript (+ React) のプロジェクト自体は作成済みとします。 何も準備できていなければ、Next.js の create-next-app コマンドを使うと簡単に作成できます（typescript および @types/node、@types/react、@types/react-dom などの型情報が導入された状態のプロジェクトが作成されます）。
+2 つやり方あるけど、大体中身は同じ # テンプレートを使う方法 $ create-next-app myapp --example with-typescript # typescript オプションを使う方法 $ create-next-app myapp --typescript  参考リンク  Next.js で HelloWorld（プロジェクト作成からサーバー起動まで） Next.js のプロジェクトを TypeScript 化する   Prettier + ESLint の基本設定 (for TypeScript with React) 必要なパッケージのインストール # Prettier 本体 $ yarn add --dev --exact prettier # ESLint 本体 $ yarn add --dev eslint # ESLint 用のプラグインおよび共有設定 $ yarn add --dev @typescript-eslint/eslint-plugin $ yarn add --dev @typescript-eslint/parser $ yarn add --dev eslint-plugin-react $ yarn add --dev eslint-plugin-react-hooks $ yarn add --dev eslint-config-prettier # npm スクリプトの並列実行用 $ yarn add --dev yarn-run-all  npm の場合 # Prettier 本体 $ npm install prettier --save-dev --save-exact # ESLint 本体 $ npm install eslint --save-dev # ESLint 用のプラグインおよび共有設定 $ npm install @typescript-eslint/eslint-plugin --save-dev $ npm install @typescript-eslint/parser --save-dev $ npm install eslint-plugin-react --save-dev $ npm install eslint-plugin-react-hooks --save-dev $ npm install eslint-config-prettier --save-dev # npm スクリプトの並列実行用 $ npm install npm-run-all --save-dev    .">
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
+<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
+<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
+<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
+<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
+<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
+</head>
+<body>
+<div id=xRoot>
+<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/ujqinda/>プログラミング</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/gqo9yoo/>TypeScript</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/tx6md39/>環境/設定</a>
+</span>
+<span class=xBreadcrumb_item>ESLint (3) ESLint + Prettier の設定方法まとめ
+</span>
+</div>
+</aside>
+<div id=xContainer>
+<nav id=xMenu aria-label=メニュー>
+<div id=sidebar style=height:100%>
+<div id=sidebar_notFixed>
+<a href=../../><img src=../../assets/img/site-logo.png></a>
+<div class=xMenu_box data-sticky>
+<form action=https://cse.google.com/cse target=_blank>
+<div class=xSearchBox>
+<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<input type=hidden name=ie value=UTF-8>
+<input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
+<input type=submit value=検索></input>
+</div>
+</form>
+<div class=xMenu_box_body>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
+<div class=xMenu_box_body>
+<div class=xBoxLink>
+<a href=../../p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う
+<time>2022-03-17</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ryq6it6/>NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ
+<time>2022-03-16</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/un3gu8m/>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする
+<time>2022-02-27</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/m4dmu4c/>Next.js でブラウザ履歴で戻るボタンを表示する (router.back)
+<time>2022-02-22</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ter3doz/>Linuxメモ: Bluetooth 関連コマンドのメモ (hciconfig, bluetoothctl)
+<time>2022-02-20</time></a>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title>フォルダ</h3>
+<div class=xMenu_box_body>
+<div class=xNavTree>
+<ul>
+<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/d7p5jye/>React</a>
+<li><a class=xNavTree-dir href=../../p/gqo9yoo/>TypeScript</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/tx6md39/>環境/設定</a>
+<ul>
+</ul>
+<li><a class=xNavTree-dir href=../../p/u53q2qi/>モジュール</a>
+<li><a class=xNavTree-dir href=../../p/hrgu4dk/>型／タイプアノテーション</a>
+<li><a class=xNavTree-dir href=../../p/7wnt5qf/>サンプルコード</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/5398aih/>Android プログラミング</a>
+<li><a class=xNavTree-dir href=../../p/zkw9ju6/>Electron</a>
+<li><a class=xNavTree-dir href=../../p/7zhxet9/>Java</a>
+<li><a class=xNavTree-dir href=../../p/kevbq7k/>正規表現</a>
+<li><a class=xNavTree-dir href=../../p/g3gs5gs/>Unity</a>
+<li><a class=xNavTree-dir href=../../p/qapsyfa/>3D</a>
+<li><a class=xNavTree-dir href=../../p/qikq9o8/>MongoDB</a>
+<li><a class=xNavTree-dir href=../../p/sfs4fq2/>プログラム雑多メモ</a>
+<li><a class=xNavTree-dir href=../../p/4vcr8ji/>Jade</a>
+<li><a class=xNavTree-dir href=../../p/ce8c2q5/>Doxygen</a>
+<li><a class=xNavTree-dir href=../../p/p3z9bup/>アルゴリズム</a>
+<li><a class=xNavTree-dir href=../../p/zff2scf/>SQL</a>
+<li><a class=xNavTree-dir href=../../p/8zhwcq6/>C/C++</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
+<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
+<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
+<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
+<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
+<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
+<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
+<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
+<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
+<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
+<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
+<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
+<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
+<li><a class=xNavTree-dir href=../../p/uo7n4ix/>PowerShell</a>
+<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
+<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
+<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
+<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
+<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
+<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
+<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
+<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
+<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
+<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
+</ul>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
+<div class=xMenu_box_body><div class=xMenu_tag>
+<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (79)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure>azure (58)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/typescript>typescript (57)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws>aws (51)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/next.js>next.js (36)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/chatbot>chatbot (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/react>react (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/gnuplot>gnuplot (27)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github>github (23)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/graphql>graphql (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/node.js>node.js (17)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/electron>electron (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/linux>linux (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vs-code>vs-code (14)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/javascript>javascript (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mongodb>mongodb (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cdk>aws/cdk (12)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/android>android (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/java>java (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/nginx>nginx (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/python>python (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/uml>uml (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/3d>3d (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/lambda>aws/lambda (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sam>aws/sam (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unity>unity (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webgl>webgl (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-cli>azure-cli (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jade>jade (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apollo>apollo (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cognito>aws/cognito (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-storage>azure-storage (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/doxygen>doxygen (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase>firebase (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/luis>luis (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/material-ui>material-ui (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/qna-maker>qna-maker (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ansible>ansible (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cli>aws/cli (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/ssm>aws/ssm (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/c/c++>c/c++ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/eslint>eslint (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/firestore>firebase/firestore (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html/css>html/css (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sql>sql (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/windows>windows (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-functions>azure-functions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/cosmos-db>cosmos-db (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-actions>github-actions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-pages>github-pages (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jekyll>jekyll (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/kotlin>kotlin (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mac>mac (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/powershell>powershell (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/prettier>prettier (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sqlite>sqlite (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/textlint>textlint (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tv>tv (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apache>apache (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/arib>arib (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/amplify>aws/amplify (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/iam>aws/iam (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/kms>aws/kms (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/s3>aws/s3 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sdk>aws/sdk (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-app-service>azure-app-service (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/excel>excel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/hugo>hugo (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/npm>npm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/oauth>oauth (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/opengl>opengl (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/rsync>rsync (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/scp>scp (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/slack>slack (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teraterm>teraterm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unicode>unicode (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vercel>vercel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/zip>zip (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/.net>.net (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/androidstudio>androidstudio (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/atomic-design>atomic-design (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/blender>blender (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bluetooth>bluetooth (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bootstrap>bootstrap (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-framework>bot-framework (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/boto3>boto3 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/css>css (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dns>dns (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dvb>dvb (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/editorconfig>editorconfig (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/evernote>evernote (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/git>git (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/groovy>groovy (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html>html (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/iso>iso (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/json>json (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/macos>macos (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/parcel>parcel (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/raspberrypi>raspberrypi (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ssh>ssh (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teams>teams (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tex>tex (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ubuntu>ubuntu (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vim>vim (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/web>web (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webpack>webpack (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/wsl>wsl (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
+</div></div>
+</div>
+<div class=xMenu_box data-sticky><br></div>
+</div>
+<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
+</div>
+</div>
+</nav>
+<main id=xMain>
+<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_prev>
+<a href=../../p/j6iu7it/>ESLint (2) 設定ファイル (.eslintrc) の各プロパティの意味を理解する</a>
+</div>
+<div class=xPrevNextLink_next>
+<a href=../../p/dexgg8o/>ESLint (4) ESLint の設定方法まとめ (for Next.js 11)</a>
+</div>
+</div>
+</aside>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/ujqinda/>プログラミング</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/gqo9yoo/>TypeScript</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/tx6md39/>環境/設定</a></span></div>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/yfow6dk/>ESLint + Prettier の設定方法まとめ</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/eslint>ESLint</a></span>
+<span class=xPageTags_item><a href=../../tags/prettier>Prettier</a></span>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2021-05-23>2021-05-23</time><br>
+作成: <time itemprop=datePublished datetime=2021-05-23>2021-05-23</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#typescript-プロジェクトの準備>TypeScript プロジェクトの準備</a></li>
+<li><a href=#prettier--eslint-の基本設定-for-typescript-with-react>Prettier + ESLint の基本設定 (for TypeScript with React)</a></li>
+<li><a href=#tstsx-ファイルを-src-ディレクトリにまとめる>ts/tsx ファイルを src ディレクトリにまとめる</a></li>
+<li><a href=#ここまでの結果をテンプレートにする>ここまでの結果をテンプレートにする</a></li>
+<li><a href=#airbnb-スタイルを追加導入する>Airbnb スタイルを追加導入する</a></li>
+<li><a href=#eslint-と-prettier-の設定で気を付けること>ESLint と Prettier の設定で気を付けること</a>
+<ul>
+<li><a href=#typescript-型情報のチェックを-eslint-で行う>TypeScript 型情報のチェックを ESLint で行う</a></li>
+<li><a href=#typescript--prettier-の設定は後ろへ>TypeScript / Prettier の設定は後ろへ</a></li>
+<li><a href=#airbnb-スタイルは-react-込み>Airbnb スタイルは React 込み</a></li>
+<li><a href=#eslint-config-airbnb-が依存するパッケージを調べる>eslint-config-airbnb が依存するパッケージを調べる</a></li>
+</ul>
+</li>
+</ul>
+</nav><p>ここでは、とにかく混乱しがちな <strong>ESLint + Prettier</strong> の設定方法をまとめておきます。
+まず、基本的な構成として、<strong>TypeScript (with React)</strong> の Lint をかけられるようにして、<strong>必要に応じて Airbnb スタイル</strong> を追加で設定する、という流れにしたいと思います。</p>
+<h2 id=typescript-プロジェクトの準備>TypeScript プロジェクトの準備</h2>
+<p>前提条件として、TypeScript (+ React) のプロジェクト自体は作成済みとします。
+何も準備できていなければ、Next.js の <code>create-next-app</code> コマンドを使うと簡単に作成できます（<code>typescript</code> および <code>@types/node</code>、<code>@types/react</code>、<code>@types/react-dom</code> などの型情報が導入された状態のプロジェクトが作成されます）。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>2 つやり方あるけど、大体中身は同じ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain># テンプレートを使う方法
+$ create-next-app myapp --example with-typescript
+
+# typescript オプションを使う方法
+$ create-next-app myapp --typescript</code></pre></div></div>
+</figure>
+<div style="border:solid 1px #ccc;border-radius:.5em;background:#eee;padding:.5em">
+<h2 style="font-size:1rem;margin:.3em .5em;color:#333">参考リンク</h2>
+<ul>
+<li><a href=../../p/ubmu3bj>Next.js で HelloWorld（プロジェクト作成からサーバー起動まで）</a></li>
+<li><a href=../../p/ny9fmty>Next.js のプロジェクトを TypeScript 化する</a></li>
+</ul>
+</div>
+<h2 id=prettier--eslint-の基本設定-for-typescript-with-react>Prettier + ESLint の基本設定 (for TypeScript with React)</h2>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>必要なパッケージのインストール</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain># Prettier 本体
+$ yarn add --dev --exact prettier
+
+# ESLint 本体
+$ yarn add --dev eslint
+
+# ESLint 用のプラグインおよび共有設定
+$ yarn add --dev @typescript-eslint/eslint-plugin
+$ yarn add --dev @typescript-eslint/parser
+$ yarn add --dev eslint-plugin-react
+$ yarn add --dev eslint-plugin-react-hooks
+$ yarn add --dev eslint-config-prettier
+
+# npm スクリプトの並列実行用
+$ yarn add --dev yarn-run-all</code></pre></div></div>
+</figure>
+<div class=xAccordion>
+<input id=id-467312958 type=checkbox>
+<label class=xAccordion_title for=id-467312958>npm の場合</label>
+<div class=xAccordion_body>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain># Prettier 本体
+$ npm install prettier --save-dev --save-exact
+
+# ESLint 本体
+$ npm install eslint --save-dev
+
+# ESLint 用のプラグインおよび共有設定
+$ npm install @typescript-eslint/eslint-plugin --save-dev
+$ npm install @typescript-eslint/parser --save-dev
+$ npm install eslint-plugin-react --save-dev
+$ npm install eslint-plugin-react-hooks --save-dev
+$ npm install eslint-config-prettier --save-dev
+
+# npm スクリプトの並列実行用
+$ npm install npm-run-all --save-dev</code></pre></div></div>
+</figure>
+</div>
+</div>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>.prettierrc（必要に応じて Prettier フォーマット設定）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>semi</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w> </span><span class=c># 行末のセミコロンは省略する</span><span class=w>
+</span><span class=w></span><span class=nt>singleQuote</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w> </span><span class=c># 引用符にはシングルクォートを使う</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>.prettierignore（Prettier の無視設定）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>.next/
+build/
+*.html</code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>.eslintrc.yml（ESLint 設定）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>root</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w></span><span class=nt>env</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>browser</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>  </span><span class=nt>es2021</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w></span><span class=nt>extends</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span>- <span class=l>eslint:recommended</span><span class=w>
+</span><span class=w>  </span>- <span class=l>plugin:react/recommended</span><span class=w>
+</span><span class=w>  </span>- <span class=l>plugin:react-hooks/recommended</span><span class=w>
+</span><span class=w>  </span>- <span class=l>plugin:@typescript-eslint/recommended</span><span class=w>
+</span><span class=w>  </span>- <span class=l>plugin:@typescript-eslint/recommended-requiring-type-checking</span><span class=w>
+</span><span class=w>  </span>- <span class=l>prettier</span><span class=w>
+</span><span class=w></span><span class=nt>parser</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;@typescript-eslint/parser&#34;</span><span class=w>
+</span><span class=w></span><span class=nt>parserOptions</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>ecmaVersion</span><span class=p>:</span><span class=w> </span><span class=m>12</span><span class=w>
+</span><span class=w>  </span><span class=nt>ecmaFeatures</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=nt>jsx</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>  </span><span class=nt>project</span><span class=p>:</span><span class=w> </span><span class=l>./tsconfig.json</span><span class=w>
+</span><span class=w></span><span class=nt>plugins</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span>- <span class=l>react</span><span class=w>
+</span><span class=w>  </span>- <span class=l>react-hooks</span><span class=w>
+</span><span class=w>  </span>- <span class=s2>&#34;@typescript-eslint&#34;</span><span class=w>
+</span><span class=w></span><span class=nt>rules</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>react/react-in-jsx-scope</span><span class=p>:</span><span class=w> </span><span class=kc>off</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>package.json（npm スクリプト設定）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=c1>// ...
+</span><span class=c1></span>  <span class=nx>scripts</span><span class=o>:</span> <span class=p>{</span>
+    <span class=s2>&#34;lint&#34;</span><span class=o>:</span> <span class=s2>&#34;run-p -c lint:prettier lint:eslint lint:tsc&#34;</span><span class=p>,</span>
+    <span class=s2>&#34;lint:prettier&#34;</span><span class=o>:</span> <span class=s2>&#34;prettier --check .&#34;</span><span class=p>,</span>
+    <span class=s2>&#34;lint:eslint&#34;</span><span class=o>:</span> <span class=s2>&#34;eslint . --ext .ts,.tsx&#34;</span><span class=p>,</span>
+    <span class=s2>&#34;lint:tsc&#34;</span><span class=o>:</span> <span class=s2>&#34;tsc&#34;</span><span class=p>,</span>
+    <span class=s2>&#34;fix&#34;</span><span class=o>:</span> <span class=s2>&#34;run-s fix:prettier fix:eslint&#34;</span><span class=p>,</span>
+    <span class=s2>&#34;fix:prettier&#34;</span><span class=o>:</span> <span class=s2>&#34;prettier --write .&#34;</span><span class=p>,</span>
+    <span class=s2>&#34;fix:eslint&#34;</span><span class=o>:</span> <span class=s2>&#34;eslint . --ext .ts,.tsx --fix&#34;</span><span class=p>,</span></code></pre></div></div>
+</figure>
+<p>これで、次のようにして Prettier + ESLint による Lint チェックと自動修正をかけられるようになります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Prettier と ESLint の実行</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain># yarn の場合
+$ yarn lint  # Lint チェック
+$ yarn fix   # 自動修正
+
+# npm の場合
+$ npm run lint  # Lint チェック
+$ npm run fix   # 自動修正</code></pre></div></div>
+</figure>
+<p><code>fix</code> を実行すると多数のファイルが自動修正されることになるので、<code>lint</code> が実行できた段階で、一度 Git へ設定をコミットしておくことをオススメします。</p>
+<h2 id=tstsx-ファイルを-src-ディレクトリにまとめる>ts/tsx ファイルを src ディレクトリにまとめる</h2>
+<p><a href=https://nextjs.org/blog/next-9-1>Next.js 9.1</a> からは、<code>pages</code> ディレクトリを <strong><code>src/pages</code></strong> というパスで作成できるようになりました。
+<code>next</code> コマンドは、プロジェクトのルートに <code>pages</code> が見つからないとき、<code>src/pages</code> を参照してくれます。</p>
+<p>この仕組みを利用すると、<code>.ts</code>、<code>.tsx</code> ファイルは全て <code>src</code> ディレクトリ以下にまとめられるので、プロジェクトのルートディレクトリがスッキリします。
+ただし、<code>tsconfig.json</code> や <code>public</code> ディレクトリは、これまで通りルートディレクトリに配置する必要があります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>.ts/.tsx ファイルの入ったディレクトリを src 以下にまとめる</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ mkdir src
+$ git mv components src
+$ git mv interfaces src
+$ git mv pages src
+$ git mv utils src</code></pre></div></div>
+</figure>
+<p>あとは、各種コマンドの対象パスなどを変更すれば OK です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>package.json</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-diff data-lang=diff>   &#34;scripts&#34;: {
+     &#34;lint&#34;: &#34;run-p -c lint:prettier lint:eslint lint:tsc&#34;,
+<span class=gd>-    &#34;lint:prettier&#34;: &#34;prettier --check .&#34;,
+</span><span class=gd>-    &#34;lint:eslint&#34;: &#34;eslint . --ext .ts,.tsx&#34;,
+</span><span class=gd></span><span class=gi>+    &#34;lint:prettier&#34;: &#34;prettier --check src&#34;,
+</span><span class=gi>+    &#34;lint:eslint&#34;: &#34;eslint src --ext .ts,.tsx&#34;,
+</span><span class=gi></span>     &#34;lint:tsc&#34;: &#34;tsc&#34;,
+     &#34;fix&#34;: &#34;run-s fix:prettier fix:eslint&#34;,
+<span class=gd>-    &#34;fix:prettier&#34;: &#34;prettier --write .&#34;,
+</span><span class=gd>-    &#34;fix:eslint&#34;: &#34;eslint . --ext .ts,.tsx --fix&#34;,
+</span><span class=gd></span><span class=gi>+    &#34;fix:prettier&#34;: &#34;prettier --write src&#34;,
+</span><span class=gi>+    &#34;fix:eslint&#34;: &#34;eslint src --ext .ts,.tsx --fix&#34;,
+</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>tsconfig.json</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-diff data-lang=diff>     &#34;target&#34;: &#34;esnext&#34;
+   },
+   &#34;exclude&#34;: [&#34;node_modules&#34;],
+<span class=gd>-  &#34;include&#34;: [&#34;**/*.ts&#34;, &#34;**/*.tsx&#34;]
+</span><span class=gd></span><span class=gi>+  &#34;include&#34;: [&#34;src/**/*.ts&#34;, &#34;src/**/*.tsx&#34;]
+</span><span class=gi></span> }
+</code></pre></div></div>
+</figure>
+<h2 id=ここまでの結果をテンプレートにする>ここまでの結果をテンプレートにする</h2>
+<p>ここで作成したプロジェクトを GitHub にプッシュしておけば、<code>create-next-app</code> コマンドのテンプレートとして使用できるようになります。
+次のように、<strong><code>--example</code></strong> オプションで GitHub リポジトリの URL を指定するだけで OK です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>例: TypeScript、ESLint、Prettier 設定済みのプロジェクトを生成</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ create-next-app myapp --example \
+  https://github.com/maku77/template-nextjs-ts-eslint-prettier</code></pre></div></div>
+</figure>
+<h2 id=airbnb-スタイルを追加導入する>Airbnb スタイルを追加導入する</h2>
+<p>JavaScript のコーディングスタイルとしては、Airbnb のスタイルが有名です。
+ここでは、前述の基本的な ESLint + Prettier 設定が終わっている想定で、追加で Airbnb スタイルを導入してみます。</p>
+<p>Airbnb は ESLint 用の <a href=https://www.npmjs.com/package/eslint-config-airbnb>eslint-config-airbnb</a> 共有設定を用意しているのですが、これをそのまま使うと TypeScript 用のカスタマイズが厄介なので、最初から TypeScript 用の対応が入った <a href=https://www.npmjs.com/package/eslint-config-airbnb-typescript>eslint-config-airbnb-typescript</a> を使うことにします。</p>
+<p>公式サイトを見ると、<code>eslint-config-airbnb-typescript</code> の依存パッケージとして下記が必要ということが分かるので、まだインストールしていないものを追加でインストールします。</p>
+<ul>
+<li>eslint-plugin-import</li>
+<li>eslint-plugin-jsx-a11y</li>
+<li>eslint-plugin-react （インストール済み）</li>
+<li>eslint-plugin-react-hooks （インストール済み）</li>
+<li>@typescript-eslint/eslint-plugin （インストール済み）</li>
+</ul>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>eslint-config-airbnb-typescript のインストール</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ yarn add --dev eslint-config-airbnb-typescript
+$ yarn add --dev eslint-plugin-import
+$ yarn add --dev eslint-plugin-jsx-a11y</code></pre></div></div>
+</figure>
+<div class=xAccordion>
+<input id=id-865142973 type=checkbox>
+<label class=xAccordion_title for=id-865142973>npm の場合</label>
+<div class=xAccordion_body>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ npm install eslint-config-airbnb-typescript --save-dev
+$ npm install eslint-plugin-import --save-dev
+$ npm install eslint-plugin-jsx-a11y --save-dev</code></pre></div></div>
+</figure>
+</div>
+</div>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>.eslintrc.yml（airbnb-typescript を使うよう修正）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>root</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w></span><span class=nt>env</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>browser</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>  </span><span class=nt>es2021</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w></span><span class=nt>extends</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span>- <span class=l>airbnb-typescript</span><span class=w>
+</span><span class=w>  </span>- <span class=l>prettier</span><span class=w>
+</span><span class=w></span><span class=nt>parser</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;@typescript-eslint/parser&#34;</span><span class=w>
+</span><span class=w></span><span class=nt>parserOptions</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>ecmaFeatures</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=nt>jsx</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>  </span><span class=nt>ecmaVersion</span><span class=p>:</span><span class=w> </span><span class=m>12</span><span class=w>
+</span><span class=w>  </span><span class=nt>project</span><span class=p>:</span><span class=w> </span><span class=l>./tsconfig.json</span><span class=w>
+</span><span class=w></span><span class=nt>plugins</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span>- <span class=l>react</span><span class=w>
+</span><span class=w>  </span>- <span class=s2>&#34;@typescript-eslint&#34;</span><span class=w>
+</span><span class=w></span><span class=nt>rules</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>react/react-in-jsx-scope</span><span class=p>:</span><span class=w> </span><span class=kc>off</span><span class=w>  </span><span class=c># JSX 用の React インポートエラー抑制</span></code></pre></div></div>
+</figure>
+<p>実行方法はこれまで通りで変化なしです（<code>npm run lint</code> と <code>npm run fix</code>）。</p>
+<h2 id=eslint-と-prettier-の設定で気を付けること>ESLint と Prettier の設定で気を付けること</h2>
+<p>ESLint および Prettier の設定のポイントや、ハマりがちなことをまとめておきます。</p>
+<h3 id=typescript-型情報のチェックを-eslint-で行う>TypeScript 型情報のチェックを ESLint で行う</h3>
+<p><code>@typescript-eslint/eslint-plugin</code> プラグインが提供する <strong><code>recommended-requiring-type-checking</code></strong> という共有設定を有効にすると、TypeScript の型情報を利用した Lint チェックを行うことができます。
+このとき、内部では TypeScript コンパイラが使用されるため、<strong><code>parserOptions.project</code></strong> で <code>tsconfig.json</code> ファイルの位置を知らせてやる必要があります（指定しないとエラーになります）。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>.eslintrc.yml</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>root</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w></span><span class=nt>parser</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;@typescript-eslint/parser&#39;</span><span class=w>
+</span><span class=w></span><span class=nt>parserOptions</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>ecmaVersion</span><span class=p>:</span><span class=w> </span><span class=m>2021</span><span class=w>
+</span><span class=w>  </span><span class=nt>project</span><span class=p>:</span><span class=w> </span><span class=l>./tsconfig.json </span><span class=w> </span><span class=c># ★型チェックに必要</span><span class=w>
+</span><span class=w></span><span class=nt>plugins</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span>- <span class=s1>&#39;@typescript-eslint&#39;</span><span class=w>
+</span><span class=w></span><span class=nt>extends</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span>- <span class=l>eslint:recommended</span><span class=w>
+</span><span class=w>  </span>- <span class=l>plugin:@typescript-eslint/recommended</span><span class=w>
+</span><span class=w>  </span>- <span class=l>plugin:@typescript-eslint/recommended-requiring-type-checking </span><span class=w> </span><span class=c># ★型チェック</span></code></pre></div></div>
+</figure>
+<p>TypeScript の型チェックを行うよう設定すると、追加で TypeScript コンパイラが動作するようになるため、ESLint の実行に時間がかかるようになります。
+<code>tsconfig.json</code> の情報をそのまま使うのではなく、ESLint 用に <code>tsconfig.eslint.json</code> を作成してパフォーマンス向上させる方法が提案されています。
+いずれにしても、型チェックの仕組みはあまり洗練されているとは言えないので、型チェックに関しては TypeScript コードの <code>tsc</code> ビルド時にだけ行うと割り切ってもいいかもしれません（VS Code デフォルトの検出機能もあります）。</p>
+<div style="border:solid 1px #ccc;border-radius:.5em;background:#eee;padding:.5em">
+<h2 style="font-size:1rem;margin:.3em .5em;color:#333">参考リンク</h2>
+<ul>
+<li><a href=https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/TYPED_LINTING.md>typescript-eslint - Getting Started - Linting with Type Information</a></li>
+</ul>
+</div>
+<h3 id=typescript--prettier-の設定は後ろへ>TypeScript / Prettier の設定は後ろへ</h3>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>.eslintrc.yml</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>plugin</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span>- <span class=l>react</span><span class=w>
+</span><span class=w>  </span>- @<span class=l>typescript-eslint</span><span class=w>
+</span><span class=w></span><span class=nt>extends</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span>- <span class=l>eslint:recommended</span><span class=w>
+</span><span class=w>  </span>- <span class=l>plugin:react/recommended</span><span class=w>
+</span><span class=w>  </span>- <span class=l>plugin:@typescript-eslint/recommended</span><span class=w>
+</span><span class=w>  </span>- <span class=l>plugin:@typescript-eslint/recommended-requiring-type-checking</span></code></pre></div></div>
+</figure>
+<p>TypeScript 用の共有設定 <code>plugin:@typescript-eslint/recommended</code> は、<code>eslint:recommended</code> などにより定義されるルールのうち、TypeScript と競合するものを解決してくれます。
+なので、TypeScript に関する設定は <code>extends</code> の中で最後の方に指定して設定を上書きする必要があります。
+具体的には、<code>plugin:@typescript-eslint/eslint-recommended</code> がこの競合を解決するものであり、<code>plugin:@typescript-eslint/recommended</code> から利用されています。</p>
+<p>同様に、コードフォーマッターの <a href=https://prettier.io/>Prettier</a> を使用する場合は、Prettier が自動修正してくれる部分を ESLint が指摘しないように、一番最後に <a href=https://www.npmjs.com/package/eslint-config-prettier>eslint-config-prettier</a> 関連の共有設定を指定する必要があります。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>extends</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span>- <span class=l>eslint:recommended</span><span class=w>
+</span><span class=w>  </span>- <span class=l>plugin:react/recommended</span><span class=w>
+</span><span class=w>  </span>- <span class=l>plugin:@typescript-eslint/recommended</span><span class=w>
+</span><span class=w>  </span>- <span class=l>plugin:@typescript-eslint/recommended-requiring-type-checking</span><span class=w>
+</span><span class=w>  </span>- <span class=l>prettier</span></code></pre></div></div>
+</figure>
+<div style="border:solid 1px #ccc;border-radius:.5em;background:#eee;padding:.5em">
+<h2 style="font-size:1rem;margin:.3em .5em;color:#333">参考リンク</h2>
+<ul>
+<li><a href=https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/README.md#usage-with-prettier>typescript-eslint/typescript-eslint - Usage with prettier</a></li>
+</ul>
+</div>
+<h3 id=airbnb-スタイルは-react-込み>Airbnb スタイルは React 込み</h3>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>.eslintrc.yml</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-diff data-lang=diff>  extends:
+<span class=gd>-   - eslint:recommended
+</span><span class=gd>-   - plugin:react/recommended
+</span><span class=gd></span><span class=gi>+   - airbnb
+</span><span class=gi>+   - airbnb/hooks
+</span></code></pre></div></div>
+</figure>
+<p><code>extends</code> プロパティで <code>airbnb</code> (<a href=https://www.npmjs.com/package/eslint-config-airbnb>eslint-config-airbnb</a>) を指定する場合、<code>eslint:recommended</code> や <code>plugin:react/recommeded</code> の設定は <code>airbnb</code> 側でほぼカバーされるので、指定する必要はありません。</p>
+<p>逆に、React を使わない場合は、<code>eslint-config-airbnb</code> ではなく <a href=https://www.npmjs.com/package/eslint-config-airbnb-base>eslint-config-airbnb-base</a> の方を使います。</p>
+<h3 id=eslint-config-airbnb-が依存するパッケージを調べる>eslint-config-airbnb が依存するパッケージを調べる</h3>
+<p><code>.eslintrc.*</code> ファイルの <code>extends</code> プロパティで <strong><code>airbnb</code></strong> を指定するには、あらかじめ <a href=https://www.npmjs.com/package/eslint-config-airbnb>eslint-config-airbnb</a> パッケージをインストールするだけでなく、その依存パッケージ (peerDependencies) もインストールしておく必要があります。
+依存パッケージは次のように確認することができます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ npm info &#34;eslint-config-airbnb@latest&#34; peerDependencies
+{
+  eslint: &#39;^5.16.0 || ^6.8.0 || ^7.2.0&#39;,
+  &#39;eslint-plugin-import&#39;: &#39;^2.22.1&#39;,
+  &#39;eslint-plugin-jsx-a11y&#39;: &#39;^6.4.1&#39;,
+  &#39;eslint-plugin-react&#39;: &#39;^7.21.5&#39;,
+  &#39;eslint-plugin-react-hooks&#39;: &#39;^4 || ^3 || ^2.3.0 || ^1.7.0&#39;
+}</code></pre></div></div>
+</figure>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=../../p/j6iu7it/>ESLint の設定ファイル (.eslintrc) の各プロパティの意味を理解する</a></li>
+<li><a href=../../p/xz9iry9/>TypeScript プロジェクトに ESLint を導入する</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/eslint>ESLint</a></span>
+<span class=xPageTags_item><a href=../../tags/prettier>Prettier</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=../../p/tx6md39/><span class=xArticle_up_label>TypeScriptの環境/設定について</span><br>へ戻る</a>
+</div>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_prev>
+<a href=../../p/j6iu7it/>ESLint (2) 設定ファイル (.eslintrc) の各プロパティの意味を理解する</a>
+</div>
+<div class=xPrevNextLink_next>
+<a href=../../p/dexgg8o/>ESLint (4) ESLint の設定方法まとめ (for Next.js 11)</a>
+</div>
+</div>
+</aside>
+</article>
+<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
+</main>
+</div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/ujqinda/>プログラミング</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/gqo9yoo/>TypeScript</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/tx6md39/>環境/設定</a>
+</span>
+<span class=xBreadcrumb_item>ESLint (3) ESLint + Prettier の設定方法まとめ
+</span>
+</div>
+</aside>
+<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
+<div id=xSiteFooter2>
+<a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
+</div>
+</div>
+<script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c];b.setAttribute('target','_blank'),b.setAttribute('rel','noopener');const d=b.getElementsByTagName('img');if(d.length>0)continue;b.classList.add('xExternalLinkIcon')}})</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"プログラミング","item":"https://maku.blog/p/ujqinda/"},{"@type":"ListItem","position":4,"name":"TypeScript","item":"https://maku.blog/p/gqo9yoo/"},{"@type":"ListItem","position":5,"name":"環境/設定","item":"https://maku.blog/p/tx6md39/"},{"@type":"ListItem","position":6,"name":"ESLint (3) ESLint + Prettier の設定方法まとめ","item":"https://maku.blog/p/yfow6dk/"}]}</script>
+</body>
+</html>

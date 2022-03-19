@@ -1,0 +1,754 @@
+<!doctype html><html lang=ja-jp>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>GitHub OAuth トークンを取得する (1) 処理の流れを理解する｜まくろぐ</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
+<meta property="og:title" content="GitHub OAuth トークンを取得する (1) 処理の流れを理解する">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maku.blog/p/ubkt3ai/">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://maku.blog/assets/img/site-logo-large.png">
+<meta property="og:description" content="GitHub の OAuth トークンとは GitHub API を使って GitHub 上の情報（リポジトリ情報やユーザー情報）を取得するには、GitHub によって発行されるアクセストークンが必要です。 GitHub API ver.3 (REST API) ではアクセストークンを必要としない API もありましたが、GitHub API ver.4 (GraphQL API) では必ずアクセストークンが必要です。
+アクセストークンにはいくつか種類があり、GitHub の Web サイト上で作成する パーソナルアクセストークン や、Web アプリの OAuth プロセスで取得する OAuth アクセストークン などがあります。 アクセストークンの取得方法は異なりますが、いずれも取得した後は同じように使用できます。
+ パーソナルアクセストークン : ユーザーが GitHub サイト上で作成 OAuth アクセストークン : Web アプリ内の OAuth プロセスで取得  通常、Web アプリから GitHub API を使用する場合は、後者の OAuth を使用してアクセストークンの取得を自動化します。 ここでは、GitHub の OAuth アクセストークン取得の流れを、実装コードを示しながら説明していきます。
+GitHub の OAuth の流れ (Web application flow) Web アプリから OAuth トークンを取得するまでの流れはざっと次のような感じになります。">
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
+<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
+<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
+<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
+<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
+<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
+</head>
+<body>
+<div id=xRoot>
+<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/5q4fr3d/>GitHub</a>
+</span>
+<span class=xBreadcrumb_item>GitHub OAuth トークンを取得する (1) 処理の流れを理解する
+</span>
+</div>
+</aside>
+<div id=xContainer>
+<nav id=xMenu aria-label=メニュー>
+<div id=sidebar style=height:100%>
+<div id=sidebar_notFixed>
+<a href=../../><img src=../../assets/img/site-logo.png></a>
+<div class=xMenu_box data-sticky>
+<form action=https://cse.google.com/cse target=_blank>
+<div class=xSearchBox>
+<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<input type=hidden name=ie value=UTF-8>
+<input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
+<input type=submit value=検索></input>
+</div>
+</form>
+<div class=xMenu_box_body>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
+<div class=xMenu_box_body>
+<div class=xBoxLink>
+<a href=../../p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う
+<time>2022-03-17</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ryq6it6/>NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ
+<time>2022-03-16</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/un3gu8m/>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする
+<time>2022-02-27</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/m4dmu4c/>Next.js でブラウザ履歴で戻るボタンを表示する (router.back)
+<time>2022-02-22</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ter3doz/>Linuxメモ: Bluetooth 関連コマンドのメモ (hciconfig, bluetoothctl)
+<time>2022-02-20</time></a>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title>フォルダ</h3>
+<div class=xMenu_box_body>
+<div class=xNavTree>
+<ul>
+<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
+<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
+<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
+<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
+<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/ubkahpw/>GitHub GraphQL API のクエリ例</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
+<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
+<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
+<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
+<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
+<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
+<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
+<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
+<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
+<li><a class=xNavTree-dir href=../../p/uo7n4ix/>PowerShell</a>
+<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
+<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
+<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
+<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
+<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
+<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
+<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
+<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
+<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
+<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
+</ul>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
+<div class=xMenu_box_body><div class=xMenu_tag>
+<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (79)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure>azure (58)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/typescript>typescript (57)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws>aws (51)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/next.js>next.js (36)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/chatbot>chatbot (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/react>react (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/gnuplot>gnuplot (27)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github>github (23)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/graphql>graphql (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/node.js>node.js (17)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/electron>electron (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/linux>linux (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vs-code>vs-code (14)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/javascript>javascript (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mongodb>mongodb (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cdk>aws/cdk (12)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/android>android (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/java>java (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/nginx>nginx (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/python>python (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/uml>uml (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/3d>3d (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/lambda>aws/lambda (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sam>aws/sam (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unity>unity (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webgl>webgl (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-cli>azure-cli (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jade>jade (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apollo>apollo (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cognito>aws/cognito (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-storage>azure-storage (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/doxygen>doxygen (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase>firebase (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/luis>luis (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/material-ui>material-ui (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/qna-maker>qna-maker (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ansible>ansible (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cli>aws/cli (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/ssm>aws/ssm (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/c/c++>c/c++ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/eslint>eslint (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/firestore>firebase/firestore (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html/css>html/css (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sql>sql (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/windows>windows (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-functions>azure-functions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/cosmos-db>cosmos-db (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-actions>github-actions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-pages>github-pages (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jekyll>jekyll (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/kotlin>kotlin (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mac>mac (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/powershell>powershell (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/prettier>prettier (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sqlite>sqlite (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/textlint>textlint (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tv>tv (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apache>apache (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/arib>arib (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/amplify>aws/amplify (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/iam>aws/iam (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/kms>aws/kms (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/s3>aws/s3 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sdk>aws/sdk (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-app-service>azure-app-service (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/excel>excel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/hugo>hugo (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/npm>npm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/oauth>oauth (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/opengl>opengl (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/rsync>rsync (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/scp>scp (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/slack>slack (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teraterm>teraterm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unicode>unicode (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vercel>vercel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/zip>zip (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/.net>.net (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/androidstudio>androidstudio (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/atomic-design>atomic-design (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/blender>blender (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bluetooth>bluetooth (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bootstrap>bootstrap (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-framework>bot-framework (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/boto3>boto3 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/css>css (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dns>dns (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dvb>dvb (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/editorconfig>editorconfig (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/evernote>evernote (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/git>git (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/groovy>groovy (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html>html (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/iso>iso (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/json>json (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/macos>macos (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/parcel>parcel (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/raspberrypi>raspberrypi (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ssh>ssh (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teams>teams (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tex>tex (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ubuntu>ubuntu (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vim>vim (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/web>web (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webpack>webpack (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/wsl>wsl (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
+</div></div>
+</div>
+<div class=xMenu_box data-sticky><br></div>
+</div>
+<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
+</div>
+</div>
+</nav>
+<main id=xMain>
+<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_next>
+<a href=../../p/ar2bjs2/>GitHub OAuth トークンを取得する (2) Azure Functions 経由で取得する</a>
+</div>
+</div>
+</aside>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/5q4fr3d/>GitHub</a></span></div>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/ubkt3ai/>GitHub OAuth トークンを取得する (1) 処理の流れを理解する</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/github>GitHub</a></span>
+<span class=xPageTags_item><a href=../../tags/oauth>OAuth</a></span>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2020-08-16>2020-08-16</time><br>
+作成: <time itemprop=datePublished datetime=2020-08-16>2020-08-16</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#github-の-oauth-トークンとは>GitHub の OAuth トークンとは</a></li>
+<li><a href=#github-の-oauth-の流れ-web-application-flow>GitHub の OAuth の流れ (Web application flow)</a>
+<ul>
+<li><a href=#1-github-のログイン画面に遷移>(1) GitHub のログイン画面に遷移</a></li>
+<li><a href=#2-一時コードの取得>(2) 一時コードの取得</a></li>
+<li><a href=#3-アクセストークンの取得>(3) アクセストークンの取得</a></li>
+</ul>
+</li>
+<li><a href=#oauth-アプリの登録>OAuth アプリの登録</a></li>
+<li><a href=#web-アプリの実装>Web アプリの実装</a>
+<ul>
+<li><a href=#1-github-のログイン画面に遷移-1>(1) GitHub のログイン画面に遷移</a></li>
+<li><a href=#2-一時コードの取得-1>(2) 一時コードの取得</a></li>
+<li><a href=#3-アクセストークンの取得-1>(3) アクセストークンの取得</a></li>
+</ul>
+</li>
+<li><a href=#次のステップへ>次のステップへ</a></li>
+</ul>
+</nav>
+<h2 id=github-の-oauth-トークンとは>GitHub の OAuth トークンとは</h2>
+<p>GitHub API を使って GitHub 上の情報（リポジトリ情報やユーザー情報）を取得するには、GitHub によって発行されるアクセストークンが必要です。
+GitHub API ver.3 (REST API) ではアクセストークンを必要としない API もありましたが、GitHub API ver.4 (GraphQL API) では必ずアクセストークンが必要です。</p>
+<p>アクセストークンにはいくつか種類があり、GitHub の Web サイト上で作成する <strong>パーソナルアクセストークン</strong> や、Web アプリの OAuth プロセスで取得する <strong>OAuth アクセストークン</strong> などがあります。
+アクセストークンの取得方法は異なりますが、いずれも取得した後は同じように使用できます。</p>
+<ul>
+<li><b>パーソナルアクセストークン</b>
+: ユーザーが GitHub サイト上で作成</li>
+<li><b>OAuth アクセストークン</b>
+: Web アプリ内の OAuth プロセスで取得</li>
+</ul>
+<p>通常、Web アプリから GitHub API を使用する場合は、後者の OAuth を使用してアクセストークンの取得を自動化します。
+ここでは、GitHub の OAuth アクセストークン取得の流れを、実装コードを示しながら説明していきます。</p>
+<h2 id=github-の-oauth-の流れ-web-application-flow>GitHub の OAuth の流れ (Web application flow)</h2>
+<p>Web アプリから OAuth トークンを取得するまでの流れはざっと次のような感じになります。</p>
+<h3 id=1-github-のログイン画面に遷移>(1) GitHub のログイン画面に遷移</h3>
+<p>Web アプリから次のようなアドレスで GitHub のログインページにジャンプします。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>https://github.com/login/oauth/authorize?client_id=XXX&amp;scope=YYY`</code></pre></div></div>
+</figure>
+<p>すると、GitHub のサイト上で、この Web アプリに情報を提供してもいいかの確認が表示されるので、ここでユーザーが OK すると、あらかじめ登録してあったコールバックアドレスに Web ブラウザがリダイレクトされます。
+OAuth アプリの登録方法に関しては後述しますが、上記 URL の <code>client_id</code> パラメータには登録済みの OAuth アプリの ID を指定し、<code>scope</code> パラメータには取得したい情報のスコープ（<code>repo</code> や <code>user</code>）を指定します。</p>
+<h3 id=2-一時コードの取得>(2) 一時コードの取得</h3>
+<p>GitHub からのリダイレクト要求により、リダイレクト先のページ（自分の Web サイト内）に Web ブラウザが自動的にジャンプします。
+このとき、URL の末尾にアクセストークン取得用の一時コード (temporary code) が次のような形で付いてきます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>http://localhost:1234?code=ABCDEABCDEABCDE</code></pre></div></div>
+</figure>
+<p>この <strong>一時コードはアクセストークンではない</strong> ので注意してください。
+アクセストークンは、後述の HTTP POST メソッドで、一時コードを送ることで取得することができます。</p>
+<p>この段階では、JavaScript などで URL をパースし、一時コードを抽出しておきます。
+<strong>一時コードの有効期間は 10 分間</strong> とされているので、すぐにアクセストークンを取得する必要があります。
+アクセストークンの方は Revoke されるまで有効です。</p>
+<h3 id=3-アクセストークンの取得>(3) アクセストークンの取得</h3>
+<p>前のステップで取得した一時コードを使って、次のアドレスに <strong>POST</strong> リクエストを送ると、晴れて OAuth アクセストークンを取得することができます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>https://github.com/login/oauth/access_token</code></pre></div></div>
+</figure>
+<p>POST リクエストには、次のようなパラメータを含めておく必要があります。</p>
+<ul>
+<li><b>client_id</b>
+&mldr; 登録した OAuth アプリに割り当てられたクライアント ID（文字列）</li>
+<li><b>client_secret</b>
+&mldr; 登録した OAuth アプリに割り当てられたクライアントシークレット（文字列）</li>
+<li><b>code</b>
+&mldr; 前のステップで取得した一時コード（文字列）</li>
+</ul>
+<p>レスポンスの形式は、POST リクエスト時に指定した <code>Accept</code> ヘッダの値によって変化します。
+例えば、<strong><code>Accept: application/json</code></strong> と指定してリクエストすると、次のような JSON 形式のレスポンスが返ってきます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
+  <span class=nt>&#34;access_token&#34;</span><span class=p>:</span> <span class=s2>&#34;e72e16c7e42f292c6912e7710c838347ae178b4a&#34;</span><span class=p>,</span>
+  <span class=nt>&#34;scope&#34;</span><span class=p>:</span> <span class=s2>&#34;repo,gist&#34;</span><span class=p>,</span>
+  <span class=nt>&#34;token_type&#34;</span><span class=p>:</span> <span class=s2>&#34;bearer&#34;</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>この中の <strong><code>access_token</code></strong> が、OAuth アクセストークンです。
+これを GitHub API を呼び出すときのリクエストヘッダに指定することになります。</p>
+<div class=xNote>
+<span class=xNote_title>☝️ CORS 制約</span>
+<span class=xNote_body>残念ながら、最後のステップのアクセストークンを取得する API は、クロスオリジン通信 (CORS) の制約のため、Web ブラウザ上で動作する JavaScript からは呼び出せないようになっています。
+GitHub のアクセストークンは、外部サーバなどで動作する Node.js プログラムなどを経由して取得しなければいけません。
+ここでは、最後のステップの HTTP POST リクエストだけ Node.js プログラムを使って実行し、アクセストークンが正しく取得できるところまでを確認します。</span>
+</div>
+<h2 id=oauth-アプリの登録>OAuth アプリの登録</h2>
+<p>GitHub から一時コードを発行してもらうには、下記の設定ページから OAuth アプリを登録して、クライアント ID を生成しておく必要があります。
+登録と言っても、アプリ名と一時コード発行時のコールバックアドレスなどを設定するだけで簡単に終わります。</p>
+<ul>
+<li><a href=https://github.com/settings/developers>GitHub / Settings / Developer settings / OAuth App</a></li>
+</ul>
+<figure class=xImage>
+<a href=../../p/ubkt3ai/img-001.png target=_blank>
+<img style="border:solid #ccc 2px" width=600 height=593 src=../../p/ubkt3ai/img-001_hu6728f6f3885b43b2d119c6ea2e4299c0_68102_600x0_resize_box_3.png alt=/p/ubkt3ai/img-001.png>
+</a>
+</figure>
+<p>Web アプリでの GitHub 認証時には、ここで設定したアプリ名がユーザーに提示されることになります。
+怪しいアプリだと思われないように、アプリ名はちゃんとしたものを設定しましょう（登録後も簡単に変更できますが）。
+今回は、開発用 Web サーバーのローカルアドレス (<code>localhost</code>) の登録なので、アプリ名は適当に付けちゃって大丈夫です。
+重要なのは <strong><code>Authorization callback URL</code></strong> で、このアドレスが、一時コード取得時のリダイレクト先になります。</p>
+<p>最後に <code>Register application</code> ボタンを押すと、次のように、クライアント ID とクライアントシークレットが発行されます。
+これらの値を使って、一時コードやアクセストークンを取得することになります。</p>
+<figure class=xImage>
+<a href=../../p/ubkt3ai/img-002.png target=_blank>
+<img style="border:solid #ccc 2px" width=500 height=218 src=../../p/ubkt3ai/img-002_hu94f55561a3c09a0a2a5c552ced0a3f06_23478_500x0_resize_box_3.png alt=/p/ubkt3ai/img-002.png>
+</a>
+</figure>
+<p>発行された値は、<a href=https://github.com/settings/developers>登録済み OAuth アプリの一覧</a> からいつでも確認することができるので、特に保存しておく必要はありません。</p>
+<h2 id=web-アプリの実装>Web アプリの実装</h2>
+<h3 id=1-github-のログイン画面に遷移-1>(1) GitHub のログイン画面に遷移</h3>
+<p>まず、GitHub のログインサイトへのリンクを張ります。
+認証後は GitHub からリダイレクトされて戻ってくるので、単純にページ遷移してしまえば OK です。
+アドレス末尾のクエリ文字列として、前述の OAuth アプリ登録で発行されたクライアント ID (<code>client_id</code>) と、情報のスコープ (<code>scope</code>) を指定する必要があります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>HTML</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=p>&lt;</span><span class=nt>a</span> <span class=na>href</span><span class=o>=</span><span class=s>&#34;https://github.com/login/oauth/authorize?client_id=e971ec6b4a72cebc398c&amp;scope=repo&#34;</span><span class=p>&gt;</span>Sign In<span class=p>&lt;/</span><span class=nt>a</span><span class=p>&gt;</span></code></pre></div></div>
+</figure>
+<p>もちろん、JavaScript から次のようにページ遷移しても OK です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>JavaScript</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=kr>const</span> <span class=nx>CLIENT_ID</span> <span class=o>=</span> <span class=s1>&#39;e971ec6b4a72cebc398c&#39;</span><span class=p>;</span>
+<span class=nb>window</span><span class=p>.</span><span class=nx>location</span><span class=p>.</span><span class=nx>href</span> <span class=o>=</span> <span class=sb>`https://github.com/login/oauth/authorize?client_id=</span><span class=si>${</span><span class=nx>CLIENT_ID</span><span class=si>}</span><span class=sb>&amp;scope=repo`</span><span class=p>;</span></code></pre></div></div>
+</figure>
+<div class=xNote>
+<span class=xNote_title>☝️ クライアント ID は公開してよい？</span>
+<span class=xNote_body>クライアント ID は、GitHub に登録されたアプリの単なる識別子であり、秘密のキーではないので、上記のように HTML ファイルや JavaScript ファイルにハードコードしても問題ありません。</span>
+</div>
+<h3 id=2-一時コードの取得-1>(2) 一時コードの取得</h3>
+<p>上記のリンクにアクセスすると、GitHub の認証（認可）画面が表示されます。
+ユーザーが情報へのアクセスを許可すると、OAuth アプリ登録で指定しておいたコールバックアドレスにリダイレクトされます。
+リダイレクトされた URL のクエリ文字列部分に一時コードが入ってくるので、これを <code>window.location.search</code> などから抽出すれば、一時コードの取得は完了です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>JavaScript</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=kr>const</span> <span class=nx>params</span> <span class=o>=</span> <span class=nb>window</span><span class=p>.</span><span class=nx>location</span><span class=p>.</span><span class=nx>search</span><span class=p>;</span>  <span class=c1>//=&gt; &#34;?code=4f7b17572bee8cac9587&#34;
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>code</span> <span class=o>=</span> <span class=nx>params</span><span class=p>.</span><span class=nx>startsWith</span><span class=p>(</span><span class=s1>&#39;?code=&#39;</span><span class=p>)</span> <span class=o>?</span> <span class=nx>params</span><span class=p>.</span><span class=nx>split</span><span class=p>(</span><span class=s1>&#39;=&#39;</span><span class=p>)[</span><span class=mi>1</span><span class=p>]</span> <span class=o>:</span> <span class=kc>undefined</span><span class=p>;</span>
+<span class=k>if</span> <span class=p>(</span><span class=nx>code</span><span class=p>)</span> <span class=p>{</span>
+  <span class=nx>alert</span><span class=p>(</span><span class=s1>&#39;一時コード: &#39;</span> <span class=o>+</span> <span class=nx>code</span><span class=p>);</span>  <span class=c1>//=&gt; &#34;4f7b17572bee8cac9587&#34;
+</span><span class=c1></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<p>URL に一時コードが含まれているときは、<code>code</code> 変数にその値が格納されます。
+一時コードが含まれていないときは、<code>code</code> 変数の値は <code>undefined</code> になります。
+実際の Web アプリの実装では、この <code>code</code> 変数の値が設定されている場合に次のアクセストークン取得のステップに進む、といった流れになると思います。</p>
+<h3 id=3-アクセストークンの取得-1>(3) アクセストークンの取得</h3>
+<p>最後に、前のステップで取得した一時コード (<code>code</code>) を使ってアクセストークンを取得するのですが、クロスオリジン通信 (CORS) の制約があるため、残念ながら Web ブラウザ上の JavaScript からは、直接アクセストークンを取得することはできません。
+ここでは、別途 Node.js のプログラムを作成し、そのプログラムを使ってアクセストークンを取得できることを確認してみます。</p>
+<p>後述のプログラムでは、HTTP リクエストを発行するために <code>node-fetch</code> モジュールを使用しているので、先にインストールしておきます。
+ちなみに、この <code>node-fetch</code> モジュールは、Web ブラウザの <code>fetch</code> 関数と同様の機能を Node.js アプリから使えるようにするためのものです。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ npm install node-fetch</code></pre></div></div>
+</figure>
+<p>下記のコードを実行すると、HTTP POST リクエストを発行してアクセストークンを取得します。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>get-token.js</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=kr>const</span> <span class=nx>fetch</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;node-fetch&#39;</span><span class=p>);</span>
+
+<span class=c1>// 下記の値は自分の OAuth アプリのものに変更してください
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>URL</span> <span class=o>=</span> <span class=s1>&#39;https://github.com/login/oauth/access_token&#39;</span><span class=p>;</span>
+<span class=kr>const</span> <span class=nx>CLIENT_ID</span> <span class=o>=</span> <span class=s1>&#39;e971ec6b4a72cebc398c&#39;</span><span class=p>;</span>
+<span class=kr>const</span> <span class=nx>CLIENT_SECRET</span> <span class=o>=</span> <span class=s1>&#39;fae0b936df633dc526ab754731b3015c6b14afcb&#39;</span><span class=p>;</span>
+<span class=kr>const</span> <span class=nx>TEMP_CODE</span> <span class=o>=</span> <span class=s1>&#39;4f7b17572bee8cac9587&#39;</span><span class=p>;</span>  <span class=c1>// 一時コード
+</span><span class=c1></span>
+<span class=c1>// HTTP リクエストのカスタマイズ
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>fetchOption</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>method</span><span class=o>:</span> <span class=s1>&#39;POST&#39;</span><span class=p>,</span>
+  <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>Accept</span><span class=o>:</span> <span class=s1>&#39;application/json&#39;</span><span class=p>,</span>
+    <span class=s1>&#39;Content-Type&#39;</span><span class=o>:</span> <span class=s1>&#39;application/json&#39;</span><span class=p>,</span>
+  <span class=p>},</span>
+  <span class=nx>body</span><span class=o>:</span> <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>({</span>
+    <span class=nx>client_id</span><span class=o>:</span> <span class=nx>CLIENT_ID</span><span class=p>,</span>
+    <span class=nx>client_secret</span><span class=o>:</span> <span class=nx>CLIENT_SECRET</span><span class=p>,</span>
+    <span class=nx>code</span><span class=o>:</span> <span class=nx>TEMP_CODE</span><span class=p>,</span>
+  <span class=p>})</span>
+<span class=p>};</span>
+
+<span class=c1>// HTTP POST リクエストを送信
+</span><span class=c1></span><span class=nx>fetch</span><span class=p>(</span><span class=nx>URL</span><span class=p>,</span> <span class=nx>fetchOption</span><span class=p>)</span>
+  <span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>res</span> <span class=p>=&gt;</span> <span class=p>{</span>
+    <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=nx>res</span><span class=p>.</span><span class=nx>ok</span><span class=p>)</span> <span class=p>{</span>
+      <span class=k>throw</span> <span class=k>new</span> <span class=nb>Error</span><span class=p>(</span><span class=sb>`</span><span class=si>${</span><span class=nx>res</span><span class=p>.</span><span class=nx>status</span><span class=si>}</span><span class=sb> </span><span class=si>${</span><span class=nx>res</span><span class=p>.</span><span class=nx>statusText</span><span class=si>}</span><span class=sb>`</span><span class=p>);</span>
+    <span class=p>}</span>
+    <span class=k>return</span> <span class=nx>res</span><span class=p>.</span><span class=nx>json</span><span class=p>();</span>
+  <span class=p>})</span>
+  <span class=c1>// ここでレスポンスの JSON オブジェクトを出力
+</span><span class=c1></span>  <span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>json</span> <span class=p>=&gt;</span> <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>json</span><span class=p>))</span>
+  <span class=c1>// エラーはまとめて処理
+</span><span class=c1></span>  <span class=p>.</span><span class=k>catch</span><span class=p>(</span><span class=nx>err</span> <span class=p>=&gt;</span> <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>));</span></code></pre></div></div>
+</figure>
+<p>コードをシンプルにするために、クライアント ID などをハードコードしているので、先頭部分の次の定数を適切な値に変更してから実行してください。</p>
+<ul>
+<li><b>CLIENT_ID</b>
+&mldr; 登録した OAuth アプリのクライアント ID</li>
+<li><b>CLIENT_SECRET</b>
+&mldr; 登録した OAuth アプリのクライアントシークレット</li>
+<li><b>TEMP_CODE</b>
+&mldr; 前述のステップで取得した一時コード</li>
+</ul>
+<p>特に、一時コード (<code>TEMP_CODE</code>) は発行後 10 分で期限切れになるので、素早くコード修正して実行してくださいｗ</p>
+<p>アクセストークンの取得に成功すると、次のような結果が表示されます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ node get-token
+{
+  access_token: &#39;e08644f37543bf0722d9d79dcb64973cfdbcb9e4&#39;,
+  token_type: &#39;bearer&#39;,
+  scope: &#39;repo&#39;
+}</code></pre></div></div>
+</figure>
+<p>この中の <strong><code>access_token</code></strong> プロパティの値が、我々が望んでいた OAuth アクセストークンです。
+GitHub API を実行するときは、このトークンを HTTP リクエストヘッダに指定して呼び出すことになります。</p>
+<h2 id=次のステップへ>次のステップへ</h2>
+<p>これで、GitHub の OAuth アクセストークンの取得の流れがわかりました。
+ただ今回は、最後のアクセストークンの発行で、ローカルの Node.js プログラムを使いました。
+これでは静的な Web サイトにおいて自動でアクセストークンを取得することはできないので、実際にはアクセストークンを取得するための独自のバックエンドサーバーを用意して、Web サイトはそこ経由でアクセストークンを取得することになります。</p>
+<p>その話はまた <a href=../../p/ar2bjs2>次回</a> 。。。</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=../../p/bqz7emt/>GitHub GraphQL API の呼び出し回数制限 (rate limit) の情報を取得する</a></li>
+<li><a href=../../p/qcp2cnx/>Apollo Client で GitHub GraphQL API を使う (Node & React)</a></li>
+<li><a href=../../p/9bku4cj/>GitHub GraphQL API のクエリ例: ユーザー情報を取得する (viewer, user)</a></li>
+<li><a href=../../p/7r6gr3d/>Node.js で GitHub REST API を使用する (@octokit/rest)</a></li>
+<li><a href=../../p/xwfwdy6/>GitHub Pages は早く Jekyll から Hugo に乗り換えるべき</a></li>
+<li><a href=../../p/6ez7nuf/>Jekyll (GitHub Pages) でページの最終更新日を表示する</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/github>GitHub</a></span>
+<span class=xPageTags_item><a href=../../tags/oauth>OAuth</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=../../p/5q4fr3d/><span class=xArticle_up_label>GitHubメモ</span><br>へ戻る</a>
+</div>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_next>
+<a href=../../p/ar2bjs2/>GitHub OAuth トークンを取得する (2) Azure Functions 経由で取得する</a>
+</div>
+</div>
+</aside>
+</article>
+<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
+</main>
+</div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/5q4fr3d/>GitHub</a>
+</span>
+<span class=xBreadcrumb_item>GitHub OAuth トークンを取得する (1) 処理の流れを理解する
+</span>
+</div>
+</aside>
+<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
+<div id=xSiteFooter2>
+<a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
+</div>
+</div>
+<script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c];b.setAttribute('target','_blank'),b.setAttribute('rel','noopener');const d=b.getElementsByTagName('img');if(d.length>0)continue;b.classList.add('xExternalLinkIcon')}})</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"GitHub","item":"https://maku.blog/p/5q4fr3d/"},{"@type":"ListItem","position":4,"name":"GitHub OAuth トークンを取得する (1) 処理の流れを理解する","item":"https://maku.blog/p/ubkt3ai/"}]}</script>
+</body>
+</html>

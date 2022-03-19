@@ -1,0 +1,1232 @@
+<!doctype html><html lang=ja-jp>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>１時間で分かる GoF デザインパターン｜まくろぐ</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
+<meta property="og:title" content="１時間で分かる GoF デザインパターン">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maku.blog/p/7gmjvza/">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://maku.blog/assets/img/site-logo-large.png">
+<meta property="og:description" content="オブジェクト指向における再利用のためのデザインパターン エリック ガンマ, ラルフ ジョンソン, リチャード ヘルム, ジョン ブリシディース ソフトバンククリエイティブ      増補改訂版Java言語で学ぶデザインパターン入門 結城 浩 ソフトバンククリエイティブ     デザインパターンの輪講をしたときのメモ。
+生成に関するパターン (Creational Patterns) (1) Abstract Factory パターン 同種の複数のオブジェクト生成を concrete factory クラスとして種類ごとにまとめ、実際の生成は abstract factory クラスの抽象化されたインタフェース経由で行う。一貫した種類のインスタンスを作ることができる。
+実装イメージ TvFactory tvFactory = new SonyTvFactory(); // Sony 製の TV を作るための TvFactory ... tvFactory.CreatePanel(); // SonyPanel を生成 tvFactory.CreateTuner(); // SonyTuner を生成 ...  どのような手順で factory method を呼び出すかを定義すると、それは Builder パターンになる。
+(2) Builder パターン オブジェクトの生成手順を共通化して使いまわし、異なるオブジェクトを作成。">
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
+<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
+<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
+<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
+<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
+<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
+</head>
+<body>
+<div id=xRoot>
+<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/xb5w4in/>デザインパターン/UML</a>
+</span>
+<span class=xBreadcrumb_item>１時間で分かる GoF デザインパターン
+</span>
+</div>
+</aside>
+<div id=xContainer>
+<nav id=xMenu aria-label=メニュー>
+<div id=sidebar style=height:100%>
+<div id=sidebar_notFixed>
+<a href=../../><img src=../../assets/img/site-logo.png></a>
+<div class=xMenu_box data-sticky>
+<form action=https://cse.google.com/cse target=_blank>
+<div class=xSearchBox>
+<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<input type=hidden name=ie value=UTF-8>
+<input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
+<input type=submit value=検索></input>
+</div>
+</form>
+<div class=xMenu_box_body>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
+<div class=xMenu_box_body>
+<div class=xBoxLink>
+<a href=../../p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う
+<time>2022-03-17</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ryq6it6/>NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ
+<time>2022-03-16</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/un3gu8m/>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする
+<time>2022-02-27</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/m4dmu4c/>Next.js でブラウザ履歴で戻るボタンを表示する (router.back)
+<time>2022-02-22</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ter3doz/>Linuxメモ: Bluetooth 関連コマンドのメモ (hciconfig, bluetoothctl)
+<time>2022-02-20</time></a>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title>フォルダ</h3>
+<div class=xMenu_box_body>
+<div class=xNavTree>
+<ul>
+<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
+<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
+<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
+<ul>
+</ul>
+<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
+<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
+<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
+<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
+<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
+<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
+<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
+<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
+<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
+<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
+<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
+<li><a class=xNavTree-dir href=../../p/uo7n4ix/>PowerShell</a>
+<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
+<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
+<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
+<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
+<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
+<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
+<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
+<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
+<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
+<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
+</ul>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
+<div class=xMenu_box_body><div class=xMenu_tag>
+<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (79)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure>azure (58)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/typescript>typescript (57)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws>aws (51)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/next.js>next.js (36)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/chatbot>chatbot (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/react>react (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/gnuplot>gnuplot (27)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github>github (23)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/graphql>graphql (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/node.js>node.js (17)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/electron>electron (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/linux>linux (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vs-code>vs-code (14)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/javascript>javascript (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mongodb>mongodb (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cdk>aws/cdk (12)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/android>android (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/java>java (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/nginx>nginx (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/python>python (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/uml>uml (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/3d>3d (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/lambda>aws/lambda (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sam>aws/sam (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unity>unity (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webgl>webgl (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-cli>azure-cli (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jade>jade (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apollo>apollo (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cognito>aws/cognito (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-storage>azure-storage (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/doxygen>doxygen (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase>firebase (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/luis>luis (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/material-ui>material-ui (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/qna-maker>qna-maker (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ansible>ansible (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cli>aws/cli (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/ssm>aws/ssm (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/c/c++>c/c++ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/eslint>eslint (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/firestore>firebase/firestore (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html/css>html/css (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sql>sql (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/windows>windows (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-functions>azure-functions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/cosmos-db>cosmos-db (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-actions>github-actions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-pages>github-pages (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jekyll>jekyll (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/kotlin>kotlin (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mac>mac (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/powershell>powershell (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/prettier>prettier (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sqlite>sqlite (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/textlint>textlint (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tv>tv (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apache>apache (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/arib>arib (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/amplify>aws/amplify (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/iam>aws/iam (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/kms>aws/kms (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/s3>aws/s3 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sdk>aws/sdk (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-app-service>azure-app-service (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/excel>excel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/hugo>hugo (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/npm>npm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/oauth>oauth (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/opengl>opengl (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/rsync>rsync (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/scp>scp (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/slack>slack (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teraterm>teraterm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unicode>unicode (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vercel>vercel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/zip>zip (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/.net>.net (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/androidstudio>androidstudio (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/atomic-design>atomic-design (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/blender>blender (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bluetooth>bluetooth (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bootstrap>bootstrap (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-framework>bot-framework (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/boto3>boto3 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/css>css (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dns>dns (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dvb>dvb (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/editorconfig>editorconfig (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/evernote>evernote (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/git>git (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/groovy>groovy (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html>html (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/iso>iso (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/json>json (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/macos>macos (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/parcel>parcel (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/raspberrypi>raspberrypi (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ssh>ssh (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teams>teams (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tex>tex (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ubuntu>ubuntu (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vim>vim (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/web>web (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webpack>webpack (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/wsl>wsl (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
+</div></div>
+</div>
+<div class=xMenu_box data-sticky><br></div>
+</div>
+<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
+</div>
+</div>
+</nav>
+<main id=xMain>
+<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_next>
+<a href=../../p/yzs49gv/>UML ダイアグラムの一覧と分類</a>
+</div>
+</div>
+</aside>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/xb5w4in/>デザインパターン/UML</a></span></div>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/7gmjvza/>１時間で分かる GoF デザインパターン</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム</a></span>
+<span class=xPageTags_item><a href=../../tags/%E8%AA%AD%E6%9B%B8>読書</a></span>
+<span class=xPageTags_item><a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン</a></span>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2008-05-13>2008-05-13</time><br>
+作成: <time itemprop=datePublished datetime=2008-05-13>2008-05-13</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#生成に関するパターン-creational-patterns>生成に関するパターン (Creational Patterns)</a>
+<ul>
+<li><a href=#1-abstract-factory-パターン>(1) Abstract Factory パターン</a></li>
+<li><a href=#2-builder-パターン>(2) Builder パターン</a></li>
+<li><a href=#3-factory-method-パターン>(3) Factory Method パターン</a></li>
+<li><a href=#4-prototype-パターン>(4) Prototype パターン</a></li>
+<li><a href=#5-singleton-パターン>(5) Singleton パターン</a></li>
+</ul>
+</li>
+<li><a href=#構造に関するパターン-structual-patterns>構造に関するパターン (Structual Patterns)</a>
+<ul>
+<li><a href=#6-adapter-パターン>(6) Adapter パターン</a></li>
+<li><a href=#7-bridge-パターン>(7) Bridge パターン</a></li>
+<li><a href=#8-composite-パターン>(8) Composite パターン</a></li>
+<li><a href=#9-decorator-パターン>(9) Decorator パターン</a></li>
+<li><a href=#10-facade-パターン>(10) Facade パターン</a></li>
+<li><a href=#11-flyweight-パターン>(11) Flyweight パターン</a></li>
+<li><a href=#12-proxy-パターン>(12) Proxy パターン</a></li>
+</ul>
+</li>
+<li><a href=#振る舞いに関するパターン-behavioral-patterns>振る舞いに関するパターン (Behavioral Patterns)</a>
+<ul>
+<li><a href=#13-chain-of-responsibility-パターン>(13) Chain of Responsibility パターン</a></li>
+<li><a href=#14-command-パターン>(14) Command パターン</a></li>
+<li><a href=#15-interpreter-パターン>(15) Interpreter パターン</a></li>
+<li><a href=#16-iterator-パターン>(16) Iterator パターン</a></li>
+<li><a href=#17-mediator-パターン>(17) Mediator パターン</a></li>
+<li><a href=#18-memento-パターン>(18) Memento パターン</a></li>
+<li><a href=#19-observer-パターン>(19) Observer パターン</a></li>
+<li><a href=#20-state-パターン>(20) State パターン</a></li>
+<li><a href=#21-strategy-パターン>(21) Strategy パターン</a></li>
+<li><a href=#22-template-method-パターン>(22) Template Method パターン</a></li>
+<li><a href=#23-visitor-パターン>(23) Visitor パターン</a></li>
+</ul>
+</li>
+</ul>
+</nav><div class=xAmazon>
+<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4797311126/maku04-22/ref=nosim/" target=_blank>
+<div class=xAmazon_image>
+<img src=https://images-na.ssl-images-amazon.com/images/I/61zDpaqhh7L.jpg alt=オブジェクト指向における再利用のためのデザインパターン>
+</div>
+<div class=xAmazon_info>
+<div class=xAmazon_info_title>オブジェクト指向における再利用のためのデザインパターン</div>
+<div class=xAmazon_info_author>エリック ガンマ, ラルフ ジョンソン, リチャード ヘルム, ジョン ブリシディース</div>
+<div class=xAmazon_info_publisher>ソフトバンククリエイティブ</div>
+<div class=xAmazon_info_icon><img src="data:image/gif;base64,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"></div>
+</div>
+</a>
+</div>
+<div class=xAmazon>
+<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4797327030/maku04-22/ref=nosim/" target=_blank>
+<div class=xAmazon_image>
+<img src=https://images-na.ssl-images-amazon.com/images/I/71aAui0y3bL.jpg alt=増補改訂版Java言語で学ぶデザインパターン入門>
+</div>
+<div class=xAmazon_info>
+<div class=xAmazon_info_title>増補改訂版Java言語で学ぶデザインパターン入門</div>
+<div class=xAmazon_info_author>結城 浩</div>
+<div class=xAmazon_info_publisher>ソフトバンククリエイティブ</div>
+<div class=xAmazon_info_icon><img src="data:image/gif;base64,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"></div>
+</div>
+</a>
+</div>
+<p>デザインパターンの輪講をしたときのメモ。</p>
+<h2 id=生成に関するパターン-creational-patterns>生成に関するパターン (Creational Patterns)</h2>
+<h3 id=1-abstract-factory-パターン>(1) Abstract Factory パターン</h3>
+<p>同種の複数のオブジェクト生成を concrete factory クラスとして種類ごとにまとめ、実際の生成は abstract factory クラスの抽象化されたインタフェース経由で行う。<strong>一貫した種類のインスタンスを作ることができる</strong>。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=n>TvFactory</span> <span class=n>tvFactory</span> <span class=o>=</span> <span class=k>new</span> <span class=n>SonyTvFactory</span><span class=o>();</span>  <span class=c1>// Sony 製の TV を作るための TvFactory
+</span><span class=c1></span><span class=o>...</span>
+<span class=n>tvFactory</span><span class=o>.</span><span class=na>CreatePanel</span><span class=o>();</span>  <span class=c1>// SonyPanel を生成
+</span><span class=c1></span><span class=n>tvFactory</span><span class=o>.</span><span class=na>CreateTuner</span><span class=o>();</span>  <span class=c1>// SonyTuner を生成
+</span><span class=c1></span><span class=o>...</span></code></pre></div></div>
+</figure>
+<p>どのような手順で factory method を呼び出すかを定義すると、それは Builder パターンになる。</p>
+<h3 id=2-builder-パターン>(2) Builder パターン</h3>
+<p>オブジェクトの<strong>生成手順を共通化</strong>して使いまわし、異なるオブジェクトを作成。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=n>Product</span><span class=o>*</span> <span class=n>Director</span><span class=o>::</span><span class=n>CreateProduct</span><span class=o>(</span><span class=n>Builder</span> <span class=o>*</span><span class=n>builder</span><span class=o>)</span> <span class=o>{</span>
+    <span class=n>builder</span><span class=o>-&gt;</span><span class=n>CreateStep1</span><span class=o>();</span>
+    <span class=n>builder</span><span class=o>-&gt;</span><span class=n>CreateStep2</span><span class=o>();</span>
+    <span class=n>builder</span><span class=o>-&gt;</span><span class=n>CreateStep3</span><span class=o>();</span>
+    <span class=k>return</span> <span class=n>builder</span><span class=o>-&gt;</span><span class=n>GetProduct</span><span class=o>();</span>
+<span class=o>}</span></code></pre></div></div>
+</figure>
+<p>上記のメソッドに異なる Builder オブジェクトを渡せば、異なる Product が生成される。ただし、作成手順は共通化されている。</p>
+<h3 id=3-factory-method-パターン>(3) Factory Method パターン</h3>
+<p>インスタンス生成メソッドを抽象化し、サブクラスに具体的なインスタンス生成を任せる。インスタンス生成メソッド (factory method) を呼び出す部分がすべて抽象化されるのがポイント。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=n>Component</span> <span class=n>component</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TextComponent</span><span class=o>();</span>  <span class=c1>// 具象クラスが出るのはこの１回のみ
+</span><span class=c1></span><span class=n>Renderer</span> <span class=n>renderer</span> <span class=o>=</span> <span class=n>component</span><span class=o>.</span><span class=na>CreateRenderer</span><span class=o>();</span>  <span class=c1>// その後のインスタンス生成は抽象化される
+</span><span class=c1></span>
+<span class=c1>// factory method の実装
+</span><span class=c1></span><span class=n>Renderer</span> <span class=n>TextComponent</span><span class=o>::</span><span class=n>CreateRenderer</span><span class=o>()</span> <span class=o>{</span>
+    <span class=k>return</span> <span class=k>new</span> <span class=n>TextRenderer</span><span class=o>();</span>  <span class=c1>// このクラスに適したインスタンスを生成
+</span><span class=c1></span><span class=o>}</span></code></pre></div></div>
+</figure>
+<p>Factory Method と Abstract Factory の違いは下記のような感じ（個人的解釈あり）。</p>
+<p>同系統のクラスをインスタンス化するための factory method を複数持つように実装すると、それは、Abstract Factory パターンになる。
+Abstract Factory の場合、一貫性を保持して同種のオブジェクトを factory method で作成するようにしているのがポイント。
+Factory Method パターンの場合、抽象化する対象は単一のメソッドなので、クラス名にそのパターンを使っていることを暗示するような名前をわざわざ付けるようなことはしない。
+一方、Abstract Factory パターンの場合、どのような種類のインスタンスを生成するためクラスなのかを示す名前を付けるべき。というか付けないと相当分かりにくくなる。</p>
+<h3 id=4-prototype-パターン>(4) Prototype パターン</h3>
+<p>プロトタイプ・オブジェクトをコピーして似たようなインスタンスを作る。コンストラクタでなく、オブジェクト (prototype) を元にインスタンスを生成するため、作成されるオブジェクトをカスタマイズできる。</p>
+<p>AbstractFactory オブジェクトに Prototype オブジェクトをセットできるようにすれば、生成するオブジェクトの種類を制御できる。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=n>PrototypeHoge</span> <span class=n>hoge</span> <span class=o>=</span> <span class=n>prototypeHoge</span><span class=o>.</span><span class=na>Clone</span><span class=o>();</span></code></pre></div></div>
+</figure>
+<h3 id=5-singleton-パターン>(5) Singleton パターン</h3>
+<p>省略。</p>
+<h2 id=構造に関するパターン-structual-patterns>構造に関するパターン (Structual Patterns)</h2>
+<h3 id=6-adapter-パターン>(6) Adapter パターン</h3>
+<p>既存クラスのインタフェース (Adaptee) を、クライアントが使用したいインタフェース (Target) に合うように変換する。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ（object adapter の場合）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>Adapter</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Target</span> <span class=p>{</span>
+<span class=k>private</span><span class=o>:</span>
+    <span class=n>Adaptee</span> <span class=o>*</span><span class=n>m_pAdaptee</span><span class=p>;</span>  <span class=c1>// インタフェースの合わない既存のクラス
+</span><span class=c1></span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=c1>// object adapter の一般的な作り方
+</span><span class=c1></span>    <span class=n>Adapter</span><span class=p>(</span><span class=n>Adaptee</span> <span class=o>*</span><span class=n>adaptee</span><span class=p>)</span> <span class=o>:</span> <span class=n>m_adaptee</span><span class=p>(</span><span class=n>adaptee</span><span class=p>)</span> <span class=p>{}</span>
+
+    <span class=c1>// クライアントは Target::DoSomething() の形で呼び出したい
+</span><span class=c1></span>    <span class=n>vitual</span> <span class=kt>void</span> <span class=nf>DoSomething</span><span class=p>()</span> <span class=p>{</span>
+        <span class=n>m_adaptee</span><span class=o>-&gt;</span><span class=n>ProprietaryMethod</span><span class=p>();</span>
+        <span class=p>...</span>
+    <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>上記のように委譲させる実装方法 (delegation) の他に、Adapter クラスが Adaptee を private 継承するようにする class adapter という実装形態もある。</p>
+<h3 id=7-bridge-パターン>(7) Bridge パターン</h3>
+<p>機能の階層（アプリドメインにおける機能など (Abstraction)）と、実装の階層（プラットフォームごとの実装や、データクラスの内部表現など (Implementor)）をごっちゃにするなということ。抽象化された実装のインタフェースを使って機能部分を実装することで、プラットフォームごとの実装にとらわれずにアプリの本質的な処理を実装できる。つまり、Abstraction レイヤーをいじれば（アプリなどの）機能が変わり、Implemetor レイヤーをいじっても表面的な機能は変わらないということ。</p>
+<p>性質上、Implementor のインタフェースは Abstraction のインタフェースよりもプリミティブなものになる。機能部分と実装部分は別々の継承関係を持つので、別々にサブクラス化して拡張していける。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=c1>// 機能の階層 (Abstraction &amp; RefinedAbstraction)
+</span><span class=c1></span><span class=k>class</span> <span class=nc>Frame</span> <span class=p>{</span>
+    <span class=kt>void</span> <span class=nf>Draw</span><span class=p>()</span> <span class=p>{</span>
+        <span class=n>Graphics</span> <span class=o>*</span><span class=n>p</span> <span class=o>=</span> <span class=n>GetGraphics</span><span class=p>();</span>
+        <span class=n>p</span><span class=o>-&gt;</span><span class=n>DrawLine</span><span class=p>()</span> <span class=err>で枠を描く</span>
+    <span class=p>}</span>
+<span class=p>}</span>
+<span class=k>class</span> <span class=nc>BeautifulFrame</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Frame</span> <span class=p>{</span>
+    <span class=kt>void</span> <span class=nf>Draw</span><span class=p>()</span> <span class=p>{</span>
+        <span class=n>Graphics</span> <span class=o>*</span><span class=n>p</span> <span class=o>=</span> <span class=n>GetGraphics</span><span class=p>();</span>
+        <span class=n>p</span><span class=o>-&gt;</span><span class=n>DrawLine</span><span class=p>()</span> <span class=err>で綺麗な枠を描く</span>
+    <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=c1>// 内部実装の階層 (Implementor &amp; ConcreteImplementor)
+</span><span class=c1></span><span class=k>class</span> <span class=nc>Graphics</span> <span class=p>{</span>
+    <span class=kt>void</span> <span class=nf>DrawLine</span><span class=p>(</span><span class=n>Point</span><span class=p>,</span> <span class=n>Point</span><span class=p>);</span>
+<span class=p>}</span>
+<span class=k>class</span> <span class=nc>BresenhamGraphics</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Graphics</span> <span class=p>{</span>
+    <span class=kt>void</span> <span class=nf>DrawLine</span><span class=p>(</span><span class=n>Point</span> <span class=n>a</span><span class=p>,</span> <span class=n>Point</span> <span class=n>b</span><span class=p>)</span> <span class=p>{</span> <span class=n>Bresenham</span> <span class=err>アルゴリズムによる線の描画</span> <span class=p>}</span>
+<span class=p>}</span>
+<span class=k>class</span> <span class=nc>EccentricGraphics</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Graphics</span> <span class=p>{</span>
+    <span class=kt>void</span> <span class=nf>DrawLine</span><span class=p>(</span><span class=n>Point</span> <span class=n>a</span><span class=p>,</span> <span class=n>Point</span> <span class=n>b</span><span class=p>)</span> <span class=p>{</span> <span class=err>変わったアルゴリズムによる線の描画</span> <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>階層を分けるというと複雑に感じるけど、Abstraction と Implementor 階層のクラス関係を見ると、それは単なる Strategy パターンだと気づく。だから、Bridge パターンって、役割の違うクラスを同じ階層に入れるなという単なる教訓みたいなもの。</p>
+<h3 id=8-composite-パターン>(8) Composite パターン</h3>
+<p>あるオブジェクトと、それを含む composite のインタフェースを統一する。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=c1>// File と Directory の共通の親クラス
+</span><span class=c1></span><span class=k>class</span> <span class=nc>Entry</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=kt>int</span> <span class=n>GetSize</span><span class=p>();</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>File</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Entry</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=kt>int</span> <span class=n>GetSize</span><span class=p>()</span> <span class=p>{</span> <span class=k>return</span> <span class=err>自分自身のサイズ</span><span class=p>;</span> <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=k>class</span> <span class=nc>Directory</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Entry</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=kt>int</span> <span class=n>GetSize</span><span class=p>()</span> <span class=p>{</span> <span class=k>return</span> <span class=err>ディレクトリ内の合計サイズ</span><span class=p>;</span> <span class=p>}</span>
+    <span class=kt>void</span> <span class=nf>AddEntry</span><span class=p>(</span><span class=n>Entry</span> <span class=o>*</span><span class=n>entry</span><span class=p>)</span> <span class=p>{</span> <span class=err>ディレクトリに追加</span><span class=p>;</span> <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=c1>// Directory には File を格納できる
+</span><span class=c1></span><span class=n>Directory</span> <span class=o>*</span><span class=n>dir</span> <span class=o>=</span> <span class=k>new</span> <span class=n>Directory</span><span class=p>();</span>
+<span class=n>dir</span><span class=o>-&gt;</span><span class=n>AddEntry</span><span class=p>(</span><span class=k>new</span> <span class=n>File</span><span class=p>());</span>
+<span class=n>dir</span><span class=o>-&gt;</span><span class=n>AddEntry</span><span class=p>(</span><span class=k>new</span> <span class=n>File</span><span class=p>());</span>
+
+<span class=c1>// Directory に Directory を格納することもできる
+</span><span class=c1></span><span class=n>Directory</span> <span class=o>*</span><span class=n>dir2</span> <span class=o>=</span> <span class=k>new</span> <span class=n>Directory</span><span class=p>();</span>
+<span class=n>dir2</span><span class=o>-&gt;</span><span class=n>AddEntry</span><span class=p>(</span><span class=n>dir</span><span class=p>);</span>
+
+<span class=c1>// Directory 内のファイルサイズ合計を取得
+</span><span class=c1></span><span class=n>Print</span><span class=p>(</span><span class=n>dir2</span><span class=o>-&gt;</span><span class=n>GetSize</span><span class=p>());</span></code></pre></div></div>
+</figure>
+<h3 id=9-decorator-パターン>(9) Decorator パターン</h3>
+<p>継承せずにオブジェクトを拡張する。
+拡張対象のオブジェクト (Component) を delegate として持ち、メソッド呼び出しをラッピングする形で拡張する。インタフェースは変わらないので、再帰的に拡張することができる。継承ではなく、オブジェクトコンポジションによる拡張なので、動的 (at run-time) に拡張することができる。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=c1>// 拡張される側 (Component)
+</span><span class=c1></span><span class=k>class</span> <span class=nc>Greeter</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=n>Greet</span><span class=p>()</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>OrdinaryGreeter</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Greeter</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=n>Greet</span><span class=p>()</span> <span class=p>{</span> <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Hello. &#34;</span><span class=p>;</span> <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=c1>// 拡張する側 (Decorator)
+</span><span class=c1></span><span class=k>class</span> <span class=nc>Decorator</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Greeter</span> <span class=p>{</span>
+<span class=k>private</span><span class=o>:</span>
+    <span class=n>Greeter</span> <span class=o>*</span><span class=n>m_greeter</span><span class=p>;</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=n>Decorator</span><span class=p>(</span><span class=n>Greeter</span> <span class=o>*</span><span class=n>greeter</span><span class=p>)</span> <span class=o>:</span> <span class=n>m_greeter</span><span class=p>(</span><span class=n>greeter</span><span class=p>)</span> <span class=p>{}</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>Greet</span><span class=p>()</span> <span class=p>{</span> <span class=n>m_greeter</span><span class=o>-&gt;</span><span class=n>Greet</span><span class=p>();</span> <span class=p>}</span>
+    <span class=p>...</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>YahooDecorator</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Decorator</span> <span class=p>{</span>  <span class=c1>// ConcreteDecorator
+</span><span class=c1></span><span class=k>public</span><span class=o>:</span>
+    <span class=n>YahooDecorator</span><span class=p>(</span><span class=n>Greeter</span> <span class=o>*</span><span class=n>greeter</span><span class=p>)</span> <span class=o>:</span> <span class=n>Decorator</span><span class=p>(</span><span class=n>greeter</span><span class=p>)</span> <span class=p>{};</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>Greet</span><span class=p>()</span> <span class=p>{</span>
+        <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Yahoo! &#34;</span><span class=p>;</span>
+        <span class=n>Decorator</span><span class=o>::</span><span class=n>Greet</span><span class=p>();</span>
+        <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;WYYYRYYY!&#34;</span>
+    <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=c1>// main
+</span><span class=c1></span><span class=n>Greeter</span> <span class=o>*</span><span class=n>greeter</span> <span class=o>=</span> <span class=k>new</span> <span class=n>YahooDecorator</span><span class=p>(</span>
+                       <span class=k>new</span> <span class=n>YahooDecorator</span><span class=p>(</span>
+                           <span class=k>new</span> <span class=n>OrdinaryGreeter</span><span class=p>()));</span>
+<span class=n>greeter</span><span class=o>-&gt;</span><span class=n>Greet</span><span class=p>();</span>  <span class=c1>// &#34;Yahoo! Hello. WYYYRYYY!&#34;
+</span></code></pre></div></div>
+</figure>
+<p>上記の例では、ConcreteDecorator は 1 種類しか存在しないので、実は Decorator 部分が ConcreteDecorator（ここでは YahooDecorator）であってもよい。</p>
+<h3 id=10-facade-パターン>(10) Facade パターン</h3>
+<p>複数のオブジェクトを使用して行わなければならない処理をまとめ、シンプルなインタフェースで実行できるようにする。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>Facade</span> <span class=p>{</span>
+<span class=k>private</span><span class=o>:</span>
+    <span class=k>static</span> <span class=kt>void</span> <span class=n>DoEverything</span><span class=p>()</span> <span class=p>{</span>
+        <span class=c1>// 複数オブジェクトを駆使した処理をまとめる
+</span><span class=c1></span>        <span class=n>ClassA</span> <span class=n>a</span><span class=p>;</span>
+        <span class=n>a</span><span class=p>.</span><span class=n>DoSomething</span><span class=p>();</span>
+        <span class=n>ClassB</span> <span class=n>b</span><span class=p>;</span>
+        <span class=n>b</span><span class=p>.</span><span class=n>DoSomething</span><span class=p>(</span><span class=n>a</span><span class=p>);</span>
+        <span class=n>ClassC</span> <span class=n>c</span><span class=p>;</span>
+        <span class=n>c</span><span class=p>.</span><span class=n>DoSomething</span><span class=p>(</span><span class=n>a</span><span class=p>,</span> <span class=n>b</span><span class=p>);</span>
+    <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=c1>// main
+</span><span class=c1></span><span class=n>Facade</span><span class=o>::</span><span class=n>DoEverything</span><span class=p>();</span>  <span class=c1>// クライアントはシンプルなインタフェースで呼び出すだけ
+</span></code></pre></div></div>
+</figure>
+<h3 id=11-flyweight-パターン>(11) Flyweight パターン</h3>
+<p>多数のオブジェクトを作る必要があるとき、使いまわせるデータを複数のオブジェクトが共有することで効率よく内部データを表現する。共有できるデータを intrinsic state といい、これを保持するオブジェクトをテーブルに保持するなどして使いまわす。逆に、コンテキストによって変化する共有できないデータを extrinsic state といい、メソッド実行時にパラメータで渡す。どちらのアプローチもメモリ節約に貢献する。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>Character</span> <span class=p>{</span>
+<span class=k>private</span><span class=o>:</span>
+    <span class=kt>char</span> <span class=n>m_ch</span><span class=p>;</span>    <span class=c1>// 共有できる部分 (intrinsic state)
+</span><span class=c1></span><span class=k>public</span><span class=o>:</span>
+    <span class=n>Character</span><span class=p>(</span><span class=kt>char</span> <span class=n>ch</span><span class=p>)</span> <span class=o>:</span> <span class=n>m_ch</span><span class=p>(</span><span class=n>ch</span><span class=p>)</span> <span class=p>{}</span>
+    <span class=n>Draw</span><span class=p>(</span><span class=n>Position</span> <span class=n>pos</span><span class=p>)</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>    <span class=c1>// 各々の Position は共有できない (extrinsic state)
+</span><span class=c1></span><span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>CharacterFactory</span> <span class=p>{</span>
+<span class=k>private</span><span class=o>:</span>
+    <span class=n>Character</span> <span class=n>m_char</span><span class=p>[</span><span class=n>MAX_CHAR</span><span class=p>];</span>  <span class=c1>// intrinsic state を持つオブジェクトはテーブルに入れて共有
+</span><span class=c1></span><span class=k>public</span><span class=o>:</span>
+    <span class=k>static</span> <span class=o>*</span><span class=n>Character</span> <span class=n>CreateCharacter</span><span class=p>(</span><span class=kt>char</span> <span class=n>c</span><span class=p>)</span> <span class=p>{</span>
+        <span class=k>if</span> <span class=p>(</span><span class=n>m_characters</span><span class=p>[</span><span class=n>c</span><span class=p>])</span> <span class=p>{</span>
+            <span class=n>m_characters</span><span class=p>[</span><span class=n>c</span><span class=p>]</span> <span class=o>=</span> <span class=k>new</span> <span class=n>Character</span><span class=p>(</span><span class=n>c</span><span class=p>);</span>
+        <span class=p>}</span>
+        <span class=k>return</span> <span class=n>m_characters</span><span class=p>[</span><span class=n>c</span><span class=p>];</span>
+    <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=c1>// main
+</span><span class=c1></span><span class=n>Character</span> <span class=o>*</span><span class=n>pCh1</span> <span class=o>=</span> <span class=n>CharacterFactory</span><span class=o>::</span><span class=n>GetCharacter</span><span class=p>(</span><span class=sc>&#39;a&#39;</span><span class=p>);</span>
+<span class=n>Character</span> <span class=o>*</span><span class=n>pCh2</span> <span class=o>=</span> <span class=n>CharacterFactory</span><span class=o>::</span><span class=n>GetCharacter</span><span class=p>(</span><span class=sc>&#39;a&#39;</span><span class=p>);</span>  <span class=c1>// 同じオブジェクトを参照する
+</span><span class=c1></span><span class=n>pCh1</span><span class=o>-&gt;</span><span class=n>Draw</span><span class=p>(</span><span class=n>Position</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=mi>10</span><span class=p>));</span>  <span class=c1>// それぞれの描画位置は共有できないので引数で渡す
+</span><span class=c1></span><span class=n>pCh2</span><span class=o>-&gt;</span><span class=n>Draw</span><span class=p>(</span><span class=n>Position</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=mi>20</span><span class=p>));</span></code></pre></div></div>
+</figure>
+<p>intrinsic なデータを持つオブジェクトも extrinsic なデータを扱ってよい。ただし、extrinsic なデータは毎回パラメータとして渡す必要がある。上の例では Character オブジェクトをテーブルに保持して共有しているが、実際に共有されているデータは Character オブジェクトの intrinsic state である <code>m_ch</code> のみ。</p>
+<h3 id=12-proxy-パターン>(12) Proxy パターン</h3>
+<p>あるオブジェクト (RealSubject) へのアクセス方法を制御する。クライアントは RealSubject へ直接アクセスするときと同じインタフェースで Proxy にアクセスできる。
+「遅延ロード (on demand)」「キャッシュ」「インスタンス共有」「アクセス先の隠蔽」「スマートポインタの実装」などの用途に適用できる。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ（遅延ロードを実現する場合）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=c1>// (Subject) クライアントが使用するインタフェース
+</span><span class=c1></span><span class=k>class</span> <span class=nc>Data</span> <span class=p>{</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>PrintData</span><span class=p>()</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>};</span>
+
+<span class=c1>// (RealSubject) インスタンス化にコストがかかると仮定
+</span><span class=c1></span><span class=k>class</span> <span class=nc>LargeData</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Data</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=n>PrintData</span><span class=p>()</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>
+    <span class=p>...</span>
+<span class=p>};</span>
+
+<span class=c1>// (Proxy) RealSubject へのアクセスを制御（必要になってから RealSubject をインスタンス化）
+</span><span class=c1></span><span class=k>class</span> <span class=nc>DataProxy</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Data</span> <span class=p>{</span>
+<span class=k>private</span><span class=o>:</span>
+    <span class=n>LargeData</span> <span class=o>*</span><span class=n>m_pData</span><span class=p>;</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=n>DataProxy</span><span class=p>()</span> <span class=o>:</span> <span class=n>m_pData</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span> <span class=p>{}</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>PrintData</span><span class=p>()</span> <span class=p>{</span>
+        <span class=k>if</span> <span class=p>(</span><span class=n>m_pData</span> <span class=o>==</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
+            <span class=n>m_pData</span> <span class=o>=</span> <span class=k>new</span> <span class=n>LargeData</span><span class=p>();</span>
+        <span class=p>}</span>
+        <span class=n>m_pData</span><span class=o>-&gt;</span><span class=n>PrintData</span><span class=p>();</span>
+    <span class=p>}</span>
+    <span class=p>...</span>
+<span class=p>}</span>
+
+<span class=c1>// main
+</span><span class=c1></span><span class=n>Data</span> <span class=o>*</span><span class=n>pData</span> <span class=o>=</span> <span class=k>new</span> <span class=n>DataProxy</span><span class=p>();</span>  <span class=c1>// この段階では LargeData はインスタンス化されない
+</span><span class=c1></span><span class=n>pData</span><span class=o>-&gt;</span><span class=n>PrintData</span><span class=p>();</span>  <span class=c1>// この段階で Proxy 内部で LargeData が生成される
+</span></code></pre></div></div>
+</figure>
+<h2 id=振る舞いに関するパターン-behavioral-patterns>振る舞いに関するパターン (Behavioral Patterns)</h2>
+<h3 id=13-chain-of-responsibility-パターン>(13) Chain of Responsibility パターン</h3>
+<p>リクエストを伝播させ、適切なオブジェクトで処理させる。Linked list か何かでメソッド呼び出しを伝播させるように実装する。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>Handler</span> <span class=p>{</span>
+<span class=k>private</span><span class=o>:</span>
+    <span class=n>Handler</span> <span class=o>*</span><span class=n>m_pSuccessor</span><span class=p>;</span>  <span class=c1>// 次のリクエスト転送先
+</span><span class=c1></span><span class=k>public</span><span class=o>:</span>
+    <span class=n>Handler</span><span class=p>(</span><span class=n>Handler</span> <span class=o>*</span><span class=n>pSuccessor</span> <span class=o>=</span> <span class=mi>0</span><span class=p>)</span> <span class=o>:</span> <span class=n>m_pSuccessor</span><span class=p>(</span><span class=n>pSuccessor</span><span class=p>)</span> <span class=p>{}</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>HandleRequest</span><span class=p>(</span><span class=k>const</span> <span class=n>Request</span> <span class=o>*</span><span class=n>pRequest</span><span class=p>)</span> <span class=p>{</span>
+        <span class=k>if</span> <span class=p>(</span><span class=n>m_pHandler</span><span class=p>)</span> <span class=p>{</span>
+            <span class=n>m_pHandler</span><span class=o>-&gt;</span><span class=n>HandleRequest</span><span class=p>();</span>
+        <span class=p>}</span>
+    <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>ConcreteHandler1</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Handler</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=n>ConcreteHandler1</span><span class=p>(</span><span class=n>Handler</span> <span class=o>*</span><span class=n>pSuccessor</span><span class=p>)</span> <span class=o>:</span> <span class=n>Handler</span><span class=p>(</span><span class=n>pSuccessor</span><span class=p>)</span> <span class=p>{}</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>HandleRequest</span><span class=p>(</span><span class=k>const</span> <span class=n>Request</span> <span class=o>*</span><span class=n>pRequest</span><span class=p>)</span> <span class=p>{</span>
+        <span class=k>if</span> <span class=p>(</span><span class=n>pRequest</span><span class=o>-&gt;</span><span class=n>GetType</span><span class=p>()</span> <span class=o>==</span> <span class=n>Request</span><span class=o>::</span><span class=n>SOME_KIND_OF_REQUEST</span><span class=p>)</span> <span class=p>{</span>
+            <span class=c1>// 自分の興味のあるリクエストだったら処理して終了
+</span><span class=c1></span>            <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Yahoooo!&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>endl</span><span class=p>;</span>
+            <span class=k>return</span><span class=p>;</span>
+        <span class=p>}</span>
+        <span class=c1>// 次の Handler へリクエストを転送
+</span><span class=c1></span>        <span class=n>Handler</span><span class=o>::</span><span class=n>HandleRequest</span><span class=p>();</span>
+    <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>ConcreteHandler2</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Handler</span> <span class=p>{</span>
+    <span class=p>...</span> <span class=err>同様</span> <span class=p>...</span>
+<span class=p>};</span>
+
+<span class=c1>// main
+</span><span class=c1></span><span class=n>Handler</span> <span class=o>*</span><span class=n>pHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=n>ConcreteHandler1</span><span class=p>(</span><span class=k>new</span> <span class=n>ConcreteHandler2</span><span class=p>(</span><span class=k>new</span> <span class=n>CocreteHandler3</span><span class=p>());</span>
+<span class=n>pHandler</span><span class=o>-&gt;</span><span class=n>HandleRequest</span><span class=p>(</span><span class=n>someKindOfRequest</span><span class=p>);</span></code></pre></div></div>
+</figure>
+<h4 id=メモ>メモ</h4>
+<ul>
+<li>ツリー構造が既に構成されているなら、親ノードへのポインタを successor ポインタの代わりに利用できる。</li>
+<li>チェーンがループしないように注意しなきゃね。</li>
+<li>リクエストの転送部分以外の実際の処理部分だけを子クラスで実装するようにしてもよい。その場合は、リクエストを処理したかどうかを示す真偽値をハンドラメソッドの戻り値で返すようにして転送させる必要があるかどうかを親クラス側で判断する。いくつかの Windows API がこの方法を採用している。</li>
+<li>Q. すでに何らかのクラスを継承済みのクラスに Handler の役割を持たせたい場合は？
+<ul>
+<li>A. 既存のクラスに Handler を継承させるのではなく、チェーンを構成するための ConcreteHandler クラス群を別に作り、それに既存のクラスの処理を委譲させればよい。</li>
+</ul>
+</li>
+</ul>
+<h3 id=14-command-パターン>(14) Command パターン</h3>
+<p>要求の処理方法を Command オブジェクトにカプセル化し、好きなタイミングで要求を処理できるようにする。処理を発火させるオブジェクト (Invoker) は、処理方法を知らなくてもよいので、簡単に要求の種類 (Command) を増やすことができる。</p>
+<p>処理内容は Command オブジェクト内に直接実装してもよいし、Command オブジェクトに保持させた他のオブジェクト (Receiver) に委譲してもよい。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>Command</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=o>~</span><span class=n>Command</span><span class=p>();</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>Execute</span><span class=p>()</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>HelloCommand</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Command</span> <span class=p>{</span>
+<span class=k>private</span><span class=o>:</span>
+    <span class=n>string</span> <span class=n>m_name</span><span class=p>;</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=n>HelloCommand</span><span class=p>(</span><span class=n>string</span> <span class=n>name</span><span class=p>)</span> <span class=o>:</span> <span class=n>m_name</span><span class=p>(</span><span class=n>name</span><span class=p>)</span> <span class=p>{}</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>Execute</span><span class=p>()</span> <span class=p>{</span> <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Hello &#34;</span> <span class=o>&lt;&lt;</span> <span class=n>name</span><span class=p>;</span> <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>GoodByeCommand</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Command</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=n>Execute</span><span class=p>()</span> <span class=p>{</span> <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Good bye&#34;</span><span class=p>;</span> <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=c1>// main
+</span><span class=c1></span><span class=n>buttonA</span><span class=p>.</span><span class=n>SetCommand</span><span class=p>(</span><span class=k>new</span> <span class=n>HelloCommand</span><span class=p>(</span><span class=s>&#34;Mike&#34;</span><span class=p>));</span>  <span class=c1>// ボタン A が押された時の処理を設定
+</span><span class=c1></span><span class=n>buttonB</span><span class=p>.</span><span class=n>SetCommand</span><span class=p>(</span><span class=k>new</span> <span class=n>GoodByeCommand</span><span class=p>());</span>  <span class=c1>// ボタン B が押された時の処理を設定
+</span><span class=c1></span><span class=n>timer</span><span class=p>.</span><span class=n>SetCommand</span><span class=p>(</span><span class=k>new</span> <span class=n>GoodByeCommand</span><span class=p>(),</span> <span class=mi>10</span><span class=p>);</span>  <span class=c1>// 10 分のタイマーが切れた時の処理を設定
+</span></code></pre></div></div>
+</figure>
+<p><code>Command::Execute()</code> を実行する前の状態を Command オブジェクトが保持するようにしておけば、<code>Command::Undo()</code>、<code>Command::Redo()</code> などを実装することができる。</p>
+<h3 id=15-interpreter-パターン>(15) Interpreter パターン</h3>
+<p>ある言語ルールに従った表現 (Expression) をオブジェクトの構造（構文木など）で表現し、そのオブジェクト構造をもとに言語を解釈（式の評価など）できるようにする。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>Expression</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=kt>int</span> <span class=n>Evaluate</span><span class=p>()</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>Number</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Expression</span> <span class=p>{</span>
+<span class=k>private</span><span class=o>:</span>
+    <span class=kt>int</span> <span class=n>m_num</span><span class=p>;</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=n>Number</span><span class=p>(</span><span class=kt>int</span> <span class=n>num</span><span class=p>)</span> <span class=o>:</span> <span class=n>m_num</span><span class=p>(</span><span class=n>num</span><span class=p>)</span> <span class=p>{}</span>
+    <span class=k>virtual</span> <span class=kt>int</span> <span class=nf>Evaluate</span><span class=p>()</span> <span class=p>{</span> <span class=k>return</span> <span class=n>m_num</span><span class=p>;</span> <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>PlusExpression</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Expression</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=n>PlusExpression</span><span class=p>(</span><span class=n>Expression</span> <span class=o>*</span><span class=n>exp1</span><span class=p>,</span> <span class=n>Expression</span> <span class=o>*</span><span class=n>exp2</span><span class=p>)</span> <span class=o>:</span>
+        <span class=n>m_exp1</span><span class=p>(</span><span class=n>exp1</span><span class=p>),</span> <span class=n>m_exp2</span><span class=p>(</span><span class=n>exp2</span><span class=p>)</span> <span class=p>{}</span>
+
+    <span class=c1>// 足し算の解釈方法を定義（解釈方法は実装言語に依存した形で実装する）
+</span><span class=c1></span>    <span class=k>virtual</span> <span class=kt>int</span> <span class=nf>Evaluate</span><span class=p>()</span> <span class=p>{</span>
+        <span class=k>return</span> <span class=n>m_exp1</span><span class=p>.</span><span class=n>Evaluate</span><span class=p>()</span> <span class=o>+</span> <span class=n>m_exp2</span><span class=p>.</span><span class=n>Evaluate</span><span class=p>();</span>
+    <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=c1>// main
+</span><span class=c1>// &#34;(100 + 200) + 300&#34; を表現し、解釈する
+</span><span class=c1></span><span class=n>Expression</span> <span class=o>*</span><span class=n>pExp</span> <span class=o>=</span> <span class=k>new</span> <span class=n>PlusExpression</span><span class=p>(</span>
+    <span class=k>new</span> <span class=n>Expression</span><span class=p>(</span><span class=k>new</span> <span class=n>Number</span><span class=p>(</span><span class=mi>100</span><span class=p>),</span> <span class=k>new</span> <span class=n>Number</span><span class=p>(</span><span class=mi>200</span><span class=p>)),</span>
+    <span class=k>new</span> <span class=n>Number</span><span class=p>(</span><span class=mi>300</span><span class=p>));</span>
+<span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=n>pExp</span><span class=o>-&gt;</span><span class=n>Evaluate</span><span class=p>()</span> <span class=o>&lt;&lt;</span> <span class=n>endl</span><span class=p>;</span>    <span class=c1>// 600
+</span></code></pre></div></div>
+</figure>
+<p>生成したオブジェクト構造それ自身に意味を解釈する (interpret) 能力を持たせるところがポイント。オブジェクト構造を構成する要素 (Expression) それぞれに自分自身を解釈する機能を持たせているため、新しい表現を追加する場合は Expression を追加するだけで、自動的に言語の解釈方法が拡張されることになる（当然、パースしてこういったオブジェクト構造を作成する部分は変更しなければならないが）。</p>
+<h3 id=16-iterator-パターン>(16) Iterator パターン</h3>
+<p>様々な集約構造 (aggregate) 内の要素を、統一されたインタフェースで順にアクセスする。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>template</span><span class=o>&lt;</span><span class=n>Item</span><span class=o>&gt;</span>
+<span class=k>class</span> <span class=nc>ListIterator</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Iterator</span> <span class=p>{</span>  <span class=c1>// List の要素を走査する Iterator
+</span><span class=c1></span><span class=k>public</span><span class=o>:</span>
+    <span class=n>ListIterator</span><span class=p>(</span><span class=k>const</span> <span class=n>List</span><span class=o>&lt;</span><span class=n>Item</span><span class=o>&gt;</span> <span class=o>*</span><span class=n>pList</span><span class=p>)</span> <span class=o>:</span> <span class=n>m_pList</span><span class=p>(</span><span class=n>pList</span><span class=p>),</span> <span class=n>m_index</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span> <span class=p>{}</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>First</span><span class=p>()</span> <span class=p>{</span> <span class=n>m_index</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=p>}</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>Next</span><span class=p>()</span> <span class=p>{</span> <span class=o>++</span><span class=n>m_index</span><span class=p>;</span> <span class=p>}</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=kt>bool</span> <span class=nf>IsDone</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span> <span class=k>return</span> <span class=n>m_index</span> <span class=o>&gt;=</span> <span class=n>m_pList</span><span class=p>.</span><span class=n>Size</span><span class=p>();</span> <span class=p>}</span>
+    <span class=k>virtual</span> <span class=n>Item</span> <span class=nf>CurrentItem</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span> <span class=k>return</span> <span class=n>m_pList</span><span class=p>.</span><span class=n>Item</span><span class=p>(</span><span class=n>m_index</span><span class=p>);</span> <span class=p>}</span>
+<span class=k>private</span><span class=o>:</span>
+    <span class=k>const</span> <span class=n>List</span><span class=o>&lt;</span><span class=n>Item</span><span class=o>&gt;</span> <span class=o>*</span><span class=n>m_pList</span><span class=p>;</span>
+    <span class=kt>int</span> <span class=n>m_index</span><span class=p>;</span>
+<span class=p>};</span>
+
+<span class=c1>// main
+</span><span class=c1></span><span class=n>List</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=o>*</span><span class=n>pList</span> <span class=o>=</span> <span class=k>new</span> <span class=n>List</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span><span class=p>;</span>
+<span class=n>pList</span><span class=o>-&gt;</span><span class=n>Add</span><span class=p>(</span><span class=mi>100</span><span class=p>);</span>
+<span class=n>pList</span><span class=o>-&gt;</span><span class=n>Add</span><span class=p>(</span><span class=mi>200</span><span class=p>);</span>
+
+<span class=n>ListIterator</span> <span class=nf>it</span><span class=p>(</span><span class=n>pList</span><span class=p>);</span>
+<span class=k>for</span> <span class=p>(</span><span class=n>it</span><span class=o>-&gt;</span><span class=n>First</span><span class=p>();</span> <span class=o>!</span><span class=n>it</span><span class=o>-&gt;</span><span class=n>IsDone</span><span class=p>();</span> <span class=n>it</span><span class=o>-&gt;</span><span class=n>Next</span><span class=p>())</span> <span class=p>{</span>
+    <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=n>pList</span><span class=o>-&gt;</span><span class=n>CurrentItem</span><span class=p>()</span> <span class=o>&lt;&lt;</span> <span class=n>endl</span><span class=p>;</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>特定の条件を満たす要素だけを抽出するフィルタ用途の iterator を作ったり、走査の順序を変えた iterator を作ったりすることができる。
+aggregate がインタフェースにより抽象化されているのなら、ひとつの iterator を様々な aggregate に対して適用できる。</p>
+<h3 id=17-mediator-パターン>(17) Mediator パターン</h3>
+<p>複数のオブジェクト間のやり取りを、ひとつのオブジェクトに集約する。
+オブジェクト間の連携方法は Mediator オブジェクトに隠蔽される。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装例 （ListBox、TextBox への入力を互いに反映させる Mediator）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>QuickEntryMediator</span> <span class=o>:</span> <span class=k>public</span> <span class=n>ListBoxListener</span><span class=p>,</span> <span class=k>public</span> <span class=n>TextBoxListener</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=n>QuickEntryMediator</span><span class=p>(</span><span class=n>ListBox</span> <span class=o>*</span><span class=n>pListBox</span><span class=p>,</span> <span class=n>TextBox</span> <span class=o>*</span><span class=n>pTextBox</span><span class=p>)</span> <span class=p>{</span>
+        <span class=o>:</span> <span class=n>m_pListBox</span><span class=p>(</span><span class=n>pListBox</span><span class=p>),</span> <span class=n>m_pTextBox</span><span class=p>(</span><span class=n>pTextBox</span><span class=p>)</span> <span class=p>{</span>
+        <span class=n>m_pListBox</span><span class=p>.</span><span class=n>addListener</span><span class=p>(</span><span class=k>this</span><span class=p>);</span>
+        <span class=n>m_pTextBox</span><span class=p>.</span><span class=n>addListener</span><span class=p>(</span><span class=k>this</span><span class=p>);</span>
+    <span class=p>}</span>
+    <span class=k>virtual</span> <span class=o>~</span><span class=n>QuickEntryMediator</span><span class=p>()</span> <span class=p>{</span>
+        <span class=n>m_pListBox</span><span class=p>.</span><span class=n>deleteListener</span><span class=p>(</span><span class=k>this</span><span class=p>);</span>
+        <span class=n>m_pTextBox</span><span class=p>.</span><span class=n>deleteListener</span><span class=p>(</span><span class=k>this</span><span class=p>);</span>
+    <span class=p>}</span>
+
+    <span class=c1>// ListBox の選択が変更されたら、TextBox に内容を表示
+</span><span class=c1></span>    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>OnListBoxChanged</span><span class=p>(</span><span class=k>const</span> <span class=n>Event</span><span class=o>&amp;</span> <span class=n>e</span><span class=p>)</span> <span class=p>{</span>
+        <span class=n>m_pTextBox</span><span class=o>-&gt;</span><span class=n>SetText</span><span class=p>(</span><span class=n>m_pListBox</span><span class=o>-&gt;</span><span class=n>GetSelectedText</span><span class=p>());</span>
+    <span class=p>}</span>
+
+    <span class=c1>// TextBox の内容が変更されたら、対応する ListBox の項目を選択
+</span><span class=c1></span>    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>OnTextBoxChanged</span><span class=p>(</span><span class=k>const</span> <span class=n>Event</span><span class=o>&amp;</span> <span class=n>e</span><span class=p>)</span> <span class=p>{</span>
+        <span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=n>GetCorrespondingIndex</span><span class=p>(</span><span class=n>m_pTextBox</span><span class=p>.</span><span class=n>GetText</span><span class=p>());</span>
+        <span class=k>if</span> <span class=p>(</span><span class=n>i</span> <span class=o>&gt;</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
+            <span class=n>m_pListBox</span><span class=o>-&gt;</span><span class=n>Select</span><span class=p>(</span><span class=n>i</span><span class=p>);</span>
+        <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+            <span class=n>m_pListBox</span><span class=o>-&gt;</span><span class=n>Unselect</span><span class=p>();</span>
+        <span class=p>}</span>
+    <span class=p>}</span>
+
+    <span class=kt>int</span> <span class=nf>GetCorrespondingIndex</span><span class=p>(</span><span class=k>const</span> <span class=n>string</span><span class=o>&amp;</span> <span class=n>text</span><span class=p>)</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>
+<span class=p>};</span></code></pre></div></div>
+</figure>
+<p>言い換えれば、汎用性のない部分が Mediator に集約される。</p>
+<h3 id=18-memento-パターン>(18) Memento パターン</h3>
+<p>あるオブジェクト (Originator) の状態をオブジェクト (Memento) に保存し、後からその状態を復元できるようにする。Memento オブジェクトの内容は Originator のみが設定／参照できる。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=c1>// Originator のある時点の状態（スナップショット）を保存
+</span><span class=c1></span><span class=k>class</span> <span class=nc>Memento</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=o>~</span><span class=n>Memento</span><span class=p>();</span>
+<span class=k>private</span><span class=o>:</span>
+    <span class=c1>// Memento の内容は対象の Originator だけが設定／参照する
+</span><span class=c1></span>    <span class=k>friend</span> <span class=k>class</span> <span class=nc>Originator</span><span class=p>;</span>
+
+    <span class=n>Memento</span><span class=p>();</span>
+    <span class=kt>void</span> <span class=nf>GetState</span><span class=p>(</span><span class=n>State</span> <span class=o>&amp;</span><span class=n>state</span><span class=p>)</span> <span class=p>{</span> <span class=n>state</span> <span class=o>=</span> <span class=n>m_state</span><span class=p>;</span> <span class=p>}</span>
+    <span class=kt>void</span> <span class=nf>SetState</span><span class=p>(</span><span class=k>const</span> <span class=n>State</span> <span class=o>&amp;</span><span class=n>state</span><span class=p>)</span> <span class=p>{</span> <span class=n>m_state</span> <span class=o>=</span> <span class=n>state</span><span class=p>;</span> <span class=p>}</span>
+    <span class=n>State</span> <span class=n>m_state</span><span class=p>;</span>  <span class=c1>// Originator の状態
+</span><span class=c1></span><span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>Originator</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=n>Originator</span><span class=p>()</span> <span class=p>{</span> <span class=n>m_state</span><span class=p>.</span><span class=n>ChangeState</span><span class=p>();</span> <span class=p>}</span>
+    <span class=n>Mement</span> <span class=nf>CreateMemento</span><span class=p>();</span>  <span class=c1>// 現在のスナップショットを Memento オブジェクトに保存
+</span><span class=c1></span>    <span class=kt>void</span> <span class=nf>SetMemento</span><span class=p>(</span><span class=k>const</span> <span class=n>Memento</span><span class=o>&amp;</span> <span class=n>memento</span><span class=p>);</span>  <span class=c1>// 状態を Memento オブジェクトから復帰
+</span><span class=c1></span>    <span class=kt>void</span> <span class=nf>ChangeState</span><span class=p>()</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>
+
+<span class=k>private</span><span class=o>:</span>
+    <span class=n>State</span> <span class=n>m_state</span><span class=p>;</span>
+<span class=p>};</span>
+
+<span class=c1>// main
+</span><span class=c1></span><span class=n>Originator</span> <span class=n>org</span><span class=p>;</span>
+<span class=n>org</span><span class=p>.</span><span class=n>ChangeState</span><span class=p>();</span>
+<span class=n>Mement</span> <span class=n>mement</span> <span class=o>=</span> <span class=n>org</span><span class=p>.</span><span class=n>CreateMemento</span><span class=p>();</span>  <span class=c1>// 現在の状態を Memento オブジェクトに保存
+</span><span class=c1></span><span class=n>org</span><span class=p>.</span><span class=n>ChangeState</span><span class=p>();</span>
+<span class=n>org</span><span class=p>.</span><span class=n>SetMemento</span><span class=p>(</span><span class=n>memento</span><span class=p>);</span>  <span class=c1>// 状態を復帰
+</span></code></pre></div></div>
+</figure>
+<h3 id=19-observer-パターン>(19) Observer パターン</h3>
+<p>オブジェクト (Subject) に変化があったときに、関連する他のオブジェクト (Observers) に自動で通知されるようにする。Subject は Observer が何を行うかを知らないでよい。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>Subject</span> <span class=p>{</span>  <span class=c1>// Subject interface
+</span><span class=c1></span><span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=o>~</span><span class=n>Subject</span><span class=p>();</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=o>*</span><span class=nf>Attach</span><span class=p>(</span><span class=n>Observer</span> <span class=o>*</span><span class=n>observer</span><span class=p>)</span> <span class=p>{</span>
+        <span class=n>m_observers</span><span class=p>.</span><span class=n>Add</span><span class=p>(</span><span class=n>observer</span><span class=p>);</span>
+    <span class=p>}</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=o>*</span><span class=nf>Detach</span><span class=p>(</span><span class=n>Observer</span> <span class=o>*</span><span class=n>observer</span><span class=p>)</span> <span class=p>{</span>
+        <span class=n>m_observers</span><span class=p>.</span><span class=n>Remove</span><span class=p>(</span><span class=n>observer</span><span class=p>);</span>
+    <span class=p>}</span>
+    <span class=kt>void</span> <span class=nf>Notify</span><span class=p>()</span> <span class=p>{</span>
+        <span class=n>ListIterator</span> <span class=n>it</span><span class=p>(</span><span class=n>m_observers</span><span class=p>);</span>
+        <span class=k>for</span> <span class=p>(</span><span class=n>it</span><span class=p>.</span><span class=n>First</span><span class=p>();</span> <span class=o>!</span><span class=n>it</span><span class=p>.</span><span class=n>IsDone</span><span class=p>();</span> <span class=n>it</span><span class=p>.</span><span class=n>Next</span><span class=p>())</span> <span class=p>{</span>
+            <span class=n>it</span><span class=p>.</span><span class=n>CurrentItem</span><span class=p>()</span><span class=o>-&gt;</span><span class=n>Update</span><span class=p>(</span><span class=k>this</span><span class=p>);</span>
+        <span class=p>}</span>
+    <span class=p>}</span>
+<span class=k>protected</span><span class=o>:</span>
+    <span class=n>Subject</span><span class=p>();</span>
+    <span class=n>List</span> <span class=n>m_observers</span><span class=p>;</span>
+<span class=p>}</span>
+
+<span class=k>class</span> <span class=nc>Observer</span> <span class=p>{</span>  <span class=c1>// Observer interface
+</span><span class=c1></span><span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=o>~</span><span class=n>Object</span><span class=p>();</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>Update</span><span class=p>(</span><span class=n>Subject</span> <span class=o>*</span><span class=n>changedSubject</span><span class=p>)</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+<span class=k>protected</span><span class=o>:</span>
+    <span class=n>Observer</span><span class=p>();</span>
+<span class=p>};</span></code></pre></div></div>
+</figure>
+<p>自動で通知といっても、どこかで <code>Subject#Notify()</code> を呼ばなきゃならないのだけど。</p>
+<h3 id=20-state-パターン>(20) State パターン</h3>
+<p>オブジェクトの状態を State オブジェクトとして表現し、それぞれの状態における振る舞いを定義する。State クラスのサブクラスを定義することによって、新たな状態の追加を柔軟に行える。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>Context</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=n>Context</span><span class=p>()</span> <span class=o>:</span> <span class=n>m_pState</span><span class=p>(</span><span class=k>new</span> <span class=n>ConcreteState1</span><span class=p>())</span> <span class=p>{}</span>
+    <span class=k>virtual</span> <span class=nf>Context</span><span class=p>()</span> <span class=p>{</span> <span class=k>delete</span> <span class=n>m_pState</span><span class=p>;</span> <span class=p>}</span>
+    <span class=kt>void</span> <span class=nf>Request</span><span class=p>()</span> <span class=p>{</span>
+        <span class=c1>// 現在の状態に応じた処理を行う。中で状態が変化することもある。
+</span><span class=c1></span>        <span class=n>m_pState</span><span class=o>-&gt;</span><span class=n>Handle</span><span class=p>(</span><span class=k>this</span><span class=p>);</span>
+    <span class=p>}</span>
+
+<span class=k>private</span><span class=o>:</span>
+    <span class=k>friend</span> <span class=k>class</span> <span class=nc>State</span><span class=p>;</span>  <span class=c1>// State オブジェクトにだけ ChangeState() を許可
+</span><span class=c1></span>    <span class=kt>void</span> <span class=nf>ChangeState</span><span class=p>(</span><span class=n>State</span> <span class=o>*</span><span class=n>pState</span><span class=p>)</span> <span class=p>{</span>
+        <span class=k>delete</span> <span class=n>m_pState</span><span class=p>;</span>
+        <span class=n>m_pState</span> <span class=o>=</span> <span class=n>pState</span><span class=p>;</span>
+    <span class=p>}</span>
+    <span class=n>State</span> <span class=o>*</span><span class=n>m_pState</span><span class=p>;</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>State</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=n>Handle</span><span class=p>(</span><span class=n>Context</span> <span class=o>*</span><span class=n>pContext</span><span class=p>)</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>ConcreteState1</span> <span class=o>:</span> <span class=k>public</span> <span class=n>State</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=n>Handle</span><span class=p>(</span><span class=n>Context</span> <span class=o>*</span><span class=n>pContext</span><span class=p>)</span> <span class=p>{</span>
+        <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;state1&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>endl</span><span class=p>;</span>
+        <span class=n>pContext</span><span class=o>-&gt;</span><span class=n>ChangeState</span><span class=p>(</span><span class=k>new</span> <span class=n>ConcreteState2</span><span class=p>());</span>
+    <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>ConcreteState2</span> <span class=o>:</span> <span class=k>public</span> <span class=n>State</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=n>Handle</span><span class=p>(</span><span class=n>Context</span> <span class=o>*</span><span class=n>pContext</span><span class=p>)</span> <span class=p>{</span>
+        <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;state2&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>endl</span><span class=p>;</span>
+        <span class=n>pContext</span><span class=o>-&gt;</span><span class=n>ChangeState</span><span class=p>(</span><span class=k>new</span> <span class=n>ConcreteState1</span><span class=p>());</span>
+    <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<h3 id=21-strategy-パターン>(21) Strategy パターン</h3>
+<p>アルゴリズムをオブジェクトにカプセル化し、自由に取り替えられるようにする。多態性の基本的な考え方。委譲によりアルゴリズムを切り替える。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>TextBox</span> <span class=p>{</span>  <span class=c1>// Strategy を利用するクラス
+</span><span class=c1></span><span class=k>public</span><span class=o>:</span>
+    <span class=kt>bool</span> <span class=n>IsValid</span><span class=p>()</span> <span class=p>{</span>
+        <span class=c1>// このテキストボックスに入力された値が正しいかをチェック。
+</span><span class=c1></span>        <span class=c1>// チェックの仕組み (Strategy) は自由に入れ換えられる。
+</span><span class=c1></span>        <span class=k>return</span> <span class=n>m_pValidator</span><span class=o>-&gt;</span><span class=n>IsValid</span><span class=p>(</span><span class=n>GetText</span><span class=p>());</span>
+    <span class=p>}</span>
+    <span class=p>...</span>
+<span class=k>private</span><span class=o>:</span>
+    <span class=n>Strategy</span> <span class=o>*</span><span class=n>m_pValidator</span><span class=p>;</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>Validator</span> <span class=p>{</span>  <span class=c1>// テキストのフォーマットが正しいかを検証する Strategy
+</span><span class=c1></span><span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=kt>bool</span> <span class=n>IsValid</span><span class=p>(</span><span class=n>string</span> <span class=n>text</span><span class=p>)</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>PostalCodeValidator</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Validator</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=kt>bool</span> <span class=n>IsValid</span><span class=p>(</span><span class=n>string</span> <span class=n>text</span><span class=p>)</span> <span class=p>{</span>
+        <span class=p>...</span> <span class=n>text</span> <span class=err>が郵便番号として正しいなら</span> <span class=nb>true</span> <span class=err>を返す</span>
+    <span class=p>}</span>
+<span class=p>};</span></code></pre></div></div>
+</figure>
+<h3 id=22-template-method-パターン>(22) Template Method パターン</h3>
+<p>メソッドの呼び出し方法（アルゴリズムの大枠）を template method として定義し、各メソッド (primitive operations) の実装をサブクラスで行えるようにする。</p>
+<p>アルゴリズムの不変な部分、変化する部分を明確に分けることができる。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実装イメージ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>AbstractClass</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=c1>// TemplateMethod 内でメソッドの呼び出し順序（アルゴリズム）が固定される
+</span><span class=c1></span>    <span class=kt>void</span> <span class=n>TemplateMethod</span><span class=p>()</span> <span class=p>{</span>
+        <span class=n>PrimitiveOperation1</span><span class=p>();</span>
+        <span class=n>PrimitiveOperation2</span><span class=p>();</span>
+        <span class=p>...</span>
+    <span class=p>}</span>
+<span class=k>protected</span><span class=o>:</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=n>PrimitiveOperation1</span><span class=p>()</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>PrimitiveOperation2</span><span class=p>()</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>ConcreteClass</span> <span class=o>:</span> <span class=k>public</span> <span class=n>AbstractClass</span> <span class=p>{</span>
+<span class=k>protected</span><span class=o>:</span>
+    <span class=c1>// TemplateMethod の中で呼ばれる各ステップの実装はサブクラスで定義できる
+</span><span class=c1></span>    <span class=k>virtual</span> <span class=kt>void</span> <span class=n>PrimitiveOperation1</span><span class=p>()</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>
+    <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>PrimitiveOperation2</span><span class=p>()</span> <span class=p>{</span> <span class=p>...</span> <span class=p>}</span>
+<span class=p>};</span></code></pre></div></div>
+</figure>
+<p>abstract メソッドを定義した時点で、ほぼこのパターンになる。</p>
+<p>Strategy パターンが委譲によってアルゴリズムの一部を変更するのに対し、Template Method パターンは継承によってアルゴリズムの一部を変更する。</p>
+<h3 id=23-visitor-パターン>(23) Visitor パターン</h3>
+<p>ある構文をあらわしたオブジェクト構造（ツリーなど）を意味解釈するために、意味解釈するためのオブジェクト (Visitor) を各オブジェクト (Element) に巡回させ、その過程で意味を解釈していく。オブジェクト構造を解釈するためのオペレーションを、各 Element に散らばらせることなく、ひとつの Visitor オブジェクトにまとめられる。</p>
+<p>オブジェクト構造を構成する各 Element は、巡回してきた Visitor を Accept() メソッドで処理する。ここでは単純に自分自身を Visitor に渡し、意味解釈を Visitor オブジェクトに委譲すればよい。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=kt>void</span> <span class=n>ElementA</span><span class=o>::</span><span class=n>Accept</span><span class=p>(</span><span class=n>Visitor</span><span class=o>&amp;</span> <span class=n>visitor</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>visitor</span><span class=p>.</span><span class=n>VisitElementA</span><span class=p>(</span><span class=k>this</span><span class=p>);</span>  <span class=c1>// 意味解釈は Visitor に任せる
+</span><span class=c1></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<p>オブジェクト構造を別の方法で意味解釈したい場合は、Visitor のサブクラスを新たに作成し、上記の例における VisitElementA() などを適切に実装するだけでよい。この時、各 Element の実装を変更する必要はない。</p>
+<p>Interpreter パターンでは、オブジェクト構造自体に意味解釈する機能を持たせるが、さらに Visitor パターンを適用することで、いろんな方法で意味解釈できるようになる。</p>
+<p>ConcreteVisitor を実装するのは、XML の SAX Parser を実装するのに似てるかな。</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=../../p/r58xbyk/>無名サブルーチンとクロージャ</a></li>
+<li><a href=../../p/96rfove/>読書メモ『アイデアのつくり方』ジェームス・ウェブ・ヤング</a></li>
+<li><a href=../../p/dk63fzr/>読書メモ『ヤル気が格段に高まる科学的習慣』BIG tomorrow August 2005</a></li>
+<li><a href=../../p/m3p8hh6/>数値計算系のプログラムメモ</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム</a></span>
+<span class=xPageTags_item><a href=../../tags/%E8%AA%AD%E6%9B%B8>読書</a></span>
+<span class=xPageTags_item><a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=../../p/xb5w4in/><span class=xArticle_up_label>デザインパターン/UMLのメモ</span><br>へ戻る</a>
+</div>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_next>
+<a href=../../p/yzs49gv/>UML ダイアグラムの一覧と分類</a>
+</div>
+</div>
+</aside>
+</article>
+<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
+</main>
+</div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/xb5w4in/>デザインパターン/UML</a>
+</span>
+<span class=xBreadcrumb_item>１時間で分かる GoF デザインパターン
+</span>
+</div>
+</aside>
+<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
+<div id=xSiteFooter2>
+<a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
+</div>
+</div>
+<script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c];b.setAttribute('target','_blank'),b.setAttribute('rel','noopener');const d=b.getElementsByTagName('img');if(d.length>0)continue;b.classList.add('xExternalLinkIcon')}})</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"デザインパターン/UML","item":"https://maku.blog/p/xb5w4in/"},{"@type":"ListItem","position":4,"name":"１時間で分かる GoF デザインパターン","item":"https://maku.blog/p/7gmjvza/"}]}</script>
+</body>
+</html>

@@ -1,0 +1,1440 @@
+<!doctype html><html lang=ja-jp>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>DynamoDB を Node.js で操作する（SDK ver.2 の場合）｜まくろぐ</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
+<meta property="og:title" content="DynamoDB を Node.js で操作する（SDK ver.2 の場合）">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maku.blog/p/8t7iu6g/">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://maku.blog/assets/img/site-logo-large.png">
+<meta property="og:description" content="ここでは、Node.js 用の AWS SDK ver.2 を使って Amazon DynamoDB を操作する方法を説明します。 TypeScript の基本的な環境構築 は終わっているものとします。
+SDK ver.3 を使う方法はこちらの記事 を参照してください。 基本的には ver.3 の使用が推奨されていますが、AWS の Lambda 実行環境は現時点（2021年5月）でも ver.2 がインストールされていたりするので、ver.2 の需要はまだあると思います。
+Dynamo DB 用の SDK (ver.2) をインストールする AWS SDK version 2 で DynamoDB を扱うには、次のように AWS SDK パッケージ全体をインストールする必要があります（version 3 では DynamoDB サービスなどのパッケージを個別にインストールできます）。
+$ npm install aws-sdk --save  これで、TypeScript コードから次のように SDK モジュールをインポートできるようになります。
+import * as AWS from 'aws-sdk';  AWS.DynamoDB だけ参照したければ、次のようにインポートできます。
+import { DynamoDB } from 'aws-sdk';  DynamoDB インスタンスの生成 基本 DynamoDB の API を呼び出すには、まずは AWS.">
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
+<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
+<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
+<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
+<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
+<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
+</head>
+<body>
+<div id=xRoot>
+<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/7s7hs4e/>AWS</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3jt3bjr/>DynamoDB</a>
+</span>
+<span class=xBreadcrumb_item>DynamoDB を Node.js で操作する（SDK ver.2 の場合）
+</span>
+</div>
+</aside>
+<div id=xContainer>
+<nav id=xMenu aria-label=メニュー>
+<div id=sidebar style=height:100%>
+<div id=sidebar_notFixed>
+<a href=../../><img src=../../assets/img/site-logo.png></a>
+<div class=xMenu_box data-sticky>
+<form action=https://cse.google.com/cse target=_blank>
+<div class=xSearchBox>
+<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<input type=hidden name=ie value=UTF-8>
+<input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
+<input type=submit value=検索></input>
+</div>
+</form>
+<div class=xMenu_box_body>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
+<div class=xMenu_box_body>
+<div class=xBoxLink>
+<a href=../../p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う
+<time>2022-03-17</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ryq6it6/>NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ
+<time>2022-03-16</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/un3gu8m/>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする
+<time>2022-02-27</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/m4dmu4c/>Next.js でブラウザ履歴で戻るボタンを表示する (router.back)
+<time>2022-02-22</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ter3doz/>Linuxメモ: Bluetooth 関連コマンドのメモ (hciconfig, bluetoothctl)
+<time>2022-02-20</time></a>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title>フォルダ</h3>
+<div class=xMenu_box_body>
+<div class=xNavTree>
+<ul>
+<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
+<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
+<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
+<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
+<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
+<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
+<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
+<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
+<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/vigdnzf/>CLI</a>
+<li><a class=xNavTree-dir href=../../p/q7fov5c/>S3</a>
+<li><a class=xNavTree-dir href=../../p/wn52kog/>IAM</a>
+<li><a class=xNavTree-dir href=../../p/eyeq2do/>Lambda</a>
+<li><a class=xNavTree-dir href=../../p/cxcozak/>EC2</a>
+<li><a class=xNavTree-dir href=../../p/au8is4e/>CodeBuild</a>
+<li><a class=xNavTree-dir href=../../p/sdq2cnx/>CloudFormation/SAM/CDK</a>
+<li><a class=xNavTree-dir href=../../p/3jt3bjr/>DynamoDB</a>
+<ul>
+</ul>
+<li><a class=xNavTree-dir href=../../p/5o2cnw8/>SSM</a>
+<li><a class=xNavTree-dir href=../../p/3nybkv6/>AWS KMS</a>
+<li><a class=xNavTree-dir href=../../p/yz2h95y/>Cognito</a>
+<li><a class=xNavTree-dir href=../../p/szcbzgt/>AWS のトラブルシューティング</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
+<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
+<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
+<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
+<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
+<li><a class=xNavTree-dir href=../../p/uo7n4ix/>PowerShell</a>
+<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
+<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
+<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
+<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
+<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
+<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
+<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
+<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
+<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
+<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
+</ul>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
+<div class=xMenu_box_body><div class=xMenu_tag>
+<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (79)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure>azure (58)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/typescript>typescript (57)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws>aws (51)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/next.js>next.js (36)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/chatbot>chatbot (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/react>react (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/gnuplot>gnuplot (27)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github>github (23)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/graphql>graphql (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/node.js>node.js (17)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/electron>electron (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/linux>linux (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vs-code>vs-code (14)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/javascript>javascript (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mongodb>mongodb (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cdk>aws/cdk (12)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/android>android (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/java>java (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/nginx>nginx (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/python>python (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/uml>uml (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/3d>3d (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/lambda>aws/lambda (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sam>aws/sam (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unity>unity (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webgl>webgl (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-cli>azure-cli (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jade>jade (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apollo>apollo (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cognito>aws/cognito (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-storage>azure-storage (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/doxygen>doxygen (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase>firebase (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/luis>luis (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/material-ui>material-ui (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/qna-maker>qna-maker (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ansible>ansible (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cli>aws/cli (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/ssm>aws/ssm (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/c/c++>c/c++ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/eslint>eslint (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/firestore>firebase/firestore (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html/css>html/css (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sql>sql (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/windows>windows (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-functions>azure-functions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/cosmos-db>cosmos-db (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-actions>github-actions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-pages>github-pages (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jekyll>jekyll (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/kotlin>kotlin (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mac>mac (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/powershell>powershell (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/prettier>prettier (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sqlite>sqlite (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/textlint>textlint (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tv>tv (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apache>apache (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/arib>arib (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/amplify>aws/amplify (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/iam>aws/iam (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/kms>aws/kms (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/s3>aws/s3 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sdk>aws/sdk (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-app-service>azure-app-service (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/excel>excel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/hugo>hugo (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/npm>npm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/oauth>oauth (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/opengl>opengl (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/rsync>rsync (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/scp>scp (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/slack>slack (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teraterm>teraterm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unicode>unicode (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vercel>vercel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/zip>zip (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/.net>.net (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/androidstudio>androidstudio (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/atomic-design>atomic-design (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/blender>blender (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bluetooth>bluetooth (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bootstrap>bootstrap (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-framework>bot-framework (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/boto3>boto3 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/css>css (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dns>dns (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dvb>dvb (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/editorconfig>editorconfig (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/evernote>evernote (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/git>git (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/groovy>groovy (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html>html (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/iso>iso (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/json>json (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/macos>macos (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/parcel>parcel (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/raspberrypi>raspberrypi (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ssh>ssh (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teams>teams (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tex>tex (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ubuntu>ubuntu (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vim>vim (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/web>web (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webpack>webpack (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/wsl>wsl (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
+</div></div>
+</div>
+<div class=xMenu_box data-sticky><br></div>
+</div>
+<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
+</div>
+</div>
+</nav>
+<main id=xMain>
+<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_prev>
+<a href=../../p/5mv5dkt/>DynamoDB を Node.js で操作する（SDK ver.3 の場合）</a>
+</div>
+<div class=xPrevNextLink_next>
+<a href=../../p/wht5epz/>DynamoDB を Python で操作する (boto3)</a>
+</div>
+</div>
+</aside>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/7s7hs4e/>AWS</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/3jt3bjr/>DynamoDB</a></span></div>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/8t7iu6g/>DynamoDB を Node.js で操作する（SDK ver.2 の場合）</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/aws>AWS</a></span>
+<span class=xPageTags_item><a href=../../tags/aws/dynamodb>AWS/DynamoDB</a></span>
+<span class=xPageTags_item><a href=../../tags/typescript>TypeScript</a></span>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2021-05-01>2021-05-01</time><br>
+作成: <time itemprop=datePublished datetime=2021-05-01>2021-05-01</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#dynamo-db-用の-sdk-ver2-をインストールする>Dynamo DB 用の SDK (ver.2) をインストールする</a></li>
+<li><a href=#dynamodb-インスタンスの生成>DynamoDB インスタンスの生成</a>
+<ul>
+<li><a href=#基本>基本</a></li>
+<li><a href=#接続設定-config>接続設定 (config)</a></li>
+<li><a href=#プロキシ設定>プロキシ設定</a></li>
+<li><a href=#dynamodbdocumentclient-インスタンス>DynamoDB.DocumentClient インスタンス</a></li>
+</ul>
+</li>
+<li><a href=#テーブルを作成する-createtable>テーブルを作成する (createTable)</a></li>
+<li><a href=#テーブルを削除する-deletetable>テーブルを削除する (deleteTable)</a></li>
+<li><a href=#テーブルの一覧を取得する-listtables>テーブルの一覧を取得する (listTables)</a></li>
+<li><a href=#テーブルの詳細情報を取得する-describetable>テーブルの詳細情報を取得する (describeTable)</a></li>
+<li><a href=#アイテムを追加する-putitem>アイテムを追加する (putItem)</a>
+<ul>
+<li><a href=#dynamodb-を使う場合>DynamoDB を使う場合</a></li>
+<li><a href=#dynamodbdocumentclient-を使う場合>DynamoDB.DocumentClient を使う場合</a></li>
+</ul>
+</li>
+<li><a href=#アイテムの属性値を部分的に更新する-updateitem>アイテムの属性値を部分的に更新する (updateItem)</a>
+<ul>
+<li><a href=#dynamodb-を使う場合-1>DynamoDB を使う場合</a></li>
+<li><a href=#dynamodbdocumentclient-を使う場合-1>DynamoDB.DocumentClient を使う場合</a></li>
+</ul>
+</li>
+<li><a href=#アイテムを取得する-getitem>アイテムを取得する (getItem)</a>
+<ul>
+<li><a href=#dynamodb-を使う場合-2>DynamoDB を使う場合</a></li>
+<li><a href=#dynamodbdocumentclient-を使う場合-2>DynamoDB.DocumentClient を使う場合</a></li>
+</ul>
+</li>
+<li><a href=#アイテムを削除する-deleteitem>アイテムを削除する (deleteItem)</a>
+<ul>
+<li><a href=#dynamodb-を使う場合-3>DynamoDB を使う場合</a></li>
+<li><a href=#dynamodbdocumentclient-を使う場合-3>DynamoDB.DocumentClient を使う場合</a></li>
+</ul>
+</li>
+<li><a href=#バッチ処理---複数のアイテムを追加削除する-batchwriteitem>バッチ処理 - 複数のアイテムを追加・削除する (batchWriteItem)</a>
+<ul>
+<li><a href=#dynamodb-を使う場合-4>DynamoDB を使う場合</a></li>
+<li><a href=#dynamodbdocumentclient-を使う場合-4>DynamoDB.DocumentClient を使う場合</a></li>
+<li><a href=#batchwrite-のパラメーターを作るユーティリティ関数を作る>batchWrite のパラメーターを作るユーティリティ関数を作る</a></li>
+</ul>
+</li>
+<li><a href=#テーブル内の要素をすべて取得する-scan>テーブル内の要素をすべて取得する (scan)</a></li>
+<li><a href=#テーブル内の要素をプライマリーキーでフィルタして取得する-query>テーブル内の要素をプライマリーキーでフィルタして取得する (query)</a></li>
+</ul>
+</nav><p>ここでは、Node.js 用の AWS SDK ver.2 を使って Amazon DynamoDB を操作する方法を説明します。
+<a href=../../p/taiqx6d>TypeScript の基本的な環境構築</a> は終わっているものとします。</p>
+<p><a href=../../p/5mv5dkt>SDK ver.3 を使う方法はこちらの記事</a> を参照してください。
+基本的には ver.3 の使用が推奨されていますが、AWS の Lambda 実行環境は現時点（2021年5月）でも ver.2 がインストールされていたりするので、ver.2 の需要はまだあると思います。</p>
+<h2 id=dynamo-db-用の-sdk-ver2-をインストールする>Dynamo DB 用の SDK (ver.2) をインストールする</h2>
+<p>AWS SDK version 2 で DynamoDB を扱うには、次のように AWS SDK パッケージ全体をインストールする必要があります（version 3 では DynamoDB サービスなどのパッケージを個別にインストールできます）。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ npm install aws-sdk --save</code></pre></div></div>
+</figure>
+<p>これで、TypeScript コードから次のように SDK モジュールをインポートできるようになります。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>AWS</span> <span class=kr>from</span> <span class=s1>&#39;aws-sdk&#39;</span><span class=p>;</span></code></pre></div></div>
+</figure>
+<p><code>AWS.DynamoDB</code> だけ参照したければ、次のようにインポートできます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>DynamoDB</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;aws-sdk&#39;</span><span class=p>;</span></code></pre></div></div>
+</figure>
+<h2 id=dynamodb-インスタンスの生成>DynamoDB インスタンスの生成</h2>
+<h3 id=基本>基本</h3>
+<p>DynamoDB の API を呼び出すには、まずは <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html>AWS.DynamoDB</a> インスタンスを生成する必要があります。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>AWS</span> <span class=kr>from</span> <span class=s1>&#39;aws-sdk&#39;</span><span class=p>;</span>
+
+<span class=kr>const</span> <span class=nx>dynamoDb</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>AWS</span><span class=p>.</span><span class=nx>DynamoDB</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<h3 id=接続設定-config>接続設定 (config)</h3>
+<p><a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#constructor-property>DynamoDB コンストランクタ</a> の引数でオプションオブジェクトを渡すと、接続先のリージョンやエンドポイントを設定することができます。
+例えば、エンドポイントを <code>http://localhost:8000</code> に設定すれば、<a href=../../p/rdq4eq2>DynamoDB Local</a> によるテスト用サーバに接続できます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>AWS</span> <span class=kr>from</span> <span class=s1>&#39;aws-sdk&#39;</span><span class=p>;</span>
+
+<span class=kr>const</span> <span class=nx>dynamoDb</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>AWS</span><span class=p>.</span><span class=nx>DynamoDB</span><span class=p>({</span>
+  <span class=nx>apiVersion</span><span class=o>:</span> <span class=s1>&#39;2012-08-10&#39;</span><span class=p>,</span>
+  <span class=nx>region</span><span class=o>:</span> <span class=s1>&#39;ap-northeast-1&#39;</span><span class=p>,</span>
+  <span class=nx>endpoint</span><span class=o>:</span> <span class=s1>&#39;http://localhost:8000&#39;</span><span class=p>,</span>
+  <span class=nx>accessKeyId</span><span class=o>:</span> <span class=s1>&#39;fakeMyKeyId&#39;</span><span class=p>,</span>
+  <span class=nx>secretAccessKey</span><span class=o>:</span> <span class=s1>&#39;fakeSecretAccessKey&#39;</span><span class=p>,</span>
+<span class=p>});</span></code></pre></div></div>
+</figure>
+<p><a href=../../p/j5iu7it>認証情報ファイルなど</a> で実行ユーザーに適切な接続情報が設定されていれば、上記のようにコード内で接続設定する必要はありませんが、少なくとも <strong><code>apiVersion</code></strong> は明示しておくとが推奨されています。
+環境変数（<code>AWS_REGION</code>、<code>AWS_ACCESS_KEY_ID</code>、<code>AWS_SECRET_ACCESS_KEY</code> など）で接続情報を設定することもできます。</p>
+<p>接続情報の優先順位は次の通りです。</p>
+<ol>
+<li>プログラム内での設定（ローカル設定 ＞ グローバル設定）</li>
+<li>環境変数での設定 (<code>AWS_REGION</code>, <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code>, <code>AWS_SESSION_TOKEN</code>)</li>
+<li>認証情報ファイルでの設定 (<code>~/.aws/credentials</code>, <code>~/.aws/config</code>)</li>
+</ol>
+<p>SDK 全体のグローバル設定を変更する場合は、<strong><code>AWS.config.update</code></strong> メソッドに <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html>AWS.Config</a> オブジェクトを渡します。
+このグローバル設定は、これ以降に生成されるクライアントオブジェクトのデフォルト設定として使用されます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>AWS</span><span class=p>.</span><span class=nx>config</span><span class=p>.</span><span class=nx>update</span><span class=p>({</span>
+  <span class=nx>region</span><span class=o>:</span> <span class=s1>&#39;ap-northeast-1&#39;</span><span class=p>,</span>
+  <span class=nx>accessKeyId</span><span class=o>:</span> <span class=s1>&#39;fakeMyKeyId&#39;</span><span class=p>,</span>
+  <span class=nx>secretAccessKey</span><span class=o>:</span> <span class=s1>&#39;fakeSecretAccessKey&#39;</span><span class=p>,</span>
+  <span class=nx>dynamodb</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>apiVersion</span><span class=o>:</span> <span class=s1>&#39;2012-08-10&#39;</span><span class=p>,</span>
+    <span class=nx>endpoint</span><span class=o>:</span> <span class=s1>&#39;http://localhost:8000&#39;</span>
+  <span class=p>}</span>
+<span class=p>});</span></code></pre></div></div>
+</figure>
+<h3 id=プロキシ設定>プロキシ設定</h3>
+<p>社内のプロキシ環境などから接続するときは、<code>AWS.Config</code> の <strong><code>httpOptions</code></strong> プロパティを使用します。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>proxy-agent のインストール</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ npm install proxy-agent --save</code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>AWS</span> <span class=kr>from</span> <span class=s1>&#39;aws-sdk&#39;</span><span class=p>;</span>
+<span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>proxy</span> <span class=kr>from</span> <span class=s1>&#39;proxy-agent&#39;</span><span class=p>;</span>
+
+<span class=nx>AWS</span><span class=p>.</span><span class=nx>config</span><span class=p>.</span><span class=nx>update</span><span class=p>({</span>
+  <span class=nx>httpOptions</span><span class=o>:</span> <span class=p>{</span> <span class=nx>agent</span>: <span class=kt>proxy</span><span class=p>(</span><span class=s1>&#39;http://internal.proxy.com&#39;</span><span class=p>)</span> <span class=p>}</span>
+<span class=p>});</span></code></pre></div></div>
+</figure>
+<h3 id=dynamodbdocumentclient-インスタンス>DynamoDB.DocumentClient インスタンス</h3>
+<p><code>AWS.DynamoDB</code> インスタンスの代わりに、<code>AWS.DynamoDB.DocumentClient</code> インスタンスを使うと、もう少し抽象度の高い API で CRUD 系操作を行えるようです。
+用途によってはこちらを使った方が楽かもしれませんが、<code>createTable</code> などテーブル自体の操作はできません。</p>
+<ul>
+<li><a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html>Class: AWS.DynamoDB.DocumentClient — AWS SDK for JavaScript</a></li>
+</ul>
+<p>インスタンスの作成方法は <code>AWS.DynamoDB</code> と同様です。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>AWS</span> <span class=kr>from</span> <span class=s1>&#39;aws-sdk&#39;</span><span class=p>;</span>
+
+<span class=kr>const</span> <span class=nx>dynamoDb</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>AWS</span><span class=p>.</span><span class=nx>DynamoDB</span><span class=p>.</span><span class=nx>DocumentClient</span><span class=p>(</span><span class=nx>option</span><span class=p>);</span></code></pre></div></div>
+</figure>
+<h2 id=テーブルを作成する-createtable>テーブルを作成する (createTable)</h2>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>AWS</span> <span class=kr>from</span> <span class=s1>&#39;aws-sdk&#39;</span><span class=p>;</span>
+<span class=kr>const</span> <span class=nx>dynamoDb</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>AWS</span><span class=p>.</span><span class=nx>DynamoDB</span><span class=p>({</span>
+  <span class=nx>apiVersion</span><span class=o>:</span> <span class=s1>&#39;2012-08-10&#39;</span><span class=p>,</span>
+  <span class=nx>region</span><span class=o>:</span> <span class=s1>&#39;ap-northeast-1&#39;</span>
+<span class=p>});</span>
+
+<span class=kr>async</span> <span class=kd>function</span> <span class=nx>createTable() {</span>
+  <span class=c1>// 作成するテーブルの情報
+</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.CreateTableInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span><span class=p>,</span>  <span class=c1>// テーブル名
+</span><span class=c1></span>    <span class=nx>BillingMode</span><span class=o>:</span> <span class=s1>&#39;PAY_PER_REQUEST&#39;</span><span class=p>,</span>  <span class=c1>// 課金方法
+</span><span class=c1></span>    <span class=nx>KeySchema</span><span class=o>:</span> <span class=p>[</span>
+      <span class=p>{</span> <span class=nx>AttributeName</span><span class=o>:</span> <span class=s1>&#39;Hardware&#39;</span><span class=p>,</span> <span class=nx>KeyType</span><span class=o>:</span> <span class=s1>&#39;HASH&#39;</span> <span class=p>},</span>  <span class=c1>// パーティションキー
+</span><span class=c1></span>      <span class=p>{</span> <span class=nx>AttributeName</span><span class=o>:</span> <span class=s1>&#39;GameId&#39;</span><span class=p>,</span> <span class=nx>KeyType</span><span class=o>:</span> <span class=s1>&#39;RANGE&#39;</span> <span class=p>},</span>  <span class=c1>// ソートキー
+</span><span class=c1></span>    <span class=p>],</span>
+    <span class=nx>AttributeDefinitions</span><span class=o>:</span> <span class=p>[</span>
+      <span class=p>{</span> <span class=nx>AttributeName</span><span class=o>:</span> <span class=s1>&#39;Hardware&#39;</span><span class=p>,</span> <span class=nx>AttributeType</span><span class=o>:</span> <span class=s1>&#39;S&#39;</span> <span class=p>},</span>  <span class=c1>// 文字列属性
+</span><span class=c1></span>      <span class=p>{</span> <span class=nx>AttributeName</span><span class=o>:</span> <span class=s1>&#39;GameId&#39;</span><span class=p>,</span> <span class=nx>AttributeType</span><span class=o>:</span> <span class=s1>&#39;S&#39;</span> <span class=p>},</span>  <span class=c1>// 文字列属性
+</span><span class=c1></span>    <span class=p>],</span>
+    <span class=nx>StreamSpecification</span><span class=o>:</span> <span class=p>{</span>
+      <span class=nx>StreamEnabled</span>: <span class=kt>false</span><span class=p>,</span>
+    <span class=p>},</span>
+  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>dynamoDb</span><span class=p>.</span><span class=nx>createTable</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=c1>// テーブルの作成に成功したら、ARN 情報を取得してみる
+</span><span class=c1></span>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>.</span><span class=nx>TableDescription</span><span class=o>?</span><span class=p>.</span><span class=nx>TableArn</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>arn:aws:dynamodb:ap-northeast-1:123456789012:table/Games</code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#createTable-property>DynamoDB.createTable</a></li>
+</ul>
+<h2 id=テーブルを削除する-deletetable>テーブルを削除する (deleteTable)</h2>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>async</span> <span class=kd>function</span> <span class=nx>deleteTable() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.DeleteTableInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span> <span class=c1>// 削除するテーブルの名前
+</span><span class=c1></span>  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>dynamoDb</span><span class=p>.</span><span class=nx>deleteTable</span><span class=p>(</span><span class=nx>params</span><span class=p>)</span> <span class=p>.</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>.</span><span class=nx>TableDescription</span><span class=o>?</span><span class=p>.</span><span class=nx>TableArn</span><span class=p>)</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=nx>deleteTable</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>arn:aws:dynamodb:ap-northeast-1:123456789012:table/Games</code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#deleteTable-property>DynamoDB.deleteTable</a></li>
+</ul>
+<h2 id=テーブルの一覧を取得する-listtables>テーブルの一覧を取得する (listTables)</h2>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>async</span> <span class=kd>function</span> <span class=nx>listTables() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.ListTablesInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>Limit</span>: <span class=kt>10</span>  <span class=c1>// 一度に取得するテーブル数
+</span><span class=c1></span>  <span class=p>}</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>dynamoDb</span><span class=p>.</span><span class=nx>listTables</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>.</span><span class=nx>TableNames</span><span class=o>?</span><span class=p>.</span><span class=nx>join</span><span class=p>(</span><span class=s1>&#39;\n&#39;</span><span class=p>));</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=nx>listTables</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#listTables-property>DynamoDB.listTables</a></li>
+</ul>
+<h2 id=テーブルの詳細情報を取得する-describetable>テーブルの詳細情報を取得する (describeTable)</h2>
+<p>指定したテーブルのスキーマ情報などを取得できます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>async</span> <span class=kd>function</span> <span class=nx>describeTable() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.DescribeTableInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span>
+  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>dynamoDb</span><span class=p>.</span><span class=nx>describeTable</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>.</span><span class=nx>Table</span><span class=o>?</span><span class=p>.</span><span class=nx>KeySchema</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=nx>describeTable</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>[</span>
+  <span class=p>{</span> <span class=nx>AttributeName</span><span class=o>:</span> <span class=s1>&#39;Hardware&#39;</span><span class=p>,</span> <span class=nx>KeyType</span><span class=o>:</span> <span class=s1>&#39;HASH&#39;</span> <span class=p>},</span>
+  <span class=p>{</span> <span class=nx>AttributeName</span><span class=o>:</span> <span class=s1>&#39;GameId&#39;</span><span class=p>,</span> <span class=nx>KeyType</span><span class=o>:</span> <span class=s1>&#39;RANGE&#39;</span> <span class=p>}</span>
+<span class=p>]</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#deleteTable-property>DynamoDB.describeTable</a></li>
+</ul>
+<h2 id=アイテムを追加する-putitem>アイテムを追加する (putItem)</h2>
+<h3 id=dynamodb-を使う場合>DynamoDB を使う場合</h3>
+<p><code>putItem</code> メソッドでテーブルに要素を追加するときは、少なくともプライマリキー属性（パーティションキー、およびソートキー）の指定が必要です（<code>Games</code> テーブルの例では <code>Hardware</code> と <code>GameId</code>）。
+すでに同じキーの要素が存在する場合、デフォルトでは新しい値で上書きされます。
+<code>ReturnValues</code> プロパティに <code>ALL_OLD</code> を指定しておくと、もともと格納されていた値を戻り値として取得できます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>async</span> <span class=kd>function</span> <span class=nx>putItem() {</span>
+  <span class=c1>// 追加先のテーブル名や、追加するアイテムを指定
+</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.PutItemInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span><span class=p>,</span>
+    <span class=nx>Item</span><span class=o>:</span> <span class=p>{</span>
+      <span class=nx>Hardware</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span> <span class=p>},</span>
+      <span class=nx>GameId</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span> <span class=p>},</span>
+      <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;Super Mario World&#39;</span> <span class=p>},</span>
+      <span class=nx>Players</span><span class=o>:</span> <span class=p>{</span> <span class=nx>N</span><span class=o>:</span> <span class=s1>&#39;2&#39;</span> <span class=p>},</span>
+      <span class=nx>Genre</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span> <span class=p>},</span>
+    <span class=p>},</span>
+    <span class=nx>ReturnValues</span><span class=o>:</span> <span class=s1>&#39;ALL_OLD&#39;</span> <span class=c1>// 同じプライマリキーの値があったら、過去の値を返す
+</span><span class=c1></span>  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>dynamoDb</span><span class=p>.</span><span class=nx>putItem</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=nx>putItem</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果（2回目以降の実行時）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
+  <span class=nx>Attributes</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;Super Mario World&#39;</span> <span class=p>},</span>
+    <span class=nx>Genre</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span> <span class=p>},</span>
+    <span class=nx>GameId</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span> <span class=p>},</span>
+    <span class=nx>Hardware</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span> <span class=p>},</span>
+    <span class=nx>Players</span><span class=o>:</span> <span class=p>{</span> <span class=nx>N</span><span class=o>:</span> <span class=s1>&#39;2&#39;</span> <span class=p>}</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p><code>putItem</code> メソッドはデフォルトではアイテムの内容を上書きしますが、この振る舞いを抑制したいときは、コマンドのパラメータに次のように <strong><code>ConditionExpression</code></strong> を指定します。
+このようにすると、プライマリキーが一致するアイテムがすでに存在する場合に、<code>ConditionalCheckFailedException</code> 例外が発生するようになります。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>async</span> <span class=kd>function</span> <span class=nx>putItem() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.PutItemInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span><span class=p>,</span>
+    <span class=nx>Item</span><span class=o>:</span> <span class=p>{</span>
+      <span class=nx>Hardware</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span> <span class=p>},</span>
+      <span class=nx>GameId</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span> <span class=p>},</span>
+      <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;Super Mario World&#39;</span> <span class=p>},</span>
+      <span class=nx>Players</span><span class=o>:</span> <span class=p>{</span> <span class=nx>N</span><span class=o>:</span> <span class=s1>&#39;2&#39;</span> <span class=p>},</span>
+      <span class=nx>Genre</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span> <span class=p>},</span>
+    <span class=p>},</span>
+    <span class=nx>ConditionExpression</span><span class=o>:</span> <span class=s1>&#39;attribute_not_exists(Hardware)&#39;</span>
+  <span class=p>};</span>
+  <span class=c1>// ...
+</span><span class=c1></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#putItem-property>DynamoDB.putItem</a></li>
+</ul>
+<h3 id=dynamodbdocumentclient-を使う場合>DynamoDB.DocumentClient を使う場合</h3>
+<p><code>DocumentClient</code> インスタンスを使用すると、属性値の指定が若干シンプルになります（<code>S</code> や <code>N</code> などのタイプ指定が必要なくなります）。
+それ以外は同じです。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>AWS</span> <span class=kr>from</span> <span class=s1>&#39;aws-sdk&#39;</span><span class=p>;</span>
+<span class=kr>const</span> <span class=nx>documentClient</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>AWS</span><span class=p>.</span><span class=nx>DynamoDB</span><span class=p>.</span><span class=nx>DocumentClient</span><span class=p>({</span>
+  <span class=nx>apiVersion</span><span class=o>:</span> <span class=s1>&#39;2012-08-10&#39;</span><span class=p>,</span>
+  <span class=nx>region</span><span class=o>:</span> <span class=s1>&#39;ap-northeast-1&#39;</span>
+<span class=p>});</span>
+
+<span class=kr>async</span> <span class=kd>function</span> <span class=nx>documentClient_put() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.DocumentClient.PutItemInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span><span class=p>,</span>
+    <span class=nx>Item</span><span class=o>:</span> <span class=p>{</span>
+      <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span><span class=p>,</span>
+      <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span><span class=p>,</span>
+      <span class=nx>Title</span><span class=o>:</span> <span class=s1>&#39;Super Mario World&#39;</span><span class=p>,</span>
+      <span class=nx>Players</span>: <span class=kt>2</span><span class=p>,</span>
+      <span class=nx>Genre</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span><span class=p>,</span>
+    <span class=p>},</span>
+    <span class=nx>ReturnValues</span><span class=o>:</span> <span class=s1>&#39;ALL_OLD&#39;</span> <span class=c1>// 同じプライマリキーの値があったら、過去の値を返す
+</span><span class=c1></span>  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>documentClient</span><span class=p>.</span><span class=nx>put</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=nx>documentClient_put</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<p>実行結果の形式も少しだけシンプルになります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果（2回目以降の実行時）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
+  <span class=nx>Attributes</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>Title</span><span class=o>:</span> <span class=s1>&#39;Super Mario World&#39;</span><span class=p>,</span>
+    <span class=nx>Genre</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span><span class=p>,</span>
+    <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span><span class=p>,</span>
+    <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span><span class=p>,</span>
+    <span class=nx>Players</span><span class=o>:</span> <span class=mi>2</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#put-property>DynamoDB.DocumentClient.put</a></li>
+</ul>
+<h2 id=アイテムの属性値を部分的に更新する-updateitem>アイテムの属性値を部分的に更新する (updateItem)</h2>
+<h3 id=dynamodb-を使う場合-1>DynamoDB を使う場合</h3>
+<p><code>putItem</code> に似たメソッドに <code>updateItem</code> があります。
+<code>putItem</code> はプライマリーキー属性が一致するアイテムがあると、その内容を完全に置き換えますが、<code>updateItem</code> の場合は、<strong>指定した属性の値のみを更新</strong> します（まだ存在しない属性を指定すると追加されます）。
+プライマリーキー属性に一致するアイテムが見つからない場合に、新しいアイテムを追加するのは <code>putItem</code> も <code>updateItem</code> も同様です。</p>
+<p>属性値の更新内容は、SQL のプレースホルダーを使った構文のような感じで指定する必要があります。
+DynamoDB の API は複雑すぎるとは聞いていましたが、確かにこの API 仕様はクレイジーですね・・・（AWS SDK が低レベルすぎるだけかもしれませんが）。
+次の例では、既存のアイテムの <code>Title</code> 属性の値を更新し、さらに新しい属性 <code>Maker</code> を追加しています。
+新しい属性名は <strong><code>#xxx</code></strong>、新しい属性値は <strong><code>:xxx</code></strong> といった形のプレースホルダーで指定する必要があります。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>async</span> <span class=kd>function</span> <span class=nx>updateItem() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.UpdateItemInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span><span class=p>,</span>
+    <span class=c1>// 更新するアイテムを特定するプライマリーキー属性
+</span><span class=c1></span>    <span class=nx>Key</span><span class=o>:</span> <span class=p>{</span>
+      <span class=nx>Hardware</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span> <span class=p>},</span>
+      <span class=nx>GameId</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span> <span class=p>}</span>
+    <span class=p>},</span>
+    <span class=c1>// 属性値の更新方法を下記 3 プロパティで設定
+</span><span class=c1></span>    <span class=nx>UpdateExpression</span><span class=o>:</span> <span class=s1>&#39;set Title = :x, #a = :y&#39;</span><span class=p>,</span>
+    <span class=nx>ExpressionAttributeNames</span><span class=o>:</span> <span class=p>{</span>
+      <span class=s1>&#39;#a&#39;</span><span class=o>:</span> <span class=s1>&#39;Maker&#39;</span><span class=p>,</span>
+    <span class=p>},</span>
+    <span class=nx>ExpressionAttributeValues</span><span class=o>:</span> <span class=p>{</span>
+      <span class=s1>&#39;:x&#39;</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;Mario 4&#39;</span> <span class=p>},</span>
+      <span class=s1>&#39;:y&#39;</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;Nintendo&#39;</span> <span class=p>}</span>
+    <span class=p>},</span>
+    <span class=c1>// 更新後の内容を戻り値で知りたいとき（ALL_OLD なら更新前の値が返される）
+</span><span class=c1></span>    <span class=nx>ReturnValues</span><span class=o>:</span> <span class=s1>&#39;ALL_NEW&#39;</span><span class=p>,</span>
+  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>dynamoDb</span><span class=p>.</span><span class=nx>updateItem</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=nx>updateItem</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
+  <span class=nx>Attributes</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;Mario 4&#39;</span> <span class=p>},</span>
+    <span class=nx>Maker</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;Nintendo&#39;</span> <span class=p>},</span>
+    <span class=nx>GameId</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span> <span class=p>},</span>
+    <span class=nx>Hardware</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span> <span class=p>},</span>
+    <span class=nx>Players</span><span class=o>:</span> <span class=p>{</span> <span class=nx>N</span><span class=o>:</span> <span class=s1>&#39;2&#39;</span> <span class=p>}</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#updateItem-property>DynamoDB.updateItem</a></li>
+</ul>
+<h3 id=dynamodbdocumentclient-を使う場合-1>DynamoDB.DocumentClient を使う場合</h3>
+<p><code>DocumentClient</code> インスタンスを使用すると、属性値の指定が若干シンプルになります（<code>S</code> や <code>N</code> などのタイプ指定が必要なくなります）。
+それ以外は同じです。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>AWS</span> <span class=kr>from</span> <span class=s1>&#39;aws-sdk&#39;</span><span class=p>;</span>
+<span class=kr>const</span> <span class=nx>documentClient</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>AWS</span><span class=p>.</span><span class=nx>DynamoDB</span><span class=p>.</span><span class=nx>DocumentClient</span><span class=p>({</span>
+  <span class=nx>apiVersion</span><span class=o>:</span> <span class=s1>&#39;2012-08-10&#39;</span><span class=p>,</span>
+  <span class=nx>region</span><span class=o>:</span> <span class=s1>&#39;ap-northeast-1&#39;</span>
+<span class=p>});</span>
+
+<span class=kr>async</span> <span class=kd>function</span> <span class=nx>documentClient_update() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.DocumentClient.UpdateItemInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span><span class=p>,</span>
+    <span class=nx>Key</span><span class=o>:</span> <span class=p>{</span> <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span><span class=p>,</span> <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span> <span class=p>},</span>
+    <span class=nx>UpdateExpression</span><span class=o>:</span> <span class=s1>&#39;set Title = :x, #a = :y&#39;</span><span class=p>,</span>
+    <span class=nx>ExpressionAttributeNames</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;#a&#39;</span><span class=o>:</span> <span class=s1>&#39;Maker&#39;</span> <span class=p>},</span>
+    <span class=nx>ExpressionAttributeValues</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;:x&#39;</span><span class=o>:</span> <span class=s1>&#39;Mario 4&#39;</span><span class=p>,</span> <span class=s1>&#39;:y&#39;</span><span class=o>:</span> <span class=s1>&#39;Nintendo&#39;</span> <span class=p>},</span>
+    <span class=nx>ReturnValues</span><span class=o>:</span> <span class=s1>&#39;ALL_NEW&#39;</span><span class=p>,</span>
+  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>documentClient</span><span class=p>.</span><span class=nx>update</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=nx>documentClient_update</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<p>実行結果の形式も少しだけシンプルになります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
+  <span class=nx>Attributes</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>Title</span><span class=o>:</span> <span class=s1>&#39;Mario 4&#39;</span><span class=p>,</span>
+    <span class=nx>Maker</span><span class=o>:</span> <span class=s1>&#39;Nintendo&#39;</span><span class=p>,</span>
+    <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span><span class=p>,</span>
+    <span class=nx>Genre</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span><span class=p>,</span>
+    <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span><span class=p>,</span>
+    <span class=nx>Players</span><span class=o>:</span> <span class=mi>2</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#update-property>DynamoDB.DocumentClient.update</a></li>
+</ul>
+<h2 id=アイテムを取得する-getitem>アイテムを取得する (getItem)</h2>
+<h3 id=dynamodb-を使う場合-2>DynamoDB を使う場合</h3>
+<p>アイテムを 1 つ取得するときは、テーブル名 (<code>Table</code>) と、アイテムを特定するためのプライマリーキー (<code>Key</code>) を指定します。
+複合プライマリキーを使用している場合は、パーティションキーとソートキーの両方を指定する必要があります（<code>ValidationException</code> が発生します）。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>async</span> <span class=kd>function</span> <span class=nx>getItem() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.GetItemInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span><span class=p>,</span>
+    <span class=nx>Key</span><span class=o>:</span> <span class=p>{</span>
+      <span class=nx>Hardware</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span> <span class=p>},</span>
+      <span class=nx>GameId</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span> <span class=p>}</span>
+    <span class=p>}</span>
+  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>dynamoDb</span><span class=p>.</span><span class=nx>getItem</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
+  <span class=nx>Item</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;Super Mario World&#39;</span> <span class=p>},</span>
+    <span class=nx>GameId</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span> <span class=p>},</span>
+    <span class=nx>Hardware</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span> <span class=p>},</span>
+    <span class=nx>Players</span><span class=o>:</span> <span class=p>{</span> <span class=nx>N</span><span class=o>:</span> <span class=s1>&#39;2&#39;</span> <span class=p>}</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#getItem-property>DynamoDB.getItem</a></li>
+</ul>
+<h3 id=dynamodbdocumentclient-を使う場合-2>DynamoDB.DocumentClient を使う場合</h3>
+<p><code>DocumentClient</code> インスタンスを使用すると、プライマリーキーの指定が若干シンプルになります（<code>S</code> や <code>N</code> などのタイプ指定が必要なくなります）。
+それ以外は同じです。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>AWS</span> <span class=kr>from</span> <span class=s1>&#39;aws-sdk&#39;</span><span class=p>;</span>
+<span class=kr>const</span> <span class=nx>documentClient</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>AWS</span><span class=p>.</span><span class=nx>DynamoDB</span><span class=p>.</span><span class=nx>DocumentClient</span><span class=p>({</span>
+  <span class=nx>apiVersion</span><span class=o>:</span> <span class=s1>&#39;2012-08-10&#39;</span><span class=p>,</span>
+  <span class=nx>region</span><span class=o>:</span> <span class=s1>&#39;ap-northeast-1&#39;</span>
+<span class=p>});</span>
+
+<span class=kr>async</span> <span class=kd>function</span> <span class=nx>documentClient_get() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.DocumentClient.GetItemInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span><span class=p>,</span>
+    <span class=nx>Key</span><span class=o>:</span> <span class=p>{</span>
+      <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span><span class=p>,</span>
+      <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span>
+    <span class=p>}</span>
+  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>documentClient</span><span class=p>.</span><span class=kr>get</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=nx>documentClient_get</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<p>実行結果の形式も少しだけシンプルになります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
+  <span class=nx>Item</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>Title</span><span class=o>:</span> <span class=s1>&#39;Super Mario World&#39;</span><span class=p>,</span>
+    <span class=nx>Genre</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span><span class=p>,</span>
+    <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span><span class=p>,</span>
+    <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span><span class=p>,</span>
+    <span class=nx>Players</span><span class=o>:</span> <span class=mi>2</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#get-property>DynamoDB.DocumentClient.get</a></li>
+</ul>
+<h2 id=アイテムを削除する-deleteitem>アイテムを削除する (deleteItem)</h2>
+<h3 id=dynamodb-を使う場合-3>DynamoDB を使う場合</h3>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>async</span> <span class=kd>function</span> <span class=nx>deleteItem() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.DeleteItemInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span><span class=p>,</span>
+    <span class=nx>Key</span><span class=o>:</span> <span class=p>{</span>
+      <span class=nx>Hardware</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span> <span class=p>},</span>
+      <span class=nx>GameId</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span> <span class=p>}</span>
+    <span class=p>},</span>
+    <span class=nx>ReturnValues</span><span class=o>:</span> <span class=s1>&#39;ALL_OLD&#39;</span> <span class=c1>// 削除されたアイテムの内容を戻り値で取得
+</span><span class=c1></span>  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>dynamoDb</span><span class=p>.</span><span class=nx>deleteItem</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
+  <span class=nx>Item</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;Super Mario World&#39;</span> <span class=p>},</span>
+    <span class=nx>GameId</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span> <span class=p>},</span>
+    <span class=nx>Hardware</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span> <span class=p>},</span>
+    <span class=nx>Players</span><span class=o>:</span> <span class=p>{</span> <span class=nx>N</span><span class=o>:</span> <span class=s1>&#39;2&#39;</span> <span class=p>}</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>アイテムを削除するときは、テーブル名 (<code>Table</code>) と、アイテムを特定するためのプライマリーキー (<code>Key</code>) を指定します。
+複合プライマリキーを使用している場合は、パーティションキーとソートキーの両方を指定する必要があります（<code>ValidationException</code> が発生します）。</p>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#deleteItem-property>DynamoDB.deleteItem</a></li>
+</ul>
+<h3 id=dynamodbdocumentclient-を使う場合-3>DynamoDB.DocumentClient を使う場合</h3>
+<p><code>DocumentClient</code> インスタンスを使用すると、プライマリーキーの指定が若干シンプルになります（<code>S</code> や <code>N</code> などのタイプ指定が必要なくなります）。
+それ以外は同じです。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>AWS</span> <span class=kr>from</span> <span class=s1>&#39;aws-sdk&#39;</span><span class=p>;</span>
+<span class=kr>const</span> <span class=nx>documentClient</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>AWS</span><span class=p>.</span><span class=nx>DynamoDB</span><span class=p>.</span><span class=nx>DocumentClient</span><span class=p>({</span>
+  <span class=nx>apiVersion</span><span class=o>:</span> <span class=s1>&#39;2012-08-10&#39;</span><span class=p>,</span>
+  <span class=nx>region</span><span class=o>:</span> <span class=s1>&#39;ap-northeast-1&#39;</span>
+<span class=p>});</span>
+
+<span class=kr>async</span> <span class=kd>function</span> <span class=nx>documentClient_delete() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.DocumentClient.DeleteItemInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span><span class=p>,</span>
+    <span class=nx>Key</span><span class=o>:</span> <span class=p>{</span>
+      <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span><span class=p>,</span>
+      <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span>
+    <span class=p>},</span>
+    <span class=nx>ReturnValues</span><span class=o>:</span> <span class=s1>&#39;ALL_OLD&#39;</span> <span class=c1>// 削除されたアイテムの内容を戻り値で取得
+</span><span class=c1></span>  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>documentClient</span><span class=p>.</span><span class=k>delete</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=nx>documentClient_delete</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<p>実行結果の形式も少しだけシンプルになります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
+  <span class=nx>Attributes</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>Title</span><span class=o>:</span> <span class=s1>&#39;Super Mario World&#39;</span><span class=p>,</span>
+    <span class=nx>Genre</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span><span class=p>,</span>
+    <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span><span class=p>,</span>
+    <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span><span class=p>,</span>
+    <span class=nx>Players</span><span class=o>:</span> <span class=mi>2</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#delete-property>DynamoDB.DocumentClient.delete</a></li>
+</ul>
+<h2 id=バッチ処理---複数のアイテムを追加削除する-batchwriteitem>バッチ処理 - 複数のアイテムを追加・削除する (batchWriteItem)</h2>
+<p>DynamoDB テーブルに複数のアイテムを追加、削除したいときは、<code>putItem</code> や <code>deleteItem</code> を何度も呼び出すよりも、<code>batchWriteItem</code> を使うのが効率的です。
+ただし、最大でも 25 項目までといった細かな制約があります。
+その他の制約などは、<a href=https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/APIReference/API_BatchWriteItem.html>BatchWriteItem の仕様</a> を確認してください。</p>
+<p>次の例では、<code>Games</code> テーブルに 2 つの項目を追加し、1 つの項目を削除しています。</p>
+<h3 id=dynamodb-を使う場合-4>DynamoDB を使う場合</h3>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>async</span> <span class=kd>function</span> <span class=nx>batchWriteItem() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.BatchWriteItemInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>RequestItems</span><span class=o>:</span> <span class=p>{</span>
+      <span class=s1>&#39;Games&#39;</span><span class=o>:</span> <span class=p>[</span>
+        <span class=p>{</span>
+          <span class=nx>PutRequest</span><span class=o>:</span> <span class=p>{</span>
+            <span class=nx>Item</span><span class=o>:</span> <span class=p>{</span>
+              <span class=nx>Hardware</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;FC&#39;</span> <span class=p>},</span>
+              <span class=nx>GameId</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;1984-lode-runner&#39;</span> <span class=p>},</span>
+              <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;Lode Runner&#39;</span> <span class=p>},</span>
+              <span class=nx>Players</span><span class=o>:</span> <span class=p>{</span> <span class=nx>N</span><span class=o>:</span> <span class=s1>&#39;1&#39;</span> <span class=p>},</span>
+              <span class=nx>Genre</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span> <span class=p>},</span>
+            <span class=p>}</span>
+          <span class=p>},</span>
+        <span class=p>},</span>
+        <span class=p>{</span>
+          <span class=nx>PutRequest</span><span class=o>:</span> <span class=p>{</span>
+            <span class=nx>Item</span><span class=o>:</span> <span class=p>{</span>
+              <span class=nx>Hardware</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;FC&#39;</span> <span class=p>},</span>
+              <span class=nx>GameId</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;1985-exed-exes&#39;</span> <span class=p>},</span>
+              <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;Exed Exes&#39;</span> <span class=p>},</span>
+              <span class=nx>Players</span><span class=o>:</span> <span class=p>{</span> <span class=nx>N</span><span class=o>:</span> <span class=s1>&#39;2&#39;</span> <span class=p>},</span>
+              <span class=nx>Genre</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;STG&#39;</span> <span class=p>},</span>
+            <span class=p>}</span>
+          <span class=p>}</span>
+        <span class=p>},</span>
+        <span class=p>{</span>
+          <span class=nx>DeleteRequest</span><span class=o>:</span> <span class=p>{</span>
+            <span class=nx>Key</span><span class=o>:</span> <span class=p>{</span>
+              <span class=nx>Hardware</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span> <span class=p>},</span>
+              <span class=nx>GameId</span><span class=o>:</span> <span class=p>{</span> <span class=nx>S</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span> <span class=p>},</span>
+            <span class=p>}</span>
+          <span class=p>}</span>
+        <span class=p>}</span>
+      <span class=p>]</span>
+    <span class=p>}</span>
+  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>dynamoDb</span><span class=p>.</span><span class=nx>batchWriteItem</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=nx>batchWriteItem</span><span class=p>()</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span> <span class=nx>UnprocessedItems</span><span class=o>:</span> <span class=p>{}</span> <span class=p>}</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#batchWriteItem-property>DynamoDB.batchWriteItem</a></li>
+</ul>
+<h3 id=dynamodbdocumentclient-を使う場合-4>DynamoDB.DocumentClient を使う場合</h3>
+<p><code>DocumentClient</code> インスタンスを使用すると、属性値の指定が若干シンプルになります（<code>S</code> や <code>N</code> などのタイプ指定が必要なくなります）。
+それ以外は同じです。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>async</span> <span class=kd>function</span> <span class=nx>documentClient_batchWrite() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.DocumentClient.BatchWriteItemInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>RequestItems</span><span class=o>:</span> <span class=p>{</span>
+      <span class=s1>&#39;Games&#39;</span><span class=o>:</span> <span class=p>[</span>
+        <span class=p>{</span>
+          <span class=nx>PutRequest</span><span class=o>:</span> <span class=p>{</span> <span class=nx>Item</span><span class=o>:</span> <span class=p>{</span> <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;FC&#39;</span><span class=p>,</span> <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1984-lode-runner&#39;</span><span class=p>,</span> <span class=nx>Title</span><span class=o>:</span> <span class=s1>&#39;Lode Runner&#39;</span><span class=p>,</span> <span class=nx>Players</span>: <span class=kt>1</span><span class=p>,</span> <span class=nx>Genre</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span> <span class=p>}}</span>
+        <span class=p>},</span>
+        <span class=p>{</span>
+          <span class=nx>PutRequest</span><span class=o>:</span> <span class=p>{</span> <span class=nx>Item</span><span class=o>:</span> <span class=p>{</span> <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;FC&#39;</span><span class=p>,</span> <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1985-exed-exes&#39;</span><span class=p>,</span> <span class=nx>Title</span><span class=o>:</span> <span class=s1>&#39;Exed Exes&#39;</span><span class=p>,</span> <span class=nx>Players</span>: <span class=kt>1</span><span class=p>,</span> <span class=nx>Genre</span><span class=o>:</span> <span class=s1>&#39;STG&#39;</span> <span class=p>}}</span>
+        <span class=p>},</span>
+        <span class=p>{</span>
+          <span class=nx>DeleteRequest</span><span class=o>:</span> <span class=p>{</span> <span class=nx>Key</span><span class=o>:</span> <span class=p>{</span> <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;SFC&#39;</span><span class=p>,</span> <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span> <span class=p>}}</span>
+        <span class=p>}</span>
+      <span class=p>]</span>
+    <span class=p>}</span>
+  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>documentClient</span><span class=p>.</span><span class=nx>batchWrite</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#batchWrite-property>DynamoDB.DocumentClient.batchWrite</a></li>
+</ul>
+<h3 id=batchwrite-のパラメーターを作るユーティリティ関数を作る>batchWrite のパラメーターを作るユーティリティ関数を作る</h3>
+<p><code>DynamoDB.DocumentClient.batchWrite</code> メソッドに渡すパラメーターをハードコードするのは大変なので、現実的には、複数アイテムをまとめて追加するためのラッパー関数的なものを用意することになると思います。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>こんな感じ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>type</span> <span class=nx>Game</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>Hardware</span>: <span class=kt>string</span><span class=p>,</span>
+  <span class=nx>GameId</span>: <span class=kt>string</span><span class=p>,</span>
+  <span class=nx>Title</span>: <span class=kt>string</span><span class=p>,</span>
+  <span class=nx>Players</span>: <span class=kt>number</span><span class=p>,</span>
+  <span class=nx>Genre</span>: <span class=kt>string</span>
+<span class=p>};</span>
+
+<span class=cm>/** DocumentClient.batchWrite に渡すオブジェクトを生成します */</span>
+<span class=kd>function</span> <span class=nx>createParams</span><span class=p>(</span><span class=nx>games</span>: <span class=kt>Game</span><span class=p>[])</span><span class=o>:</span> <span class=nx>AWS</span><span class=p>.</span><span class=nx>DynamoDB</span><span class=p>.</span><span class=nx>DocumentClient</span><span class=p>.</span><span class=nx>BatchWriteItemInput</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=p>{</span>
+    <span class=nx>RequestItems</span><span class=o>:</span> <span class=p>{</span>
+      <span class=s1>&#39;Games&#39;</span><span class=o>:</span> <span class=nx>games</span><span class=p>.</span><span class=nx>map</span><span class=p>(</span><span class=nx>g</span> <span class=o>=&gt;</span> <span class=p>({</span>
+        <span class=nx>PutRequest</span><span class=o>:</span> <span class=p>{</span> <span class=nx>Item</span>: <span class=kt>g</span> <span class=p>}</span>
+      <span class=p>}))</span>
+    <span class=p>}</span>
+  <span class=p>};</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<h2 id=テーブル内の要素をすべて取得する-scan>テーブル内の要素をすべて取得する (scan)</h2>
+<p>DynamoDB テーブル内のすべてのアイテムを取得するには <code>scan</code> メソッドを使用します。
+フィルタ条件を指定することもできますが、内部的には「全アイテムの取得 → フィルタ」という動作になるため、<code>scan</code> メソッドは基本的にはアイテム数が少ない場合にのみ使用できます（返却するデータは 1MB までなどの制約があります）。
+プライマリーキーで検索条件を指定できる場合は、<code>scan</code> ではなく <code>query</code> メソッドを使うことで効率的な取得が可能です。</p>
+<p><code>DynamoDB</code> クラスにも <code>DynamoDB.DocumentClient</code> クラスにも同名の <code>scan</code> メソッドがありますが、後者の方が若干シンプルに記述できる（<code>S</code> や <code>N</code> などの属性タイプ指定を省略できる）ので、そちらを使ったサンプルコードを示します。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>async</span> <span class=kd>function</span> <span class=nx>scan() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.DocumentClient.ScanInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span>
+  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>documentClient</span><span class=p>.</span><span class=nx>scan</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=nx>scan</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<div class=xAccordion>
+<input id=id-352169478 type=checkbox>
+<label class=xAccordion_title for=id-352169478>実行結果</label>
+<div class=xAccordion_body>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
+  <span class=nx>Items</span><span class=o>:</span> <span class=p>[</span>
+    <span class=p>{</span>
+      <span class=nx>Title</span><span class=o>:</span> <span class=s1>&#39;Lode Runner&#39;</span><span class=p>,</span>
+      <span class=nx>Genre</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span><span class=p>,</span>
+      <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1984-lode-runner&#39;</span><span class=p>,</span>
+      <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;FC&#39;</span><span class=p>,</span>
+      <span class=nx>Players</span><span class=o>:</span> <span class=mi>1</span>
+    <span class=p>},</span>
+    <span class=p>{</span>
+      <span class=nx>Title</span><span class=o>:</span> <span class=s1>&#39;Exed Exes&#39;</span><span class=p>,</span>
+      <span class=nx>Genre</span><span class=o>:</span> <span class=s1>&#39;STG&#39;</span><span class=p>,</span>
+      <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1985-exed-exes&#39;</span><span class=p>,</span>
+      <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;FC&#39;</span><span class=p>,</span>
+      <span class=nx>Players</span><span class=o>:</span> <span class=mi>2</span>
+    <span class=p>},</span>
+    <span class=p>{</span>
+      <span class=nx>Title</span><span class=o>:</span> <span class=s1>&#39;Super Mario World&#39;</span><span class=p>,</span>
+      <span class=nx>Genre</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span><span class=p>,</span>
+      <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1990-SuperMarioWorld&#39;</span><span class=p>,</span>
+      <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;SNES&#39;</span><span class=p>,</span>
+      <span class=nx>Players</span><span class=o>:</span> <span class=mi>2</span>
+    <span class=p>}</span>
+  <span class=p>],</span>
+  <span class=nx>Count</span><span class=o>:</span> <span class=mi>3</span><span class=p>,</span>
+  <span class=nx>ScannedCount</span><span class=o>:</span> <span class=mi>3</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+</div>
+</div>
+<p><code>scan</code> 結果を何らかの条件で絞り込みたい場合は、<code>FilterExpression</code> パラメーターを使用します。
+次の例では、<code>Genre</code> 属性が <code>ACT</code> のアイテムだけを取得しています。
+ただし前述のように、<code>FilterExpression</code> による絞り込みは、全アイテム取得後にフィルターしているだけなので注意してください（アイテム数が増えてくると機能しなくなります）。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>scan 用のフィルター条件を追加</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.DocumentClient.ScanInput</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span><span class=p>,</span>
+  <span class=nx>FilterExpression</span><span class=o>:</span> <span class=s1>&#39;Genre = :genre&#39;</span><span class=p>,</span>
+  <span class=nx>ExpressionAttributeValues</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;:genre&#39;</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span> <span class=p>}</span>
+<span class=p>};</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#scan-property>DynamoDB.scan</a></li>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#scan-property>DynamoDB.DocumentClient.scan</a></li>
+<li>参考: <a href=https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/APIReference/API_Scan.html>Scan API 仕様</a></li>
+</ul>
+<h2 id=テーブル内の要素をプライマリーキーでフィルタして取得する-query>テーブル内の要素をプライマリーキーでフィルタして取得する (query)</h2>
+<p>DynamoDB テーブルから、指定したプライマリーキーに一致するアイテムを検索するには、<code>query</code> メソッドを使用します。
+主に、複合キー（パーティションキー + ソートキー）で構成されているテーブルから、</p>
+<ul>
+<li>パーティションキーのみの指定</li>
+<li>パーティションキー + ソートキーの条件指定</li>
+</ul>
+<p>といった検索を行います。
+ソートキーの方は部分一致や大小比較など、ある程度柔軟なフィルタ条件を指定できますが、パーティションキーの方は、あくまで完全一致させる必要があります。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>async</span> <span class=kd>function</span> <span class=nx>query() {</span>
+  <span class=kr>const</span> <span class=nx>params</span>: <span class=kt>AWS.DynamoDB.DocumentClient.QueryInput</span> <span class=o>=</span> <span class=p>{</span>
+    <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;Games&#39;</span><span class=p>,</span>
+    <span class=nx>KeyConditionExpression</span><span class=o>:</span> <span class=s1>&#39;Hardware = :hard and GameId &gt; :game&#39;</span><span class=p>,</span>
+    <span class=nx>ExpressionAttributeValues</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;:hard&#39;</span><span class=o>:</span> <span class=s1>&#39;FC&#39;</span><span class=p>,</span> <span class=s1>&#39;:game&#39;</span><span class=o>:</span> <span class=s1>&#39;1984-&#39;</span> <span class=p>}</span>
+  <span class=p>};</span>
+
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>documentClient</span><span class=p>.</span><span class=nx>query</span><span class=p>(</span><span class=nx>params</span><span class=p>).</span><span class=nx>promise</span><span class=p>();</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=nx>query</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
+  <span class=nx>Items</span><span class=o>:</span> <span class=p>[</span>
+    <span class=p>{</span>
+      <span class=nx>Title</span><span class=o>:</span> <span class=s1>&#39;Lode Runner&#39;</span><span class=p>,</span>
+      <span class=nx>Genre</span><span class=o>:</span> <span class=s1>&#39;ACT&#39;</span><span class=p>,</span>
+      <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1984-lode-runner&#39;</span><span class=p>,</span>
+      <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;FC&#39;</span><span class=p>,</span>
+      <span class=nx>Players</span><span class=o>:</span> <span class=mi>1</span>
+    <span class=p>},</span>
+    <span class=p>{</span>
+      <span class=nx>Title</span><span class=o>:</span> <span class=s1>&#39;Exed Exes&#39;</span><span class=p>,</span>
+      <span class=nx>Genre</span><span class=o>:</span> <span class=s1>&#39;STG&#39;</span><span class=p>,</span>
+      <span class=nx>GameId</span><span class=o>:</span> <span class=s1>&#39;1985-exed-exes&#39;</span><span class=p>,</span>
+      <span class=nx>Hardware</span><span class=o>:</span> <span class=s1>&#39;FC&#39;</span><span class=p>,</span>
+      <span class=nx>Players</span><span class=o>:</span> <span class=mi>2</span>
+    <span class=p>}</span>
+  <span class=p>],</span>
+  <span class=nx>Count</span><span class=o>:</span> <span class=mi>2</span><span class=p>,</span>
+  <span class=nx>ScannedCount</span><span class=o>:</span> <span class=mi>2</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#query-property>DynamoDB.query</a></li>
+<li>参考: <a href=https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#query-property>DynamoDB.DocumentClient.query</a></li>
+<li>参考: <a href=https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/APIReference/API_Query.html>Query API 仕様</a></li>
+</ul>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=../../p/5mv5dkt/>DynamoDB を Node.js で操作する（SDK ver.3 の場合）</a></li>
+<li><a href=../../p/h3gsjs2/>AWS CloudFormation で DyanamoDB のリソースを作成する</a></li>
+<li><a href=../../p/m8kv8it/>Node.js で Amazon S3 を操作する (AWS SDK)</a></li>
+<li><a href=../../p/taiqx6d/>TypeScript で AWS SDK を使う開発環境を整える</a></li>
+<li><a href=../../p/rdq4eq2/>DynamoDB Local で DynamoDB のローカルテスト環境を作る</a></li>
+<li><a href=../../p/zkzamw8/>DynamoDB をコマンドライン (CLI) で操作する</a></li>
+<li><a href=../../p/7tds7bw/>AWS CLI でアクセスできるのに AWS SDK で Access Denied (403) になるとき</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/aws>AWS</a></span>
+<span class=xPageTags_item><a href=../../tags/aws/dynamodb>AWS/DynamoDB</a></span>
+<span class=xPageTags_item><a href=../../tags/typescript>TypeScript</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=../../p/3jt3bjr/><span class=xArticle_up_label>AWS DynamoDB 関連記事</span><br>へ戻る</a>
+</div>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_prev>
+<a href=../../p/5mv5dkt/>DynamoDB を Node.js で操作する（SDK ver.3 の場合）</a>
+</div>
+<div class=xPrevNextLink_next>
+<a href=../../p/wht5epz/>DynamoDB を Python で操作する (boto3)</a>
+</div>
+</div>
+</aside>
+</article>
+<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
+</main>
+</div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/7s7hs4e/>AWS</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3jt3bjr/>DynamoDB</a>
+</span>
+<span class=xBreadcrumb_item>DynamoDB を Node.js で操作する（SDK ver.2 の場合）
+</span>
+</div>
+</aside>
+<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
+<div id=xSiteFooter2>
+<a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
+</div>
+</div>
+<script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c];b.setAttribute('target','_blank'),b.setAttribute('rel','noopener');const d=b.getElementsByTagName('img');if(d.length>0)continue;b.classList.add('xExternalLinkIcon')}})</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"AWS","item":"https://maku.blog/p/7s7hs4e/"},{"@type":"ListItem","position":4,"name":"DynamoDB","item":"https://maku.blog/p/3jt3bjr/"},{"@type":"ListItem","position":5,"name":"DynamoDB を Node.js で操作する（SDK ver.2 の場合）","item":"https://maku.blog/p/8t7iu6g/"}]}</script>
+</body>
+</html>

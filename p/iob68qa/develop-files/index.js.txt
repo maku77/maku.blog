@@ -1,0 +1,44 @@
+// ボットアダプターを生成する。
+// Connector と Bot プログラムの橋渡し、認証処理などを行う。
+function createBotAdapter(config) {
+  // See https://aka.ms/about-bot-adapter to learn more about bot adapter.
+  const { BotFrameworkAdapter } = require('botbuilder');
+  const adapter = new BotFrameworkAdapter(config);
+
+  // Catch-all for any unhandled errors in your bot.
+  adapter.onTurnError = async (context, error) => {
+      // This check writes out errors to console log .vs. app insights.
+      console.error(`\n [onTurnError]: ${ error }`);
+      // Send a message to the user
+      await context.sendActivity(`Oops. Something went wrong!`);
+  };
+
+  return adapter;
+}
+
+// ボットサーバーを起動する
+function startServer(adapter, bot) {
+  const restify = require('restify');
+
+  let server = restify.createServer();
+  server.listen(process.env.port || process.env.PORT || 3978, function() {
+    console.log(`\nBot server listening to ${ server.url }`);
+  });
+
+  // Listen for incoming activities and route them to your bot main dialog.
+  server.post('/api/messages', (req, res) => {
+    adapter.processActivity(req, res, async (context) => {
+      await bot.onTurn(context);
+    });
+  });
+}
+
+// エントリポイント
+(function main() {
+  const { Bot } = require('./bot.js');
+  const config = require('./config.js');
+  const adapter = createBotAdapter(config);
+  const bot = new Bot();
+  startServer(adapter, bot);
+})();
+

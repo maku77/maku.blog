@@ -1,0 +1,1340 @@
+<!doctype html><html lang=ja-jp>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>『アジャイルソフトウェア開発の奥義』ロバート・C・マーチン（輪講メモ）｜まくろぐ</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
+<meta property="og:title" content="『アジャイルソフトウェア開発の奥義』ロバート・C・マーチン（輪講メモ）">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maku.blog/p/fn9ris5/">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://maku.blog/assets/img/site-logo-large.png">
+<meta property="og:description" content="今回読み進める本は、『アジャイルソフトウェア開発の奥義』です。 第2版までは日本語版が出てます。内容的にはどの版のものを読んでも大丈夫。
+第1版  アジャイルソフトウェア開発の奥義 ロバート・C・マーチン ソフトバンククリエイティブ     第2版  アジャイルソフトウェア開発の奥義 第2版 オブジェクト指向開発の神髄と匠の技 ロバート・C・マーチン ソフトバンククリエイティブ     第3版  Agile Principles, Patterns, and Practices in C# Robert C. Martin Prentice Hall     ちなみに版が進むごとにサンプルコードの言語がより高水準な言語に変わっています。
+ 第1版: C/C++ 第2版: Java 第3版: C#  第1版と第2版の内容はほとんど一緒だけど、第3版には各種ダイアグラムに関する説明の Chapter.14～20 が追加で挿入されています。 C/C++ のコードで読みたい場合は、書店からなくなる前に第1版を買っておいた方がよいです。
+以下、各章ごとのポイントや議論のメモです。
+Preface（序文）   単なるパターン集ではなく、そのパターンが「なぜ」生き残ったのかという過程を知ることが大切。 著者 Robert C. Martin（Object Mentor 社の創設者。社長）は、11個のオブジェクト指向の原則をまとめている。それに従って設計することで、デザインパターンですら導き出される。  Section I: Agile Development（アジャイル開発） ▼議論  Q.">
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
+<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
+<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
+<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
+<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
+<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
+</head>
+<body>
+<div id=xRoot>
+<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/35odek9/>読書</a>
+</span>
+<span class=xBreadcrumb_item>『アジャイルソフトウェア開発の奥義』ロバート・C・マーチン（輪講メモ）
+</span>
+</div>
+</aside>
+<div id=xContainer>
+<nav id=xMenu aria-label=メニュー>
+<div id=sidebar style=height:100%>
+<div id=sidebar_notFixed>
+<a href=../../><img src=../../assets/img/site-logo.png></a>
+<div class=xMenu_box data-sticky>
+<form action=https://cse.google.com/cse target=_blank>
+<div class=xSearchBox>
+<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<input type=hidden name=ie value=UTF-8>
+<input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
+<input type=submit value=検索></input>
+</div>
+</form>
+<div class=xMenu_box_body>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
+<div class=xMenu_box_body>
+<div class=xBoxLink>
+<a href=../../p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う
+<time>2022-03-17</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ryq6it6/>NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ
+<time>2022-03-16</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/un3gu8m/>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする
+<time>2022-02-27</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/m4dmu4c/>Next.js でブラウザ履歴で戻るボタンを表示する (router.back)
+<time>2022-02-22</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ter3doz/>Linuxメモ: Bluetooth 関連コマンドのメモ (hciconfig, bluetoothctl)
+<time>2022-02-20</time></a>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title>フォルダ</h3>
+<div class=xMenu_box_body>
+<div class=xNavTree>
+<ul>
+<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
+<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/raw875t/>受賞作リスト</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
+<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
+<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
+<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
+<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
+<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
+</ul>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
+<div class=xMenu_box_body><div class=xMenu_tag>
+<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (79)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure>azure (58)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/typescript>typescript (57)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws>aws (51)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/next.js>next.js (36)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/chatbot>chatbot (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/react>react (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/gnuplot>gnuplot (27)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github>github (23)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/graphql>graphql (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/node.js>node.js (17)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/electron>electron (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/linux>linux (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vs-code>vs-code (14)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/javascript>javascript (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mongodb>mongodb (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cdk>aws/cdk (12)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/android>android (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/java>java (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/nginx>nginx (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/python>python (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/uml>uml (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/3d>3d (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/lambda>aws/lambda (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sam>aws/sam (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unity>unity (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webgl>webgl (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-cli>azure-cli (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jade>jade (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apollo>apollo (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cognito>aws/cognito (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-storage>azure-storage (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/doxygen>doxygen (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase>firebase (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/luis>luis (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/material-ui>material-ui (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/qna-maker>qna-maker (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ansible>ansible (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cli>aws/cli (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/ssm>aws/ssm (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/c/c++>c/c++ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/eslint>eslint (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/firestore>firebase/firestore (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html/css>html/css (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sql>sql (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/windows>windows (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-functions>azure-functions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/cosmos-db>cosmos-db (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-actions>github-actions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-pages>github-pages (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jekyll>jekyll (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/kotlin>kotlin (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mac>mac (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/powershell>powershell (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/prettier>prettier (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sqlite>sqlite (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/textlint>textlint (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tv>tv (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apache>apache (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/arib>arib (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/amplify>aws/amplify (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/iam>aws/iam (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/kms>aws/kms (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/s3>aws/s3 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sdk>aws/sdk (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-app-service>azure-app-service (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/excel>excel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/hugo>hugo (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/npm>npm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/oauth>oauth (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/opengl>opengl (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/rsync>rsync (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/scp>scp (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/slack>slack (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teraterm>teraterm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unicode>unicode (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vercel>vercel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/zip>zip (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/.net>.net (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/androidstudio>androidstudio (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/atomic-design>atomic-design (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/blender>blender (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bluetooth>bluetooth (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bootstrap>bootstrap (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-framework>bot-framework (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/boto3>boto3 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/css>css (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dns>dns (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dvb>dvb (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/editorconfig>editorconfig (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/evernote>evernote (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/git>git (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/groovy>groovy (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html>html (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/iso>iso (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/json>json (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/macos>macos (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/parcel>parcel (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/raspberrypi>raspberrypi (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ssh>ssh (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teams>teams (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tex>tex (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ubuntu>ubuntu (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vim>vim (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/web>web (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webpack>webpack (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/wsl>wsl (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
+</div></div>
+</div>
+<div class=xMenu_box data-sticky><br></div>
+</div>
+<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
+</div>
+</div>
+</nav>
+<main id=xMain>
+<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_prev>
+<a href=../../p/b2zio3x/>『情報整理術クマガイ式』熊谷正寿</a>
+</div>
+<div class=xPrevNextLink_next>
+<a href=../../p/ot2a7rx/>『手帳フル活用術 仕事の達人、27人の手のうち！』</a>
+</div>
+</div>
+</aside>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/35odek9/>読書</a></span></div>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/fn9ris5/>『アジャイルソフトウェア開発の奥義』ロバート・C・マーチン（輪講メモ）</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/%E8%AA%AD%E6%9B%B8>読書</a></span>
+<span class=xPageTags_item><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム</a></span>
+<span class=xPageTags_item><a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン</a></span>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2008-10-27>2008-10-27</time><br>
+作成: <time itemprop=datePublished datetime=2008-10-27>2008-10-27</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li>
+<ul>
+<li><a href=#第1版>第1版</a></li>
+<li><a href=#第2版>第2版</a></li>
+<li><a href=#第3版>第3版</a></li>
+</ul>
+</li>
+<li><a href=#preface序文----2006-05-30--->Preface（序文） </a></li>
+<li><a href=#section-i-agile-developmentアジャイル開発>Section I: Agile Development（アジャイル開発）</a>
+<ul>
+<li></li>
+<li><a href=#chapter-1-agile-practicesアジャイルプラクティス----2006-05-30--->Chapter 1. Agile Practices（アジャイルプラクティス） </a></li>
+<li><a href=#chapter-2-overview-of-extreme-programming----2006-05-30--->Chapter 2. Overview of Extreme Programming </a></li>
+<li><a href=#chapter-3-planning----2006-05-30--->Chapter 3. Planning </a></li>
+<li><a href=#chapter-4-testingテスティング----2006-05-31--->Chapter 4. Testing（テスティング） </a></li>
+<li><a href=#chapter-5-refactoringリファクタリング----2006-05-31--->Chapter 5. Refactoring（リファクタリング） </a></li>
+<li><a href=#chapter-6-a-programming-episodeプログラミングエピソード----2006-05-31--->Chapter 6. A Programming Episode（プログラミングエピソード） </a></li>
+</ul>
+</li>
+<li><a href=#section-ii-agile-designアジャイル設計>Section II: Agile Design（アジャイル設計）</a>
+<ul>
+<li><a href=#chapter-7-what-is-agile-designアジャイル設計とは----2006-06-12--->Chapter 7. What Is Agile Design?（アジャイル設計とは？） </a></li>
+<li><a href=#chapter-8-single-responsibility-principle-srp-単一責任の原則----2008-11-02--->Chapter 8. Single Responsibility Principle (SRP) 単一責任の原則 </a></li>
+<li><a href=#chapter-9-open-closed-principle-ocp-オープンクローズドの原則----2008-11-03--->Chapter 9. Open-Closed Principle (OCP) オープン・クローズドの原則 </a></li>
+<li><a href=#chapter-10-the-liskov-substitution-principle-lsp-リスコフの置換原則----2006-06-21--->Chapter 10. The Liskov Substitution Principle (LSP) リスコフの置換原則 </a></li>
+<li><a href=#chapter-11-the-dependency-inversion-principle-dip-依存関係逆転の原則----2006-06-22--->Chapter 11. The Dependency-Inversion Principle (DIP) 依存関係逆転の原則 </a></li>
+<li><a href=#chapter-12-the-interface-segregation-principle-isp-インタフェース分離の原則----2006-06-28--->Chapter 12. The Interface Segregation Principle (ISP) インタフェース分離の原則 </a></li>
+<li><a href=#chapter-13-overview-of-uml-for-c-programmers>Chapter 13. Overview of UML for C# Programmers</a></li>
+<li><a href=#chapter-14-working-with-diagrams>Chapter 14. Working with Diagrams</a></li>
+<li><a href=#chapter-15-state-diagrams>Chapter 15. State Diagrams</a></li>
+<li><a href=#chapter-16-object-diagrams>Chapter 16. Object Diagrams</a></li>
+<li><a href=#chapter-17-use-cases>Chapter 17. Use Cases</a></li>
+<li><a href=#chapter-18-sequence-diagrams>Chapter 18. Sequence Diagrams</a></li>
+<li><a href=#chapter-19-class-diagrams>Chapter 19. Class Diagrams</a></li>
+<li><a href=#chapter-20-heuristics-and-coffee>Chapter 20. Heuristics and Coffee</a></li>
+</ul>
+</li>
+<li><a href=#section-iii-the-payroll-case-study>Section III: The Payroll Case Study</a>
+<ul>
+<li><a href=#chapter-21-command-and-active-object-versatility-and-multitasking----2006-07-03--->Chapter 21. COMMAND and ACTIVE OBJECT: Versatility and Multitasking </a></li>
+<li><a href=#chapter-22-template-method-and-strategy-inheritance-versus-delegation-継承と委譲----2009-01-18--->Chapter 22. TEMPLATE METHOD and STRATEGY: Inheritance versus Delegation （継承と委譲） </a></li>
+<li><a href=#chapter-23-facade-and-mediator----2009-01-18--->Chapter 23. Facade and Mediator </a></li>
+<li><a href=#chapter-24-singleton-and-monostate----2009-01-25--->Chapter 24. Singleton and Monostate </a></li>
+<li><a href=#chapter-25-null-object----2009-01-26--->Chapter 25. Null Object </a></li>
+<li><a href=#chapter-26-the-payroll-case-study-iteration-1-給与システムのケーススタディ最初のイテレーション----2009-01-31--->Chapter 26. The Payroll Case Study: Iteration 1 （給与システムのケーススタディ：最初のイテレーション） </a></li>
+<li><a href=#chapter-27-the-payroll-case-study-implementation-給与システムのケーススタディ実装----2009-02-01--->Chapter 27. The Payroll Case Study: Implementation （給与システムのケーススタディ：実装） </a></li>
+</ul>
+</li>
+<li><a href=#section-iv-packaging-the-payroll-system>Section IV: Packaging the Payroll System</a>
+<ul>
+<li><a href=#chapter-28-principles-of-package-and-component-design-パッケージ設計の原則----2009-02-07--->Chapter 28. Principles of Package and Component Design （パッケージ設計の原則） </a></li>
+<li><a href=#chapter-29-factory----2009-02-14--->Chapter 29. Factory </a></li>
+<li><a href=#chapter-30-the-payroll-case-study-package-analysis-給与システムのケーススタディふたたび----2009-02-14--->Chapter 30. The Payroll Case Study: Package Analysis （給与システムのケーススタディ：ふたたび） </a></li>
+<li><a href=#chapter-31-composite----2009-02-21--->Chapter 31. Composite </a></li>
+<li><a href=#chapter-32-observer-evolving-into-a-pattern-デザインパターンへの回帰----2009-02-22--->Chapter 32. Observer: Evolving into a Pattern （デザインパターンへの回帰） </a></li>
+<li><a href=#chapter-33-abstract-server-adapter-and-bridge----2009-02-28--->Chapter 33. Abstract Server, Adapter, and Bridge </a></li>
+<li><a href=#chapter-34-proxy-and-gateway-managing-third-party-apis-第1版タイトル-proxy-stairway-to-heaven----2009-03-01--->Chapter 34. PROXY and GATEWAY: Managing Third-Party APIs （第1版タイトル: Proxy, Stairway to Heaven） </a></li>
+<li><a href=#chapter-35-visitor----2009-03-07--->Chapter 35. Visitor </a></li>
+<li><a href=#chapter-36-state----2009-03-14--->Chapter 36. State </a></li>
+<li><a href=#chapter-37-the-payroll-case-study-the-database>Chapter 37. The Payroll Case Study: The Database</a></li>
+<li><a href=#chapter-38-the-payroll-user-interface-model-view-presenter>Chapter 38. The Payroll User Interface: MODEL VIEW PRESENTER</a></li>
+</ul>
+</li>
+</ul>
+</nav><p>今回読み進める本は、『アジャイルソフトウェア開発の奥義』です。
+第2版までは日本語版が出てます。内容的にはどの版のものを読んでも大丈夫。</p>
+<h3 id=第1版>第1版</h3>
+<div class=xAmazon>
+<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4797323361/maku04-22/ref=nosim/" target=_blank>
+<div class=xAmazon_image>
+<img src=https://images-na.ssl-images-amazon.com/images/I/51YANQY595L.jpg alt=アジャイルソフトウェア開発の奥義>
+</div>
+<div class=xAmazon_info>
+<div class=xAmazon_info_title>アジャイルソフトウェア開発の奥義</div>
+<div class=xAmazon_info_author>ロバート・C・マーチン</div>
+<div class=xAmazon_info_publisher>ソフトバンククリエイティブ</div>
+<div class=xAmazon_info_icon><img src="data:image/gif;base64,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"></div>
+</div>
+</a>
+</div>
+<h3 id=第2版>第2版</h3>
+<div class=xAmazon>
+<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4797347783/maku04-22/ref=nosim/" target=_blank>
+<div class=xAmazon_image>
+<img src=https://images-na.ssl-images-amazon.com/images/I/71cDOUiJvPL.jpg alt="アジャイルソフトウェア開発の奥義 第2版 オブジェクト指向開発の神髄と匠の技">
+</div>
+<div class=xAmazon_info>
+<div class=xAmazon_info_title>アジャイルソフトウェア開発の奥義 第2版 オブジェクト指向開発の神髄と匠の技</div>
+<div class=xAmazon_info_author>ロバート・C・マーチン</div>
+<div class=xAmazon_info_publisher>ソフトバンククリエイティブ</div>
+<div class=xAmazon_info_icon><img src="data:image/gif;base64,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"></div>
+</div>
+</a>
+</div>
+<h3 id=第3版>第3版</h3>
+<div class=xAmazon>
+<a href="https://www.amazon.co.jp/exec/obidos/ASIN/0131857258/maku04-22/ref=nosim/" target=_blank>
+<div class=xAmazon_image>
+<img src=https://images-na.ssl-images-amazon.com/images/I/81EjDm%2BYl8L.jpg alt="Agile Principles, Patterns, and Practices in C#">
+</div>
+<div class=xAmazon_info>
+<div class=xAmazon_info_title>Agile Principles, Patterns, and Practices in C#</div>
+<div class=xAmazon_info_author>Robert C. Martin</div>
+<div class=xAmazon_info_publisher>Prentice Hall</div>
+<div class=xAmazon_info_icon><img src="data:image/gif;base64,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"></div>
+</div>
+</a>
+</div>
+<p>ちなみに版が進むごとにサンプルコードの言語がより高水準な言語に変わっています。</p>
+<ul>
+<li>第1版: C/C++</li>
+<li>第2版: Java</li>
+<li>第3版: C#</li>
+</ul>
+<p>第1版と第2版の内容はほとんど一緒だけど、第3版には各種ダイアグラムに関する説明の Chapter.14～20 が追加で挿入されています。
+C/C++ のコードで読みたい場合は、書店からなくなる前に第1版を買っておいた方がよいです。</p>
+<p>以下、各章ごとのポイントや議論のメモです。</p>
+<h2 id=preface序文----2006-05-30--->Preface（序文） </h2>
+<ul>
+<li>単なるパターン集ではなく、そのパターンが「なぜ」生き残ったのかという過程を知ることが大切。</li>
+<li>著者 Robert C. Martin（Object Mentor 社の創設者。社長）は、11個のオブジェクト指向の原則をまとめている。それに従って設計することで、デザインパターンですら導き出される。</li>
+</ul>
+<h2 id=section-i-agile-developmentアジャイル開発>Section I: Agile Development（アジャイル開発）</h2>
+<h4 id=議論>▼議論</h4>
+<ul>
+<li><b>Q. アジャイルを大規模な開発に適用できるか？</b><br>
+当初は大規模開発に適さないのでは？という懸念があったが、結果として大規模開発においてもアジャイル開発が主流になりつつある。ただ、いつものことだが日本では普及が遅れている。</li>
+</ul>
+<p>大規模プロジェクトにおけるアジャイル開発に関しては、下記の記事や書籍が参考になる。</p>
+<ul>
+<li><a href=http://www-06.ibm.com/jp/software/rational/agile/index.html>IBM Rational アジャイル開発</a>
+<ul>
+<li>(そのうち3分の1は従業員数10,000人以上) の88%がアジャイル・プロセスを使用中または評価中である</li>
+</ul>
+</li>
+<li>書籍: 『The Object Primer（邦題: オブジェクト開発の神髄）』
+<ul>
+<li>アジャイルソフトウェア開発の長所の一つ: 規模の大小を問わずうまくいく。</li>
+</ul>
+</li>
+<li><a href=http://www.atmarkit.co.jp/im/carc/serial/redge/72/01.html>The Rational Edge (72) アジャイル開発の広範な普及を目指して</a></li>
+<li><a href=http://www.atmarkit.co.jp/farc/rensai/redge27/redge27a.html>The Rational Edge (28) 大規模プロジェクトにアジャイルを適用する方法</a>
+<ul>
+<li>「この大規模プロジェクトがアジャイル手法で管理できるのか？ 」という疑問が出てくる。その答えはイエスだ。</li>
+</ul>
+</li>
+<li><a href=http://martinfowler.com/articles/agileOffshore.html>アジャイルソフトウェアプロセスを使ってオフショア開発（English）</a></li>
+<li><a href=http://andore.com/money/trans/agileOffshore_ja.html>アジャイルソフトウェアプロセスを使ってオフショア開発（日本語）</a>
+<ul>
+<li>分析と設計はオンショアで行い、構築をオフショアで行い、そして受入試験をオンショアで行うというやり方よりも、<strong>オフショアのチームにできるだけ多くの工程をやらせると問題が改善される</strong>。<strong>作業工程に沿って分けるのではなく、機能面に沿った分割を行う</strong>。</li>
+<li>バグフィクスからやらせると、開発者は変更するよりも多くのコードを読むことになるので、コードベースに精通することができた。</li>
+<li><strong>オフショア開発においては、ドキュメントを作成するための時間を確保する</strong>必要がある。</li>
+<li>最低限、IM と Wiki、良質の電話回線を用意すること。</li>
+</ul>
+</li>
+</ul>
+<h3 id=chapter-1-agile-practicesアジャイルプラクティス----2006-05-30--->Chapter 1. Agile Practices（アジャイルプラクティス） </h3>
+<ul>
+<li>プロジェクトをうまくまわすために<strong>ルールやプロセスをどんどん導入してしまうと、逆に重くなってうまくいかない</strong>。
+<ul>
+<li>重いプロセスのせいで開発ペースが落ちる ⇒ まだプロセスが足りないと思い込む ⇒ ルールやプロセスを追加する ⇒ 悪循環…</li>
+</ul>
+</li>
+<li>マネージャーは開発環境を構築する前にチームを構築するべき。環境はチームメンバーに最適化させるのがよい。</li>
+<li>高価なツールを導入する前に小さなところから始める。
+<ul>
+<li>まずはフリーのツールを実際に使ってみて、本当に使えるのか試してみる。</li>
+<li>CASE (Computer-Aided Software Engineering) ツールの前にホワイトボードやグラフ用紙を使ってみる。</li>
+<li>大きなデータベースを使う前にプレーンテキストファイルを使ってみる。</li>
+</ul>
+</li>
+<li>ドキュメントに関して
+<ul>
+<li><b>Martin のドキュメントに関する第一法則</b> … <strong>重要で差し迫った必要のあるドキュメント以外は作成しない</strong>。</li>
+<li>読みやすいドキュメントを用意する必要はあるが、多すぎるドキュメントは、少なすぎるドキュメントよりもたちが悪い。ドキュメントが多すぎると、ソースコードを変更したときにドキュメントを修正して整合性を保つのに時間がかかる。<strong>メンテナンスされていないドキュメントが存在していると、そこには嘘が書かれていることになり、逆に混乱を招く</strong>。ソースコードは嘘をつかない。</li>
+<li>ドキュメントは手短に、洗練されたものだけ用意するのがよい。ドキュメントは長くても12ページ～24ページ（1、2ダース）に保ち、<strong>抽象度の高い設計構造を示したドキュメントを用意するとよい</strong>。新メンバーが参入した場合に、より<strong>詳細な設計構造を教えたい場合は、隣に座ってコミュニケーションを取るのが効率がよい</strong>。</li>
+</ul>
+</li>
+<li>プロジェクト成功の鍵
+<ul>
+<li>顧客との密接な協調関係を築くこと。</li>
+<li>「コスト」や「納期」などの条件を決める契約ではなく、<strong>「相互の協調関係」について取り決めた契約書を用意する</strong>。「近くで一緒に働こう」といったものがよい。</li>
+<li>うまくいった一例としては、「顧客側の受け入れテストに合格した機能ブロックの分だけ対価を支払う」という契約がある。どのように受け入れテストを行うかなどの詳細は契約では決めていない。</li>
+</ul>
+</li>
+<li>計画は日程がずれるだけでなく、形そのものが変わっていくもの。
+<ul>
+<li><b>詳細な予定</b> … 2週間先まで決める。</li>
+<li><b>大まかな計画</b> … 3ヶ月先まで決める。</li>
+<li>それ以外は柔軟にしておく。システムがどんな形になるのかを把握するくらいでよい。</li>
+</ul>
+</li>
+</ul>
+<h3 id=chapter-2-overview-of-extreme-programming----2006-05-30--->Chapter 2. Overview of Extreme Programming </h3>
+<p>この章には XP の概要が書かれている。</p>
+<h3 id=chapter-3-planning----2006-05-30--->Chapter 3. Planning </h3>
+<ul>
+<li>
+<p>ブレイクダウンの順番</p>
+<ol>
+<li><b>Features</b> (by customer)</li>
+<li><b>Stories</b> (by customer & developer)</li>
+<li><b>Development Tasks</b> (by developer)</li>
+</ol>
+</li>
+<li>
+<p>プロジェクト開始時</p>
+<ul>
+<li>developer と customer は話し合って feature を洗い出し、それぞれの feature を複数の story に分割してインデックスカードに記入する。<strong>それぞれの story には相対的な実装コストを示す story point を記入する</strong>。より正確な見積もりのため、大きすぎる story は分割し、小さすぎる story は結合する。</li>
+<li>developer と customer で話し合い、iteration ごとの期間を決める。一般的には1週間か2週間。実装の進捗度合いによって iteration の期間が変わることはない。</li>
+</ul>
+</li>
+<li>
+<p>iteration 開始時</p>
+<ul>
+<li>customer は次の iteration で、どの story を実装してもらいたいかを決める。story の選択は、iteration あたりにこなせる story point 数である velocity の範囲内で決めないといけない。それ以上の story は選択してはいけない。iteration の途中で実装してもらう story を変更してはいけない。</li>
+<li>velocity は通常、前回の iteration でこなせた story point と同じ値にする。</li>
+<li>iteration の中で story をどのような順で実装していくかは、developer が自由に決めてよい。</li>
+<li>developer は <strong>story を development task に分割し、story point と同じように task point を付け</strong>、メンバーへのタスク分担の目安とする。</li>
+<li>メンバーは自分の得意不得意にかかわらず、好きな task を選んでよい。</li>
+</ul>
+</li>
+<li>
+<p>iteration 中間点</p>
+<ul>
+<li>iteration の中間点でミーティングを行い、story の半分をこなせているかを調べる。もし遅れているようであれば、task の分担をやり直す。それでも間に合いそうになかったら、customer と話し合い、story （あるいは task）を減らしたり優先度を付けるといった決断をする。</li>
+</ul>
+</li>
+<li>
+<p>iteration 終了時</p>
+<ul>
+<li>story の実装が終了したかどうかは、acceptance test をパスしたかどうかで決める。各 story の acceptance test は iteration の開始時に作成される。</li>
+<li>task の進捗が 90% であっても、story の進捗が 0% では意味がない。</li>
+<li>developer は iteration ごとに動作するソフトウェアを customer に触ってもらい、見た目はどうか、パフォーマンスはどうかといったフィードバックを得る。このフィードバックは新しい story 作成のために使われる。</li>
+<li>iteration 開始時に計画した story の実装が終了しなかったら、次の iteration の velocity を調整する。</li>
+<li>技術が向上したり、設備が整えば、velocity は上がる。</li>
+<li><strong>プロジェクトの開始時は velocity が分かりにくく、見積もりしにくいかもしれないが、そこであまり時間をかけてはいけない</strong>。3, 4週間すれば平均 velocity が分かる。平均 velocity が分かれば、最初のリリース（多くの場合24ヵ月後）までにどういった feature が実現できるか明らかになる。</li>
+</ul>
+</li>
+<li>
+<p>メンバー全員のよく見える場所に少なくとも次の2つの表を貼っておく。</p>
+<ul>
+<li><b>Velocity chart</b> … 横軸に iteration、縦軸に velocity（その iteration でこなした story point）を示した棒グラフ。</li>
+<li><b>Burn-down chart</b> … velocity chart とは少し違い、縦軸に次のマイルストーン（またはリリース）までの残り story point を示した棒グラフ。story が追加されれば残り story point は増加するし、story の再見積もりによっても変化する。</li>
+</ul>
+</li>
+</ul>
+<h3 id=chapter-4-testingテスティング----2006-05-31--->Chapter 4. Testing（テスティング） </h3>
+<ul>
+<li>ユニットテストを書くという行為は、機能検証というより設計に近い行為である。</li>
+<li>テストを最初に書くことは、ソフトウェアを次のようにする効果があり、設計の質が高まる。
+<ul>
+<li>テスト可能な形式。</li>
+<li>分離された形式。</li>
+</ul>
+</li>
+<li>テストはコンパイルも実行できるドキュメントである。<strong>テストは「常に最新の用例集」としての役割を果たす。</strong></li>
+<li>ユニットテストと受け入れテスト
+<ul>
+<li><b>ユニットテスト</b> … ホワイトボックステスト。プログラマが読めるようにプログラム言語で記述される。</li>
+<li><b>受け入れテスト</b> … ブラックボックステスト。究極の仕様書。顧客が読めるように顧客自身が設計した言語で記述される。</li>
+</ul>
+</li>
+<li><strong>1回分のイテレーションの仕様をとり上げて、受け入れテストのフレームワークを作るのはそれほど困難ではない。作っただけの見返りは得られる。</strong></li>
+</ul>
+<h3 id=chapter-5-refactoringリファクタリング----2006-05-31--->Chapter 5. Refactoring（リファクタリング） </h3>
+<ul>
+<li>書き上げるモジュールも、<strong>保守するモジュールもすべてリファクタリングするべき</strong>である。</li>
+</ul>
+<h3 id=chapter-6-a-programming-episodeプログラミングエピソード----2006-05-31--->Chapter 6. A Programming Episode（プログラミングエピソード） </h3>
+<ul>
+<li>UML ダイアグラムを使うことが適切でない時もある。それは、ダイアグラムを検証するコードを作らず、それに従ってプログラムを作ろうとする場合。</li>
+<li>アイデアの模索に UML ダイアグラムを使うことは問題はないが、できたダイアグラムが最適なものであると思い込んでしまうことに問題がある。</li>
+<li>最良の設計は、まずテストを用意し、小さなステップの積み重ねで生まれていくもの。</li>
+</ul>
+<h2 id=section-ii-agile-designアジャイル設計>Section II: Agile Design（アジャイル設計）</h2>
+<p>以下は、貧弱な設計の兆候である。</p>
+<ol>
+<li>硬さ</li>
+<li>もろさ</li>
+<li>移植性のなさ</li>
+<li>扱いにくさ</li>
+<li>不必要な複雑さ</li>
+<li>不必要な繰り返し</li>
+<li>不透明さ</li>
+</ol>
+<p>これらの兆候が現れるということは、1 つ以上の原則に違反している可能性が高い。
+下記は、<strong>オブジェクト指向設計の原則</strong>である。</p>
+<ol>
+<li><b>SRP</b>: Single Responsibility Principle （単一責任の原則 → 8章）</li>
+<li><b>OCP</b>: Open-Closed Principle（オープン・クローズドの原則 → 9章）</li>
+<li><b>LSP</b>: Liskov Substitution Principle（リスコフの置換原則 → 10章）</li>
+<li><b>DIP</b>: Dependency Inversion Principle（依存関係逆転の原則 → 11章）</li>
+<li><b>ISP</b>: Interface Segregation Principle（インタフェース分離の原則 → 12章）</li>
+</ol>
+<h3 id=chapter-7-what-is-agile-designアジャイル設計とは----2006-06-12--->Chapter 7. What Is Agile Design?（アジャイル設計とは？） </h3>
+<ul>
+<li><strong>アジャイル設計とは、ソフトウェアの構造や可読性を向上させるために、原則、パターン、プラクティスを継続的に適用する行為である。</strong> ⇒ 仕様変更にも素早く対応できる。</li>
+<li>仕様が最も変わりやすいものだということはみんなが知っている。<strong>仕様変更が原因で設計が劣化していくなら、それは自分たちの設計やプラクティスが間違っている。</strong></li>
+<li>仕様は変化するものであり、設計もその変わっていくものなので、アジャイルなチームは<strong>初期の設計に時間をかけるようなことはしない</strong>。そこに時間をかけるのではなく、ユニットテストや受け入れテストをできるだけ頻繁に行うようにして、変更しやすいように保つべき。</li>
+<li>新しい要求、仕様変更が来た時点で、今後の変更にも対応できるように設計を改善するのがよい。先を見越して設計をするのは工数の無駄に終わることが多いし、逆に不要なコードが含まれて理解が難しいコードになってしまう。 <strong>アジャイルでいう「柔軟」とは、どちらかというと設計のシンプルさに重点を置いている。</strong> 汎用性を揚げようとすると、ほとんどの場合、永遠に使われないモジュールであふれかえって複雑なものができあがる。 ⇒ <b>YAGNI</b>: You Aren&rsquo;t Going to Need It! （あなたはそれを必要としないだろう）</li>
+</ul>
+<h4 id=議論-1>▼議論</h4>
+<ul>
+<li><b>Q. クリーンなコードってなんや？シンプルなコードとは違うのか？</b><br>
+無駄なコードがない。バグっぽいコードがないってことではないか。少しでも汚いコードがあると、そこからどんどんコードが腐敗していくということは <a target=_blank href="https://www.amazon.co.jp/dp/427421933X?tag=maku04-22">『達人プログラマー』</a>
+でも言及されている 。</li>
+<li><b>Q. 後からたぶん仕様変更があると分かっていて、その対応をあらかじめいれておかないと、変更するときに二度手間にならない？</b><br>
+確実に仕様変更があると分かっているのならあらかじめ対応をいれておけばよいし、その判断は期待値によるのでは？ただ、あらかじめ対応コードを入れておく方法は、逆に仕様変更がなかった場合に意味のない無駄なコードを残すことになるリスクや、結局あとからコードを消さないといけなくなるリスクが常にある。</li>
+<li><b>Q. アジャイル設計はプロセスではないのか？</b><br>
+翻訳ミスですね。翻訳本では「アジャイル設計はプロセスでもイベントでもない」となっているが、原書では &ldquo;<b>Agile design is a process</b>, not an event.&rdquo; となっている。アジャイルプロセスって言葉もあるしね。</li>
+</ul>
+<h3 id=chapter-8-single-responsibility-principle-srp-単一責任の原則----2008-11-02--->Chapter 8. Single Responsibility Principle (SRP) 単一責任の原則 </h3>
+<div style="border:solid 1px #efefef;border-radius:.5em;padding:.5em .7em">
+<div>
+単一のクラスは単一の責務だけを持つべきである
+</div>
+</div>
+<ul>
+<li>クラスが複数の責任を持っていることの弊害
+<ul>
+<li>そのクラスを使うモジュールが必要のない部分まで含んでしまう。</li>
+<li>そのクラスを変更すると、そのクラスを使用しているモジュールをリビルド、再テスト、再ロードしないといけない。</li>
+</ul>
+</li>
+<li><strong>永続性のあるシステム（データベースなど）と、ビジネスルールは、単一クラスに絶対に混ぜてはいけない。</strong>
+<ul>
+<li>永続性のあるシステムはあまり変化しないけど、ビジネスルールは頻繁に変化する。</li>
+<li>永続性のあるシステムとビジネスルールはまったく違う理由で変化する。</li>
+</ul>
+</li>
+<li>クラスの役割の分離は、Chapter 7 で言っているように、必要になってから行えばよい。</li>
+</ul>
+<h4 id=議論-2>▼議論</h4>
+<ul>
+<li><b>Q. 「永続性のあるシステム」と「ビジネスルール」を分離する必要性がいまいち分からない。</b><br>
+ホットスポットとなる部分を別クラスに分離するのは Agile でなくてもごく基本的な考え。分離していないと、あまり変更のない部分だけを利用したいクラスでも無駄なリビルドやテストが頻繁に発生してしまう。
+また、永続化部分とビジネスロジックが分かれていないと、ビジネスロジックのユニットテストを記述することが困難になる。</li>
+</ul>
+<h3 id=chapter-9-open-closed-principle-ocp-オープンクローズドの原則----2008-11-03--->Chapter 9. Open-Closed Principle (OCP) オープン・クローズドの原則 </h3>
+<div style="border:solid 1px #efefef;border-radius:.5em;padding:.5em .7em">
+<div>
+変更の起こる部分は抽象化して、機能を拡張できるようにしつつ (Open)、既存の部分は変更しないでも済むように (Closed) すべし
+</div>
+</div>
+<ul>
+<li>クラス図の中で <code>A → B</code> という矢印があったら、「B を変更したら A も変更しなければならない」 と考える。</li>
+<li>変更に対して Closed にするには、依存の矢印があると無理なので「抽象」を使用する。どの部分をどのように抽象化すべきかは、求められているシステムによって異なる。
+<ul>
+<li>抽象クラスを使用する方法 … <b>Strategy パターン</b></li>
+<li>抽象メソッドを使用する方法 … <b>Template Method パターン</b></li>
+</ul>
+</li>
+<li>OCP をむやみに適用すべきではない。つまり、抽象をむやみに使用すべきではない。
+<ul>
+<li>抽象を使いすぎるとコードは複雑になる。</li>
+<li>抽象化にはある程度の時間がかかる。</li>
+</ul>
+</li>
+<li>抽象化は、変化が起こる部分（変化しやすい部分）が明らかになってから行えばよい。 <strong>前世紀の考え方では、あらかじめ抽象を仕込むこと＝柔軟と考えられていたがこれは間違いである。</strong> なぜなら、
+<ol>
+<li>抽象化には、将来の仕様変更をある程度予測する洞察力が必要だ。</li>
+<li>そして、その予測はほとんどの場合外れる。</li>
+<li>抽象化されたクラスは邪魔でしかなくなる。</li>
+</ol>
+</li>
+<li>変化が起こってから抽象化を行うのであれば、変化の可能性はプロジェクトの早めに知ることができたほうがよい。そのためには、
+<ul>
+<li>テストファーストで開発をする。</li>
+<li>短いサイクルで開発し、顧客へのリリース頻繁に行う。</li>
+<li>最も重要な機能から優先的に開発を進める。</li>
+</ul>
+</li>
+</ul>
+<h4 id=議論-3>▼議論</h4>
+<ul>
+<li><b>Q. テストファーストでどうして変化の可能性を早く知ることができるのか？</b><br>
+変化の可能性を知るというよりは、あらかじめテストで想定されうる入力を洗い出すことで、早い時点で抽象化するべき部分を見極めることができるということではないか。</li>
+</ul>
+<h3 id=chapter-10-the-liskov-substitution-principle-lsp-リスコフの置換原則----2006-06-21--->Chapter 10. The Liskov Substitution Principle (LSP) リスコフの置換原則 </h3>
+<div style="border:solid 1px #efefef;border-radius:.5em;padding:.5em .7em">
+<div>
+派生型はその基本型と置換可能でなければならない
+</div><div style=text-align:right;font-size:smaller;color:gray>── Barbara Liskov 1988</div>
+</div>
+<ul>
+<li>基本クラスの使えるところでは必ず派生クラスのオブジェクトが使えなければならないという意味。派生型の本当の定義は、基本型と置き換えられるということ。例えば、<code>MyFunc(Base *pObj)</code> という関数には、<code>Base</code> クラスのサブクラスのオブジェクトを渡しても適切に振舞わなければならない。だからといって、if 文でオブジェクトの型を判断して処理を振り分けるようなコードは記述してはならない。これは OCP (Open-Closed Principle) に違反し、修正に対して「閉じ」なくなってしまう。</li>
+<li>派生クラスが基本クラスの機能を制限してしている場合は LSP に違反している。なぜなら、基本クラス以下のことしかできないものは基本クラスの代わりにはなり得ないから。あるメソッドをオーバーライドして、実装を空っぽにしてしまうのは典型的な違反例。</li>
+<li>派生クラスで基本クラスにない例外を投げてしまうと、LSP に違反する。基本クラスを使っているメソッドは、派生クラスが投げる例外をキャッチするようには設計されていないため。</li>
+<li><strong>LSP に準拠させるためには、「振る舞い」の等しさに注目して継承関係を持たせないといけない。</strong> ソフトウェアは「振る舞い」そのものであり、ソフトウェアの世界で「IS-A 関係」を持つということは、つまり、「振る舞い」が等しいということである。例えば、<code>Rectangle::SetWidth()</code> と <code>Square::SetWidth()</code> の「振る舞い」は異なるので、<code>Rectangle</code> クラスと <code>Square</code> クラスは継承関係 (IS-A) を持たせてはいけない。</li>
+<li>モデルの正当性は立場によって異なり、その使い方によって正しかったり正しくなかったりするので、普遍的に正しいモデルは存在しない。<strong>以下のテクニックを使えば、そのクラスが合理的だと仮定している「振る舞い」を明確にできる。</strong>
+<ul>
+<li><b>契約による設計 (Design by Contract)</b><br>
+Bertrand Meyer 1997 によって提唱。メソッドの事前条件と事後条件を明確にすることでユーザに対して「振る舞い」を明示する。派生クラスの事前条件は、基本クラスで許可されているものは全て許可しなければならない（派生クラスで事前条件を厳しくしてはいけない）。派生クラスの事後条件は、基本クラスで課せられている条件を全て満たさなければならない。これにより、基本クラスのオブジェクトの代わりに派生クラスのオブジェクトを使用できることが保証される。</li>
+<li><b>ユニットテスト</b><br>
+ユニットテストによって契約内容を記述することもできる。ユーザはユニットテストを見れば、そのクラスについて何が仮定されているか知ることができる。</li>
+</ul>
+</li>
+<li>2つのクラスに単純な継承関係を持たせることによって LSP に違反してしまう場合は、共通部分だけを親クラスにくくり出すことによって解決できることがある。</li>
+</ul>
+<h4 id=議論-4>▼議論</h4>
+<ul>
+<li><b>Q. 共通部分を親クラスにくくり出すというが、実装の多重継承ができない言語を使用していて、既にあるクラスを継承している場合はどうするのか？</b><br>
+そーゆー場合は、インタフェースだけくくり出すしかないのでは。</li>
+<li><b>Q. 純粋仮想関数として親クラスにくくり出した場合、ここで言っている「振る舞い」が IS-A 関係にあることが保証されるのか？</b><br>
+インタフェースはそもそも何も「振る舞い」を定義しないので、IS-A 関係は必ず成立する。そのインタフェースを使うメソッドは何らかの「振る舞い」を期待したコーディングをしてはいけない。</li>
+</ul>
+<h3 id=chapter-11-the-dependency-inversion-principle-dip-依存関係逆転の原則----2006-06-22--->Chapter 11. The Dependency-Inversion Principle (DIP) 依存関係逆転の原則 </h3>
+<div style="border:solid 1px #efefef;border-radius:.5em;padding:.5em .7em">
+<div>
+上位のモジュールは下位のモジュールに依存してはならない。どちらのモジュールも抽象に依存すべきである。
+</div>
+</div>
+<ul>
+<li>抽象は実装の詳細に依存してはならない。実装の詳細が抽象に依存すべき。</li>
+<li>下位レイヤのモジュールがサブルーチンライブラリという形で再利用できるのは当たり前。そういうことを言っているのではなく、ここでは、<strong>上位のモジュールを再利用できるようにするために、下位のモジュールに依存しないように設計しよう</strong>と言っている。特に C → C++ という学習過程を辿ってきた人には重要な原則。</li>
+<li>ここで「上位のモジュール」といっているのは、アプリケーションの全体的な動きなどの方針を決める部分で、実装の詳細（下位のモジュール）が変更されても影響を受けない本質的な部分。</li>
+<li>下位のモジュールが提供するインタフェースを利用するのではなく、上位のモジュールが要求しているインタフェースを下位のモジュールが実装するという考え。分かりやすいのは Observer パターンとか。</li>
+</ul>
+<p>下記は DIP に違反している例。</p>
+<div style="border:solid 1px #efefef;border-radius:.5em;padding:.5em .7em">
+<div>
+[上位モジュール] ─利用→ [下位モジュール]
+</div>
+</div>
+<p>下記は DIP に従っている例。</p>
+<div style="border:solid 1px #efefef;border-radius:.5em;padding:.5em .7em">
+<div>
+[上位モジュール] ─利用→ [抽象インタフェース] ←実装─ [下位モジュール]
+</div>
+</div>
+<ul>
+<li><strong>DIP に違反していれば「手続き型」の設計をしており、DIP に従っていれば「オブジェクト指向」の設計をしている。</strong></li>
+<li>下位のモジュールの再利用は、サブルーチンライブラリという形で確保されている。我々が本当に確保したいのは上位のモジュールの再利用性である。実装の詳細（下位のモジュール）を変更しても、上位のモジュールに影響がないようにしないといけない。</li>
+<li>再利用可能なフレームワークの構築には DIP の適切な適用が欠かせない。例えば、あるメニュー項目をクリックしたときに、具体的な処理が行われるとか。メニューのフレームワークが特定の処理に依存しているわけではない。</li>
+<li>あるクラスがほかのクラスにメッセージを送るようなケースでは、この依存関係の逆転は常に適用できる。</li>
+</ul>
+<h4 id=議論-5>▼議論</h4>
+<ul>
+<li><b>Q. 上位モジュールと下位モジュールの依存関係を逆転するために最初から上位モジュールが利用するインタフェースを用意するという実装方法（図11-2）は、常にコードをシンプルに保つという思想と矛盾していないか？DIP はシンプルさうんぬんの前に最低限守るべきということ？</b><br>
+レイヤーの違うモジュールに関してはこの原則を適用すべきということ。</li>
+</ul>
+<h3 id=chapter-12-the-interface-segregation-principle-isp-インタフェース分離の原則----2006-06-28--->Chapter 12. The Interface Segregation Principle (ISP) インタフェース分離の原則 </h3>
+<div style="border:solid 1px #efefef;border-radius:.5em;padding:.5em .7em">
+<div>
+関連性のないインタフェースをまとめない
+</div>
+</div>
+<ul>
+<li>すべてのインタフェースを1つのクラスにまとめてしまわず、関連性のあるインタフェースごとにグループ分けして分離する。</li>
+<li>インタフェースが太りすぎると、そのインタフェースを変更したとき、多くのサブクラスを再コンパイルしなければいけない。</li>
+<li>インタフェースを追加するときは、既存のインタフェースを弄るのではなく、新しいインタフェースを追加する方法もある。この方法で追加した新しいインタフェースをクライアントが利用するには、次のように新しいインタフェースを取得することができる。
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=kt>void</span> <span class=nf>Invoke</span><span class=p>(</span><span class=n>Service</span> <span class=o>*</span><span class=n>service</span><span class=p>)</span> <span class=p>{</span>
+    <span class=k>if</span> <span class=p>(</span><span class=n>NewService</span> <span class=o>*</span><span class=n>ns</span> <span class=o>=</span> <span class=k>dynamic_cast</span><span class=o>&lt;</span><span class=n>NewService</span> <span class=o>*&gt;</span><span class=p>(</span><span class=n>service</span><span class=p>))</span> <span class=p>{</span>
+        <span class=c1>// ns を利用する
+</span><span class=c1></span>    <span class=p>}</span>
+    <span class=p>...</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+</li>
+</ul>
+<h3 id=chapter-13-overview-of-uml-for-c-programmers>Chapter 13. Overview of UML for C# Programmers</h3>
+<h3 id=chapter-14-working-with-diagrams>Chapter 14. Working with Diagrams</h3>
+<h3 id=chapter-15-state-diagrams>Chapter 15. State Diagrams</h3>
+<h3 id=chapter-16-object-diagrams>Chapter 16. Object Diagrams</h3>
+<h3 id=chapter-17-use-cases>Chapter 17. Use Cases</h3>
+<h3 id=chapter-18-sequence-diagrams>Chapter 18. Sequence Diagrams</h3>
+<h3 id=chapter-19-class-diagrams>Chapter 19. Class Diagrams</h3>
+<h3 id=chapter-20-heuristics-and-coffee>Chapter 20. Heuristics and Coffee</h3>
+<h2 id=section-iii-the-payroll-case-study>Section III: The Payroll Case Study</h2>
+<h3 id=chapter-21-command-and-active-object-versatility-and-multitasking----2006-07-03--->Chapter 21. COMMAND and ACTIVE OBJECT: Versatility and Multitasking </h3>
+<ul>
+<li>Command パターンはシンプルだが万能で、様々な目的に利用できる。
+<ul>
+<li>データベースのトランザクションの生成と処理</li>
+<li>デバイスの制御</li>
+<li>マルチスレッドのコア</li>
+<li>GUI の do/undo の管理</li>
+</ul>
+</li>
+<li>例えばデバイスの制御に適用すれば、システムの論理的な内部構造とシステムに接続するデバイスの詳細を切り離すことができる。Sensor はイベントを検出したら結び付けられた Command インタフェースの do メソッドを呼び出すだけでよい（初期化時の関連付けは必要だが、実行の際に Sensor が出力先のハードウェアの詳細を意識する必要はない）。</li>
+<li>命令の一時的な保存場所として Command オブジェクトを使用することもできる。例えば、Transaction インタフェースに validate() メソッドを加えれば、Transaction オブジェクト生成時にその有効性だけをチェックしておき、後からまとめてバッチ処理を行うことができる。</li>
+<li>Command インタフェースに do() メソッドだけでなく、undo() メソッドを用意すれば、Undo 処理をサポートできる。各 Command オブジェクトは do() 実行時に以前の状態を覚えてスタックに積まれる（当然、操作対象となるオブジェクトの参照も覚えておく）。Undo するときは、スタックから pop して、undo() メソッドにより以前の状態に戻される。</li>
+<li><strong>Command パターンを有効活用しているパターンの 1 つに ActiveObject パターンがある。</strong> ActiveObject パターンでは、メソッドの実行は 1 つのスレッドでシーケンシャルに行われるため、スタック領域を節約しなければならないようなメモリの限られたシステムでメリットが大きい。</li>
+</ul>
+<h4 id=参考-activeobject-パターンの論文>参考: ActiveObject パターンの論文</h4>
+<p><a href=http://www.cs.wustl.edu/~schmidt/PDF/Act-Obj.pdf>Active Object: An Object Behavioral Pattern for Concurrent Programming</a></p>
+<p>下記は P.1 ～ P.4 までのまとめ。</p>
+<ul>
+<li>Active Object パターンとは、複数のスレッドからオブジェクトにアクセスする際の &ldquo;method execution&rdquo; と &ldquo;method invocation&rdquo; のスレッドを分離するパターン。</li>
+<li>別名 (Also Known As) は &ldquo;Concurrent Object and Actor&rdquo;</li>
+<li>Active Object が解決しようとしているのは、<strong>複数スレッドからの共有オブジェクトへのアクセスが引き起こす下記のような課題</strong>。
+<ul>
+<li>共有オブジェクトにおけるメソッド呼び出しが実行されるときに、全体のスレッドがブロックされてしまうのを防ぎたい。</li>
+<li>複数スレッドからの共有オブジェクトへのアクセスはできるだけシンプルにしたい。例えば、アクセスごとに mutex lock をかけなければならないのは複雑だ。</li>
+<li>アプリケーションは透過的に並列性を利用するように設計されるべきだ。←▼これの意図がよくわからない。</li>
+</ul>
+</li>
+<li>Active Object パターンを使う場合、メソッドの呼び出しは、自動的に Method Requrest オブジェクトに変換されるので、普通のメソッド呼び出しと同じようになる。</li>
+<li>全体のフローの概要は以下の通り。
+<ol>
+<li>クライアントのスレッドは Proxy 経由で共有オブジェクトのメソッドを呼び出す。</li>
+<li>Proxy が各メソッドに対応する MethodRequest オブジェクトを生成し、別スレッドの Scheduler に enqueue() する。</li>
+<li>Scheduler 側のスレッドは常にシーケンシャルに MethodRequest を処理していく。Proxy で呼びだされるメソッドの実装は Servant と呼ばれているもので実装される。</li>
+<li>クライアント側では Proxy 経由のメソッド呼び出しの戻り値として Future オブジェクトを取得し、Future オブジェクトから各メソッドの戻り値を取得できる。</li>
+</ol>
+</li>
+</ul>
+<h3 id=chapter-22-template-method-and-strategy-inheritance-versus-delegation-継承と委譲----2009-01-18--->Chapter 22. TEMPLATE METHOD and STRATEGY: Inheritance versus Delegation （継承と委譲） </h3>
+<ul>
+<li>1990年代初期は、継承によって差分プログラミングできると信じられていた。1995年には、継承の乱用の欠点が明らかになった。GoF は「<strong>クラスの継承よりオブジェクトのコンポジションを使え</strong>」というまでになった。</li>
+<li><strong>Template Method パターンは継承を使って問題を解決</strong>し、<strong>Strategy パターンは委譲を使って問題を解決</strong>する。もっと詳しくいうと、Template Method パターンでは汎用的なアルゴリズムを抽象クラスで実装し、具体的な処理の内容を派生クラスで実装する。Strategy パターンでは汎用的なアルゴリズムを具象クラスで実装し、具体的な処理の内容はインタフェースに委譲する。
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=c1>// Template Method パターン
+</span><span class=c1></span><span class=kt>void</span> <span class=nf>func</span><span class=o>()</span> <span class=o>{</span>
+    <span class=o>...</span>
+    <span class=n>abstractMethod1</span><span class=o>();</span>  <span class=c1>// 派生クラスで実装
+</span><span class=c1></span>    <span class=o>...</span>
+    <span class=n>abstractMethod2</span><span class=o>();</span>
+<span class=o>}</span>
+
+<span class=c1>// Strategy パターン
+</span><span class=c1></span><span class=kt>void</span> <span class=nf>func</span><span class=o>(</span><span class=n>Strategy</span> <span class=o>*</span><span class=n>strategy</span><span class=o>)</span> <span class=o>{</span>
+    <span class=o>...</span>
+    <span class=n>strategy</span><span class=o>-&gt;</span><span class=n>method1</span><span class=o>();</span>  <span class=c1>// インタフェースに委譲
+</span><span class=c1></span>    <span class=o>...</span>
+    <span class=n>strategy</span><span class=o>-&gt;</span><span class=n>method2</span><span class=o>();</span>
+<span class=o>}</span></code></pre></div></div>
+</figure>
+</li>
+<li>Template Method パターンも Strategy パターンも上位レベルのアルゴリズムを再利用するパターン。Strategy パターンは、Template Method パターンより複雑さ、メモリ効率、実行時間の点で若干不利だが、<strong>Strategy パターンには下位レベルの実装の詳細を再利用できる</strong>という利点がある。</li>
+<li><b>Template Method パターン</b>
+<ul>
+<li><b>欠点</b>: 上位クラス（アルゴリズム部分）が下位クラス（実装の詳細）が継承という強い関係で結ばれてしまう。つまり、下位クラスはその上位クラスとは切り離して使用することができないので、別のアルゴリズムに再利用することができなくなってしまう（<strong>DIP に違反</strong>）。たとえ下位クラスの実装から上位クラスのメソッドを利用していないとしても、継承関係にある限り切り離せない。</li>
+<li><b>欠点</b>: ▼そもそも多重継承の許されない言語を使っている場合は採用しにくいでしょ？</li>
+</ul>
+</li>
+<li><b>Strategy パターン</b>
+<ul>
+<li><b>利点</b>: 実装の詳細が、アルゴリズムを表現しているクラスの実装に依存しないため、いろんなアルゴリズムで利用できる（<strong>DIP に完全に準拠している</strong>）。</li>
+<li><b>欠点</b>: Template Method パターンに比べ、クラスの数が多く、間接参照が多い（メモリ、実行時間のコストがかかる）。ただし、多くの場合、これはほとんど問題にならない。</li>
+</ul>
+</li>
+</ul>
+<p>結論としては、<strong>実装の詳細を再利用できる可能性が少しでもあり、微々たる実行コストが問題にならないなら、常に Strategy パターンを採用すべし</strong>。</p>
+<h3 id=chapter-23-facade-and-mediator----2009-01-18--->Chapter 23. Facade and Mediator </h3>
+<ul>
+<li><strong>Facade パターンも Mediator パターンもある種の方針をオブジェクトに強制する。</strong>
+<ul>
+<li>Facade パターンは上から方針を制約する。その方針は視覚的に捉えられる。</li>
+<li>Mediator パターンは下から方針を制約する。その方針は視覚的には捉えられない。</li>
+</ul>
+</li>
+<li>Facade パターンを採用する場合は、全員が Facade を利用することに同意しなければならないことを暗に意味する。上から使い方の制約を課すことができるのであれば、Facade パターンを利用できる。Facade のクライアントは、Facade の下に隠されたライブラリに直接アクセスしないように約束する必要がある。
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=c1>// Facade パターンでは、クライアントコードに見える形で方針が課される。
+</span><span class=c1>// つまり、Facade 経由でメソッドを呼び出さないといけないというルールが必須。
+</span><span class=c1></span><span class=n>facade</span><span class=o>.</span><span class=na>DoSomething1</span><span class=o>();</span>
+<span class=n>facade</span><span class=o>.</span><span class=na>DoSomething2</span><span class=o>();</span></code></pre></div></div>
+</figure>
+</li>
+<li>Mediator パターンは、Mediator オブジェクトを作成した時点でオブジェクト間の方針が課される。Mediator パターンの場合、オブジェクト同士にどのような制約が課されるか（どのように連携されるか）は、Mediator の実装によって隠蔽される。
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=c1>// Mediator パターンでは、クライアントコードは Mediator オブジェクトを作成するだけ。
+</span><span class=c1>// あとは、クライアントコードには見えない形で方針が課される。
+</span><span class=c1></span><span class=n>HogeMediator</span> <span class=n>m</span> <span class=o>=</span> <span class=k>new</span> <span class=n>HogeMediator</span><span class=o>(</span><span class=n>obj1</span><span class=o>,</span> <span class=n>obj2</span><span class=o>);</span></code></pre></div></div>
+</figure>
+</li>
+</ul>
+<h3 id=chapter-24-singleton-and-monostate----2009-01-25--->Chapter 24. Singleton and Monostate </h3>
+<p>Singleton はインスタンスが複数生成されないような<b>「構造」</b>である。
+Monostate はすべてのオブジェクトが同じ<b>「振る舞い」</b>をする。</p>
+<ul>
+<li><b>Singleton パターン</b>の特徴
+<ul>
+<li>Singleton でない既存のクラスを派生して Singleton にすることができる。</li>
+<li>Singleton であるクラスを継承すると、そのままでは Singleton ではなくなってしまう。</li>
+</ul>
+</li>
+<li><b>Monostate パターン</b>の特徴
+<ul>
+<li>Monostate を継承したクラスは Monostate になる（派生による多態性を利用できる）。</li>
+<li>Monostate でないクラスを継承して Monostate にすることはできない。</li>
+<li>Monostate のメソッドは static でないので多態性を持たせられる。</li>
+<li>Singleton に比べて Monostate は振る舞い的に気持ち悪い。</li>
+</ul>
+</li>
+</ul>
+<p>あるクラスを Monostate にするには、メンバ変数をすべて static にすればよい（メンバメソッドは static にしない）。</p>
+<h4 id=monostate-パターンによる実装例-mymonostatecs>Monostate パターンによる実装例 (MyMonostate.cs)</h4>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=k>public</span> <span class=k>class</span> <span class=nc>MyMonostate</span> <span class=p>{</span>
+    <span class=k>private</span> <span class=k>static</span> <span class=kt>int</span> <span class=n>itsX</span> <span class=p>=</span> <span class=m>0</span><span class=p>;</span>  <span class=c1>// すべてのインスタンスが同じ値を共有
+</span><span class=c1></span>    <span class=k>public</span> <span class=kt>int</span> <span class=n>X</span> <span class=p>{</span>
+        <span class=k>get</span> <span class=p>{</span> <span class=k>return</span> <span class=n>itsX</span><span class=p>;</span> <span class=p>}</span>
+        <span class=k>set</span> <span class=p>{</span> <span class=n>itsX</span> <span class=p>=</span> <span class=k>value</span><span class=p>;</span> <span class=p>}</span>
+    <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<h4 id=議論-6>▼議論</h4>
+<ul>
+<li><b>Q. Singleton は削除するいい方法がないといっているが、参照カウンタで生存期間を管理すればよいのでは？</b><br>
+参照カウンタが 0 になった時点でオブジェクトが消えてしまうのであれば、次に生成されるオブジェクトは別のオブジェクトになってメンバ変数も初期化されるので、それはもはや Singleton とは言えない。つまり、メモリ使用量が気になるようなオブジェクトは、Singleton にしてはいけない。</li>
+<li><b>Q. Singleton のメンバメソッドも static ではないので Monostate と同様に多態性を持たせられるのでは？</b><br>
+そもそも Singleton を継承するのは難しい。なぜなら、親クラスの GetInstance() は static なので継承ができないし、親クラスと子クラス両方に GetInstance() 系のメソッドを用意すると、クライアントは親クラスと子クラスのオブジェクトを別々に生成できることになり、結果として親クラスの性質を持つオブジェクトが 2 つ存在することになる。要するに分かりにくい。</li>
+</ul>
+<h3 id=chapter-25-null-object----2009-01-26--->Chapter 25. Null Object </h3>
+<p>Null Object パターンは、オブジェクトを返すメソッドが null や 0 を返さないことを保証し、メソッド呼び出し側での null チェックの必要をなくす。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=n>Color</span> <span class=n>color</span> <span class=p>=</span> <span class=n>GetColor</span><span class=p>(</span><span class=s>&#34;0xFF4080FF&#34;</span><span class=p>);</span>
+<span class=n>color</span><span class=p>.</span><span class=n>Paint</span><span class=p>();</span>  <span class=c1>// NullObject の場合は何もしない
+</span></code></pre></div></div>
+</figure>
+<p>Null Object が唯一のインスタンスであることが保証されているのであれば、従来の null チェックのような分岐処理を記述することもできる。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=n>Color</span> <span class=n>color</span> <span class=p>=</span> <span class=n>GetColor</span><span class=p>(</span><span class=s>&#34;0xFF4080FF&#34;</span><span class=p>);</span>
+<span class=k>if</span> <span class=p>(</span><span class=n>color</span> <span class=p>==</span> <span class=n>Color</span><span class=p>.</span><span class=n>NULL</span><span class=p>)</span> <span class=p>{</span>
+    <span class=c1>// ...
+</span><span class=c1></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<h4 id=議論-7>▼議論</h4>
+<ul>
+<li><b>Q. null チェックしなくてよくなったとしても、バグが表面化しないだけで、潜在的なバグを Null Object によって包み込んでしまうだけでは？</b><br>
+そうかもしれない。結局のところ、Null Object が提供する振る舞い（一般的に何も実行しないという振る舞い）が正しい振る舞いでないのであれば、分岐処理は必要である。</li>
+<li><b>Q. では、Null Object パターンの主な価値は何？だって、Null Object で何もしないでスルーしてもよいケースなんてそんなないでしょ？</b><br>
+プレースホルダ的な機能を用意しておくケースはいろいろある。あるピアへの接続が完了するまではイベント発生しても何もしないとか、イベントに対して何らかの振る舞いを後付けで割り当てるケースなど。
+「null チェック忘れによってクラッシュすることを防ぐ」ために Null Object を導入するというのは、本質的な使い方ではない。
+元のコードで、null 時に特別なシーケンスを実行していたのであれば、Null Object を導入したところでそのシーケンスが必要なくなるわけではない。</li>
+</ul>
+<h3 id=chapter-26-the-payroll-case-study-iteration-1-給与システムのケーススタディ最初のイテレーション----2009-01-31--->Chapter 26. The Payroll Case Study: Iteration 1 （給与システムのケーススタディ：最初のイテレーション） </h3>
+<ul>
+<li>データベースは実装の詳細にすぎないので、データベースについて考えるのはできるだけ後回しにすべき。</li>
+<li>Jacobson が提唱したユースケースは、XP のユーザーストーリーの概念にそっくり。ユースケースはユーザーストーリーをもう少し詳細にしたものだと考えればよい。</li>
+<li><strong>ユースケースを使った落とし込みは、現在のイテレーションで実装する必要のあるユーザーストーリーについてだけ行うべき</strong>。</li>
+<li>各イテレーションの最初で、チーム全員がホワイトボードの前で、選択されたユースケースの簡単な設計議論を行うのは「考えるプロセスを始める」ためであり、設計の詳細を詰めるためではない。</li>
+</ul>
+<h3 id=chapter-27-the-payroll-case-study-implementation-給与システムのケーススタディ実装----2009-02-01--->Chapter 27. The Payroll Case Study: Implementation （給与システムのケーススタディ：実装） </h3>
+<ul>
+<li>コードの検証を怠って、UML にのめり込んでしまうのは危険である。コードは UML が教えてくれなかった設計の問題点を教えてくれる。UML ダイアグラムは役立つツールだが、コードからのフィードバックなしに依存しきってしまうのは危険だ。</li>
+<li>フィードバックなしに設計を進めると必ずエラーが発生する。エラーを防ぐには、テストケースやコードを走らせることでフィードバックを得ること。</li>
+<li>データベースを設計や実装の主要部分とみなすべきではない。<strong>データベースに対する考察は最後まで残し、詳細設計として扱うべきである。そうすることで、データの保存方法や、テストのメカニズムをどう作るかに関して色々な選択肢を残しておける。</strong></li>
+</ul>
+<h2 id=section-iv-packaging-the-payroll-system>Section IV: Packaging the Payroll System</h2>
+<h3 id=chapter-28-principles-of-package-and-component-design-パッケージ設計の原則----2009-02-07--->Chapter 28. Principles of Package and Component Design （パッケージ設計の原則） </h3>
+<p>大きなアプリケーションを体系化するにはクラスだけでなく、もっと大きな単位のパッケージが必要になる。UML ではクラスをとりまとめるコンテナとしてパッケージを扱える。</p>
+<h4 id=パッケージ内部の凝集度-cohesion-に関する原則>パッケージ内部の凝集度 (cohesion) に関する原則</h4>
+<ul>
+<li><b>(1) 再利用・リリース等価の原則 (REP: Reuse-Release Equivalency Principle)</b>
+<ul>
+<li>再利用の単位とリリースの単位は等価になる。</li>
+<li>再利用されるものはリリースされて、そのパッケージにリリース番号を与えてトラッキング可能でなければならない。</li>
+<li><strong>パッケージ内のクラスはすべて再利用可能なものか、すべて再利用できないものかのどちらかにすべき。</strong></li>
+</ul>
+</li>
+<li><b>(2) 全再利用の原則 (CRP: Common Reuse Principle)</b>
+<ul>
+<li>パッケージに含まれるクラスはすべて一緒に再利用される。</li>
+<li>一緒に使われる傾向のあるクラスは同じパッケージに属す。コンテナとイテレータなど。</li>
+<li>逆に、<strong>一緒に使われる傾向のないクラスは同じパッケージに入れるべきではない。</strong></li>
+<li>ある新しいクラスを使おうとしてパッケージを新しいものに置き換えると、そのパッケージ内のクラスを利用しているコードをすべて再評価しなければならない。</li>
+</ul>
+</li>
+<li><b>(3) 閉鎖性共通の原則 (CCP: Common Closure Principle)</b>
+<ul>
+<li>パッケージに含まれるクラスは、みな同じ種類の変更に対して閉じているべきである。</li>
+<li>単一責任の原則 (SRP) のパッケージ版。</li>
+<li>こうすれば、仕様変更があってもその影響を受けるパッケージを最小限にできる。</li>
+</ul>
+</li>
+</ul>
+<h4 id=パッケージ同士の結合度に関する原則>パッケージ同士の結合度に関する原則</h4>
+<ul>
+<li><b>(4) 非循環依存関係の原則 (ADP: Acyclic Dependencies Principle)</b>
+<ul>
+<li>パッケージ依存グラフに循環を持ち込んではいけない。</li>
+<li>パッケージの依存グラフの矢印を辿っていったときに、最初のパッケージに戻ってきてはいけない。</li>
+<li><strong>矢印を下向きに書くと、上向きの矢印が出てきたときに依存関係が循環してしまっていることがすぐに分かる。</strong></li>
+<li>非循環性の有効グラフ (DAG: Directed Acyclic Graph) になっていれば、新しいパッケージのリリースによる影響範囲を絞り込みやすい。矢印をただ逆に辿ればよいだけ。</li>
+<li>依存グラフが循環すると、ほとんどのパッケージを同時にビルド、リリースしないといけなくなる。</li>
+<li><strong>パッケージ依存構造は、アプリケーションの作成の過程で変化していくものなので、常に依存構造に循環が起きていないか見張っておかなければならない。</strong></li>
+<li>パッケージ依存ダイアグラムはビルド方法を示すマップであり、アプリケーションの機能の概要を示すことはほとんどない。</li>
+<li><strong>クラスを作る前にパッケージダイアグラムを作ろうとするのは間違い。確実に依存関係が循環することになる。</strong></li>
+</ul>
+</li>
+<li><b>(5) 安定依存の原則 (SDP: Stable Dependencies Principle)</b>
+<ul>
+<li>安定する方向に依存せよ。パッケージの不安程度は、それが依存するパッケージの不安程度より大きくあるべきだ。</li>
+<li><strong>不安定なパッケージを常に上に描くようにするとよい。こうしておけば、上向きの矢印が見つかったらすぐに SDP に違反していることが分かる。</strong></li>
+</ul>
+</li>
+<li><b>(6) 安定度・抽象度等価の原則 (SAP: Stable Abstractions Principle)</b>
+<ul>
+<li>パッケージの抽象度と安定度は同程度でなければならない。</li>
+<li>パッケージの安定度が高いということは、それ相応の抽象クラスで構成されているべきということ。</li>
+<li>このバランスが崩れると、無意味なパッケージ、苦痛を伴うパッケージが生まれることになる。</li>
+</ul>
+</li>
+</ul>
+<h3 id=chapter-29-factory----2009-02-14--->Chapter 29. Factory </h3>
+<ul>
+<li>いくらインタフェースを使用して具象クラスのオブジェクトにアクセスしても、具象クラスを new する部分がコードが含まれていれば、そのクラスに依存してしまう。Factory パターンは、抽象インタフェースのみで具象クラスを作成することを可能にする。</li>
+<li>Factory パターンのメリットのひとつとして、Factory の実装を自由に入れ替えられることがあげられる。Factory を抽象化しておけば、オブジェクトのインスタンス化方法を簡単に変更できる。</li>
+<li><strong>Factory パターンを、テスト用のモックオブジェクトを作成するために使うこともできる。</strong> Factory の抽象インタフェースをグローバルに保持するようにしておけば、テストコードの中でこのグローバル変数に、テスト用の Factory の参照をセットできるようになる。つまり、本物のコードに一切手をつけずにテスト用の振る舞いをさせることができる。</li>
+<li>依存関係逆転の法則 (DIP) に完全に準拠しようとすると、多くの場所で Factory パターンを適用しなければならなくなる。ただし、これはやりすぎで、例えば、下記のような場合に Factory パターンを適用するとよい。
+<ul>
+<li>Proxy パターンを使う場合。Factory を使って永続性のあるオブジェクトを作るために必要になる。</li>
+<li>ユニットテストのために、オブジェクトを生成するオブジェクトをだまさないといけない場合。</li>
+</ul>
+</li>
+</ul>
+<h3 id=chapter-30-the-payroll-case-study-package-analysis-給与システムのケーススタディふたたび----2009-02-14--->Chapter 30. The Payroll Case Study: Package Analysis （給与システムのケーススタディ：ふたたび） </h3>
+<ul>
+<li><b>ダメなパッケージ分割</b> … 詳細部分が下の方に配置されている。</li>
+<li><b>よいパッケージ分割</b> … 抽象化された部分がより下に配置されている。</li>
+<li>再利用の単位はパッケージ単位になる。なぜならば、パッケージ内のクラスには凝集性 (cohesive) があるからで、互いに強く依存しているから。これはパッケージ分割のひとつの指標になる。</li>
+<li>パッケージ分割はシンプルなところから始めて、徐々に複雑にしていくのがよい。</li>
+<li>再利用されないものや、変更の少ないものまでパッケージ分割するのはやりすぎ。</li>
+<li><strong>パッケージ間の依存度は、Factory パターンによって下げることができる。パッケージごとに、Factory を 1 つ用意し、そのパッケージ内に含まれる public なオブジェクトをその Factory を通してインスタンス化するようにすればよい。</strong></li>
+<li>機能面を軸にパッケージ分割するよりも、トランザクションを軸にパッケージ分割する方がずっと意味がある。</li>
+</ul>
+<h3 id=chapter-31-composite----2009-02-21--->Chapter 31. Composite </h3>
+<ul>
+<li><strong>Command パターンに Composite パターンを付加すれば、ある Command を使用しているクラスに変更をいれずに複数の Command を扱えるようになる。</strong> → OCP をうまく適用した例。</li>
+<li>複数のオブジェクトを同様に扱うためのリストや配列などをメンバ変数として持っているクラスは、Composite パターンを導入することで、「1対多」の関係から「1対1」の関係に落とし込める。こうすることで、コードはシンプルになり、コーディングも保守も楽になる。各クライアントにリストを繰り返し処理するためのコードを埋め込むのではなく、Composite の中に一度だけ繰り返し処理を記述するだけで済むようになる。</li>
+</ul>
+<h3 id=chapter-32-observer-evolving-into-a-pattern-デザインパターンへの回帰----2009-02-22--->Chapter 32. Observer: Evolving into a Pattern （デザインパターンへの回帰） </h3>
+<ul>
+<li>テストファーストを実践することで、必然的に設計の分離性が促進される。テストの方法を考えるだけで、インタフェースを設計に追加することになる。</li>
+<li>Observer パターンを使用すると直接的な依存関係をなくすことができるので、多くの場所で使用したくなるが、Observer パターンを乱用すると、理解しにくく、流れを追いにくくなってしまう。</li>
+</ul>
+<h3 id=chapter-33-abstract-server-adapter-and-bridge----2009-02-28--->Chapter 33. Abstract Server, Adapter, and Bridge </h3>
+<ul>
+<li>依存関係逆転の法則 (DIP) は抽象クラスに依存することが望ましいと主張している。</li>
+<li>通常、継承階層構造は同じパッケージにまとめるべきものではない。クライアントは、それがコントロールするインタフェースとともにパッケージ化されるべき。</li>
+<li>システムの一部をその場しのぎで解決しても、あとからそれが原因で厄介な依存関係が生じ、まったく関係ない別のシステムで問題を引き起こす。</li>
+<li><strong>Adapter パターンを使用するときに Factory パターンも一緒に使用すれば、Adapter の存在を隠蔽することができ、Adapter への依存関係をなくすことができる。</strong></li>
+<li>Bridge パターンを利用することで、複数の階層構造を 1 つに併合せず、分離したまま結合することができる。</li>
+<li>Adapter パターンを使った方法は、シンプルで依存関係も正しい方向になる。一方、Bridge パターンは 2 つの階層構造を完全に分離することができるが、かなり複雑になるので、その必要がある局面でない限りおすすめできない。</li>
+<li>責任の所在をたやすく「不十分な設計」のせいにするべきではない。この世に十分な設計などありえない。存在するのは、コストと利益のバランスがとれるように設計された構造だけ。設計の変化をうまく管理するには、システムを極力シンプルかつ柔軟に保つこと。</li>
+</ul>
+<h3 id=chapter-34-proxy-and-gateway-managing-third-party-apis-第1版タイトル-proxy-stairway-to-heaven----2009-03-01--->Chapter 34. PROXY and GATEWAY: Managing Third-Party APIs （第1版タイトル: Proxy, Stairway to Heaven） </h3>
+<ul>
+<li><strong>Proxy パターンを導入すると、ビジネスルールを他のあらゆる実装（データベース、COM、CORBA、EJB）から切り離すことができる。</strong></li>
+<li>Proxy パターンの取り扱いはそれほど簡単ではなく、ほとんどのアプリケーションでは導入すべきではない。ただし、アプリケーションと API を徹底的に分離することが望ましいケースもある。その代表的なケースは、システムが大きく、データベーススキーマや API が頻繁に変更されるような場合、あるいは複数の MW、データベースエンジン上に構築されているシステム。</li>
+<li>パフォーマンスの改善方法の検討は、実際にパフォーマンスが問題になっていることを検証して、それが実証された場合に限って行うべき。</li>
+<li>Stairway to Heaven パターンを使うと、Proxy パターンと同様に依存関係の逆転を実現できる。ビジネスルールの継承構造を、他の実装（永続メカニズムなど）の継承構造と分離できる。ただし、C++ のような多重継承をサポートした言語でしか採用できない。</li>
+<li><strong>Proxy パターンや Stairway to Heaven パターンは本当に必要になるまでは導入すべきではない（特に Proxy パターン）。それまでは Facade パターンなどを使えばよい。</strong></li>
+</ul>
+<h4 id=議論-8>▼議論</h4>
+<ul>
+<li><b>Q. Stairway to Heaven ってインタフェース導入すれば多重継承しなくてもよいんじゃない？</b><br>
+その通り。そうするとまさに Proxy っぽくなる。だから Stairway to Heaven は Proxy の退化版（インタフェース使わない版）とも言えるかもしれない。第3版から削除されたのはそれが理由かも。</li>
+<li><b>Q. Facade のダイアグラムの依存の方向逆じゃない？</b><br>
+データクラスが Facade のクライアントということを示していると思われる。でも、この Facade の使い方は気持ち悪い。この図だけではデータの永続化のタイミングはどうやって指定しているのか分からない。</li>
+</ul>
+<h3 id=chapter-35-visitor----2009-03-07--->Chapter 35. Visitor </h3>
+<ul>
+<li>Visitor パターンは大きなデータ構造を渡り歩き、そのレポートを作成するような場合によく使われる。1 つのデータ構造をいろいろな形で利用しなければならないアプリケーションで使用される。</li>
+<li>Visitor パターンがうまくいくのは、visit される側のクラスをあまり変更することがない場合。visit される側に派生クラスが追加されるたびに Visitor 側も再コンパイルしなければならない。</li>
+<li>visit される側のクラスの階層構造が頻繁に変わるような場合は、Acyclic Visitor パターン（非循環 Visitor パターン）を採用するとよい。ただし、Acyclic Visitor パターンは若干複雑で、キャストを必要とする。</li>
+<li>Visitor パターンは魅惑的だが、通常はもっとシンプルな方法で解決できることが多い。</li>
+<li>Decorator パターン、Extension Object パターンも、既存のクラス構造に影響を与えずに機能を追加するパターン。</li>
+<li>Extension Object は他のパターンより複雑だが、パワフルで柔軟性がある。</li>
+</ul>
+<h4 id=議論-9>▼議論</h4>
+<ul>
+<li><b>Q. Extension オブジェクトは、getExtension() した時点で作成した方が効率てきではないか？Hash を使った方がシンプルで分かりやすいというのは確かだが、CSV や XML の両方の Extension オブジェクトをいつも使うわけではないので、Extension オブジェクト生成のコストが無駄になるのでは？</b><br>
+その通り。</li>
+</ul>
+<h3 id=chapter-36-state----2009-03-14--->Chapter 36. State </h3>
+<ul>
+<li><strong>有限状態マシン (FSM: Finite State Machine)、状態遷移図 (STD: State Transition Diagram) は、ほとんどどんな場合でも使用できる万能な設計ツール。もっと活用すべき。</strong></li>
+<li>状態遷移図における遷移は、<b>状態遷移テーブル (STT: State Transition Table)</b> でも表現できる。</li>
+<li>状態遷移図、状態遷移テーブルを使うことで、設計者が見落としてしまいがちなマイナーな状態を発見できる。</li>
+<li>Java の弱点のひとつは、C++ の friend と同等の機能が存在しないこと。この機能がないので、private な state 変数をチェックするテストコードが書けない。</li>
+<li>有限状態マシンを実装する 3 つの方法
+<ol>
+<li><b>switch 文を使う方法</b>
+<ul>
+<li>○ 単純な有限状態マシンならエレガントに効率的に実装できる</li>
+<li>× 状態が多くなると保守できなくなる</li>
+<li>× 状態マシンの論理部分とアクション部分を分離できない</li>
+</ul>
+</li>
+<li><b>遷移テーブルを使う方法</b>
+<ul>
+<li>○ 状態遷移テーブルの構成を理解しやすい</li>
+<li>○ プログラム実行時にテーブルを変更できる</li>
+<li>○ 複数の遷移テーブルを作れる</li>
+<li>× 遷移テーブルをサーチするため効率が悪い</li>
+<li>× 遷移テーブルをサポートするためにサポート関数が多数必要</li>
+</ul>
+</li>
+<li><b>State パターンを使う方法</b>
+<ul>
+<li>○ switch を使う方法の効率性、遷移テーブルを使う方法の柔軟性の両方を備えている。</li>
+<li>× State クラスのサブクラスを作成する作業が飽き飽きする。</li>
+<li>× 論理が記述している部分が複数の State 派生クラスに分離してしまい、保守が困難になる。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>State パターンと Strategy パターンの違いは、State パターンでは State クラスが Context クラスへの参照を保持していること。</li>
+<li>State クラスのメソッドのデフォルト実装として、例外を投げるコードを記述しておくと、ある State で発生してはいけないイベントが発生したときにすぐ分かるようになる。</li>
+</ul>
+<h4 id=議論-10>▼議論</h4>
+<ul>
+<li><b>Q. テーブルをサーチするのは switch 文より効率が悪いって本当？</b><br>
+currentState * event の組み合わせでリニアサーチするから switch より平均的に遅くなる。さらに switch 分岐はインデクシングにより最適化される可能性が高い。</li>
+<li><b>Q. n回イベントが発生したときに状態を遷移させるようなステートチャートは記述可能か？</b><br>
+ガード条件を付加すれば可能。ただ、単純な表からコードを自動生成するようなことができなくなりそう。</li>
+</ul>
+<h3 id=chapter-37-the-payroll-case-study-the-database>Chapter 37. The Payroll Case Study: The Database</h3>
+<h3 id=chapter-38-the-payroll-user-interface-model-view-presenter>Chapter 38. The Payroll User Interface: MODEL VIEW PRESENTER</h3>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=../../p/7gmjvza/>１時間で分かる GoF デザインパターン</a></li>
+<li><a href=../../p/ot2a7rx/>読書メモ『手帳フル活用術 仕事の達人、27人の手のうち！』</a></li>
+<li><a href=../../p/bymt9rp/>読書メモ『人生は手帳で変わる 第4世代手帳フランクリン・プランナーを使いこなす』</a></li>
+<li><a href=../../p/r55ad8w/>読書メモ『人生は手帳で変わる』の付録『最も大切なことを発見するためのヒント』</a></li>
+<li><a href=../../p/m4x8mcw/>クワイン・マクラスキー法 (Quine-McCluskey algorithm)</a></li>
+<li><a href=../../p/r58xbyk/>無名サブルーチンとクロージャ</a></li>
+<li><a href=../../p/96rfove/>読書メモ『アイデアのつくり方』ジェームス・ウェブ・ヤング</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/%E8%AA%AD%E6%9B%B8>読書</a></span>
+<span class=xPageTags_item><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム</a></span>
+<span class=xPageTags_item><a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=../../p/35odek9/><span class=xArticle_up_label>読書</span><br>へ戻る</a>
+</div>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_prev>
+<a href=../../p/b2zio3x/>『情報整理術クマガイ式』熊谷正寿</a>
+</div>
+<div class=xPrevNextLink_next>
+<a href=../../p/ot2a7rx/>『手帳フル活用術 仕事の達人、27人の手のうち！』</a>
+</div>
+</div>
+</aside>
+</article>
+<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
+</main>
+</div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/35odek9/>読書</a>
+</span>
+<span class=xBreadcrumb_item>『アジャイルソフトウェア開発の奥義』ロバート・C・マーチン（輪講メモ）
+</span>
+</div>
+</aside>
+<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
+<div id=xSiteFooter2>
+<a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
+</div>
+</div>
+<script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c];b.setAttribute('target','_blank'),b.setAttribute('rel','noopener');const d=b.getElementsByTagName('img');if(d.length>0)continue;b.classList.add('xExternalLinkIcon')}})</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"読書","item":"https://maku.blog/p/35odek9/"},{"@type":"ListItem","position":3,"name":"『アジャイルソフトウェア開発の奥義』ロバート・C・マーチン（輪講メモ）","item":"https://maku.blog/p/fn9ris5/"}]}</script>
+</body>
+</html>

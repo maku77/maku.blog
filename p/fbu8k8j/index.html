@@ -1,0 +1,792 @@
+<!doctype html><html lang=ja-jp>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>TypeScriptでモジュールを作成する／インポートする (export, import)｜まくろぐ</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
+<meta property="og:title" content="TypeScriptでモジュールを作成する／インポートする (export, import)">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maku.blog/p/fbu8k8j/">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://maku.blog/assets/img/site-logo-large.png">
+<meta property="og:description" content="モジュールとは TypeScript で大きなプログラムを作成するときは、モジュールの仕組みを使って 複数のファイルに分割 していきます。 ファイルを分割することでコードを管理しやすくなるだけでなく、名前空間のコンテキストが分けられることになるので、 名前の衝突の問題も解決 することができます。
+モジュールを作るのは簡単で、export キーワードを含む .ts ファイルを作ればそれがモジュールになります。 export キーワードでは、クラスやインタフェースをまるごと公開することもできるし、関数や変数の単位で公開することもできます。
+export の使い方のポイントは、次のように、 クラスや変数を定義するときにプレフィックスとして付加する というところです。 基本的には、定義済みのオブジェクトを後から export するという使い方はしません。
+ export class &mldr; export interface &mldr; export const &mldr; export let &mldr;  ここからは、具体的な export の使い方を見ていきます。
+クラスやインタフェースの定義を export する 下記の lib/mylib.ts ファイルでは、MyInterface インタフェースと、MyClass クラスを公開しています。 それぞれの定義の前に export キーワードを付けるだけでよいので簡単ですね。
+lib/mylib.ts export interface MyInterface { name: string; } export class MyClass implements MyInterface { constructor(public name: string) {} }  次の index.">
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
+<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
+<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
+<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
+<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
+<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
+</head>
+<body>
+<div id=xRoot>
+<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/ujqinda/>プログラミング</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/gqo9yoo/>TypeScript</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/u53q2qi/>モジュール</a>
+</span>
+<span class=xBreadcrumb_item>モジュールを作成する／インポートする (export, import)
+</span>
+</div>
+</aside>
+<div id=xContainer>
+<nav id=xMenu aria-label=メニュー>
+<div id=sidebar style=height:100%>
+<div id=sidebar_notFixed>
+<a href=../../><img src=../../assets/img/site-logo.png></a>
+<div class=xMenu_box data-sticky>
+<form action=https://cse.google.com/cse target=_blank>
+<div class=xSearchBox>
+<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<input type=hidden name=ie value=UTF-8>
+<input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
+<input type=submit value=検索></input>
+</div>
+</form>
+<div class=xMenu_box_body>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
+<div class=xMenu_box_body>
+<div class=xBoxLink>
+<a href=../../p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う
+<time>2022-03-17</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ryq6it6/>NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ
+<time>2022-03-16</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/un3gu8m/>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする
+<time>2022-02-27</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/m4dmu4c/>Next.js でブラウザ履歴で戻るボタンを表示する (router.back)
+<time>2022-02-22</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ter3doz/>Linuxメモ: Bluetooth 関連コマンドのメモ (hciconfig, bluetoothctl)
+<time>2022-02-20</time></a>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title>フォルダ</h3>
+<div class=xMenu_box_body>
+<div class=xNavTree>
+<ul>
+<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/d7p5jye/>React</a>
+<li><a class=xNavTree-dir href=../../p/gqo9yoo/>TypeScript</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/tx6md39/>環境/設定</a>
+<li><a class=xNavTree-dir href=../../p/u53q2qi/>モジュール</a>
+<ul>
+</ul>
+<li><a class=xNavTree-dir href=../../p/hrgu4dk/>型／タイプアノテーション</a>
+<li><a class=xNavTree-dir href=../../p/7wnt5qf/>サンプルコード</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/5398aih/>Android プログラミング</a>
+<li><a class=xNavTree-dir href=../../p/zkw9ju6/>Electron</a>
+<li><a class=xNavTree-dir href=../../p/7zhxet9/>Java</a>
+<li><a class=xNavTree-dir href=../../p/kevbq7k/>正規表現</a>
+<li><a class=xNavTree-dir href=../../p/g3gs5gs/>Unity</a>
+<li><a class=xNavTree-dir href=../../p/qapsyfa/>3D</a>
+<li><a class=xNavTree-dir href=../../p/qikq9o8/>MongoDB</a>
+<li><a class=xNavTree-dir href=../../p/sfs4fq2/>プログラム雑多メモ</a>
+<li><a class=xNavTree-dir href=../../p/4vcr8ji/>Jade</a>
+<li><a class=xNavTree-dir href=../../p/ce8c2q5/>Doxygen</a>
+<li><a class=xNavTree-dir href=../../p/p3z9bup/>アルゴリズム</a>
+<li><a class=xNavTree-dir href=../../p/zff2scf/>SQL</a>
+<li><a class=xNavTree-dir href=../../p/8zhwcq6/>C/C++</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
+<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
+<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
+<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
+<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
+<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
+<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
+<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
+<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
+<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
+<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
+<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
+<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
+<li><a class=xNavTree-dir href=../../p/uo7n4ix/>PowerShell</a>
+<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
+<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
+<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
+<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
+<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
+<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
+<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
+<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
+<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
+<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
+</ul>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
+<div class=xMenu_box_body><div class=xMenu_tag>
+<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (79)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure>azure (58)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/typescript>typescript (57)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws>aws (51)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/next.js>next.js (36)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/chatbot>chatbot (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/react>react (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/gnuplot>gnuplot (27)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github>github (23)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/graphql>graphql (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/node.js>node.js (17)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/electron>electron (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/linux>linux (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vs-code>vs-code (14)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/javascript>javascript (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mongodb>mongodb (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cdk>aws/cdk (12)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/android>android (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/java>java (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/nginx>nginx (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/python>python (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/uml>uml (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/3d>3d (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/lambda>aws/lambda (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sam>aws/sam (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unity>unity (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webgl>webgl (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-cli>azure-cli (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jade>jade (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apollo>apollo (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cognito>aws/cognito (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-storage>azure-storage (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/doxygen>doxygen (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase>firebase (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/luis>luis (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/material-ui>material-ui (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/qna-maker>qna-maker (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ansible>ansible (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cli>aws/cli (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/ssm>aws/ssm (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/c/c++>c/c++ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/eslint>eslint (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/firestore>firebase/firestore (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html/css>html/css (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sql>sql (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/windows>windows (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-functions>azure-functions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/cosmos-db>cosmos-db (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-actions>github-actions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-pages>github-pages (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jekyll>jekyll (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/kotlin>kotlin (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mac>mac (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/powershell>powershell (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/prettier>prettier (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sqlite>sqlite (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/textlint>textlint (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tv>tv (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apache>apache (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/arib>arib (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/amplify>aws/amplify (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/iam>aws/iam (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/kms>aws/kms (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/s3>aws/s3 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sdk>aws/sdk (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-app-service>azure-app-service (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/excel>excel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/hugo>hugo (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/npm>npm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/oauth>oauth (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/opengl>opengl (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/rsync>rsync (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/scp>scp (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/slack>slack (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teraterm>teraterm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unicode>unicode (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vercel>vercel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/zip>zip (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/.net>.net (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/androidstudio>androidstudio (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/atomic-design>atomic-design (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/blender>blender (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bluetooth>bluetooth (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bootstrap>bootstrap (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-framework>bot-framework (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/boto3>boto3 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/css>css (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dns>dns (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dvb>dvb (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/editorconfig>editorconfig (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/evernote>evernote (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/git>git (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/groovy>groovy (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html>html (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/iso>iso (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/json>json (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/macos>macos (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/parcel>parcel (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/raspberrypi>raspberrypi (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ssh>ssh (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teams>teams (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tex>tex (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ubuntu>ubuntu (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vim>vim (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/web>web (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webpack>webpack (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/wsl>wsl (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
+</div></div>
+</div>
+<div class=xMenu_box data-sticky><br></div>
+</div>
+<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
+</div>
+</div>
+</nav>
+<main id=xMain>
+<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_next>
+<a href=../../p/emdtiio/>モジュールのインポートには import を使う</a>
+</div>
+</div>
+</aside>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/ujqinda/>プログラミング</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/gqo9yoo/>TypeScript</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/u53q2qi/>モジュール</a></span></div>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/fbu8k8j/>TypeScriptでモジュールを作成する／インポートする (export, import)</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/javascript>JavaScript</a></span>
+<span class=xPageTags_item><a href=../../tags/typescript>TypeScript</a></span>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2019-11-21>2019-11-21</time><br>
+作成: <time itemprop=datePublished datetime=2019-11-21>2019-11-21</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#モジュールとは>モジュールとは</a></li>
+<li><a href=#クラスやインタフェースの定義を-export-する>クラスやインタフェースの定義を export する</a></li>
+<li><a href=#単一の変数や定数関数などを-export-する>単一の変数や定数、関数などを export する</a></li>
+<li><a href=#再-export-re-export>再 export (Re-export)</a></li>
+<li><a href=#デフォルト-export>デフォルト export</a></li>
+<li><a href=#オブジェクト-export-object-export>オブジェクト export (Object export)</a></li>
+</ul>
+</nav><h2 id=モジュールとは>モジュールとは</h2>
+<p>TypeScript で大きなプログラムを作成するときは、モジュールの仕組みを使って <strong>複数のファイルに分割</strong> していきます。
+ファイルを分割することでコードを管理しやすくなるだけでなく、名前空間のコンテキストが分けられることになるので、 <strong>名前の衝突の問題も解決</strong> することができます。</p>
+<p>モジュールを作るのは簡単で、<strong><code>export</code></strong> キーワードを含む <code>.ts</code> ファイルを作ればそれがモジュールになります。
+<code>export</code> キーワードでは、クラスやインタフェースをまるごと公開することもできるし、関数や変数の単位で公開することもできます。</p>
+<p><code>export</code> の使い方のポイントは、次のように、 <strong>クラスや変数を定義するときにプレフィックスとして付加する</strong> というところです。
+基本的には、定義済みのオブジェクトを後から <code>export</code> するという使い方はしません。</p>
+<ul>
+<li>export class &mldr;</li>
+<li>export interface &mldr;</li>
+<li>export const &mldr;</li>
+<li>export let &mldr;</li>
+</ul>
+<p>ここからは、具体的な <code>export</code> の使い方を見ていきます。</p>
+<h2 id=クラスやインタフェースの定義を-export-する>クラスやインタフェースの定義を export する</h2>
+<p>下記の <code>lib/mylib.ts</code> ファイルでは、<code>MyInterface</code> インタフェースと、<code>MyClass</code> クラスを公開しています。
+それぞれの定義の前に <code>export</code> キーワードを付けるだけでよいので簡単ですね。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>lib/mylib.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>export</span> <span class=kr>interface</span> <span class=nx>MyInterface</span> <span class=p>{</span>
+  <span class=nx>name</span>: <span class=kt>string</span><span class=p>;</span>
+<span class=p>}</span>
+
+<span class=kr>export</span> <span class=kr>class</span> <span class=nx>MyClass</span> <span class=kr>implements</span> <span class=nx>MyInterface</span> <span class=p>{</span>
+  <span class=kr>constructor</span><span class=p>(</span><span class=kr>public</span> <span class=nx>name</span>: <span class=kt>string</span><span class=p>)</span> <span class=p>{}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>次の <code>index.ts</code> ファイルからは、上記のクラスモジュールを <strong><code>import</code></strong> して読み込んでいます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>index.ts（個別に import）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>import</span> <span class=p>{</span> <span class=nx>MyInterface</span><span class=p>,</span> <span class=nx>MyClass</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;./lib/mylib&#39;</span><span class=p>;</span>
+
+<span class=kr>const</span> <span class=nx>obj</span>: <span class=kt>MyInterface</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>MyClass</span><span class=p>(</span><span class=s1>&#39;Maku&#39;</span><span class=p>);</span>
+<span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>obj</span><span class=p>.</span><span class=nx>name</span><span class=p>);</span>  <span class=c1>//=&gt; Maku
+</span></code></pre></div></div>
+</figure>
+<p><code>from</code> の後ろに指定するファイルパスには、 <strong>拡張子の <code>.ts</code> を記述しない</strong> ことに注意してください（実際に読み込むファイルは <code>.js</code> なので、<code>.ts</code> の指定は意味的にも間違っています）。
+上記の例では、インタフェースやクラスの名前を直接指定して、個別の変数に読み込んでいますが、次のようにワイルドカードを使って <code>export</code> されているものを 1 つの変数にすべて読み込むこともできます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>index.js（まとめて import）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>mylib</span> <span class=kr>from</span> <span class=s1>&#39;./lib/mylib&#39;</span><span class=p>;</span>
+
+<span class=kr>const</span> <span class=nx>obj</span>: <span class=kt>mylib.MyInterface</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>mylib</span><span class=p>.</span><span class=nx>MyClass</span><span class=p>(</span><span class=s1>&#39;Maku&#39;</span><span class=p>);</span>
+<span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>obj</span><span class=p>.</span><span class=nx>name</span><span class=p>);</span>  <span class=c1>//=&gt; Maku
+</span></code></pre></div></div>
+</figure>
+<p>ここでは、<strong><code>as</code> キーワード</strong> を使って <code>mylib</code> という変数のプロパティ経由で公開されているインタフェースにアクセスできるようにしています。
+<strong>ワイルドカードを使用する場合、この変数の指定は必須</strong> であることに注意してください（それにより、不注意による名前の衝突を防げるようになっています）。</p>
+<p>個別の変数に読み込む場合でも、<code>as</code> キーワードを使って別名を付けることができます。
+使用頻度は高くないかもしれませんが、名前の衝突が起こってしまう場合や、長いインタフェース名を短い名前で参照したいときなどに使えるテクニックです。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>index.js（別名を付ける）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>import</span> <span class=p>{</span> <span class=nx>MyInterface</span> <span class=kr>as</span> <span class=nx>MI</span><span class=p>,</span> <span class=nx>MyClass</span> <span class=kr>as</span> <span class=nx>MC</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;./lib/mylib&#39;</span><span class=p>;</span>
+
+<span class=kr>const</span> <span class=nx>obj</span>: <span class=kt>MI</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>MC</span><span class=p>(</span><span class=s1>&#39;Maku&#39;</span><span class=p>);</span>
+<span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>obj</span><span class=p>.</span><span class=nx>name</span><span class=p>);</span>  <span class=c1>//=&gt; Maku
+</span></code></pre></div></div>
+</figure>
+<h2 id=単一の変数や定数関数などを-export-する>単一の変数や定数、関数などを export する</h2>
+<p><code>const</code> や <code>let</code> を使って変数を定義するときに、<code>export</code> キーワードを付けておくと、その変数を単独で公開できます。</p>
+<p>次の <code>config.ts</code> モジュールは、<code>config</code> 変数（<code>Config</code> クラスのインスタンス）を公開しています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>config.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>class</span> <span class=nx>Config</span> <span class=p>{</span>
+  <span class=nx>debug</span>: <span class=kt>boolean</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span>
+  <span class=nx>animSpeed</span>: <span class=kt>number</span> <span class=o>=</span> <span class=mi>10</span><span class=p>;</span>
+<span class=p>}</span>
+
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>config</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Config</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<p>参照側では次のようにして <code>config</code> 変数を扱うことができます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>index.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>import</span> <span class=p>{</span> <span class=nx>config</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;./config&#39;</span><span class=p>;</span>
+
+<span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>config</span><span class=p>.</span><span class=nx>debug</span><span class=p>);</span>  <span class=c1>//=&gt; true
+</span></code></pre></div></div>
+</figure>
+<p>ちなみに、このような設定情報であれば、次のように各プロパティを static なクラス変数として定義し、クラスごと <code>export</code> した方がシンプルでよいかもしれません。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>config.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>export</span> <span class=kr>class</span> <span class=nx>Config</span> <span class=p>{</span>
+  <span class=kr>static</span> <span class=kr>readonly</span> <span class=nx>DEBUG</span>: <span class=kt>boolean</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<div style="border:solid 1px #ccc;border-radius:.5em;background:#eee;padding:.5em">
+<h2 style="font-size:1rem;margin:.3em .5em;color:#333">参考リンク</h2>
+<ul>
+<li><a href=../../p/nky6cbb>TypeScript: クラス定数を定義する (static readonly)</a></li>
+</ul>
+</div>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>index.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>import</span> <span class=p>{</span> <span class=nx>Config</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;./config&#39;</span><span class=p>;</span>
+
+<span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>Config</span><span class=p>.</span><span class=nx>DEBUG</span><span class=p>);</span>  <span class=c1>//=&gt; true
+</span></code></pre></div></div>
+</figure>
+<p>定数や関数を単独で公開することもできます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>mylib.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>export</span> <span class=kr>const</span> <span class=nx>MAX_CHANNELS</span> <span class=o>=</span> <span class=mi>100</span><span class=p>;</span>
+<span class=kr>export</span> <span class=kd>function</span> <span class=nx>greet() {</span>
+  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;Hello&#39;</span><span class=p>);</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>index.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>import</span> <span class=p>{</span> <span class=nx>MAX_CHANNELS</span><span class=p>,</span> <span class=nx>greet</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;./config&#39;</span><span class=p>;</span>
+
+<span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>MAX_CHANNELS</span><span class=p>);</span>  <span class=c1>//=&gt; 100
+</span><span class=c1></span><span class=nx>greet</span><span class=p>();</span>  <span class=c1>//=&gt; Hello
+</span></code></pre></div></div>
+</figure>
+<p>次のように、<code>export</code> するときに別名を付けることもできます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>mylib.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kd>function</span> <span class=nx>greet() {</span>
+  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;Hello&#39;</span><span class=p>);</span>
+<span class=p>}</span>
+
+<span class=kr>export</span> <span class=p>{</span> <span class=nx>greet</span> <span class=kr>as</span> <span class=nx>myGreet</span> <span class=p>}</span></code></pre></div></div>
+</figure>
+<h2 id=再-export-re-export>再 export (Re-export)</h2>
+<p>次のように <code>export</code> を使用すると、別のモジュールから <code>export</code> されているインタフェースを、あたかも自分が <code>export</code> しているかのように見せることができます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>export</span> <span class=p>{</span> <span class=nx>Foo</span><span class=p>,</span> <span class=nx>Bar</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;./submodule&#39;</span><span class=p>;</span></code></pre></div></div>
+</figure>
+<p>次のように、別名を付けて再 <code>export</code> したり、すべてのインタフェースを再 <code>export</code> することもできます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>export</span> <span class=p>{</span> <span class=nx>Foo</span> <span class=kr>as</span> <span class=nx>MyFoo</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;./submodule&#39;</span><span class=p>;</span>
+<span class=kr>export</span> <span class=o>*</span> <span class=kr>from</span> <span class=s1>&#39;./submodule&#39;</span><span class=p>;</span></code></pre></div></div>
+</figure>
+<p>このようにワイルドカードを使用する場合は、<code>import</code> の場合と違い、<code>as</code> による別名を付けなくてよいことに注意してください。</p>
+<p>この再 export の仕組みを使用すれば、複数のサブモジュールで構成されたライブラリを、 1 つの大きなモジュールとして見せることができます。</p>
+<h2 id=デフォルト-export>デフォルト export</h2>
+<p>（この仕組みはオススメしません）</p>
+<p><strong><code>export default</code></strong> を指定すると、モジュールの中の 1 つのメンバーをデフォルト export に設定することができ、シンプルな記述で <code>import</code> できるようになります。</p>
+<p>次の例では、<code>Book</code> クラスの定義をデフォルト export しています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>book.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>export</span> <span class=k>default</span> <span class=kr>class</span> <span class=nx>Book</span> <span class=p>{</span>
+  <span class=kr>constructor</span><span class=p>(</span><span class=kr>public</span> <span class=nx>title</span>: <span class=kt>string</span><span class=p>)</span> <span class=p>{}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>このクラスは下記のようにシンプルに <code>import</code> できます（変数名を <code>{}</code> で囲んだりする必要がありません）。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>index.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>import</span> <span class=nx>Book</span> <span class=kr>from</span> <span class=s1>&#39;./book&#39;</span><span class=p>;</span>
+
+<span class=kr>const</span> <span class=nx>book</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Book</span><span class=p>(</span><span class=s1>&#39;Title&#39;</span><span class=p>);</span></code></pre></div></div>
+</figure>
+<p>デフォルト export された <code>Book</code> クラスは、次のように別の名前の変数にも代入できてしまいます（それでも実体は <code>Book</code> クラスです）。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>index.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>import</span> <span class=nx>Hoge</span> <span class=kr>from</span> <span class=s1>&#39;./book&#39;</span><span class=p>;</span>
+
+<span class=kr>const</span> <span class=nx>book</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Hoge</span><span class=p>(</span><span class=s1>&#39;Title&#39;</span><span class=p>);</span></code></pre></div></div>
+</figure>
+<p>このように名前の変更ができてしまうので、デフォルト export を使ったコードは分かりにくくなってしまう可能性があります。
+そのため、<strong>デフォルト export の仕組みはあまりオススメできません</strong>。</p>
+<p><code>export default</code> は、次のように、単一のインスタンス（ここでは <code>Config</code> オブジェクト）を公開するのにも使用できます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>config.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>class</span> <span class=nx>Config</span> <span class=p>{</span>
+  <span class=nx>debug</span>: <span class=kt>boolean</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span>
+  <span class=nx>animSpeed</span>: <span class=kt>number</span> <span class=o>=</span> <span class=mi>10</span><span class=p>;</span>
+<span class=p>}</span>
+
+<span class=kr>export</span> <span class=k>default</span> <span class=k>new</span> <span class=nx>Config</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<p>次のように <code>import</code> すれば、モジュール側で生成された <code>Config</code> オブジェクトを直接参照できます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>index.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>import</span> <span class=nx>config</span> <span class=kr>from</span> <span class=s1>&#39;./config&#39;</span><span class=p>;</span>
+
+<span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>config</span><span class=p>.</span><span class=nx>debug</span><span class=p>);</span>  <span class=c1>//=&gt; true
+</span></code></pre></div></div>
+</figure>
+<p>とはいえ、通常の <code>export</code> の使い方でも同様のことを実現できるため、やはり <code>export default</code> の使用はオススメできません。</p>
+<h2 id=オブジェクト-export-object-export>オブジェクト export (Object export)</h2>
+<p>（この仕組みもオススメしません）</p>
+<p>単一のオブジェクトだけを公開したい場合は、上で説明した <code>export default</code> の仕組みを使用する方法以外にも、</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>export = オブジェクト;</code></pre></div></div>
+</figure>
+<p>という構文を使用する方法があります。
+CommonJS の exports & requre のようなものだというと伝わる人には伝わるかもしれません。</p>
+<p>次の <code>config.ts</code> モジュールでは、唯一 <code>Config</code> クラスのインスタンスだけを <code>export</code> しています。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-config.ts data-lang=config.ts><span class=kr>class</span> <span class=nx>Config</span> <span class=p>{</span>
+  <span class=nx>debug</span>: <span class=kt>boolean</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span>
+  <span class=nx>animSpeed</span>: <span class=kt>number</span> <span class=o>=</span> <span class=mi>10</span><span class=p>;</span>
+<span class=p>}</span>
+
+<span class=kr>export</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Config</span><span class=p>();</span></code></pre></div></div>
+</figure>
+<p>このモジュールを読み込む側では、<code>import/from</code> ではなく、<strong><code>import/require</code></strong> を使って読み込む必要があります。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-index.ts data-lang=index.ts><span class=kr>import</span> <span class=nx>config</span> <span class=o>=</span> <span class=kr>require</span><span class=p>(</span><span class=s1>&#39;./config&#39;</span><span class=p>);</span>
+
+<span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>config</span><span class=p>.</span><span class=nx>debug</span><span class=p>);</span>  <span class=c1>//=&gt; true
+</span></code></pre></div></div>
+</figure>
+<p>この方法でモジュールを読み込む場合、公開されているオブジェクトの名前と合わせた変数に代入する必要はありません（上記の例では意図的に <code>config</code> と合わせているだけです）。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-typescript data-lang=typescript><span class=kr>import</span> <span class=nx>hogehoge</span> <span class=o>=</span> <span class=kr>require</span><span class=p>(</span><span class=s1>&#39;./config&#39;</span><span class=p>);</span></code></pre></div></div>
+</figure>
+<p>このように使用側で名前を勝手に変更できてしまう点は、<code>export default</code> との共通点であり、オススメできない理由でもあります。</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=../../p/a3eh9w2/>TypeScriptで名前空間を定義する (namespace)</a></li>
+<li><a href=../../p/nxzsnkf/>TypeScriptの環境: tsc-watch で ts ファイルの変更監視＆アプリの再起動を自動化する</a></li>
+<li><a href=../../p/27m3brm/>TypeScriptの環境: tsconfig.json の基本</a></li>
+<li><a href=../../p/3eccb2t/>TypeScriptの環境: 既存の JavaScript プロジェクトを TypeScript に乗り換える</a></li>
+<li><a href=../../p/tdouo5p/>TypeScript とは</a></li>
+<li><a href=../../p/ak7u3h3/>TypeScriptの環境: Visual Studio Code で TypeScript の開発環境を構築する</a></li>
+<li><a href=../../p/5zoqtmi/>TypeScriptの型: タイプエイリアスを定義する (type)</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/javascript>JavaScript</a></span>
+<span class=xPageTags_item><a href=../../tags/typescript>TypeScript</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=../../p/u53q2qi/><span class=xArticle_up_label>TypeScriptのモジュールの仕組みについて</span><br>へ戻る</a>
+</div>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_next>
+<a href=../../p/emdtiio/>モジュールのインポートには import を使う</a>
+</div>
+</div>
+</aside>
+</article>
+<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
+</main>
+</div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/ujqinda/>プログラミング</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/gqo9yoo/>TypeScript</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/u53q2qi/>モジュール</a>
+</span>
+<span class=xBreadcrumb_item>モジュールを作成する／インポートする (export, import)
+</span>
+</div>
+</aside>
+<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
+<div id=xSiteFooter2>
+<a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
+</div>
+</div>
+<script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c];b.setAttribute('target','_blank'),b.setAttribute('rel','noopener');const d=b.getElementsByTagName('img');if(d.length>0)continue;b.classList.add('xExternalLinkIcon')}})</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"プログラミング","item":"https://maku.blog/p/ujqinda/"},{"@type":"ListItem","position":4,"name":"TypeScript","item":"https://maku.blog/p/gqo9yoo/"},{"@type":"ListItem","position":5,"name":"モジュール","item":"https://maku.blog/p/u53q2qi/"},{"@type":"ListItem","position":6,"name":"モジュールを作成する／インポートする (export, import)","item":"https://maku.blog/p/fbu8k8j/"}]}</script>
+</body>
+</html>

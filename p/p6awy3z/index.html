@@ -1,0 +1,979 @@
+<!doctype html><html lang=ja-jp>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>読書メモ『レガシーコード改善ガイド』マイケル・C・フェザーズ｜まくろぐ</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
+<meta property="og:title" content="読書メモ『レガシーコード改善ガイド』マイケル・C・フェザーズ">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maku.blog/p/p6awy3z/">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://maku.blog/assets/img/site-logo-large.png">
+<meta property="og:description" content="レガシーコード改善ガイド マイケル・C・フェザーズ 翔泳社     はじめに テストのないコードは悪いコード（レガシーコード）である。
+これがマイケル・C・フェザーズの強いメッセージです。 どれだけうまく書かれているかは関係ない。テストが書かれていない＝悪であるとまで言い切っています。 どれだけ美しいか、オブジェクト指向か、きちんとカプセル化されているかは関係ない。テストがなきゃだめだ！
+第1部 変更のメカニズム 第1章 ソフトウェアの変更  リファクタリングでは、  小さな変更を繰り返し行う。 変更を容易に行うためテストでサポートする。 機能を変更すべきではない。   コードの変更時に問題になるのは、影響範囲を把握できないこと。変更を安全に行うために最も重要なことは、影響範囲を理解すること。 変更を避けると腕がなまってしまう。大きなクラスを分割する作業は週に２，３回くらい行っていないと、困難な仕事になってしまう。頻繁に変更を行っていれば、何が分割できるかの検討をつけやすくなり、変更作業が容易になる。  第2章 フィードバックを得ながらの作業  テストを用意することには、「正しいことを確認するため」だけでなく、「変更を検出するため」という目的もある。 特定のコードにエラーがあると思ったときにテストハーネスを利用できれば、手早くテストコードを書いて、本当にそこにエラーがあるのか確認することができる。 優れた単体テストの条件  実行が速い: 速く走らないとしたら、それは単体テストではない。0.1 秒もかかっていたら遅い単体テストである。「DBアクセス」、「ネットワーク通信」、「ファイルシステムアクセス」、「実行するための環境設定」が必要なものは単体テストとは言えない。 問題個所の特定がしやすい   他のクラスと依存関係があるクラスはテストハーネスに入れられない。例えば、DbConnection に依存しているクラスをテストしたい場合は、まずはインタフェース IDbConnection を導入して依存を切る必要がある。 価値をもたらす機能的な変更を行いながら、システムのより多くの部分をテストで保護していくべき。 扱いやすくなるように大きなクラスを分割するといった些細なことによって、アプリケーションに大きな違いが出てくる。  第3章 検出と分離  テストを整備する際に依存関係を排除するのには2つの理由がある。  検出: コードの計算した値にアクセスできないときに、それを検出するために依存関係を排除する。 分離: コードをテストハーネスに入れて実行することすらできないとき、分離するために依存関係を排除する。   ソフトウェアを分離するには様々な方法があるが、検出のための主な手段は「強調クラスの擬装」のひとつしかない。 あるクラスの依存をインタフェースの導入によってなくした場合、そのクラスに FakeObject を渡してテストすることになる。FakeObject ではテスト対象のクラスから渡されたデータを記録することで、テスト対象のクラスが正しくデータを渡しているかを検証できる。依存部分を切り離すことにより、依存していたインタフェースでやりとりしているデータが正しいかどうかをテストすることができる。 public void testPrintItem() { FakePrinter printer = new FakePrinter(); Item item = new Item(printer); // テスト対象のクラス  item.">
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
+<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
+<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
+<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
+<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
+<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
+</head>
+<body>
+<div id=xRoot>
+<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/35odek9/>読書</a>
+</span>
+<span class=xBreadcrumb_item>『レガシーコード改善ガイド』マイケル・C・フェザーズ
+</span>
+</div>
+</aside>
+<div id=xContainer>
+<nav id=xMenu aria-label=メニュー>
+<div id=sidebar style=height:100%>
+<div id=sidebar_notFixed>
+<a href=../../><img src=../../assets/img/site-logo.png></a>
+<div class=xMenu_box data-sticky>
+<form action=https://cse.google.com/cse target=_blank>
+<div class=xSearchBox>
+<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<input type=hidden name=ie value=UTF-8>
+<input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
+<input type=submit value=検索></input>
+</div>
+</form>
+<div class=xMenu_box_body>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
+<div class=xMenu_box_body>
+<div class=xBoxLink>
+<a href=../../p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う
+<time>2022-03-17</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ryq6it6/>NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ
+<time>2022-03-16</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/un3gu8m/>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする
+<time>2022-02-27</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/m4dmu4c/>Next.js でブラウザ履歴で戻るボタンを表示する (router.back)
+<time>2022-02-22</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ter3doz/>Linuxメモ: Bluetooth 関連コマンドのメモ (hciconfig, bluetoothctl)
+<time>2022-02-20</time></a>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title>フォルダ</h3>
+<div class=xMenu_box_body>
+<div class=xNavTree>
+<ul>
+<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
+<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/raw875t/>受賞作リスト</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
+<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
+<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
+<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
+<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
+<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
+</ul>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
+<div class=xMenu_box_body><div class=xMenu_tag>
+<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (79)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure>azure (58)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/typescript>typescript (57)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws>aws (51)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/next.js>next.js (36)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/chatbot>chatbot (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/react>react (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/gnuplot>gnuplot (27)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github>github (23)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/graphql>graphql (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/node.js>node.js (17)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/electron>electron (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/linux>linux (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vs-code>vs-code (14)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/javascript>javascript (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mongodb>mongodb (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cdk>aws/cdk (12)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/android>android (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/java>java (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/nginx>nginx (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/python>python (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/uml>uml (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/3d>3d (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/lambda>aws/lambda (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sam>aws/sam (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unity>unity (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webgl>webgl (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-cli>azure-cli (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jade>jade (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apollo>apollo (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cognito>aws/cognito (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-storage>azure-storage (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/doxygen>doxygen (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase>firebase (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/luis>luis (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/material-ui>material-ui (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/qna-maker>qna-maker (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ansible>ansible (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cli>aws/cli (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/ssm>aws/ssm (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/c/c++>c/c++ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/eslint>eslint (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/firestore>firebase/firestore (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html/css>html/css (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sql>sql (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/windows>windows (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-functions>azure-functions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/cosmos-db>cosmos-db (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-actions>github-actions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-pages>github-pages (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jekyll>jekyll (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/kotlin>kotlin (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mac>mac (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/powershell>powershell (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/prettier>prettier (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sqlite>sqlite (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/textlint>textlint (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tv>tv (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apache>apache (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/arib>arib (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/amplify>aws/amplify (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/iam>aws/iam (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/kms>aws/kms (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/s3>aws/s3 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sdk>aws/sdk (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-app-service>azure-app-service (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/excel>excel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/hugo>hugo (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/npm>npm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/oauth>oauth (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/opengl>opengl (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/rsync>rsync (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/scp>scp (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/slack>slack (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teraterm>teraterm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unicode>unicode (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vercel>vercel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/zip>zip (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/.net>.net (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/androidstudio>androidstudio (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/atomic-design>atomic-design (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/blender>blender (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bluetooth>bluetooth (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bootstrap>bootstrap (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-framework>bot-framework (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/boto3>boto3 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/css>css (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dns>dns (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dvb>dvb (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/editorconfig>editorconfig (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/evernote>evernote (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/git>git (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/groovy>groovy (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html>html (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/iso>iso (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/json>json (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/macos>macos (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/parcel>parcel (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/raspberrypi>raspberrypi (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ssh>ssh (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teams>teams (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tex>tex (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ubuntu>ubuntu (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vim>vim (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/web>web (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webpack>webpack (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/wsl>wsl (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
+</div></div>
+</div>
+<div class=xMenu_box data-sticky><br></div>
+</div>
+<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
+</div>
+</div>
+</nav>
+<main id=xMain>
+<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_prev>
+<a href=../../p/kojyx2x/>『Javaの鉄則』ピーター・ハガー</a>
+</div>
+<div class=xPrevNextLink_next>
+<a href=../../p/5oc7g4c/>『ピープルウェア』トム・デマルコ、ティモシー・リスター</a>
+</div>
+</div>
+</aside>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/35odek9/>読書</a></span></div>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/p6awy3z/>読書メモ『レガシーコード改善ガイド』マイケル・C・フェザーズ</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/%E8%AA%AD%E6%9B%B8>読書</a></span>
+<span class=xPageTags_item><a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト</a></span>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2010-10-30>2010-10-30</time><br>
+作成: <time itemprop=datePublished datetime=2010-10-30>2010-10-30</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#はじめに>はじめに</a></li>
+<li><a href=#第1部-変更のメカニズム>第1部 変更のメカニズム</a>
+<ul>
+<li><a href=#第1章-ソフトウェアの変更>第1章 ソフトウェアの変更</a></li>
+<li><a href=#第2章-フィードバックを得ながらの作業>第2章 フィードバックを得ながらの作業</a></li>
+<li><a href=#第3章-検出と分離>第3章 検出と分離</a></li>
+<li><a href=#第4章-接合モデル>第4章 接合モデル</a></li>
+<li><a href=#第5章-ツール>第5章 ツール</a></li>
+</ul>
+</li>
+<li><a href=#第2部-ソフトウェアの変更>第2部 ソフトウェアの変更</a>
+<ul>
+<li><a href=#第6章-時間がないのに変更しなければなりません>第6章 時間がないのに変更しなければなりません</a></li>
+<li><a href=#第7章-いつまで経っても変更作業が終わりません>第7章 いつまで経っても変更作業が終わりません</a></li>
+<li><a href=#第8章-どうやって機能を追加すればよいのでしょうか>第8章 どうやって機能を追加すればよいのでしょうか?</a></li>
+<li><a href=#第9章-このクラスをテストハーネスに入れることができません>第9章 このクラスをテストハーネスに入れることができません</a></li>
+<li><a href=#第10章-このメソッドをテストハーネスで動かすことができません>第10章 このメソッドをテストハーネスで動かすことができません</a></li>
+<li><a href=#第11章-変更する必要がありますがどのメソッドをテストすればよいのでしょうか>第11章 変更する必要がありますが、どのメソッドをテストすればよいのでしょうか?</a></li>
+<li><a href=#第12章-1カ所にたくさんの変更が必要ですが関係するすべてのクラスの依存関係を排除すべきでしょうか>第12章 1カ所にたくさんの変更が必要ですが、関係するすべてのクラスの依存関係を排除すべきでしょうか?</a></li>
+<li><a href=#第13章-変更する必要がありますがどんなテストを書けばよいのかわかりません>第13章 変更する必要がありますが、どんなテストを書けばよいのかわかりません</a></li>
+<li><a href=#第14章-ライブラリへの依存で身動きが取れません>第14章 ライブラリへの依存で身動きが取れません</a></li>
+<li><a href=#第15章-私のアプリケーションは-api-呼び出しだらけです>第15章 私のアプリケーションは API 呼び出しだらけです</a></li>
+<li><a href=#第16章-変更できるほど十分に私はコードを理解していません>第16章 変更できるほど十分に私はコードを理解していません</a></li>
+<li><a href=#第17章-私のアプリケーションには構造がありません>第17章 私のアプリケーションには構造がありません</a></li>
+<li><a href=#第18章-自分のテストコードが邪魔になっています>第18章 自分のテストコードが邪魔になっています</a></li>
+<li><a href=#第19章-私のオブジェクトはオブジェクト指向ではありませんがどうすれば安全に変更できるでしょうか>第19章 私のオブジェクトはオブジェクト指向ではありませんが、どうすれば安全に変更できるでしょうか?</a></li>
+<li><a href=#第20章-このクラスは大きすぎてもうこれ以上大きくしたくありません>第20章 このクラスは大きすぎて、もうこれ以上大きくしたくありません</a></li>
+<li><a href=#第21章-同じコードをいたるところで変更しています>第21章 同じコードをいたるところで変更しています</a></li>
+<li><a href=#第22章-モンスターメソッドを変更する必要がありますがテストを書くことができません>第22章 モンスターメソッドを変更する必要がありますが、テストを書くことができません</a></li>
+<li><a href=#第23章-どうすれば何も壊していないことを確認できるでしょうか>第23章 どうすれば何も壊していないことを確認できるでしょうか?</a></li>
+<li><a href=#第24章-もうウンザリです何も改善できません>第24章 もうウンザリです。何も改善できません)</a></li>
+</ul>
+</li>
+<li><a href=#第3部-依存関係を排除する手法>第3部 依存関係を排除する手法</a>
+<ul>
+<li><a href=#第25章-依存関係を排除する手法>第25章 依存関係を排除する手法</a></li>
+</ul>
+</li>
+</ul>
+</nav><div class=xAmazon>
+<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4798116831/maku04-22/ref=nosim/" target=_blank>
+<div class=xAmazon_image>
+<img src=https://images-na.ssl-images-amazon.com/images/I/91n2SO7bqnL.jpg alt=レガシーコード改善ガイド>
+</div>
+<div class=xAmazon_info>
+<div class=xAmazon_info_title>レガシーコード改善ガイド</div>
+<div class=xAmazon_info_author>マイケル・C・フェザーズ</div>
+<div class=xAmazon_info_publisher>翔泳社</div>
+<div class=xAmazon_info_icon><img src="data:image/gif;base64,R0lGODlhbQAcAPYVAAAAABANBx8ZDSghEDQpFT4yGQAAZhkXbjAseUs8HlVEIl9MJmtWK3NcLntjMW5YZUE/kFNSln9/soZsNo9zOZp7PplmZqKBQauJRbaRSb2XS7iUU8yZM/+ZAf+nC/+lF/+tJP+0Lv+4O8SdT8uiUdCmU9OpVditVt2xWeuzT+O2W+a4XOq8X+6+X/++Rf/ATv/EVvLBYPfGY/zJZP/MZv7UeK+vz/zXgf/hmv/oucfH3tra6fXuyv//zO3t9P///6usrQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAUAAEAALAAAAABtABwAAAf+gD+Cg4SFhoeIiYqLjI2OiBCRkpIGlZaXmJmam5ydnp+eBxARhxA6jz2pqqusra6vsLGys6o5NxsPpISmPzw0OYy0wsPExa84NBsQg7w0v4I6EhAHBqISpz+2ztvc3d7f4OHi4+TbNTg1NLmCy77AOxLUmQcSO9np5fn6++EkACbibqRQxu7HMx0RPEU4lYOfw4f5YlyQEZDDiQMF3yX8FMEeMm4ZJlA44exEhhkaKlDEoHJbyAkAaZjIoKFmzBMVLsxwRkIDDZYUXTbAsK3FBAckt6GgQQLlBJImTKxwZtFAQUESMB1AwJWrPAMSfvTA16IAgLMAMtBQAIDAWQL+bAEMcJYALQCfZtEWoHEBrQAWNAQAyEtgG4W2ABrQWBFAgFufTAHEGECgMYASKBhMoMrB6o9lP3R8hWBjhw8fgnzAq3SAobMJbVcwAJBgLYAADc4GmA2Ahb8BKxwAWEBjRAXYACrMOKshtwIaAwAI4L10+QUaGQC0SCDAmYIAPAHIEByDBoG5LcrT4ND5atZqNhLtsBS2IY0YJ1SwEF54AQAK5qUVGABLnYACC7A954x/e/W1VwtnBeiTYCQUB8A2DpQAwHUyAUCShuM54Ex2LXDDnmegQVAJAhJEEAlXEIT1w3yVtLPNBAHoRYN/15lVoWBLUZDjWQr2FUCJwj3+txwAKrhVAnSX0VABeNvEAMAIzqxwFw0gClCBMyZ4aGJ7PyAgyFeb2GODJRgZRENuA8SAwWA7JhcgloKxoIF0LexJnJYAEEUDbLUtyYJbFUb3JAZU3qelWjSoAECFXQLY4VLbnHimIPMs9J4971UiiDPRKTZbd/596RaeveVGXG57uSVdARhoCN6ec0WXaJQQTqXlCQIQJ+WFHY5X26AA7JQpmWb+IM8BEdSDlQHNblTNqHVKh5YK/gEYnU85rjCntmcBOoBg4NU1pFo5YtluAyMoIMAFAsw15wQVADBBBkiJF50D+Yo4JoqCuGgDaoO8J+NoYjkTQwMEFGBCBV/+XpAAlg4kQBIDCSAZcQk50aCBei0QNQMDjgnaQAJLrYxCAhjIkEAAHTtDgQACbEbBAif4u7IAinWj6WepFWKDtaeEClY24bjwkAsgeOBBCBCRo+EMXoYzNATAELKDtQaQQiNrroEjggci8APD2lFXHU4MCwQwVwCbgbN1Dl3bEA8m8alIX8PivOBBByC8UM4LIHSAONVufyMDAwwAlgGm39ytkSbRXNLRDx+NI0IHoH8AggguvGC6CyKE8EHoL8zggbKNV303DdCAzZrmZecjwuqg9+474YbTAIPTsbvNXptcO/PO3vNIywM+xUcvPQ0pcIBBs5EARjs00lBjDTZd2kwvfuPVc7AOOxCwxwELXR+SAwvqxy///PTXb//9+Od/vwUs7pJ+/CkIoADLp78CGvCACLQfBh7Qv0JMYhIIAIUEJ0jBCkpwK9F6hAY3yMEOevCDIAyhCEf4g0AAADs="></div>
+</div>
+</a>
+</div>
+<h2 id=はじめに>はじめに</h2>
+<p><strong>テストのないコードは悪いコード（レガシーコード）である</strong>。</p>
+<p>これがマイケル・C・フェザーズの強いメッセージです。
+どれだけうまく書かれているかは関係ない。テストが書かれていない＝悪であるとまで言い切っています。
+どれだけ美しいか、オブジェクト指向か、きちんとカプセル化されているかは関係ない。テストがなきゃだめだ！</p>
+<h2 id=第1部-変更のメカニズム>第1部 変更のメカニズム</h2>
+<h3 id=第1章-ソフトウェアの変更>第1章 ソフトウェアの変更</h3>
+<ul>
+<li>リファクタリングでは、
+<ul>
+<li>小さな変更を繰り返し行う。</li>
+<li>変更を容易に行うためテストでサポートする。</li>
+<li>機能を変更すべきではない。</li>
+</ul>
+</li>
+<li>コードの変更時に問題になるのは、影響範囲を把握できないこと。<strong>変更を安全に行うために最も重要なことは、影響範囲を理解すること</strong>。</li>
+<li>変更を避けると腕がなまってしまう。<strong>大きなクラスを分割する作業は週に２，３回くらい行っていないと、困難な仕事になってしまう</strong>。頻繁に変更を行っていれば、何が分割できるかの検討をつけやすくなり、変更作業が容易になる。</li>
+</ul>
+<h3 id=第2章-フィードバックを得ながらの作業>第2章 フィードバックを得ながらの作業</h3>
+<ul>
+<li>テストを用意することには、「正しいことを確認するため」だけでなく、「変更を検出するため」という目的もある。</li>
+<li>特定のコードにエラーがあると思ったときにテストハーネスを利用できれば、手早くテストコードを書いて、本当にそこにエラーがあるのか確認することができる。</li>
+<li>優れた単体テストの条件
+<ul>
+<li><b>実行が速い</b>: <strong>速く走らないとしたら、それは単体テストではない</strong>。0.1 秒もかかっていたら遅い単体テストである。「DBアクセス」、「ネットワーク通信」、「ファイルシステムアクセス」、「実行するための環境設定」が必要なものは単体テストとは言えない。</li>
+<li><b>問題個所の特定がしやすい</b></li>
+</ul>
+</li>
+<li>他のクラスと依存関係があるクラスはテストハーネスに入れられない。例えば、<code>DbConnection</code> に依存しているクラスをテストしたい場合は、まずはインタフェース <code>IDbConnection</code> を導入して依存を切る必要がある。</li>
+<li>価値をもたらす機能的な変更を行いながら、システムのより多くの部分をテストで保護していくべき。</li>
+<li>扱いやすくなるように<strong>大きなクラスを分割するといった些細なことによって、アプリケーションに大きな違いが出てくる</strong>。</li>
+</ul>
+<h3 id=第3章-検出と分離>第3章 検出と分離</h3>
+<ul>
+<li>テストを整備する際に依存関係を排除するのには2つの理由がある。
+<ul>
+<li><b>検出:</b> コードの計算した値にアクセスできないときに、それを検出するために依存関係を排除する。</li>
+<li><b>分離:</b> コードをテストハーネスに入れて実行することすらできないとき、分離するために依存関係を排除する。</li>
+</ul>
+</li>
+<li>ソフトウェアを<strong>分離するには様々な方法があるが、検出のための主な手段は「強調クラスの擬装」のひとつしかない</strong>。</li>
+<li>あるクラスの依存をインタフェースの導入によってなくした場合、そのクラスに FakeObject を渡してテストすることになる。<strong>FakeObject では</strong>テスト対象のクラスから渡されたデータを記録することで、<strong>テスト対象のクラスが正しくデータを渡しているかを検証できる</strong>。依存部分を切り離すことにより、依存していたインタフェースでやりとりしているデータが正しいかどうかをテストすることができる。
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=kt>void</span> <span class=nf>testPrintItem</span><span class=o>()</span> <span class=o>{</span>
+    <span class=n>FakePrinter</span> <span class=n>printer</span> <span class=o>=</span> <span class=k>new</span> <span class=n>FakePrinter</span><span class=o>();</span>
+    <span class=n>Item</span> <span class=n>item</span> <span class=o>=</span> <span class=k>new</span> <span class=n>Item</span><span class=o>(</span><span class=n>printer</span><span class=o>);</span>  <span class=c1>// テスト対象のクラス
+</span><span class=c1></span>    <span class=n>item</span><span class=o>.</span><span class=na>doSomething</span><span class=o>(</span><span class=n>100</span><span class=o>);</span>  <span class=c1>// テスト対象のメソッド
+</span><span class=c1></span>    <span class=n>assertEquals</span><span class=o>(</span><span class=s>&#34;This is a result&#34;</span><span class=o>,</span> <span class=n>item</span><span class=o>.</span><span class=na>getLastLine</span><span class=o>());</span>
+<span class=o>}</span></code></pre></div></div>
+</figure>
+</li>
+<li>オブジェクト指向以外の言語では、代替関数を定義して、その中でテストからアクセスできるグローバルなデータに値を記録する。</li>
+<li>擬装オブジェクトに、<b>結果が正しいかを確認する機能を追加したもの</b>が「<strong>モックオブジェクト</strong>」。モックオブジェクトは協力なツールだが、すべての言語に対応するモックオブジェクトフレームが提供されているわけではない。しかし、大抵の場合は、単純な擬装オブジェクトで十分である。</li>
+</ul>
+<h3 id=第4章-接合モデル>第4章 接合モデル</h3>
+<ul>
+<li>テストが可能になるようにクラスを取り出す作業を行っていると、どのような設計が優れているかという基準が変わってくる。</li>
+<li>ソフトウェアを接合部 (Seam) という観点から見ることで、コードにすでに含まれている依存関係を排除するための手掛かりを見出すことが可能になる。<strong>Seam とは直接その場所を変更しなくても、プログラムの振る舞いを変えられることのできる場所</strong>。</li>
+<li>Java では同じ名前のクラスを別のディレクトリに置き、CLASSPATH を変更することで別のクラスにリンクすることができる。（リンク接合部: link seam）</li>
+</ul>
+<h3 id=第5章-ツール>第5章 ツール</h3>
+<ul>
+<li><b>自動リファクタリングツール:</b> リファクタリングツールを使って自動リファクタリングを行う場合、振る舞いが変わっていないか注意する必要がある。例えば、リファクタリング後に、あるメソッドの呼び出し回数が変わっている場合、そのメソッドに副作用があると振る舞いが変化する。</li>
+<li><b>モックオブジェクト (mock object):</b> 他のコードを取り除いて、テスト時に自分のコードを完全に実行させるには、代わりに正しい値を返してくれるものが必要になる。オブジェクト指向のコードでは、これをモックオブジェクトと呼ぶ。</li>
+<li><b>単体テストハーネス:</b> xUnit テスティングフレームワークは、ほとんどの言語に移植されている。JUnit, CppUnit, NUnit&mldr;</li>
+<li><b>一般的なテストハーネス:</b> <a href=http://fit.c2.com/>FIT (Framework for Integrated Test)</a> は統合テスト用のテスティングフレームワーク。システムに関する文書を書き、その中にシステムの入力と出力について記述した表を含めることができれば、FIT フレームワークがテストを実行してくれる。<a href=http://www.fitnesse.org/>FitNesse</a> は wiki 上に構築された FIT で、FIT テストを定義するときに階層構造の Web ページを使うことができる。</li>
+</ul>
+<h2 id=第2部-ソフトウェアの変更>第2部 ソフトウェアの変更</h2>
+<h3 id=第6章-時間がないのに変更しなければなりません>第6章 時間がないのに変更しなければなりません</h3>
+<ul>
+<li>一般的に変更箇所は集中する。今日ソフトウェアを変更しているのであれば、近い将来、そのすぐ近くを変更することになる。</li>
+<li>今すぐクラスを変更しなければならないのなら、<strong>テストハーネス内でそのクラスのインスタンス化を試みてみる</strong>。</li>
+<li>システムに新しい要件を加えるときの方法。
+<ul>
+<li><b>スプラウトメソッド (sprout method):</b> 新しい機能を新しいメソッドとして記述する方法。既存のコードに直接手を加えるよりも望ましい結果をもたらす。
+<ul>
+<li><b>長所:</b> 古いコードと新しいコードを明確に区別できる。</li>
+<li><b>短所:</b> 元のコードはテストするわけでもなく、改善するわけでもない。</li>
+</ul>
+</li>
+<li><b>スプラウトクラス (sprout class):</b> 変更部分を新しいクラスで実現する方法。変更対象の既存のクラスをテストハーネス内でインスタンス化できない場合は、テストを書けないのでスプラウトメソッドは使えない。既存クラスの依存を排除するのに時間がかかりすぎる場合、新しいクラスを導入して、そこだけテスト可能にするという方法がある。
+<ul>
+<li><b>長所:</b> コードを直接書き換える方法よりも、確信を持って変更を進められる。</li>
+<li><b>短所:</b> 仕組みが複雑になること。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id=第7章-いつまで経っても変更作業が終わりません>第7章 いつまで経っても変更作業が終わりません</h3>
+<p>あまりに多くの依存関係を持つクラスは、大きなコードの塊を切り離し、テストで保護できるかどうかを調べるとよい。</p>
+<h3 id=第8章-どうやって機能を追加すればよいのでしょうか>第8章 どうやって機能を追加すればよいのでしょうか?</h3>
+<p>この章には、TDD の基本的な進め方が述べられています。</p>
+<ul>
+<li>強力なリファクタリングは数多くあるが、<strong>最も強力なのはクラス名の変更</strong>である。開発者のコードの見方を変え、考えもしなかった可能性に気づかせてくれる。</li>
+</ul>
+<h3 id=第9章-このクラスをテストハーネスに入れることができません>第9章 このクラスをテストハーネスに入れることができません</h3>
+<ul>
+<li>コンストラクタで渡しているオブジェクトが外部リソースなどを利用している場合、そのクラスのインタフェースを抽出し、擬装オブジェクトを渡してテストするようにする。例えば、コンストラクタでデータベースへの接続を行うオブジェクトを渡している場合は、その FakeConnection などの擬装オブジェクトを渡すようにする。リファクタリングをサポートしたツールがあれば、インタフェースの抽出は簡単にできる。</li>
+<li><strong>テストコードはきれいであるべき</strong>。それは簡単に理解でき、変更できるものでなければならない。</li>
+<li>テストしたいクラスが、生成しづらいパラメータを必要としていたら、Null を渡すことを考えてみる。実際にそのパラメータがテスト中で参照されたら例外を投げるので分かるはず。実際にそのパラメータが必要になった時点で、必要なオブジェクトを生成するように変更すればよい。ただし、C++ のように Null ポインタエラーを検知できない言語ではこの方法は使用できない。</li>
+<li><strong>通常は Null を本番コードで使用すべきではない</strong>。Null オブジェクトパターンなどを適用できないか考えてみる。</li>
+<li>あるクラスをテストする際に、依存するクラスのインスタンスを作らなければならない時、そのクラスの振る舞いがテストに影響することがある。例えば、その依存クラスのコンストラクタで DB へのコネクションを張っていたりすると単体テストが書けない。このような場合は、<strong>依存クラスのサブクラスを作って connect() などをオーバーライドしてしまえばよい。これを可能にするためにも、コンストラクタでのハードコードは避けてメンバメソッドを呼び出すような実装を心がけるべき</strong>。</li>
+<li>依存クラスのコンストラクタ内で、外部リソースやライブラリに依存するクラスのオブジェクトを生成している場合もテストができなくなる。その場合は、<strong>コンストラクタのパラメータでオブジェクトを渡すようにする（コンストラクタのパラメータ化）</strong>。元々のシグネチャを持つコンストラクタは残しておいて、新しくパラメータをとるコンストラクタを追加すればよい。コンストラクタ内でオブジェクトが生成されていて、生成の依存関係がない場合には、コンストラクタのパラメータ化が非常に簡単に適用できる。</li>
+<li>テストハーネスの中で <strong>Singleton を含むコードを実行するには、Singleton の制約を緩和する必要がある</strong>。
+<ol>
+<li>Singleton クラスに、Singleton インスタンスの setter メソッドを用意する。</li>
+<li>Singleton クラスのコンストラクタを private から protected に変更する。</li>
+<li>Singleton クラスのインタフェースを抽出し、テストコードから擬装オブジェクトを生成して Singleton クラスにセットする。あるいは、Singleton クラスをサブクラス化して、各メソッドをオーバーライドする方法もある。</li>
+</ol>
+</li>
+</ul>
+<h3 id=第10章-このメソッドをテストハーネスで動かすことができません>第10章 このメソッドをテストハーネスで動かすことができません</h3>
+<p>オリジナルのコードは複雑すぎるので、ここでは簡素化したコードに置き換えてざっと説明してみます。</p>
+<h4 id=テストしたいメソッドが-private-である>テストしたいメソッドが private である</h4>
+<ul>
+<li><strong>private メソッドをテストしたい場合、そのメソッドは public にすべきである</strong>。</li>
+<li>public メソッドにすべきかどうかで悩んでしまう場合、大抵は、そのクラスが多くのことを行いすぎであり、修正すべきことを意味している（1つのクラスが複数の責務を持ってしまっている）。</li>
+<li>よい設計はテスト可能であり、テスト可能でない設計は悪い設計である。</li>
+</ul>
+<p><b>▲まく注記</b>: 例えば、複雑なアルゴリズムや演算処理を担う private メソッドがあるのであれば、それはおそらく専用クラスの public メソッドとして作成し、テストを記述すべきということでしょう。</p>
+<p>private メソッドを別クラスに括りだして、public 化する余裕がない場合は、以下のようにテスト用のラッパークラスを作成して解決する方法がある。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=c1>// テスト対象のクラス
+</span><span class=c1></span><span class=k>class</span> <span class=nc>Sample</span> <span class=p>{</span>
+<span class=k>protected</span><span class=o>:</span>  <span class=c1>// ← private だったものを protected にする
+</span><span class=c1></span>    <span class=kt>void</span> <span class=n>needToTest</span><span class=p>();</span>
+<span class=p>};</span>
+
+<span class=c1>// テスト用に作成するラッパークラス
+</span><span class=c1></span><span class=k>class</span> <span class=nc>TestingSample</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Sample</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>  <span class=c1>// ← テスト用にサブクラス化して public にする
+</span><span class=c1></span>    <span class=kt>void</span> <span class=n>needToTest</span><span class=p>()</span> <span class=p>{</span>
+        <span class=c1>// 親クラスのメソッドを呼び出す
+</span><span class=c1></span>        <span class=n>Sample</span><span class=o>::</span><span class=n>needToTest</span><span class=p>();</span>
+    <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=c1>// C++ では下記のように using を使って委譲処理を簡潔に記述できる
+</span><span class=c1></span><span class=k>class</span> <span class=nc>TestingSample</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Sample</span> <span class=p>{</span>
+<span class=k>public</span><span class=o>:</span>
+    <span class=k>using</span> <span class=n>Sample</span><span class=o>::</span><span class=n>needToTest</span><span class=p>();</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<ul>
+<li>この方法は、メソッドを単純に public 化するのと本質的には変わらないので微妙な対応方法だが、リファクタリングすべき箇所の目印となる。</li>
+<li>Java などの言語では<strong>リフレクションによって private メソッドのテストを記述することはできるが、根本的な依存関係の問題を先延ばしにしているだけである</strong>。その種のごまかしをすると、コードがどの程度悪くなっているのかに気付きにくくなってしまう。</li>
+</ul>
+<h4 id=標準ライブラリの継承できないクラスインスタンス化できないクラス依存している>標準ライブラリの継承できないクラス、インスタンス化できないクラス依存している</h4>
+<p>Java の final クラス、.NET の sealed クラスのような、継承できないクラスに依存したコードがあると、うまくテストがかけないことがある（インスタンス化できなかったり）。
+このような制御不可能なライブラリのクラスに直接依存したコードがあったら、将来の変更に対応できるようにインタフェースを抽出し、ラッパーで隔離するのがよい。</p>
+<p>例えば、.NET の sealed なクラス <code>HttpPostedFile</code> に直接依存したコードがあったら、<code>IHttpPostedFile</code> インタフェースとして抽出し、<code>HttpPostedFileWrapper</code> というラッパクラスを作成する。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=k>public</span> <span class=k>class</span> <span class=nc>HttpPostedFileWrapper</span> <span class=p>:</span> <span class=n>IHttpPostedFile</span> <span class=p>{</span>
+    <span class=k>public</span> <span class=n>HttpPostedFileWrapper</span><span class=p>(</span><span class=n>HttpPostedFile</span> <span class=n>file</span><span class=p>)</span> <span class=p>{</span>
+        <span class=k>this</span><span class=p>.</span><span class=n>file</span> <span class=p>=</span> <span class=n>file</span><span class=p>;</span>
+    <span class=p>}</span>
+    <span class=k>public</span> <span class=kt>string</span> <span class=n>FileName</span> <span class=p>{</span>
+        <span class=k>get</span> <span class=p>{</span> <span class=k>return</span> <span class=n>file</span><span class=p>.</span><span class=n>FileName</span><span class=p>;</span> <span class=p>}</span>
+    <span class=p>}</span>
+    <span class=k>public</span> <span class=kt>int</span> <span class=n>ContentLength</span> <span class=p>{</span>
+        <span class=k>get</span> <span class=p>{</span> <span class=k>return</span> <span class=n>file</span><span class=p>.</span><span class=n>ContentLength</span><span class=p>;</span> <span class=p>}</span>
+    <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>元の <code>HttpPostedFile</code> クラスに依存したコードを、<code>IHttpPostedFile</code> インタフェースを使用したコードに置き換え、<code>HttpPostedFileWrapper</code> 経由で <code>HttpPostedFile</code> クラスを使用するようにする。テストコードでは、<code>IHttpPostedFile</code> を実装したスタブクラスを用意すればよい。</p>
+<h4 id=gui-に強く結びついたコードになっていて結果を検出できない>GUI に強く結びついたコードになっていて結果を検出できない</h4>
+<p>例えば、下記の UI 系クラスは、イベントハンドラ内で表示内容の構築から UI 表示までの処理を一括で行っている。
+このイベントハンドラを実行した結果は、実際の UI 上の表示が更新されるという形で表れるので、テストコードから直接呼び出しても結果の妥当性を判断することができない。
+また、表示内容を構築するロジックが UI 系のクラスに依存していると、その部分を別クラスに抽出することもできなかったりする。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=n>MyFrame</span> <span class=kd>extends</span> <span class=n>Frame</span> <span class=o>{</span>
+    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>actionPerformed</span><span class=o>(</span><span class=n>Event</span> <span class=n>event</span><span class=o>)</span> <span class=o>{</span>
+        <span class=k>if</span> <span class=o>(</span><span class=s>&#34;activity&#34;</span><span class=o>.</span><span class=na>equals</span><span class=o>(</span><span class=n>event</span><span class=o>.</span><span class=na>getCommand</span><span class=o>()))</span> <span class=o>{</span>
+            <span class=c1>// ...
+</span><span class=c1></span>            <span class=n>display</span><span class=o>.</span><span class=na>setDescription</span><span class=o>(...);</span>
+            <span class=n>display</span><span class=o>.</span><span class=na>show</span><span class=o>();</span>
+        <span class=o>}</span>
+    <span class=o>}</span>
+<span class=o>}</span></code></pre></div></div>
+</figure>
+<p>このようなケースでは、UI 系クラスをサブクラス化し、取得したい結果だけをフックして参照できるようにしつつ、実行されてはいけない UI 処理をオーバーライドにより削除してしまうという方法がある。
+一言で言えば、「<strong>サブクラス化してテストしたい部分だけを生かす</strong>」ということ。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=n>MyFrame</span> <span class=kd>extends</span> <span class=n>Frame</span> <span class=o>{</span>
+    <span class=c1>// イベントハンドラはテストコードからは直接呼び出さないので、
+</span><span class=c1></span>    <span class=c1>// 処理を public メソッドに委譲するだけにする。
+</span><span class=c1></span>    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>actionPerformed</span><span class=o>(</span><span class=n>Event</span> <span class=n>event</span><span class=o>)</span> <span class=o>{</span>
+        <span class=n>performCommand</span><span class=o>(</span><span class=n>event</span><span class=o>.</span><span class=na>getCommand</span><span class=o>());</span>
+
+    <span class=o>}</span>
+    <span class=c1>// テストコードから直接呼び出す部分を public メソッドに抽出する。
+</span><span class=c1></span>    <span class=c1>// ここにはテストしたいビジネスロジックが含まれており、
+</span><span class=c1></span>    <span class=c1>// かつ、テストでは動作させたくない UI 更新処理も含まれている。
+</span><span class=c1></span>    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>performCommand</span><span class=o>(</span><span class=n>String</span> <span class=n>command</span><span class=o>)</span> <span class=o>{</span>
+        <span class=k>if</span> <span class=o>(</span><span class=n>command</span><span class=o>.</span><span class=na>equals</span><span class=o>(</span><span class=s>&#34;project activity&#34;</span><span class=o>))</span> <span class=o>{</span>
+            <span class=o>...</span>
+            <span class=n>updateView</span><span class=o>(...);</span>
+            <span class=o>...</span>
+            <span class=n>setResult</span><span class=o>(...);</span>
+        <span class=o>}</span>
+    <span class=o>}</span>
+    <span class=c1>// UIを実際に更新する部分も分離する。
+</span><span class=c1></span>    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>updateView</span><span class=o>(</span><span class=n>String</span> <span class=n>desc</span><span class=o>)</span> <span class=o>{</span>
+        <span class=n>display</span> <span class=o>=</span> <span class=k>new</span> <span class=n>Display</span><span class=o>();</span>
+        <span class=n>display</span><span class=o>.</span><span class=na>setDescription</span><span class=o>(</span><span class=n>desc</span><span class=o>)</span>
+        <span class=n>display</span><span class=o>.</span><span class=na>show</span><span class=o>();</span>
+    <span class=o>}</span>
+<span class=o>}</span></code></pre></div></div>
+</figure>
+<p>そして、テストコードでは、この UI 系のクラスをサブクラス化し、処理結果だけを機械的に取得できるようにする。
+UI 制御を行っている部分は <code>updateView</code> メソッドとして分離してあるので、オーバーライドして空っぽにしてしまえば、テストコードを実行したときに UI が表示されてしまうのを防ぐことができる。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=n>TestingMyFrame</span> <span class=kd>extends</span> <span class=n>MyFrame</span> <span class=o>{</span>
+    <span class=n>String</span> <span class=n>result</span> <span class=o>=</span> <span class=s>&#34;&#34;</span><span class=o>;</span>
+    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>updateView</span><span class=o>(</span><span class=n>String</span> <span class=n>desc</span><span class=o>)</span> <span class=o>{</span> <span class=c1>// 何もしない }
+</span><span class=c1></span>    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>setResult</span><span class=o>(</span><span class=n>String</span> <span class=n>result</span><span class=o>)</span> <span class=o>{</span> <span class=k>this</span><span class=o>.</span><span class=na>result</span> <span class=o>=</span> <span class=n>result</span><span class=o>;</span> <span class=o>}</span>
+<span class=o>}</span>
+
+<span class=c1>// テストコードのイメージ
+</span><span class=c1></span><span class=kd>public</span> <span class=kt>void</span> <span class=nf>testPerformCommand</span><span class=o>()</span> <span class=o>{</span>
+    <span class=n>TestingMyFrame</span> <span class=n>frame</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TestingMyFrame</span><span class=o>();</span>
+    <span class=n>frame</span><span class=o>.</span><span class=na>performCommand</span><span class=o>(</span><span class=s>&#34;activity&#34;</span><span class=o>);</span>
+    <span class=n>assertEquals</span><span class=o>(</span><span class=s>&#34;Correct result&#34;</span><span class=o>,</span> <span class=n>frame</span><span class=o>.</span><span class=na>result</span><span class=o>);</span>
+<span class=o>}</span></code></pre></div></div>
+</figure>
+<p><b>▲まく注記</b>: もちろん Frame クラスが単独でインスタンス化できないと、このようなテストは不可能ですね。
+ここでは、どうしても部分的にしかテストできないクラスがあるときに、何とかしてその部分だけでもテストできるようにする方法の一例があげられているのだと捉えればよいでしょう。</p>
+<h4 id=コラム-コマンドとクエリーの分離>コラム: コマンドとクエリーの分離</h4>
+<p><strong>コマンドとクエリーの分離 (Command/Query Separation)</strong> は、Bertrand Meyer（Eiffel の開発者）が設計の原則で、<strong>メソッドはコマンドあるいはクエリーのいずれかであり、両方にすべきではない</strong>というもの。</p>
+<ul>
+<li><b>コマンド:</b> オブジェクトの状態を変更できるが値は返さないメソッド。</li>
+<li><b>クエリー:</b> 値は返すがオブジェクトの状態を変更しないメソッド。</li>
+</ul>
+<p>この原則に従うことでわかりやすい設計になる。
+例えば、メソッドがクエリーであれば、副作用を起こさずに何度も続けて呼び出せることがすぐにわかる（C++ ではメソッドに const キーワードが付いていれば、クエリーであることがすぐにわかる）。</p>
+<h3 id=第11章-変更する必要がありますがどのメソッドをテストすればよいのでしょうか>第11章 変更する必要がありますが、どのメソッドをテストすればよいのでしょうか?</h3>
+<h4 id=テストすべき場所はどこか>テストすべき場所はどこか</h4>
+<p>この章には、<strong>変更の影響範囲を調べ、テストする部分を決めるまでの流れ</strong>に関して記述されています。
+基本的な手順は次の通り。</p>
+<ol>
+<li>変更の影響範囲を調べて、どこで変更を検出することができるかを明らかにする。<strong>影響スケッチ (effect sketch)</strong> を描くとよい。</li>
+<li>どこで影響を検出できるかを明らかにしたら、その中から選んでテストを記述する（影響が伝搬していった先の方でテストを書くと効果が大きい）。</li>
+</ol>
+<p>影響は基本的に以下の３種類の方法で伝搬する。</p>
+<ul>
+<li>戻り値が呼び出し側で使われる</li>
+<li>パラメータとして渡されたオブジェクトが変更される</li>
+<li>静的データや、グローバルなデータが変更される （書籍には明記されてませんが、メンバ変数などの変更もこれに含むと考えればよい）</li>
+</ul>
+<p><strong>メソッドの利用者になり得るスーパークラスとサブクラスも忘れずに確認する</strong>必要がある。</p>
+<p>あと、使用している言語についてよく知っていることは重要。
+例えば、C++ では、変数宣言に <code>mutable</code> キーワードを指定した場合、<code>const</code> メソッドからその変数を更新することができてしまう。
+<code>const</code> メソッドだから、意味的に const（変更されない）と捉えていると危険なことになります。</p>
+<h4 id=影響を単純化する>影響を単純化する</h4>
+<p><strong>小さな重複部分を削除することが、影響の広がりを小さくすることに繋がる</strong>。
+例えば、下記の影響スケッチは、<code>declarations</code> というフィールドの変更が、<code>getInstance</code> メソッドと <code>getDeclaration</code> メソッドに影響することを示している（言い換えると、2つのメソッドが <code>declarations</code> フィールドを参照している）。</p>
+<figure class=xImage>
+<a href=../../p/p6awy3z/legacy-code11-1.jpg target=_blank>
+<img width=400 height=242 src=../../p/p6awy3z/legacy-code11-1_hu568eb5ec817affcbdede44fadc4075a5_16282_400x0_resize_q75_box.jpg alt=/p/p6awy3z/legacy-code11-1.jpg>
+</a>
+</figure>
+<p><code>getInterface</code> の実装の中で直接 <code>declarations</code> フィールドを参照せず、<code>getDeclaration</code> メソッドを呼び出すように変更すれば、影響スケッチは下記のようにシンプルになる。</p>
+<figure class=xImage>
+<a href=../../p/p6awy3z/legacy-code11-2.jpg target=_blank>
+<img width=400 height=242 src=../../p/p6awy3z/legacy-code11-2_huea2a2f160bd0108052b7f55cbb363415_15849_400x0_resize_q75_box.jpg alt=/p/p6awy3z/legacy-code11-2.jpg>
+</a>
+</figure>
+<p>こうすることで、<strong>getInterface のテストをすれば、getDeclaration のテストもできたことになる</strong>。
+影響スケッチが末広がりな形になっていたら、このような小さな変更で改善できないかを考えてみるとよい。</p>
+<h4 id=著者の意見>著者の意見</h4>
+<p>著者の意見として、「影響を調査できる統合開発環境があるといいなぁ。コードの一部を選択してホットキーを押すと、選択したコードの変更によって影響を受ける、すべての変数とメソッドを示してくれるようなもの」というものがあります。</p>
+<p><b>▲まく注記</b>: 確かにこのようなものが一般的になれば、ユニットテストや、リファクタリングもずいぶん作りやすくなりそうです。
+ただ、フレームワークによっては影響範囲というものは動的にしか決まらない部分（Android の Intent のように、レシーバーが動的に決まるものなど）も多々あるので、なかなか難しいのかもしれません。</p>
+<p>マイケル・C・フェザーズは、<strong>カプセル化とテストが対立した場合（どちらかを諦めないといけない場合）、テストによる保護を優先する</strong>立場を取っています。
+カプセル化自体は目的ではなく、理解するための手段であるということ、テストはコード調査を簡単にし、将来カプセル化を強めるために役立つということなどを理由に挙げています。</p>
+<h3 id=第12章-1カ所にたくさんの変更が必要ですが関係するすべてのクラスの依存関係を排除すべきでしょうか>第12章 1カ所にたくさんの変更が必要ですが、関係するすべてのクラスの依存関係を排除すべきでしょうか?</h3>
+<h4 id=割り込み点>割り込み点</h4>
+<p><strong>割り込み点 (interception point) とは、特定の変更による影響を検出できるプログラム上の場所</strong>のこと。
+例えば、private フィールドに影響が及ぶとしても、そこでは影響を検出できないので、割り込み点ではない。
+多くの場合、変更のための最善の割り込み点は、変更しようとしているクラスの public メソッドになる。
+変更点のすぐそばにある割り込み点を選択するのが良い考えである。</p>
+<h4 id=絞り込み点>絞り込み点</h4>
+<p><strong>絞り込み点 (pinch point) とは、影響スケッチの集約された場所であり、少数のメソッドに対するテストで、多くのメソッドの変更を検出できる場所</strong>である。
+つまり、割り込み点の中で、テストを書くべき第一候補となる場所である。
+例えば、ある変更に関して下記のような影響スケッチが描けた場合、絞り込み点は <code>BillingStatement.makeStatement</code> となる。
+ここにテストがあれば、そこより上の影響をすべて把握することができる。</p>
+<figure class=xImage>
+<a href=../../p/p6awy3z/legacy-code12.jpg target=_blank>
+<img width=600 height=293 src=../../p/p6awy3z/legacy-code12_hu21805c70aa8877117e18553fc4e56ee7_18578_600x0_resize_q75_box.jpg alt=/p/p6awy3z/legacy-code12.jpg>
+</a>
+</figure>
+<p>ただし、多くの場合、絞り込み点を見つけるのはほとんど不可能である。
+直接的に影響を及ぼすものがたくさんあると、影響スケッチは大きな絡み合った木のようになってしまう。
+そのような場合は、一度にあまりにたくさんの変更をしようとしているのかもしれないので、1つや2つの変更だけを取り上げて絞り込み点を探すのがよい。
+最終的に絞り込み点が2つだけ見つかったときに、そのどちらか片方だけにテストを書くだけで十分かどうかを判断するには、「そのメソッドを壊したら、この場所で変更を検出できるか？」と問いかけてみればよい。</p>
+<p><strong>既存のコードに変更を加えるとき、絞り込み点を見つけて、そこにテストを書くのがファーストステップになる</strong>。
+絞り込み点のテストは、森の中に歩いて立ち入り、線を引いて、「この区域すべては私のものだ」と言うようなものだ。
+その後、その区域内のリファクタリングを行い、より細かい粒度でテストを書いていけばよい。
+最終的には絞り込み点のテストは削除し、それぞれのクラス用の単体テストを使って開発を進めることができるようになる。</p>
+<p><strong>絞り込み点を見つけることは、コード改善のためのヒントにもなる</strong>。
+絞り込み点は、自然なカプセル化の境界を示している。
+大きすぎるクラスがある場合、影響スケッチを描いて絞り込み点を見つけることで、どの境界でクラス分離するのがよいかが分かる。</p>
+<h3 id=第13章-変更する必要がありますがどんなテストを書けばよいのかわかりません>第13章 変更する必要がありますが、どんなテストを書けばよいのかわかりません</h3>
+<p>ほとんどのレガシーコードでは、すべてのバグを見つけて修正することを目標にすると作業は決して終わらなくなってしまう。
+レガシーコードを修正する必要があるときは、ソフトウェアの仕様書やプロジェクトのメモを掘り起こしてテストコードを書く方法の他に、<strong>仕様化テスト (characterization test)</strong> を書いてコードの振る舞いを明らかにする方法がある。</p>
+<h4 id=仕様化テスト-characterization-test>仕様化テスト (characterization test)</h4>
+<p>仕様化テスト（マイケル・C・フェザーズの造語）は、コードの実際の振る舞いを明らかにするテスト。
+「システムはこれをすべきだ」とか「こうしていると思う」ということを確認するテストではない。
+仕様化テストは、システムの現在の振る舞いをそのまま文書化する。
+下記が仕様化テストを書くときの手順である。</p>
+<ol>
+<li>テストハーネスの中で対象のコードを呼び出す</li>
+<li>失敗するとわかっている表明 (assert) を書く</li>
+<li>失敗した結果から実際の振る舞いを確認する</li>
+<li>コードが実現する振る舞いを期待するように、テストを変更する</li>
+<li>以上の手順を繰り返す</li>
+</ol>
+<p><b>▲まく注記</b>: ようするに、現在の振る舞いを正しいものとしてユニットテストを書くだけですね。</p>
+<h4 id=仕様化テストはどこまで書けばよいか>仕様化テストはどこまで書けばよいか？</h4>
+<p>仕様化テストは無限に書けてしまうが、いつやめればよいのか？
+重要なことは、ブラックボックステストを書いているわけではないということ。
+仕様化テストを書くときは、対象となるコードを読むことができる。
+コードに加えたい変更について考え、<strong>変更に起因するあらゆる問題を、今持っているテストで検出できるかを考えてみるとよい</strong>。</p>
+<p>できない場合、検出できると確信を持てるまでテストを追加する。
+それでも確信できない場合は、別の方法でソフトウェアを変更すること（つまり、仕様書などの文書を調べてテストを記述すること）を考えた方が安全。</p>
+<h4 id=仕様化テストでバグを発見した場合>仕様化テストでバグを発見した場合</h4>
+<ul>
+<li>a) リリース前なら … 修正する。</li>
+<li>b) リリース後なら … 関係者に周知して相談。もちろん修正するのが望ましいが、影響度合いによる。</li>
+</ul>
+<p><b>▲まく注記</b>: 仕様化テストを書いたときは、それが望ましい振る舞いを調べるためのテストではなく、あくまで現在の振る舞いを調べる仕様化テストとして書いたことが分かるようにしておいた方がよいですね。</p>
+<h3 id=第14章-ライブラリへの依存で身動きが取れません>第14章 ライブラリへの依存で身動きが取れません</h3>
+<p>特定のライブラリに強く依存したコード → ベンダーがライブラリを値上げする → 利益出ないので乗り換えたい → 無理。死亡。</p>
+<ul>
+<li>ライブラリの直接呼出しをコード内に分散させてはならない。使用するライブラリの変更は絶対ないと考えるかもしれないが、勝手な予想にすぎない。</li>
+<li>言語の機能を利用して、設計上の制約に従わせようとするライブラリの設計者は、過ちを犯していることが多い。優れたコードはテスト環境でも問題なく動くものである。本番環境に特化した制約は、テスト環境で行いたい作業を不可能にしてしまうことがある。</li>
+</ul>
+<p><b>▲まく注記</b>: 要するに、ライブラリとの結合部はゆる～く置き換えられるような設計になっていないとテストできなくなっちゃうよ。<strong>本番環境で完璧に動けばOKという考え方は間違っている</strong>よ。ということ。</p>
+<h3 id=第15章-私のアプリケーションは-api-呼び出しだらけです>第15章 私のアプリケーションは API 呼び出しだらけです</h3>
+<p>ライブラリの API 呼び出しをあちこちで行っているシステムは、自分たちの手作りのシステムに比べて扱いが難しくなる。</p>
+<ul>
+<li><b>理由1</b>: 表面的な API 呼び出ししかないので、構造を改善する方法を調べるのが難しい。</li>
+<li><b>理由2</b>: その API が自分たちの所有物でないので、インタフェースを改善しにくい。</li>
+</ul>
+<p>こういったシステムにアプローチする方法は2つある。</p>
+<ol>
+<li>API をラップする</li>
+<li>責務をもとに抽出する</li>
+</ol>
+<h4 id=api-をラップする方法>API をラップする方法</h4>
+<p>以下のような状況では API をラップしてしまうのが有効。</p>
+<ul>
+<li>API が比較的小さい。</li>
+<li>サードパーティライブラリへの依存を完全に分離したい。</li>
+<li>API を通じたテストが不可能なため、テストを書くことできない。</li>
+</ul>
+<h4 id=責務をもとに抽出する>責務をもとに抽出する</h4>
+<p>以下のような状況では、コード内の処理を責務をもとに抽出し、より上位のメソッドとしてまとめてしまうのが有効。</p>
+<ul>
+<li>API が複雑である。</li>
+<li>安全なメソッド抽出をサポートするツールがあるか、手動での抽出を安全に行う自信がある。</li>
+</ul>
+<p>API をラップする方法の方がシンプルに感じるが、実際にはうまくいかないケースがある。
+例えば、下記のようなコードで <code>Trasport</code> のラップすることを考えてみる（テスト用のスタブとしてサブクラスを作る）。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=n>Session</span> <span class=n>smtpSession</span> <span class=o>=</span> <span class=n>Session</span><span class=o>.</span><span class=na>getDefaultInstance</span><span class=o>(</span><span class=n>props</span><span class=o>,</span> <span class=kc>null</span><span class=o>);</span>
+<span class=n>Transport</span> <span class=n>transport</span> <span class=o>=</span> <span class=n>smtpSession</span><span class=o>.</span><span class=na>getTransport</span><span class=o>(</span><span class=s>&#34;smtp&#34;</span><span class=o>);</span>
+<span class=n>transport</span><span class=o>.</span><span class=na>connect</span><span class=o>(</span><span class=n>host</span><span class=o>.</span><span class=na>smtpHost</span><span class=o>,</span> <span class=n>host</span><span class=o>.</span><span class=na>smtpUser</span><span class=o>,</span> <span class=n>host</span><span class=o>.</span><span class=na>smtpPw</span><span class=o>);</span></code></pre></div></div>
+</figure>
+<p>よく見ると、<code>Transport</code> は <code>Session</code> から作成されているので、<code>Session</code> の方をラップしなければいけないことがわかる。
+でも、<code>Session</code> クラスはライブラリ内で <code>final</code> 定義されていてサブクラス化できない。
+こうなると、ラッパ用のサブクラスを作成することは不可能なので、2つ目の、責務をもとに抽出するという方法を取らざるを得なくなる。</p>
+<p>API をラップする方法の方が作業量は多くなるが、サードパーティライブラリから自分たちのコードを切り離したいときには便利である。
+責務をもとに抽出する方法では、コードをより上位のインタフェースに依存させることが可能となるが、抽出したコードはテストで保護できないかもしれない。</p>
+<h3 id=第16章-変更できるほど十分に私はコードを理解していません>第16章 変更できるほど十分に私はコードを理解していません</h3>
+<ul>
+<li><strong>コードを印刷する</strong>ことで、印をつけることができるようになる。
+長いコードを色分けすることで、責務の分担や、構造の理解に役立てる。</li>
+<li><strong>テストを書かずにリファクタリングすること (試行リファクタリング: scratch refactoring) は、そのコードを理解するために非常に役に立つ。ただし、そのコードはチェックインせずに破棄すること。</strong></li>
+</ul>
+<h3 id=第17章-私のアプリケーションには構造がありません>第17章 私のアプリケーションには構造がありません</h3>
+<p>大規模なシステムの全体像を理解する方法のカタログが<a target=_blank href="https://www.amazon.co.jp/dp/1558606394?tag=maku04-22">『Object-Oriented Reengineering Patterns』</a>
+に載っている。
+他には下記のような方法もある。</p>
+<h4 id=システムのストーリーを話す>システムのストーリーを話す</h4>
+<p>2人以上でシステムの振る舞いをストーリー仕立てで話すことで、他のメンバに説明する方法。
+「このシステムのアーキテクチャはどうなっていますか？」という質問から始め、「他には何かありますか？」と繋げていく。
+シンプルな会話ベースで説明することにより、システム自体をシンプルにするのを促す効果がある。
+ストーリーは指針を提供する。</p>
+<h4 id=白紙のcrc>白紙のCRC</h4>
+<p>CRC は、クラス (Class)、責務 (Responsibility)、協調 (Collaboration) の略。
+それぞれのカードにクラス名、クラスの責務、強調するクラス（やりとりする他のクラス）の一覧を記述する。
+ここで提案する方法は、白紙の CRC カード、つまり、単なる白いカードを使ってアーキテクチャを説明する方法で、カードを何らかのインスタンスに見立ててシステムの動きを表現する。
+例えば、あるインスタンスが入力と出力の接続を持つのであれば、1つのカードの上に二枚のカードを重ねる。
+コレクションを表現する場合も、カードの上にカードを重ねる。
+そして、それぞれのカードを動かしながら、システム全体の動きを説明する。</p>
+<h3 id=第18章-自分のテストコードが邪魔になっています>第18章 自分のテストコードが邪魔になっています</h3>
+<h3 id=第19章-私のオブジェクトはオブジェクト指向ではありませんがどうすれば安全に変更できるでしょうか>第19章 私のオブジェクトはオブジェクト指向ではありませんが、どうすれば安全に変更できるでしょうか?</h3>
+<h3 id=第20章-このクラスは大きすぎてもうこれ以上大きくしたくありません>第20章 このクラスは大きすぎて、もうこれ以上大きくしたくありません</h3>
+<h3 id=第21章-同じコードをいたるところで変更しています>第21章 同じコードをいたるところで変更しています</h3>
+<h3 id=第22章-モンスターメソッドを変更する必要がありますがテストを書くことができません>第22章 モンスターメソッドを変更する必要がありますが、テストを書くことができません</h3>
+<h3 id=第23章-どうすれば何も壊していないことを確認できるでしょうか>第23章 どうすれば何も壊していないことを確認できるでしょうか?</h3>
+<h3 id=第24章-もうウンザリです何も改善できません>第24章 もうウンザリです。何も改善できません)</h3>
+<h2 id=第3部-依存関係を排除する手法>第3部 依存関係を排除する手法</h2>
+<h3 id=第25章-依存関係を排除する手法>第25章 依存関係を排除する手法</h3>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=../../p/5oc7g4c/>読書メモ『ピープルウェア』トム・デマルコ、ティモシー・リスター</a></li>
+<li><a href=../../p/8npfate/>読書メモ『仕事は楽しいかね２』デイル・ドーテン</a></li>
+<li><a href=../../p/cbvx4d5/>読書メモ『不機嫌な職場 - なぜ社員同士で協力できないのか』</a></li>
+<li><a href=../../p/8sinbv4/>読書メモ『仕事は楽しいかね』デイル・ドーテン</a></li>
+<li><a href=../../p/ejm5wd2/>読書メモ『ソフトウェアアーキテクトが知るべき97のこと』鈴木雄介 監修</a></li>
+<li><a href=../../p/b2zio3x/>読書メモ『情報整理術クマガイ式』熊谷正寿</a></li>
+<li><a href=../../p/fn9ris5/>『アジャイルソフトウェア開発の奥義』ロバート・C・マーチン（輪講メモ）</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/%E8%AA%AD%E6%9B%B8>読書</a></span>
+<span class=xPageTags_item><a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=../../p/35odek9/><span class=xArticle_up_label>読書</span><br>へ戻る</a>
+</div>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_prev>
+<a href=../../p/kojyx2x/>『Javaの鉄則』ピーター・ハガー</a>
+</div>
+<div class=xPrevNextLink_next>
+<a href=../../p/5oc7g4c/>『ピープルウェア』トム・デマルコ、ティモシー・リスター</a>
+</div>
+</div>
+</aside>
+</article>
+<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
+</main>
+</div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/35odek9/>読書</a>
+</span>
+<span class=xBreadcrumb_item>『レガシーコード改善ガイド』マイケル・C・フェザーズ
+</span>
+</div>
+</aside>
+<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
+<div id=xSiteFooter2>
+<a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
+</div>
+</div>
+<script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c];b.setAttribute('target','_blank'),b.setAttribute('rel','noopener');const d=b.getElementsByTagName('img');if(d.length>0)continue;b.classList.add('xExternalLinkIcon')}})</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"読書","item":"https://maku.blog/p/35odek9/"},{"@type":"ListItem","position":3,"name":"『レガシーコード改善ガイド』マイケル・C・フェザーズ","item":"https://maku.blog/p/p6awy3z/"}]}</script>
+</body>
+</html>

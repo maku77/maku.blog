@@ -1,0 +1,943 @@
+<!doctype html><html lang=ja-jp>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>React フック: useSWR でデータフェッチ｜まくろぐ</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
+<meta property="og:title" content="React フック: useSWR でデータフェッチ">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maku.blog/p/vm2ft83/">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://maku.blog/assets/img/site-logo-large.png">
+<meta property="og:description" content="SWR とは useSWR フック SWR (useSWR) は、Next.js を開発している人たち (Vercel) が開発したデータフェッチ用の React フックライブラリです。 React アプリでデータフェッチを真面目に実装しようとすると、大体最後にこのライブラリに行き着きますので、最初からこれを使いましょう（GraphQL の場合は Apollo Client がありますが）。
+ SWR - React Hooks library for data fetching  React コンポーネント内から Web API などを呼び出してデータフェッチを行う場合、標準の仕組みだけで実現しようとすると、useEffect フックなどで fetch 関数を呼び出したりすることになります。
+useEffect による不完全なデータフェッチ実装 function Page () { const [user, setUser] = useState(null) useEffect(() => { fetch('/api/user') .then(res => res.json()) .then(data => setUser(data)) }, []) // ... }  もちろん、それで実現は可能なのですが、「データ取得前の表示」「エラー処理/リトライ処理」「非同期処理のキャンセル処理」などをちゃんとやろうとすると非常に煩雑なコードになってきます（上記コードはそれらが全く考慮できていません）。 useSWR フックを使うと、クライアントサイド JavaScript からのデータフェッチ処理をとても綺麗に記述することができます。
+useSWR の使用例 import { FC } from 'react' import useSWR from 'swr' const fetcher = (url: string) => fetch(url).">
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
+<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
+<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
+<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
+<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
+<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
+</head>
+<body>
+<div id=xRoot>
+<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/ujqinda/>プログラミング</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/d7p5jye/>React</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/pfdpybm/>React フック関連の記事</a>
+</span>
+<span class=xBreadcrumb_item>React フック: useSWR でデータフェッチ
+</span>
+</div>
+</aside>
+<div id=xContainer>
+<nav id=xMenu aria-label=メニュー>
+<div id=sidebar style=height:100%>
+<div id=sidebar_notFixed>
+<a href=../../><img src=../../assets/img/site-logo.png></a>
+<div class=xMenu_box data-sticky>
+<form action=https://cse.google.com/cse target=_blank>
+<div class=xSearchBox>
+<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<input type=hidden name=ie value=UTF-8>
+<input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
+<input type=submit value=検索></input>
+</div>
+</form>
+<div class=xMenu_box_body>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
+<div class=xMenu_box_body>
+<div class=xBoxLink>
+<a href=../../p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う
+<time>2022-03-17</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ryq6it6/>NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ
+<time>2022-03-16</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/un3gu8m/>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする
+<time>2022-02-27</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/m4dmu4c/>Next.js でブラウザ履歴で戻るボタンを表示する (router.back)
+<time>2022-02-22</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/ter3doz/>Linuxメモ: Bluetooth 関連コマンドのメモ (hciconfig, bluetoothctl)
+<time>2022-02-20</time></a>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title>フォルダ</h3>
+<div class=xMenu_box_body>
+<div class=xNavTree>
+<ul>
+<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/d7p5jye/>React</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/ofuan2e/>React の基本と環境構築</a>
+<li><a class=xNavTree-dir href=../../p/saku4ck/>Next.js</a>
+<li><a class=xNavTree-dir href=../../p/pfdpybm/>React フック関連の記事</a>
+<ul>
+</ul>
+<li><a class=xNavTree-dir href=../../p/m7it4do/>React 雑多記事</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/gqo9yoo/>TypeScript</a>
+<li><a class=xNavTree-dir href=../../p/5398aih/>Android プログラミング</a>
+<li><a class=xNavTree-dir href=../../p/zkw9ju6/>Electron</a>
+<li><a class=xNavTree-dir href=../../p/7zhxet9/>Java</a>
+<li><a class=xNavTree-dir href=../../p/kevbq7k/>正規表現</a>
+<li><a class=xNavTree-dir href=../../p/g3gs5gs/>Unity</a>
+<li><a class=xNavTree-dir href=../../p/qapsyfa/>3D</a>
+<li><a class=xNavTree-dir href=../../p/qikq9o8/>MongoDB</a>
+<li><a class=xNavTree-dir href=../../p/sfs4fq2/>プログラム雑多メモ</a>
+<li><a class=xNavTree-dir href=../../p/4vcr8ji/>Jade</a>
+<li><a class=xNavTree-dir href=../../p/ce8c2q5/>Doxygen</a>
+<li><a class=xNavTree-dir href=../../p/p3z9bup/>アルゴリズム</a>
+<li><a class=xNavTree-dir href=../../p/zff2scf/>SQL</a>
+<li><a class=xNavTree-dir href=../../p/8zhwcq6/>C/C++</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
+<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
+<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
+<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
+<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
+<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
+<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
+<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
+<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
+<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
+<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
+<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
+<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
+<li><a class=xNavTree-dir href=../../p/uo7n4ix/>PowerShell</a>
+<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
+<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
+<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
+<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
+<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
+<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
+<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
+<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
+<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
+<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
+</ul>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
+<div class=xMenu_box_body><div class=xMenu_tag>
+<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (79)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure>azure (58)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/typescript>typescript (57)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws>aws (51)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/next.js>next.js (36)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/chatbot>chatbot (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/react>react (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/gnuplot>gnuplot (27)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github>github (23)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/graphql>graphql (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/node.js>node.js (17)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/electron>electron (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/linux>linux (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vs-code>vs-code (14)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/javascript>javascript (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mongodb>mongodb (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cdk>aws/cdk (12)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/android>android (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/java>java (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/nginx>nginx (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/python>python (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/uml>uml (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/3d>3d (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/lambda>aws/lambda (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sam>aws/sam (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unity>unity (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webgl>webgl (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-cli>azure-cli (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jade>jade (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apollo>apollo (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cognito>aws/cognito (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-storage>azure-storage (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/doxygen>doxygen (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase>firebase (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/luis>luis (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/material-ui>material-ui (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/qna-maker>qna-maker (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ansible>ansible (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cli>aws/cli (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/ssm>aws/ssm (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/c/c++>c/c++ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/eslint>eslint (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/firestore>firebase/firestore (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html/css>html/css (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sql>sql (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/windows>windows (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-functions>azure-functions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/cosmos-db>cosmos-db (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-actions>github-actions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-pages>github-pages (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jekyll>jekyll (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/kotlin>kotlin (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mac>mac (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/powershell>powershell (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/prettier>prettier (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sqlite>sqlite (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/textlint>textlint (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tv>tv (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apache>apache (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/arib>arib (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/amplify>aws/amplify (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/iam>aws/iam (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/kms>aws/kms (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/s3>aws/s3 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sdk>aws/sdk (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-app-service>azure-app-service (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/excel>excel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/hugo>hugo (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/npm>npm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/oauth>oauth (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/opengl>opengl (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/rsync>rsync (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/scp>scp (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/slack>slack (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teraterm>teraterm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unicode>unicode (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vercel>vercel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/zip>zip (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/.net>.net (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/androidstudio>androidstudio (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/atomic-design>atomic-design (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/blender>blender (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bluetooth>bluetooth (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bootstrap>bootstrap (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-framework>bot-framework (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/boto3>boto3 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/css>css (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dns>dns (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dvb>dvb (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/editorconfig>editorconfig (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/evernote>evernote (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/git>git (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/groovy>groovy (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html>html (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/iso>iso (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/json>json (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/macos>macos (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/parcel>parcel (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/raspberrypi>raspberrypi (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ssh>ssh (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teams>teams (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tex>tex (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ubuntu>ubuntu (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vim>vim (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/web>web (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webpack>webpack (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/wsl>wsl (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
+</div></div>
+</div>
+<div class=xMenu_box data-sticky><br></div>
+</div>
+<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
+</div>
+</div>
+</nav>
+<main id=xMain>
+<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_next>
+<a href=../../p/qoz8fow/>React Context で複数のコンポーネント間でデータを共有する</a>
+</div>
+</div>
+</aside>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/ujqinda/>プログラミング</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/d7p5jye/>React</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/pfdpybm/>React フック関連の記事</a></span></div>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/vm2ft83/>React フック: useSWR でデータフェッチ</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/react>React</a></span>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2021-06-22>2021-06-22</time><br>
+作成: <time itemprop=datePublished datetime=2021-06-22>2021-06-22</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#swr-とは>SWR とは</a>
+<ul>
+<li><a href=#useswr-フック>useSWR フック</a></li>
+<li><a href=#useswr-の特徴>useSWR の特徴</a></li>
+</ul>
+</li>
+<li><a href=#コラム-swr--stale-while-revalidate>（コラム） SWR = stale-while-revalidate</a></li>
+<li><a href=#swr-のインストール>SWR のインストール</a></li>
+<li><a href=#useswr-関数の使い方>useSWR 関数の使い方</a>
+<ul>
+<li><a href=#基本的な使い方>基本的な使い方</a></li>
+<li><a href=#フェッチ関数を指定する>フェッチ関数を指定する</a></li>
+<li><a href=#フェッチ関数を省略する>フェッチ関数を省略する</a></li>
+</ul>
+</li>
+<li><a href=#useswr-はカスタムフックにラップして使う>useSWR はカスタムフックにラップして使う</a></li>
+<li><a href=#応用>応用</a>
+<ul>
+<li><a href=#フェッチ関数に追加のデータを渡す>フェッチ関数に追加のデータを渡す</a></li>
+<li><a href=#依存関係のある-useswr-の連続呼び出し>依存関係のある useSWR の連続呼び出し</a></li>
+<li><a href=#フェッチ関数から独自のエラーを投げる>フェッチ関数から独自のエラーを投げる</a></li>
+</ul>
+</li>
+</ul>
+</nav><h2 id=swr-とは>SWR とは</h2>
+<h3 id=useswr-フック>useSWR フック</h3>
+<p>SWR (<code>useSWR</code>) は、Next.js を開発している人たち (Vercel) が開発したデータフェッチ用の React フックライブラリです。
+React アプリでデータフェッチを真面目に実装しようとすると、大体最後にこのライブラリに行き着きますので、最初からこれを使いましょう（GraphQL の場合は Apollo Client がありますが）。</p>
+<ul>
+<li><a href=https://swr.vercel.app/>SWR - React Hooks library for data fetching</a></li>
+</ul>
+<p>React コンポーネント内から Web API などを呼び出してデータフェッチを行う場合、標準の仕組みだけで実現しようとすると、<code>useEffect</code> フックなどで <code>fetch</code> 関数を呼び出したりすることになります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>useEffect による不完全なデータフェッチ実装</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kd>function</span> <span class=nx>Page</span> <span class=p>()</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=p>[</span><span class=nx>user</span><span class=p>,</span> <span class=nx>setUser</span><span class=p>]</span> <span class=o>=</span> <span class=nx>useState</span><span class=p>(</span><span class=kc>null</span><span class=p>)</span>
+
+  <span class=nx>useEffect</span><span class=p>(()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+    <span class=nx>fetch</span><span class=p>(</span><span class=s1>&#39;/api/user&#39;</span><span class=p>)</span>
+      <span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>res</span> <span class=o>=&gt;</span> <span class=nx>res</span><span class=p>.</span><span class=nx>json</span><span class=p>())</span>
+      <span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>data</span> <span class=o>=&gt;</span> <span class=nx>setUser</span><span class=p>(</span><span class=nx>data</span><span class=p>))</span>
+  <span class=p>},</span> <span class=p>[])</span>
+
+  <span class=c1>// ...
+</span><span class=c1></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<p>もちろん、それで実現は可能なのですが、「データ取得前の表示」「エラー処理/リトライ処理」「非同期処理のキャンセル処理」などをちゃんとやろうとすると非常に煩雑なコードになってきます（上記コードはそれらが全く考慮できていません）。
+<code>useSWR</code> フックを使うと、クライアントサイド JavaScript からのデータフェッチ処理をとても綺麗に記述することができます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>useSWR の使用例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>FC</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;react&#39;</span>
+<span class=kr>import</span> <span class=nx>useSWR</span> <span class=kr>from</span> <span class=s1>&#39;swr&#39;</span>
+
+<span class=kr>const</span> <span class=nx>fetcher</span> <span class=o>=</span> <span class=p>(</span><span class=nx>url</span>: <span class=kt>string</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>fetch</span><span class=p>(</span><span class=nx>url</span><span class=p>).</span><span class=nx>then</span><span class=p>((</span><span class=nx>r</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>r</span><span class=p>.</span><span class=nx>json</span><span class=p>())</span>
+
+<span class=kr>const</span> <span class=nx>Profile</span>: <span class=kt>FC</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span><span class=p>,</span> <span class=nx>error</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSWR</span><span class=p>(</span><span class=s1>&#39;/api/user&#39;</span><span class=p>,</span> <span class=nx>fetcher</span><span class=p>)</span>
+
+  <span class=k>if</span> <span class=p>(</span><span class=nx>error</span><span class=p>)</span> <span class=k>return</span> <span class=p>&lt;</span><span class=nt>div</span><span class=p>&gt;</span><span class=nx>Failed</span> <span class=nx>to</span> <span class=nx>load</span><span class=p>&lt;/</span><span class=nt>div</span><span class=p>&gt;</span>
+  <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=nx>data</span><span class=p>)</span> <span class=k>return</span> <span class=p>&lt;</span><span class=nt>div</span><span class=p>&gt;</span><span class=nx>Loading</span><span class=p>...&lt;/</span><span class=nt>div</span><span class=p>&gt;</span>
+  <span class=k>return</span> <span class=p>&lt;</span><span class=nt>div</span><span class=p>&gt;</span><span class=nx>Hello</span> <span class=p>{</span><span class=nx>data</span><span class=p>.</span><span class=nx>name</span><span class=p>}</span><span class=o>!</span><span class=p>&lt;/</span><span class=nt>div</span><span class=p>&gt;</span>
+<span class=p>}</span>
+
+<span class=kr>export</span> <span class=k>default</span> <span class=nx>FC</span></code></pre></div></div>
+</figure>
+<h3 id=useswr-の特徴>useSWR の特徴</h3>
+<p><code>useSWR</code> は高度なキャッシュコントロール機能を備えています。</p>
+<dl>
+<dt>キー名によるキャッシュ共有</dt>
+<dd>第1パラメータのキー名を共通にするだけで、ページ間でキャッシュを共有できます。
+<code>useEffect</code> などでデータフェッチを行おうとすると、無駄なフェッチを防ぐために、トップレベルのコンポーネントで一度だけデータ取得して子コンポーネントにたらい回ししていく、という実装になりがちです。
+<code>useSWR</code> であれば、各コンポーネントで個別にデータフェッチする感覚で呼び出せます。</dd>
+<dt>自動リトライ、ポーリング</dt>
+<dd>エラー発生時のリトライ処理 (<a href=https://en.wikipedia.org/wiki/Exponential_backoff>exponential backoff アルゴリズム</a>)、ネットワーク復帰時の自動フェッチ (<code>{ revalidateOnReconnect: true }</code>)、ブラウザのタブ切り替え時の自動フェッチ (<code>{ revalidateOnFocus: true }</code>) などをデフォルトで行ってくれるため、ユーザーが最新データにアクセスしやすくなります。これらの設定は <code>useSWR</code> 呼び出し時のオプションで制御できます（参考: <a href=https://swr.vercel.app/ja/docs/options#%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3>useSWR のオプション</a>）。</dd>
+<dt>手動でのキャッシュ更新（ミューテート）</dt>
+<dd><code>useSWR</code> フックは、任意のタイミングでキャッシュ更新をかけるためのミューテート関数 (<code>mutate</code>) を提供してくれます。キャッシュが更新されると、自動的にコンポーネントは再描画されます。また、グローバルな <code>mutate</code> API も提供されており、指定したキーのキャッシュをどこからでも更新できます。</dd>
+<dt>フェッチ関数は自由</dt>
+<dd><code>useSWR</code> フックは、デフォルトでフェッチ関数として <code>fetch</code> を使用（JSONデータを想定）しますが、<code>Promise</code> を返す任意のフェッチ関数を使用することができます。</dd>
+<dt>TypeScript、Next.js 対応</dt>
+<dd>Vercel 製なので、もちろん Next.js に対応していて、プリレンダリング時にも呼び出せます。Web サイトビルド時にはその時点でのデータで静的なページを生成しておいて、実行時は最新データをフェッチ＆キャッシュするといったことが可能です。TypeScript の型情報も標準でサポートしています。</dd>
+</dl>
+<h2 id=コラム-swr--stale-while-revalidate>（コラム） SWR = stale-while-revalidate</h2>
+<p>SWR という名前の由来は、<a href=https://datatracker.ietf.org/doc/html/rfc5861>RFC5861</a> で提唱されている HTTP レスポンスヘッダの <code>Cache-Control</code> 拡張のひとつである <strong>stale-while-revalidate</strong> から来ています。</p>
+<p><code>Cache-Control</code> はデータフェッチ後のキャッシュ有効期間を示すために導入されたもので、例えば、<code>Cache-Control: max-age=600</code> が返された場合は、ブラウザは 600 秒間キャッシュを保持します（その間のデータフェッチ要求ではサーバーアクセスしない）。
+そして、600 秒経過するとキャッシュは古い (stale) とみなされて、次のデータフェッチ時には実際にサーバーアクセスが発生します。
+このとき、データフェッチ処理が同期的に行われるため、ユーザーはデータ表示まで少し待たされることになります。
+この待ち時間を軽減しようというのが stale-while-revalidate (SWR) という拡張で、例えば、</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>Cache-Control: max-age=600, stale-while-revalidate=300</code></pre></div></div>
+</figure>
+<p>というレスポンスが返されると、<code>max-age</code> の 600 秒経過後も、<code>stale-while-revalidate</code> で指定された 300 秒間は、古いキャッシュ (stale cache) がブラウザでの描画に使われます。
+そして、その背後でサーバーに対してデータフェッチを行うことで、キャッシュの更新も同時に行います。
+この仕組みにより、（多少古いかもしれない）キャッシュでとりあえず高速に初期表示しつつ、常に最新のデータをキャッシュしておく、ということが実現できます。</p>
+<p>React ライブラリの <code>useSWR</code> フックもこの思想をもとに実装されており、ブラウザ側のキャッシュを使って高速な表示をしつつ、背後でキャッシュの更新を行って必要に応じて再描画を行う、といったことを可能にしています。
+<code>useSWR</code> フックのすごいところは、この辺りの複雑なキャッシュコントロールを意識せずに、シンプルにデータフェッチ処理を記述できるところにあります。</p>
+<h2 id=swr-のインストール>SWR のインストール</h2>
+<p>SWR フックライブラリは <code>yarn</code> あるいは <code>npm</code> で簡単にインストールできます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>### yarn の場合
+$ yarn add swr
+
+### npm の場合
+$ npm install swr</code></pre></div></div>
+</figure>
+<p>これで、次のように <code>useSWR</code> 関数をインポートできるようになります。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=nx>useSWR</span> <span class=kr>from</span> <span class=s1>&#39;swr&#39;</span></code></pre></div></div>
+</figure>
+<h2 id=useswr-関数の使い方>useSWR 関数の使い方</h2>
+<h3 id=基本的な使い方>基本的な使い方</h3>
+<p>下記のコンポーネントは、GitHub のユーザー情報を REST API を使って取得＆表示します。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>src/components/GitHubUser.tsx</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>FC</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;react&#39;</span>
+<span class=kr>import</span> <span class=nx>useSWR</span> <span class=kr>from</span> <span class=s1>&#39;swr&#39;</span>
+
+<span class=kr>const</span> <span class=nx>fetcher</span> <span class=o>=</span> <span class=p>(</span><span class=nx>url</span>: <span class=kt>string</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>fetch</span><span class=p>(</span><span class=nx>url</span><span class=p>).</span><span class=nx>then</span><span class=p>((</span><span class=nx>r</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>r</span><span class=p>.</span><span class=nx>json</span><span class=p>())</span>
+<span class=kr>type</span> <span class=nx>Props</span> <span class=o>=</span> <span class=p>{</span> <span class=nx>login</span>: <span class=kt>string</span> <span class=p>}</span>  <span class=c1>// コンポーネントの props の型
+</span><span class=c1></span><span class=kr>type</span> <span class=nx>Data</span> <span class=o>=</span> <span class=p>{</span> <span class=nx>name</span>: <span class=kt>string</span> <span class=p>}</span>  <span class=c1>// フェッチするデータの型
+</span><span class=c1></span>
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>GitHubUser</span>: <span class=kt>FC</span><span class=p>&lt;</span><span class=nt>Props</span><span class=p>&gt;</span> <span class=o>=</span> <span class=p>({</span> <span class=nx>login</span> <span class=p>}</span><span class=o>:</span> <span class=nx>Props</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=nx>url</span> <span class=o>=</span> <span class=sb>`https://api.github.com/users/</span><span class=si>${</span><span class=nx>login</span><span class=si>}</span><span class=sb>`</span>
+  <span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span><span class=p>,</span> <span class=nx>error</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSWR</span><span class=p>&lt;</span><span class=nt>Data</span><span class=err>,</span> <span class=na>Error</span><span class=p>&gt;(</span><span class=nx>url</span><span class=p>,</span> <span class=nx>fetcher</span><span class=p>)</span>
+
+  <span class=k>if</span> <span class=p>(</span><span class=nx>error</span><span class=p>)</span> <span class=k>return</span> <span class=p>&lt;</span><span class=nt>div</span><span class=p>&gt;</span><span class=nx>Failed</span> <span class=nx>to</span> <span class=nx>load</span><span class=p>&lt;/</span><span class=nt>div</span><span class=p>&gt;</span>
+  <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=nx>data</span><span class=p>)</span> <span class=k>return</span> <span class=p>&lt;</span><span class=nt>div</span><span class=p>&gt;</span><span class=nx>Loading</span><span class=p>...&lt;/</span><span class=nt>div</span><span class=p>&gt;</span>
+  <span class=k>return</span> <span class=p>&lt;</span><span class=nt>div</span><span class=p>&gt;</span><span class=nx>Name</span><span class=o>:</span> <span class=p>{</span><span class=nx>data</span><span class=p>.</span><span class=nx>name</span><span class=p>}&lt;/</span><span class=nt>div</span><span class=p>&gt;</span>
+<span class=p>}</span>
+
+<span class=c1>// 使用例: &lt;GitHubUser login=&#34;octocat&#34; /&gt;
+</span></code></pre></div></div>
+</figure>
+<p><code>useSWR</code> 関数の第1パラメーターは、フェッチ関数に渡すパラメーターであり、キャッシュを識別するためのキーとしても使われます。
+典型的には Web API の URL を渡しますが、配列の形で付加データを渡すことも可能です。</p>
+<p>戻り値の <code>data</code> プロパティには、フェッチ関数によって取得したデータ（<code>Promise.resolve()</code> された値）が格納されますが、データ取得が完了するまでは <code>data</code> の値は <code>undefined</code> になります。
+なので、ロード中であるかどうかを <code>if (!data)</code> で簡単に判別できます（<code>isLoading</code> とか存在しません）。
+<code>error</code> プロパティも同様で、エラーが発生していなければ <code>undefined</code> になり、エラーが発生したらエラー内容（<code>Promise.reject()</code> された値）が格納されます。</p>
+<h3 id=フェッチ関数を指定する>フェッチ関数を指定する</h3>
+<p><code>useSWR</code> の第2パラメーターでは、データフェッチに使用するフェッチ関数を指定することができます。
+下記は、JSON データを返す Web API を呼び出すときに使う典型的なフェッチ関数の使用例です。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=hl><span class=kr>const</span> <span class=nx>fetcher</span> <span class=o>=</span> <span class=p>(</span><span class=nx>url</span>: <span class=kt>string</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>fetch</span><span class=p>(</span><span class=nx>url</span><span class=p>).</span><span class=nx>then</span><span class=p>((</span><span class=nx>r</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>r</span><span class=p>.</span><span class=nx>json</span><span class=p>())</span>
+</span>
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>Hello</span>: <span class=kt>FC</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+    <span class=c1>// ...
+</span><span class=c1></span>    <span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span><span class=p>,</span> <span class=nx>error</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSWR</span><span class=p>&lt;</span><span class=nt>Data</span><span class=err>,</span> <span class=na>Error</span><span class=p>&gt;(</span><span class=nx>url</span><span class=p>,</span> <span class=nx>fetcher</span><span class=p>)</span>
+    <span class=c1>// ...
+</span><span class=c1></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<p>フェッチ関数と言うと特殊なもののように聞こえますが、単なる getter 関数であり、<code>Promise&lt;Xxx></code> を返す非同期関数であれば、そのままフェッチ関数として使えると考えればよいです。
+次の例では、<code>fetchBookData</code> 関数をフェッチ関数として使用しています。
+この <code>fetchBookData</code> 関数はそれ単独でも使えるものですが、それをそのまま <code>useSWR</code> に渡すことができます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>src/components/BookList.tsx</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=nx>useSWR</span> <span class=kr>from</span> <span class=s1>&#39;swr&#39;</span>
+
+<span class=kr>type</span> <span class=nx>BookData</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>author</span>: <span class=kt>string</span>
+  <span class=nx>titles</span>: <span class=kt>string</span><span class=p>[]</span>
+<span class=p>}</span>
+
+<span class=kr>async</span> <span class=kd>function</span> <span class=nx>fetchBookData</span><span class=p>(</span><span class=nx>author</span>: <span class=kt>string</span><span class=p>)</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>BookData</span><span class=p>&gt;</span> <span class=p>{</span>
+  <span class=k>try</span> <span class=p>{</span>
+    <span class=c1>// ...本当はここで fetch 処理など
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>bookData</span> <span class=o>=</span> <span class=p>{</span>
+      <span class=nx>author</span>: <span class=kt>author</span><span class=p>,</span>
+      <span class=nx>titles</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;Title1&#39;</span><span class=p>,</span> <span class=s1>&#39;Title2&#39;</span><span class=p>,</span> <span class=s1>&#39;Title3&#39;</span><span class=p>],</span>
+    <span class=p>}</span>
+    <span class=k>return</span> <span class=nx>bookData</span>
+  <span class=p>}</span> <span class=k>catch</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>{</span>
+    <span class=c1>// Error を再スローするだけなら、通常は try ... catch は必要ない
+</span><span class=c1></span>    <span class=k>throw</span> <span class=nx>err</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=kr>const</span> <span class=nx>BookList</span>: <span class=kt>React.FC</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span>: <span class=kt>bookData</span><span class=p>,</span> <span class=nx>error</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSWR</span><span class=p>&lt;</span><span class=nt>BookData</span><span class=err>,</span> <span class=na>Error</span><span class=p>&gt;(</span><span class=s1>&#39;Author1&#39;</span><span class=p>,</span> <span class=nx>fetchBookData</span><span class=p>)</span>
+  <span class=k>if</span> <span class=p>(</span><span class=nx>error</span><span class=p>)</span> <span class=k>return</span> <span class=p>&lt;</span><span class=nt>p</span><span class=p>&gt;</span><span class=nb>Error</span><span class=o>:</span> <span class=p>{</span><span class=nx>error</span><span class=p>.</span><span class=nx>message</span><span class=p>}&lt;/</span><span class=nt>p</span><span class=p>&gt;</span>
+  <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=nx>bookData</span><span class=p>)</span> <span class=k>return</span> <span class=p>&lt;</span><span class=nt>p</span><span class=p>&gt;</span><span class=nx>Loading</span><span class=p>...&lt;/</span><span class=nt>p</span><span class=p>&gt;</span>
+  <span class=k>return</span> <span class=p>(</span>
+    <span class=p>&lt;</span><span class=nt>ul</span><span class=p>&gt;</span>
+      <span class=p>{</span><span class=nx>bookData</span><span class=p>.</span><span class=nx>titles</span><span class=p>.</span><span class=nx>map</span><span class=p>((</span><span class=nx>title</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>(</span>
+        <span class=p>&lt;</span><span class=nt>li</span> <span class=na>key</span><span class=o>=</span><span class=p>{</span><span class=nx>title</span><span class=p>}&gt;</span>
+          <span class=p>{</span><span class=nx>bookData</span><span class=p>.</span><span class=nx>author</span><span class=p>}</span> <span class=o>-</span> <span class=p>{</span><span class=nx>title</span><span class=p>}</span>
+        <span class=p>&lt;/</span><span class=nt>li</span><span class=p>&gt;</span>
+      <span class=p>))}</span>
+    <span class=p>&lt;/</span><span class=nt>ul</span><span class=p>&gt;</span>
+  <span class=p>)</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>パラメーターが 2 つ以上の関数をフェッチ関数として使いたい場合は、<code>useSWR</code> の第1パラメータ―に引数を配列でまとめて渡します。
+フェッチ関数側に配列が渡されるわけではないことに注意してください。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// パラメーターが 2 つ必要なフェッチ関数
+</span><span class=c1></span><span class=kr>async</span> <span class=kd>function</span> <span class=nx>fetchData</span><span class=p>(</span><span class=nx>key1</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>key2</span>: <span class=kt>string</span><span class=p>)</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>Data</span><span class=p>&gt;</span> <span class=p>{</span>
+  <span class=c1>// ...
+</span><span class=c1></span><span class=p>}</span>
+
+<span class=c1>// useSWR 経由で上記関数を呼び出す
+</span><span class=c1></span><span class=kr>export</span> <span class=kr>const</span> <span class=nx>MyComponent</span>: <span class=kt>FC</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span><span class=p>,</span> <span class=nx>error</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSWR</span><span class=p>&lt;</span><span class=nt>Data</span><span class=err>,</span> <span class=na>Error</span><span class=p>&gt;([</span><span class=s1>&#39;aaa&#39;</span><span class=p>,</span> <span class=s1>&#39;bbb&#39;</span><span class=p>],</span> <span class=nx>fetchData</span><span class=p>)</span>
+  <span class=c1>// ...
+</span><span class=c1></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<p>フェッチ関数の仕組みは非常に柔軟で、時間がかかるデータフェッチをシミュレートしたり、エラーが発生したときにどう見えるかを簡単に確認できます。
+例えば次のフェッチ関数は 1 秒後に現在時刻を返すか、エラーを発生させます。
+通常、フェッチ関数のパラメーターとして、<code>useSWR</code> の第 1 引数で渡された値を受け取りますが、このフェッチ関数は特殊でパラメーターなしです。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>fetchCurrentTime</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=c1>// 1秒待つ
+</span><span class=c1></span>  <span class=k>await</span> <span class=k>new</span> <span class=nx>Promise</span><span class=p>((</span><span class=nx>res</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>setTimeout</span><span class=p>(</span><span class=nx>res</span><span class=p>,</span> <span class=mi>1000</span><span class=p>))</span>
+
+  <span class=c1>// 現在時刻の文字列を返すか、エラーを発生させる
+</span><span class=c1></span>  <span class=k>if</span> <span class=p>(</span><span class=nb>Math</span><span class=p>.</span><span class=nx>random</span><span class=p>()</span> <span class=o>&gt;</span> <span class=mf>0.3</span><span class=p>)</span> <span class=p>{</span>
+    <span class=k>return</span> <span class=k>new</span> <span class=nb>Date</span><span class=p>().</span><span class=nx>toLocaleString</span><span class=p>()</span>
+  <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+    <span class=k>throw</span> <span class=k>new</span> <span class=nb>Error</span><span class=p>(</span><span class=s1>&#39;An error has occurred!&#39;</span><span class=p>)</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=c1>// 使用例
+</span><span class=c1></span><span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span><span class=p>,</span> <span class=nx>error</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSWR</span><span class=p>&lt;</span><span class=nt>string</span><span class=err>,</span> <span class=na>Error</span><span class=p>&gt;(</span><span class=s1>&#39;/fake&#39;</span><span class=p>,</span> <span class=nx>fetchCurrentTime</span><span class=p>)</span></code></pre></div></div>
+</figure>
+<p>フェッチ関数の中でスローした Error オブジェクトは、<code>useSWR</code> 関数の戻り値オブジェクトの <code>error</code> プロパティにされます（エラーがしなかった場合は <code>undefined</code>）。</p>
+<h3 id=フェッチ関数を省略する>フェッチ関数を省略する</h3>
+<p><a href=https://swr.vercel.app/ja/docs/global-configuration>SWRConfig コンポーネント</a> を使用すると、子コンポーネント内で <code>useSWR</code> を使用するときの共通設定（グローバル設定）を行うことができます。
+具体的には、<code>useSWR</code> の第 3 引数に渡すオプションオブジェクトのデフォルト値として扱われます。
+このオブジェクトには、次のようにのフェッチ関数 (<code>fetcher</code>) を指定しておくことができます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>pages/_app.tsx</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=kr>type</span> <span class=p>{</span> <span class=nx>AppProps</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;next/app&#39;</span>
+<span class=kr>import</span> <span class=p>{</span> <span class=nx>SWRConfig</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;swr&#39;</span>
+
+<span class=cm>/** Default fetcher for useSWR hook. */</span>
+<span class=kr>const</span> <span class=nx>fetcher</span> <span class=o>=</span> <span class=p>(</span><span class=nx>url</span>: <span class=kt>string</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>fetch</span><span class=p>(</span><span class=nx>url</span><span class=p>).</span><span class=nx>then</span><span class=p>((</span><span class=nx>r</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>r</span><span class=p>.</span><span class=nx>json</span><span class=p>())</span>
+
+<span class=kr>export</span> <span class=k>default</span> <span class=kd>function</span> <span class=nx>MyApp</span><span class=p>({</span> <span class=nx>Component</span><span class=p>,</span> <span class=nx>pageProps</span> <span class=p>}</span><span class=o>:</span> <span class=nx>AppProps</span><span class=p>)</span><span class=o>:</span> <span class=nx>JSX</span><span class=p>.</span><span class=nx>Element</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=p>(</span>
+    <span class=p>&lt;</span><span class=nt>SWRConfig</span> <span class=na>value</span><span class=o>=</span><span class=p>{{</span> <span class=nx>fetcher</span> <span class=p>}}&gt;</span>
+      <span class=p>&lt;</span><span class=nt>Component</span> <span class=p>{</span><span class=na>...pageProps</span><span class=p>}</span> <span class=p>/&gt;</span>
+    <span class=p>&lt;/</span><span class=nt>SWRConfig</span><span class=p>&gt;</span>
+  <span class=p>)</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>これで、子コンポーネントから <code>useSWR</code> 関数を呼び出すときにフェッチ関数を省略できるようになります。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span>: <span class=kt>projects</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSWR</span><span class=p>(</span><span class=s1>&#39;/api/projects&#39;</span><span class=p>)</span></code></pre></div></div>
+</figure>
+<h2 id=useswr-はカスタムフックにラップして使う>useSWR はカスタムフックにラップして使う</h2>
+<p><code>useSWR</code> 特有の話ではないですが、データフェッチ処理に関してはコンポーネントの実装から分離して、カスタムフックの形で定義しておくと保守性の高いコードになります。
+次の <code>useIssueCount</code> カスタムフックは、指定した GitHub リポジトリ (<code>$org/$repo</code>) のイシュー数を取得します。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>src/hooks/useIssueCount.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=nx>useSWR</span> <span class=kr>from</span> <span class=s1>&#39;swr&#39;</span>
+
+<span class=kr>type</span> <span class=nx>UseIssueCountInput</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>org</span>: <span class=kt>string</span>
+  <span class=nx>repo</span>: <span class=kt>string</span>
+<span class=p>}</span>
+
+<span class=kr>type</span> <span class=nx>UseIssueCountOutput</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>count?</span>: <span class=kt>number</span>
+  <span class=nx>error?</span>: <span class=kt>Error</span>
+  <span class=nx>isLoading</span>: <span class=kt>boolean</span>
+<span class=p>}</span>
+
+<span class=kr>const</span> <span class=nx>fetcher</span> <span class=o>=</span> <span class=p>(</span><span class=nx>url</span>: <span class=kt>string</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>fetch</span><span class=p>(</span><span class=nx>url</span><span class=p>).</span><span class=nx>then</span><span class=p>((</span><span class=nx>r</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>r</span><span class=p>.</span><span class=nx>json</span><span class=p>())</span>
+
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>useIssueCount</span> <span class=o>=</span> <span class=p>(</span>
+  <span class=nx>input</span>: <span class=kt>UseIssueCountInput</span>
+<span class=p>)</span><span class=o>:</span> <span class=nx>UseIssueCountOutput</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=p>{</span> <span class=nx>org</span><span class=p>,</span> <span class=nx>repo</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>input</span>
+  <span class=kr>const</span> <span class=nx>url</span> <span class=o>=</span> <span class=sb>`https://api.github.com/repos/</span><span class=si>${</span><span class=nx>org</span><span class=si>}</span><span class=sb>/</span><span class=si>${</span><span class=nx>repo</span><span class=si>}</span><span class=sb>/issues`</span>
+  <span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span><span class=p>,</span> <span class=nx>error</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSWR</span><span class=o>&lt;</span><span class=p>[],</span> <span class=nb>Error</span><span class=o>&gt;</span><span class=p>(</span><span class=nx>url</span><span class=p>,</span> <span class=nx>fetcher</span><span class=p>)</span>
+
+  <span class=k>return</span> <span class=p>{</span>
+    <span class=nx>count</span>: <span class=kt>data?.length</span><span class=p>,</span>
+    <span class=nx>error</span><span class=p>,</span>
+    <span class=nx>isLoading</span><span class=o>:</span> <span class=o>!</span><span class=nx>error</span> <span class=o>&amp;&amp;</span> <span class=o>!</span><span class=nx>data</span><span class=p>,</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>そして描画を担うコンポーネント側の実装では、データ取得処理はカスタムフックの呼び出しだけで済ませます。
+カスタムフックを呼び出している時点で、データ取得処理が完全に分離できているとは言えませんが、こうすることで「見た目」の定義に集中できます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>src/components/IssueCount.tsx（使用例）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>FC</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;react&#39;</span>
+<span class=kr>import</span> <span class=p>{</span> <span class=nx>useIssueCount</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;../hooks/useIssueCount&#39;</span>
+
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>IssueCount</span>: <span class=kt>FC</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=p>{</span> <span class=nx>count</span><span class=p>,</span> <span class=nx>error</span><span class=p>,</span> <span class=nx>isLoading</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useIssueCount</span><span class=p>({</span>
+    <span class=nx>org</span><span class=o>:</span> <span class=s1>&#39;vercel&#39;</span><span class=p>,</span>
+    <span class=nx>repo</span><span class=o>:</span> <span class=s1>&#39;swr&#39;</span><span class=p>,</span>
+  <span class=p>})</span>
+
+  <span class=k>if</span> <span class=p>(</span><span class=nx>error</span><span class=p>)</span> <span class=k>return</span> <span class=p>&lt;</span><span class=nt>div</span><span class=p>&gt;</span><span class=nb>Error</span><span class=p>&lt;/</span><span class=nt>div</span><span class=p>&gt;</span>
+  <span class=k>if</span> <span class=p>(</span><span class=nx>isLoading</span><span class=p>)</span> <span class=k>return</span> <span class=p>&lt;</span><span class=nt>div</span><span class=p>&gt;</span><span class=nx>Loading</span><span class=p>...&lt;/</span><span class=nt>div</span><span class=p>&gt;</span>
+  <span class=k>return</span> <span class=p>&lt;</span><span class=nt>div</span><span class=p>&gt;</span><span class=nx>Count</span><span class=o>:</span> <span class=p>{</span><span class=nx>count</span><span class=p>}&lt;/</span><span class=nt>div</span><span class=p>&gt;</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>ちなみに、さらに「見た目」と「ロジック」を分離する手法に、Presentational component / Container component という方法があります。
+これは、React コンポーネントを「見た目」用と「ロジック」用の 2 種類に分けて実装する考え方です。</p>
+<ul>
+<li>Presentational component &mldr; 純粋な UI コンポーネント。渡された <code>props</code> をそのまま表示するだけ。</li>
+<li>Cotainer component &mldr; ロジック（フックなどの呼び出し）を含むコンポーネント。内部でのデータ取得結果などを Presentational component に <code>props</code> で渡す。</li>
+</ul>
+<h2 id=応用>応用</h2>
+<h3 id=フェッチ関数に追加のデータを渡す>フェッチ関数に追加のデータを渡す</h3>
+<p>API 呼び出し時に、フェッチ関数にトークン情報を渡したいことがあるかもしれません。
+そのような場合は、<code>useSWR</code> 関数のキーパラメータを配列にすることで、トークン情報が変化した時に再フェッチさせることができます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span>: <span class=kt>user</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSWR</span><span class=p>([</span><span class=s1>&#39;/api/user&#39;</span><span class=p>,</span> <span class=nx>token</span><span class=p>],</span> <span class=nx>fetchWithToken</span><span class=p>)</span></code></pre></div></div>
+</figure>
+<p>フェッチ関数 <code>fetchWithToken</code> は、2 つのパラメーター（上の例であれば、<code>/api/user</code> と <code>token</code>）を受け取り、<code>Promise&lt;Xxx></code> を返すように実装します。
+パラメーターとして配列を受け取るわけではないことに注意してください（配列の要素が個別パラメーターとして渡されてきます）。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>type</span> <span class=nx>Output</span> <span class=o>=</span> <span class=p>{</span> <span class=nx>user</span>: <span class=kt>string</span> <span class=p>}</span>
+
+<span class=kr>async</span> <span class=kd>function</span> <span class=nx>fetchWithToken</span><span class=p>(</span><span class=nx>url</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>token</span>: <span class=kt>string</span><span class=p>)</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>Output</span><span class=p>&gt;</span> <span class=p>{</span>
+  <span class=c1>// ...
+</span><span class=c1></span>  <span class=k>return</span> <span class=p>{</span> <span class=nx>user</span><span class=o>:</span> <span class=s1>&#39;Jojo&#39;</span> <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<h3 id=依存関係のある-useswr-の連続呼び出し>依存関係のある useSWR の連続呼び出し</h3>
+<p><code>useSWR</code> 関数の第1パラメーターが偽とみなされる値 (falsy) 場合、フェッチ処理はスキップされます。
+次の例では、この性質を利用して、1番目の <code>useSWR</code> の結果を取得した段階で、2番目の <code>useSWR</code> によるデータフェッチを発火させています。
+それまでは、1番目の <code>useSWR</code> の結果のみを使ってコンポーネントが描画されます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span>: <span class=kt>user</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSWR</span><span class=p>([</span><span class=s1>&#39;/api/user&#39;</span><span class=p>,</span> <span class=nx>token</span><span class=p>],</span> <span class=nx>fetchWithToken</span><span class=p>)</span>
+<span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span>: <span class=kt>orders</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSWR</span><span class=p>(</span><span class=nx>user</span> <span class=o>?</span> <span class=p>[</span><span class=s1>&#39;/api/orders&#39;</span><span class=p>,</span> <span class=nx>user</span><span class=p>]</span> <span class=o>:</span> <span class=kc>null</span><span class=p>,</span> <span class=nx>fetchWithUser</span><span class=p>)</span></code></pre></div></div>
+</figure>
+<p>ちなみに、<code>useSWR</code> は React フックなので、データフェッチが必要ないケースでも上記のように必ず呼び出す必要があります（条件分岐して呼び出し自体をスキップしてはいけません）。</p>
+<h3 id=フェッチ関数から独自のエラーを投げる>フェッチ関数から独自のエラーを投げる</h3>
+<p><code>useSWR</code> 関数の第 2 引数で指定した独自のフェッチ関数からエラーオブジェクトを throw すると、<code>useSWR</code> 関数の戻り値オブジェクトの <code>error</code> プロパティとして受け取ることができます。
+<code>useSWR</code> 関数を使用する箇所で、データフェッチに関する細かいエラー処理を行いたいのであれば、フェッチ関数の中で詳細情報を詰めたエラーオブジェクトを <code>throw</code> すれば OK です。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// 独自のエラークラスの定義例
+</span><span class=c1></span><span class=kr>export</span> <span class=kr>class</span> <span class=nx>GameError</span> <span class=kr>extends</span> <span class=nb>Error</span> <span class=p>{</span>
+  <span class=nx>errorId</span>: <span class=kt>string</span>  <span class=c1>// 独自のエラー ID
+</span><span class=c1></span>  <span class=nx>statusCode</span>: <span class=kt>number</span>  <span class=c1>// HTTP ステータスコード
+</span><span class=c1></span>
+  <span class=kr>constructor</span><span class=p>(</span><span class=nx>errorId</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>statusCode</span>: <span class=kt>number</span><span class=p>,</span> <span class=nx>message?</span>: <span class=kt>string</span><span class=p>)</span> <span class=p>{</span>
+    <span class=c1>// Error オブジェクト用の設定
+</span><span class=c1></span>    <span class=kr>super</span><span class=p>(</span><span class=nx>message</span> <span class=o>??</span> <span class=sb>`Error </span><span class=si>${</span><span class=nx>errorId</span><span class=si>}</span><span class=sb> occurred.`</span><span class=p>)</span>
+    <span class=k>this</span><span class=p>.</span><span class=nx>name</span> <span class=o>=</span> <span class=k>new</span><span class=p>.</span><span class=nx>target</span><span class=p>.</span><span class=nx>name</span>
+
+    <span class=c1>// 独自のエラー情報
+</span><span class=c1></span>    <span class=k>this</span><span class=p>.</span><span class=nx>errorId</span> <span class=o>=</span> <span class=nx>errorId</span>
+    <span class=k>this</span><span class=p>.</span><span class=nx>statusCode</span> <span class=o>=</span> <span class=nx>statusCode</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=c1>// 独自のフェッチ関数
+</span><span class=c1></span><span class=kr>export</span> <span class=kr>async</span> <span class=kd>function</span> <span class=nx>fetchGame</span><span class=p>(</span><span class=nx>url</span>: <span class=kt>string</span><span class=p>)</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>Game</span><span class=p>&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=nx>res</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>fetch</span><span class=p>(</span><span class=nx>url</span><span class=p>)</span>
+  <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=nx>res</span><span class=p>.</span><span class=nx>ok</span><span class=p>)</span> <span class=p>{</span>
+    <span class=c1>// ステータスコードが 2xx 以外の場合は、独自エラーを投げる
+</span><span class=c1></span>    <span class=k>throw</span> <span class=k>new</span> <span class=nx>GameError</span><span class=p>(</span><span class=s1>&#39;FETCH_GAME_ERROR&#39;</span><span class=p>,</span> <span class=nx>res</span><span class=p>.</span><span class=nx>status</span><span class=p>)</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=p>(</span><span class=k>await</span> <span class=nx>res</span><span class=p>.</span><span class=nx>json</span><span class=p>())</span> <span class=kr>as</span> <span class=nx>Game</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p><code>useSWR</code> を呼び出すときは、第 2 型パラメーターでエラーオブジェクトの型を指定できます。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span><span class=p>,</span> <span class=nx>error</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSWR</span><span class=p>&lt;</span><span class=nt>Game</span><span class=err>,</span> <span class=na>GameError</span><span class=p>&gt;(</span><span class=nx>url</span><span class=p>,</span> <span class=nx>fetchGame</span><span class=p>)</span>
+<span class=k>if</span> <span class=p>(</span><span class=nx>error</span><span class=p>)</span> <span class=p>{</span>
+  <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>error</span><span class=p>.</span><span class=nx>errorId</span><span class=p>)</span>  <span class=c1>// FETCH_GAME_ERROR
+</span><span class=c1></span>  <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>error</span><span class=p>.</span><span class=nx>statusCode</span><span class=p>)</span>  <span class=c1>// 404 など
+</span><span class=c1></span>  <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>error</span><span class=p>.</span><span class=nx>message</span><span class=p>)</span>  <span class=c1>// Error FETCH_GAME_ERROR occurred.
+</span><span class=c1></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=../../p/xjv6gqy/>React の JSX 記述のコツ</a></li>
+<li><a href=../../p/ny9fmty/>Next.js のプロジェクトを TypeScript 化する</a></li>
+<li><a href=../../p/xjw8it5/>Next.js アプリのソースコードを GitHub で管理する</a></li>
+<li><a href=../../p/au8ju6g/>Next.js アプリを GitHub Actions でビルドして GitHub Pages で公開する</a></li>
+<li><a href=../../p/ubmu3bj/>Next.js で HelloWorld（プロジェクト作成からサーバー起動まで）</a></li>
+<li><a href=../../p/kmj7sdv/>Apollo Client の useQuery 呼び出し部分をカスタムフックで分離する</a></li>
+<li><a href=../../p/m7ju6gr/>Apollo Client でクリック時に GraphQL クエリを実行する</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/react>React</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=../../p/pfdpybm/><span class=xArticle_up_label>React フック関連の記事</span><br>へ戻る</a>
+</div>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_next>
+<a href=../../p/qoz8fow/>React Context で複数のコンポーネント間でデータを共有する</a>
+</div>
+</div>
+</aside>
+</article>
+<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
+</main>
+</div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/ujqinda/>プログラミング</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/d7p5jye/>React</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/pfdpybm/>React フック関連の記事</a>
+</span>
+<span class=xBreadcrumb_item>React フック: useSWR でデータフェッチ
+</span>
+</div>
+</aside>
+<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
+<div id=xSiteFooter2>
+<a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
+</div>
+</div>
+<script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c];b.setAttribute('target','_blank'),b.setAttribute('rel','noopener');const d=b.getElementsByTagName('img');if(d.length>0)continue;b.classList.add('xExternalLinkIcon')}})</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"プログラミング","item":"https://maku.blog/p/ujqinda/"},{"@type":"ListItem","position":4,"name":"React","item":"https://maku.blog/p/d7p5jye/"},{"@type":"ListItem","position":5,"name":"React フック関連の記事","item":"https://maku.blog/p/pfdpybm/"},{"@type":"ListItem","position":6,"name":"React フック: useSWR でデータフェッチ","item":"https://maku.blog/p/vm2ft83/"}]}</script>
+</body>
+</html>
