@@ -121,14 +121,14 @@ jobs:
         run: hugo --minify
 
       - name: Generate ssh key
-        run: echo "$SSH_PRIVATE_KEY" > key && chmod 600 key
+        run: echo "$SSH_PRIVATE_KEY" > ${{ runner.temp }}/key && chmod 600 ${{ runner.temp }}/key
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy with rsync
         run: >
-          rsync -e 'ssh -i key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
-          -r -h --delete public/ ${SSH_USER}@${SSH_HOST}:${DST_PATH}
+          rsync -e 'ssh -i ${{ runner.temp }}/key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+          -av --delete public/ ${SSH_USER}@${SSH_HOST}:${DST_PATH}
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
@@ -180,18 +180,19 @@ Hugo による Web サイトのビルドを行います。
 
 ```yaml
 - name: Generate ssh key
-  run: echo "$SSH_PRIVATE_KEY" > key && chmod 600 key
+  run: echo "$SSH_PRIVATE_KEY" > ${{ runner.temp }}/key && chmod 600 ${{ runner.temp }}/key
   env:
     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 ```
 
 この後の `rsync` コマンド実行時に、SSH 秘密鍵の「ファイル」が必要になるので、ここで作成しています。
 前述の手順で `SSH_PRIVATE_KEY` というシークレットに、SSH 秘密鍵の「値」を格納しておいたので、この値を `key` という名前の「ファイル」として出力します。
+`${{ runner.temp }}` は、ビルド時にテンポラリディレクトリ名に置換されます。
 
 ```yaml
 - name: Deploy with rsync
   run: >
-    rsync -e 'ssh -i key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+    rsync -e 'ssh -i ${{ runner.temp }}/key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
     -r -h --delete public/ ${SSH_USER}@${SSH_HOST}:${DST_PATH}
   env:
     SSH_USER: ${{ secrets.SSH_USER }}
@@ -200,10 +201,10 @@ Hugo による Web サイトのビルドを行います。
 ```
 
 最後は `rsync` によるデプロイ処理ですが、ここは若干複雑です。
-`rsync` の `-e` オプションでは、SSH 秘密鍵ファイルの指定 (`-i key`) と、`known_hosts` 関連のエラー対策を行っています。
+`rsync` の `-e` オプションでは、SSH 秘密鍵ファイルの指定と、`known_hosts` 関連のエラー対策を行っています。
 
 ```
-rsync -e 'ssh -i key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+rsync -e 'ssh -i ${{ runner.temp }}/key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
 ```
 
 SSH で新しいホストに接続しようとすると、`known_hosts` への接続先ホスト情報の書き込みが行われるのですが、この処理はデフォルトでユーザーに確認を求めるという挙動になっているので、`-o StrictHostKeyChecking=no` というオプションで、ユーザー確認なしで書き込むようにします。
@@ -214,7 +215,7 @@ SSH で新しいホストに接続しようとすると、`known_hosts` への�
 `rsync` の残りの部分では、具体的なファイルのコピー方法などを指定しています。
 
 ```
-    -r -h --delete public/ ${SSH_USER}@${SSH_HOST}:${DST_PATH}
+    -av --delete public/ ${SSH_USER}@${SSH_HOST}:${DST_PATH}
   env:
     SSH_USER: ${{ secrets.SSH_USER }}
     SSH_HOST: ${{ secrets.SSH_HOST }}
@@ -223,8 +224,8 @@ SSH で新しいホストに接続しようとすると、`known_hosts` への�
 
 ここも用途によって要調整ですが、大体次のような指定を行っています。
 
-- `-r` ... 再帰的にファイルをコピーする
-- `-h` ... 人間に読みやすいフォーマットでログ出力する
+- `-a` ... アーカイブモードでコピーする（ディレクトリを再帰的に処理し、タイムスタンプやパーミッション情報を維持する）
+- `-v` ... ログを詳細に表示する
 - `--delete` ... コピー元にないファイルをコピー先から削除する
 - `public/` ... コピー元のディレクトリパス
   - Hugo のデフォルトの出力ディレクトリは `public` です。`public` ディレクトリそのものではなく、ディレクトリ内のファイルだけをコピーしたい場合は、`public/` のように末尾にスラッシュが必要なことに注意してください。
