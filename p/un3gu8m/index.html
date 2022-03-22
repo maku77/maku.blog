@@ -543,11 +543,15 @@ RyRi5y7Tx50Z0AAAASbWFrdUBtYWt1bWFjLmxvY2FsAQ==
 -----END OPENSSH PRIVATE KEY-----
 </code></pre></li>
 </ol>
-<p>VPS の「ユーザー名」や「接続先アドレス」も念のため隠しておきたいので、次のようなシークレットも追加で登録しておきます。</p>
+<p>VPS の「ユーザー名」や「接続先アドレス」、「コピー先ディレクトリ」も念のため隠しておきたいので、次のようなシークレットも追加で登録しておきます。</p>
 <ul>
 <li>Name: <strong><code>SSH_USER</code></strong>、Value: VPSのユーザ名 （例: <code>maku</code>）</li>
 <li>Name: <strong><code>SSH_HOST</code></strong>、Value: VPSのアドレス （例: <code>www9999xx.sakura.ne.jp</code>）</li>
 <li>Name: <strong><code>DST_PATH</code></strong>、Value: デプロイ先のホームディレクトリからの相対パス （例: <code>webroot</code>）</li>
+</ul>
+<p>シークレットを 3 つ登録するのが煩わしい場合は、次のように 1 つのシークレットにまとめてしまってもいいかもしれません。</p>
+<ul>
+<li>Name: <strong><code>RSYNC_TARGET</code></strong>、Value: <code>maku@www9999xx.sakura.ne.jp:webroot</code>（例）</li>
 </ul>
 <h2 id=github-actions-のワークフローを作成する>GitHub Actions のワークフローを作成する</h2>
 <p>Web サイトのコンテンツが格納されている GitHub リポジトリに、GitHub Actions のワークフローを作成します。
@@ -582,14 +586,14 @@ RyRi5y7Tx50Z0AAAASbWFrdUBtYWt1bWFjLmxvY2FsAQ==
 </span><span class=w>        </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>hugo --minify</span><span class=w>
 </span><span class=w>
 </span><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Generate ssh key</span><span class=w>
-</span><span class=w>        </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>echo &#34;$SSH_PRIVATE_KEY&#34; &gt; key &amp;&amp; chmod 600 key</span><span class=w>
+</span><span class=w>        </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>echo &#34;$SSH_PRIVATE_KEY&#34; &gt; ${{ runner.temp }}/key &amp;&amp; chmod 600 ${{ runner.temp }}/key</span><span class=w>
 </span><span class=w>        </span><span class=nt>env</span><span class=p>:</span><span class=w>
 </span><span class=w>          </span><span class=nt>SSH_PRIVATE_KEY</span><span class=p>:</span><span class=w> </span><span class=l>${{ secrets.SSH_PRIVATE_KEY }}</span><span class=w>
 </span><span class=w>
 </span><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Deploy with rsync</span><span class=w>
 </span><span class=w>        </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=p>&gt;</span><span class=sd>
-</span><span class=sd>          rsync -e &#39;ssh -i key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null&#39;
-</span><span class=sd>          -r -h --delete public/ ${SSH_USER}@${SSH_HOST}:${DST_PATH}</span><span class=w>          
+</span><span class=sd>          rsync -e &#39;ssh -i ${{ runner.temp }}/key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null&#39;
+</span><span class=sd>          -av --delete public/ ${SSH_USER}@${SSH_HOST}:${DST_PATH}</span><span class=w>          
 </span><span class=w>        </span><span class=nt>env</span><span class=p>:</span><span class=w>
 </span><span class=w>          </span><span class=nt>SSH_USER</span><span class=p>:</span><span class=w> </span><span class=l>${{ secrets.SSH_USER }}</span><span class=w>
 </span><span class=w>          </span><span class=nt>SSH_HOST</span><span class=p>:</span><span class=w> </span><span class=l>${{ secrets.SSH_HOST }}</span><span class=w>
@@ -622,36 +626,37 @@ Web サイトのスタイル定義に SCSS などのプリプロセッサを使�
 オプションは適宜修正します。
 例えば、<code>-F</code> オプションを追加すれば、将来の日付が設定されたコンテンツをビルド対象にできます。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Generate ssh key</span><span class=w>
-</span><span class=w>  </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>echo &#34;$SSH_PRIVATE_KEY&#34; &gt; key &amp;&amp; chmod 600 key</span><span class=w>
+</span><span class=w>  </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>echo &#34;$SSH_PRIVATE_KEY&#34; &gt; ${{ runner.temp }}/key &amp;&amp; chmod 600 ${{ runner.temp }}/key</span><span class=w>
 </span><span class=w>  </span><span class=nt>env</span><span class=p>:</span><span class=w>
 </span><span class=w>    </span><span class=nt>SSH_PRIVATE_KEY</span><span class=p>:</span><span class=w> </span><span class=l>${{ secrets.SSH_PRIVATE_KEY }}</span><span class=w>
 </span></code></pre></div><p>この後の <code>rsync</code> コマンド実行時に、SSH 秘密鍵の「ファイル」が必要になるので、ここで作成しています。
-前述の手順で <code>SSH_PRIVATE_KEY</code> というシークレットに、SSH 秘密鍵の「値」を格納しておいたので、この値を <code>key</code> という名前の「ファイル」として出力します。</p>
+前述の手順で <code>SSH_PRIVATE_KEY</code> というシークレットに、SSH 秘密鍵の「値」を格納しておいたので、この値を <code>key</code> という名前の「ファイル」として出力します。
+<code>${{ runner.temp }}</code> は、ビルド時にテンポラリディレクトリ名に置換されます。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Deploy with rsync</span><span class=w>
 </span><span class=w>  </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=p>&gt;</span><span class=sd>
-</span><span class=sd>    rsync -e &#39;ssh -i key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null&#39;
+</span><span class=sd>    rsync -e &#39;ssh -i ${{ runner.temp }}/key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null&#39;
 </span><span class=sd>    -r -h --delete public/ ${SSH_USER}@${SSH_HOST}:${DST_PATH}</span><span class=w>    
 </span><span class=w>  </span><span class=nt>env</span><span class=p>:</span><span class=w>
 </span><span class=w>    </span><span class=nt>SSH_USER</span><span class=p>:</span><span class=w> </span><span class=l>${{ secrets.SSH_USER }}</span><span class=w>
 </span><span class=w>    </span><span class=nt>SSH_HOST</span><span class=p>:</span><span class=w> </span><span class=l>${{ secrets.SSH_HOST }}</span><span class=w>
 </span><span class=w>    </span><span class=nt>DST_PATH</span><span class=p>:</span><span class=w> </span><span class=l>${{ secrets.DST_PATH }}</span><span class=w>
 </span></code></pre></div><p>最後は <code>rsync</code> によるデプロイ処理ですが、ここは若干複雑です。
-<code>rsync</code> の <code>-e</code> オプションでは、SSH 秘密鍵ファイルの指定 (<code>-i key</code>) と、<code>known_hosts</code> 関連のエラー対策を行っています。</p>
-<pre tabindex=0><code>rsync -e 'ssh -i key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+<code>rsync</code> の <code>-e</code> オプションでは、SSH 秘密鍵ファイルの指定と、<code>known_hosts</code> 関連のエラー対策を行っています。</p>
+<pre tabindex=0><code>rsync -e 'ssh -i ${{ runner.temp }}/key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
 </code></pre><p>SSH で新しいホストに接続しようとすると、<code>known_hosts</code> への接続先ホスト情報の書き込みが行われるのですが、この処理はデフォルトでユーザーに確認を求めるという挙動になっているので、<code>-o StrictHostKeyChecking=no</code> というオプションで、ユーザー確認なしで書き込むようにします。
 さらに、<code>-o UserKnownHostsFile=/dev/null</code> という指定で、実際には <code>known_hosts</code> ファイルには出力せずに、出力を破棄するという振る舞いにしています。
 これらを指定しておかないと、<code>rsync</code> コマンド実行時に、<code>Host key verification failed.</code> というエラーが出て、ジョブが停止してしまいます。
 このあたりは、おまじないのように入れておけばよいと思います。</p>
 <p><code>rsync</code> の残りの部分では、具体的なファイルのコピー方法などを指定しています。</p>
-<pre tabindex=0><code>    -r -h --delete public/ ${SSH_USER}@${SSH_HOST}:${DST_PATH}
+<pre tabindex=0><code>    -av --delete public/ ${SSH_USER}@${SSH_HOST}:${DST_PATH}
   env:
     SSH_USER: ${{ secrets.SSH_USER }}
     SSH_HOST: ${{ secrets.SSH_HOST }}
     DST_PATH: ${{ secrets.DST_PATH }}
 </code></pre><p>ここも用途によって要調整ですが、大体次のような指定を行っています。</p>
 <ul>
-<li><code>-r</code> &mldr; 再帰的にファイルをコピーする</li>
-<li><code>-h</code> &mldr; 人間に読みやすいフォーマットでログ出力する</li>
+<li><code>-a</code> &mldr; アーカイブモードでコピーする（ディレクトリを再帰的に処理し、タイムスタンプやパーミッション情報を維持する）</li>
+<li><code>-v</code> &mldr; ログを詳細に表示する</li>
 <li><code>--delete</code> &mldr; コピー元にないファイルをコピー先から削除する</li>
 <li><code>public/</code> &mldr; コピー元のディレクトリパス
 <ul>
