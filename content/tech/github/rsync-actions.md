@@ -79,11 +79,15 @@ GitHub Actions から SSH 秘密鍵を参照する必要があるので、先に
     -----END OPENSSH PRIVATE KEY-----
     ```
 
-VPS の「ユーザー名」や「接続先アドレス」も念のため隠しておきたいので、次のようなシークレットも追加で登録しておきます。
+VPS の「ユーザー名」や「接続先アドレス」、「コピー先ディレクトリ」も念のため隠しておきたいので、次のようなシークレットも追加で登録しておきます。
 
 - Name: __`SSH_USER`__、Value: VPSのユーザ名 （例: `maku`）
 - Name: __`SSH_HOST`__、Value: VPSのアドレス （例: `www9999xx.sakura.ne.jp`）
 - Name: __`DST_PATH`__、Value: デプロイ先のホームディレクトリからの相対パス （例: `webroot`）
+
+シークレットを 3 つ登録するのが煩わしい場合は、次のように 1 つのシークレットにまとめてしまってもいいかもしれません。
+
+- Name: __`RSYNC_TARGET`__、Value: `maku@www9999xx.sakura.ne.jp:webroot`（例）
 
 
 GitHub Actions のワークフローを作成する
