@@ -1,10 +1,16 @@
-name: Build and deploy website
+name: Build Hugo site and deploy to GitHub Pages
 
 on:
   push:
     branches: [main, master]
   workflow_dispatch:
   workflow_call:
+    inputs:
+      domain:
+        description: 'Custom domain name of this website'
+        default: 'maku.blog'
+        required: false
+        type: string
 
 jobs:
   build:
@@ -15,17 +21,18 @@ jobs:
         submodules: true  # Fetch Hugo themes (true OR recursive)
         fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
 
-    - name: Setup Hugo
-      uses: peaceiris/actions-hugo@v2
+    - uses: peaceiris/actions-hugo@v2
       with:
         hugo-version: '0.92.1'
         extended: true  # Enable scss
 
-    - name: Build
+    - name: Build Hugo site
       run: hugo --minify
 
-    - name: Deploy website
+    - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: public
+          cname: ${{ inputs.domain }}
+
