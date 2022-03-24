@@ -49,7 +49,7 @@ $ yarn add --dev eslint-plugin-react-hooks
 $ yarn add --dev eslint-config-prettier
 
 # npm スクリプトの並列実行用
-$ yarn add --dev yarn-run-all
+$ yarn add --dev npm-run-all
 {{< /code >}}
 
 {{< accordion title="npm の場合" >}}
@@ -112,11 +112,11 @@ rules:
 {{< code lang="js" title="package.json（npm スクリプト設定）" >}}
 // ...
   scripts: {
-    "lint": "run-p -c lint:prettier lint:eslint lint:tsc",
+    "lint": "run-p -c -l lint:**",
     "lint:prettier": "prettier --check .",
     "lint:eslint": "eslint . --ext .ts,.tsx",
     "lint:tsc": "tsc",
-    "fix": "run-s fix:prettier fix:eslint",
+    "fix": "run-s -l fix:**",
     "fix:prettier": "prettier --write .",
     "fix:eslint": "eslint . --ext .ts,.tsx --fix",
 {{< /code >}}
@@ -157,13 +157,13 @@ $ git mv utils src
 
 {{< code lang="diff" title="package.json" >}}
    "scripts": {
-     "lint": "run-p -c lint:prettier lint:eslint lint:tsc",
+     "lint": "run-p -c -l lint:**",
 -    "lint:prettier": "prettier --check .",
 -    "lint:eslint": "eslint . --ext .ts,.tsx",
 +    "lint:prettier": "prettier --check src",
 +    "lint:eslint": "eslint src --ext .ts,.tsx",
      "lint:tsc": "tsc",
-     "fix": "run-s fix:prettier fix:eslint",
+     "fix": "run-s -l fix:**",
 -    "fix:prettier": "prettier --write .",
 -    "fix:eslint": "eslint . --ext .ts,.tsx --fix",
 +    "fix:prettier": "prettier --write src",

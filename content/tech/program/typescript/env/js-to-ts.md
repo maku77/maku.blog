@@ -120,23 +120,26 @@ $ npm install --save-dev npm-run-all  # NPMコマンドの逐次実行
 {
   "scripts": {
     "clean": "rimraf build",
-    "build": "run-s clean build:tsc build:static",
+    "build": "run-s -l clean build:**",
     "build:tsc": "tsc",
     "build:static": "cpx static/** build"
   },
 {{< /code >}}
 
-下記のように `build` スクリプトを実行すると、
+次のように `build` スクリプトを実行すると、
 
 {{< code >}}
 $ npm run build
 {{< /code >}}
 
-次の NPM スクリプトが順番に実行されます（`npm-run-all` パッケージが提供する `run-s` コマンドによって逐次実行が実現されます）。
+`npm-run-all` パッケージが提供する `run-s` コマンドによって、次の NPM スクリプトが逐次実行されます。
+`-l` オプションを付けておくと、ログのプレフィックスとして NPM スクリプト名が表示されてわかりやすくなります。
 
 - `clean`: `build` ディレクトリの削除
 - `build:tsc`: `src` ディレクトリ内の TypeScript コードのトランスパイル
 - `build:static`: `static` ディレクトリ内のファイル群を `build` へコピー
+
+スクリプト名を `build:xxx:yyy` のような形で階層化しておくと、`build:**` という形でまとめて指定できるので便利です（グロブパターンで `**` の代わりに `*` を使うと一階層下のみのスクリプトが選択されます）。
 
 これらの NPM スクリプトは単独で実行することもできます。
 
@@ -144,7 +147,7 @@ $ npm run build
 $ npm run clean
 {{< /code >}}
 
-ここで使用している各種 NPM パッケージの使い方は、下記のサイトで分かりやすく紹介されています。
+ここで使用している各種 NPM パッケージの使い方は、下記のサイトを参考にするとよいです。
 
 - 参考: [まくまく Node.js ノート](https://maku77.github.io/nodejs/)
 

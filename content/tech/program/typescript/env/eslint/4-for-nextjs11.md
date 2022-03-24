@@ -96,19 +96,19 @@ $ npx eslint src --ext .ts,.tsx
 {
   "scripts": {
     // ...
-    "lint": "run-p -c lint:prettier lint:eslint lint:tsc",
+    "lint": "run-p -c -l lint:**",
     "lint:prettier": "prettier --check src",
     "lint:eslint": "eslint src --ext .ts,.tsx",
     "lint:tsc": "tsc",
-    "fix": "run-s fix:prettier fix:eslint",
+    "fix": "run-s -l fix:**",
     "fix:prettier": "prettier --write src",
     "fix:eslint": "eslint src --ext .ts,.tsx --fix",
     // ...
 {{< /code >}}
 
-上記で使用している `run-p` や `run-s` は、複数の npm-scripts を並列 or 順次実行するためのコマンドで、`npm-run-all` や `yarn-run-all` パッケージをインストールすると使えるようになります。
+上記で使用している `run-p` や `run-s` は、複数の npm-scripts を並列 or 順次実行するためのコマンドで、`npm-run-all` パッケージをインストールすると使えるようになります。
 
 {{< code >}}
-$ yarn add yarn-run-all --dev
+$ yarn add npm-run-all --dev
 {{< /code >}}
 
