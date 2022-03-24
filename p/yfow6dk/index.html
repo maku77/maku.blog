@@ -12,7 +12,7 @@
 <meta property="og:image" content="https://maku.blog/assets/img/site-logo-large.png">
 <meta property="og:description" content="ここでは、とにかく混乱しがちな ESLint + Prettier の設定方法をまとめておきます。 まず、基本的な構成として、TypeScript (with React) の Lint をかけられるようにして、必要に応じて Airbnb スタイル を追加で設定する、という流れにしたいと思います。
 TypeScript プロジェクトの準備 前提条件として、TypeScript (+ React) のプロジェクト自体は作成済みとします。 何も準備できていなければ、Next.js の create-next-app コマンドを使うと簡単に作成できます（typescript および @types/node、@types/react、@types/react-dom などの型情報が導入された状態のプロジェクトが作成されます）。
-2 つやり方あるけど、大体中身は同じ # テンプレートを使う方法 $ create-next-app myapp --example with-typescript # typescript オプションを使う方法 $ create-next-app myapp --typescript  参考リンク  Next.js で HelloWorld（プロジェクト作成からサーバー起動まで） Next.js のプロジェクトを TypeScript 化する   Prettier + ESLint の基本設定 (for TypeScript with React) 必要なパッケージのインストール # Prettier 本体 $ yarn add --dev --exact prettier # ESLint 本体 $ yarn add --dev eslint # ESLint 用のプラグインおよび共有設定 $ yarn add --dev @typescript-eslint/eslint-plugin $ yarn add --dev @typescript-eslint/parser $ yarn add --dev eslint-plugin-react $ yarn add --dev eslint-plugin-react-hooks $ yarn add --dev eslint-config-prettier # npm スクリプトの並列実行用 $ yarn add --dev yarn-run-all  npm の場合 # Prettier 本体 $ npm install prettier --save-dev --save-exact # ESLint 本体 $ npm install eslint --save-dev # ESLint 用のプラグインおよび共有設定 $ npm install @typescript-eslint/eslint-plugin --save-dev $ npm install @typescript-eslint/parser --save-dev $ npm install eslint-plugin-react --save-dev $ npm install eslint-plugin-react-hooks --save-dev $ npm install eslint-config-prettier --save-dev # npm スクリプトの並列実行用 $ npm install npm-run-all --save-dev    .">
+2 つやり方あるけど、大体中身は同じ # テンプレートを使う方法 $ create-next-app myapp --example with-typescript # typescript オプションを使う方法 $ create-next-app myapp --typescript  参考リンク  Next.js で HelloWorld（プロジェクト作成からサーバー起動まで） Next.js のプロジェクトを TypeScript 化する   Prettier + ESLint の基本設定 (for TypeScript with React) 必要なパッケージのインストール # Prettier 本体 $ yarn add --dev --exact prettier # ESLint 本体 $ yarn add --dev eslint # ESLint 用のプラグインおよび共有設定 $ yarn add --dev @typescript-eslint/eslint-plugin $ yarn add --dev @typescript-eslint/parser $ yarn add --dev eslint-plugin-react $ yarn add --dev eslint-plugin-react-hooks $ yarn add --dev eslint-config-prettier # npm スクリプトの並列実行用 $ yarn add --dev npm-run-all  npm の場合 # Prettier 本体 $ npm install prettier --save-dev --save-exact # ESLint 本体 $ npm install eslint --save-dev # ESLint 用のプラグインおよび共有設定 $ npm install @typescript-eslint/eslint-plugin --save-dev $ npm install @typescript-eslint/parser --save-dev $ npm install eslint-plugin-react --save-dev $ npm install eslint-plugin-react-hooks --save-dev $ npm install eslint-config-prettier --save-dev # npm スクリプトの並列実行用 $ npm install npm-run-all --save-dev    .">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -560,11 +560,11 @@ $ yarn add --dev eslint-plugin-react-hooks
 $ yarn add --dev eslint-config-prettier
 
 # npm スクリプトの並列実行用
-$ yarn add --dev yarn-run-all</code></pre></div></div>
+$ yarn add --dev npm-run-all</code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-726891354 type=checkbox>
-<label class=xAccordion_title for=id-726891354>npm の場合</label>
+<input id=id-541967823 type=checkbox>
+<label class=xAccordion_title for=id-541967823>npm の場合</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain># Prettier 本体
@@ -626,11 +626,11 @@ build/
 <figcaption class=xCodeBlock_title>package.json（npm スクリプト設定）</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=c1>// ...
 </span><span class=c1></span>  <span class=nx>scripts</span><span class=o>:</span> <span class=p>{</span>
-    <span class=s2>&#34;lint&#34;</span><span class=o>:</span> <span class=s2>&#34;run-p -c lint:prettier lint:eslint lint:tsc&#34;</span><span class=p>,</span>
+    <span class=s2>&#34;lint&#34;</span><span class=o>:</span> <span class=s2>&#34;run-p -c -l lint:**&#34;</span><span class=p>,</span>
     <span class=s2>&#34;lint:prettier&#34;</span><span class=o>:</span> <span class=s2>&#34;prettier --check .&#34;</span><span class=p>,</span>
     <span class=s2>&#34;lint:eslint&#34;</span><span class=o>:</span> <span class=s2>&#34;eslint . --ext .ts,.tsx&#34;</span><span class=p>,</span>
     <span class=s2>&#34;lint:tsc&#34;</span><span class=o>:</span> <span class=s2>&#34;tsc&#34;</span><span class=p>,</span>
-    <span class=s2>&#34;fix&#34;</span><span class=o>:</span> <span class=s2>&#34;run-s fix:prettier fix:eslint&#34;</span><span class=p>,</span>
+    <span class=s2>&#34;fix&#34;</span><span class=o>:</span> <span class=s2>&#34;run-s -l fix:**&#34;</span><span class=p>,</span>
     <span class=s2>&#34;fix:prettier&#34;</span><span class=o>:</span> <span class=s2>&#34;prettier --write .&#34;</span><span class=p>,</span>
     <span class=s2>&#34;fix:eslint&#34;</span><span class=o>:</span> <span class=s2>&#34;eslint . --ext .ts,.tsx --fix&#34;</span><span class=p>,</span></code></pre></div></div>
 </figure>
@@ -663,13 +663,13 @@ $ git mv utils src</code></pre></div></div>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>package.json</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-diff data-lang=diff>   &#34;scripts&#34;: {
-     &#34;lint&#34;: &#34;run-p -c lint:prettier lint:eslint lint:tsc&#34;,
+     &#34;lint&#34;: &#34;run-p -c -l lint:**&#34;,
 <span class=gd>-    &#34;lint:prettier&#34;: &#34;prettier --check .&#34;,
 </span><span class=gd>-    &#34;lint:eslint&#34;: &#34;eslint . --ext .ts,.tsx&#34;,
 </span><span class=gd></span><span class=gi>+    &#34;lint:prettier&#34;: &#34;prettier --check src&#34;,
 </span><span class=gi>+    &#34;lint:eslint&#34;: &#34;eslint src --ext .ts,.tsx&#34;,
 </span><span class=gi></span>     &#34;lint:tsc&#34;: &#34;tsc&#34;,
-     &#34;fix&#34;: &#34;run-s fix:prettier fix:eslint&#34;,
+     &#34;fix&#34;: &#34;run-s -l fix:**&#34;,
 <span class=gd>-    &#34;fix:prettier&#34;: &#34;prettier --write .&#34;,
 </span><span class=gd>-    &#34;fix:eslint&#34;: &#34;eslint . --ext .ts,.tsx --fix&#34;,
 </span><span class=gd></span><span class=gi>+    &#34;fix:prettier&#34;: &#34;prettier --write src&#34;,
@@ -713,8 +713,8 @@ $ yarn add --dev eslint-plugin-import
 $ yarn add --dev eslint-plugin-jsx-a11y</code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-891364275 type=checkbox>
-<label class=xAccordion_title for=id-891364275>npm の場合</label>
+<input id=id-975183264 type=checkbox>
+<label class=xAccordion_title for=id-975183264>npm の場合</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ npm install eslint-config-airbnb-typescript --save-dev
