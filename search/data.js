@@ -2,7 +2,7 @@ var data = [
 {
 url: "/p/ujqinda/",
 title: "プログラミング",
-date: "2022-02-22T00:00:00Z",
+date: "2022-04-04T00:00:00Z",
 body: "プログラミング"
 },
 {
@@ -1358,7 +1358,7 @@ body: "Lambda 実装例: S3 へのアップロードを SNS で通知して Lamb
 {
 url: "/p/tx6md39/",
 title: "TypeScriptの環境/設定について",
-date: "2021-07-19T00:00:00Z",
+date: "2022-04-04T00:00:00Z",
 body: "TypeScriptの環境/設定について"
 },
 {
@@ -1476,22 +1476,34 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
-url: "/p/ryq6it6/",
-title: "NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ",
-date: "2022-03-16T00:00:00Z",
-body: "NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ name, version フィールド name と version フィールドは、パッケージを公開するつもりがないなら指定する必要はありません。 description フィールド description プロパティは、ユーザーがこのパッケージを探しやすくするための説明文で、npm search を実行したときに表示されます。 パッケージ対象外にするファイル (.npmignore / .gitignore) NPM パッケージを作るときに、.npmignore に書かれたファイルはパッケージングされなくなります。 .npmignore ファイルがない場合は、.gitignore ファイルが代わりに参照されます。 これらの設定にかかわらず、下記のファイルは必ずパッケージングされます。 package.json README（大文字小文字と拡張子は問わない） CHANGES / CHANGELOG / HISTORY（大文字小文字と拡張子は問わない） LICENSE / LICENCE（大文字小文字と拡張子は問わない） NOTICE（大文字小文字と拡張子は問わない） main フィールドで指定されたファイル bin フィールド NPM パッケージで何らかの実行コマンドを提供したいときは、bin フィールドを使用します。 例えば、mycommand コマンドを提供するときは次のように記述します。 { // ... \u0026#34;bin\u0026#34;: { \u0026#34;mycommand\u0026#34;: \u0026#34;./cli.js\u0026#34; } } 単独のコマンドをインストールするための NPM パッケージを作る場合は、bin フィールドのコマンド名を省略して次のように記述できます。 { \u0026#34;name\u0026#34;: \u0026#34;mycommand\u0026#34;, \u0026#34;version\u0026#34;: \u0026#34;1.2.5\u0026#34;, \u0026#34;bin\u0026#34;: \u0026#34;./path/to/program.js\u0026#34; } 上記の bin フィールドは次のように記述するのと同様に振舞います。 { // ... \u0026#34;bin\u0026#34;: { \u0026#34;mycommand\u0026#34;: \u0026#34;./path/to/program.js\u0026#34; } } repository repository フィールドでは、ソースコードの場所を示すことができます。 例えば、GitHub のリポジトリで管理している場合は次のような感じ。 { // ... \u0026#34;repository\u0026#34;: { \u0026#34;type\u0026#34;: \u0026#34;git\u0026#34;, \u0026#34;url\u0026#34;: \u0026#34;https://github.com/maku77/myapp.git\u0026#34; } } npm 1.1.65 移行は、url 部分は省略して次のように書くことができます。 { // ... \u0026#34;repository\u0026#34;: { \u0026#34;type\u0026#34;: \u0026#34;git\u0026#34;, \u0026#34;url\u0026#34;: \u0026#34;maku77/myapp\u0026#34; } }"
+url: "/p/9xxpe4t/",
+title: "Jest で TypeScript コードのユニットテストを記述する",
+date: "2022-04-04T00:00:00Z",
+body: "Jest で TypeScript コードのユニットテストを記述する Jest とは Jest は Facebook が公開した JavaScript 用のシンプルなテストフレームワークで、Node.js 環境で実行することができます。 Jest · 🃏 Delightful JavaScript Testing Jest は下記のような特徴を持っています。 ゼロコンフィグで使い始められる（設定ファイルなしで実行可能） テストを並列実行するので高速 コードカバレッジレポートの出力を標準搭載 わかりやすいマッチャー表現 (expect ～ toBe、toContain など、自然な文章として読める） TypeScript に対応（ts-jest を利用） Jest 用のテストコードは、次のようなコードジェネレーターでも採用されており、利用者は増え続けています（2022 年現在）。 create-react-app \u0026hellip; React アプリのジェネレーター cdk init app \u0026hellip; AWS のインフラ生成コードのジェネレーター Jest のインストール Jest 本体の jest モジュールをインストールします。 TypeScript を使用する場合は、Jest ライブラリの型情報である @types/jest と、Jest 用の TypeScript プロセッサ (ts-jest) もインストールする必要があります。 これらはすべてテスト時のみ使用する NPM モジュールなので、devDependencies としてインストールします。 Jest 本体と TypeScript 関連モジュールをインストール ### npm の場合 $ npm install --save-dev jest @types/jest ts-jest ### yarn の場合 $ yarn add --dev jest @types/jest ts-jest package.json の修正 Jest によるテストを簡単に起動できるように、package.json に NPM スクリプト (test) を定義しておきます。 あと、Jest が TypeScript のコードを理解できるように、jest.preset に ts-jest を設定しておきます。 これを設定しておかないと、import 構文などを理解できなくてエラーになります。 package.json { // ... \u0026#34;scripts\u0026#34;: { // ... \u0026#34;test\u0026#34;: \u0026#34;jest\u0026#34; }, \u0026#34;jest\u0026#34;: { \u0026#34;preset\u0026#34;: \u0026#34;ts-jest\u0026#34; } } 上記の jest プロパティの値は、jest.config.js という別ファイルとして定義することもできます。 jest.config.js（これがあればこちらが優先される） module.exports = { preset: \u0026#39;ts-jest\u0026#39;, } これで、次のようにユニットテストを起動できます。 $ yarn test # yarn の場合 $ npm test # npm の場合 最初は何もテストコードがないので、実行しても次のようなエラーで終了するはずです（終了コード 1 はコマンドが失敗したことを表します）。 $ yarn -s test No tests found, exiting with code 1 テストがないときにエラーにならないようにするには、--passWithNoTests オプションを付けて実行します。 自動ビルド環境などで、常に yarn test は実行しておきたい場合にお世話になるかもしれません。 $ yarn -s jest --passWithNoTests No tests found, exiting with code 0 テストの記述 ここでは、次のような計算ライブラリをテスト対象のコードとして使うことにします。 src/math.ts（テスト対象） export function add(a: number, b: number): number { return a + b } Jest はデフォルトで次のようなファイルを検索してテストコードとして実行します。 拡張子が .test.ts (.test.js) のファイル 拡張子が .spec.ts (.spec.js) のファイル __test__ ディレクトリ以下に配置した .ts (.js) ファイル 前述の計算ライブラリ (math.ts) をテストするためのテストコードを、math.test.ts というファイル名で作成します。 ファイル名のベース部分 (math) はテスト対象のファイル名と合わせておくと分かりやすいでしょう。 src/math.test.ts（テストコード） import { add } from \u0026#39;./math\u0026#39; test(\u0026#39;add - positives\u0026#39;, () =\u0026gt; { const result = add(1, 2) expect(result).toBe(3) }) test(\u0026#39;add - negatives\u0026#39;, () =\u0026gt; { const result = add(-1, -2) expect(result).toBe(-3) }) テストコード内では、上記のように test(テスト名, テスト内容) という形で各テストを定義します（test の代わりに it も使えます）。 計算結果の検証は、expect(実行結果).toBe(期待結果) のように記述します。 次のようにテストを起動できます（yarn の出力をシンプルにするために -s オプションを指定しています）。 $ yarn -s test PASS src/math.test.ts √ add - positives (1 ms) √ add - negatives Test Suites: 1 passed, 1 total Tests: 2 passed, 2 total Snapshots: 0 total Time: 2.316 s, estimated 3 s Ran all test suites. すべてのテストが通りました！ さらに、--coverage オプションを付けて実行することで、テストカバレッジのレポートを出力することができます。 テスト対象となったソースコードのうち何％がテストでカバーされているかを表示してくれます。 $ yarn -s test --coverage PASS src/math.test.ts √ add - positives (2 ms) √ add - negatives (1 ms) ----------|---------|----------|---------|---------|------------------- File | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s ----------|---------|----------|---------|---------|------------------- All files | 100 | 100 | 100 | 100 | math.ts | 100 | 100 | 100 | 100 | ----------|---------|----------|---------|---------|------------------- Test Suites: 1 passed, 1 total Tests: 2 passed, 2 total Snapshots: 0 total Time: 3.201 s Ran all test suites. Jest のマッチャー expect(add(1, 2)).toBe(3) 上記の検証コードの toBe の部分は マッチャー と呼ばれており、toBe 以外にも次のようなマッチャーが用意されています。 真偽値や null との比較 toBeTruthy() \u0026hellip; 値が true であることを確認する toBeFalthy() \u0026hellip; 値が false であることを確認する toBeNull() \u0026hellip; 値が null であることを確認する toBeUndefined() \u0026hellip; 値が undefined であることを確認する toBeDefined() \u0026hellip; 値が undefined でないことを確認する test(\u0026#39;null\u0026#39;, () =\u0026gt; { const n = null expect(n).toBeNull() }) 否定 (not) not を使うと、条件を反転できます。 expect(1).not.toBeNull() 数値の比較 数値の同値比較には toBe あるいは toEqual が使えますが、大小比較用のマッチャーも用意されています。 test(\u0026#39;two plus two\u0026#39;, () =\u0026gt; { const value = 2 + 2 expect(value).toBe(4) expect(value).toBeGreaterThan(3) expect(value).toBeGreaterThanOrEqual(3.5) expect(value).toBeLessThan(5) expect(value).toBeLessThanOrEqual(4.5) }) 浮動小数点数の同値比較には、toBe ではなく toBeCloseTo を使うようにします。 test(\u0026#39;add floating point numbers\u0026#39;, () =\u0026gt; { const value = 0.1 + 0.2 expect(value).toBeCloseTo(0.3) // Do not use \u0026#39;toBe\u0026#39; }) 正規表現 文字列が正規表現に一致するかを調べるには、toMatch を使用します。 次の例では、チーム名が team- プレフィックスで始まっているかを調べています。 test(\u0026#39;starts with \u0026#34;team-\u0026#34; prefix\u0026#39;, () =\u0026gt; { const teamName = \u0026#39;team-xxx\u0026#39; expect(teamName).toMatch(/^team-/); }) 配列、セットのテスト 配列やセットの内容が等しいことを確認するには、toEqual を使います。 toBe を使うと参照の比較になってしまうので、toEqual で実際の値を比較するようにします。 // 配列の比較 const arr = [1, 2, 3] expect(arr).toEqual([1, 2, 3]) // セットの比較 const set = new Set([1, 2, 3]) expect(set).toEqual(new Set([1, 2, 3])) 配列やセットに特定の値が含まれているかどうかを調べるには、toContain を使います。 test(`contain 200`, () =\u0026gt; { const arr = [100, 200, 300] expect(arr).toContain(200) }) 指定した複数の値がすべて含まれているかどうかを調べるには、ちょっと複雑ですが、expect.arrayContaining を組み合わせて次のようにします。 const arr = [1, 2, 3, 4, 5] expect(arr).toEqual(expect.arrayContaining([3, 5, 1])) 例外のスロー ある関数が例外を投げるかどうかを調べるには、toThrow を使用します。 テスト対象の関数が expect 内で呼び出されるように、ラムダ式の形で渡すことに注意してください。 function foo() { throw new Error() } test(`foo throws exeception`, () =\u0026gt; { expect(() =\u0026gt; foo()).toThrow() // 何らかの例外をスローすることを確認 expect(() =\u0026gt; foo()).toThrow(Error) // Error をスローすることを確認 }) その他のマッチャー マッチャーの詳細は、expect API のページで確認することができます。"
+},
+{
+url: "/p/gqo9yoo/",
+title: "TypeScript メモ",
+date: "2022-04-04T00:00:00Z",
+body: "TypeScript メモ"
 },
 {
 url: "/",
 title: "まくろぐ",
-date: "2022-03-16T00:00:00Z",
+date: "2022-04-04T00:00:00Z",
 body: "まくろぐ"
 },
 {
 url: "/p/3ftx6b2/",
 title: "技術系のメモ",
-date: "2022-03-16T00:00:00Z",
+date: "2022-04-04T00:00:00Z",
 body: "技術系のメモ"
+},
+{
+url: "/p/ryq6it6/",
+title: "NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ",
+date: "2022-03-16T00:00:00Z",
+body: "NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ name, version フィールド name と version フィールドは、パッケージを公開するつもりがないなら指定する必要はありません。 description フィールド description プロパティは、ユーザーがこのパッケージを探しやすくするための説明文で、npm search を実行したときに表示されます。 パッケージ対象外にするファイル (.npmignore / .gitignore) NPM パッケージを作るときに、.npmignore に書かれたファイルはパッケージングされなくなります。 .npmignore ファイルがない場合は、.gitignore ファイルが代わりに参照されます。 これらの設定にかかわらず、下記のファイルは必ずパッケージングされます。 package.json README（大文字小文字と拡張子は問わない） CHANGES / CHANGELOG / HISTORY（大文字小文字と拡張子は問わない） LICENSE / LICENCE（大文字小文字と拡張子は問わない） NOTICE（大文字小文字と拡張子は問わない） main フィールドで指定されたファイル bin フィールド NPM パッケージで何らかの実行コマンドを提供したいときは、bin フィールドを使用します。 例えば、mycommand コマンドを提供するときは次のように記述します。 { // ... \u0026#34;bin\u0026#34;: { \u0026#34;mycommand\u0026#34;: \u0026#34;./cli.js\u0026#34; } } 単独のコマンドをインストールするための NPM パッケージを作る場合は、bin フィールドのコマンド名を省略して次のように記述できます。 { \u0026#34;name\u0026#34;: \u0026#34;mycommand\u0026#34;, \u0026#34;version\u0026#34;: \u0026#34;1.2.5\u0026#34;, \u0026#34;bin\u0026#34;: \u0026#34;./path/to/program.js\u0026#34; } 上記の bin フィールドは次のように記述するのと同様に振舞います。 { // ... \u0026#34;bin\u0026#34;: { \u0026#34;mycommand\u0026#34;: \u0026#34;./path/to/program.js\u0026#34; } } repository repository フィールドでは、ソースコードの場所を示すことができます。 例えば、GitHub のリポジトリで管理している場合は次のような感じ。 { // ... \u0026#34;repository\u0026#34;: { \u0026#34;type\u0026#34;: \u0026#34;git\u0026#34;, \u0026#34;url\u0026#34;: \u0026#34;https://github.com/maku77/myapp.git\u0026#34; } } npm 1.1.65 移行は、url 部分は省略して次のように書くことができます。 { // ... \u0026#34;repository\u0026#34;: { \u0026#34;type\u0026#34;: \u0026#34;git\u0026#34;, \u0026#34;url\u0026#34;: \u0026#34;maku77/myapp\u0026#34; } }"
 },
 {
 url: "/p/6p3dox9/",
@@ -1552,12 +1564,6 @@ url: "/p/2mzbmw8/",
 title: "Linux コマンド: ssh-id-copy で SSH の公開鍵をリモートホストに登録する",
 date: "2022-02-17T00:00:00Z",
 body: "Linux コマンド: ssh-id-copy で SSH の公開鍵をリモートホストに登録する ssh-id-copy とは SSH で公開鍵認証方式を使ってリモートホストに接続するには、リモートホスト側の ~/.ssh/authorized_keys ファイルに公開鍵を書き込んでおく必要がありますが、ssh-copy-id コマンドを使うと、この作業を一撃で済ますことができます。 ssh-copy-id コマンドは Linux 環境であれば標準でインストールされているはずです。 前提条件として、パスワード認証で SSH 接続できる状態にはしておく必要があります。 （必要があれば）鍵ファイルの作成 (ssh-keygen) 接続元のマシンに次のような秘密鍵＆公開鍵のペアが存在しないときは、ssh-keygen コマンドなどで作成しておきます。 ~/.ssh/id_rsa \u0026hellip; 秘密鍵 ~/.ssh/id_rsa.pub \u0026hellip; 公開鍵（これをリモートホストに登録します） 秘密鍵と公開鍵を生成する $ ssh-keygen Generating public/private rsa key pair. Enter file in which to save the key (/Users/maku/.ssh/id_rsa): （このパスでよければ Enter） Enter passphrase (empty for no passphrase): （鍵のパスワードを入力） Enter same passphrase again: （パスワードを再入力） Your identification has been saved in /Users/maku/.ssh/id_rsa. Your public key has been saved in /Users/maku/.ssh/id_rsa.pub. The key fingerprint is: SHA256:hmOfShQhPstmuGyB3qj0wpdosKXD82ibJs+7Jsb+wSl maku@makumac.local The key\u0026#39;s randomart image is: +---[RSA 3072]----+ | | | | |o.* * . | |O O O = S | |o . . . | |.@ o * . . | |oB * B o | | *E+o+ | |++oOOo | +----[SHA256]-----+ リモートホストに公開鍵を登録する (ssh-copy-id) 公開鍵の準備ができたら、ssh-copy-id コマンドでリモートホストの ~/.ssh/authorized_keys に書き込みます。 最初は、-n オプションをつけて dry-run 実行してみるのがよいです。 実際には実行されませんが、どの公開鍵が登録されるかを確認できます。 dry-run 実行 $ ssh-copy-id -n user@192.168.1.20 /usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: \u0026#34;/Users/maku/.ssh/id_rsa.pub\u0026#34; /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys =-=-=-=-=-=-=-= Would have added the following key(s): ssh-rsa AAAAB3NzaCn21Bq...(省略)...Qu4cIuQFG92hxMqU= maku@makumac.local =-=-=-=-=-=-=-= 公開鍵ファイルは、デフォルトで ~/.ssh/id*.pub というファイルが検索されて使用されますが、-i オプションで明示することもできます。 $ ssh-copy-id -n -i ~/.ssh/id_rsa_XXX.pub user@192.168.1.20 登録内容に問題なさそうであれば、今度は -n オプションを外して実際に実行します。 ここでは、まだパスワード認証が使われるので、リモートホスト側のユーザーのパスワードを入力する必要があります。 $ ssh-copy-id user@192.168.1.20 /usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: \u0026#34;/Users/maku/.ssh/id_rsa.pub\u0026#34; /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys user@192.168.1.20\u0026#39;s password: （リモートホストのユーザーのパスワードを入力） Number of key(s) added: 1 Now try logging into the machine, with: \u0026#34;ssh \u0026#39;user@192.168.1.20\u0026#39;\u0026#34; and check to make sure that only the key(s) you wanted were added. これで、ssh コマンド実行時に SSH 鍵を使って（公開鍵認証方式で） 接続するようになります。 $ ssh user@192.168.1.20 Enter passphrase for key \u0026#39;/Users/maku/.ssh/id_rsa\u0026#39;: （SSH鍵のパスワードを入力） ssh-copy-id で -i オプションを使って標準と異なる名前の公開鍵を登録した場合は、ssh で接続するときも -i オプションを使って対となる秘密鍵を指定します。 $ ssh -i ~/.ssh/id_rsa_XXX user@192.168.1.20 SSH 鍵のパスワード入力に失敗すると、従来のリモートホストのパスワード認証が実行されますが、この振る舞いは後述のように無効化することができます。 パスワード認証を無効にする SSH 鍵でリモートホストに接続できるようになったら、パスワード認証による接続は無効にしておくと安全です。 次のように vim や nano エディタで SSH デーモンの設定ファイルを開き、 $ sudo vim /etc/ssh/sshd_config 下記の行を修正して保存します。 PasswordAuthentication yes ↓ PasswordAuthentication no あとは、SSH デーモンを再起動して反映します。 $ sudo systemctl restart ssh （おまけ）ssh-copy-id を使わずに authorized_keys に登録する場合 何らかの理由で ssh-copy-id コマンドが使えない場合は、次のようにして ssh コマンド経由で公開鍵を登録することができます。 $ cat ~/.ssh/id_rsa.pub | ssh user@192.168.1.20 \u0026#34;cat \u0026gt;\u0026gt; ~/.ssh/authorized_keys\u0026#34; こちらでも簡単に登録できますが、~/.ssh ディレクトリが存在しない場合は先に作成しておくなどの対応が必要になってくるので、できれば ssh-copy-id コマンドを使った方がよいです。"
-},
-{
-url: "/p/gqo9yoo/",
-title: "TypeScript メモ",
-date: "2022-02-08T00:00:00Z",
-body: "TypeScript メモ"
 },
 {
 url: "/p/9t6gr3c/",
