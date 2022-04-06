@@ -4,6 +4,7 @@ url: "/p/24p8jjx"
 date: "2021-06-09"
 lastmod: "2021-11-01"
 tags: ["AWS", "AWS/Amplify", "AWS/Cognito"]
+weight: 3
 ---
 
 認証済みユーザーが admin グループに属しているか調べて UI を切り替える
