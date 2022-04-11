@@ -43,7 +43,11 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
-<a href=./p/>Go 言語で AWS SDK を使う開発環境を整える
+<a href=./p/nej9wjb/>Go 言語と AWS SDK V2 で Amazon Cognito を操作する
+<time>2022-04-11</time></a>
+</div>
+<div class=xBoxLink>
+<a href=./p/xnogqgm/>Go 言語で AWS SDK を使う開発環境を整える
 <time>2022-04-11</time></a>
 </div>
 <div class=xBoxLink>
@@ -57,10 +61,6 @@
 <div class=xBoxLink>
 <a href=./p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う
 <time>2022-03-17</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/ryq6it6/>NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ
-<time>2022-03-16</time></a>
 </div>
 </div>
 </div>
@@ -90,7 +90,7 @@
 </div><div class=xMenu_tag>
 <a href=./tags/typescript>typescript (58)</a>
 </div><div class=xMenu_tag>
-<a href=./tags/aws>aws (53)</a>
+<a href=./tags/aws>aws (54)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
 </div><div class=xMenu_tag>
@@ -130,6 +130,8 @@
 </div><div class=xMenu_tag>
 <a href=./tags/android>android (10)</a>
 </div><div class=xMenu_tag>
+<a href=./tags/aws/cognito>aws/cognito (10)</a>
+</div><div class=xMenu_tag>
 <a href=./tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
@@ -147,8 +149,6 @@
 <a href=./tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/3d>3d (8)</a>
-</div><div class=xMenu_tag>
-<a href=./tags/aws/cognito>aws/cognito (8)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/aws/lambda>aws/lambda (8)</a>
 </div><div class=xMenu_tag>
@@ -421,11 +421,11 @@
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
-<a href=./p/>Go 言語で AWS SDK を使う開発環境を整える<span class=xRecents_item_tag>AWS</span><span class=xRecents_item_tag>Go</span><time>2022-04-11</time></a>
+<a href=./p/nej9wjb/>Go 言語と AWS SDK V2 で Amazon Cognito を操作する<span class=xRecents_item_tag>AWS</span><span class=xRecents_item_tag>AWS/Cognito</span><time>2022-04-11</time></a>
+</div><div class=xRecents_item>
+<a href=./p/xnogqgm/>Go 言語で AWS SDK を使う開発環境を整える<span class=xRecents_item_tag>AWS</span><span class=xRecents_item_tag>Go</span><time>2022-04-11</time></a>
 </div><div class=xRecents_item>
 <a href=./p/yzjj4c7/>Amazon Cognito をコマンドライン (CLI) から操作する<span class=xRecents_item_tag>AWS</span><span class=xRecents_item_tag>AWS/Cognito</span><time>2022-04-06</time></a>
-</div><div class=xRecents_item>
-<a href=./p/9xxpe4t/>Jest で TypeScript コードのユニットテストを記述する<span class=xRecents_item_tag>ユニットテスト</span><span class=xRecents_item_tag>Jest</span><span class=xRecents_item_tag>TypeScript</span><time>2022-04-04</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -438,8 +438,242 @@
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=./p/7s7hs4e/>AWS</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/yz2h95y/>Cognito</a></span></div>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/nej9wjb/>Go 言語と AWS SDK V2 で Amazon Cognito を操作する</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/aws>AWS</a></span>
+<span class=xPageTags_item><a href=./tags/aws/cognito>AWS/Cognito</a></span>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-04-11>2022-04-11</time><br>
+作成: <time itemprop=datePublished datetime=2022-04-11>2022-04-11</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#指定したユーザープール内のユーザーリストを取得する-listusers>指定したユーザープール内のユーザーリストを取得する (ListUsers)</a></li>
+<li><a href=#ユーザーのパスワードを変更する-adminsetuserpassword>ユーザーのパスワードを変更する (AdminSetUserPassword)</a></li>
+<li><a href=#ユーザー名とパスワードで認証して-id-トークンとアクセストークンを取得する-admininitiateauth>ユーザー名とパスワードで認証して ID トークンとアクセストークンを取得する (AdminInitiateAuth)</a></li>
+</ul>
+</nav><p>ここでは、AWS SDK for Go V2 を使って、Go 言語から Amazon Cognito を操作するサンプルコードを示します。
+<a href=./p/xnogqgm>Go 言語で AWS SDK を使うための開発環境</a> は構築済みとします。</p>
+<h2 id=指定したユーザープール内のユーザーリストを取得する-listusers>指定したユーザープール内のユーザーリストを取得する (ListUsers)</h2>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>list_users.go</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
+
+<span class=kn>import</span> <span class=p>(</span>
+	<span class=s>&#34;context&#34;</span>
+	<span class=s>&#34;fmt&#34;</span>
+
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/aws&#34;</span>
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/config&#34;</span>
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider&#34;</span>
+<span class=p>)</span>
+
+<span class=kd>var</span> <span class=nx>userPoolId</span> <span class=p>=</span> <span class=s>&#34;ap-northeast-1_XXXXXXXXX&#34;</span> <span class=c1>// ユーザープールの ID
+</span><span class=c1></span>
+<span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+	<span class=nf>listUsers</span><span class=p>()</span>
+<span class=p>}</span>
+
+<span class=kd>func</span> <span class=nf>listUsers</span><span class=p>()</span> <span class=p>{</span>
+	<span class=nx>client</span> <span class=o>:=</span> <span class=nx>cognitoidentityprovider</span><span class=p>.</span><span class=nf>NewFromConfig</span><span class=p>(</span><span class=nf>loadAwsConfig</span><span class=p>())</span>
+	<span class=nx>input</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>cognitoidentityprovider</span><span class=p>.</span><span class=nx>ListUsersInput</span> <span class=p>{</span>
+		<span class=nx>UserPoolId</span><span class=p>:</span> <span class=o>&amp;</span><span class=nx>userPoolId</span><span class=p>,</span>
+	<span class=p>}</span>
+	<span class=nx>output</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>client</span><span class=p>.</span><span class=nf>ListUsers</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>TODO</span><span class=p>(),</span> <span class=nx>input</span><span class=p>)</span>
+	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nb>panic</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+	<span class=p>}</span>
+	<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>user</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>output</span><span class=p>.</span><span class=nx>Users</span> <span class=p>{</span>
+		<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;%s, %s\n&#34;</span><span class=p>,</span> <span class=nx>user</span><span class=p>.</span><span class=nx>UserCreateDate</span><span class=p>,</span> <span class=o>*</span><span class=nx>user</span><span class=p>.</span><span class=nx>Username</span><span class=p>)</span>
+	<span class=p>}</span>
+	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;Found %d users\n&#34;</span><span class=p>,</span> <span class=nb>len</span><span class=p>(</span><span class=nx>output</span><span class=p>.</span><span class=nx>Users</span><span class=p>))</span>
+<span class=p>}</span>
+
+<span class=c1>// 外部リソース（~/.aws/config など）からコンフィグ情報 (aws.Config) を生成します。
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>loadAwsConfig</span><span class=p>()</span> <span class=nx>aws</span><span class=p>.</span><span class=nx>Config</span> <span class=p>{</span>
+	<span class=nx>cfg</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>config</span><span class=p>.</span><span class=nf>LoadDefaultConfig</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>TODO</span><span class=p>())</span>
+	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nb>panic</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=nx>cfg</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>go run list_users.go
+<span class=go>2021-11-25 06:37:28.751 +0000 UTC, user-name-1
+</span><span class=go>2021-10-28 02:34:29.485 +0000 UTC, user-name-2
+</span><span class=go>2021-11-30 13:49:28.566 +0000 UTC, user-name-3
+</span><span class=go>Found 3 users
+</span></code></pre></div></div>
+</figure>
+<h2 id=ユーザーのパスワードを変更する-adminsetuserpassword>ユーザーのパスワードを変更する (AdminSetUserPassword)</h2>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
+
+<span class=kn>import</span> <span class=p>(</span>
+	<span class=s>&#34;context&#34;</span>
+	<span class=s>&#34;fmt&#34;</span>
+
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/aws&#34;</span>
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/config&#34;</span>
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider&#34;</span>
+<span class=p>)</span>
+
+<span class=kd>var</span> <span class=nx>userPoolId</span> <span class=p>=</span> <span class=s>&#34;ap-northeast-1_XXXXXXXXX&#34;</span> <span class=c1>// ユーザープールの ID
+</span><span class=c1></span>
+<span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+	<span class=nf>adminSetUserPassword</span><span class=p>()</span>
+<span class=p>}</span>
+
+<span class=kd>func</span> <span class=nf>adminSetUserPassword</span><span class=p>()</span> <span class=p>{</span>
+	<span class=nx>client</span> <span class=o>:=</span> <span class=nx>cognitoidentityprovider</span><span class=p>.</span><span class=nf>NewFromConfig</span><span class=p>(</span><span class=nf>loadAwsConfig</span><span class=p>())</span>
+	<span class=nx>user</span> <span class=o>:=</span> <span class=s>&#34;user1&#34;</span>
+	<span class=nx>pass</span> <span class=o>:=</span> <span class=s>&#34;Password#123&#34;</span>
+	<span class=nx>input</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>cognitoidentityprovider</span><span class=p>.</span><span class=nx>AdminSetUserPasswordInput</span><span class=p>{</span>
+		<span class=nx>UserPoolId</span><span class=p>:</span> <span class=o>&amp;</span><span class=nx>userPoolId</span><span class=p>,</span>
+		<span class=nx>Username</span><span class=p>:</span>   <span class=o>&amp;</span><span class=nx>user</span><span class=p>,</span>
+		<span class=nx>Password</span><span class=p>:</span>   <span class=o>&amp;</span><span class=nx>pass</span><span class=p>,</span>
+	<span class=p>}</span>
+	<span class=nx>_</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>client</span><span class=p>.</span><span class=nf>AdminSetUserPassword</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>TODO</span><span class=p>(),</span> <span class=nx>input</span><span class=p>)</span>
+	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nb>panic</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+	<span class=p>}</span>
+	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;Password changed&#34;</span><span class=p>)</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<h2 id=ユーザー名とパスワードで認証して-id-トークンとアクセストークンを取得する-admininitiateauth>ユーザー名とパスワードで認証して ID トークンとアクセストークンを取得する (AdminInitiateAuth)</h2>
+<p>下記のように <code>AdminInitiateAuth</code> API でユーザー認証を行うには、Cognito ユーザープールの設定で対象のクライアントを選択し、<strong><code>ALLOW_ADMIN_USER_PASSWORD_AUTH</code></strong> にチェックを入れておく必要があります。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
+
+<span class=kn>import</span> <span class=p>(</span>
+	<span class=s>&#34;context&#34;</span>
+	<span class=s>&#34;fmt&#34;</span>
+
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/aws&#34;</span>
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/config&#34;</span>
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider&#34;</span>
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types&#34;</span>
+<span class=p>)</span>
+
+<span class=kd>var</span> <span class=nx>userPoolId</span> <span class=p>=</span> <span class=s>&#34;ap-northeast-1_XXXXXXXXX&#34;</span> <span class=c1>// ユーザープールの ID
+</span><span class=c1></span><span class=kd>var</span> <span class=nx>clientId</span> <span class=p>=</span> <span class=s>&#34;XXXXXXXXXXXXXXXXXXXXXXXXX&#34;</span>
+
+<span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+	<span class=nf>adminInitiateAuth</span><span class=p>()</span>
+<span class=p>}</span>
+
+<span class=kd>func</span> <span class=nf>adminInitiateAuth</span><span class=p>()</span> <span class=p>{</span>
+	<span class=nx>client</span> <span class=o>:=</span> <span class=nx>cognitoidentityprovider</span><span class=p>.</span><span class=nf>NewFromConfig</span><span class=p>(</span><span class=nf>loadAwsConfig</span><span class=p>())</span>
+	<span class=nx>input</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>cognitoidentityprovider</span><span class=p>.</span><span class=nx>AdminInitiateAuthInput</span><span class=p>{</span>
+		<span class=nx>UserPoolId</span><span class=p>:</span>     <span class=o>&amp;</span><span class=nx>userPoolId</span><span class=p>,</span>
+		<span class=nx>ClientId</span><span class=p>:</span>       <span class=o>&amp;</span><span class=nx>clientId</span><span class=p>,</span>
+		<span class=nx>AuthFlow</span><span class=p>:</span>       <span class=nx>types</span><span class=p>.</span><span class=nx>AuthFlowTypeAdminUserPasswordAuth</span><span class=p>,</span>
+		<span class=nx>AuthParameters</span><span class=p>:</span> <span class=kd>map</span><span class=p>[</span><span class=kt>string</span><span class=p>]</span><span class=kt>string</span><span class=p>{</span><span class=s>&#34;USERNAME&#34;</span><span class=p>:</span> <span class=s>&#34;user1&#34;</span><span class=p>,</span> <span class=s>&#34;PASSWORD&#34;</span><span class=p>:</span> <span class=s>&#34;Password#123&#34;</span><span class=p>},</span>
+	<span class=p>}</span>
+	<span class=nx>output</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>client</span><span class=p>.</span><span class=nf>AdminInitiateAuth</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>TODO</span><span class=p>(),</span> <span class=nx>input</span><span class=p>)</span>
+	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nb>panic</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+	<span class=p>}</span>
+
+	<span class=c1>// レスポンスの出力
+</span><span class=c1></span>	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;ChallengeName = %s\n&#34;</span><span class=p>,</span> <span class=nx>output</span><span class=p>.</span><span class=nx>ChallengeName</span><span class=p>)</span>
+	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;ChallengeParameters = %v\n&#34;</span><span class=p>,</span> <span class=nx>output</span><span class=p>.</span><span class=nx>ChallengeParameters</span><span class=p>)</span>
+	<span class=k>if</span> <span class=nx>output</span><span class=p>.</span><span class=nx>Session</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;Session:\n%s\n&#34;</span><span class=p>,</span> <span class=o>*</span><span class=nx>output</span><span class=p>.</span><span class=nx>Session</span><span class=p>)</span>
+	<span class=p>}</span>
+	<span class=k>if</span> <span class=nx>output</span><span class=p>.</span><span class=nx>AuthenticationResult</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;AuthenticationResult:&#34;</span><span class=p>)</span>
+		<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;    IdToken = %s\n&#34;</span><span class=p>,</span> <span class=o>*</span><span class=nx>output</span><span class=p>.</span><span class=nx>AuthenticationResult</span><span class=p>.</span><span class=nx>IdToken</span><span class=p>)</span>
+		<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;    AccessToken = %s\n&#34;</span><span class=p>,</span> <span class=o>*</span><span class=nx>output</span><span class=p>.</span><span class=nx>AuthenticationResult</span><span class=p>.</span><span class=nx>AccessToken</span><span class=p>)</span>
+		<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;    RefreshToken = %s\n&#34;</span><span class=p>,</span> <span class=o>*</span><span class=nx>output</span><span class=p>.</span><span class=nx>AuthenticationResult</span><span class=p>.</span><span class=nx>RefreshToken</span><span class=p>)</span>
+		<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;    TokenType = %s\n&#34;</span><span class=p>,</span> <span class=o>*</span><span class=nx>output</span><span class=p>.</span><span class=nx>AuthenticationResult</span><span class=p>.</span><span class=nx>TokenType</span><span class=p>)</span>
+		<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;    ExpiresIn = %d(sec)\n&#34;</span><span class=p>,</span> <span class=nx>output</span><span class=p>.</span><span class=nx>AuthenticationResult</span><span class=p>.</span><span class=nx>ExpiresIn</span><span class=p>)</span>
+	<span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>認証に成功すると、API の戻り値の <code>AuthenticationResult</code> に各種トークン情報が格納されます。</p>
+<pre tabindex=0><code>ChallengeName = 
+ChallengeParameters = map[]
+AuthenticationResult:
+    IdToken = eyJraWQiOiJvVU-UYPb...長いので省略...QlbXNjaDF4cHBRWWU
+    AccessToken = eyJraWQiOiJ2a1W...長いので省略...MeaGq7Q-ecVo7UrQA
+    RefreshToken = eyJjdHkiOiJKV1...長いので省略...FmbPUE4M-CFXNp9aA
+    TokenType = Bearer
+    ExpiresIn = 3600(sec)
+</code></pre><p>場合によっては、次のように追加のチャレンジリクエストが返されることがあります。</p>
+<pre tabindex=0><code>ChallengeName = NEW_PASSWORD_REQUIRED
+ChallengeParameters = map[USER_ID_FOR_SRP:user1 requiredAttributes:[&quot;userAttributes.email&quot;] userAttributes:{&quot;email&quot;:&quot;&quot;}]
+Session:
+AYABeGUOL0khu9R69cL1oW5AlDMAHQABAAdTZXJ2aWNlABBDb2duaXRvVXN
+lclBvVsigrdMZ2QLwOwDNyG485jP45wBAn19cJKXxHhAGETrvfQjHMSOIyz
+                  ...長いので省略...
+Uk9oosogIT_QEIXF5OrGGtWq7ELm56gXiW1hc06rp3cBYFbOlI5pjp36Jfd
+SfWaFjq0yyWYVAwEA4NG0DgtW3xZjto4NpHVCIVdxBmmolAKDtbkvVsWNFQ
+</code></pre><p>その場合は、続けて <strong><code>AdminRespondToAuthChallenge</code></strong> API を呼び出し、<code>ChallengeName</code> で指定されたチャレンジ（上記の場合は <code>NEW_PASSWORD_REQURED</code>）に答える必要があります。
+このとき、チャレンジ要求時に提示された Session 情報が必要になります。
+下記は、<code>AdminRespondToAuthChallenge</code> の呼び出し方の例です（ここでは全部ハードコーディングしちゃってます）。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=nf>adminRespondToAuthChallenge</span><span class=p>()</span> <span class=p>{</span>
+	<span class=nx>client</span> <span class=o>:=</span> <span class=nx>cognitoidentityprovider</span><span class=p>.</span><span class=nf>NewFromConfig</span><span class=p>(</span><span class=nf>loadAwsConfig</span><span class=p>())</span>
+	<span class=nx>session</span> <span class=o>:=</span> <span class=s>&#34;AYABeJDb9BhR5D...長いので省略...fZAPW2Ynnslwww&#34;</span>
+	<span class=nx>input</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>cognitoidentityprovider</span><span class=p>.</span><span class=nx>AdminRespondToAuthChallengeInput</span><span class=p>{</span>
+		<span class=nx>UserPoolId</span><span class=p>:</span>    <span class=o>&amp;</span><span class=nx>userPoolId</span><span class=p>,</span>
+		<span class=nx>ClientId</span><span class=p>:</span>      <span class=o>&amp;</span><span class=nx>clientId</span><span class=p>,</span>
+		<span class=nx>ChallengeName</span><span class=p>:</span> <span class=s>&#34;NEW_PASSWORD_REQUIRED&#34;</span><span class=p>,</span>
+		<span class=nx>ChallengeResponses</span><span class=p>:</span> <span class=kd>map</span><span class=p>[</span><span class=kt>string</span><span class=p>]</span><span class=kt>string</span><span class=p>{</span>
+			<span class=s>&#34;USERNAME&#34;</span><span class=p>:</span>             <span class=s>&#34;user1&#34;</span><span class=p>,</span>
+			<span class=s>&#34;NEW_PASSWORD&#34;</span><span class=p>:</span>         <span class=s>&#34;Password#123&#34;</span><span class=p>,</span>
+			<span class=s>&#34;userAttributes.email&#34;</span><span class=p>:</span> <span class=s>&#34;user1@example.com&#34;</span><span class=p>,</span>
+		<span class=p>},</span>
+		<span class=nx>Session</span><span class=p>:</span> <span class=o>&amp;</span><span class=nx>session</span><span class=p>,</span>
+	<span class=p>}</span>
+	<span class=nx>_</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>client</span><span class=p>.</span><span class=nf>AdminRespondToAuthChallenge</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>TODO</span><span class=p>(),</span> <span class=nx>input</span><span class=p>)</span>
+	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nb>panic</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+	<span class=p>}</span>
+	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;Auth challenge succeeded&#34;</span><span class=p>)</span>
+<span class=p>}</span>
+</code></pre></div><p>チャレンジに正しく応答できると、<code>AdminRespondToAuthChannelgeInput</code> API の戻り値の <code>AuthenticationResult</code> フィールドに、ID トークンやアクセストークンが格納されます。
+これは、<code>AdminInitiateAuth</code> API の戻り値と同様です。
+チャレンジに応答した後に、再度 <code>AdminInitiateAuth</code> を呼び出して各トークンを取得することもできます。</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/yzjj4c7/>Amazon Cognito をコマンドライン (CLI) から操作する</a></li>
+<li><a href=./p/24p8jjx/>Amazon Cognito: Amplify SDK による認証まわりの UI 表示あれこれ</a></li>
+<li><a href=./p/3mx8hr2/>Amazon Cognito (2) サインイン後に AWS リソースへのアクセス権限を与える (Cognito Identity Pool)</a></li>
+<li><a href=./p/pufs8kx/>Amazon Cognito (1) サインイン可能な Web サイトを作る (Cognito User Pool)</a></li>
+<li><a href=./p/xnogqgm/>Go 言語で AWS SDK を使う開発環境を整える</a></li>
+<li><a href=./p/wht5epz/>DynamoDB を Python で操作する (boto3)</a></li>
+<li><a href=./p/s3o57jv/>AWS SSM のポリシーステートメント例</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/aws>AWS</a></span>
+<span class=xPageTags_item><a href=./tags/aws/cognito>AWS/Cognito</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/yz2h95y/><span class=xArticle_up_label>Amazon Cognito 関連記事</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/7s7hs4e/>AWS</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=./p/cenio8m/>AWS 一般／環境／設定など</a></span></div>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/>Go 言語で AWS SDK を使う開発環境を整える</a></h1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/xnogqgm/>Go 言語で AWS SDK を使う開発環境を整える</a></h1>
 <div class=xPageTags>
 <span class=xPageTags_item><a href=./tags/aws>AWS</a></span>
 <span class=xPageTags_item><a href=./tags/go>Go</a></span>
@@ -604,13 +838,13 @@ SessionToken = Ub7oU0AhI0k4NIGo3J（省略）D9f3YiTZ2xyyqi44w=</code></pre></di
 </span>
 <h3 style="border-bottom:1px solid gray">関連記事</h3>
 <ul>
+<li><a href=./p/nej9wjb/>Go 言語と AWS SDK V2 で Amazon Cognito を操作する</a></li>
 <li><a href=./p/yzjj4c7/>Amazon Cognito をコマンドライン (CLI) から操作する</a></li>
 <li><a href=./p/wht5epz/>DynamoDB を Python で操作する (boto3)</a></li>
 <li><a href=./p/s3o57jv/>AWS SSM のポリシーステートメント例</a></li>
 <li><a href=./p/m8jv7hr/>AWS KMS をコマンドライン (CLI) で操作する</a></li>
 <li><a href=./p/aug76s5/>AWS SSM をコマンドライン (CLI) で操作する</a></li>
 <li><a href=./p/vx5ta85/>AWS CDK で外部パラメーターを扱う（コンテキスト・バリューと環境変数）</a></li>
-<li><a href=./p/cj9i4m3/>AWS CDK で TypeScript の Lambda 関数をデプロイする (aws-lambda-nodejs)</a></li>
 </ul>
 <div class=xPageTags>
 <span class=xPageTags_item><a href=./tags/aws>AWS</a></span>
@@ -677,8 +911,8 @@ SessionToken = Ub7oU0AhI0k4NIGo3J（省略）D9f3YiTZ2xyyqi44w=</code></pre></di
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-user-pools --max-results <span class=m>10</span>
 </code></pre></div>
 <div class=xAccordion>
-<input id=id-273148965 type=checkbox>
-<label class=xAccordion_title for=id-273148965>実行例</label>
+<input id=id-765891243 type=checkbox>
+<label class=xAccordion_title for=id-765891243>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>UserPools</span><span class=p>:</span><span class=w>
@@ -703,8 +937,8 @@ SessionToken = Ub7oU0AhI0k4NIGo3J（省略）D9f3YiTZ2xyyqi44w=</code></pre></di
 </span><span class=go>    --message-action SUPPRESS（確認メールを送信しない場合）
 </span></code></pre></div><p>ユーザープールIDは、<code>cognito-idp list-user-pools</code> コマンドで確認できます。</p>
 <div class=xAccordion>
-<input id=id-391465278 type=checkbox>
-<label class=xAccordion_title for=id-391465278>実行例</label>
+<input id=id-521897346 type=checkbox>
+<label class=xAccordion_title for=id-521897346>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp admin-create-user --user-pool-id ap-northeast-1_sf1nSZ2Oj --username user1
@@ -729,8 +963,8 @@ SessionToken = Ub7oU0AhI0k4NIGo3J（省略）D9f3YiTZ2xyyqi44w=</code></pre></di
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-users --user-pool-id ユーザープールID
 </code></pre></div>
 <div class=xAccordion>
-<input id=id-875392164 type=checkbox>
-<label class=xAccordion_title for=id-875392164>実行例</label>
+<input id=id-197345826 type=checkbox>
+<label class=xAccordion_title for=id-197345826>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-users --user-pool-id ap-northeast-1_sf1nSZ2Oj
@@ -753,8 +987,8 @@ SessionToken = Ub7oU0AhI0k4NIGo3J（省略）D9f3YiTZ2xyyqi44w=</code></pre></di
 </span><span class=go>    --username ユーザー名
 </span></code></pre></div>
 <div class=xAccordion>
-<input id=id-217649835 type=checkbox>
-<label class=xAccordion_title for=id-217649835>実行例</label>
+<input id=id-652947381 type=checkbox>
+<label class=xAccordion_title for=id-652947381>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp admin-get-user --user-pool-id ap-northeast-1_sf1nSZ2Oj --username user1
@@ -776,8 +1010,8 @@ SessionToken = Ub7oU0AhI0k4NIGo3J（省略）D9f3YiTZ2xyyqi44w=</code></pre></di
 </span><span class=go>    --client-name クライアント名
 </span></code></pre></div><p>クライアントアプリや AWS CLI で認証を行うには、ユーザープールに「クライアント」を追加しておく必要があります。</p>
 <div class=xAccordion>
-<input id=id-168572943 type=checkbox>
-<label class=xAccordion_title for=id-168572943>実行例</label>
+<input id=id-283954716 type=checkbox>
+<label class=xAccordion_title for=id-283954716>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp create-user-pool-client --user-pool-id ap-northeast-1_sf1nSZ2Oj --client-name client1
@@ -799,8 +1033,8 @@ SessionToken = Ub7oU0AhI0k4NIGo3J（省略）D9f3YiTZ2xyyqi44w=</code></pre></di
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-user-pool-clients --user-pool-id ユーザープールID
 </code></pre></div>
 <div class=xAccordion>
-<input id=id-739521864 type=checkbox>
-<label class=xAccordion_title for=id-739521864>実行例</label>
+<input id=id-814632579 type=checkbox>
+<label class=xAccordion_title for=id-814632579>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-user-pool-clients --user-pool-id ap-northeast-1_sf1nSZ2Oj
@@ -822,8 +1056,8 @@ SessionToken = Ub7oU0AhI0k4NIGo3J（省略）D9f3YiTZ2xyyqi44w=</code></pre></di
 </span></code></pre></div><p>クライアント名ではなく、クライアント ID を指定する必要があることに注意してください。
 クライアント ID は、<code>list-user-pool-clients</code> コマンドで確認できます。</p>
 <div class=xAccordion>
-<input id=id-915473826 type=checkbox>
-<label class=xAccordion_title for=id-915473826>実行例</label>
+<input id=id-935718462 type=checkbox>
+<label class=xAccordion_title for=id-935718462>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp describe-user-pool-client --user-pool-id ap-northeast-1_sf1nSZ2Oj --client-id 5sf3ad654tid5qt4r1768stto
@@ -864,8 +1098,8 @@ SessionToken = Ub7oU0AhI0k4NIGo3J（省略）D9f3YiTZ2xyyqi44w=</code></pre></di
 この管理 API でユーザー認証を行うには、Cognito ユーザープールの設定で対象のクライアントを選択し、<strong><code>ALLOW_ADMIN_USER_PASSWORD_AUTH</code></strong> にチェックを入れておく必要があります。
 これを有効にしておかないと、管理者用の Cognito API（<code>admin-initiate-auth</code> コマンドなど）で認証できません。</p>
 <div class=xAccordion>
-<input id=id-234716598 type=checkbox>
-<label class=xAccordion_title for=id-234716598>実行例（パスワード変更が必要な場合）</label>
+<input id=id-754369218 type=checkbox>
+<label class=xAccordion_title for=id-754369218>実行例（パスワード変更が必要な場合）</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp admin-initiate-auth --user-pool-id ap-northeast-1_sf1nSZ2Oj --client-id 5sf3ad654tid5qt4r1768stto --auth-flow ADMIN_USER_PASSWORD_AUTH --auth-parameters <span class=nv>USERNAME</span><span class=o>=</span>user1,PASSWORD<span class=o>=</span>Password!123
@@ -885,7 +1119,7 @@ SessionToken = Ub7oU0AhI0k4NIGo3J（省略）D9f3YiTZ2xyyqi44w=</code></pre></di
 </span><span class=se></span><span class=go>    --user-pool-id ap-northeast-1_sf1nSZ2Oj \
 </span><span class=go>    --client-id 5sf3ad654tid5qt4r1768stto \
 </span><span class=go>    --challenge-name NEW_PASSWORD_REQUIRED \
-</span><span class=go>    --challenge-responses USERNAME=user1,NEW_PASSWORD=&#34;passWORD#123&#34; \
+</span><span class=go>    --challenge-responses USERNAME=user1,NEW_PASSWORD=&#34;passWORD#123&#34;,userAttributes.email=&#34;user1@example.com&#34; \
 </span><span class=go>    --session &#34;AYABeBBlOnhrpnx82...（省略）...L7uMc6Q_FXfCoWCsI-w&#34;
 </span></code></pre></div>
 <meta itemprop=author content="まく">
@@ -912,268 +1146,6 @@ SessionToken = Ub7oU0AhI0k4NIGo3J（省略）D9f3YiTZ2xyyqi44w=</code></pre></di
 </div>
 <div class=xArticle_up>
 <a href=./p/yz2h95y/><span class=xArticle_up_label>Amazon Cognito 関連記事</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/ujqinda/>プログラミング</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/gqo9yoo/>TypeScript</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/tx6md39/>環境/設定</a></span></div>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/9xxpe4t/>Jest で TypeScript コードのユニットテストを記述する</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト</a></span>
-<span class=xPageTags_item><a href=./tags/jest>Jest</a></span>
-<span class=xPageTags_item><a href=./tags/typescript>TypeScript</a></span>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-04-04>2022-04-04</time><br>
-作成: <time itemprop=datePublished datetime=2022-04-04>2022-04-04</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#jest-とは>Jest とは</a></li>
-<li><a href=#jest-のインストール>Jest のインストール</a></li>
-<li><a href=#packagejson-の修正>package.json の修正</a></li>
-<li><a href=#テストの記述>テストの記述</a></li>
-<li><a href=#jest-のマッチャー>Jest のマッチャー</a>
-<ul>
-<li><a href=#真偽値や-null-との比較>真偽値や null との比較</a></li>
-<li><a href=#否定-not>否定 (not)</a></li>
-<li><a href=#数値の比較>数値の比較</a></li>
-<li><a href=#正規表現>正規表現</a></li>
-<li><a href=#配列セットのテスト>配列、セットのテスト</a></li>
-<li><a href=#例外のスロー>例外のスロー</a></li>
-<li><a href=#その他のマッチャー>その他のマッチャー</a></li>
-</ul>
-</li>
-</ul>
-</nav><h2 id=jest-とは>Jest とは</h2>
-<p>Jest は Facebook が公開した JavaScript 用のシンプルなテストフレームワークで、Node.js 環境で実行することができます。</p>
-<ul>
-<li><a href=https://jestjs.io/>Jest · 🃏 Delightful JavaScript Testing</a></li>
-</ul>
-<p>Jest は下記のような特徴を持っています。</p>
-<ul>
-<li>ゼロコンフィグで使い始められる（設定ファイルなしで実行可能）</li>
-<li>テストを並列実行するので高速</li>
-<li>コードカバレッジレポートの出力を標準搭載</li>
-<li>わかりやすいマッチャー表現 (expect ～ toBe、toContain など、自然な文章として読める）</li>
-<li>TypeScript に対応（ts-jest を利用）</li>
-</ul>
-<p>Jest 用のテストコードは、次のようなコードジェネレーターでも採用されており、利用者は増え続けています（2022 年現在）。</p>
-<ul>
-<li><code>create-react-app</code> &mldr; React アプリのジェネレーター</li>
-<li><code>cdk init app</code> &mldr; AWS のインフラ生成コードのジェネレーター</li>
-</ul>
-<h2 id=jest-のインストール>Jest のインストール</h2>
-<p>Jest 本体の <strong><code>jest</code></strong> モジュールをインストールします。
-TypeScript を使用する場合は、Jest ライブラリの型情報である <strong><code>@types/jest</code></strong> と、Jest 用の TypeScript プロセッサ (<a href=https://kulshekhar.github.io/ts-jest/>ts-jest</a>) もインストールする必要があります。
-これらはすべてテスト時のみ使用する NPM モジュールなので、<code>devDependencies</code> としてインストールします。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>Jest 本体と TypeScript 関連モジュールをインストール</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>#</span><span class=c1>## npm の場合</span>
-<span class=gp>$ </span>npm install --save-dev jest @types/jest ts-jest
-<span class=err>
-</span><span class=err></span><span class=gp>#</span><span class=c1>## yarn の場合</span>
-<span class=gp>$ </span>yarn add --dev jest @types/jest ts-jest
-</code></pre></div></div>
-</figure>
-<h2 id=packagejson-の修正>package.json の修正</h2>
-<p>Jest によるテストを簡単に起動できるように、<code>package.json</code> に NPM スクリプト (<code>test</code>) を定義しておきます。
-あと、Jest が TypeScript のコードを理解できるように、<code>jest.preset</code> に <strong><code>ts-jest</code></strong> を設定しておきます。
-これを設定しておかないと、<code>import</code> 構文などを理解できなくてエラーになります。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>package.json</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
-  <span class=c1>// ...
-</span><span class=c1></span>  <span class=s2>&#34;scripts&#34;</span><span class=o>:</span> <span class=p>{</span>
-    <span class=c1>// ...
-</span><span class=c1></span>    <span class=s2>&#34;test&#34;</span><span class=o>:</span> <span class=s2>&#34;jest&#34;</span>
-  <span class=p>},</span>
-  <span class=s2>&#34;jest&#34;</span><span class=o>:</span> <span class=p>{</span>
-    <span class=s2>&#34;preset&#34;</span><span class=o>:</span> <span class=s2>&#34;ts-jest&#34;</span>
-  <span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>上記の <code>jest</code> プロパティの値は、<strong><code>jest.config.js</code></strong> という別ファイルとして定義することもできます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>jest.config.js（これがあればこちらが優先される）</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>module</span><span class=p>.</span><span class=nx>exports</span> <span class=o>=</span> <span class=p>{</span>
-  <span class=nx>preset</span><span class=o>:</span> <span class=s1>&#39;ts-jest&#39;</span><span class=p>,</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>これで、次のようにユニットテストを起動できます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>yarn <span class=nb>test</span>  <span class=c1># yarn の場合</span>
-<span class=gp>$ </span>npm <span class=nb>test</span>   <span class=c1># npm の場合</span>
-</code></pre></div><p>最初は何もテストコードがないので、実行しても次のようなエラーで終了するはずです（終了コード 1 はコマンドが失敗したことを表します）。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>yarn -s <span class=nb>test</span>
-<span class=go>No tests found, exiting with code 1
-</span></code></pre></div><p>テストがないときにエラーにならないようにするには、<strong><code>--passWithNoTests</code></strong> オプションを付けて実行します。
-自動ビルド環境などで、常に <code>yarn test</code> は実行しておきたい場合にお世話になるかもしれません。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>yarn -s jest --passWithNoTests
-<span class=go>No tests found, exiting with code 0
-</span></code></pre></div><h2 id=テストの記述>テストの記述</h2>
-<p>ここでは、次のような計算ライブラリをテスト対象のコードとして使うことにします。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>src/math.ts（テスト対象）</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>export</span> <span class=kd>function</span> <span class=nx>add</span><span class=p>(</span><span class=nx>a</span>: <span class=kt>number</span><span class=p>,</span> <span class=nx>b</span>: <span class=kt>number</span><span class=p>)</span><span class=o>:</span> <span class=kt>number</span> <span class=p>{</span>
-  <span class=k>return</span> <span class=nx>a</span> <span class=o>+</span> <span class=nx>b</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>Jest はデフォルトで次のようなファイルを検索してテストコードとして実行します。</p>
-<ul>
-<li>拡張子が <strong><code>.test.ts</code></strong> (<code>.test.js</code>) のファイル</li>
-<li>拡張子が <strong><code>.spec.ts</code></strong> (<code>.spec.js</code>) のファイル</li>
-<li><strong><code>__test__</code></strong> ディレクトリ以下に配置した <code>.ts</code> (<code>.js</code>) ファイル</li>
-</ul>
-<p>前述の計算ライブラリ (<code>math.ts</code>) をテストするためのテストコードを、<strong><code>math.test.ts</code></strong> というファイル名で作成します。
-ファイル名のベース部分 (<code>math</code>) はテスト対象のファイル名と合わせておくと分かりやすいでしょう。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>src/math.test.ts（テストコード）</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>add</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;./math&#39;</span>
-
-<span class=nx>test</span><span class=p>(</span><span class=s1>&#39;add - positives&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=nx>add</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>)</span>
-  <span class=nx>expect</span><span class=p>(</span><span class=nx>result</span><span class=p>).</span><span class=nx>toBe</span><span class=p>(</span><span class=mi>3</span><span class=p>)</span>
-<span class=p>})</span>
-
-<span class=nx>test</span><span class=p>(</span><span class=s1>&#39;add - negatives&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>result</span> <span class=o>=</span> <span class=nx>add</span><span class=p>(</span><span class=o>-</span><span class=mi>1</span><span class=p>,</span> <span class=o>-</span><span class=mi>2</span><span class=p>)</span>
-  <span class=nx>expect</span><span class=p>(</span><span class=nx>result</span><span class=p>).</span><span class=nx>toBe</span><span class=p>(</span><span class=o>-</span><span class=mi>3</span><span class=p>)</span>
-<span class=p>})</span></code></pre></div></div>
-</figure>
-<p>テストコード内では、上記のように <strong><code>test(テスト名, テスト内容)</code></strong> という形で各テストを定義します（<code>test</code> の代わりに <code>it</code> も使えます）。
-計算結果の検証は、<strong><code>expect(実行結果).toBe(期待結果)</code></strong> のように記述します。
-次のようにテストを起動できます（<code>yarn</code> の出力をシンプルにするために <code>-s</code> オプションを指定しています）。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>yarn -s <span class=nb>test</span>
-<span class=go> PASS  src/math.test.ts
-</span><span class=go>  √ add - positives (1 ms)
-</span><span class=go>  √ add - negatives
-</span><span class=go></span><span class=err>
-</span><span class=err></span><span class=go>Test Suites: 1 passed, 1 total
-</span><span class=go>Tests:       2 passed, 2 total
-</span><span class=go>Snapshots:   0 total
-</span><span class=go>Time:        2.316 s, estimated 3 s
-</span><span class=go>Ran all test suites.
-</span></code></pre></div><p>すべてのテストが通りました！</p>
-<p>さらに、<strong><code>--coverage</code></strong> オプションを付けて実行することで、テストカバレッジのレポートを出力することができます。
-テスト対象となったソースコードのうち何％がテストでカバーされているかを表示してくれます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>yarn -s <span class=nb>test</span> --coverage
-<span class=go> PASS  src/math.test.ts
-</span><span class=go>  √ add - positives (2 ms)
-</span><span class=go>  √ add - negatives (1 ms)
-</span><span class=go></span><span class=err>
-</span><span class=err></span><span class=go>----------|---------|----------|---------|---------|-------------------
-</span><span class=go>File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
-</span><span class=go>----------|---------|----------|---------|---------|-------------------
-</span><span class=go>All files |     100 |      100 |     100 |     100 |
-</span><span class=go> math.ts  |     100 |      100 |     100 |     100 |
-</span><span class=go>----------|---------|----------|---------|---------|-------------------
-</span><span class=go>Test Suites: 1 passed, 1 total
-</span><span class=go>Tests:       2 passed, 2 total
-</span><span class=go>Snapshots:   0 total
-</span><span class=go>Time:        3.201 s
-</span><span class=go>Ran all test suites.
-</span></code></pre></div><h2 id=jest-のマッチャー>Jest のマッチャー</h2>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>expect</span><span class=p>(</span><span class=nx>add</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>)).</span><span class=nx>toBe</span><span class=p>(</span><span class=mi>3</span><span class=p>)</span>
-</code></pre></div><p>上記の検証コードの <code>toBe</code> の部分は <strong>マッチャー</strong> と呼ばれており、<code>toBe</code> 以外にも次のようなマッチャーが用意されています。</p>
-<h3 id=真偽値や-null-との比較>真偽値や null との比較</h3>
-<ul>
-<li><code>toBeTruthy()</code> &mldr; 値が <code>true</code> であることを確認する</li>
-<li><code>toBeFalthy()</code> &mldr; 値が <code>false</code> であることを確認する</li>
-<li><code>toBeNull()</code> &mldr; 値が <code>null</code> であることを確認する</li>
-<li><code>toBeUndefined()</code> &mldr; 値が <code>undefined</code> であることを確認する</li>
-<li><code>toBeDefined()</code> &mldr; 値が <code>undefined</code> でないことを確認する</li>
-</ul>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>test</span><span class=p>(</span><span class=s1>&#39;null&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>n</span> <span class=o>=</span> <span class=kc>null</span>
-  <span class=nx>expect</span><span class=p>(</span><span class=nx>n</span><span class=p>).</span><span class=nx>toBeNull</span><span class=p>()</span>
-<span class=p>})</span>
-</code></pre></div><h3 id=否定-not>否定 (not)</h3>
-<p><code>not</code> を使うと、条件を反転できます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>expect</span><span class=p>(</span><span class=mi>1</span><span class=p>).</span><span class=nx>not</span><span class=p>.</span><span class=nx>toBeNull</span><span class=p>()</span>
-</code></pre></div><h3 id=数値の比較>数値の比較</h3>
-<p>数値の同値比較には <code>toBe</code> あるいは <code>toEqual</code> が使えますが、大小比較用のマッチャーも用意されています。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>test</span><span class=p>(</span><span class=s1>&#39;two plus two&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>value</span> <span class=o>=</span> <span class=mi>2</span> <span class=o>+</span> <span class=mi>2</span>
-  <span class=nx>expect</span><span class=p>(</span><span class=nx>value</span><span class=p>).</span><span class=nx>toBe</span><span class=p>(</span><span class=mi>4</span><span class=p>)</span>
-  <span class=nx>expect</span><span class=p>(</span><span class=nx>value</span><span class=p>).</span><span class=nx>toBeGreaterThan</span><span class=p>(</span><span class=mi>3</span><span class=p>)</span>
-  <span class=nx>expect</span><span class=p>(</span><span class=nx>value</span><span class=p>).</span><span class=nx>toBeGreaterThanOrEqual</span><span class=p>(</span><span class=mf>3.5</span><span class=p>)</span>
-  <span class=nx>expect</span><span class=p>(</span><span class=nx>value</span><span class=p>).</span><span class=nx>toBeLessThan</span><span class=p>(</span><span class=mi>5</span><span class=p>)</span>
-  <span class=nx>expect</span><span class=p>(</span><span class=nx>value</span><span class=p>).</span><span class=nx>toBeLessThanOrEqual</span><span class=p>(</span><span class=mf>4.5</span><span class=p>)</span>
-<span class=p>})</span>
-</code></pre></div><p>浮動小数点数の同値比較には、<code>toBe</code> ではなく <code>toBeCloseTo</code> を使うようにします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>test</span><span class=p>(</span><span class=s1>&#39;add floating point numbers&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>value</span> <span class=o>=</span> <span class=mf>0.1</span> <span class=o>+</span> <span class=mf>0.2</span>
-  <span class=nx>expect</span><span class=p>(</span><span class=nx>value</span><span class=p>).</span><span class=nx>toBeCloseTo</span><span class=p>(</span><span class=mf>0.3</span><span class=p>)</span>  <span class=c1>// Do not use &#39;toBe&#39;
-</span><span class=c1></span><span class=p>})</span>
-</code></pre></div><h3 id=正規表現>正規表現</h3>
-<p>文字列が正規表現に一致するかを調べるには、<code>toMatch</code> を使用します。
-次の例では、チーム名が <code>team-</code> プレフィックスで始まっているかを調べています。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>test</span><span class=p>(</span><span class=s1>&#39;starts with &#34;team-&#34; prefix&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>teamName</span> <span class=o>=</span> <span class=s1>&#39;team-xxx&#39;</span>
-  <span class=nx>expect</span><span class=p>(</span><span class=nx>teamName</span><span class=p>).</span><span class=nx>toMatch</span><span class=p>(</span><span class=sr>/^team-/</span><span class=p>);</span>
-<span class=p>})</span>
-</code></pre></div><h3 id=配列セットのテスト>配列、セットのテスト</h3>
-<p>配列やセットの内容が等しいことを確認するには、<code>toEqual</code> を使います。
-<code>toBe</code> を使うと参照の比較になってしまうので、<code>toEqual</code> で実際の値を比較するようにします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// 配列の比較
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>arr</span> <span class=o>=</span> <span class=p>[</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>]</span>
-<span class=nx>expect</span><span class=p>(</span><span class=nx>arr</span><span class=p>).</span><span class=nx>toEqual</span><span class=p>([</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>])</span>
-
-<span class=c1>// セットの比較
-</span><span class=c1></span><span class=kr>const</span> <span class=kr>set</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Set</span><span class=p>([</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>])</span>
-<span class=nx>expect</span><span class=p>(</span><span class=kr>set</span><span class=p>).</span><span class=nx>toEqual</span><span class=p>(</span><span class=k>new</span> <span class=nx>Set</span><span class=p>([</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>]))</span>
-</code></pre></div><p>配列やセットに特定の値が含まれているかどうかを調べるには、<code>toContain</code> を使います。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>test</span><span class=p>(</span><span class=sb>`contain 200`</span><span class=p>,</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>arr</span> <span class=o>=</span> <span class=p>[</span><span class=mi>100</span><span class=p>,</span> <span class=mi>200</span><span class=p>,</span> <span class=mi>300</span><span class=p>]</span>
-  <span class=nx>expect</span><span class=p>(</span><span class=nx>arr</span><span class=p>).</span><span class=nx>toContain</span><span class=p>(</span><span class=mi>200</span><span class=p>)</span>
-<span class=p>})</span>
-</code></pre></div><p>指定した複数の値がすべて含まれているかどうかを調べるには、ちょっと複雑ですが、<code>expect.arrayContaining</code> を組み合わせて次のようにします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>arr</span> <span class=o>=</span> <span class=p>[</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>]</span>
-<span class=nx>expect</span><span class=p>(</span><span class=nx>arr</span><span class=p>).</span><span class=nx>toEqual</span><span class=p>(</span><span class=nx>expect</span><span class=p>.</span><span class=nx>arrayContaining</span><span class=p>([</span><span class=mi>3</span><span class=p>,</span> <span class=mi>5</span><span class=p>,</span> <span class=mi>1</span><span class=p>]))</span>
-</code></pre></div><h3 id=例外のスロー>例外のスロー</h3>
-<p>ある関数が例外を投げるかどうかを調べるには、<code>toThrow</code> を使用します。
-テスト対象の関数が <code>expect</code> 内で呼び出されるように、ラムダ式の形で渡すことに注意してください。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kd>function</span> <span class=nx>foo() {</span>
-  <span class=k>throw</span> <span class=k>new</span> <span class=nb>Error</span><span class=p>()</span>
-<span class=p>}</span>
-
-<span class=nx>test</span><span class=p>(</span><span class=sb>`foo throws exeception`</span><span class=p>,</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=nx>expect</span><span class=p>(()</span> <span class=o>=&gt;</span> <span class=nx>foo</span><span class=p>()).</span><span class=nx>toThrow</span><span class=p>()</span>  <span class=c1>// 何らかの例外をスローすることを確認
-</span><span class=c1></span>  <span class=nx>expect</span><span class=p>(()</span> <span class=o>=&gt;</span> <span class=nx>foo</span><span class=p>()).</span><span class=nx>toThrow</span><span class=p>(</span><span class=nb>Error</span><span class=p>)</span>  <span class=c1>// Error をスローすることを確認
-</span><span class=c1></span><span class=p>})</span>
-</code></pre></div><h3 id=その他のマッチャー>その他のマッチャー</h3>
-<p>マッチャーの詳細は、<a href=https://archive.jestjs.io/docs/ja/expect>expect API</a> のページで確認することができます。</p>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/9t6gr3c/>TypeScriptの型: 既存の型をちょっと変えた型を作る（ユーティリティ型）</a></li>
-<li><a href=./p/k7it5fp/>React コンポーネントで入力フォームを作成する (2) react-hook-form 編</a></li>
-<li><a href=./p/xenv4bh/>React の props.children の型定義には ReactNode を使う</a></li>
-<li><a href=./p/2hr3eqx/>TypeScript で JSON オブジェクトに型情報を付加する</a></li>
-<li><a href=./p/5oyaju5/>TypeScript で undefined/null をうまく扱う (nullish coalescing (??), optional chaining (?.))</a></li>
-<li><a href=./p/au8iu6u/>TypeScript コードを Prettier で自動整形する</a></li>
-<li><a href=./p/8t7iu6g/>DynamoDB を Node.js で操作する（SDK ver.2 の場合）</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト</a></span>
-<span class=xPageTags_item><a href=./tags/jest>Jest</a></span>
-<span class=xPageTags_item><a href=./tags/typescript>TypeScript</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/tx6md39/><span class=xArticle_up_label>TypeScriptの環境/設定について</span><br>へ戻る</a>
 </div>
 </article><h2>メニュー</h2>
 <div class=xTopMenu>
