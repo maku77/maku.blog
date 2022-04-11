@@ -3,7 +3,6 @@ title: "Lambda 実装例: S3 へのアップロードを SNS で通知して Lam
 url: "/p/f2fq2cn"
 date: "2021-04-19"
 tags: ["AWS"]
-weight: 999
 ---
 
 何をするか？

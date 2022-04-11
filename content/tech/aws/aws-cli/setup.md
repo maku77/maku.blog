@@ -12,19 +12,18 @@ AWS CLI とは？
 AWS CLI (Command Line Interface) を使うと、AWS の各種サービスをコマンドラインから操作することができます。
 例えば、次のように様々な処理を実行できます。
 
-{{< code title="AWS CLI の使用例" >}}
-### S3 バケットを作成する
-$ aws s3 mb s3://バケット名
-
-### S3 にファイルをコピーする
-$ aws s3 cp ローカルファイル s3://バケット名/ディレクトリ名
-
-### IAM ユーザーのアクセスキーを表示する
-$ aws iam list-access-keys --user-name=ユーザー名
-
-### DynamoDB にテーブルを作成する
-$ aws dynamodb create-table --table-name テーブル名 ...
-{{< /code >}}
+- S3 にファイルをコピーする
+  ```console
+  $ aws s3 cp ローカルファイル s3://バケット名/ディレクトリ名
+  ```
+- IAM ユーザーのアクセスキーを表示する
+  ```console
+  $ aws iam list-access-keys --user-name=ユーザー名
+  ```
+- DynamoDB にテーブルを作成する
+  ```console
+  $ aws dynamodb create-table --table-name テーブル名 ...
+  ```
 
 AWS の各種サービスの設定は、それぞれのマネージメントコンソール（Web サイト）上で設定することができますが、AWS CLI を使うことで、Web ブラウザを開かずに設定を済ませられます。
 頻繁に行う処理などは、シェルスクリプトなどにして自動化することができます。
@@ -62,9 +61,9 @@ aws-cli/2.1.24 Python/3.7.4 Darwin/19.5.0 exe/x86_64 prompt/off
 AWS CLI の設定 (aws configure)
 ----
 
-{{< private >}}
+{{% private %}}
 - [AWS CLI - 設定の基本](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-configure-quickstart.html)
-{{< /private >}}
+{{% /private %}}
 
 ### 設定ファイルを作成する
 
