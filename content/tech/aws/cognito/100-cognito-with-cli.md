@@ -249,13 +249,7 @@ $ aws cognito-idp admin-respond-to-auth-challenge \
     --user-pool-id ap-northeast-1_sf1nSZ2Oj \
     --client-id 5sf3ad654tid5qt4r1768stto \
     --challenge-name NEW_PASSWORD_REQUIRED \
-    --challenge-responses USERNAME=user1,NEW_PASSWORD="passWORD#123" \
+    --challenge-responses USERNAME=user1,NEW_PASSWORD="passWORD#123",userAttributes.email="user1@example.com" \
     --session "AYABeBBlOnhrpnx82...（省略）...L7uMc6Q_FXfCoWCsI-w"
 ```
-
-{{< private >}}
-E メール設定されていないと、下記エラーになる？要チェック。
-
-An error occurred (InvalidParameterException) when calling the AdminRespondToAuthChallenge operation: Invalid attributes given, email is missing
-{{< /private >}}
 

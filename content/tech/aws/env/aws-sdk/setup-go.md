@@ -1,6 +1,6 @@
 ---
 title: "Go 言語で AWS SDK を使う開発環境を整える"
-url: "/p/"
+url: "/p/xnogqgm"
 date: "2022-04-11"
 tags: ["AWS", "Go"]
 ---
@@ -115,6 +115,8 @@ AWS サービスの API を呼び出してみる
 {{% private %}}
 - [AWS SDK for Go V2 のサンプルコード](https://aws.github.io/aws-sdk-go-v2/docs/code-examples/)
   - [S3 のサンプルコード](https://aws.github.io/aws-sdk-go-v2/docs/code-examples/s3/)
+- [AWS SDK for Go V1 のサンプルコード](https://docs.aws.amazon.com/code-samples/latest/catalog/code-catalog-go.html)
+  - V1 だけどサンプルはたくさんそろっている。
 {{% /private %}}
 
 コンフィグ情報 (`aws.Config`) を取得できるようになったら、あとは各 AWS サービス（S3、API Gateway、DynamoDB など）の API を呼び出すだけです。
