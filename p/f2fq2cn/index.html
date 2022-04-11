@@ -32,6 +32,8 @@ $ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev  Lam
 </span>
 <span class=xBreadcrumb_item><a href=../../p/7s7hs4e/>AWS</a>
 </span>
+<span class=xBreadcrumb_item><a href=../../p/eyeq2do/>Lambda</a>
+</span>
 <span class=xBreadcrumb_item>Lambda 実装例: S3 へのアップロードを SNS で通知して Lambda から読み込む
 </span>
 </div>
@@ -57,6 +59,10 @@ $ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev  Lam
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/>Go 言語で AWS SDK を使う開発環境を整える
+<time>2022-04-11</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/yzjj4c7/>Amazon Cognito をコマンドライン (CLI) から操作する
 <time>2022-04-06</time></a>
 </div>
@@ -72,10 +78,6 @@ $ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev  Lam
 <a href=../../p/ryq6it6/>NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ
 <time>2022-03-16</time></a>
 </div>
-<div class=xBoxLink>
-<a href=../../p/un3gu8m/>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする
-<time>2022-02-27</time></a>
-</div>
 </div>
 </div>
 <div class=xMenu_box data-sticky>
@@ -90,10 +92,13 @@ $ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev  Lam
 <li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
 <li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
 <ul>
+<li><a class=xNavTree-dir href=../../p/cenio8m/>AWS 一般／環境／設定など</a>
 <li><a class=xNavTree-dir href=../../p/vigdnzf/>CLI</a>
 <li><a class=xNavTree-dir href=../../p/q7fov5c/>S3</a>
 <li><a class=xNavTree-dir href=../../p/wn52kog/>IAM</a>
 <li><a class=xNavTree-dir href=../../p/eyeq2do/>Lambda</a>
+<ul>
+</ul>
 <li><a class=xNavTree-dir href=../../p/cxcozak/>EC2</a>
 <li><a class=xNavTree-dir href=../../p/au8is4e/>CodeBuild</a>
 <li><a class=xNavTree-dir href=../../p/sdq2cnx/>CloudFormation/SAM/CDK</a>
@@ -139,9 +144,9 @@ $ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev  Lam
 </div><div class=xMenu_tag>
 <a href=../../tags/typescript>typescript (58)</a>
 </div><div class=xMenu_tag>
-<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
+<a href=../../tags/aws>aws (53)</a>
 </div><div class=xMenu_tag>
-<a href=../../tags/aws>aws (52)</a>
+<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/next.js>next.js (36)</a>
 </div><div class=xMenu_tag>
@@ -399,6 +404,8 @@ $ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev  Lam
 </div><div class=xMenu_tag>
 <a href=../../tags/git>git (1)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/go>go (1)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/groovy>groovy (1)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/html>html (1)</a>
@@ -468,11 +475,8 @@ $ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev  Lam
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <aside>
 <div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/sdq2cnx/>CloudFormation/SAM/CDK</a>
-</div>
 <div class=xPrevNextLink_next>
-<a href=../../p/yz2h95y/>Cognito</a>
+<a href=../../p/zmydq3f/>Lambda にデプロイするための ZIP パッケージを npm で作成する (npm-pack-zip)</a>
 </div>
 </div>
 </aside>
@@ -480,7 +484,8 @@ $ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev  Lam
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=../../p/7s7hs4e/>AWS</a></span></div>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/7s7hs4e/>AWS</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/eyeq2do/>Lambda</a></span></div>
 <h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/f2fq2cn/>Lambda 実装例: S3 へのアップロードを SNS で通知して Lambda から読み込む</a></h1>
 <div class=xPageTags>
 <span class=xPageTags_item><a href=../../tags/aws>AWS</a></span>
@@ -607,8 +612,8 @@ $ npm install @types/aws-lambda --save-dev</code></pre></div></div>
 <h3 id=解説>解説</h3>
 <p>Lambda 関数の第一引数 (<code>event</code>) で渡されるオブジェクト (このケースでは <code>SNSEvent</code> 型) の <code>Records[0].Sns.Message</code> プロパティを参照すると、次のような JSON テキストを取得できます（オブジェクトではなく JSON 形式のテキストです）。</p>
 <div class=xAccordion>
-<input id=id-475392861 type=checkbox>
-<label class=xAccordion_title for=id-475392861>SNSEvent.Records[0].Sns.Message の内容</label>
+<input id=id-537468291 type=checkbox>
+<label class=xAccordion_title for=id-537468291>SNSEvent.Records[0].Sns.Message の内容</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
@@ -774,15 +779,12 @@ $ npm run cf:deploy   # デプロイ（CloudFormation スタックを生成）</
 <div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
 </div>
 <div class=xArticle_up>
-<a href=../../p/7s7hs4e/><span class=xArticle_up_label>AWS 関連メモ</span><br>へ戻る</a>
+<a href=../../p/eyeq2do/><span class=xArticle_up_label>AWS Lambda のメモ</span><br>へ戻る</a>
 </div>
 <aside>
 <div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/sdq2cnx/>CloudFormation/SAM/CDK</a>
-</div>
 <div class=xPrevNextLink_next>
-<a href=../../p/yz2h95y/>Cognito</a>
+<a href=../../p/zmydq3f/>Lambda にデプロイするための ZIP パッケージを npm で作成する (npm-pack-zip)</a>
 </div>
 </div>
 </aside>
@@ -800,6 +802,8 @@ $ npm run cf:deploy   # デプロイ（CloudFormation スタックを生成）</
 </span>
 <span class=xBreadcrumb_item><a href=../../p/7s7hs4e/>AWS</a>
 </span>
+<span class=xBreadcrumb_item><a href=../../p/eyeq2do/>Lambda</a>
+</span>
 <span class=xBreadcrumb_item>Lambda 実装例: S3 へのアップロードを SNS で通知して Lambda から読み込む
 </span>
 </div>
@@ -812,6 +816,6 @@ $ npm run cf:deploy   # デプロイ（CloudFormation スタックを生成）</
 </div>
 <script src=../../assets/js/sidebar.js></script>
 <script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c];b.setAttribute('target','_blank'),b.setAttribute('rel','noopener');const d=b.getElementsByTagName('img');if(d.length>0)continue;b.classList.add('xExternalLinkIcon')}})</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"AWS","item":"https://maku.blog/p/7s7hs4e/"},{"@type":"ListItem","position":4,"name":"Lambda 実装例: S3 へのアップロードを SNS で通知して Lambda から読み込む","item":"https://maku.blog/p/f2fq2cn/"}]}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"AWS","item":"https://maku.blog/p/7s7hs4e/"},{"@type":"ListItem","position":4,"name":"Lambda","item":"https://maku.blog/p/eyeq2do/"},{"@type":"ListItem","position":5,"name":"Lambda 実装例: S3 へのアップロードを SNS で通知して Lambda から読み込む","item":"https://maku.blog/p/f2fq2cn/"}]}</script>
 </body>
 </html>

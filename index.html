@@ -43,6 +43,10 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/>Go 言語で AWS SDK を使う開発環境を整える
+<time>2022-04-11</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/yzjj4c7/>Amazon Cognito をコマンドライン (CLI) から操作する
 <time>2022-04-06</time></a>
 </div>
@@ -57,10 +61,6 @@
 <div class=xBoxLink>
 <a href=./p/ryq6it6/>NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ
 <time>2022-03-16</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/un3gu8m/>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする
-<time>2022-02-27</time></a>
 </div>
 </div>
 </div>
@@ -90,9 +90,9 @@
 </div><div class=xMenu_tag>
 <a href=./tags/typescript>typescript (58)</a>
 </div><div class=xMenu_tag>
-<a href=./tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
+<a href=./tags/aws>aws (53)</a>
 </div><div class=xMenu_tag>
-<a href=./tags/aws>aws (52)</a>
+<a href=./tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/next.js>next.js (36)</a>
 </div><div class=xMenu_tag>
@@ -350,6 +350,8 @@
 </div><div class=xMenu_tag>
 <a href=./tags/git>git (1)</a>
 </div><div class=xMenu_tag>
+<a href=./tags/go>go (1)</a>
+</div><div class=xMenu_tag>
 <a href=./tags/groovy>groovy (1)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/html>html (1)</a>
@@ -419,11 +421,11 @@
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/>Go 言語で AWS SDK を使う開発環境を整える<span class=xRecents_item_tag>AWS</span><span class=xRecents_item_tag>Go</span><time>2022-04-11</time></a>
+</div><div class=xRecents_item>
 <a href=./p/yzjj4c7/>Amazon Cognito をコマンドライン (CLI) から操作する<span class=xRecents_item_tag>AWS</span><span class=xRecents_item_tag>AWS/Cognito</span><time>2022-04-06</time></a>
 </div><div class=xRecents_item>
 <a href=./p/9xxpe4t/>Jest で TypeScript コードのユニットテストを記述する<span class=xRecents_item_tag>ユニットテスト</span><span class=xRecents_item_tag>Jest</span><span class=xRecents_item_tag>TypeScript</span><time>2022-04-04</time></a>
-</div><div class=xRecents_item>
-<a href=./p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う<span class=xRecents_item_tag>Firebase</span><time>2022-03-17</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -431,6 +433,197 @@
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/7s7hs4e/>AWS</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/cenio8m/>AWS 一般／環境／設定など</a></span></div>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/>Go 言語で AWS SDK を使う開発環境を整える</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/aws>AWS</a></span>
+<span class=xPageTags_item><a href=./tags/go>Go</a></span>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-04-11>2022-04-11</time><br>
+作成: <time itemprop=datePublished datetime=2022-04-11>2022-04-11</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#何をするか>何をするか？</a></li>
+<li><a href=#テスト用の-go-プロジェクトを作成する>テスト用の Go プロジェクトを作成する</a></li>
+<li><a href=#aws-sdk-でコンフィグ情報を参照してみる>AWS SDK でコンフィグ情報を参照してみる</a></li>
+<li><a href=#aws-サービスの-api-を呼び出してみる>AWS サービスの API を呼び出してみる</a></li>
+</ul>
+</nav><h2 id=何をするか>何をするか？</h2>
+<p>ここでは、Go 言語用の AWS SDK V2 をセットアップして、各種 AWS サービス用の API を呼び出す準備をします。</p>
+<p>Go 言語は Google が開発したプログラミング言語で、ライブラリインポートの手軽さや、生成された実行バイナリの実行速度に定評があるため、今後も利用ユーザーは増えていきそうです。</p>
+<ul>
+<li>参考: <a href=https://maku77.github.io/hugo/go/what-is-go.html>Go 言語とは？／Go をインストールする | まくまくHugo/Goノート</a></li>
+</ul>
+<p>Go の実行環境は <a href=https://go.dev/doc/install>Go のインストーラー</a> で簡単にインストールできます。
+これ以降の説明では、Go の実行環境はインストール済みであると想定しています。</p>
+<h2 id=テスト用の-go-プロジェクトを作成する>テスト用の Go プロジェクトを作成する</h2>
+<p>Go プロジェクト用に適当なディレクトリを作成し、その中で <strong><code>go mod init</code></strong> コマンドを実行して <strong><code>go.mod</code></strong> （依存関係などが保存されるファイル）を作成しておきます。
+このファイルが存在するディレクトリを、Go はモジュールとして認識します。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mkdir aws-study
+<span class=gp>$ </span><span class=nb>cd</span> aws-study
+<span class=gp>$ </span>go mod init aws-study
+</code></pre></div><p>上記の例では、<code>go mod init</code> の引数（モジュールパス）を <code>aws-study</code> としましたが、GitHub リポジトリで管理する前提であれば、<strong><code>github.com/&lt;user>/aws-study</code></strong> のようなモジュールパスを指定するようにしてください。
+これで、Go 言語プロジェクトの準備完了です。</p>
+<h2 id=aws-sdk-でコンフィグ情報を参照してみる>AWS SDK でコンフィグ情報を参照してみる</h2>
+<p>AWS SDK を使って AWS のサービスにアクセスするには、認証情報として IAM ユーザーの「アクセスキー ID」や「シークレットアクセスキー」などが必要になります。
+これらは、一般的には AWS CLI の <code>aws configure</code> コマンドによって、<code>~/.aws/credentials</code> や <code>~/.aws/config</code> に保存された情報です。</p>
+<ul>
+<li>参考: <a href=./p/j5iu7it>AWS の初期設定: AWS CLI と認証情報の設定</a></li>
+</ul>
+<p>AWS SDK にはこれらの設定ファイルから認証情報（クレデンシャル情報）を読み取る API が用意されています。
+まず、<strong><code>go get</code></strong> コマンドを実行して、設定情報を読み込むための <a href=https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config>github.com/aws/aws-sdk-go-v2/config パッケージ</a> の依存情報を追加します。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>go get github.com/aws/aws-sdk-go-v2/config
+</code></pre></div><p><code>go get</code> コマンドを実行すると、パッケージの依存情報が記載された <code>go.mod</code> と <code>go.sum</code> ファイルが更新されるので、これらは忘れずに Git などにコミットするようにしてください。
+下記のサンプルコードでは、AWS のコンフィグ情報を取得して、画面上に出力しています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>main.go</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
+
+<span class=kn>import</span> <span class=p>(</span>
+	<span class=s>&#34;context&#34;</span>
+	<span class=s>&#34;fmt&#34;</span>
+
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/config&#34;</span>
+<span class=p>)</span>
+
+<span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+	<span class=c1>// 外部リソース（~/.aws/config など）からコンフィグ情報 (aws.Config) を生成
+</span><span class=c1></span>	<span class=nx>cfg</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>config</span><span class=p>.</span><span class=nf>LoadDefaultConfig</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>TODO</span><span class=p>())</span>
+	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nb>panic</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;failed loading config, %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>))</span>
+	<span class=p>}</span>
+
+	<span class=c1>// コンフィグ情報を表示
+</span><span class=c1></span>	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;Region = %s\n&#34;</span><span class=p>,</span> <span class=nx>cfg</span><span class=p>.</span><span class=nx>Region</span><span class=p>)</span>
+	<span class=nx>cred</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>cfg</span><span class=p>.</span><span class=nx>Credentials</span><span class=p>.</span><span class=nf>Retrieve</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>TODO</span><span class=p>())</span>
+	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nb>panic</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;failed retrieving credentials, %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>))</span>
+	<span class=p>}</span>
+	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;AccessKeyID = %s\n&#34;</span><span class=p>,</span> <span class=nx>cred</span><span class=p>.</span><span class=nx>AccessKeyID</span><span class=p>)</span>
+	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;SecretAccessKey = %s\n&#34;</span><span class=p>,</span> <span class=nx>cred</span><span class=p>.</span><span class=nx>SecretAccessKey</span><span class=p>)</span>
+	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;SessionToken = %s\n&#34;</span><span class=p>,</span> <span class=nx>cred</span><span class=p>.</span><span class=nx>SessionToken</span><span class=p>)</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>次のように実行してアクセスキーの情報が表示されれば、各種 AWS サービスの API を呼び出す準備は整っています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ go run main.go
+Region = ap-northeast-1
+AccessKeyID = TAZASBDCD4ASIAVTXAP4
+SecretAccessKey = S2VmkhmfeN8n9TXe7G2L1XAOVhK80jui/eNcdgna
+SessionToken = Ub7oU0AhI0k4NIGo3J（省略）D9f3YiTZ2xyyqi44w=</code></pre></div></div>
+</figure>
+<p><a href=https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig>config.LoadDefaultConfig 関数</a> は、次のような外部リソースを情報源として AWS のコンフィグ情報 (<code>aws.Config</code>) を構築しています。
+コンフィグ情報がうまく表示されないときは、これらの設定を確認すると原因が分かるかもしれません。</p>
+<ul>
+<li>環境変数
+<ul>
+<li><code>export AWS_REGION=ap-northeast-1</code></li>
+<li><code>export AWS_ACCESS_KEY_ID=TAZASBDCD4ASIAVTXAP4</code></li>
+<li><code>export AWS_SECRET_ACCESS_KEY=S2VmkhmfeN8n9TXe7G2L1XAOVhK80jui/eNcdgna</code></li>
+<li><code>export AWS_SESSION_TOKEN=Ub7oU0AhI0k4NIGo3J（省略）D9f3YiTZ2xyyqi44w=</code></li>
+<li><code>export AWS_PROFILE=default</code></li>
+</ul>
+</li>
+<li>Shared Credentials ファイル (<code>~/.aws/credentials</code>)</li>
+<li>Shared Configuration ファイル (<code>~/.aws/config</code>)</li>
+</ul>
+<h2 id=aws-サービスの-api-を呼び出してみる>AWS サービスの API を呼び出してみる</h2>
+<p>コンフィグ情報 (<code>aws.Config</code>) を取得できるようになったら、あとは各 AWS サービス（S3、API Gateway、DynamoDB など）の API を呼び出すだけです。
+例としては何でもよいのですが、ここでは、S3 バケットの情報を取得してみます。</p>
+<p>各 AWS サービス用のパッケージは <strong><code>github.com/aws/aws-sdk-go-v2/service/サービス名</code></strong> という名前で提供されているので、これを <code>go get</code> しておきます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>go get github.com/aws/aws-sdk-go-v2/service/s3
+</code></pre></div><p>下記のサンプルコードを実行すると、S3 バケットの一覧（作成日とバケット名）を出力します。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>main.go</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
+
+<span class=kn>import</span> <span class=p>(</span>
+	<span class=s>&#34;context&#34;</span>
+	<span class=s>&#34;fmt&#34;</span>
+
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/aws&#34;</span>
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/config&#34;</span>
+	<span class=s>&#34;github.com/aws/aws-sdk-go-v2/service/s3&#34;</span>
+<span class=p>)</span>
+
+<span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+	<span class=nx>cfg</span> <span class=o>:=</span> <span class=nf>loadAwsConfig</span><span class=p>()</span>
+	<span class=nx>output</span> <span class=o>:=</span> <span class=nf>listS3Buckets</span><span class=p>(</span><span class=nx>cfg</span><span class=p>)</span>
+
+	<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>bucket</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>output</span><span class=p>.</span><span class=nx>Buckets</span> <span class=p>{</span>
+		<span class=nx>created</span> <span class=o>:=</span> <span class=nx>bucket</span><span class=p>.</span><span class=nx>CreationDate</span><span class=p>.</span><span class=nf>Format</span><span class=p>(</span><span class=s>&#34;2006-01-02 15:04:05 Mon&#34;</span><span class=p>)</span>
+		<span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>created</span> <span class=o>+</span> <span class=s>&#34;: &#34;</span> <span class=o>+</span> <span class=o>*</span><span class=nx>bucket</span><span class=p>.</span><span class=nx>Name</span><span class=p>)</span>
+	<span class=p>}</span>
+	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;Found %d buckets\n&#34;</span><span class=p>,</span> <span class=nb>len</span><span class=p>(</span><span class=nx>output</span><span class=p>.</span><span class=nx>Buckets</span><span class=p>))</span>
+<span class=p>}</span>
+
+<span class=c1>// 外部リソース（~/.aws/config など）からコンフィグ情報 (aws.Config) を生成します。
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>loadAwsConfig</span><span class=p>()</span> <span class=nx>aws</span><span class=p>.</span><span class=nx>Config</span> <span class=p>{</span>
+	<span class=nx>cfg</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>config</span><span class=p>.</span><span class=nf>LoadDefaultConfig</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>TODO</span><span class=p>())</span>
+	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nb>panic</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;failed loading config, %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>))</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=nx>cfg</span>
+<span class=p>}</span>
+
+<span class=c1>// S3 バケットの一覧を取得します。
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>listS3Buckets</span><span class=p>(</span><span class=nx>cfg</span> <span class=nx>aws</span><span class=p>.</span><span class=nx>Config</span><span class=p>)</span> <span class=o>*</span><span class=nx>s3</span><span class=p>.</span><span class=nx>ListBucketsOutput</span> <span class=p>{</span>
+	<span class=nx>client</span> <span class=o>:=</span> <span class=nx>s3</span><span class=p>.</span><span class=nf>NewFromConfig</span><span class=p>(</span><span class=nx>cfg</span><span class=p>)</span>
+	<span class=nx>input</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>s3</span><span class=p>.</span><span class=nx>ListBucketsInput</span><span class=p>{}</span>
+	<span class=nx>output</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>client</span><span class=p>.</span><span class=nf>ListBuckets</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>TODO</span><span class=p>(),</span> <span class=nx>input</span><span class=p>)</span>
+	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nb>panic</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;failed listing S3 buckets, %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>))</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=nx>output</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>go run main.go
+<span class=go>2021-12-24 00:59:06 Fri: my-sample-bucket-name-1
+</span><span class=go>2022-04-08 05:15:52 Fri: my-sample-bucket-name-2
+</span><span class=go>2022-04-04 08:47:23 Mon: my-sample-bucket-name-3
+</span><span class=go>2020-07-10 06:54:33 Fri: my-sample-bucket-name-4
+</span><span class=go>Found 4 buckets
+</span></code></pre></div></div>
+</figure>
+<p>このサンプルコードでは S3 サービスの API を使用しましたが、他の AWS サービスに関しても同様に操作することができます。</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/yzjj4c7/>Amazon Cognito をコマンドライン (CLI) から操作する</a></li>
+<li><a href=./p/wht5epz/>DynamoDB を Python で操作する (boto3)</a></li>
+<li><a href=./p/s3o57jv/>AWS SSM のポリシーステートメント例</a></li>
+<li><a href=./p/m8jv7hr/>AWS KMS をコマンドライン (CLI) で操作する</a></li>
+<li><a href=./p/aug76s5/>AWS SSM をコマンドライン (CLI) で操作する</a></li>
+<li><a href=./p/vx5ta85/>AWS CDK で外部パラメーターを扱う（コンテキスト・バリューと環境変数）</a></li>
+<li><a href=./p/cj9i4m3/>AWS CDK で TypeScript の Lambda 関数をデプロイする (aws-lambda-nodejs)</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/aws>AWS</a></span>
+<span class=xPageTags_item><a href=./tags/go>Go</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/cenio8m/><span class=xArticle_up_label>AWS 一般／環境／設定など</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -484,8 +677,8 @@
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-user-pools --max-results <span class=m>10</span>
 </code></pre></div>
 <div class=xAccordion>
-<input id=id-139768254 type=checkbox>
-<label class=xAccordion_title for=id-139768254>実行例</label>
+<input id=id-273148965 type=checkbox>
+<label class=xAccordion_title for=id-273148965>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>UserPools</span><span class=p>:</span><span class=w>
@@ -510,8 +703,8 @@
 </span><span class=go>    --message-action SUPPRESS（確認メールを送信しない場合）
 </span></code></pre></div><p>ユーザープールIDは、<code>cognito-idp list-user-pools</code> コマンドで確認できます。</p>
 <div class=xAccordion>
-<input id=id-279468513 type=checkbox>
-<label class=xAccordion_title for=id-279468513>実行例</label>
+<input id=id-391465278 type=checkbox>
+<label class=xAccordion_title for=id-391465278>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp admin-create-user --user-pool-id ap-northeast-1_sf1nSZ2Oj --username user1
@@ -536,8 +729,8 @@
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-users --user-pool-id ユーザープールID
 </code></pre></div>
 <div class=xAccordion>
-<input id=id-915327648 type=checkbox>
-<label class=xAccordion_title for=id-915327648>実行例</label>
+<input id=id-875392164 type=checkbox>
+<label class=xAccordion_title for=id-875392164>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-users --user-pool-id ap-northeast-1_sf1nSZ2Oj
@@ -560,8 +753,8 @@
 </span><span class=go>    --username ユーザー名
 </span></code></pre></div>
 <div class=xAccordion>
-<input id=id-153269478 type=checkbox>
-<label class=xAccordion_title for=id-153269478>実行例</label>
+<input id=id-217649835 type=checkbox>
+<label class=xAccordion_title for=id-217649835>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp admin-get-user --user-pool-id ap-northeast-1_sf1nSZ2Oj --username user1
@@ -583,8 +776,8 @@
 </span><span class=go>    --client-name クライアント名
 </span></code></pre></div><p>クライアントアプリや AWS CLI で認証を行うには、ユーザープールに「クライアント」を追加しておく必要があります。</p>
 <div class=xAccordion>
-<input id=id-823941576 type=checkbox>
-<label class=xAccordion_title for=id-823941576>実行例</label>
+<input id=id-168572943 type=checkbox>
+<label class=xAccordion_title for=id-168572943>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp create-user-pool-client --user-pool-id ap-northeast-1_sf1nSZ2Oj --client-name client1
@@ -606,8 +799,8 @@
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-user-pool-clients --user-pool-id ユーザープールID
 </code></pre></div>
 <div class=xAccordion>
-<input id=id-296783415 type=checkbox>
-<label class=xAccordion_title for=id-296783415>実行例</label>
+<input id=id-739521864 type=checkbox>
+<label class=xAccordion_title for=id-739521864>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-user-pool-clients --user-pool-id ap-northeast-1_sf1nSZ2Oj
@@ -629,8 +822,8 @@
 </span></code></pre></div><p>クライアント名ではなく、クライアント ID を指定する必要があることに注意してください。
 クライアント ID は、<code>list-user-pool-clients</code> コマンドで確認できます。</p>
 <div class=xAccordion>
-<input id=id-921634758 type=checkbox>
-<label class=xAccordion_title for=id-921634758>実行例</label>
+<input id=id-915473826 type=checkbox>
+<label class=xAccordion_title for=id-915473826>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp describe-user-pool-client --user-pool-id ap-northeast-1_sf1nSZ2Oj --client-id 5sf3ad654tid5qt4r1768stto
@@ -671,8 +864,8 @@
 この管理 API でユーザー認証を行うには、Cognito ユーザープールの設定で対象のクライアントを選択し、<strong><code>ALLOW_ADMIN_USER_PASSWORD_AUTH</code></strong> にチェックを入れておく必要があります。
 これを有効にしておかないと、管理者用の Cognito API（<code>admin-initiate-auth</code> コマンドなど）で認証できません。</p>
 <div class=xAccordion>
-<input id=id-937854216 type=checkbox>
-<label class=xAccordion_title for=id-937854216>実行例（パスワード変更が必要な場合）</label>
+<input id=id-234716598 type=checkbox>
+<label class=xAccordion_title for=id-234716598>実行例（パスワード変更が必要な場合）</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp admin-initiate-auth --user-pool-id ap-northeast-1_sf1nSZ2Oj --client-id 5sf3ad654tid5qt4r1768stto --auth-flow ADMIN_USER_PASSWORD_AUTH --auth-parameters <span class=nv>USERNAME</span><span class=o>=</span>user1,PASSWORD<span class=o>=</span>Password!123
@@ -981,311 +1174,6 @@ TypeScript を使用する場合は、Jest ライブラリの型情報である 
 </div>
 <div class=xArticle_up>
 <a href=./p/tx6md39/><span class=xArticle_up_label>TypeScriptの環境/設定について</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/6p3dox9/>Firebase</a></span></div>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/firebase>Firebase</a></span>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-03-17>2022-03-17</time><br>
-作成: <time itemprop=datePublished datetime=2022-03-13>2022-03-13</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#何をするか>何をするか？</a></li>
-<li><a href=#事前準備>事前準備</a></li>
-<li><a href=#プロジェクトの雛形の生成>プロジェクトの雛形の生成</a></li>
-<li><a href=#集計用-cloud-functions-の作成>集計用 Cloud Functions の作成</a></li>
-<li><a href=#実行結果の確認>実行結果の確認</a></li>
-<li><a href=#さらにドキュメントの-read-回数を減らすには>さらにドキュメントの read 回数を減らすには</a>
-<ul>
-<li><a href=#集計処理をスキップする>集計処理をスキップする</a></li>
-<li><a href=#集計情報を差分更新する>集計情報を差分更新する</a></li>
-</ul>
-</li>
-</ul>
-</nav><h2 id=何をするか>何をするか？</h2>
-<p>Firestore データベースは、コレクションデータを手軽に格納していくのにはとても便利ですが、全データを集計するような処理は苦手です。
-例えば、各ドキュメントに付けられた「タグ」情報をすべて回収して、タグの一覧を生成したい場合、全てのドキュメントを read する必要があるため、ドキュメント数が Firebase の使用料金にダイレクトに効いてきます。
-もし、Firestore にドキュメントが追加されるたびに Cloud Functions を起動してこのような集計処理を行うと、凄まじい勢いで課金されてしまいます。</p>
-<p>ここでは、Cloud Functions による <strong>集計処理を定期的なスケジュールで起動する</strong> ことで、Firestore ドキュメントの read 処理を削減してみます。
-もちろん、リアルタイムな更新が必要なデータには使えませんが、カタログ的なデータであれば、定期的なデータ更新で間に合うケースは多いはずです。</p>
-<h2 id=事前準備>事前準備</h2>
-<ul>
-<li><a href=https://console.firebase.google.com/>Firebase コンソール</a> からテスト用のプロジェクトを作成してください。ここでは、自動生成されたアプリ ID を <code>myapp-58138</code> とします。</li>
-<li>Firestore データベースに <code>books</code> コレクションを追加し、次のようなサンプルドキュメントを追加してください。<code>tag</code> フィールドは本来は配列 (<code>tags</code>) であるべきですが、ここではシンプル化のために文字列型のスカラデータとしています。
-<ul>
-<li>id: <code>001</code> (title: <code>Title1</code>, author: <code>Author1</code>, tag: <code>Tag1</code>)</li>
-<li>id: <code>002</code> (title: <code>Title2</code>, author: <code>Author2</code>, tag: <code>Tag2</code>)</li>
-<li>id: <code>003</code> (title: <code>Title3</code>, author: <code>Author3</code>, tag: <code>Tag3</code>)</li>
-</ul>
-</li>
-<li><a href=./p/pamw7hr>Firebase CLI をインストール</a> して、<code>firebase</code> コマンドを使用できるようにしてください。作成した関数を Cloud Functions にデプロイするために使います。</li>
-</ul>
-<h2 id=プロジェクトの雛形の生成>プロジェクトの雛形の生成</h2>
-<p>プロジェクト用のディレクトリを作成します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mkdir myapp
-<span class=gp>$ </span><span class=nb>cd</span> myapp
-</code></pre></div><p><code>firebase init</code> コマンドを実行して、Cloud Functions をデプロイするための <code>firebase.json</code> ファイルと、関数実装のテンプレート (<code>functions/*</code>) を作成します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>firebase init functions
-</code></pre></div><p>次のような感じで質問に回答していけば OK です。
-ESLint のスタイルはプロジェクトによって異なるので、ここでは自動設定しないようにしています。</p>
-<ul>
-<li>? Please select an option: <code>Use an existing project</code></li>
-<li>? Select a default Firebase project for this directory: <code>myapp-58138 (MyApp)</code></li>
-<li>? What language would you like to use to write Cloud Functions? <code>TypeScript</code></li>
-<li>? Do you want to use ESLint to catch probable bugs and enforce style? <code>n</code></li>
-<li>? Do you want to install dependencies with npm now? <code>y</code></li>
-</ul>
-<h2 id=集計用-cloud-functions-の作成>集計用 Cloud Functions の作成</h2>
-<p>Cloud Functions のテンプレートコードとして、<code>functions/src/index.ts</code> というファイルが生成されているので、このファイルを修正することにします。
-ここでは、次のような処理を <strong>60 分おきに実行</strong> するように実装しています。</p>
-<ol>
-<li><code>books</code> コレクション内のすべてのドキュメントからタグ情報を回収（<code>collectTags</code> 関数）</li>
-<li>タグの配列を <code>meta/booksMeta</code> ドキュメントの <code>tags</code> フィールドに保存（<code>updateMeta</code> 関数）</li>
-</ol>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>functions/src/index.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>admin</span> <span class=kr>from</span> <span class=s1>&#39;firebase-admin&#39;</span>
-<span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>functions</span> <span class=kr>from</span> <span class=s1>&#39;firebase-functions&#39;</span>
-
-<span class=nx>admin</span><span class=p>.</span><span class=nx>initializeApp</span><span class=p>()</span>
-<span class=kr>const</span> <span class=nx>booksCollRef</span> <span class=o>=</span> <span class=nx>admin</span><span class=p>.</span><span class=nx>firestore</span><span class=p>().</span><span class=nx>collection</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>)</span>
-<span class=kr>const</span> <span class=nx>booksMetaRef</span> <span class=o>=</span> <span class=nx>admin</span><span class=p>.</span><span class=nx>firestore</span><span class=p>().</span><span class=nx>doc</span><span class=p>(</span><span class=s1>&#39;meta/booksMeta&#39;</span><span class=p>)</span>
-
-<span class=cm>/** 定期的にメタ情報を更新する関数。 */</span>
-<span class=nx>exports</span><span class=p>.</span><span class=nx>updateMetaFunction</span> <span class=o>=</span> <span class=nx>functions</span>
-  <span class=p>.</span><span class=nx>region</span><span class=p>(</span><span class=s1>&#39;asia-northeast1&#39;</span><span class=p>)</span>
-  <span class=p>.</span><span class=nx>pubsub</span><span class=p>.</span><span class=nx>schedule</span><span class=p>(</span><span class=s1>&#39;every 60 minutes&#39;</span><span class=p>)</span>
-  <span class=p>.</span><span class=nx>onRun</span><span class=p>(</span><span class=kr>async</span> <span class=p>(</span><span class=nx>context</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;Start updating tags information of books&#39;</span><span class=p>)</span>
-    <span class=kr>const</span> <span class=nx>tags</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>collectTags</span><span class=p>()</span>
-    <span class=k>await</span> <span class=nx>updateMeta</span><span class=p>(</span><span class=nx>tags</span><span class=p>)</span>
-    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=sb>`tags = </span><span class=si>${</span><span class=nx>tags</span><span class=p>.</span><span class=nx>join</span><span class=p>(</span><span class=s1>&#39;, &#39;</span><span class=p>)</span><span class=si>}</span><span class=sb>`</span><span class=p>)</span>
-    <span class=k>return</span> <span class=kc>null</span>
-  <span class=p>})</span>
-
-<span class=cm>/** books コレクション内のドキュメントからタグ情報を抽出します。 */</span>
-<span class=kr>async</span> <span class=kd>function</span> <span class=nx>collectTags</span><span class=p>()</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>string</span><span class=err>[]</span><span class=p>&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>tags</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Set</span><span class=p>&lt;</span><span class=nt>string</span><span class=p>&gt;()</span>
-  <span class=kr>const</span> <span class=nx>snapshot</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>booksCollRef</span><span class=p>.</span><span class=kr>get</span><span class=p>()</span>
-  <span class=nx>snapshot</span><span class=p>.</span><span class=nx>docs</span><span class=p>.</span><span class=nx>forEach</span><span class=p>((</span><span class=nx>doc</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-    <span class=kr>const</span> <span class=nx>book</span> <span class=o>=</span> <span class=nx>doc</span><span class=p>.</span><span class=nx>data</span><span class=p>()</span>
-    <span class=nx>tags</span><span class=p>.</span><span class=nx>add</span><span class=p>(</span><span class=nx>book</span><span class=p>[</span><span class=s1>&#39;tag&#39;</span><span class=p>])</span>
-  <span class=p>})</span>
-  <span class=k>return</span> <span class=p>[...</span><span class=nx>tags</span><span class=p>].</span><span class=nx>sort</span><span class=p>()</span> <span class=c1>// Set からソート済み文字列配列に変換
-</span><span class=c1></span><span class=p>}</span>
-
-<span class=cm>/** meta コレクションのタグ一覧情報を更新します。 */</span>
-<span class=kr>async</span> <span class=kd>function</span> <span class=nx>updateMeta</span><span class=p>(</span><span class=nx>tags</span>: <span class=kt>string</span><span class=p>[])</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>void</span><span class=p>&gt;</span> <span class=p>{</span>
-  <span class=k>await</span> <span class=nx>booksMetaRef</span><span class=p>.</span><span class=kr>set</span><span class=p>({</span> <span class=nx>tags</span> <span class=p>},</span> <span class=p>{</span> <span class=nx>merge</span>: <span class=kt>true</span> <span class=p>})</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p><code>functions</code> ディレクトリ以下で次のようにしてビルド＆デプロイします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>npm run deploy
-<span class=go>（下記と同様です）
-</span><span class=go></span><span class=gp>$ </span>firebase deploy --only functions
-</code></pre></div><p>デプロイが完了するまで数分間待ちます。</p>
-<ul>
-<li>参考: <a href="https://firebase.google.com/docs/functions/schedule-functions?hl=ja">関数のスケジュール設定 | Firebase Documentation</a></li>
-</ul>
-<h2 id=実行結果の確認>実行結果の確認</h2>
-<p>Firebase コンソールからプロジェクトを開き、Functions のページを開きます。
-今回作成した関数は「60 分おき」に実行されるようにスケジューリングしましたが、関数のオプションメニューから <strong><code>Cloud Scheduler で表示</code></strong> を選択し、関数を手動で <strong><code>今すぐ実行</code></strong> することができます。</p>
-<figure class=xImage>
-<a href=./p/vgs4dox/img-001.png target=_blank>
-<img style="border:solid #ccc 2px" width=1948 height=792 src=./p/vgs4dox/img-001.png alt=/p/vgs4dox/img-001.png>
-</a>
-</figure>
-<div class=xNote>
-<span class=xNote_title>☝️ Cloud Scheduler とは</span>
-<span class=xNote_body>Cloud Functions の スケジュール実行は、GCP (Google Cloud Platform) の Pub/Sub API と Cloud Scheduler API によって実現されています。
-Firebase CLI で関数をデプロイすると、これらのリソースは自動的に生成されるので、特に意識して操作する必要はありません。
-ただし、上記の例のように、Cloud Scheduler を手動トリガで起動する場合は、GCP 側の画面に遷移して操作する必要があります。</span>
-</div>
-<p>関数が実行されると、Firestore の <code>books</code> コレクションのタグ情報が回収されて、<code>meta/booksMeta</code> ドキュメントに書き込まれます。
-Firestore Database のページを開き、データタブを選択すると、<code>tags</code> フィールドにすべてのタグ情報が格納されていることを確認できます。</p>
-<figure class=xImage>
-<a href=./p/vgs4dox/img-002.png target=_blank>
-<img style="border:solid #ccc 2px" width=1710 height=908 src=./p/vgs4dox/img-002.png alt=/p/vgs4dox/img-002.png>
-</a>
-</figure>
-<h2 id=さらにドキュメントの-read-回数を減らすには>さらにドキュメントの read 回数を減らすには</h2>
-<p>今回、Firestore ドキュメントの集計用関数の呼び出し頻度を 1 時間に 1 回としましたが、ドキュメント数が数万件規模になってくると、これでもドキュメントの read 回数が膨大になってしまいます（Firestore の無料枠は、1 日あたり 50,000 read しかありません）。
-データ集計用の read 回数をさらに減らすには、次のような方法が考えられます。</p>
-<ul>
-<li>Cloud Functions の定期実行時に <code>books</code> コレクションが更新されているかをチェックして、更新されていない場合は <strong>集計処理をスキップする</strong></li>
-<li><code>books</code> コレクションの更新時に <strong>集計情報を差分更新する</strong></li>
-</ul>
-<p>以下、それぞれの方法を見ていきます。</p>
-<h3 id=集計処理をスキップする>集計処理をスキップする</h3>
-<p>スケジューリングされた Cloud Functions は定期的に呼び出されますが、このとき <code>books</code> コレクションのデータが何も更新されていないのであれば、全データをスキャンして集計するのは無駄です。
-各ドキュメントを更新したときに、<strong><code>updatedAt</code></strong> のようなフィールドを付加しておけば、前回の集計関数が実行されたあとにデータ更新があったかどうかをチェックすることができます（集計データの方にも <strong><code>updatedAt</code></strong> フィールドが必要です）。</p>
-<p>ちなみに、クライアントアプリから Firestore のドキュメントを更新するときは、<a href=https://firebase.google.com/docs/reference/node/firebase.firestore.FieldValue#servertimestamp>serverTimestamp 関数</a> の戻り値をフィールド値として設定することで、サーバー側のタイムスタンプを格納することができます。
-クライアント PC のシステム時刻は狂っている可能性があるので、このように更新時刻をセットした方が安全です。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>serverTimestamp</span><span class=p>,</span> <span class=nx>setDoc</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;firebase/firestore&#34;</span><span class=p>;</span>
-
-<span class=c1>// ...
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>bookDoc</span> <span class=o>=</span> <span class=p>{</span>
-  <span class=nx>title</span><span class=o>:</span> <span class=s1>&#39;New Title&#39;</span><span class=p>,</span>
-  <span class=nx>author</span><span class=o>:</span> <span class=s1>&#39;New Author&#39;</span><span class=p>,</span>
-  <span class=nx>tag</span><span class=o>:</span> <span class=s1>&#39;New Tag&#39;</span><span class=p>,</span>
-  <span class=nx>updatedAt</span>: <span class=kt>serverTimestamp</span><span class=p>()</span>  <span class=c1>// サーバー側で更新時刻を詰める
-</span><span class=c1></span><span class=p>}</span>
-</code></pre></div><p>Cloud Functions でメタ情報を更新するときも、メタ情報側に <code>updatedAt</code> フィールドを格納するようにします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// import { FieldValue } from &#39;firebase-admin/firestore&#39;
-</span><span class=c1></span>
-<span class=cm>/** meta コレクションのタグ一覧情報を更新します。 */</span>
-<span class=kr>async</span> <span class=kd>function</span> <span class=nx>updateMeta</span><span class=p>(</span><span class=nx>tags</span>: <span class=kt>string</span><span class=p>[])</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>void</span><span class=p>&gt;</span> <span class=p>{</span>
-  <span class=k>await</span> <span class=nx>booksMetaRef</span><span class=p>.</span><span class=kr>set</span><span class=p>(</span>
-    <span class=p>{</span> <span class=nx>tags</span><span class=p>,</span> <span class=nx>updatedAt</span>: <span class=kt>FieldValue.serverTimestamp</span><span class=p>()</span> <span class=p>},</span>
-    <span class=p>{</span> <span class=nx>merge</span>: <span class=kt>true</span> <span class=p>}</span>
-  <span class=p>)</span>
-<span class=p>}</span>
-</code></pre></div><p>あとは、定期実行される Cloud Functions の集計関数の中で、上記タイムスタンプを比較して、メタ情報の更新時刻の方が古い場合のみメタ情報を更新するようにします。
-更新が必要ない場合は、<code>books</code> コレクション内のドキュメントは 1 つだけ read するだけで済む（最新の <code>updatedAt</code> を持つドキュメントを 1 つだけ read する）ので、Firestore の課金を最小限に抑えられます。</p>
-<p>以下にこの対応を入れた Cloud Functions の関数実装を載せておきます。</p>
-<div class=xAccordion>
-<input id=id-489623175 type=checkbox>
-<label class=xAccordion_title for=id-489623175>functions/src/index.ts</label>
-<div class=xAccordion_body>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>admin</span> <span class=kr>from</span> <span class=s1>&#39;firebase-admin&#39;</span>
-<span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>functions</span> <span class=kr>from</span> <span class=s1>&#39;firebase-functions&#39;</span>
-<span class=kr>import</span> <span class=p>{</span> <span class=nx>FieldValue</span><span class=p>,</span> <span class=nx>Timestamp</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;firebase-admin/firestore&#39;</span>
-
-<span class=nx>admin</span><span class=p>.</span><span class=nx>initializeApp</span><span class=p>()</span>
-<span class=kr>const</span> <span class=nx>booksCollRef</span> <span class=o>=</span> <span class=nx>admin</span><span class=p>.</span><span class=nx>firestore</span><span class=p>().</span><span class=nx>collection</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>)</span>
-<span class=kr>const</span> <span class=nx>booksMetaRef</span> <span class=o>=</span> <span class=nx>admin</span><span class=p>.</span><span class=nx>firestore</span><span class=p>().</span><span class=nx>doc</span><span class=p>(</span><span class=s1>&#39;meta/booksMeta&#39;</span><span class=p>)</span>
-
-<span class=cm>/** 定期的に実行する関数。 */</span>
-<span class=nx>exports</span><span class=p>.</span><span class=nx>updateMetaFunction</span> <span class=o>=</span> <span class=nx>functions</span>
-  <span class=p>.</span><span class=nx>region</span><span class=p>(</span><span class=s1>&#39;asia-northeast1&#39;</span><span class=p>)</span>
-  <span class=p>.</span><span class=nx>pubsub</span><span class=p>.</span><span class=nx>schedule</span><span class=p>(</span><span class=s1>&#39;every 60 minutes&#39;</span><span class=p>)</span>
-  <span class=p>.</span><span class=nx>onRun</span><span class=p>(</span><span class=kr>async</span> <span class=p>(</span><span class=nx>context</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;Checks if the books are updated&#39;</span><span class=p>)</span>
-    <span class=kr>const</span> <span class=nx>needToUpdate</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>needToUpdateMeta</span><span class=p>()</span>
-    <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=nx>needToUpdate</span><span class=p>)</span> <span class=p>{</span>
-      <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;Books are not updated&#39;</span><span class=p>)</span>
-      <span class=k>return</span> <span class=kc>null</span>
-    <span class=p>}</span>
-    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;Start updating meta information of books&#39;</span><span class=p>)</span>
-    <span class=kr>const</span> <span class=nx>tags</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>collectTags</span><span class=p>()</span>
-    <span class=c1>// console.log(`tags = ${tags.join(&#39;, &#39;)}`)
-</span><span class=c1></span>    <span class=k>await</span> <span class=nx>updateMeta</span><span class=p>(</span><span class=nx>tags</span><span class=p>)</span>
-
-    <span class=k>return</span> <span class=kc>null</span>
-  <span class=p>})</span>
-
-<span class=cm>/** books コレクション内のドキュメントからタグ情報を抽出します。 */</span>
-<span class=kr>async</span> <span class=kd>function</span> <span class=nx>collectTags</span><span class=p>()</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>string</span><span class=err>[]</span><span class=p>&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>tags</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Set</span><span class=p>&lt;</span><span class=nt>string</span><span class=p>&gt;()</span>
-  <span class=kr>const</span> <span class=nx>snapshot</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>booksCollRef</span><span class=p>.</span><span class=kr>get</span><span class=p>()</span>
-  <span class=nx>snapshot</span><span class=p>.</span><span class=nx>docs</span><span class=p>.</span><span class=nx>forEach</span><span class=p>((</span><span class=nx>doc</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-    <span class=kr>const</span> <span class=nx>book</span> <span class=o>=</span> <span class=nx>doc</span><span class=p>.</span><span class=nx>data</span><span class=p>()</span>
-    <span class=nx>tags</span><span class=p>.</span><span class=nx>add</span><span class=p>(</span><span class=nx>book</span><span class=p>[</span><span class=s1>&#39;tag&#39;</span><span class=p>])</span>
-  <span class=p>})</span>
-  <span class=k>return</span> <span class=p>[...</span><span class=nx>tags</span><span class=p>].</span><span class=nx>sort</span><span class=p>()</span> <span class=c1>// Set からソート済み文字列配列に変換
-</span><span class=c1></span><span class=p>}</span>
-
-<span class=cm>/** meta コレクションのタグ一覧情報を更新します。 */</span>
-<span class=kr>async</span> <span class=kd>function</span> <span class=nx>updateMeta</span><span class=p>(</span><span class=nx>tags</span>: <span class=kt>string</span><span class=p>[])</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>void</span><span class=p>&gt;</span> <span class=p>{</span>
-  <span class=k>await</span> <span class=nx>booksMetaRef</span><span class=p>.</span><span class=kr>set</span><span class=p>(</span>
-    <span class=p>{</span> <span class=nx>tags</span><span class=p>,</span> <span class=nx>updatedAt</span>: <span class=kt>FieldValue.serverTimestamp</span><span class=p>()</span> <span class=p>},</span>
-    <span class=p>{</span> <span class=nx>merge</span>: <span class=kt>true</span> <span class=p>}</span>
-  <span class=p>)</span>
-<span class=p>}</span>
-
-<span class=cm>/** books コレクションの最終更新日時を取得します。 */</span>
-<span class=kr>async</span> <span class=kd>function</span> <span class=nx>lastUpdatedTimeOfBook</span><span class=p>()</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>Timestamp</span> <span class=err>|</span> <span class=na>undefined</span><span class=p>&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>booksSnap</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>booksCollRef</span>
-    <span class=p>.</span><span class=nx>orderBy</span><span class=p>(</span><span class=s1>&#39;updatedAt&#39;</span><span class=p>,</span> <span class=s1>&#39;desc&#39;</span><span class=p>)</span>
-    <span class=p>.</span><span class=nx>limit</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
-    <span class=p>.</span><span class=kr>get</span><span class=p>()</span>
-  <span class=k>if</span> <span class=p>(</span><span class=nx>booksSnap</span><span class=p>.</span><span class=nx>empty</span><span class=p>)</span> <span class=p>{</span>
-    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=s1>&#39;updatedAt を持つドキュメントが見つかりません！&#39;</span><span class=p>)</span>
-    <span class=k>return</span> <span class=kc>undefined</span>
-  <span class=p>}</span>
-  <span class=kr>const</span> <span class=nx>latestBook</span> <span class=o>=</span> <span class=nx>booksSnap</span><span class=p>.</span><span class=nx>docs</span><span class=p>[</span><span class=mi>0</span><span class=p>].</span><span class=nx>data</span><span class=p>()</span>
-  <span class=k>return</span> <span class=nx>latestBook</span><span class=p>[</span><span class=s1>&#39;updatedAt&#39;</span><span class=p>]</span>
-<span class=p>}</span>
-
-<span class=cm>/** メタ情報の最終更新日時を取得します。 */</span>
-<span class=kr>async</span> <span class=kd>function</span> <span class=nx>lastUpdatedTimeOfMeta</span><span class=p>()</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>Timestamp</span> <span class=err>|</span> <span class=na>undefined</span><span class=p>&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>metaSnap</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>booksMetaRef</span><span class=p>.</span><span class=kr>get</span><span class=p>()</span>
-  <span class=k>return</span> <span class=nx>metaSnap</span><span class=p>.</span><span class=nx>data</span><span class=p>()</span><span class=o>?</span><span class=p>.[</span><span class=s1>&#39;updatedAt&#39;</span><span class=p>]</span>
-<span class=p>}</span>
-
-<span class=cm>/**
-</span><span class=cm> * メタ情報の更新が必要かどうかを確認します。
-</span><span class=cm> * （メタ情報の最終更新後に、books コレクションが更新されていれば true）
-</span><span class=cm> */</span>
-<span class=kr>async</span> <span class=kd>function</span> <span class=nx>needToUpdateMeta</span><span class=p>()</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>boolean</span><span class=p>&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>bookUpdated</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>lastUpdatedTimeOfBook</span><span class=p>()</span>
-  <span class=k>if</span> <span class=p>(</span><span class=nx>bookUpdated</span> <span class=o>==</span> <span class=kc>undefined</span><span class=p>)</span> <span class=p>{</span>
-    <span class=c1>// books コレクションのドキュメントに updatedAt フィールドがなければ何もしない
-</span><span class=c1></span>    <span class=k>return</span> <span class=kc>false</span>
-  <span class=p>}</span>
-
-  <span class=kr>const</span> <span class=nx>metaUpdated</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>lastUpdatedTimeOfMeta</span><span class=p>()</span>
-  <span class=c1>// メタ情報が books コレクションより古ければ更新する必要がある
-</span><span class=c1></span>  <span class=k>return</span> <span class=nx>metaUpdated</span> <span class=o>==</span> <span class=kc>undefined</span> <span class=o>||</span> <span class=nx>bookUpdated</span> <span class=o>&gt;</span> <span class=nx>metaUpdated</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-</div>
-</div>
-<h3 id=集計情報を差分更新する>集計情報を差分更新する</h3>
-<p>Cloud Functions の <a href="https://firebase.google.com/docs/functions/firestore-events?hl=ja">Cloud Firestore トリガー</a> を使うと、Firestore データベースの任意のドキュメントが更新されたときに関数を呼び出すことができます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>exports</span><span class=p>.</span><span class=nx>bookUpdated</span> <span class=o>=</span> <span class=nx>functions</span><span class=p>.</span><span class=nx>firestore</span>
-  <span class=p>.</span><span class=nb>document</span><span class=p>(</span><span class=s1>&#39;books/{bookId}&#39;</span><span class=p>)</span>
-  <span class=p>.</span><span class=nx>onWrite</span><span class=p>((</span><span class=nx>change</span><span class=p>,</span> <span class=nx>context</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-    <span class=c1>// context.params.bookId == &#34;001&#34;;
-</span><span class=c1></span>    <span class=c1>// ... and ...
-</span><span class=c1></span>    <span class=c1>// change.before.data() == {tag: &#34;Old Tag&#34;, ...}
-</span><span class=c1></span>    <span class=c1>// change.after.data() == {tag: &#34;New Tag&#34;, ...}
-</span><span class=c1></span>  <span class=p>});</span>
-</code></pre></div><p>これを利用すると、更新されたドキュメントの内容（更新前と更新後の値）を随時取得できるので、その差分情報を使ってメタ情報をリアルタイムに更新することができます。
-ただし、積み上げの形でメタ情報を更新していくことになるので、整合性が保たれるように注意しなければいけません。</p>
-<p>タグが完全に削除されたことを検出するためには、メタ情報としてタグの参照カウンタを保存しておくといった変更も必要になるでしょう。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>メタ情報としてタグの参照カウンタを持つ</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>tags</span><span class=p>:</span><span class=w>
-</span><span class=w>  </span><span class=nt>&#34;Tag1&#34;: </span><span class=m>7</span><span class=w>
-</span><span class=w>  </span><span class=nt>&#34;Tag2&#34;: </span><span class=m>10</span><span class=w>
-</span><span class=w>  </span><span class=nt>&#34;Tag3&#34;: </span><span class=m>0</span></code></pre></div></div>
-</figure>
-<p>上記の <code>Tag3</code> のように、そのタグの参照数カウンタが 0 になったらそのタグはもう存在しないとみなします。</p>
-<p>このように、差分更新は複雑で慎重に扱う必要があるので、定期的な集計で済むのであればそちらの手法を使った方が簡単です。
-ある程度の整合性を保ちながら、メタ情報をリアルタイムに更新していく必要がある場合は、両者の手法を組み合わせて使う方法も考えられます。
-例えば、ドキュメントの更新時にメタ情報を差分更新しつつ、1 日 1 回程度の定期的な集計処理で整合性を担保します。</p>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/dw9jt4e/>Firebase Auth で admin ユーザーのみ Firestore に書き込みできるようにする</a></li>
-<li><a href=./p/pamw7hr/>Firebase CLI でコマンドラインから Firebase を操作する</a></li>
-<li><a href=./p/yfov4bi/>Firebase Admin SDK で Firebase の各種サービスを操作する</a></li>
-<li><a href=./p/73eq2cm/>Next.js で Firebase: プロジェクトの作成と接続準備</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/firebase>Firebase</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/6p3dox9/><span class=xArticle_up_label>Firebase 関連メモ</span><br>へ戻る</a>
 </div>
 </article><h2>メニュー</h2>
 <div class=xTopMenu>

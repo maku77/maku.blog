@@ -11,7 +11,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://maku.blog/assets/img/site-logo-large.png">
 <meta property="og:description" content="AWS CLI とは？ AWS CLI (Command Line Interface) を使うと、AWS の各種サービスをコマンドラインから操作することができます。 例えば、次のように様々な処理を実行できます。
-AWS CLI の使用例 ### S3 バケットを作成する $ aws s3 mb s3://バケット名 ### S3 にファイルをコピーする $ aws s3 cp ローカルファイル s3://バケット名/ディレクトリ名 ### IAM ユーザーのアクセスキーを表示する $ aws iam list-access-keys --user-name=ユーザー名 ### DynamoDB にテーブルを作成する $ aws dynamodb create-table --table-name テーブル名 ...  AWS の各種サービスの設定は、それぞれのマネージメントコンソール（Web サイト）上で設定することができますが、AWS CLI を使うことで、Web ブラウザを開かずに設定を済ませられます。 頻繁に行う処理などは、シェルスクリプトなどにして自動化することができます。
+ S3 にファイルをコピーする $ aws s3 cp ローカルファイル s3://バケット名/ディレクトリ名  IAM ユーザーのアクセスキーを表示する $ aws iam list-access-keys --user-name=ユーザー名  DynamoDB にテーブルを作成する $ aws dynamodb create-table --table-name テーブル名 ...   AWS の各種サービスの設定は、それぞれのマネージメントコンソール（Web サイト）上で設定することができますが、AWS CLI を使うことで、Web ブラウザを開かずに設定を済ませられます。 頻繁に行う処理などは、シェルスクリプトなどにして自動化することができます。
 AWS CLI を使用するには、下記のような IAM ユーザーのアクセスキー（及びシークレットアクセスキー）が必要です。 以降の説明では、これらの情報が取得できていることを前提とします。
  API 用アクセスキー（例）: INMCAKIAQX77PNSXQAGP API 用シークレットアクセスキー（例）: 2ufOA3Q2KAmpNTo2GHPDXFJK7Jiv9yfZGegIdbCW  参考リンク  IAM ユーザーのアクセスキーを作成するには - AWS CLI   AWS CLI のインストール インストール方法  macOS の場合 &mldr; AWSCLIV2.">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
@@ -60,6 +60,10 @@ AWS CLI を使用するには、下記のような IAM ユーザーのアクセ�
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/>Go 言語で AWS SDK を使う開発環境を整える
+<time>2022-04-11</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/yzjj4c7/>Amazon Cognito をコマンドライン (CLI) から操作する
 <time>2022-04-06</time></a>
 </div>
@@ -75,10 +79,6 @@ AWS CLI を使用するには、下記のような IAM ユーザーのアクセ�
 <a href=../../p/ryq6it6/>NPM パッケージを作るときの package.json ファイルの書き方に関してのメモ
 <time>2022-03-16</time></a>
 </div>
-<div class=xBoxLink>
-<a href=../../p/un3gu8m/>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする
-<time>2022-02-27</time></a>
-</div>
 </div>
 </div>
 <div class=xMenu_box data-sticky>
@@ -93,6 +93,7 @@ AWS CLI を使用するには、下記のような IAM ユーザーのアクセ�
 <li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
 <li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
 <ul>
+<li><a class=xNavTree-dir href=../../p/cenio8m/>AWS 一般／環境／設定など</a>
 <li><a class=xNavTree-dir href=../../p/vigdnzf/>CLI</a>
 <ul>
 </ul>
@@ -144,9 +145,9 @@ AWS CLI を使用するには、下記のような IAM ユーザーのアクセ�
 </div><div class=xMenu_tag>
 <a href=../../tags/typescript>typescript (58)</a>
 </div><div class=xMenu_tag>
-<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
+<a href=../../tags/aws>aws (53)</a>
 </div><div class=xMenu_tag>
-<a href=../../tags/aws>aws (52)</a>
+<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/next.js>next.js (36)</a>
 </div><div class=xMenu_tag>
@@ -404,6 +405,8 @@ AWS CLI を使用するには、下記のような IAM ユーザーのアクセ�
 </div><div class=xMenu_tag>
 <a href=../../tags/git>git (1)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/go>go (1)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/groovy>groovy (1)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/html>html (1)</a>
@@ -515,20 +518,17 @@ AWS CLI を使用するには、下記のような IAM ユーザーのアクセ�
 </nav><h2 id=aws-cli-とは>AWS CLI とは？</h2>
 <p>AWS CLI (Command Line Interface) を使うと、AWS の各種サービスをコマンドラインから操作することができます。
 例えば、次のように様々な処理を実行できます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>AWS CLI の使用例</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>### S3 バケットを作成する
-$ aws s3 mb s3://バケット名
-
-### S3 にファイルをコピーする
-$ aws s3 cp ローカルファイル s3://バケット名/ディレクトリ名
-
-### IAM ユーザーのアクセスキーを表示する
-$ aws iam list-access-keys --user-name=ユーザー名
-
-### DynamoDB にテーブルを作成する
-$ aws dynamodb create-table --table-name テーブル名 ...</code></pre></div></div>
-</figure>
+<ul>
+<li>S3 にファイルをコピーする
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws s3 cp ローカルファイル s3://バケット名/ディレクトリ名
+</code></pre></div></li>
+<li>IAM ユーザーのアクセスキーを表示する
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws iam list-access-keys --user-name<span class=o>=</span>ユーザー名
+</code></pre></div></li>
+<li>DynamoDB にテーブルを作成する
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws dynamodb create-table --table-name テーブル名 ...
+</code></pre></div></li>
+</ul>
 <p>AWS の各種サービスの設定は、それぞれのマネージメントコンソール（Web サイト）上で設定することができますが、AWS CLI を使うことで、Web ブラウザを開かずに設定を済ませられます。
 頻繁に行う処理などは、シェルスクリプトなどにして自動化することができます。</p>
 <p>AWS CLI を使用するには、下記のような IAM ユーザーのアクセスキー（及びシークレットアクセスキー）が必要です。
