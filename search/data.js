@@ -932,7 +932,7 @@ body: "gnuplot: 場合分けをして不連続関数を描画する 次のよう
 {
 url: "/p/sdq2cnx/",
 title: "AWS CloudFormation/SAM/CDK のメモ",
-date: "2021-10-11T00:00:00Z",
+date: "2022-04-13T00:00:00Z",
 body: "AWS CloudFormation/SAM/CDK のメモ"
 },
 {
@@ -1488,16 +1488,34 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/7s7hs4e/",
+title: "AWS 関連メモ",
+date: "2022-04-13T00:00:00Z",
+body: "AWS 関連メモ"
+},
+{
+url: "/p/54s6es8/",
+title: "Go 言語で AWS CDK V2 を使う (1) 導入編",
+date: "2022-04-13T00:00:00Z",
+body: "Go 言語で AWS CDK V2 を使う (1) 導入編 何をするか？ CDK プロジェクトでは多くのケースでは TypeScript を使ってコード記述されていると思いますが、Go 言語の勢いが出てきていることもあり、ここでは Go 言語を使った CDK プロジェクトを作成してみます。 CDK 自体の概要については下記に簡単にまとまっています。 参考: AWS CDK 入門 (1) インストールから Hello World まで 以下、Go 言語のインストールや、AWS の認証情報の設定 (~/.aws/credentials, ~/.aws/config) はできているものとします。 参考: Go 言語で AWS SDK を使う開発環境を整える AWS CDK のインストール Go 言語で CDK のコードを記述する場合でも、AWS CDK のコマンドラインツール (cdk) 自体は、Node.js の NPM パッケージで提供されているものを使います。 $ npm install -g aws-cdk ... $ cdk --version 2.20.0 (build 738ef49) CDK プロジェクトを作成する (cdk init) CDK の Scaffold 機能を使って、Go 言語用の CDK プロジェクトを生成します。 $ mkdir cdk-with-go $ cd cdk-with-go $ cdk init --language=go cdk init すると、次のようなファイルが生成されます。 TypeScript 用のプロジェクトと比べてとってもシンプルです！ - README.md # GitHub リポジトリのトップページ - .gitignore # CDK と Go 言語用の .gitignore - cdk-with-go.go # スタック生成コードのエントリポイント - cdk-with-go_test.go # 上記のテストコード - cdk.json # CDK 用の設定 - go.mod # Go モジュールの定義（CDK パッケージの依存情報など） 依存モジュールをダウンロードして、不要な依存関係を削除しておきます。 $ go mod tidy CloudFormation にスタックを生成する、削除する (cdk deploy, cdk destroy) 自動生成されたスタック定義用の Go コードを見ると、次のような感じになっています。 初期状態では、空っぽの CdkWithGoStack スタックを作るようになっています。 cdk-with-go.go （自動生成されたコード） package main import ( \u0026#34;github.com/aws/aws-cdk-go/awscdk/v2\u0026#34; // \u0026#34;github.com/aws/aws-cdk-go/awscdk/v2/awssqs\u0026#34; \t\u0026#34;github.com/aws/constructs-go/constructs/v10\u0026#34; // \u0026#34;github.com/aws/jsii-runtime-go\u0026#34; ) type CdkWithGoStackProps struct { awscdk.StackProps } func NewCdkWithGoStack(scope constructs.Construct, id string, props *CdkWithGoStackProps) awscdk.Stack { var sprops awscdk.StackProps if props != nil { sprops = props.StackProps } stack := awscdk.NewStack(scope, \u0026amp;id, \u0026amp;sprops) // The code that defines your stack goes here // example resource \t// queue := awssqs.NewQueue(stack, jsii.String(\u0026#34;CdkWithGoQueue\u0026#34;), \u0026amp;awssqs.QueueProps{ \t// VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(300)), \t// }) return stack } func main() { app := awscdk.NewApp(nil) NewCdkWithGoStack(app, \u0026#34;CdkWithGoStack\u0026#34;, \u0026amp;CdkWithGoStackProps{ awscdk.StackProps{ Env: env(), }, }) app.Synth(nil) } // env determines the AWS environment (account+region) in which our stack is to // be deployed. For more information see: https://docs.aws.amazon.com/cdk/latest/guide/environments.html func env() *awscdk.Environment { // If unspecified, this stack will be \u0026#34;environment-agnostic\u0026#34;. \t// Account/Region-dependent features and context lookups will not work, but a \t// single synthesized template can be deployed anywhere. \t//--------------------------------------------------------------------------- \treturn nil // Uncomment if you know exactly what account and region you want to deploy \t// the stack to. This is the recommendation for production stacks. \t//--------------------------------------------------------------------------- \t// return \u0026amp;awscdk.Environment{ \t// Account: jsii.String(\u0026#34;123456789012\u0026#34;), \t// Region: jsii.String(\u0026#34;us-east-1\u0026#34;), \t// } // Uncomment to specialize this stack for the AWS Account and Region that are \t// implied by the current CLI configuration. This is recommended for dev \t// stacks. \t//--------------------------------------------------------------------------- \t// return \u0026amp;awscdk.Environment{ \t// Account: jsii.String(os.Getenv(\u0026#34;CDK_DEFAULT_ACCOUNT\u0026#34;)), \t// Region: jsii.String(os.Getenv(\u0026#34;CDK_DEFAULT_REGION\u0026#34;)), \t// } } ここでは、このコードはそのまま使わずに、次のような最小限のコードを最初のステップとして使います。 cdk-with-go.go package main import ( \u0026#34;github.com/aws/aws-cdk-go/awscdk/v2\u0026#34; \u0026#34;github.com/aws/jsii-runtime-go\u0026#34; ) func main() { app := awscdk.NewApp(nil) awscdk.NewStack(app, jsii.String(\u0026#34;CdkWithGoStack\u0026#34;), \u0026amp;awscdk.StackProps{}) app.Synth(nil) } やっていることは単純で、空っぽのスタック (CdkWithGoStack) を作成しているだけです。 jsii.String というのは、文字列リテラルを String* 型の引数にそのまま渡すためのユーティリティです（これがないと文字列変数をいちいち作らないといけない\u0026hellip;）。 この定義に従って CloudFormation へデプロイを行うには、cdk deploy コマンドを実行します。 $ go mod tidy # 必要に応じて Go モジュールの依存解決 $ cdk deploy CloudFormation スタックの生成処理に 1 分くらいかかるのでしばらく待ちます。 コマンドの実行が完了してから AWS コンソールを覗いてみると、実際に CdkWithGoStack というスタックが生成されていることを確認できます。 図: AWS コンソール上の表示 このお試し作業が終わったら、cdk destory で作成したスタックを削除しておきます。 $ cdk destroy Are you sure you want to delete: CdkWithGoStack (y/n)? y スタックに AWS リソースを追加する ここでは、例としてスタック上に S3 バケットを作成してみます。 S3 を扱うパッケージを go get で追加します。 最後に go mod tidy でまとめて依存解決する方法もありますが、コーディング時に入力補完するためには先に go get しておく必要があります。 $ go get github.com/aws/aws-cdk-go/awscdk/v2/awss3 参考: AWS CDK V2 の API ドキュメント 参考: Go 言語用の awss3.NewBucket 関数 スタック生成用のコードを書き換えて、スタック上に S3 バケット (MyBucket) を追加します。 cdk-with-go.go package main import ( \u0026#34;github.com/aws/aws-cdk-go/awscdk/v2\u0026#34; \u0026#34;github.com/aws/aws-cdk-go/awscdk/v2/awss3\u0026#34; \u0026#34;github.com/aws/jsii-runtime-go\u0026#34; ) func main() { app := awscdk.NewApp(nil) stack := awscdk.NewStack(app, jsii.String(\u0026#34;CdkWithGoStack\u0026#34;), \u0026amp;awscdk.StackProps{}) // スタック内に S3 バケットを生成 \tawss3.NewBucket(stack, jsii.String(\u0026#34;MyBucket\u0026#34;), \u0026amp;awss3.BucketProps{}) app.Synth(nil) } あとは、次のようにデプロイすれば S3 バケットを持つ CloudFormation スタックが生成されます。 $ cdk deploy 他の AWS リソースに関しても、同様にスタックに追加していくことができます。"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2022-04-13T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-04-13T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/wqamv5d/",
 title: "Amazon API Gateway のメモ",
 date: "2022-04-11T00:00:00Z",
 body: "Amazon API Gateway のメモ"
-},
-{
-url: "/p/7s7hs4e/",
-title: "AWS 関連メモ",
-date: "2022-04-11T00:00:00Z",
-body: "AWS 関連メモ"
 },
 {
 url: "/p/yz2h95y/",
@@ -1516,18 +1534,6 @@ url: "/p/nej9wjb/",
 title: "Go 言語と AWS SDK V2 で Amazon Cognito を操作する",
 date: "2022-04-11T00:00:00Z",
 body: "Go 言語と AWS SDK V2 で Amazon Cognito を操作する ここでは、AWS SDK for Go V2 を使って、Go 言語から Amazon Cognito を操作するサンプルコードを示します。 Go 言語で AWS SDK を使うための開発環境 は構築済みとします。 指定したユーザープール内のユーザーリストを取得する (ListUsers) list_users.go package main import ( \u0026#34;context\u0026#34; \u0026#34;fmt\u0026#34; \u0026#34;github.com/aws/aws-sdk-go-v2/aws\u0026#34; \u0026#34;github.com/aws/aws-sdk-go-v2/config\u0026#34; \u0026#34;github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider\u0026#34; ) var userPoolId = \u0026#34;ap-northeast-1_XXXXXXXXX\u0026#34; // ユーザープールの ID func main() { listUsers() } func listUsers() { client := cognitoidentityprovider.NewFromConfig(loadAwsConfig()) input := \u0026amp;cognitoidentityprovider.ListUsersInput { UserPoolId: \u0026amp;userPoolId, } output, err := client.ListUsers(context.TODO(), input) if err != nil { panic(err) } for _, user := range output.Users { fmt.Printf(\u0026#34;%s, %s\\n\u0026#34;, user.UserCreateDate, *user.Username) } fmt.Printf(\u0026#34;Found %d users\\n\u0026#34;, len(output.Users)) } // 外部リソース（~/.aws/config など）からコンフィグ情報 (aws.Config) を生成します。 func loadAwsConfig() aws.Config { cfg, err := config.LoadDefaultConfig(context.TODO()) if err != nil { panic(err) } return cfg } 実行例 $ go run list_users.go 2021-11-25 06:37:28.751 +0000 UTC, user-name-1 2021-10-28 02:34:29.485 +0000 UTC, user-name-2 2021-11-30 13:49:28.566 +0000 UTC, user-name-3 Found 3 users ユーザーのパスワードを変更する (AdminSetUserPassword) package main import ( \u0026#34;context\u0026#34; \u0026#34;fmt\u0026#34; \u0026#34;github.com/aws/aws-sdk-go-v2/aws\u0026#34; \u0026#34;github.com/aws/aws-sdk-go-v2/config\u0026#34; \u0026#34;github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider\u0026#34; ) var userPoolId = \u0026#34;ap-northeast-1_XXXXXXXXX\u0026#34; // ユーザープールの ID func main() { adminSetUserPassword() } func adminSetUserPassword() { client := cognitoidentityprovider.NewFromConfig(loadAwsConfig()) user := \u0026#34;user1\u0026#34; pass := \u0026#34;Password#123\u0026#34; input := \u0026amp;cognitoidentityprovider.AdminSetUserPasswordInput{ UserPoolId: \u0026amp;userPoolId, Username: \u0026amp;user, Password: \u0026amp;pass, } _, err := client.AdminSetUserPassword(context.TODO(), input) if err != nil { panic(err) } fmt.Println(\u0026#34;Password changed\u0026#34;) } ユーザー名とパスワードで認証して ID トークンとアクセストークンを取得する (AdminInitiateAuth) 下記のように AdminInitiateAuth API でユーザー認証を行うには、Cognito ユーザープールの設定で対象のクライアントを選択し、ALLOW_ADMIN_USER_PASSWORD_AUTH にチェックを入れておく必要があります。 package main import ( \u0026#34;context\u0026#34; \u0026#34;fmt\u0026#34; \u0026#34;github.com/aws/aws-sdk-go-v2/aws\u0026#34; \u0026#34;github.com/aws/aws-sdk-go-v2/config\u0026#34; \u0026#34;github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider\u0026#34; \u0026#34;github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types\u0026#34; ) var userPoolId = \u0026#34;ap-northeast-1_XXXXXXXXX\u0026#34; // ユーザープールの ID var clientId = \u0026#34;XXXXXXXXXXXXXXXXXXXXXXXXX\u0026#34; func main() { adminInitiateAuth() } func adminInitiateAuth() { client := cognitoidentityprovider.NewFromConfig(loadAwsConfig()) input := \u0026amp;cognitoidentityprovider.AdminInitiateAuthInput{ UserPoolId: \u0026amp;userPoolId, ClientId: \u0026amp;clientId, AuthFlow: types.AuthFlowTypeAdminUserPasswordAuth, AuthParameters: map[string]string{\u0026#34;USERNAME\u0026#34;: \u0026#34;user1\u0026#34;, \u0026#34;PASSWORD\u0026#34;: \u0026#34;Password#123\u0026#34;}, } output, err := client.AdminInitiateAuth(context.TODO(), input) if err != nil { panic(err) } // レスポンスの出力 \tfmt.Printf(\u0026#34;ChallengeName = %s\\n\u0026#34;, output.ChallengeName) fmt.Printf(\u0026#34;ChallengeParameters = %v\\n\u0026#34;, output.ChallengeParameters) if output.Session != nil { fmt.Printf(\u0026#34;Session:\\n%s\\n\u0026#34;, *output.Session) } if output.AuthenticationResult != nil { fmt.Println(\u0026#34;AuthenticationResult:\u0026#34;) fmt.Printf(\u0026#34; IdToken = %s\\n\u0026#34;, *output.AuthenticationResult.IdToken) fmt.Printf(\u0026#34; AccessToken = %s\\n\u0026#34;, *output.AuthenticationResult.AccessToken) fmt.Printf(\u0026#34; RefreshToken = %s\\n\u0026#34;, *output.AuthenticationResult.RefreshToken) fmt.Printf(\u0026#34; TokenType = %s\\n\u0026#34;, *output.AuthenticationResult.TokenType) fmt.Printf(\u0026#34; ExpiresIn = %d(sec)\\n\u0026#34;, output.AuthenticationResult.ExpiresIn) } } 認証に成功すると、API の戻り値の AuthenticationResult に各種トークン情報が格納されます。 ChallengeName = ChallengeParameters = map[] AuthenticationResult: IdToken = eyJraWQiOiJvVU-UYPb...長いので省略...QlbXNjaDF4cHBRWWU AccessToken = eyJraWQiOiJ2a1W...長いので省略...MeaGq7Q-ecVo7UrQA RefreshToken = eyJjdHkiOiJKV1...長いので省略...FmbPUE4M-CFXNp9aA TokenType = Bearer ExpiresIn = 3600(sec) 場合によっては、次のように追加のチャレンジリクエストが返されることがあります。 ChallengeName = NEW_PASSWORD_REQUIRED ChallengeParameters = map[USER_ID_FOR_SRP:user1 requiredAttributes:[\u0026quot;userAttributes.email\u0026quot;] userAttributes:{\u0026quot;email\u0026quot;:\u0026quot;\u0026quot;}] Session: AYABeGUOL0khu9R69cL1oW5AlDMAHQABAAdTZXJ2aWNlABBDb2duaXRvVXN lclBvVsigrdMZ2QLwOwDNyG485jP45wBAn19cJKXxHhAGETrvfQjHMSOIyz ...長いので省略... Uk9oosogIT_QEIXF5OrGGtWq7ELm56gXiW1hc06rp3cBYFbOlI5pjp36Jfd SfWaFjq0yyWYVAwEA4NG0DgtW3xZjto4NpHVCIVdxBmmolAKDtbkvVsWNFQ その場合は、続けて AdminRespondToAuthChallenge API を呼び出し、ChallengeName で指定されたチャレンジ（上記の場合は NEW_PASSWORD_REQURED）に答える必要があります。 このとき、チャレンジ要求時に提示された Session 情報が必要になります。 下記は、AdminRespondToAuthChallenge の呼び出し方の例です（ここでは全部ハードコーディングしちゃってます）。 func adminRespondToAuthChallenge() { client := cognitoidentityprovider.NewFromConfig(loadAwsConfig()) session := \u0026#34;AYABeJDb9BhR5D...長いので省略...fZAPW2Ynnslwww\u0026#34; input := \u0026amp;cognitoidentityprovider.AdminRespondToAuthChallengeInput{ UserPoolId: \u0026amp;userPoolId, ClientId: \u0026amp;clientId, ChallengeName: \u0026#34;NEW_PASSWORD_REQUIRED\u0026#34;, ChallengeResponses: map[string]string{ \u0026#34;USERNAME\u0026#34;: \u0026#34;user1\u0026#34;, \u0026#34;NEW_PASSWORD\u0026#34;: \u0026#34;Password#123\u0026#34;, \u0026#34;userAttributes.email\u0026#34;: \u0026#34;user1@example.com\u0026#34;, }, Session: \u0026amp;session, } _, err := client.AdminRespondToAuthChallenge(context.TODO(), input) if err != nil { panic(err) } fmt.Println(\u0026#34;Auth challenge succeeded\u0026#34;) } チャレンジに正しく応答できると、AdminRespondToAuthChannelgeInput API の戻り値の AuthenticationResult フィールドに、ID トークンやアクセストークンが格納されます。 これは、AdminInitiateAuth API の戻り値と同様です。 チャレンジに応答した後に、再度 AdminInitiateAuth を呼び出して各トークンを取得することもできます。"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2022-04-11T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-04-11T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/9xxpe4t/",

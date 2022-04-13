@@ -13,7 +13,7 @@
 <meta property="og:description" content="ここでは、Node.js 用の AWS SDK ver.3 を使って Amazon DynamoDB を操作する方法を説明します。 TypeScript の基本的な環境構築 は終わっているものとします。
 DynamoDB 用の Node.js SDK (ver.3) をインストールする まずは、AWS SDK version 3 の DynamoDB 用パッケージをインストールします。 DynamoDB を操作するときに主に次のようなクライアントクラスを使用するのですが、後者の DynamoDBDocumentClient の方は、前者の DynamoDBClient インスタンスをラップして扱いやすくするためのクラスなので、必要に応じてインストールしてください（主にテーブル内のアイテムを扱うときに便利です）。
  DynamoDBClient  DynamoDB を扱うための基本クラス（DB クライアントと呼ばれる） @aws-sdk/client-dynamodb パッケージが必要   DynamoDBDocumentClient  上記を扱いやすくするためのクラス（Document クライアントと呼ばれる） @aws-sdk/lib-dynamodb パッケージが必要 @aws-sdk/util-dynamodb パッケージも必要っぽい    ### yarn の場合 $ yarn add @aws-sdk/client-dynamodb $ yarn add @aws-sdk/lib-dynamodb @aws-sdk/util-dynamodb # Document クライアント ### npm の場合 $ npm install @aws-sdk/client-dynamodb $ npm install @aws-sdk/lib-dynamodb @aws-sdk/util-dynamodb # Document クライアント  これで、TypeScript コードから次のようにパッケージ内のクラスをインポートできるようになります。">
-<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.413f4d14822ef22d7b54964ba17b601bf4a8a096fe825363faf7a949a34eb3cc.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
 <link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
@@ -59,6 +59,10 @@ DynamoDB 用の Node.js SDK (ver.3) をインストールする まずは、AWS 
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/54s6es8/>Go 言語で AWS CDK V2 を使う (1) 導入編
+<time>2022-04-13</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/nej9wjb/>Go 言語と AWS SDK V2 で Amazon Cognito を操作する
 <time>2022-04-11</time></a>
 </div>
@@ -73,10 +77,6 @@ DynamoDB 用の Node.js SDK (ver.3) をインストールする まずは、AWS 
 <div class=xBoxLink>
 <a href=../../p/9xxpe4t/>Jest で TypeScript コードのユニットテストを記述する
 <time>2022-04-04</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う
-<time>2022-03-17</time></a>
 </div>
 </div>
 </div>
@@ -145,7 +145,7 @@ DynamoDB 用の Node.js SDK (ver.3) をインストールする まずは、AWS 
 </div><div class=xMenu_tag>
 <a href=../../tags/typescript>typescript (58)</a>
 </div><div class=xMenu_tag>
-<a href=../../tags/aws>aws (54)</a>
+<a href=../../tags/aws>aws (55)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
 </div><div class=xMenu_tag>
@@ -173,13 +173,13 @@ DynamoDB 用の Node.js SDK (ver.3) をインストールする まずは、AWS 
 </div><div class=xMenu_tag>
 <a href=../../tags/linux>linux (15)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/aws/cdk>aws/cdk (14)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/vs-code>vs-code (14)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/javascript>javascript (13)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/mongodb>mongodb (13)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cdk>aws/cdk (12)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
 </div><div class=xMenu_tag>
@@ -629,8 +629,8 @@ $ npm install @aws-sdk/lib-dynamodb @aws-sdk/util-dynamodb  # Document クライ
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>config</span>: <span class=kt>DynamoDBClientConfig</span> <span class=o>=</span> <span class=p>{}</span>
 </code></pre></div><h3 id=おまけsdk-version-2-時代のコンフィグ>（おまけ）SDK version 2 時代のコンフィグ</h3>
 <div class=xAccordion>
-<input id=id-394517826 type=checkbox>
-<label class=xAccordion_title for=id-394517826>SDK version 2 版</label>
+<input id=id-453817269 type=checkbox>
+<label class=xAccordion_title for=id-453817269>SDK version 2 版</label>
 <div class=xAccordion_body>
 <p>古い AWS SDK (version 2) では、接続情報を <code>AWS.config</code> を使ってグローバルに設定していました。</p>
 <figure class=xCodeBlock>
@@ -697,8 +697,8 @@ DynamoDB は NoSQL なので、基本的に属性を前もって定義してお�
 </figure>
 <p><code>DynamoDBClient#send</code> メソッドの戻り値は <code>Promise</code> 型になるので、コマンドの結果を参照する場合は、上記のように <code>await</code> で待機する必要があります。</p>
 <div class=xAccordion>
-<input id=id-896471523 type=checkbox>
-<label class=xAccordion_title for=id-896471523>実行結果</label>
+<input id=id-213675498 type=checkbox>
+<label class=xAccordion_title for=id-213675498>実行結果</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>SUCCESS: Table created: {
@@ -775,8 +775,8 @@ DynamoDB は NoSQL なので、基本的に属性を前もって定義してお�
 <span class=nx>deleteTable</span><span class=p>()</span></code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-457381692 type=checkbox>
-<label class=xAccordion_title for=id-457381692>実行結果</label>
+<input id=id-461529738 type=checkbox>
+<label class=xAccordion_title for=id-461529738>実行結果</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>SUCCESS: Table deleted: {
@@ -856,8 +856,8 @@ DynamoDB は NoSQL なので、基本的に属性を前もって定義してお�
 <span class=nx>listTables</span><span class=p>()</span></code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-287536941 type=checkbox>
-<label class=xAccordion_title for=id-287536941>実行結果</label>
+<input id=id-867215943 type=checkbox>
+<label class=xAccordion_title for=id-867215943>実行結果</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>Games
@@ -903,8 +903,8 @@ DynamoDB は NoSQL なので、基本的に属性を前もって定義してお�
 <span class=nx>describeTable</span><span class=p>()</span></code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-713594862 type=checkbox>
-<label class=xAccordion_title for=id-713594862>実行結果</label>
+<input id=id-357286194 type=checkbox>
+<label class=xAccordion_title for=id-357286194>実行結果</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>SUCCESS (describe table): {
@@ -988,8 +988,8 @@ DynamoDB は NoSQL なので、基本的に属性を前もって定義してお�
 <span class=nx>putItem</span><span class=p>()</span></code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-468195237 type=checkbox>
-<label class=xAccordion_title for=id-468195237>実行結果</label>
+<input id=id-539426718 type=checkbox>
+<label class=xAccordion_title for=id-539426718>実行結果</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>SUCCESS (put item): {
@@ -1103,8 +1103,8 @@ DynamoDB は NoSQL なので、基本的に属性を前もって定義してお�
 <span class=nx>updateItem</span><span class=p>()</span></code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-871264593 type=checkbox>
-<label class=xAccordion_title for=id-871264593>実行結果</label>
+<input id=id-192345876 type=checkbox>
+<label class=xAccordion_title for=id-192345876>実行結果</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>SUCCESS</span> <span class=p>(</span><span class=nx>update</span> <span class=nx>item</span><span class=p>)</span><span class=o>:</span> <span class=p>{</span>
@@ -1199,8 +1199,8 @@ DynamoDB は NoSQL なので、基本的に属性を前もって定義してお�
 <span class=nx>getItem</span><span class=p>();</span></code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-846521379 type=checkbox>
-<label class=xAccordion_title for=id-846521379>実行結果</label>
+<input id=id-294718563 type=checkbox>
+<label class=xAccordion_title for=id-294718563>実行結果</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>SUCCESS</span> <span class=p>(</span><span class=nx>get</span> <span class=nx>item</span><span class=p>)</span><span class=o>:</span> <span class=p>{</span>
@@ -1255,8 +1255,8 @@ DynamoDB テーブルから 1 つのアイテムを取得するには、<code>Dy
 <span class=p>}</span></code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-618354972 type=checkbox>
-<label class=xAccordion_title for=id-618354972>実行結果</label>
+<input id=id-671239485 type=checkbox>
+<label class=xAccordion_title for=id-671239485>実行結果</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>SUCCESS</span> <span class=p>(</span><span class=nx>get</span> <span class=nx>item</span><span class=p>)</span><span class=o>:</span> <span class=p>{</span>
@@ -1312,8 +1312,8 @@ DynamoDB テーブルから 1 つのアイテムを取得するには、<code>Dy
 <span class=nx>deleteItem</span><span class=p>();</span></code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-458193627 type=checkbox>
-<label class=xAccordion_title for=id-458193627>実行結果</label>
+<input id=id-417289635 type=checkbox>
+<label class=xAccordion_title for=id-417289635>実行結果</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>SUCCESS</span> <span class=p>(</span><span class=k>delete</span> <span class=nx>item</span><span class=p>)</span><span class=o>:</span> <span class=p>{</span>
@@ -1362,8 +1362,8 @@ DynamoDB テーブルから 1 つのアイテムを取得するには、<code>Dy
 <span class=nx>scan</span><span class=p>()</span></code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-675213984 type=checkbox>
-<label class=xAccordion_title for=id-675213984>実行結果</label>
+<input id=id-417869532 type=checkbox>
+<label class=xAccordion_title for=id-417869532>実行結果</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
@@ -1433,8 +1433,8 @@ DynamoDB テーブルから 1 つのアイテムを取得するには、<code>Dy
 <span class=nx>scan</span><span class=p>()</span></code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-752836419 type=checkbox>
-<label class=xAccordion_title for=id-752836419>実行結果</label>
+<input id=id-612598473 type=checkbox>
+<label class=xAccordion_title for=id-612598473>実行結果</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>

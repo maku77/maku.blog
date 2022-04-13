@@ -13,7 +13,7 @@
 <meta property="og:description" content="何をするか？   ここでは Lambda 関数の実装例として、SNS トピックから S3 バケットの PutObject イベント通知を受けて、アップロードされたファイルを読み込む例を示します。 S3 バケット、および SNS トピックの作成と、S3 → SNS の通知設定は完了していると想定します。
 参考リンク  CloudFormation の設定例: S3 通知を SNS トピックに Publish する CloudFormation の設定例: SNS トピックを Lambda 関数からサブスクライブする   Lambda 関数の実装 AWS SDK のインストール ここでは、Node.js 用の AWS SDK ver.2 を使っているので、先にインストールしておく必要があります。 AWS 側の Lambda 実行環境には標準でインストールされているので、--save-dev（開発用）でインストールしておけば OK です。 ついでに TypeScript 用の型定義もインストールしておくと、Lambda ハンドラのパラメータを any 型ではなく、SNSEvent 型などで参照できて便利です。
 $ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev  Lambda ハンドラの実装 先に、S3 バケット内のオブジェクトの内容を取得するユーティリティ関数を用意しておきます（AWS SDK ver.">
-<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.413f4d14822ef22d7b54964ba17b601bf4a8a096fe825363faf7a949a34eb3cc.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
 <link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
@@ -59,6 +59,10 @@ $ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev  Lam
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/54s6es8/>Go 言語で AWS CDK V2 を使う (1) 導入編
+<time>2022-04-13</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/nej9wjb/>Go 言語と AWS SDK V2 で Amazon Cognito を操作する
 <time>2022-04-11</time></a>
 </div>
@@ -73,10 +77,6 @@ $ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev  Lam
 <div class=xBoxLink>
 <a href=../../p/9xxpe4t/>Jest で TypeScript コードのユニットテストを記述する
 <time>2022-04-04</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/vgs4dox/>Cloud Functions で定期的に Firestore の集計処理を行う
-<time>2022-03-17</time></a>
 </div>
 </div>
 </div>
@@ -145,7 +145,7 @@ $ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev  Lam
 </div><div class=xMenu_tag>
 <a href=../../tags/typescript>typescript (58)</a>
 </div><div class=xMenu_tag>
-<a href=../../tags/aws>aws (54)</a>
+<a href=../../tags/aws>aws (55)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
 </div><div class=xMenu_tag>
@@ -173,13 +173,13 @@ $ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev  Lam
 </div><div class=xMenu_tag>
 <a href=../../tags/linux>linux (15)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/aws/cdk>aws/cdk (14)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/vs-code>vs-code (14)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/javascript>javascript (13)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/mongodb>mongodb (13)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cdk>aws/cdk (12)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
 </div><div class=xMenu_tag>
@@ -613,8 +613,8 @@ $ npm install @types/aws-lambda --save-dev</code></pre></div></div>
 <h3 id=解説>解説</h3>
 <p>Lambda 関数の第一引数 (<code>event</code>) で渡されるオブジェクト (このケースでは <code>SNSEvent</code> 型) の <code>Records[0].Sns.Message</code> プロパティを参照すると、次のような JSON テキストを取得できます（オブジェクトではなく JSON 形式のテキストです）。</p>
 <div class=xAccordion>
-<input id=id-479618523 type=checkbox>
-<label class=xAccordion_title for=id-479618523>SNSEvent.Records[0].Sns.Message の内容</label>
+<input id=id-196374258 type=checkbox>
+<label class=xAccordion_title for=id-196374258>SNSEvent.Records[0].Sns.Message の内容</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
