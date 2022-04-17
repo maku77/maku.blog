@@ -24,9 +24,22 @@ AWS CLI による Cognito 操作用のコマンドには、`cognito-idp` と `co
 
 `aws cognito-idp` のサブコマンドには、`admin-` プレフィックスが付くものと付かないバージョンがあったりしますが、プレフィックスがない方は、ユーザー認証後に取得できるトークンの指定 (`--access-token`) が必要です。
 
-{{< private >}}
 ### ユーザープールを作成する (cognito-idp create-user-pool)
-{{< /private >}}
+
+```console
+$ aws cognito-idp create-user-pool --pool-name "Test user pool"
+```
+
+ユーザープールの作成に成功すると、初期設定の内容（パスワードのルールなど）が出力されます。
+
+### ユーザープールを削除する (cognito-idp delete-user-pool)
+
+```console
+$ aws cognito-idp delete-user-pool --user-pool-id ap-northeast-1_5O6lfqrqN
+```
+
+`--user-pool-id` オプションには、ユーザープール名ではなく、ユーザープール ID を指定することに注意してください。
+ユーザープール ID は、`cognito-idp list-user-pools` コマンドで確認できます。
 
 ### ユーザープールの一覧を取得する (cognito-idp list-user-pools)
 
@@ -50,6 +63,196 @@ UserPools:
 {{< /code >}}
 {{< /accordion >}}
 
+### ユーザープールの情報を取得する (cognito-idp describe-user-pool)
+
+```console
+$ aws cognito-idp describe-user-pool --user-pool-id ap-northeast-1_5O6lfqrqN
+```
+
+{{< accordion title="実行例" >}}
+{{< code lang="yaml" >}}
+UserPool:
+  AdminCreateUserConfig:
+    AllowAdminCreateUserOnly: false
+    UnusedAccountValidityDays: 7
+  Arn: arn:aws:cognito-idp:ap-northeast-1:123456789012:userpool/ap-northeast-1_5O6lfqrqN
+  CreationDate: '2022-04-07T01:56:38.960000+09:00'
+  EmailConfiguration:
+    EmailSendingAccount: COGNITO_DEFAULT
+  EstimatedNumberOfUsers: 0
+  Id: ap-northeast-1_5O6lfqrqN
+  LambdaConfig: {}
+  LastModifiedDate: '2022-04-07T01:56:38.960000+09:00'
+  MfaConfiguration: OFF
+  Name: Test user pool
+  Policies:
+    PasswordPolicy:
+      MinimumLength: 8
+      RequireLowercase: true
+      RequireNumbers: true
+      RequireSymbols: true
+      RequireUppercase: true
+      TemporaryPasswordValidityDays: 7
+  SchemaAttributes:
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: false
+    Name: sub
+    Required: true
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '1'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: name
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: given_name
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: family_name
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: middle_name
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: nickname
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: preferred_username
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: profile
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: picture
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: website
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: email
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: Boolean
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: email_verified
+    Required: false
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: gender
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: birthdate
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '10'
+      MinLength: '10'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: zoneinfo
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: locale
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: phone_number
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: Boolean
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: phone_number_verified
+    Required: false
+  - AttributeDataType: String
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: address
+    Required: false
+    StringAttributeConstraints:
+      MaxLength: '2048'
+      MinLength: '0'
+  - AttributeDataType: Number
+    DeveloperOnlyAttribute: false
+    Mutable: true
+    Name: updated_at
+    NumberAttributeConstraints:
+      MinValue: '0'
+    Required: false
+  UserPoolTags: {}
+  VerificationMessageTemplate:
+    DefaultEmailOption: CONFIRM_WITH_CODE
+{{< /code >}}
+{{< /accordion >}}
+
 ### ユーザーを作成する (cognito-idp admin-create-user)
 
 ```console
@@ -59,8 +262,6 @@ $ aws cognito-idp admin-create-user \
     --temporary-password 初期パスワード（省略可） \
     --message-action SUPPRESS（確認メールを送信しない場合）
 ```
-
-ユーザープールIDは、`cognito-idp list-user-pools` コマンドで確認できます。
 
 {{< accordion title="実行例" >}}
 {{< code lang="console" >}}
@@ -106,7 +307,7 @@ Users:
 {{< /code >}}
 {{< /accordion >}}
 
-### 指定したユーザーの情報を取得する (cognito-idp adming-get-user)
+### 指定したユーザーの情報を取得する (cognito-idp admin-get-user)
 
 ```console
 $ aws cognito-idp admin-get-user \
@@ -140,7 +341,9 @@ $ aws cognito-idp create-user-pool-client \
 
 {{< accordion title="実行例" >}}
 {{< code lang="console" >}}
-$ aws cognito-idp create-user-pool-client --user-pool-id ap-northeast-1_sf1nSZ2Oj --client-name client1
+$ aws cognito-idp create-user-pool-client \
+    --user-pool-id ap-northeast-1_sf1nSZ2Oj \
+    --client-name client1
 UserPoolClient:
   AllowedOAuthFlowsUserPoolClient: false
   ClientId: 5sf3ad654tid5qt4r1768stto
@@ -197,6 +400,39 @@ UserPoolClient:
   RefreshTokenValidity: 30
   TokenValidityUnits: {}
   UserPoolId: ap-northeast-1_sf1nSZ2Oj
+{{< /code >}}
+{{< /accordion >}}
+
+### ユーザープールのクライアントの設定を変更する (update-user-pool-client)
+
+```console
+$ aws cognito-idp update-user-pool-client \
+    --user-pool-id ユーザープールID \
+    --client-id クライアントID \
+    ...(設定変更のオプション)...
+```
+
+{{< accordion title="実行例（Auth flow の設定）" >}}
+{{< code lang="console" >}}
+$ aws cognito-idp update-user-pool-client \
+    --user-pool-id ap-northeast-1_m43jEsA8r \
+    --client-id 2dkct9bm65e9oj3q3bsg40u5g5 \
+    --explicit-auth-flows ALLOW_REFRESH_TOKEN_AUTH \
+                          ALLOW_ADMIN_USER_PASSWORD_AUTH
+
+UserPoolClient:
+  AllowedOAuthFlowsUserPoolClient: false
+  ClientId: 2dkct9bm65e9oj3q3bsg40u5g5
+  ClientName: client1
+  CreationDate: '2022-04-07T02:29:09.818000+09:00'
+  EnableTokenRevocation: true
+  ExplicitAuthFlows:
+  - ALLOW_ADMIN_USER_PASSWORD_AUTH
+  - ALLOW_REFRESH_TOKEN_AUTH
+  LastModifiedDate: '2022-04-07T03:21:50.683000+09:00'
+  RefreshTokenValidity: 30
+  TokenValidityUnits: {}
+  UserPoolId: ap-northeast-1_m43jEsA8r
 {{< /code >}}
 {{< /accordion >}}
 
