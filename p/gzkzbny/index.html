@@ -74,12 +74,12 @@ S3 バケットや DynamoDB テーブルをスタック削除時に自動削除�
 <time>2022-04-17</time></a>
 </div>
 <div class=xBoxLink>
-<a href=../../p/cj9i4m3/>AWS CDK で TypeScript で実装した Lambda 関数をデプロイする (NodejsFunction)
+<a href=../../p/gzkzbny/>AWS CDK のサンプルコード集（TypeScript 版）
 <time>2022-04-15</time></a>
 </div>
 <div class=xBoxLink>
-<a href=../../p/54s6es8/>Go 言語で AWS CDK V2 を使う (1) 導入編
-<time>2022-04-13</time></a>
+<a href=../../p/cj9i4m3/>AWS CDK で TypeScript で実装した Lambda 関数をデプロイする (NodejsFunction)
+<time>2022-04-15</time></a>
 </div>
 </div>
 </div>
@@ -503,7 +503,7 @@ S3 バケットや DynamoDB テーブルをスタック削除時に自動削除�
 <span class=xPageTags_item><a href=../../tags/aws/cdk>AWS/CDK</a></span>
 </div>
 <span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2021-10-21>2021-10-21</time><br>
+更新: <time itemprop=dateModified datetime=2022-04-15>2022-04-15</time><br>
 作成: <time itemprop=datePublished datetime=2021-10-04>2021-10-04</time>
 </span>
 </header>
@@ -658,8 +658,8 @@ S3 バケットや DynamoDB テーブルをスタック削除時に自動削除�
 <p>上記のように S3 バケットと SNS トピックを生成して、<strong><code>addObjectCreatedNotification</code></strong> で関連付けると、S3 バケットへのオブジェクト追加（および更新）時に SNS トピックからの通知を発行できるようになります。
 CloudFormation を直書きすると、S3 との連携用にポリシー設定 (<code>AWS::SNS::TopicPolicy</code>) まで記述しないといけなくて非常に面倒ですが、CDK であれば、上記のように記述だけで済みます（トピックポリシーは内部で自動生成してくれます）。</p>
 <div class=xAccordion>
-<input id=id-123967854 type=checkbox>
-<label class=xAccordion_title for=id-123967854>SNS Topic に自動設定されるアクセスポリシーの例</label>
+<input id=id-723984561 type=checkbox>
+<label class=xAccordion_title for=id-723984561>SNS Topic に自動設定されるアクセスポリシーの例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
@@ -911,40 +911,53 @@ Web ブラウザのコンソール出力で、次のようなエラーが出た�
 <h2 id=apigateway--lambda-関数で-rest-api-を作成する>ApiGateway + Lambda 関数で REST API を作成する</h2>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>lib/myapi-stack.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>cdk</span> <span class=kr>from</span> <span class=s1>&#39;@aws-cdk/core&#39;</span>
-<span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>apigateway</span> <span class=kr>from</span> <span class=s1>&#39;@aws-cdk/aws-apigateway&#39;</span>
-<span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>lambdaNodejs</span> <span class=kr>from</span> <span class=s1>&#39;@aws-cdk/aws-lambda-nodejs&#39;</span>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// CDK V1 の場合
+</span><span class=c1>// import { Construct, Stack, StackProps } from &#39;@aws-cdk/core&#39;
+</span><span class=c1>// import * as apigateway from &#39;@aws-cdk/aws-apigateway&#39;
+</span><span class=c1>// import * as lambdaNodejs from &#39;@aws-cdk/aws-lambda-nodejs&#39;
+</span><span class=c1></span>
+<span class=c1>// CDK V2 の場合
+</span><span class=c1></span><span class=kr>import</span> <span class=p>{</span>
+  <span class=nx>Stack</span><span class=p>,</span>
+  <span class=nx>StackProps</span><span class=p>,</span>
+  <span class=nx>aws_apigateway</span> <span class=kr>as</span> <span class=nx>apigateway</span><span class=p>,</span>
+  <span class=nx>aws_lambda_nodejs</span> <span class=kr>as</span> <span class=nx>lambda</span><span class=p>,</span>
+<span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;aws-cdk-lib&#34;</span>
+<span class=kr>import</span> <span class=p>{</span> <span class=nx>Construct</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;constructs&#34;</span>
 
-<span class=kr>export</span> <span class=kr>class</span> <span class=nx>MyapiStack</span> <span class=kr>extends</span> <span class=nx>cdk</span><span class=p>.</span><span class=nx>Stack</span> <span class=p>{</span>
-  <span class=kr>constructor</span><span class=p>(</span><span class=nx>scope</span>: <span class=kt>cdk.Construct</span><span class=p>,</span> <span class=nx>id</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>props?</span>: <span class=kt>cdk.StackProps</span><span class=p>)</span> <span class=p>{</span>
+<span class=kr>export</span> <span class=kr>class</span> <span class=nx>MyappStack</span> <span class=kr>extends</span> <span class=nx>Stack</span> <span class=p>{</span>
+  <span class=kr>constructor</span><span class=p>(</span><span class=nx>scope</span>: <span class=kt>Construct</span><span class=p>,</span> <span class=nx>id</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>props?</span>: <span class=kt>StackProps</span><span class=p>)</span> <span class=p>{</span>
     <span class=kr>super</span><span class=p>(</span><span class=nx>scope</span><span class=p>,</span> <span class=nx>id</span><span class=p>,</span> <span class=nx>props</span><span class=p>)</span>
 
     <span class=c1>// Lambda 関数（GET books/ のハンドル用）
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>getBooksHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>lambdaNodejs</span><span class=p>.</span><span class=nx>NodejsFunction</span><span class=p>(</span>
-      <span class=k>this</span><span class=p>,</span> <span class=s1>&#39;getBooksHandler&#39;</span><span class=p>,</span> <span class=p>{</span>
-        <span class=nx>entry</span><span class=o>:</span> <span class=s1>&#39;lambda/index.ts&#39;</span><span class=p>,</span>
-        <span class=nx>handler</span><span class=o>:</span> <span class=s1>&#39;getBooksHandler&#39;</span><span class=p>,</span>
-      <span class=p>})</span>
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>getBooksHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>lambda</span><span class=p>.</span><span class=nx>NodejsFunction</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;getBooksHandler&#34;</span><span class=p>,</span> <span class=p>{</span>
+      <span class=nx>entry</span><span class=o>:</span> <span class=s2>&#34;lambda/index.ts&#34;</span><span class=p>,</span>
+      <span class=nx>handler</span><span class=o>:</span> <span class=s2>&#34;getBooksHandler&#34;</span><span class=p>,</span>
+    <span class=p>})</span>
 
     <span class=c1>// Lambda 関数（GET books/{id} のハンドル用）
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>getSingleBookHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>lambdaNodejs</span><span class=p>.</span><span class=nx>NodejsFunction</span><span class=p>(</span>
-      <span class=k>this</span><span class=p>,</span> <span class=s1>&#39;getSingleBookHandler&#39;</span><span class=p>,</span> <span class=p>{</span>
-        <span class=nx>entry</span><span class=o>:</span> <span class=s1>&#39;lambda/index.ts&#39;</span><span class=p>,</span>
-        <span class=nx>handler</span><span class=o>:</span> <span class=s1>&#39;getSingleBookHandler&#39;</span><span class=p>,</span>
-      <span class=p>})</span>
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>getSingleBookHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>lambda</span><span class=p>.</span><span class=nx>NodejsFunction</span><span class=p>(</span>
+      <span class=k>this</span><span class=p>,</span>
+      <span class=s2>&#34;getSingleBookHandler&#34;</span><span class=p>,</span>
+      <span class=p>{</span>
+        <span class=nx>entry</span><span class=o>:</span> <span class=s2>&#34;lambda/index.ts&#34;</span><span class=p>,</span>
+        <span class=nx>handler</span><span class=o>:</span> <span class=s2>&#34;getSingleBookHandler&#34;</span><span class=p>,</span>
+      <span class=p>}</span>
+    <span class=p>)</span>
 
     <span class=c1>// ApiGateway (RestApi) の作成
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>api</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>RestApi</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s1>&#39;api&#39;</span><span class=p>)</span>
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>api</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>RestApi</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;api&#34;</span><span class=p>)</span>
 
     <span class=c1>// Lambda 関数を結びつける (GET books/)
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>books</span> <span class=o>=</span> <span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>)</span>
-    <span class=nx>books</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;GET&#39;</span><span class=p>,</span>
-      <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>getBooksHandler</span><span class=p>))</span>
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>books</span> <span class=o>=</span> <span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s2>&#34;books&#34;</span><span class=p>)</span>
+    <span class=nx>books</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s2>&#34;GET&#34;</span><span class=p>,</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>getBooksHandler</span><span class=p>))</span>
 
     <span class=c1>// Lambda 関数を結びつける (GET books/{id})
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>singleBook</span> <span class=o>=</span> <span class=nx>books</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s1>&#39;{id}&#39;</span><span class=p>)</span>
-    <span class=nx>singleBook</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;GET&#39;</span><span class=p>,</span>
-      <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>getSingleBookHandler</span><span class=p>))</span>
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>singleBook</span> <span class=o>=</span> <span class=nx>books</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s2>&#34;{id}&#34;</span><span class=p>)</span>
+    <span class=nx>singleBook</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span>
+      <span class=s2>&#34;GET&#34;</span><span class=p>,</span>
+      <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>getSingleBookHandler</span><span class=p>)</span>
+    <span class=p>)</span>
   <span class=p>}</span>
 <span class=p>}</span></code></pre></div></div>
 </figure>
@@ -977,6 +990,9 @@ Web ブラウザのコンソール出力で、次のようなエラーが出た�
   <span class=p>}</span>
 <span class=p>}</span></code></pre></div></div>
 </figure>
+<p><code>cdk deploy</code> 後に発行された次のような API エンドポイントにアクセスできれば成功です。</p>
+<pre tabindex=0><code>https://xxxxxxxxxx.execute-api.ap-northeast-1.amazonaws.com/prod/books/
+</code></pre>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">
