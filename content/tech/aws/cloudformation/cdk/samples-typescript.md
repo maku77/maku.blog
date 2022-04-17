@@ -2,7 +2,7 @@
 title: "AWS CDK のサンプルコード集（TypeScript 版）"
 url: "/p/gzkzbny"
 date: "2021-10-04"
-lastmod: "2021-10-21"
+lastmod: "2022-04-15"
 tags: ["AWS", "AWS/CDK"]
 weight: 1900
 ---
@@ -470,40 +470,53 @@ ApiGateway + Lambda 関数で REST API を作成する
 ----
 
 {{< code lang="ts" title="lib/myapi-stack.ts" >}}
-import * as cdk from '@aws-cdk/core'
-import * as apigateway from '@aws-cdk/aws-apigateway'
-import * as lambdaNodejs from '@aws-cdk/aws-lambda-nodejs'
+// CDK V1 の場合
+// import { Construct, Stack, StackProps } from '@aws-cdk/core'
+// import * as apigateway from '@aws-cdk/aws-apigateway'
+// import * as lambdaNodejs from '@aws-cdk/aws-lambda-nodejs'
 
-export class MyapiStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+// CDK V2 の場合
+import {
+  Stack,
+  StackProps,
+  aws_apigateway as apigateway,
+  aws_lambda_nodejs as lambda,
+} from "aws-cdk-lib"
+import { Construct } from "constructs"
+
+export class MyappStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props)
 
     // Lambda 関数（GET books/ のハンドル用）
-    const getBooksHandler = new lambdaNodejs.NodejsFunction(
-      this, 'getBooksHandler', {
-        entry: 'lambda/index.ts',
-        handler: 'getBooksHandler',
-      })
+    const getBooksHandler = new lambda.NodejsFunction(this, "getBooksHandler", {
+      entry: "lambda/index.ts",
+      handler: "getBooksHandler",
+    })
 
     // Lambda 関数（GET books/{id} のハンドル用）
-    const getSingleBookHandler = new lambdaNodejs.NodejsFunction(
-      this, 'getSingleBookHandler', {
-        entry: 'lambda/index.ts',
-        handler: 'getSingleBookHandler',
-      })
+    const getSingleBookHandler = new lambda.NodejsFunction(
+      this,
+      "getSingleBookHandler",
+      {
+        entry: "lambda/index.ts",
+        handler: "getSingleBookHandler",
+      }
+    )
 
     // ApiGateway (RestApi) の作成
-    const api = new apigateway.RestApi(this, 'api')
+    const api = new apigateway.RestApi(this, "api")
 
     // Lambda 関数を結びつける (GET books/)
-    const books = api.root.addResource('books')
-    books.addMethod('GET',
-      new apigateway.LambdaIntegration(getBooksHandler))
+    const books = api.root.addResource("books")
+    books.addMethod("GET", new apigateway.LambdaIntegration(getBooksHandler))
 
     // Lambda 関数を結びつける (GET books/{id})
-    const singleBook = books.addResource('{id}')
-    singleBook.addMethod('GET',
-      new apigateway.LambdaIntegration(getSingleBookHandler))
+    const singleBook = books.addResource("{id}")
+    singleBook.addMethod(
+      "GET",
+      new apigateway.LambdaIntegration(getSingleBookHandler)
+    )
   }
 }
 {{< /code >}}
@@ -537,4 +550,10 @@ export const getSingleBookHandler: Handler = async (event: any = {}) => {
   }
 }
 {{< /code >}}
+
+`cdk deploy` 後に発行された次のような API エンドポイントにアクセスできれば成功です。
+
+```
+https://xxxxxxxxxx.execute-api.ap-northeast-1.amazonaws.com/prod/books/
+```
 

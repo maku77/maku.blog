@@ -32,16 +32,11 @@ myapp/
   ...
 {{< /code >}}
 
-AWS SDK と Lambda 関数実装用の TypeScript 型情報をインストールします。
+Lambda 関数実装用の TypeScript 型情報をインストールします。
 
-{{< code >}}
-### npm の場合
-$ npm install aws-sdk
-$ npm install @types/aws-lambda --save-dev
-
-### yarn の場合
-$ yarn add aws-sdk
-$ yarn add @types/aws-lambda --dev
+{{< code lang="console">}}
+$ npm install @types/aws-lambda --save-dev  # npm の場合
+$ yarn add @types/aws-lambda --dev          # yarn の場合
 {{< /code >}}
 
 最低限の Hello World 的なラムダ関数を作成します。
@@ -87,7 +82,7 @@ CDK アプリのひな型として、CloudFormation スタックを構築する�
 
 {{< code lang="ts" hl_lines="13-18" title="lib/myapp-stack.ts" >}}
 // CDK V1 の場合
-// import { Stack, StackProps } from "@aws-cdk/core"
+// import { Construct, Stack, StackProps } from "@aws-cdk/core"
 // import * as lambda from "@aws-cdk/aws-lambda-nodejs"
 
 // CDK V2 の場合
