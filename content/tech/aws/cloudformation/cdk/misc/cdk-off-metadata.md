@@ -1,9 +1,9 @@
 ---
-title: "AWS CDK でナゾの CDKMetadata を生成しないようにする"
+title: "AWS CDK メモ: 謎の CDKMetadata を生成しないようにする"
 url: "/p/2asq4k4"
 date: "2021-10-04"
 tags: ["AWS", "AWS/CDK"]
-weight: 1100
+weight: 1105
 ---
 
 AWS CDK で CloudFormation スタックを生成すると、デフォルトで `CDKMetadata` というリソースが生成されます（`cdk synth` コマンドで CloudFormation テンプレートを出力してみると確認できます）。

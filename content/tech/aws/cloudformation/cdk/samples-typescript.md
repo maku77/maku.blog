@@ -1,10 +1,10 @@
 ---
-title: "AWS CDK 入門 (3) CDK サンプルコード"
+title: "AWS CDK のサンプルコード集（TypeScript 版）"
 url: "/p/gzkzbny"
 date: "2021-10-04"
 lastmod: "2021-10-21"
 tags: ["AWS", "AWS/CDK"]
-weight: 1003
+weight: 1900
 ---
 
 AWS CDK を使った TypeScript サンプルコードいろいろです。

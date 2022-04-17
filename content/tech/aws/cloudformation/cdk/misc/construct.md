@@ -1,9 +1,9 @@
 ---
-title: "AWS CDK 入門 (2) コンストラクトの概念を理解する"
+title: "AWS CDK メモ: コンストラクトの概念を理解する"
 url: "/p/nqkav2m"
 date: "2021-10-04"
 tags: ["AWS", "AWS/CDK"]
-weight: 1002
+weight: 1102
 ---
 
 コンストラクト・ツリー (Construct Tree)
