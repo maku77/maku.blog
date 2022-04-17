@@ -1,7 +1,8 @@
 ---
-title: "AWS CDK で TypeScript で実装した Lambda 関数をデプロイする (aws-lambda-nodejs)"
+title: "AWS CDK で TypeScript で実装した Lambda 関数をデプロイする (NodejsFunction)"
 url: "/p/cj9i4m3"
 date: "2021-10-06"
+lastmod: "2022-04-15"
 tags: ["AWS", "AWS/CDK"]
 weight: 1500
 ---
@@ -20,31 +21,37 @@ Lambda 関数のビルドもデプロイ時に自動で行われるようにし�
 TypeScript で Lambda 関数を実装する
 ----
 
-AWS SDK と Lambda 用の TypeScript 型情報をインストールします。
-
-{{< code >}}
-$ yarn add aws-sdk
-$ yarn add @types/aws-lambda --dev
-{{< /code >}}
-
 Lambda 関数のコードは、プロジェクトのルートに `lambda` ディレクトリを作成して、そこに配置していくことにします。
 
-{{< code hl_lines="3" >}}
+{{< code hl_lines="3-4" >}}
 myapp/
   +-- bin/     ... CDK の App コンストラクト (.ts)
   +-- lambda/  ... ラムダ関数の実装コード (.ts) ★これを追加
+  |    +-- index.ts
   +-- lib/     ... CDK の Stack コンストラクトなど (.ts)
   ...
+{{< /code >}}
+
+AWS SDK と Lambda 関数実装用の TypeScript 型情報をインストールします。
+
+{{< code >}}
+### npm の場合
+$ npm install aws-sdk
+$ npm install @types/aws-lambda --save-dev
+
+### yarn の場合
+$ yarn add aws-sdk
+$ yarn add @types/aws-lambda --dev
 {{< /code >}}
 
 最低限の Hello World 的なラムダ関数を作成します。
 
 {{< code lang="ts" title="lambda/index.ts" >}}
-import { Handler } from 'aws-lambda'
+import { Handler } from "aws-lambda"
 
 // Lambda エントリーポイント
 export const handler: Handler = async () => {
-  console.log('Hello Lambda!')
+  console.log("Hello Lambda!")
 }
 {{< /code >}}
 
@@ -52,40 +59,50 @@ export const handler: Handler = async () => {
 Lambda 関数を含むスタックの定義とデプロイ
 ----
 
-### @aws-cdk/aws-lambda-nodejs パッケージ
+### NodejsFunction コンストラクト
 
-AWS CDK の [@aws-cdk/aws-lambda-nodejs パッケージ](https://docs.aws.amazon.com/cdk/api/latest/docs/aws-lambda-nodejs-readme.html) が提供する [NodejsFunction コンストラクト](https://docs.aws.amazon.com/cdk/api/latest/docs/@aws-cdk_aws-lambda-nodejs.NodejsFunction.html) を使用すると、TypeScript 言語で実装した Lambda 関数を簡単にデプロイできます。
-Lambda 関数用の汎用的なコンストラクトとしては、[@aws-cdk/aws-lambda パッケージ](https://docs.aws.amazon.com/cdk/api/latest/docs/aws-lambda-readme.html) が提供する `Function` コンストラクトもあるのですが、Node.js による Lambda 関数実装用に特化した `NodejsFunction` を使うと、次のような恩恵を得られます。
+AWS CDK の ml) が提供する `NodejsFunction` コンストラクトを使用すると、TypeScript 言語で実装した Lambda 関数を簡単にビルド＆デプロイできます。
+
+- [CDK V2 用の NodejsFunction コンストラクト (aws-cdk-lib/aws_lambda_nodejs)](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_lambda_nodejs-readme.html)
+- [CDK V1 用の NodejsFunction コンストラクト (@aws-cdk/aws-lambda-nodejs)](https://docs.aws.amazon.com/cdk/api/v1/docs/aws-lambda-nodejs-readme.html)
+
+Lambda 関数用の汎用的なコンストラクトとしては、[aws-cdk-lib/aws_lambda](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_lambda-readme.html) が提供する `Function` コンストラクトがあるのですが、これの代わりに、Node.js (TypeScript) に特化した `NodejsFunction` の方を使うと、次のような恩恵を得られます。
 
 * esbuild による Lambda 関数関連アセットの高速なパッケージング（バンドル）。
 * Lambda 関数の TypeScript コードをいちいちコンパイルしなくてよい。
 
 ちょっとややこしいのですが、CDK コード（TypeScript で書いた場合）の実行は `ts-code` で実行され、Lambda 関数のビルドとパッケージングは `esbuild` で行われます。
 
-コンストラクトパッケージは次のようにインストールします。
+CDK V1 のコンストラクトパッケージは次のようにインストールします。
+CDK V2 の場合は、`aws-cdk-lib` に含まれているので、追加でパッケージをインストールする必要はありません。
 
-```console
+{{< code lang="console" title="CDK V1 の場合" >}}
 $ npm install @aws-cdk/aws-lambda-nodejs  # npm の場合
 $ yarn add @aws-cdk/aws-lambda-nodejs     # yarn の場合
-```
+{{< /code >}}
 
 ### スタックの定義
 
 CDK アプリのひな型として、CloudFormation スタックを構築するためのコンストラクト (`lib/myapp-stack.ts`) が生成されているはずなので、そのスタック内に、`NodejsFunction` コンストラクトを生成するよう記述します。
 
-{{< code lang="ts" hl_lines="2 8-13" title="lib/myapp-stack.ts" >}}
-import * as cdk from '@aws-cdk/core'
-import * as lambdaNodejs from '@aws-cdk/aws-lambda-nodejs'
+{{< code lang="ts" hl_lines="13-18" title="lib/myapp-stack.ts" >}}
+// CDK V1 の場合
+// import { Stack, StackProps } from "@aws-cdk/core"
+// import * as lambda from "@aws-cdk/aws-lambda-nodejs"
 
-export class MyappStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+// CDK V2 の場合
+import { Stack, StackProps, aws_lambda_nodejs as lambda } from "aws-cdk-lib"
+import { Construct } from "constructs"
+
+export class MyappStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props)
 
-    new lambdaNodejs.NodejsFunction(this, 'HelloFunction', {
-      entry: 'lambda/index.ts',
-      // handler: 'handler', // デフォルトのハンドラ関数名は 'handler'
+    new lambda.NodejsFunction(this, "MyLambda", {
+      entry: "lambda/index.ts",
+      // handler: "handler", // デフォルトのハンドラ関数名は "handler"
       // runtime: Runtime.NODEJS_14_X, // デフォルトは Node.js 14.x
-      // timeout: cdk.Duration.minutes(15), // デフォルトは 3 秒
+      // timeout: Duration.minutes(15), // デフォルトは 3 秒
     })
   }
 }
@@ -98,7 +115,7 @@ export class MyappStack extends cdk.Stack {
 スタックの定義が済んだら、__`cdk deploy`__ を実行して Lambda 関数をデプロイすることができます。
 
 {{< code >}}
-$ cdk deploy
+$ npm run cdk -- deploy
 {{< /code >}}
 
 デプロイが完了したら、[CloudFormation コンソール](https://console.aws.amazon.com/cloudformation/) を開いて、実際にスタックと Lambda 関数が生成されているか確認しましょう。
@@ -110,15 +127,6 @@ TypeScript コードのトランスパイルも esbuild で自動でやってく
 トラブルシューティング
 ----
 
-### NodejsFunction の第1引数の this でエラーになるとき
-
-`NodejsFunction` のコンストラクタの `this` を渡している部分で、次のような型情報エラーが発生するときは、`aws-cdk` 本体と、コンストラクトライブラリ（`@aws-cdk/aws-lambda-nodejs` など）のバージョンが合っていない可能性があります。
-
-> Argument of type 'this' is not assignable to parameter of type 'Construct'.
-> Type 'MyappStack' is not assignable to type 'Construct'.
-
-`package.json` を開いて、両者のバージョンを新しい方に揃えて、`yarn install` で更新すれば直ります。
-
 ### デプロイ時に spawnSync docker ENOENT が出る場合
 
 Windows や macOS で `cdk diff` や `cdk deploy` を実行したときに、__`spawnSync docker ENOENT`__ というエラーが発生する場合は、[esbuild をインストール](https://docs.aws.amazon.com/cdk/api/latest/docs/aws-lambda-nodejs-readme.html#local-bundling) するとうまくいくようです。
@@ -128,4 +136,13 @@ $ yarn add --dev esbuild@0
 あるいは
 $ npm install --save-dev esbuild@0
 {{< /code >}}
+
+### NodejsFunction の第1引数の this でエラーになるとき
+
+CDK V1 の `NodejsFunction` のコンストラクタの `this` を渡している部分で、次のような型情報エラーが発生するときは、`aws-cdk` 本体と、コンストラクトライブラリ（`@aws-cdk/aws-lambda-nodejs` など）のバージョンが合っていない可能性があります。
+
+> Argument of type 'this' is not assignable to parameter of type 'Construct'.
+> Type 'MyappStack' is not assignable to type 'Construct'.
+
+`package.json` を開いて、両者のバージョンを新しい方に揃えて、`yarn install` で更新すれば直ります。
 

@@ -1,5 +1,5 @@
 ---
-title: "AWS CDK で Go 言語で実装した Lambda 関数をデプロイする (aws-lambda-go)"
+title: "AWS CDK で Go 言語で実装した Lambda 関数をデプロイする (GoFunction)"
 url: "/p/38jt3cm"
 date: "2022-04-17"
 tags: ["AWS", "AWS/CDK"]
@@ -116,10 +116,10 @@ Lambda 関数を含むスタックの定義とデプロイ
 AWS CDK が提供する __GoFunction コンストラクト__ クラスを使用すると、Go 言語で実装した Lambda 関数を簡単にデプロイできます。
 
 - [CDK V2 用の @aws-cdk/aws-lambda-go-alpha](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-lambda-go-alpha-readme.html)
+  - いずれ `aws-cdk-lib/aws_lambda_go` として `aws-cdk-lib` に組み込まれるはず。
 - [CDK V1 用の @aws-cdk/aws-lambda-go](https://docs.aws.amazon.com/cdk/api/v1/docs/aws-lambda-go-readme.html)
 
 コンストラクトパッケージは次のようにインストールしますが、使用している CDK 本体のバージョン（V2 あるいは V1）に合わせたパッケージをインストールしてください。
-まだ V2 用のパッケージには `-alpha` サフィックスが付いているようです（2022 年 4 月現在）。
 
 
 ```console
@@ -127,7 +127,12 @@ $ npm install @aws-cdk/aws-lambda-go-alpha  # npm の場合
 $ yarn add @aws-cdk/aws-lambda-go-alpha     # yarn の場合
 ```
 
-Lambda 関数用の汎用的なコンストラクトとしては、`@aws-cdk/aws-lambda パッケージ` が提供する `Function` コンストラクトもあるのですが、`GoFunction` コンストラクトは Go 言語に特化しており、デプロイ時に Lambda 関数のビルド (`go build`) を自動で行ってくれます。
+{{% note title="V2 と V1" %}}
+CDK V1 用のパッケージは `@aws-cdk`、CDK V2 用のパッケージは `aws-cdk-lib` としてリリースされていますが、V2 の `GoFunction` コンストラクトに関しては、まだ`@aws-cdk/aws-lambda-go-alpha` としてリリースされているようです（2022 年 4 月現在）。
+いずれ、`aws-cdk-lib/aws_lambda_go` としてリリースされると思われます（`aws-cdk-lib` 本体に組み込まれて、個別インストールの必要がなくなる）。
+{{% /note %}}
+
+Lambda 関数用の汎用的なコンストラクトとしては、`aws-cdk-lib/aws_lambda` が提供する `Function` コンストラクトもあるのですが、`GoFunction` コンストラクトは Go 言語に特化しており、デプロイ時に Lambda 関数のビルド (`go build`) を自動で行ってくれます。
 
 
 ### スタックの定義
