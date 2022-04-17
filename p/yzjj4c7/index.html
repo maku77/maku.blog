@@ -12,8 +12,8 @@
 <meta property="og:image" content="https://maku.blog/assets/img/site-logo-large.png">
 <meta property="og:description" content="AWS CLI による Cognito 操作用のコマンドには、cognito-idp と cognito-identity があります。
  aws cognito-idp &mldr; Cognito User Pools の操作（ユーザープール／ID プロバイダー）  ユーザープール自体の作成や、ユーザーの追加・削除などを行えます。ユーザープールでの認証に成功すると、ユーザー情報を参照するためのトークンが発行されます。一般的にいうところの ID プロバイダー (IdP) です。   aws cognito-identity &mldr; Cognito Federated Identities の操作（フェデレーテッドアイデンティティー／ID プール）  何らかの ID プロバイダー (IdP) で認証されたユーザーに対して、AWS サービスにアクセスするための一時的なアクセストークンを発行します。ID プロバイダーは上記の Cognito ユーザープールでもよいし、Google や Facebook などのサードパーティ ID プロバイダーでもかまいません。    ユーザープールの操作 (cognito-idp) aws cognito-idp のサブコマンドには、admin- プレフィックスが付くものと付かないバージョンがあったりしますが、プレフィックスがない方は、ユーザー認証後に取得できるトークンの指定 (--access-token) が必要です。
-ユーザープールの一覧を取得する (cognito-idp list-user-pools) $ aws cognito-idp list-user-pools --max-results 10  実行例 UserPools:- CreationDate:'2020-10-20T16:56:45.">
-<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.413f4d14822ef22d7b54964ba17b601bf4a8a096fe825363faf7a949a34eb3cc.css>
+ユーザープールを作成する (cognito-idp create-user-pool) $ aws cognito-idp create-user-pool --pool-name &#34;Test user pool&#34; ユーザープールの作成に成功すると、初期設定の内容（パスワードのルールなど）が出力されます。">
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.ac87f9b6c36029bf05c4a52fa482342bd57afd32bcc022e82b8310072f45be72.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
 <link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
@@ -505,14 +505,18 @@
 <ul>
 <li><a href=#ユーザープールの操作-cognito-idp>ユーザープールの操作 (cognito-idp)</a>
 <ul>
+<li><a href=#ユーザープールを作成する-cognito-idp-create-user-pool>ユーザープールを作成する (cognito-idp create-user-pool)</a></li>
+<li><a href=#ユーザープールを削除する-cognito-idp-delete-user-pool>ユーザープールを削除する (cognito-idp delete-user-pool)</a></li>
 <li><a href=#ユーザープールの一覧を取得する-cognito-idp-list-user-pools>ユーザープールの一覧を取得する (cognito-idp list-user-pools)</a></li>
+<li><a href=#ユーザープールの情報を取得する-cognito-idp-describe-user-pool>ユーザープールの情報を取得する (cognito-idp describe-user-pool)</a></li>
 <li><a href=#ユーザーを作成する-cognito-idp-admin-create-user>ユーザーを作成する (cognito-idp admin-create-user)</a></li>
 <li><a href=#ユーザーを削除する-cognito-idp-admin-delete-user>ユーザーを削除する (cognito-idp admin-delete-user)</a></li>
 <li><a href=#ユーザーの一覧を取得する-cognito-idp-list-users>ユーザーの一覧を取得する (cognito-idp list-users)</a></li>
-<li><a href=#指定したユーザーの情報を取得する-cognito-idp-adming-get-user>指定したユーザーの情報を取得する (cognito-idp adming-get-user)</a></li>
+<li><a href=#指定したユーザーの情報を取得する-cognito-idp-admin-get-user>指定したユーザーの情報を取得する (cognito-idp admin-get-user)</a></li>
 <li><a href=#ユーザープールにクライアントを追加する-create-user-pool-client>ユーザープールにクライアントを追加する (create-user-pool-client)</a></li>
 <li><a href=#ユーザープールのクライアントの一覧を取得する-list-user-pool-clients>ユーザープールのクライアントの一覧を取得する (list-user-pool-clients)</a></li>
 <li><a href=#ユーザープールのクライアントの情報を取得する-describe-user-pool-client>ユーザープールのクライアントの情報を取得する (describe-user-pool-client)</a></li>
+<li><a href=#ユーザープールのクライアントの設定を変更する-update-user-pool-client>ユーザープールのクライアントの設定を変更する (update-user-pool-client)</a></li>
 <li><a href=#ユーザーのパスワードを設定する-admin-set-user-password>ユーザーのパスワードを設定する (admin-set-user-password)</a></li>
 <li><a href=#ユーザー認証する-admin-initiate-auth>ユーザー認証する (admin-initiate-auth)</a></li>
 </ul>
@@ -533,12 +537,19 @@
 </ul>
 <h2 id=ユーザープールの操作-cognito-idp>ユーザープールの操作 (cognito-idp)</h2>
 <p><code>aws cognito-idp</code> のサブコマンドには、<code>admin-</code> プレフィックスが付くものと付かないバージョンがあったりしますが、プレフィックスがない方は、ユーザー認証後に取得できるトークンの指定 (<code>--access-token</code>) が必要です。</p>
+<h3 id=ユーザープールを作成する-cognito-idp-create-user-pool>ユーザープールを作成する (cognito-idp create-user-pool)</h3>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp create-user-pool --pool-name <span class=s2>&#34;Test user pool&#34;</span>
+</code></pre></div><p>ユーザープールの作成に成功すると、初期設定の内容（パスワードのルールなど）が出力されます。</p>
+<h3 id=ユーザープールを削除する-cognito-idp-delete-user-pool>ユーザープールを削除する (cognito-idp delete-user-pool)</h3>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp delete-user-pool --user-pool-id ap-northeast-1_5O6lfqrqN
+</code></pre></div><p><code>--user-pool-id</code> オプションには、ユーザープール名ではなく、ユーザープール ID を指定することに注意してください。
+ユーザープール ID は、<code>cognito-idp list-user-pools</code> コマンドで確認できます。</p>
 <h3 id=ユーザープールの一覧を取得する-cognito-idp-list-user-pools>ユーザープールの一覧を取得する (cognito-idp list-user-pools)</h3>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-user-pools --max-results <span class=m>10</span>
 </code></pre></div>
 <div class=xAccordion>
-<input id=id-521897436 type=checkbox>
-<label class=xAccordion_title for=id-521897436>実行例</label>
+<input id=id-738569241 type=checkbox>
+<label class=xAccordion_title for=id-738569241>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>UserPools</span><span class=p>:</span><span class=w>
@@ -555,16 +566,206 @@
 </figure>
 </div>
 </div>
+<h3 id=ユーザープールの情報を取得する-cognito-idp-describe-user-pool>ユーザープールの情報を取得する (cognito-idp describe-user-pool)</h3>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp describe-user-pool --user-pool-id ap-northeast-1_5O6lfqrqN
+</code></pre></div>
+<div class=xAccordion>
+<input id=id-285613497 type=checkbox>
+<label class=xAccordion_title for=id-285613497>実行例</label>
+<div class=xAccordion_body>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>UserPool</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>AdminCreateUserConfig</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=nt>AllowAdminCreateUserOnly</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>UnusedAccountValidityDays</span><span class=p>:</span><span class=w> </span><span class=m>7</span><span class=w>
+</span><span class=w>  </span><span class=nt>Arn</span><span class=p>:</span><span class=w> </span><span class=l>arn:aws:cognito-idp:ap-northeast-1:123456789012:userpool/ap-northeast-1_5O6lfqrqN</span><span class=w>
+</span><span class=w>  </span><span class=nt>CreationDate</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2022-04-07T01:56:38.960000+09:00&#39;</span><span class=w>
+</span><span class=w>  </span><span class=nt>EmailConfiguration</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=nt>EmailSendingAccount</span><span class=p>:</span><span class=w> </span><span class=l>COGNITO_DEFAULT</span><span class=w>
+</span><span class=w>  </span><span class=nt>EstimatedNumberOfUsers</span><span class=p>:</span><span class=w> </span><span class=m>0</span><span class=w>
+</span><span class=w>  </span><span class=nt>Id</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-1_5O6lfqrqN</span><span class=w>
+</span><span class=w>  </span><span class=nt>LambdaConfig</span><span class=p>:</span><span class=w> </span>{}<span class=w>
+</span><span class=w>  </span><span class=nt>LastModifiedDate</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2022-04-07T01:56:38.960000+09:00&#39;</span><span class=w>
+</span><span class=w>  </span><span class=nt>MfaConfiguration</span><span class=p>:</span><span class=w> </span><span class=kc>OFF</span><span class=w>
+</span><span class=w>  </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>Test user pool</span><span class=w>
+</span><span class=w>  </span><span class=nt>Policies</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=nt>PasswordPolicy</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinimumLength</span><span class=p>:</span><span class=w> </span><span class=m>8</span><span class=w>
+</span><span class=w>      </span><span class=nt>RequireLowercase</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>      </span><span class=nt>RequireNumbers</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>      </span><span class=nt>RequireSymbols</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>      </span><span class=nt>RequireUppercase</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>      </span><span class=nt>TemporaryPasswordValidityDays</span><span class=p>:</span><span class=w> </span><span class=m>7</span><span class=w>
+</span><span class=w>  </span><span class=nt>SchemaAttributes</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>sub</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;1&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>name</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>given_name</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>family_name</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>middle_name</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>nickname</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>preferred_username</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>profile</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>picture</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>website</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>email</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>Boolean</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>email_verified</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>gender</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>birthdate</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;10&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;10&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>zoneinfo</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>locale</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>phone_number</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>Boolean</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>phone_number_verified</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>String</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>address</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>StringAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MaxLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2048&#39;</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinLength</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>  </span>- <span class=nt>AttributeDataType</span><span class=p>:</span><span class=w> </span><span class=l>Number</span><span class=w>
+</span><span class=w>    </span><span class=nt>DeveloperOnlyAttribute</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>    </span><span class=nt>Mutable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>    </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>updated_at</span><span class=w>
+</span><span class=w>    </span><span class=nt>NumberAttributeConstraints</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=nt>MinValue</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0&#39;</span><span class=w>
+</span><span class=w>    </span><span class=nt>Required</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span><span class=w>  </span><span class=nt>UserPoolTags</span><span class=p>:</span><span class=w> </span>{}<span class=w>
+</span><span class=w>  </span><span class=nt>VerificationMessageTemplate</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=nt>DefaultEmailOption</span><span class=p>:</span><span class=w> </span><span class=l>CONFIRM_WITH_CODE</span></code></pre></div></div>
+</figure>
+</div>
+</div>
 <h3 id=ユーザーを作成する-cognito-idp-admin-create-user>ユーザーを作成する (cognito-idp admin-create-user)</h3>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp admin-create-user <span class=se>\
 </span><span class=se></span><span class=go>    --user-pool-id ユーザープールID \
 </span><span class=go>    --username ユーザー名 \
 </span><span class=go>    --temporary-password 初期パスワード（省略可） \
 </span><span class=go>    --message-action SUPPRESS（確認メールを送信しない場合）
-</span></code></pre></div><p>ユーザープールIDは、<code>cognito-idp list-user-pools</code> コマンドで確認できます。</p>
+</span></code></pre></div>
 <div class=xAccordion>
-<input id=id-872546193 type=checkbox>
-<label class=xAccordion_title for=id-872546193>実行例</label>
+<input id=id-584326791 type=checkbox>
+<label class=xAccordion_title for=id-584326791>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp admin-create-user --user-pool-id ap-northeast-1_sf1nSZ2Oj --username user1
@@ -589,8 +790,8 @@
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-users --user-pool-id ユーザープールID
 </code></pre></div>
 <div class=xAccordion>
-<input id=id-319852476 type=checkbox>
-<label class=xAccordion_title for=id-319852476>実行例</label>
+<input id=id-129486753 type=checkbox>
+<label class=xAccordion_title for=id-129486753>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-users --user-pool-id ap-northeast-1_sf1nSZ2Oj
@@ -607,14 +808,14 @@
 </figure>
 </div>
 </div>
-<h3 id=指定したユーザーの情報を取得する-cognito-idp-adming-get-user>指定したユーザーの情報を取得する (cognito-idp adming-get-user)</h3>
+<h3 id=指定したユーザーの情報を取得する-cognito-idp-admin-get-user>指定したユーザーの情報を取得する (cognito-idp admin-get-user)</h3>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp admin-get-user <span class=se>\
 </span><span class=se></span><span class=go>    --user-pool-id ユーザープールID \
 </span><span class=go>    --username ユーザー名
 </span></code></pre></div>
 <div class=xAccordion>
-<input id=id-518463927 type=checkbox>
-<label class=xAccordion_title for=id-518463927>実行例</label>
+<input id=id-217643589 type=checkbox>
+<label class=xAccordion_title for=id-217643589>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp admin-get-user --user-pool-id ap-northeast-1_sf1nSZ2Oj --username user1
@@ -636,12 +837,14 @@
 </span><span class=go>    --client-name クライアント名
 </span></code></pre></div><p>クライアントアプリや AWS CLI で認証を行うには、ユーザープールに「クライアント」を追加しておく必要があります。</p>
 <div class=xAccordion>
-<input id=id-527893146 type=checkbox>
-<label class=xAccordion_title for=id-527893146>実行例</label>
+<input id=id-267384159 type=checkbox>
+<label class=xAccordion_title for=id-267384159>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp create-user-pool-client --user-pool-id ap-northeast-1_sf1nSZ2Oj --client-name client1
-<span class=go>UserPoolClient:
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp create-user-pool-client <span class=se>\
+</span><span class=se></span><span class=go>    --user-pool-id ap-northeast-1_sf1nSZ2Oj \
+</span><span class=go>    --client-name client1
+</span><span class=go>UserPoolClient:
 </span><span class=go>  AllowedOAuthFlowsUserPoolClient: false
 </span><span class=go>  ClientId: 5sf3ad654tid5qt4r1768stto
 </span><span class=go>  ClientName: client1
@@ -659,8 +862,8 @@
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-user-pool-clients --user-pool-id ユーザープールID
 </code></pre></div>
 <div class=xAccordion>
-<input id=id-527498631 type=checkbox>
-<label class=xAccordion_title for=id-527498631>実行例</label>
+<input id=id-691254738 type=checkbox>
+<label class=xAccordion_title for=id-691254738>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp list-user-pool-clients --user-pool-id ap-northeast-1_sf1nSZ2Oj
@@ -682,8 +885,8 @@
 </span></code></pre></div><p>クライアント名ではなく、クライアント ID を指定する必要があることに注意してください。
 クライアント ID は、<code>list-user-pool-clients</code> コマンドで確認できます。</p>
 <div class=xAccordion>
-<input id=id-974253618 type=checkbox>
-<label class=xAccordion_title for=id-974253618>実行例</label>
+<input id=id-542798163 type=checkbox>
+<label class=xAccordion_title for=id-542798163>実行例</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp describe-user-pool-client --user-pool-id ap-northeast-1_sf1nSZ2Oj --client-id 5sf3ad654tid5qt4r1768stto
@@ -697,6 +900,40 @@
 </span><span class=go>  RefreshTokenValidity: 30
 </span><span class=go>  TokenValidityUnits: {}
 </span><span class=go>  UserPoolId: ap-northeast-1_sf1nSZ2Oj
+</span></code></pre></div></div>
+</figure>
+</div>
+</div>
+<h3 id=ユーザープールのクライアントの設定を変更する-update-user-pool-client>ユーザープールのクライアントの設定を変更する (update-user-pool-client)</h3>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp update-user-pool-client <span class=se>\
+</span><span class=se></span><span class=go>    --user-pool-id ユーザープールID \
+</span><span class=go>    --client-id クライアントID \
+</span><span class=go>    ...(設定変更のオプション)...
+</span></code></pre></div>
+<div class=xAccordion>
+<input id=id-817635942 type=checkbox>
+<label class=xAccordion_title for=id-817635942>実行例（Auth flow の設定）</label>
+<div class=xAccordion_body>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp update-user-pool-client <span class=se>\
+</span><span class=se></span><span class=go>    --user-pool-id ap-northeast-1_m43jEsA8r \
+</span><span class=go>    --client-id 2dkct9bm65e9oj3q3bsg40u5g5 \
+</span><span class=go>    --explicit-auth-flows ALLOW_REFRESH_TOKEN_AUTH \
+</span><span class=go>                          ALLOW_ADMIN_USER_PASSWORD_AUTH
+</span><span class=go></span><span class=err>
+</span><span class=err></span><span class=go>UserPoolClient:
+</span><span class=go>  AllowedOAuthFlowsUserPoolClient: false
+</span><span class=go>  ClientId: 2dkct9bm65e9oj3q3bsg40u5g5
+</span><span class=go>  ClientName: client1
+</span><span class=go>  CreationDate: &#39;2022-04-07T02:29:09.818000+09:00&#39;
+</span><span class=go>  EnableTokenRevocation: true
+</span><span class=go>  ExplicitAuthFlows:
+</span><span class=go>  - ALLOW_ADMIN_USER_PASSWORD_AUTH
+</span><span class=go>  - ALLOW_REFRESH_TOKEN_AUTH
+</span><span class=go>  LastModifiedDate: &#39;2022-04-07T03:21:50.683000+09:00&#39;
+</span><span class=go>  RefreshTokenValidity: 30
+</span><span class=go>  TokenValidityUnits: {}
+</span><span class=go>  UserPoolId: ap-northeast-1_m43jEsA8r
 </span></code></pre></div></div>
 </figure>
 </div>
@@ -724,8 +961,8 @@
 この管理 API でユーザー認証を行うには、Cognito ユーザープールの設定で対象のクライアントを選択し、<strong><code>ALLOW_ADMIN_USER_PASSWORD_AUTH</code></strong> にチェックを入れておく必要があります。
 これを有効にしておかないと、管理者用の Cognito API（<code>admin-initiate-auth</code> コマンドなど）で認証できません。</p>
 <div class=xAccordion>
-<input id=id-123845769 type=checkbox>
-<label class=xAccordion_title for=id-123845769>実行例（パスワード変更が必要な場合）</label>
+<input id=id-986237145 type=checkbox>
+<label class=xAccordion_title for=id-986237145>実行例（パスワード変更が必要な場合）</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>aws cognito-idp admin-initiate-auth --user-pool-id ap-northeast-1_sf1nSZ2Oj --client-id 5sf3ad654tid5qt4r1768stto --auth-flow ADMIN_USER_PASSWORD_AUTH --auth-parameters <span class=nv>USERNAME</span><span class=o>=</span>user1,PASSWORD<span class=o>=</span>Password!123
