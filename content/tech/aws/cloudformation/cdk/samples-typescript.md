@@ -507,11 +507,11 @@ export class MyappStack extends Stack {
     // ApiGateway (RestApi) の作成
     const api = new apigateway.RestApi(this, "api")
 
-    // Lambda 関数を結びつける (GET books/)
+    // リソースを定義して Lambda プロキシ統合する (GET books/)
     const books = api.root.addResource("books")
     books.addMethod("GET", new apigateway.LambdaIntegration(getBooksHandler))
 
-    // Lambda 関数を結びつける (GET books/{id})
+    // リソースを定義して Lambda プロキシ統合する (GET books/{id})
     const singleBook = books.addResource("{id}")
     singleBook.addMethod(
       "GET",
@@ -525,6 +525,7 @@ export class MyappStack extends Stack {
 実際には、DynamoDB などから情報を取得して JSON データとして返すように実装します。
 
 {{< code lang="ts" title="lambda/index.ts" >}}
+// npm install --save-dev @types/aws-lambda
 import { Handler } from 'aws-lambda'
 
 const BOOKS = [
