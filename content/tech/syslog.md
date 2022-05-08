@@ -1,5 +1,5 @@
 ---
-title: "syslog のログの保存先の設定"
+title: "Linuxメモ: syslog のログの保存先の設定"
 url: "/p/rm78k9i"
 date: "2011-02-20"
 tags: ["Linux"]

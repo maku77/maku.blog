@@ -1,5 +1,5 @@
 ---
-title: "Linux: apt (apt-get) コマンドの使い方メモ"
+title: "Linuxメモ: apt (apt-get) コマンドの使い方メモ"
 url: "/p/rdq2cnx"
 date: "2012-02-21"
 lastmod: "2022-01-30"

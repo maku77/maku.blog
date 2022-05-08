@@ -1,5 +1,5 @@
 ---
-title: "Linux コマンド: ssh-id-copy で SSH の公開鍵をリモートホストに登録する"
+title: "Linuxコマンド: ssh-id-copy で SSH の公開鍵をリモートホストに登録する"
 url: "/p/2mzbmw8"
 date: "2022-02-17"
 tags: ["Linux", "SSH"]
