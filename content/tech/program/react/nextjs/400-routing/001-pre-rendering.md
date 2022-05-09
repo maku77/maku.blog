@@ -1,6 +1,5 @@
 ---
 title: "Next.js のプリレンダリング機能を使用する (getStaticProps)"
-linkTitle: ""
 url: "/p/iv4agnt"
 date: "2021-05-04"
 tags: ["Next.js"]
