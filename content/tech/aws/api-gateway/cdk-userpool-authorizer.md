@@ -11,7 +11,7 @@ tags: ["AWS", "AWS/API Gateway", "AWS/CDK", "AWS/Cognito"]
 ここでは、API Gateway で提供している REST API にアクセス制御を追加するため、既存の Cognito ユーザープールによるオーソライザーを API Gateway に設定してみます。
 これにより、Cognito のユーザープールで認証済みのユーザーのみが REST API を呼び出せるようになります。
 
-後述の CDK コードでは、API Gateway と Lambda 関数、オーソライザーを生成していますが、Cognito ユーザープールは既存のものを ARN で参照しています（こういったユースケースは多いと思います）。
+後述の CDK コードでは、API Gateway と Lambda 関数、オーソライザーを生成していますが、Cognito ユーザープールは既存のものを参照しています（こういったユースケースは多いと思います）。
 
 なお、CDK による API Gateway の作成方法（Lambda プロキシ統合）については下記の記事を参考にしてください。
 ここでは、Cognito ユーザープールによるオーソライザーの作成方法にフォーカスします。
@@ -58,9 +58,10 @@ import {
 } from "aws-cdk-lib"
 import { Construct } from "constructs"
 
-// 既存の Cognito ユーザープールを示す ARN
-const USER_POOL_ARN =
-  "arn:aws:cognito-idp:ap-northeast-1:123456789012:userpool/ap-northeast-1_xxxxxxxxx"
+// 既存の Cognito ユーザープール
+const USER_POOL_ID = "ap-northeast-1_xxxxxxxxx"
+// const USER_POOL_ARN =
+//   "arn:aws:cognito-idp:ap-northeast-1:123456789012:userpool/ap-northeast-1_xxxxxxxxx"
 
 export class MyapiSampleStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -72,9 +73,9 @@ export class MyapiSampleStack extends Stack {
       handler: "handler",
     })
 
-    // 既存のユーザープールを参照する（fromXxx を使う）
-    const userPool = cognito.UserPool.fromUserPoolArn(
-      this, "MyUserPool", USER_POOL_ARN
+    // 既存のユーザープールを参照する（fromUserPoolId か fromUserPoolArn を使う）
+    const userPool = cognito.UserPool.fromUserPoolId(
+      this, "MyUserPool", USER_POOL_ID
     )
 
     // ユーザープールを使うオーソライザーを作成
@@ -86,6 +87,13 @@ export class MyapiSampleStack extends Stack {
     const api = new apigateway.RestApi(this, "MyApi", {
       // デフォルトで Cognito 認証を必須とする
       defaultMethodOptions: { authorizer },
+      // プリフライトリクエスト時の CORS アクセスを許可
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
+        statusCode: 200,
+      },
     })
     const books = api.root.addResource("info")
     books.addMethod("GET", new apigateway.LambdaIntegration(getInfoHandler))
@@ -93,10 +101,15 @@ export class MyapiSampleStack extends Stack {
 }
 {{< /code >}}
 
-ポイントは、__`UserPool.fromUserPoolArn()`__ で既存の Cognito ユーザープールを参照し、それを使って __`CognitoUserPoolsAuthorizer`__ オブジェクトを生成する部分です。
+ポイントは、__`UserPool.fromUserPoolId()`__ で既存の Cognito ユーザープールを参照し、それを使って __`CognitoUserPoolsAuthorizer`__ オブジェクトを生成する部分です。
 作成したオーソライザーは、`RestApi` インスタンス生成時に `defaultMethodOptions` で設定することができます。
 リソース（URL パス）ごとにアクセス制限をかけたいときは、各リソースの `addMethod` 時にオーソライザーを設定すれば OK です。
 これで、REST API へのアクセス時に、Cognito 認証によるアクセス制限がかかるようになります。
+
+`defaultCorsPreflightOptions` の設定はちょっと事情が複雑ですが、Web ブラウザ上の JavaScript から認証付き API の呼び出しを行う際に必要になります。
+クライアントサイド JS から API を呼び出すときに HTTP リクエストヘッダーに `Authorization` 情報を付加することになるのですが、この場合は GET 要求の前にプリフライトリクエストという OPTIONS 要求を行うことが HTTP の仕様で決められています。
+このプリフライトリクエストはブラウザが自動的に行ってくれるのですが、このリクエストにもクロスドメインでのアクセスを許可しておかないといけません。
+この設定を行わないと、CORS エラーが発生して API 呼び出しが失敗します。
 
 
 デプロイ
@@ -170,3 +183,41 @@ $ curl https://xxxxxxxxxx.execute-api.ap-northeast-1.amazonaws.com/prod/info -H 
 
 送った ID トークンが妥当なものかは、API Gateway が内部で自動で調べてくれるので、Lambda 関数でチェックしたりする必要はありません。
 
+
+（応用）Web アプリからの REST API 呼び出し
+----
+
+Web アプリからオーソライザー設定された API Gateway を呼び出すには、HTTP リクエスト（`fetch` 関数呼び出し）時に、`Authorization` ヘッダーで Cognito ユーザープールから取得した ID トークンを付加する必要があります。
+Web アプリからの Cognito 認証に Amplify ライブラリを使用している場合は、次のような感じで簡単に認証情報付き HTTP リクエストを発行できます。
+
+```ts
+import { Auth } from 'aws-amplify'
+
+export const fetchWithAuth = async (url: string) => {
+  const token = (await Auth.currentSession()).getIdToken().getJwtToken()
+  return fetch(url, { headers: { Authorization: token } }).then((r) => r.json())
+}
+```
+
+あとは、このフェッチ関数を通常の `fetch` 関数の代わりに React カスタムフックなどから呼び出すだけで OK です。
+下記は、今回作成した REST API を呼び出す `useInfo` カスタムフックの実装例です。
+
+{{< code lang="ts" title="<Next.jsアプリ>/src/hooks/useInfo.ts（抜粋）" >}}
+/** useInfo フックの戻り値の型 */
+type UseInfoOutput = {
+  error?: Error
+  message?: string
+}
+
+/** REST API の戻り値の型 */
+type DataType = {
+  message: string
+}
+
+export const useInfo = (): UseInfoOutput => {
+  const { data, error } = useSWR<DataType, Error>(GET_INFO_URL, fetchWithAuth)
+  return { error, message: data?.message }
+}
+{{< /code >}}
+
+- 参考: [Amazon Cognito (1) サインイン可能な Web サイトを作る (Cognito User Pool)](/p/pufs8kx/)
