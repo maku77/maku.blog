@@ -199,6 +199,8 @@ export const fetchWithAuth = async (url: string) => {
 }
 ```
 
+- 参考: [API (REST) - Define authorization rules - JavaScript - AWS Amplify Docs](https://docs.amplify.aws/lib/restapi/authz/q/platform/js/)
+
 あとは、このフェッチ関数を通常の `fetch` 関数の代わりに React カスタムフックなどから呼び出すだけで OK です。
 下記は、今回作成した REST API を呼び出す `useInfo` カスタムフックの実装例です。
 
