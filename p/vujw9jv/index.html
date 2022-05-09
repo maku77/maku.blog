@@ -11,7 +11,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://maku.blog/assets/img/site-logo-large.png">
 <meta property="og:description" content="何をするか？ ここでは、API Gateway で提供している REST API にアクセス制御を追加するため、既存の Cognito ユーザープールによるオーソライザーを API Gateway に設定してみます。 これにより、Cognito のユーザープールで認証済みのユーザーのみが REST API を呼び出せるようになります。
-後述の CDK コードでは、API Gateway と Lambda 関数、オーソライザーを生成していますが、Cognito ユーザープールは既存のものを ARN で参照しています（こういったユースケースは多いと思います）。
+後述の CDK コードでは、API Gateway と Lambda 関数、オーソライザーを生成していますが、Cognito ユーザープールは既存のものを参照しています（こういったユースケースは多いと思います）。
 なお、CDK による API Gateway の作成方法（Lambda プロキシ統合）については下記の記事を参考にしてください。 ここでは、Cognito ユーザープールによるオーソライザーの作成方法にフォーカスします。
  AWS CDK で API Gateway の REST API を作成する  Lambda 関数を作成する REST API のバックエンドである Lambda 関数は最低限の実装で用意します。 ユーザー認証後に、API Gateway 経由で正しくこのハンドラを呼び出せるかの確認用です。
 lambda/info.ts import { APIGatewayProxyHandler } from &#34;aws-lambda&#34; /** GET /info */ export const handler: APIGatewayProxyHandler = async (event) => { console.">
@@ -61,6 +61,10 @@ lambda/info.ts import { APIGatewayProxyHandler } from &#34;aws-lambda&#34; /** G
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/3vbr2bm/>Next.js でローカル開発時 (next dev) のみ有効なデバッグページを作成する (getStaticProps)
+<time>2022-05-09</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/s7q8o5k/>ウェブサイトのリンク切れを自動でチェックする (muffet)
 <time>2022-04-23</time></a>
 </div>
@@ -76,10 +80,6 @@ lambda/info.ts import { APIGatewayProxyHandler } from &#34;aws-lambda&#34; /** G
 <a href=../../p/38jt3cm/>AWS CDK で Go 言語で実装した Lambda 関数をデプロイする (GoFunction)
 <time>2022-04-17</time></a>
 </div>
-<div class=xBoxLink>
-<a href=../../p/4h3jygw/>AWS CDK メモ: CDK アプリのパッケージ管理に Yarn を使う方法
-<time>2022-04-17</time></a>
-</div>
 </div>
 </div>
 <div class=xMenu_box data-sticky>
@@ -87,7 +87,6 @@ lambda/info.ts import { APIGatewayProxyHandler } from &#34;aws-lambda&#34; /** G
 <div class=xMenu_box_body>
 <div class=xNavTree>
 <ul>
-<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
 <li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
 <ul>
 <li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
@@ -128,6 +127,7 @@ lambda/info.ts import { APIGatewayProxyHandler } from &#34;aws-lambda&#34; /** G
 <li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
 <li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
 </ul>
+<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
 <li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
 <li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
 <li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
@@ -151,7 +151,7 @@ lambda/info.ts import { APIGatewayProxyHandler } from &#34;aws-lambda&#34; /** G
 </div><div class=xMenu_tag>
 <a href=../../tags/%E6%97%A5%E8%A8%98>日記 (53)</a>
 </div><div class=xMenu_tag>
-<a href=../../tags/next.js>next.js (36)</a>
+<a href=../../tags/next.js>next.js (37)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/chatbot>chatbot (28)</a>
 </div><div class=xMenu_tag>
@@ -515,11 +515,12 @@ lambda/info.ts import { APIGatewayProxyHandler } from &#34;aws-lambda&#34; /** G
 <li><a href=#id-トークンの取得方法>ID トークンの取得方法</a></li>
 </ul>
 </li>
+<li><a href=#応用web-アプリからの-rest-api-呼び出し>（応用）Web アプリからの REST API 呼び出し</a></li>
 </ul>
 </nav><h2 id=何をするか>何をするか？</h2>
 <p>ここでは、API Gateway で提供している REST API にアクセス制御を追加するため、既存の Cognito ユーザープールによるオーソライザーを API Gateway に設定してみます。
 これにより、Cognito のユーザープールで認証済みのユーザーのみが REST API を呼び出せるようになります。</p>
-<p>後述の CDK コードでは、API Gateway と Lambda 関数、オーソライザーを生成していますが、Cognito ユーザープールは既存のものを ARN で参照しています（こういったユースケースは多いと思います）。</p>
+<p>後述の CDK コードでは、API Gateway と Lambda 関数、オーソライザーを生成していますが、Cognito ユーザープールは既存のものを参照しています（こういったユースケースは多いと思います）。</p>
 <p>なお、CDK による API Gateway の作成方法（Lambda プロキシ統合）については下記の記事を参考にしてください。
 ここでは、Cognito ユーザープールによるオーソライザーの作成方法にフォーカスします。</p>
 <ul>
@@ -558,10 +559,11 @@ lambda/info.ts import { APIGatewayProxyHandler } from &#34;aws-lambda&#34; /** G
 <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;aws-cdk-lib&#34;</span>
 <span class=kr>import</span> <span class=p>{</span> <span class=nx>Construct</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;constructs&#34;</span>
 
-<span class=c1>// 既存の Cognito ユーザープールを示す ARN
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>USER_POOL_ARN</span> <span class=o>=</span>
-  <span class=s2>&#34;arn:aws:cognito-idp:ap-northeast-1:123456789012:userpool/ap-northeast-1_xxxxxxxxx&#34;</span>
-
+<span class=c1>// 既存の Cognito ユーザープール
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>USER_POOL_ID</span> <span class=o>=</span> <span class=s2>&#34;ap-northeast-1_xxxxxxxxx&#34;</span>
+<span class=c1>// const USER_POOL_ARN =
+</span><span class=c1>//   &#34;arn:aws:cognito-idp:ap-northeast-1:123456789012:userpool/ap-northeast-1_xxxxxxxxx&#34;
+</span><span class=c1></span>
 <span class=kr>export</span> <span class=kr>class</span> <span class=nx>MyapiSampleStack</span> <span class=kr>extends</span> <span class=nx>Stack</span> <span class=p>{</span>
   <span class=kr>constructor</span><span class=p>(</span><span class=nx>scope</span>: <span class=kt>Construct</span><span class=p>,</span> <span class=nx>id</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>props?</span>: <span class=kt>StackProps</span><span class=p>)</span> <span class=p>{</span>
     <span class=kr>super</span><span class=p>(</span><span class=nx>scope</span><span class=p>,</span> <span class=nx>id</span><span class=p>,</span> <span class=nx>props</span><span class=p>)</span>
@@ -572,9 +574,9 @@ lambda/info.ts import { APIGatewayProxyHandler } from &#34;aws-lambda&#34; /** G
       <span class=nx>handler</span><span class=o>:</span> <span class=s2>&#34;handler&#34;</span><span class=p>,</span>
     <span class=p>})</span>
 
-    <span class=c1>// 既存のユーザープールを参照する（fromXxx を使う）
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>userPool</span> <span class=o>=</span> <span class=nx>cognito</span><span class=p>.</span><span class=nx>UserPool</span><span class=p>.</span><span class=nx>fromUserPoolArn</span><span class=p>(</span>
-      <span class=k>this</span><span class=p>,</span> <span class=s2>&#34;MyUserPool&#34;</span><span class=p>,</span> <span class=nx>USER_POOL_ARN</span>
+    <span class=c1>// 既存のユーザープールを参照する（fromUserPoolId か fromUserPoolArn を使う）
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>userPool</span> <span class=o>=</span> <span class=nx>cognito</span><span class=p>.</span><span class=nx>UserPool</span><span class=p>.</span><span class=nx>fromUserPoolId</span><span class=p>(</span>
+      <span class=k>this</span><span class=p>,</span> <span class=s2>&#34;MyUserPool&#34;</span><span class=p>,</span> <span class=nx>USER_POOL_ID</span>
     <span class=p>)</span>
 
     <span class=c1>// ユーザープールを使うオーソライザーを作成
@@ -586,16 +588,27 @@ lambda/info.ts import { APIGatewayProxyHandler } from &#34;aws-lambda&#34; /** G
 </span><span class=c1></span>    <span class=kr>const</span> <span class=nx>api</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>RestApi</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;MyApi&#34;</span><span class=p>,</span> <span class=p>{</span>
       <span class=c1>// デフォルトで Cognito 認証を必須とする
 </span><span class=c1></span>      <span class=nx>defaultMethodOptions</span><span class=o>:</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>},</span>
+      <span class=c1>// プリフライトリクエスト時の CORS アクセスを許可
+</span><span class=c1></span>      <span class=nx>defaultCorsPreflightOptions</span><span class=o>:</span> <span class=p>{</span>
+        <span class=nx>allowOrigins</span>: <span class=kt>apigateway.Cors.ALL_ORIGINS</span><span class=p>,</span>
+        <span class=nx>allowMethods</span>: <span class=kt>apigateway.Cors.ALL_METHODS</span><span class=p>,</span>
+        <span class=nx>allowHeaders</span>: <span class=kt>apigateway.Cors.DEFAULT_HEADERS</span><span class=p>,</span>
+        <span class=nx>statusCode</span>: <span class=kt>200</span><span class=p>,</span>
+      <span class=p>},</span>
     <span class=p>})</span>
     <span class=kr>const</span> <span class=nx>books</span> <span class=o>=</span> <span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s2>&#34;info&#34;</span><span class=p>)</span>
     <span class=nx>books</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s2>&#34;GET&#34;</span><span class=p>,</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>getInfoHandler</span><span class=p>))</span>
   <span class=p>}</span>
 <span class=p>}</span></code></pre></div></div>
 </figure>
-<p>ポイントは、<strong><code>UserPool.fromUserPoolArn()</code></strong> で既存の Cognito ユーザープールを参照し、それを使って <strong><code>CognitoUserPoolsAuthorizer</code></strong> オブジェクトを生成する部分です。
+<p>ポイントは、<strong><code>UserPool.fromUserPoolId()</code></strong> で既存の Cognito ユーザープールを参照し、それを使って <strong><code>CognitoUserPoolsAuthorizer</code></strong> オブジェクトを生成する部分です。
 作成したオーソライザーは、<code>RestApi</code> インスタンス生成時に <code>defaultMethodOptions</code> で設定することができます。
 リソース（URL パス）ごとにアクセス制限をかけたいときは、各リソースの <code>addMethod</code> 時にオーソライザーを設定すれば OK です。
 これで、REST API へのアクセス時に、Cognito 認証によるアクセス制限がかかるようになります。</p>
+<p><code>defaultCorsPreflightOptions</code> の設定はちょっと事情が複雑ですが、Web ブラウザ上の JavaScript から認証付き API の呼び出しを行う際に必要になります。
+クライアントサイド JS から API を呼び出すときに HTTP リクエストヘッダーに <code>Authorization</code> 情報を付加することになるのですが、この場合は GET 要求の前にプリフライトリクエストという OPTIONS 要求を行うことが HTTP の仕様で決められています。
+このプリフライトリクエストはブラウザが自動的に行ってくれるのですが、このリクエストにもクロスドメインでのアクセスを許可しておかないといけません。
+この設定を行わないと、CORS エラーが発生して API 呼び出しが失敗します。</p>
 <h2 id=デプロイ>デプロイ</h2>
 <p>Lambda 関数とスタック定義の実装が済んだら、CDK でデプロイします。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>cdk deploy
@@ -636,6 +649,38 @@ HTTP レスポンスコードは <a href=https://developer.mozilla.org/ja/docs/W
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>curl https://xxxxxxxxxx.execute-api.ap-northeast-1.amazonaws.com/prod/info -H <span class=s2>&#34;Authorization:eyJraWQiOiJv...&#34;</span>
 <span class=go>{&#34;message&#34;:&#34;Hello, API Gateway!&#34;}
 </span></code></pre></div><p>送った ID トークンが妥当なものかは、API Gateway が内部で自動で調べてくれるので、Lambda 関数でチェックしたりする必要はありません。</p>
+<h2 id=応用web-アプリからの-rest-api-呼び出し>（応用）Web アプリからの REST API 呼び出し</h2>
+<p>Web アプリからオーソライザー設定された API Gateway を呼び出すには、HTTP リクエスト（<code>fetch</code> 関数呼び出し）時に、<code>Authorization</code> ヘッダーで Cognito ユーザープールから取得した ID トークンを付加する必要があります。
+Web アプリからの Cognito 認証に Amplify ライブラリを使用している場合は、次のような感じで簡単に認証情報付き HTTP リクエストを発行できます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>Auth</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;aws-amplify&#39;</span>
+
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>fetchWithAuth</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>url</span>: <span class=kt>string</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=nx>token</span> <span class=o>=</span> <span class=p>(</span><span class=k>await</span> <span class=nx>Auth</span><span class=p>.</span><span class=nx>currentSession</span><span class=p>()).</span><span class=nx>getIdToken</span><span class=p>().</span><span class=nx>getJwtToken</span><span class=p>()</span>
+  <span class=k>return</span> <span class=nx>fetch</span><span class=p>(</span><span class=nx>url</span><span class=p>,</span> <span class=p>{</span> <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span> <span class=nx>Authorization</span>: <span class=kt>token</span> <span class=p>}</span> <span class=p>}).</span><span class=nx>then</span><span class=p>((</span><span class=nx>r</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>r</span><span class=p>.</span><span class=nx>json</span><span class=p>())</span>
+<span class=p>}</span>
+</code></pre></div><p>あとは、このフェッチ関数を通常の <code>fetch</code> 関数の代わりに React カスタムフックなどから呼び出すだけで OK です。
+下記は、今回作成した REST API を呼び出す <code>useInfo</code> カスタムフックの実装例です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>&lt;Next.jsアプリ>/src/hooks/useInfo.ts（抜粋）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=cm>/** useInfo フックの戻り値の型 */</span>
+<span class=kr>type</span> <span class=nx>UseInfoOutput</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>error?</span>: <span class=kt>Error</span>
+  <span class=nx>message?</span>: <span class=kt>string</span>
+<span class=p>}</span>
+
+<span class=cm>/** REST API の戻り値の型 */</span>
+<span class=kr>type</span> <span class=nx>DataType</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>message</span>: <span class=kt>string</span>
+<span class=p>}</span>
+
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>useInfo</span> <span class=o>=</span> <span class=p>()</span><span class=o>:</span> <span class=nx>UseInfoOutput</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span><span class=p>,</span> <span class=nx>error</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSWR</span><span class=p>&lt;</span><span class=nt>DataType</span><span class=err>,</span> <span class=na>Error</span><span class=p>&gt;(</span><span class=nx>GET_INFO_URL</span><span class=p>,</span> <span class=nx>fetchWithAuth</span><span class=p>)</span>
+  <span class=k>return</span> <span class=p>{</span> <span class=nx>error</span><span class=p>,</span> <span class=nx>message</span>: <span class=kt>data?.message</span> <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=../../p/pufs8kx/>Amazon Cognito (1) サインイン可能な Web サイトを作る (Cognito User Pool)</a></li>
+</ul>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">
