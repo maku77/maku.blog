@@ -1554,10 +1554,22 @@ date: "2022-04-23T00:00:00Z",
 body: "ツール"
 },
 {
+url: "/p/88gow5c/",
+title: "gRPC 関連メモ",
+date: "2022-04-20T00:00:00Z",
+body: "gRPC 関連メモ"
+},
+{
 url: "/p/37e6uck/",
 title: "Protocol Buffers の .proto ファイルをコンパイルする (protoc)",
 date: "2022-04-20T00:00:00Z",
 body: "Protocol Buffers の .proto ファイルをコンパイルする (protoc) Protcol Buffers とは プロトコルバッファー (Protocol Buffers、protobuf) は、Google が開発した、構造化したデータをシリアライズするためのフォーマットです。 同じく Google が開発した gRPC 通信プラットフォームで採用されており、XML や JSON などのテキストベースの API より効率的な通信を行うことができるという特徴を持っています。 データをコンパクトに表現できるため、通信やパース処理が高速 強い型付けを行うことでき、サーバー、クライアントの安全なコーディングが可能 定義変更時の互換性を考慮したフォーマット OS やプログラミング言語などに非依存 データ構造やサービス形式の定義は、.proto 拡張子を持つ プロトコル定義ファイル (Proto Definition file) で行います。 この .proto ファイルを protoc コマンド（プロトコルバッファーコンパイラ）でコンパイルすると、各言語用のソースコードを生成することができます。 hello.proto ──[protoc]──\u0026gt; hello_pb.rb protoc コマンドは各種プログラミング言語用のコードを生成するわけですが、そのためには、protoc コマンド本体 と 各言語用のプラグイン（protoc-gen-go など）がインストールされている必要があります。 C++ や C#、Kotlin、Python、Ruby などのコード生成は組み込みで対応していますが、Go 言語用のプラグインなどは別途インストールする必要があります。 protoc 本体のインストール protoc コマンド (Protocol Buffers Compiler) は、Linux（Ubuntu 系）や macOS ではパッケージマネージャーを使ってインストールしてしまうのが簡単です。 インストールするパッケージの名前は protobuf や protobuf-compiler であることに注意してください。 macOS (Homebrew) の場合 $ brew install protobuf # インストール $ brew upgrade protobuf # バージョン更新 Linux (apt) の場合 $ apt install -y protobuf-compiler プリビルド版を使う場合 あるいは、各 OS 用のバイナリを GitHub のリリースページ からダウンロードし、protoc コマンドにパスを通します。 例えば、Windows であれば protoc-3.20.0-win64.zip などをダウンロードします。 次のように protoc コマンドを実行できるようになれば OK です。 $ protoc --version libprotoc 3.20.0 参考: Protocol Buffer Compiler Installation | gRPC .proto ファイルをコンパイルしてみる .proto ファイル 次のような簡単な .proto ファイルを入力ファイルとして用意します。 protos/person.proto syntax = \u0026#34;proto3\u0026#34;;message Person { optional string name = 1; optional int32 id = 2; optional string email = 3;} C# のコードを生成 例えば、次のように実行すると、C# 用のソースコードを生成することができます。 --csharp_out=\u0026lt;OUT_DIR\u0026gt; というオプションで、C# ソースコードの出力先ディレクトリを指定しています。 $ mkdir gen $ protoc --csharp_out=gen protos/person.proto $ ls gen Person.cs Python のコードを生成 Python 用のソースコードを生成したければ、同様に次のようにします。 出力ディレクトリは --python_out=\u0026lt;OUT_DIR\u0026gt; オプションで指定します。 $ protoc --python_out=gen protos/person.proto その他の言語のコードを生成 他にも各言語用のソースコードを生成するオプションが用意されており、次のようにヘルプ表示すると標準でサポートしている言語を確認できます。 protoc の言語別出力オプション $ protoc --help | grep OUT_DIR --cpp_out=OUT_DIR Generate C++ header and source. --csharp_out=OUT_DIR Generate C# source file. --java_out=OUT_DIR Generate Java source file. --js_out=OUT_DIR Generate JavaScript source. --kotlin_out=OUT_DIR Generate Kotlin file. --objc_out=OUT_DIR Generate Objective-C header and source. --php_out=OUT_DIR Generate PHP source file. --python_out=OUT_DIR Generate Python source file. --ruby_out=OUT_DIR Generate Ruby source file. 言語拡張用のプラグイン (protoc-gen-xxx) protoc が標準でサポートしてない言語のコードを生成するには、追加のプラグイン（実際はただのコマンド）をインストールする必要があります。 追加でインストールするコマンドは protoc-gen-\u0026lt;言語名\u0026gt; という名前であり、そのコマンドがシステムに存在していると、protoc コマンドの --\u0026lt;言語名\u0026gt;_out というオプションが有効になります。 Go 言語用プラグイン (protoc-gen-go) 例えば、Go 言語用のプラグインである protoc-gen-go をインストールすると、--go_out オプションが使えるようになります。 protoc-gen-go のインストール # バージョン指定でインストールする場合（推奨） $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0 # 最新版をインストールする場合 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest # 確認 $ protoc-gen-go --version protoc-gen-go v1.28.0 Go 言語用のコードを出力する場合は、.proto ファイル内の option go_package でパッケージ名を設定しておく必要があります。 protos/person.proto syntax = \u0026#34;proto3\u0026#34;;option go_package = \u0026#34;example.com/myapp\u0026#34;;message Person { optional string name = 1; optional int32 id = 2; optional string email = 3;} 次のようにすると、gen ディレクトリ以下に Go コードが生成されます。 $ protoc --go_out=gen protos/person.proto .proto ファイルで指定したパッケージ名に従ってディレクトリ階層ができます。 gen/example.com/myapp/person.pb.go .proto ファイル内でパッケージ名を指定するのではなく、protoc コマンドの --go_opt=M... オプションで次のように指定することもできます。 $ protoc --go_out=gen \\ --go_opt=Mprotos/person.proto=example.com/myapp \\ protos/person.proto = が 2 回出てくるのでちょっと分かりにくいですが、protos/person.proto ファイルのパッケージ名を example.com/myapp に設定しています。"
+},
+{
+url: "/p/nd3cmt3/",
+title: "ネットワーク関連技術メモ",
+date: "2022-04-20T00:00:00Z",
+body: "ネットワーク関連技術メモ"
 },
 {
 url: "/p/7s7hs4e/",
@@ -1624,6 +1636,12 @@ url: "/p/gqo9yoo/",
 title: "TypeScript メモ",
 date: "2022-04-04T00:00:00Z",
 body: "TypeScript メモ"
+},
+{
+url: "/p/fn7m2gu/",
+title: "JavaScript / Node.js 関連メモ",
+date: "2022-03-16T00:00:00Z",
+body: "JavaScript / Node.js 関連メモ"
 },
 {
 url: "/p/ryq6it6/",
@@ -2022,6 +2040,12 @@ date: "2021-06-08T00:00:00Z",
 body: "設定"
 },
 {
+url: "/p/somcgdw/",
+title: "macOS 関連メモ",
+date: "2021-05-30T00:00:00Z",
+body: "macOS 関連メモ"
+},
+{
 url: "/p/ygpw6dk/",
 title: "macOS で不要なファイルを削除してストレージ容量を確保する",
 date: "2021-05-30T00:00:00Z",
@@ -2086,12 +2110,6 @@ url: "/p/bwamwgp/",
 title: "ドメイン管理と DNS 管理の違いを理解する",
 date: "2021-04-25T00:00:00Z",
 body: "ドメイン管理と DNS 管理の違いを理解する ドメイン管理と DNS サーバー 「独自ドメイン＋レンタルサーバー」を契約してブログサイトなどを立ち上げようとすると、どうしてもドメイン管理や DNS 設定を行う必要が出てきます。 同じ会社で一括契約すると、まとめて設定できたりしますが、これらは本来別々のサービスなので、ここで簡単に整理しておきます。 ドメイン取得・管理は、レジストラ（およびその委託先会社）が行っており、世界で一意なドメインを運用します。 日本では、お名前.com (by GMO) などが有名ですね。 一方で、DNS サービスは、このドメイン名を具体的な IP アドレスに関連づける機能を提供します。 レジストラ（ドメイン管理会社）が提供するドメイン管理サービスは、あくまでドメイン名を管理しているだけであり、DNS の機能を提供しているわけではありません。 なので、ドメイン管理会社でドメインを取得したら、そのドメインの名前解決に使用する DNS サーバーのアドレスを教えてあげる必要があります。 上の図では、お名前.com のドメイン管理設定で、さくらインターネットの DNS サーバー (ns1/2.dns.ne.jp) のアドレスを設定する例を示しています。 この設定により、ユーザーが example.com にアクセスしようとすると、DNS サーバー (ns1.dns.ne.jp) によって IP アドレス (12.34.56.78) に変換され、そのアドレスの Web サーバーにアクセスできるという仕組みになっています。 組み合わせの例 ドメイン取得・管理 DNS サーバー Web サーバー お名前.com お名前.com お名前.com お名前.com さくらインターネット さくらインターネット お名前.com AWS (R53) AWS (EC2) 多くの場合、こんな感じで DNS サーバーと Web サーバーは同じ会社のものを使います。 レンタルサーバーのアドレスなどを自動で設定できたりして便利だからです。 DNS サーバーの使用料金はレンタルサーバーの使用料金に含まれていることが多いですが、AWS の R53 などは個別に使用料金がかかります。 一方、ドメイン取得・管理会社の方は、年ごとの更新費用などが安い「お名前.com」などを選ぶことが多いです。 Amazon (AWS) などのクラウドサービスでもドメイン取得できたりしますが、ちょっとお値段高めです。"
-},
-{
-url: "/p/e58h5in/",
-title: "雑多な技術メモ",
-date: "2021-04-25T00:00:00Z",
-body: "雑多な技術メモ"
 },
 {
 url: "/p/f2fq2cn/",
@@ -2290,6 +2308,12 @@ url: "/p/ow3zskd/",
 title: "JUnit のテストケースを一時的に無効にする（@Ignore/@Disabledアノテーション）",
 date: "2020-09-30T00:00:00Z",
 body: "JUnit のテストケースを一時的に無効にする（@Ignore/@Disabledアノテーション） JUnit で特定のテストケース（クラスや関数）を一時的に無効にしておきたい場合は、次のようなアノテーションをクラスや関数に付けます。 JUnit4 の場合: @Ignore アノテーション (org.junit.Ignore) JUnit5 の場合: @Disabled アノテーション (org.junit.jupiter.api.Disabled) Java の場合 // import org.junit.Ignore; // import org.junit.Test; public class MyClassTest { @Test @Ignore public void testSomething() { // ... } } Kotlin の場合 // import org.junit.Ignore // import org.junit.Test class MyClassTest { @Test @Ignore fun testSomething() { // ... } } @Ignore (@Disabled) に文字列パラメータを渡すと、なぜそのテストを無効にしているのかを示すことができます。 @Ignore(\u0026#34;HogeHogeのパラメータを整理中\u0026#34;) @Test fun testSomething() { // ... } このメッセージは JUnit でテストを実行したときに表示されます。 下記は、Android Studio 上で JUnit によるテストを実行したときの表示例です。 16 個のテスト関数のうち 1 つが無視され、その理由が表示されています。"
+},
+{
+url: "/p/e58h5in/",
+title: "雑多な技術メモ",
+date: "2020-09-30T00:00:00Z",
+body: "雑多な技術メモ"
 },
 {
 url: "/p/fdnpuro/",
@@ -4570,12 +4594,6 @@ url: "/p/oi66eim/",
 title: "TV規格: DVBメモ",
 date: "0001-01-01T00:00:00Z",
 body: "TV規格: DVBメモ DVB について DVB (Digital Video Broadcasting) はヨーロッパのデジタル放送規格。標準化団体名でもある。DVB には以下のような種類がある。 DVB-T (Terrestrial) \u0026ndash; 地上デジタル放送の規格 DVB-S (Satellite) \u0026ndash; 衛星放送の規格 DVB-C (Cable) \u0026ndash; CATV の規格 ISDB (Integrated Services Digital Broadcasting) は日本、ブラジル向けのデジタル放送規格。ちなみに ARIB (Association of Radio Industries and Broadcast): 社団法人電波産業会というのは通信・放送分野の研究、標準化などを行う団体名であって規格の名前ではない。ISDB には以下のような種類がある。 ISDB-T (Terrestrial) \u0026ndash; 地上デジタル放送の規格 ISDB-S (Satellite) \u0026ndash; 衛星放送の規格 ISDB-TSB (Terrestrial for Sound Broadcasting) \u0026ndash; 地上デジタルラジオ放送の規格 DVB の資料 EPG に関することを知りたかったら、DVB SI 系の資料を読むと良い。まずは、DVB の Web サイトにある、DVB SI の 2 冊の Bluebook (PDF) から読み始めると楽（150ページくらい）。Bluebook はメアド登録しなくてもダウンロードできる。 DVB - Digital Video Broadcasting [Standards \u0026amp; Technology] → [Standards \u0026amp; BlueBooks] → DVB SI 日本、ブラジル向けのデジタル放送規格 ISDB も DVB をもとに考えられているので、DVB の資料を先に読んでおくと理解しやすい。 service, programme, event の違い service \u0026ndash; DVB で定義 event, programme \u0026ndash; MPEG2 で定義 broadcaster （放送局）が 1 つの TV チャンネルとして垂れ流している一連の放送を service という。つまり TV チャンネルと考えてよい。service は映像、音声、字幕などの Components (ES: Elementary Stream) をまとめたものとして構成されている。 programme は、MPEG-2 のストリームを分けるための概念で、TV のチャンネルの考え方に近い。ただし、MPEG-2 では TV に特化したものは定義していないので、DVB で TV のチャンネルに相当する service というものを定義している。service には TV のチャンネル名などが含まれる。 service 自体には時間の概念はなく、延々と続く映像や音声の ES を垂れ流しているだけ。ここに、時間の概念を入れて、1 つの番組として、開始時刻や長さを定義したものが event。複数の event を集めたものを service と考えるよりは、1 つの service を event という概念で区切ったものが番組であると考える方が正しい。 1 つの transponder（あるいは channel）で複数の service が multiplex （多重化）されて、同時に配信されている。※ここでいう channel は TV のチャンネルではなく、チャネル。ケーブル TV や地上波での 1 つの配信システムを表している。 Network ID について DVB Services - identifiers http://www.dvbservices.com/identifiers/network_id http://www.dvbservices.com/identifiers/original_network_id ここが分かりやすい http://www.interactivetvweb.org/tutorials/dtv_intro/dtv_intro 階層構造はこんなイメージ。 Network（Cable とか Satellite とかのシステムを表す。1つ以上の Transport stream を流せる） Transport stream (MPEG-2 のストリーム。複数の Service を含む） Service (TV channel) Event (TV show) Elementary stream TS パケット MPEG-2 の TS (Transport Stream) は、TS パケットという単位でいろんなデータが多重化されて配信されている（複数のチャンネルの映像や音声、字幕、番組情報、時刻データなど）。TS パケットは 188byte 固定長。 TS パケット (188byte) = TS ヘッダ (4byte) + ペイロード (184byte) TS パケットは、Audio/Video/Teletext などのデータを構成する PES (Packetized Elementary Stream) の一部であったり、SI (Service Information) や BML データを構成する section data の一部であったりする。 ある TS パケットが、これらのどのデータの一部であるかを判別するために、TS ヘッダの中に 13bit の PID (PacketID) が入っている。デコーダはこの PID を見て、TS ストリームを多重分離 (demultiplex) することができる。例えば、SI の PAT 情報を構成する TS パケットの場合、PID は 0x0000 が入っている。 SI (Service Information) tables DVB の SI (Service Information) は、ISO/IEC 13818-1 (MPEG-2) で定義されている PSI のテーブルに加え、service （チャンネル）情報や event （番組）情報を示す各種テーブルで構成されている。 PSI (Program Specific Information) のテーブル PSI は、受信機が多重化された multiplex データ（MPEG-2 TS ストリーム）を demultiplex するための情報で、MPEG-2 にて定義されている。 ※複数の service を 1 つの channel、transponder で多重送信することを multiplex という。 PSI には下記の 4 つのテーブルがある。 PAT: Program Association Table MPEG-2 の TS ストリームで伝送されるプログラムを管理する情報。各 service（チャンネル）における PMT の PID (PacketID) を示す（正確に言えば、PMT の一部のデータである TS パケットの PID）。 その TS で流している service の数だけ PID (PacketID) を含んでいる（つまり PMT もチャンネルの数だけある）。 デコーダは、この PAT の情報を起点として各 service（チャンネル）ごとの PMT パケットの PID を知るので、PAT の PID (PacketID) は 0x0000 になっている。 NIT: Network Information Table MPEG-2 の TS ストリームを配信するのに使用されている physical network の情報を示す。 MPEG-2 の PSI では NIT の構造は定義していないので、各放送方式などで独自に定義する必要がある。 PMT: Program Map Table 各 service を構成する ES: Elementary Stream（映像、音声ストリームなど）の位置を示す。チャンネルの数だけ PMT が存在する。 その service（チャンネル）が Video、Audio、Teletext の 3 つの ES で構成されているなら、PMT の中に PID (PacketID) が 3 つ含まれる。 PMT データ自体の TS パケットの PID は、PAT 内で指定されるので、PAT や CAT パケットの PID とは違って固定値ではない。 CAT: Conditional Access Table CA システムに関する情報。EMM stream (Entitlement Management Message) の位置を示す。EMM はそれぞれの CA システムに特化した情報であり、例えば日本のデジタル T V では、B-CAS カードの契約情報や暗号解除するための鍵情報などが含まれている。EMM は B-CAS カードごとに個別に送信され、情報はカード内に保存される。 PAT と同じく、TS パケットにおいて最初の段階で取得しないといけない情報なので、CAT には固定の PID (PacketID) 0x0001 が割り当てられている。 DVB 独自のテーブル DVB の SI データには、MPEG-2 で定義されている PSI の 4 つのテーブルの他に、以下の 9 種類のテーブルが含まれている。これらのテーブルは、チャンネル情報、番組情報、時刻情報などを示している。 BAT: Bouquet Association Table bouquet （ブーケ）情報を示す。bouquet を構成する service のリストなど。異なるネットワークで送信された service も 1 つの bouquet にまとめられ得る。 SDT: Service Description Table チャンネル情報（service 情報）。チャンネル名、放送局の識別子など。 EIT: Event Information Table 番組情報（event 情報）。番組名、番組の開始時刻、番組長など。SI のテーブルのうち、この EIT だけはスクランブルがかかることがある。 RST: Running Status Table 番組の現在の進行状況。 TDT: Time and Date Table 現在時刻の情報。 TOT: Time Offset Table ローカルタイム（現地時間）に関する情報。 ST: Stuffing Table 現在のセクションを無効にする。データ境界を合わせるために使用。 SIT: Selection Information Table DIT: Discontinuity Information Table SED と EED 参考資料（規格） https://www.dvb.org/standards DVB SI [DVB BlueBook A038] Specification for Service Information (SI) in DVB system https://www.dvb.org/resources/public/standards/a038_dvb-si_spec.pdf DVB SI [DVB BlueBook A005] Guidelines on implementation and usage of Service Information (SI) https://www.dvb.org/resources/public/standards/a005_dvb-si_impl_guide.pdf SED と EED の定義 SED (Short Event Descript) と EED (Extended Event Descriptor) は、SI データの EIT-section で流される (EIT: Event Information Table) の一種です。 SED には「番組名とその短い説明」が入り、EED はそれを補足する形で、「出演者: ○○○」「あらすじ: ○○○」みたいな、いわゆる Key and Value のような形で詳細説明が入ってます。 以下、DVB BlueBook A005 より 4.2.4.10 Short event descriptor This descriptor is used to transmit the name and a short text description for an event. A language code is transmitted in order to indicate in which language the title and the text are written. Transmission of this descriptor is mandatory, unless there is a time_shifted_event_descriptor, in which case the descriptor is not allowed. This descriptor is allowed more than once in the EIT event loop for different languages. Thus it is not allowed to have more than one short_event_descriptor with the same language code. 4.2.4.5 Extended event descriptor This descriptor is used to transmit a bigger amount of textual information for an event than is possible with the short_event_descriptor. The information in extended event descriptors supplements that given in a short event descriptor. A language code is transmitted in order to indicate in which language the text is written. More than one extended_event_descriptor is allowed in the EIT event loop, for transmitting more data than one descriptor can contain (255 bytes excluding header), and for different languages. The last_descriptor field specifies the number of the last extended_event_descriptor for a specific language. If there is a time_shifted_event_descriptor, this descriptor is not allowed. Transmission of this descriptor is optional. SED と EED のテーブルのフォーマット 以下、DVB BlueBook A038 より。 6.2.37 Short event descriptor short_event_descriptor(){ descriptor_tag descriptor_length ISO_639_language_code event_name_length for (i=0;i\u0026lt;event_name_length;i++){ event_name_char } text_length for (i=0;i\u0026lt;text_length;i++){ text_char } } 6.2.15 Extended event descripto extended_event_descriptor(){ descriptor_tag descriptor_length descriptor_number last_descriptor_number ISO_639_language_code length_of_items for ( i=0;i\u0026lt;N;i++){ item_description_length for (j=0;j\u0026lt;N;j++){ item_description_char } item_length for (j=0;j\u0026lt;N;j++){ item_char } } text_length for (i=0;i\u0026lt;N;i++){ text_char } } MPEG-2 TS を多重分離する流れの概要 ES（映像、音声など）を多重分離する流れ PAT (PID=0x0000) の TS パケットを受信 （TS パケットを結合して PAT を復元） PAT の内容を見て、PMT の PID を取得（チャンネル数だけある） PMT の内容を見て、各 ES の PID を取得（ES の数だけある） ES の TS パケットを結合して再生 EIT（番組情報テーブル）を多重分離する流れ EIT (PID=0x0012) の TS パケットを受信。 （TS パケットを結合して EIT を復元） EIT の内容がそのチャンネルの番組情報。 他の SI のテーブル、例えば SDT (PID=0x0011)、RST (PID=0x0013)、TDT/TOT (PID=0x0014) なども同様に多重分離される。 DVB 標準一覧 図: 出典: 映像情報メディア学会誌 Vol.60, No. 5 (2006) ディジタル地上波マルチプレックスの例 図: 出典: 映像情報メディア学会誌 Vol.60, No. 5 (2006) 各サービスをどのような比率で送信するかは、欧州各国政府が決める。"
-},
-{
-url: "/p/88gow5c/",
-title: "gRPC 関連メモ",
-date: "0001-01-01T00:00:00Z",
-body: "gRPC 関連メモ"
 },
 {
 url: "/p/uqhbb5p/",
