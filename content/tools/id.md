@@ -1,5 +1,5 @@
 ---
-title: "ランダムID生成"
+title: "ランダム ID 生成ツール"
 url: "/p/3nx9is3"
 date: "2018-04-21"
 tags: ["ツール"]

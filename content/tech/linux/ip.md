@@ -1,5 +1,5 @@
 ---
-title: "Linux「ip」コマンドの使い方"
+title: "Linuxコマンド: ip コマンドの使い方"
 url: "/p/8awcq4h"
 date: "2022-02-18"
 tags: ["Linux"]

@@ -34,7 +34,7 @@ const bookConverter: FirestoreDataConverter<Book> = {
    * Book オブジェクトを Firestore ドキュメントデータへ変換します。
    */
   toFirestore(book: Book): DocumentData {
-    // id は Firestore のパスで表現されるでドキュメントデータには含めない。
+    // id は Firestore のパスで表現されるのでドキュメントデータには含めない。
     // 下記の updatedAt のように、自動で更新時刻のフィールドを追加することも可能。
     return {
       title: book.title,
