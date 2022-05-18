@@ -1512,6 +1512,36 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/ij4jv9k/",
+title: "Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）",
+date: "2022-05-18T00:00:00Z",
+body: "Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント） 何をするか？ ここでは、Go 言語用の gRPC ライブラリである gRPC-Go (google.golang.org/grpc) を使って、簡単な gRPC サーバーとクライアントを作ってみます。 通信用のスタブコードなどは、protoc コマンド (Protocl Buffers Compiler) で .proto ファイルから自動生成するので、あらかじめ protoc コマンドをインストールしておいてください。 参考: protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler) protoc コマンドで Go 言語用のコードを生成するには、protoc-gen-go プラグインと protoc-gen-go-grpc プラグインをインストールしておく必要があります。 前者がシリアライズ用のコード、後者が gRPC 用のスタブコードを生成するための protoc プラグインです。 # バージョンを指定してインストールする方法（推奨） $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2 # 最新バージョンをインストールする方法 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest プロジェクトの作成と gRPC-Go のインストール まずは Go 言語用のプロジェクトを作成します。 モジュール名は com.example/grpc-sample としていますが、GitHub で管理する予定であれば、リポジトリ名に合わせて github.com/\u0026lt;USER\u0026gt;/grpc-sample のような名前にしてください。 これが、プロジェクト内で作成する Go パッケージをインポートするときのプレフィックスになります。 $ mkdir grpc-sample \u0026amp;\u0026amp; cd grpc-sample $ go mod init com.example/grpc-sample あとは、gRPC サーバーとクライアントの実装に使用する gRPC-Go パッケージの依存関係を追加しておきます。 $ go get google.golang.org/grpc .proto ファイルを作成する echo/echo.proto ファイルを作成して、次のように記述します。 Go 言語用のオプション option go_package で、出力する .go ファイルを echo パッケージに配置するように指定しています。 echo/echo.proto syntax = \u0026#34;proto3\u0026#34;;package echo;option go_package = \u0026#34;example.com/grpc-sample/echo\u0026#34;;// Echo メソッドを持つ EchoService の定義 service EchoService { rpc Echo (EchoRequest) returns (EchoResponse);}// Echo に送るリクエストメッセージの定義 message EchoRequest { string message = 1;}// Echo が返すレスポンスメッセージの定義 message EchoResponse { string message = 1;} ここでは、EchoService というサービスが、Echo というメソッドを提供するよう定義しています。 .proto ファイルをコンパイルする protoc コマンドを実行して、.proto ファイルからシリアライズ用のコードと、gRPC 関連のスタブコードを生成します。 $ protoc --go_out=. --go_opt=paths=source_relative \\ --go-grpc_out=. --go-grpc_opt=paths=source_relative \\ echo/echo.proto それぞれのオプションは次のような意味があります。 --go_out \u0026hellip; protoc-gen-go プラグインによる生成コードの出力先ディレクトリ --go_opt \u0026hellip; protoc-gen-go プラグインに渡すオプション --go-grpc_out \u0026hellip; protoc-gen-go-grpc プラグインによる生成コードの出力先ディレクトリ --go-grpc_opt \u0026hellip; protoc-gen-go-grpc プラグインに渡すオプション --go_out オプションを指定することでシリアライズ用のコード (echo.pb.go)、--go-grpc_out オプションを指定することで gRPC 用のスタブコード (echo_grpc.pb.go) を生成してくれます。 追加のオプションで、paths=source_relative を指定することにより、入力ファイル (.proto) と同じディレクトリ構成で .go ファイルを出力するようにしています。 今回はカレントディレクトリ (.) を出力のルートに指定しているので、結果的に入力ファイルと同じディレクトリに次のように .go ファイルが生成されることになります。 入力ファイル 使う protoc プラグイン 生成されるファイル echo/echo.proto protoc-gen-go echo/echo.pb.go echo/echo.proto protoc-gen-go-grpc echo/echo_grpc.pb.go 生成された echo.pb.go ファイルや echo_grpc.pb.go ファイルを覗いてみると、次のようなパッケージ名で定義されていることがわかります。 echo/echo.pb.go（抜粋） package echo このパッケージ名は、.proto ファイル内の options go_package で指定したパスに従って自動生成されています（パスの最後の /echo という部分が採用されています）。 また、今回はモジュール名を example.com/grpc-sample と定義したので（go.mod ファイルに書かれているので）、自動生成されたこれらのパッケージをインポートするときは、次のような感じで記述することになります。 import \u0026#34;example.com/grpc-sample/echo\u0026#34; gRPC サーバーとクライアントの実装 gRPC を使って通信するサーバーとクライアントは、それぞれ独立したコマンドとして cmd/echo-server ディレクトリ、cmd/echo-client ディレクトリ以下に作成することにします（それぞれ main 関数を作成します）。 Go 言語のプロジェクトで生成する実行ファイルのコードを cmd ディレクトリ以下に配置するのはよくあるプラクティスです。 gRPC サーバーの実装 まずは、EchoService を実装します。 protoc によって自動生成された echo/echo_grpc.pb.go の関数シグネチャを参考に、次のような感じで Echo メソッドを実装します。 クライアントから受信したテキストの先頭に * を付加したレスポンスを返しているだけなので実装は簡単です。 cmd/echo-server/server.go package main import ( \u0026#34;context\u0026#34; \u0026#34;log\u0026#34; \u0026#34;example.com/grpc-sample/echo\u0026#34; ) // EchoService を実装するサーバーの構造体 type server struct{ echo.UnimplementedEchoServiceServer } // EchoService の Echo メソッドの実装 func (s *server) Echo(ctx context.Context, in *echo.EchoRequest) (*echo.EchoResponse, error) { log.Printf(\u0026#34;Received from client: %v\u0026#34;, in.GetMessage()) return \u0026amp;echo.EchoResponse{Message: \u0026#34;*\u0026#34; + in.GetMessage()}, nil } あとは、main 関数で gRPC サーバーのインスタンスを生成して、上記の実装を登録すれば OK です。 cmd/echo-server/main.go package main import ( \u0026#34;fmt\u0026#34; \u0026#34;log\u0026#34; \u0026#34;net\u0026#34; \u0026#34;google.golang.org/grpc\u0026#34; \u0026#34;example.com/grpc-sample/echo\u0026#34; ) const port = 52000 func main() { // TCP ポートをオープンできるか確認 \tlis, err := net.Listen(\u0026#34;tcp\u0026#34;, fmt.Sprintf(\u0026#34;:%d\u0026#34;, port)) if err != nil { log.Fatalf(\u0026#34;Failed to listen: %v\u0026#34;, err) } // gRPC サーバーを生成し、EchoService サーバーの実装を登録する \ts := grpc.NewServer() echo.RegisterEchoServiceServer(s, \u0026amp;server{}) // gRPC サーバーを稼働開始 \tlog.Printf(\u0026#34;Server listening at %v\u0026#34;, lis.Addr()) if err := s.Serve(lis); err != nil { log.Fatalf(\u0026#34;Failed to serve: %v\u0026#34;, err) } } gRPC クライアントの実装 gRPC サーバー側が実装できたら、次はクライアント側の実装です。 下記の gRPC クライアントでは、Echo メソッドを呼び出して AAAAA というメッセージを送り、その応答を単純に出力しています。 cmd/echo-client/main.go package main import ( \u0026#34;context\u0026#34; \u0026#34;log\u0026#34; \u0026#34;time\u0026#34; \u0026#34;google.golang.org/grpc\u0026#34; \u0026#34;google.golang.org/grpc/credentials/insecure\u0026#34; \u0026#34;example.com/grpc-sample/echo\u0026#34; ) const addr = \u0026#34;localhost:52000\u0026#34; func main() { // EchoService サーバーへ接続する \tconn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials())) if err != nil { log.Fatalf(\u0026#34;Did not connect: %v\u0026#34;, err) } defer conn.Close() c := echo.NewEchoServiceClient(conn) // Echo メソッドを呼び出す \tctx, cancel := context.WithTimeout(context.Background(), time.Second) defer cancel() r, err := c.Echo(ctx, \u0026amp;echo.EchoRequest{Message: \u0026#34;AAAAA\u0026#34;}) if err != nil { log.Fatalf(\u0026#34;Could not echo: %v\u0026#34;, err) } log.Printf(\u0026#34;Received from server: %s\u0026#34;, r.GetMessage()) } 実行してみる まず、gRPC のサーバー側を起動します。 $ go run ./cmd/echo-server 2022/05/17 22:00:47 Server listening at [::]:52000 次に、gRPC のクライアント側を起動すると、サーバーと通信してメッセージを受信できていることを確認できます。 $ go run ./cmd/echo-client 2022/05/17 22:01:32 Received from server: *AAAAA やったー！"
+},
+{
+url: "/p/88gow5c/",
+title: "gRPC 関連メモ",
+date: "2022-05-18T00:00:00Z",
+body: "gRPC 関連メモ"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2022-05-18T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/nd3cmt3/",
+title: "ネットワーク関連技術メモ",
+date: "2022-05-18T00:00:00Z",
+body: "ネットワーク関連技術メモ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-05-18T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/saku4ck/",
 title: "Next.js 関連記事",
 date: "2022-05-09T00:00:00Z",
@@ -1530,18 +1560,6 @@ date: "2022-05-09T00:00:00Z",
 body: "React 関連記事"
 },
 {
-url: "/",
-title: "まくろぐ",
-date: "2022-05-09T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-05-09T00:00:00Z",
-body: "技術系のメモ"
-},
-{
 url: "/p/s7q8o5k/",
 title: "ウェブサイトのリンク切れを自動でチェックする (muffet)",
 date: "2022-04-23T00:00:00Z",
@@ -1554,22 +1572,10 @@ date: "2022-04-23T00:00:00Z",
 body: "ツール"
 },
 {
-url: "/p/88gow5c/",
-title: "gRPC 関連メモ",
-date: "2022-04-20T00:00:00Z",
-body: "gRPC 関連メモ"
-},
-{
 url: "/p/37e6uck/",
-title: "Protocol Buffers の .proto ファイルをコンパイルする (protoc)",
+title: "protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)",
 date: "2022-04-20T00:00:00Z",
-body: "Protocol Buffers の .proto ファイルをコンパイルする (protoc) Protcol Buffers とは プロトコルバッファー (Protocol Buffers、protobuf) は、Google が開発した、構造化したデータをシリアライズするためのフォーマットです。 同じく Google が開発した gRPC 通信プラットフォームで採用されており、XML や JSON などのテキストベースの API より効率的な通信を行うことができるという特徴を持っています。 データをコンパクトに表現できるため、通信やパース処理が高速 強い型付けを行うことでき、サーバー、クライアントの安全なコーディングが可能 定義変更時の互換性を考慮したフォーマット OS やプログラミング言語などに非依存 データ構造やサービス形式の定義は、.proto 拡張子を持つ プロトコル定義ファイル (Proto Definition file) で行います。 この .proto ファイルを protoc コマンド（プロトコルバッファーコンパイラ）でコンパイルすると、各言語用のソースコードを生成することができます。 hello.proto ──[protoc]──\u0026gt; hello_pb.rb protoc コマンドは各種プログラミング言語用のコードを生成するわけですが、そのためには、protoc コマンド本体 と 各言語用のプラグイン（protoc-gen-go など）がインストールされている必要があります。 C++ や C#、Kotlin、Python、Ruby などのコード生成は組み込みで対応していますが、Go 言語用のプラグインなどは別途インストールする必要があります。 protoc 本体のインストール protoc コマンド (Protocol Buffers Compiler) は、Linux（Ubuntu 系）や macOS ではパッケージマネージャーを使ってインストールしてしまうのが簡単です。 インストールするパッケージの名前は protobuf や protobuf-compiler であることに注意してください。 macOS (Homebrew) の場合 $ brew install protobuf # インストール $ brew upgrade protobuf # バージョン更新 Linux (apt) の場合 $ apt install -y protobuf-compiler プリビルド版を使う場合 あるいは、各 OS 用のバイナリを GitHub のリリースページ からダウンロードし、protoc コマンドにパスを通します。 例えば、Windows であれば protoc-3.20.0-win64.zip などをダウンロードします。 次のように protoc コマンドを実行できるようになれば OK です。 $ protoc --version libprotoc 3.20.0 参考: Protocol Buffer Compiler Installation | gRPC .proto ファイルをコンパイルしてみる .proto ファイル 次のような簡単な .proto ファイルを入力ファイルとして用意します。 protos/person.proto syntax = \u0026#34;proto3\u0026#34;;message Person { optional string name = 1; optional int32 id = 2; optional string email = 3;} C# のコードを生成 例えば、次のように実行すると、C# 用のソースコードを生成することができます。 --csharp_out=\u0026lt;OUT_DIR\u0026gt; というオプションで、C# ソースコードの出力先ディレクトリを指定しています。 $ mkdir gen $ protoc --csharp_out=gen protos/person.proto $ ls gen Person.cs Python のコードを生成 Python 用のソースコードを生成したければ、同様に次のようにします。 出力ディレクトリは --python_out=\u0026lt;OUT_DIR\u0026gt; オプションで指定します。 $ protoc --python_out=gen protos/person.proto その他の言語のコードを生成 他にも各言語用のソースコードを生成するオプションが用意されており、次のようにヘルプ表示すると標準でサポートしている言語を確認できます。 protoc の言語別出力オプション $ protoc --help | grep OUT_DIR --cpp_out=OUT_DIR Generate C++ header and source. --csharp_out=OUT_DIR Generate C# source file. --java_out=OUT_DIR Generate Java source file. --js_out=OUT_DIR Generate JavaScript source. --kotlin_out=OUT_DIR Generate Kotlin file. --objc_out=OUT_DIR Generate Objective-C header and source. --php_out=OUT_DIR Generate PHP source file. --python_out=OUT_DIR Generate Python source file. --ruby_out=OUT_DIR Generate Ruby source file. 言語拡張用のプラグイン (protoc-gen-xxx) protoc が標準でサポートしてない言語のコードを生成するには、追加のプラグイン（実際はただのコマンド）をインストールする必要があります。 追加でインストールするコマンドは protoc-gen-\u0026lt;言語名\u0026gt; という名前であり、そのコマンドがシステムに存在していると、protoc コマンドの --\u0026lt;言語名\u0026gt;_out というオプションが有効になります。 Go 言語用プラグイン (protoc-gen-go) 例えば、Go 言語用のプラグインである protoc-gen-go をインストールすると、--go_out オプションが使えるようになります。 protoc-gen-go のインストール # バージョン指定でインストールする場合（推奨） $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0 # 最新版をインストールする場合 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest # 確認 $ protoc-gen-go --version protoc-gen-go v1.28.0 Go 言語用のコードを出力する場合は、.proto ファイル内の option go_package でパッケージ名を設定しておく必要があります。 protos/person.proto syntax = \u0026#34;proto3\u0026#34;;option go_package = \u0026#34;example.com/myapp\u0026#34;;message Person { optional string name = 1; optional int32 id = 2; optional string email = 3;} 次のようにすると、gen ディレクトリ以下に Go コードが生成されます。 $ protoc --go_out=gen protos/person.proto .proto ファイルで指定したパッケージ名に従ってディレクトリ階層ができます。 gen/example.com/myapp/person.pb.go .proto ファイル内でパッケージ名を指定するのではなく、protoc コマンドの --go_opt=M... オプションで次のように指定することもできます。 $ protoc --go_out=gen \\ --go_opt=Mprotos/person.proto=example.com/myapp \\ protos/person.proto = が 2 回出てくるのでちょっと分かりにくいですが、protos/person.proto ファイルのパッケージ名を example.com/myapp に設定しています。"
-},
-{
-url: "/p/nd3cmt3/",
-title: "ネットワーク関連技術メモ",
-date: "2022-04-20T00:00:00Z",
-body: "ネットワーク関連技術メモ"
+body: "protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler) Protcol Buffers とは プロトコルバッファー (Protocol Buffers、protobuf) は、Google が開発した、構造化したデータをシリアライズするためのフォーマットです。 同じく Google が開発した gRPC 通信プラットフォームで採用されており、XML や JSON などのテキストベースの API より効率的な通信を行うことができるという特徴を持っています。 データをコンパクトに表現できるため、通信やパース処理が高速 強い型付けを行うことでき、サーバー、クライアントの安全なコーディングが可能 定義変更時の互換性を考慮したフォーマット OS やプログラミング言語などに非依存 データ構造やサービス形式の定義は、.proto 拡張子を持つ プロトコル定義ファイル (Proto Definition file) で行います。 この .proto ファイルを protoc コマンド（プロトコルバッファーコンパイラ）でコンパイルすると、各言語用のソースコードを生成することができます。 hello.proto ──[protoc]──\u0026gt; hello_pb.rb protoc コマンドは各種プログラミング言語用のコードを生成するわけですが、そのためには、protoc コマンド本体 と 各言語用のプラグイン（protoc-gen-go など）がインストールされている必要があります。 C++ や C#、Kotlin、Python、Ruby などのコード生成は組み込みで対応していますが、Go 言語用のプラグインなどは別途インストールする必要があります。 protoc 本体のインストール protoc コマンド (Protocol Buffers Compiler) は、Linux（Ubuntu 系）や macOS ではパッケージマネージャーを使ってインストールしてしまうのが簡単です。 インストールするパッケージの名前は protobuf や protobuf-compiler であることに注意してください。 macOS (Homebrew) の場合 $ brew install protobuf # インストール $ brew upgrade protobuf # バージョン更新 Linux (apt) の場合 $ apt install -y protobuf-compiler プリビルド版を使う場合 あるいは、各 OS 用のバイナリを GitHub のリリースページ からダウンロードし、protoc コマンドにパスを通します。 例えば、Windows であれば protoc-3.20.0-win64.zip などをダウンロードします。 次のように protoc コマンドを実行できるようになれば OK です。 $ protoc --version libprotoc 3.20.0 参考: Protocol Buffer Compiler Installation | gRPC .proto ファイルをコンパイルしてみる .proto ファイル 次のような簡単な .proto ファイルを入力ファイルとして用意します。 protos/person.proto syntax = \u0026#34;proto3\u0026#34;;message Person { optional string name = 1; optional int32 id = 2; optional string email = 3;} C# のコードを生成 例えば、次のように実行すると、C# 用のソースコードを生成することができます。 --csharp_out=\u0026lt;OUT_DIR\u0026gt; というオプションで、C# ソースコードの出力先ディレクトリを指定しています。 $ mkdir gen $ protoc --csharp_out=gen protos/person.proto $ ls gen Person.cs Python のコードを生成 Python 用のソースコードを生成したければ、同様に次のようにします。 出力ディレクトリは --python_out=\u0026lt;OUT_DIR\u0026gt; オプションで指定します。 $ protoc --python_out=gen protos/person.proto その他の言語のコードを生成 他にも各言語用のソースコードを生成するオプションが用意されており、次のようにヘルプ表示すると標準でサポートしている言語を確認できます。 protoc の言語別出力オプション $ protoc --help | grep OUT_DIR --cpp_out=OUT_DIR Generate C++ header and source. --csharp_out=OUT_DIR Generate C# source file. --java_out=OUT_DIR Generate Java source file. --js_out=OUT_DIR Generate JavaScript source. --kotlin_out=OUT_DIR Generate Kotlin file. --objc_out=OUT_DIR Generate Objective-C header and source. --php_out=OUT_DIR Generate PHP source file. --python_out=OUT_DIR Generate Python source file. --ruby_out=OUT_DIR Generate Ruby source file. 言語拡張用のプラグイン (protoc-gen-xxx) protoc が標準でサポートしてない言語のコードを生成するには、追加のプラグイン（実際はただのコマンド）をインストールする必要があります。 追加でインストールするコマンドは protoc-gen-\u0026lt;言語名\u0026gt; という名前であり、そのコマンドがシステムに存在していると、protoc コマンドの --\u0026lt;言語名\u0026gt;_out というオプションが有効になります。 Go 言語用プラグイン (protoc-gen-go) 例えば、Go 言語用のプラグインである protoc-gen-go をインストールすると、--go_out オプションが使えるようになります。 protoc-gen-go のインストール # バージョン指定でインストールする場合（推奨） $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0 # 最新版をインストールする場合 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest # 確認 $ protoc-gen-go --version protoc-gen-go v1.28.0 Go 言語用のコードを出力する場合は、.proto ファイル内の option go_package でパッケージ名を設定しておく必要があります。 protos/person.proto syntax = \u0026#34;proto3\u0026#34;;option go_package = \u0026#34;example.com/myapp\u0026#34;;message Person { optional string name = 1; optional int32 id = 2; optional string email = 3;} 次のようにすると、gen ディレクトリ以下に Go コードが生成されます。 $ protoc --go_out=gen protos/person.proto .proto ファイルで指定したパッケージ名に従ってディレクトリ階層ができます。 gen/example.com/myapp/person.pb.go .proto ファイル内でパッケージ名を指定するのではなく、protoc コマンドの --go_opt=M... オプションで次のように指定することもできます。 $ protoc --go_out=gen \\ --go_opt=Mprotos/person.proto=example.com/myapp \\ protos/person.proto = が 2 回出てくるのでちょっと分かりにくいですが、protos/person.proto ファイルのパッケージ名を example.com/myapp に設定しています。"
 },
 {
 url: "/p/7s7hs4e/",
