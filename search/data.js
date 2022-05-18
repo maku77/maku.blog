@@ -1560,6 +1560,12 @@ date: "2022-05-09T00:00:00Z",
 body: "React 関連記事"
 },
 {
+url: "/p/ufpqqno/",
+title: "HTTP/1.1 の認証スキームに関するメモ",
+date: "2022-05-01T00:00:00Z",
+body: "HTTP/1.1 の認証スキームに関するメモ 認証スキーム とは、HTTP のリクエストヘッダに指定する Authentication ヘッダーの先頭部分に指定する文字列のこと。 Basic \u0026hellip; RFC2617 Web ブラウザが標準でサポートしている。 Bearer \u0026hellip; RFC6750 OAuth 2.0 で使われている認証スキームのひとつ。 署名を行う必要はなく、受け取った値をそのまま使える。 Digest \u0026hellip; RFC2617 Web ブラウザが標準でサポートしている。 Negotiate \u0026hellip; RFC4559 OAuth \u0026hellip; RFC5849 OAuth 1.0 で使われていた認証スキーム。 署名のルールが複雑すぎて廃れた。 参考リンク RFC7235 - Hypertext Transfer Protocol (HTTP/1.1): Authentication RFC7236 - Initial Hypertext Transfer Protocol (HTTP): Authentication Scheme Registrations"
+},
+{
 url: "/p/s7q8o5k/",
 title: "ウェブサイトのリンク切れを自動でチェックする (muffet)",
 date: "2022-04-23T00:00:00Z",
