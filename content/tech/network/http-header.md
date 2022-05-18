@@ -2,7 +2,7 @@
 title: "HTTP ヘッダに関するメモ"
 url: "/p/3kkchub"
 date: "2012-12-15"
-tags: ["技術"]
+tags: ["技術", "HTTP"]
 ---
 
 
