@@ -1,5 +1,5 @@
 ---
-title: "Protocol Buffers の .proto ファイルをコンパイルする (protoc)"
+title: "protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)"
 url: "/p/37e6uck"
 date: "2022-04-20"
 lastmod: "2022-05-09"
