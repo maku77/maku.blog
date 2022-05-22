@@ -1,6 +1,5 @@
 ---
 title: "Azure Functions のメモ"
 linkTitle: "Azure Functions"
-url: "/p/i5ht5fq"
+url: "p/59jt4ck/"
 ---
-
