@@ -30,8 +30,8 @@ Open Graph タグを使ってメタ情報を付加するときは、主に次の
 - {{< label "og:type" >}}: コンテンツの種類（`website` で OK。ブログ記事の場合は `article` を使うことも）
 - {{< label "og:url" >}}: ページの URL（絶対パスで指定）
 - {{< label "og:image" >}}: サムネイル画像の URL（絶対パスで指定）。さらに下記を指定することで、ページを最初にシェアするユーザーが画像を表示できるようになります。
-  - {{< label "og:image:width" >}}: サムネイル画像の横幅（ピクセル値）
-  - {{< label "og:image:height" >}}: サムネイル画像の横幅（ピクセル値）
+  - {{< label "og:image:width" >}}: サムネイル画像の幅（ピクセル値）
+  - {{< label "og:image:height" >}}: サムネイル画像の高さ（ピクセル値）
 - {{< label "og:description" >}}: コンテンツの内容を示す説明文
 - {{< label "og:locale" >}}: コンテンツのロケール（`ja_JP` で OK）
 
