@@ -29,7 +29,9 @@ Open Graph タグを使ってメタ情報を付加するときは、主に次の
 - {{< label "og:title" >}}: ページのタイトル（サイト名は含まれないようにします）
 - {{< label "og:type" >}}: コンテンツの種類（`website` で OK。ブログ記事の場合は `article` を使うことも）
 - {{< label "og:url" >}}: ページの URL（絶対パスで指定）
-- {{< label "og:image" >}}: サムネイル画像の URL（絶対パスで指定）
+- {{< label "og:image" >}}: サムネイル画像の URL（絶対パスで指定）。さらに下記を指定することで、ページを最初にシェアするユーザーが画像を表示できるようになります。
+  - {{< label "og:image:width" >}}: サムネイル画像の横幅（ピクセル値）
+  - {{< label "og:image:height" >}}: サムネイル画像の横幅（ピクセル値）
 - {{< label "og:description" >}}: コンテンツの内容を示す説明文
 - {{< label "og:locale" >}}: コンテンツのロケール（`ja_JP` で OK）
 
@@ -45,6 +47,8 @@ Open Graph タグを使ってメタ情報を付加するときは、主に次の
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://maku.blog/p/awakw8i" />
   <meta property="og:image" content="https://maku.blog/assets/img/site-logo.png" />
+  <meta property="og:image:width" content="600" />
+  <meta property="og:image:height" content="315" />
   <meta property="og:description" content="ウェブサイトに OGP メタ情報を付加すると、SNS でリンクを共有したときの表示をカスタマイズすることができます。" />
   <meta property="og:locale" content="ja_JP" />
   <title>OGP とは | まくろぐ</title>
