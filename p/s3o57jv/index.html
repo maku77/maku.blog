@@ -8,8 +8,9 @@
 <meta property="og:title" content="AWS SSM のポリシーステートメント例">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://maku.blog/p/s3o57jv/">
-<meta property="og:locale" content="ja_JP">
-<meta property="og:image" content="https://maku.blog/assets/img/site-logo-large.png">
+<meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo-large.png">
+<meta property="og:image:width" content="1436">
+<meta property="og:image:height" content="746">
 <meta property="og:description" content="パラメーターの説明情報の取得 すべてのパラメーターの説明情報を取得できるようにする { &#34;Version&#34;: &#34;2012-10-17&#34;, &#34;Statement&#34;: [ { &#34;Effect&#34;: &#34;Allow&#34;, &#34;Action&#34;: [ &#34;ssm:DescribeParameters&#34; ], &#34;Resource&#34;: &#34;*&#34; } ] }  ssm:DescribeParameters は、SSM パラメーターストアに格納されたパラメーターの説明情報を取得する権限です。 この権限だけでは、パラメーターの「値」自体は取得できないことに注意してください。
 パラメーターの値の取得 prod- で始まるパラメーターの値を取得できるようにする { &#34;Version&#34;: &#34;2012-10-17&#34;, &#34;Statement&#34;: [ { &#34;Effect&#34;: &#34;Allow&#34;, &#34;Action&#34;: [ &#34;ssm:GetParameter*&#34; ], &#34;Resource&#34;: &#34;arn:aws:ssm:<Region>:<Account>:parameter/prod-*&#34; } ] }  パラメーターの Get 系アクションには、GetParameter/GetParameters/GetParameterHistory/GetParametersByPath など いろいろある ため、上記のように ssm:GetParameter* とワイルドカード指定しておくと確実に取得できるようになります。 GetParameter だけだと、パラメーターの一覧取得などが許可されません。
 パラメーターの追加・削除 prod- で始まるパラメーターの追加と削除を許可する { &#34;Version&#34;: &#34;2012-10-17&#34;, &#34;Statement&#34;: [ { &#34;Effect&#34;: &#34;Allow&#34;, &#34;Action&#34;: [ &#34;ssm:PutParameter&#34;, &#34;ssm:DeleteParameter&#34;, &#34;ssm:DeleteParameters&#34; ], &#34;Resource&#34;: &#34;arn:aws:ssm:<Region>:<Account>:parameter/prod-*&#34; } ] }  暗号化されたパラメーター (SecureString) の取得 暗号化された prod- で始まるパラメーターを読み込む { &#34;Version&#34;: &#34;2012-10-17&#34;, &#34;Statement&#34;: [ { &#34;Effect&#34;: &#34;Allow&#34;, &#34;Action&#34;: [ &#34;ssm:GetParameter*&#34; ], &#34;Resource&#34;: [ &#34;arn:aws:ssm:<Region>:<Account>:parameter/prod-*&#34; ] }, { &#34;Effect&#34;: &#34;Allow&#34;, &#34;Action&#34;: [ &#34;kms:Decrypt&#34; ], &#34;Resource&#34;: [ &#34;arn:aws:kms:<Region>:<Account>:key/<KmsKey>&#34; ] } ] }  SSM パラメーターストアに SecureString タイプとして格納されたパラメーターは、KMS キーによって暗号化されています。 このパラメーターの値を取得するには、ssm:GetParameter* によるパラメーター読み取り権限と、kms:Decrypt による複合化の権限が必要です。">
