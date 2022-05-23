@@ -1,6 +1,6 @@
 ---
 title: "サイトマップ"
-url: "/sitemap"
+url: "sitemap/"
 noindex: true
 _build: { list: false }
 ---
