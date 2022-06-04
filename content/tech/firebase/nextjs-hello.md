@@ -3,7 +3,6 @@ title: "Next.js で Firebase: プロジェクトの作成と接続準備"
 url: "/p/73eq2cm"
 date: "2021-12-26"
 tags: ["Firebase", "Next.js"]
-weight: 1
 ---
 
 何をするか？

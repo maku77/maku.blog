@@ -1,10 +1,9 @@
 ---
-title: "Cloud Functions で定期的に Firestore の集計処理を行う"
+title: "Firebase の Cloud Functions で定期的に Firestore の集計処理を行う"
 url: "/p/vgs4dox"
 date: "2022-03-13"
 lastmod: "2022-03-17"
-tags: ["Firebase/Firestore"]
-weight: 400
+tags: ["Firebase/CloudFunctions", "Firebase/Firestore"]
 ---
 
 何をするか？

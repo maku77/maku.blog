@@ -3,7 +3,6 @@ title: "Next.js で Firebase: Cloud Firestore データベースを使う"
 url: "/p/m3bjrz7"
 date: "2021-12-30"
 tags: ["Firebase/Firestore", "Next.js"]
-weight: 301
 ---
 
 何をするか

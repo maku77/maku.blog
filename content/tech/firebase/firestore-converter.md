@@ -3,7 +3,6 @@ title: "Firestore ドキュメントを TypeScript のユーザー定義型オ�
 url: "/p/bw9kv6g"
 date: "2022-02-12"
 tags: ["Firebase/Firestore"]
-weight: 302
 ---
 
 Firestore の JavaScript SDK でドキュメントを参照するときに、__`withConverter`__ 関数を組み合わせて使用すると、ドキュメントの読み書きを行うときに、TypeScript のユーザーデータ型との変換処理を自動的に呼び出すことができます。
