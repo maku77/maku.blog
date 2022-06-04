@@ -44,6 +44,10 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/fvevcs8/>Firebase の Cloud Functions で Hello World
+<time>2022-06-04</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/ij4jv9k/>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）
 <time>2022-05-18</time></a>
 </div>
@@ -58,10 +62,6 @@
 <div class=xBoxLink>
 <a href=./p/ufpqqno/>HTTP/1.1 の認証スキームに関するメモ
 <time>2022-05-01</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/s7q8o5k/>ウェブサイトのリンク切れを自動でチェックする (muffet)
-<time>2022-04-23</time></a>
 </div>
 </div>
 </div>
@@ -212,6 +212,8 @@
 <a href=./tags/eslint>eslint (4)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/firebase>firebase (4)</a>
+</div><div class=xMenu_tag>
+<a href=./tags/firebase/cloudfunctions>firebase/cloudfunctions (4)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/html/css>html/css (4)</a>
 </div><div class=xMenu_tag>
@@ -432,11 +434,11 @@
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/fvevcs8/>Firebase の Cloud Functions で Hello World<span class=xRecents_item_tag>Firebase/CloudFunctions</span><time>2022-06-04</time></a>
+</div><div class=xRecents_item>
 <a href=./p/ij4jv9k/>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）<span class=xRecents_item_tag>Go</span><span class=xRecents_item_tag>gRPC</span><span class=xRecents_item_tag>Protocol Buffers</span><time>2022-05-18</time></a>
 </div><div class=xRecents_item>
 <a href=./p/37e6uck/>protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)<span class=xRecents_item_tag>gRPC</span><span class=xRecents_item_tag>Protocol Buffers</span><time>2022-05-09</time></a>
-</div><div class=xRecents_item>
-<a href=./p/3vbr2bm/>Next.js でローカル開発時 (next dev) のみ有効なデバッグページを作成する (getStaticProps)<span class=xRecents_item_tag>Next.js</span><time>2022-05-09</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -444,6 +446,149 @@
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/6p3dox9/>Firebase</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/fvevcs8/>Firebase の Cloud Functions で Hello World</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/firebase/cloudfunctions>Firebase/CloudFunctions</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-06-04>2022-06-04</time><br>
+作成: <time itemprop=datePublished datetime=2022-06-04>2022-06-04</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#何をするか>何をするか？</a></li>
+<li><a href=#事前準備>事前準備</a></li>
+<li><a href=#firebase-プロジェクト用のディレクトリを作成する-firebase-init>Firebase プロジェクト用のディレクトリを作成する (firebase init)</a></li>
+<li><a href=#エミュレーターで-functions-の動作を確認してみる>エミュレーターで Functions の動作を確認してみる</a></li>
+<li><a href=#firebase-にデプロイしてみる>Firebase にデプロイしてみる</a></li>
+<li><a href=#デプロイした関数を削除する>デプロイした関数を削除する</a></li>
+</ul>
+</nav><h2 id=何をするか>何をするか？</h2>
+<p>Cloud Functions に関数をデプロイすると、Google Cloud Platform 上でサーバーレス関数として実行できるようになります（Amazon の AWS Lambda や、Microsoft の Azure Functions に相当するものです）。
+この関数は、次のように、様々なイベントをトリガーにして呼び出されます。</p>
+<ul>
+<li>HTTP でのアクセス</li>
+<li>スケジュールされたタイミング</li>
+<li>Firestore データベースの更新時</li>
+</ul>
+<p>ここでは、HTTP によるアクセス時に <code>Hello from Firebase!</code> というレスポンスを返すだけの関数を Cloud Functions に追加してみます。
+また、Firebase にデプロイする前に、エミュレーターでのローカルテストを行います。</p>
+<div class=xNote>
+<span class=xNote_title>☝️ Firebase なのか GCP なのか</span>
+<span class=xNote_body>Cloud Functions は Firebase プロジェクトからも使用できますが、実体は GCP で提供されているサービスです。
+このようなサービスは他にもあり、Firebase のサービスのうち、頭に Cloud と付いてるものは実際には GCP が提供しています（例:「Cloud Firestore」「Cloud Functions」「Cloud Storage」）。</span>
+</div>
+<h2 id=事前準備>事前準備</h2>
+<p>最初に Firebase プロジェクトを作成し、Firebase CLI をインストールしておきます。
+既存の Firebase プロジェクトに Cloud Functions を追加する場合は、プロジェクトの作成は必要ありません。</p>
+<ol>
+<li><a href=https://firebase.google.com/>Firebase</a> のアカウントを作成します</li>
+<li><a href=https://console.firebase.google.com/>Firebase コンソール</a> から新規プロジェクトを作成します
+<ul>
+<li><code>firebase</code> コマンドでもプロジェクトを作成できますが、上記サイトから作成してしまった方が楽です（名前の重複チェックなどをしてくれます）</li>
+</ul>
+</li>
+<li><a href=./p/pamw7hr/>Firebase CLI をインストール</a> して、<code>firebase</code> コマンドを実行できるようにします</li>
+</ol>
+<p>Firebase CLI をインストールしたら、次のように Firebase アカウントでサインインしておきます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>firebase login
+</code></pre></div><h2 id=firebase-プロジェクト用のディレクトリを作成する-firebase-init>Firebase プロジェクト用のディレクトリを作成する (firebase init)</h2>
+<p>任意のディレクトリ内で <strong><code>firebase init</code></strong> コマンドを実行すると、<strong><code>firebase.json</code></strong> ファイル（および <strong><code>.firebaserc</code></strong>）が作成されて、Firebase プロジェクト用のディレクトリと認識されるようになります。
+すでに GitHub などで管理しているプロジェクトディレクトリに対しても実行することができます。</p>
+<p>例えば、次のようにして、<strong>Cloud Functions for Firebase のテンプレートコード</strong> を作成することができます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Functions のテンプレートを生成する</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mkdir myapp （このディレクトリを Git 管理する想定）
+<span class=gp>$ </span><span class=nb>cd</span> myapp
+<span class=gp>$ </span>firebase init functions
+</code></pre></div></div>
+</figure>
+<p><code>firebase init</code> を実行すると、対話形式で「どのプロジェクトを対象とするか？」「JavaScript と TypeScript のどちらを使用するか？」などを聞かれるので、順番に答えていくと、次のようなファイルおよびディレクトリが生成されます（選択によって微妙に変わってきます）。</p>
+<pre tabindex=0><code>myapp/
+ +-- .firebaserc （デプロイ対象とするプロジェクトの情報）
+ +-- .gitignore （Git 管理外にするファイルの情報）
+ +-- firebase.json （Firebase へのデプロイ情報など）
+ +-- functions/
+      +-- .eslintrc.js （ESLint の設定）
+      +-- package.json （Functions 用のプロジェクト設定）
+      +-- src/ （Functions のテンプレートコード）
+      +-- tsconfig.json （TypeScript を選択した場合はその設定ファイル）
+</code></pre><h2 id=エミュレーターで-functions-の動作を確認してみる>エミュレーターで Functions の動作を確認してみる</h2>
+<p>簡単な Hello World 関数を実装して、エミュレーターで動作確認してみます。
+<code>functions</code> ディレクトリを Visual Studio Code などで開いて、<code>src/index.ts</code> ファイルを次のように修正してください。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>functions/src/index.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>functions</span> <span class=kr>from</span> <span class=s2>&#34;firebase-functions&#34;</span><span class=p>;</span>
+
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>helloWorld</span> <span class=o>=</span> <span class=nx>functions</span><span class=p>.</span><span class=nx>https</span><span class=p>.</span><span class=nx>onRequest</span><span class=p>((</span><span class=nx>request</span><span class=p>,</span> <span class=nx>response</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=nx>functions</span><span class=p>.</span><span class=nx>logger</span><span class=p>.</span><span class=nx>info</span><span class=p>(</span><span class=s2>&#34;Hello logs!&#34;</span><span class=p>,</span> <span class=p>{</span> <span class=nx>structuredData</span>: <span class=kt>true</span> <span class=p>});</span>
+  <span class=nx>response</span><span class=p>.</span><span class=nx>send</span><span class=p>(</span><span class=s2>&#34;Hello from Firebase!&#34;</span><span class=p>);</span>
+<span class=p>});</span></code></pre></div></div>
+</figure>
+<p>このように <code>helloWorld</code> という名前のオブジェクトを export することで、Cloud Functions に <code>helloWorld</code> 関数を登録することを示しています。</p>
+<p>Firebase にデプロイする前にエミュレーターで動作確認をしておきます。
+次のようにして、エミュレーターを起動してください。
+関数コードのビルドも自動的に行われます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span><span class=nb>cd</span> functions
+<span class=gp>$ </span>npm run serve
+<span class=go>...
+</span><span class=go>✔  functions[us-central1-helloWorld]: http function initialized
+</span><span class=go>   (http://localhost:5001/myapp1-12345/us-central1/helloWorld).
+</span><span class=go>...
+</span></code></pre></div><p>無事エミュレーターが起動すると、上記のような感じで、関数を呼び出すための URL が表示されるので、Web ブラウザで開くか <code>curl</code> コマンドでアクセスします。
+次のように <code>Hello</code> レスポンスが返って来れば成功です。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>curl http://localhost:5001/myapp1-12345/us-central1/helloWorld
+<span class=go>Hello from Firebase!
+</span></code></pre></div><h2 id=firebase-にデプロイしてみる>Firebase にデプロイしてみる</h2>
+<p>エミュレーターでの動作確認が済んだら、Firebase にデプロイしてみます。
+<strong><code>firebase deploy</code></strong> コマンドを実行すると、<code>firebase.json</code> の情報に基づいてデプロイが実行されます（<code>--only functions</code> オプションで、Functions のみをデプロイ対象とすることもできます）。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>firebase deploy
+<span class=err>
+</span><span class=err></span><span class=go>=== Deploying to &#39;myapp1-12345&#39;...
+</span><span class=go>:
+</span><span class=go>i  functions: creating Node.js 16 function helloWorld(us-central1)...
+</span><span class=go>✔  functions[helloWorld(us-central1)] Successful create operation.
+</span><span class=go>Function URL (helloWorld(us-central1)):
+</span><span class=go>   https://us-central1-myapp1-12345.cloudfunctions.net/helloWorld
+</span><span class=go>:
+</span><span class=go>✔  Deploy complete!
+</span></code></pre></div><p>デプロイが成功すると、上記のようにアクセス用の URL が表示されるので、Web ブラウザや <code>curl</code> コマンドで動作確認することができます。
+ちなみに、URL は次のような構成になっています。</p>
+<pre tabindex=0><code>https://&lt;LocationID&gt;-&lt;ProjectID&gt;.cloudfunctions.net/&lt;FunctionName&gt;
+</code></pre><h2 id=デプロイした関数を削除する>デプロイした関数を削除する</h2>
+<p>Cloud Functions にデプロイした関数が必要なくなったら、次のようにして削除します。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>firebase functions:delete helloWorld
+</code></pre></div>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/vgs4dox/>Firebase の Cloud Functions で定期的に Firestore の集計処理を行う</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/firebase/cloudfunctions>Firebase/CloudFunctions</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/6p3dox9/><span class=xArticle_up_label>Firebase 関連メモ</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -878,101 +1023,6 @@ C++ や C#、Kotlin、Python、Ruby などのコード生成は組み込みで�
 </div>
 <div class=xArticle_up>
 <a href=./p/88gow5c/><span class=xArticle_up_label>gRPC 関連メモ</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/ujqinda/>プログラミング</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/d7p5jye/>React</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/saku4ck/>Next.js</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3o3fq3d/>プリレンダリングとルーティング</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/3vbr2bm/>Next.js でローカル開発時 (next dev) のみ有効なデバッグページを作成する (getStaticProps)</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/next.js>Next.js</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-05-09>2022-05-09</time><br>
-作成: <time itemprop=datePublished datetime=2022-05-09>2022-05-09</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#何をするか>何をするか？</a></li>
-<li><a href=#デバッグページの作成>デバッグページの作成</a></li>
-</ul>
-</nav><h2 id=何をするか>何をするか？</h2>
-<p>Next.js アプリを作っていると、開発中にだけ表示したいデバッグ用のページを作りたくなることがよくあります。
-ここでは、ローカルサーバー (<code>next dev</code>) での開発中のみ有効になるデバッグページの作り方を説明します。</p>
-<h2 id=デバッグページの作成>デバッグページの作成</h2>
-<p>Next.js の各ページのビルド時には、必要に応じてデータフェッチなどを行うための <code>getStaticProps</code> 関数が呼び出されます（参考: <a href=./p/iv4agnt/>Next.js のプリレンダリング機能を使用する (getStaticProps)</a>）。</p>
-<p>この関数の戻り値として、<a href=https://nextjs.org/docs/api-reference/data-fetching/get-static-props#notfound>notFound プロパティ</a> を true にしたオブジェクトを返すと、そのページがないものとして扱うことができます（404 Not Found になる）。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>export</span> <span class=kr>const</span> <span class=nx>getStaticProps</span>: <span class=kt>GetStaticProps</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=c1>// ...
-</span><span class=c1></span>  <span class=k>return</span> <span class=p>{</span>
-    <span class=c1>// Return the default 404 page with a status code of 404.
-</span><span class=c1></span>    <span class=nx>notFound</span>: <span class=kt>true</span>
-  <span class=p>}</span>
-<span class=p>}</span>
-</code></pre></div><p>この仕組みを利用して次のように実装すれば、ローカルサーバーでの開発中のみ表示可能なデバッグページを作ることができます。
-ローカルサーバー (<code>next dev</code>) で実行されているかどうかは、環境変数 <code>process.env.NODE_ENV</code> の値で判断できます（参考: <a href=./p/gbpeyov/>Next.js で環境変数を扱う (.env, NEXT_PUBLIC, NODE_ENV)</a>）。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>pages/debug/info.tsx</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>GetStaticProps</span><span class=p>,</span> <span class=nx>NextPage</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;next&#39;</span>
-
-<span class=kr>type</span> <span class=nx>EmptyProps</span> <span class=o>=</span> <span class=p>{</span> <span class=p>[</span><span class=nx>key</span>: <span class=kt>string</span><span class=p>]</span><span class=o>:</span> <span class=kt>never</span> <span class=p>}</span>
-
-<span class=cm>/**
-</span><span class=cm> * ページビルド時の前処理。
-</span><span class=cm> * 開発サーバー (next dev) での実行時のみこのページが存在するようにします。
-</span><span class=cm> */</span>
-<span class=kr>export</span> <span class=kr>const</span> <span class=nx>getStaticProps</span>: <span class=kt>GetStaticProps</span><span class=p>&lt;</span><span class=nt>EmptyProps</span><span class=p>&gt;</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>isLocalDev</span> <span class=o>=</span> <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>NODE_ENV</span> <span class=o>!==</span> <span class=s1>&#39;production&#39;</span>
-  <span class=k>return</span> <span class=p>{</span> <span class=nx>notFound</span><span class=o>:</span> <span class=o>!</span><span class=nx>isLocalDev</span><span class=p>,</span> <span class=nx>props</span><span class=o>:</span> <span class=p>{}</span> <span class=p>}</span>
-<span class=p>}</span>
-
-<span class=kr>const</span> <span class=nx>DebugInfoPage</span>: <span class=kt>NextPage</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=c1>// ...
-</span><span class=c1></span>
-  <span class=k>return</span> <span class=p>(</span>
-    <span class=p>&lt;&gt;</span>
-      <span class=p>&lt;</span><span class=nt>h1</span><span class=p>&gt;</span><span class=nx>Debug</span> <span class=nx>page</span><span class=p>&lt;/</span><span class=nt>h1</span><span class=p>&gt;</span>
-      <span class=p>&lt;</span><span class=nt>p</span><span class=p>&gt;</span><span class=nx>This</span> <span class=nx>page</span> <span class=k>is</span> <span class=nx>displayed</span> <span class=nx>only</span> <span class=nx>during</span> <span class=nx>development</span><span class=p>.&lt;/</span><span class=nt>p</span><span class=p>&gt;</span>
-    <span class=p>&lt;/&gt;</span>
-  <span class=p>)</span>
-<span class=p>}</span>
-
-<span class=kr>export</span> <span class=k>default</span> <span class=nx>DebugInfoPage</span></code></pre></div></div>
-</figure>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/m4dmu4c/>Next.js でブラウザ履歴で戻るボタンを表示する (router.back)</a></li>
-<li><a href=./p/m3bjrz7/>Next.js で Firebase: Cloud Firestore データベースを使う</a></li>
-<li><a href=./p/8t6gq2b/>Next.js で Firebase: Authentication 機能でユーザー認証できるようにする</a></li>
-<li><a href=./p/73eq2cm/>Next.js で Firebase: プロジェクトの作成と接続準備</a></li>
-<li><a href=./p/cwdyhec/>Next.js で useState とローカルストレージ (localStorage) を連動させる</a></li>
-<li><a href=./p/xp8o5k2/>Next.js から AWS DynamoDB にアクセスする</a></li>
-<li><a href=./p/d4p4fr4/>Next.js で開発環境で実行しているときに Web サイト上に dev 表示する (TargetEnvIndicator)</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/next.js>Next.js</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/3o3fq3d/><span class=xArticle_up_label>Next.js のプリレンダリングとルーティング</span><br>へ戻る</a>
 </div>
 </article><h2>メニュー</h2>
 <div class=xTopMenu>
