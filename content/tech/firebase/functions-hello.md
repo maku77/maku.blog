@@ -80,13 +80,17 @@ myapp/
 {{< code lang="ts" title="functions/src/index.ts" >}}
 import * as functions from "firebase-functions";
 
-export const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("Hello logs!", { structuredData: true });
-  response.send("Hello from Firebase!");
-});
+export const helloWorld = functions
+  .region("asia-northeast1")
+  .https.onRequest((request, response) => {
+    functions.logger.info("Hello logs!", { structuredData: true });
+    response.send("Hello from Firebase!");
+  });
 {{< /code >}}
 
-このように `helloWorld` という名前のオブジェクトを export することで、Cloud Functions に `helloWorld` 関数を登録することを示しています。
+リージョンの指定方法は若干わかりにくいので要注意です。
+上記では `asia-northeast1` を指定していますが、省略すると `us-central1` にデプロイされます。
+上記のように `helloWorld` という名前のオブジェクトを export することで、Cloud Functions に `helloWorld` 関数を登録することになります。
 
 Firebase にデプロイする前にエミュレーターで動作確認をしておきます。
 次のようにして、エミュレーターを起動してください。
@@ -96,8 +100,8 @@ Firebase にデプロイする前にエミュレーターで動作確認をし�
 $ cd functions
 $ npm run serve
 ...
-✔  functions[us-central1-helloWorld]: http function initialized
-   (http://localhost:5001/myapp1-12345/us-central1/helloWorld).
+✔  functions[asia-northeast1-helloWorld]: http function initialized
+   (http://localhost:5001/myapp1-12345/asia-northeast1/helloWorld).
 ...
 ```
 
