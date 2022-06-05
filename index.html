@@ -44,6 +44,10 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/dtdtbr8/>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する
+<time>2022-06-05</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/fvevcs8/>Firebase の Cloud Functions で Hello World
 <time>2022-06-04</time></a>
 </div>
@@ -58,10 +62,6 @@
 <div class=xBoxLink>
 <a href=./p/3vbr2bm/>Next.js でローカル開発時 (next dev) のみ有効なデバッグページを作成する (getStaticProps)
 <time>2022-05-09</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/ufpqqno/>HTTP/1.1 の認証スキームに関するメモ
-<time>2022-05-01</time></a>
 </div>
 </div>
 </div>
@@ -155,6 +155,8 @@
 </div><div class=xMenu_tag>
 <a href=./tags/aws/sam>aws/sam (8)</a>
 </div><div class=xMenu_tag>
+<a href=./tags/firebase/firestore>firebase/firestore (8)</a>
+</div><div class=xMenu_tag>
 <a href=./tags/unity>unity (8)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/webgl>webgl (8)</a>
@@ -185,7 +187,7 @@
 </div><div class=xMenu_tag>
 <a href=./tags/doxygen>doxygen (6)</a>
 </div><div class=xMenu_tag>
-<a href=./tags/firebase/firestore>firebase/firestore (6)</a>
+<a href=./tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a>
 </div><div class=xMenu_tag>
@@ -212,8 +214,6 @@
 <a href=./tags/eslint>eslint (4)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/firebase>firebase (4)</a>
-</div><div class=xMenu_tag>
-<a href=./tags/firebase/cloudfunctions>firebase/cloudfunctions (4)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/html/css>html/css (4)</a>
 </div><div class=xMenu_tag>
@@ -434,11 +434,11 @@
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/dtdtbr8/>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する<span class=xRecents_item_tag>Firebase/CloudFunctions</span><span class=xRecents_item_tag>Firebase/Firestore</span><time>2022-06-05</time></a>
+</div><div class=xRecents_item>
 <a href=./p/fvevcs8/>Firebase の Cloud Functions で Hello World<span class=xRecents_item_tag>Firebase/CloudFunctions</span><time>2022-06-04</time></a>
 </div><div class=xRecents_item>
 <a href=./p/ij4jv9k/>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）<span class=xRecents_item_tag>Go</span><span class=xRecents_item_tag>gRPC</span><span class=xRecents_item_tag>Protocol Buffers</span><time>2022-05-18</time></a>
-</div><div class=xRecents_item>
-<a href=./p/37e6uck/>protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)<span class=xRecents_item_tag>gRPC</span><span class=xRecents_item_tag>Protocol Buffers</span><time>2022-05-09</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -446,6 +446,230 @@
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/6p3dox9/>Firebase</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/dtdtbr8/>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/firebase/cloudfunctions>Firebase/CloudFunctions</a></span>
+<span class=xPageTags_item><a href=./tags/firebase/firestore>Firebase/Firestore</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-06-05>2022-06-05</time><br>
+作成: <time itemprop=datePublished datetime=2022-06-05>2022-06-05</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#何をするか>何をするか？</a></li>
+<li><a href=#cloud-functions-でデータバンドルを作成する>Cloud Functions でデータバンドルを作成する</a></li>
+<li><a href=#cdn-firebase-hosting-でデータバンドルをキャッシュする>CDN (Firebase Hosting) でデータバンドルをキャッシュする</a></li>
+<li><a href=#クライアントアプリからデータバンドルを取得する>クライアントアプリからデータバンドルを取得する</a></li>
+</ul>
+</nav><h2 id=何をするか>何をするか？</h2>
+<p>Firestore はクライアントアプリから直接アクセスできることが利点ですが、多数のクライアントから複数のドキュメントを読み込んでいると、あっという間に無料枠を超えて高額な請求が発生してしまいます。</p>
+<figure class=xImage>
+<a href=./p/dtdtbr8/img-001.drawio.svg target=_blank>
+<img width height=auto src=./p/dtdtbr8/img-001.drawio.svg alt=/p/dtdtbr8/img-001.drawio.svg>
+</a>
+<figcaption>図: 同じデータなのに何度もドキュメントの Read が発生する</figcaption>
+</figure>
+<p><a href="https://firebase.google.com/support/release-notes/js?hl=ja#version_820_-_december_11_2020">Firebase 8.2.0</a> でリリースされた <a href=https://firebase.google.com/docs/firestore/bundles>Cloud Firestore Data Bundles</a> という仕組みを使用すると、Firestore から取得したデータ（クエリ結果）をバンドルというデータにまとめておいて、それを使いまわすことができます。
+データバンドルを CDN でキャッシュ、あるいはクライアントサイドでキャッシュすることにより、Firestore へのアクセスを発生させずに、あたかも Firestore からデータフェッチしたかのように動作させることが可能です。
+ユーザー数の多いアプリに導入すれば、大きなコスト削減につながります。</p>
+<p>データバンドルは Cloud Functions を使って作成してしまうのが簡単です。
+下記のような構成にすれば、クライアントアプリは Firestore にアクセスする代わりにデータバンドルを取得して動作するようになります。</p>
+<figure class=xImage>
+<a href=./p/dtdtbr8/img-002.drawio.svg target=_blank>
+<img width height=auto src=./p/dtdtbr8/img-002.drawio.svg alt=/p/dtdtbr8/img-002.drawio.svg>
+</a>
+<figcaption>図: Cloud Functions でバンドルを生成する</figcaption>
+</figure>
+<p>しかし、これだけでは複数のクライアントから Cloud Functions へのアクセスが発生してしまうので、結局はその都度 Firestore へのアクセスが発生してしまいます。
+各クライアントアプリではキャッシュが有効ですが、そのキャッシュでさえ、<code>Ctrl(Cmd) + R</code> によるスーパーリロードで無視されてしまいます。
+そこで、次のようにさらに CDN (Firebase Hosting) を挟んでデータバンドルをキャッシュすることで、各クライアントからのアクセスで Cloud Functions が起動されてしまうのを防ぎます。</p>
+<figure class=xImage>
+<a href=./p/dtdtbr8/img-003.drawio.svg target=_blank>
+<img width height=auto src=./p/dtdtbr8/img-003.drawio.svg alt=/p/dtdtbr8/img-003.drawio.svg>
+</a>
+<figcaption>図: CDN でバンドルをキャッシュする</figcaption>
+</figure>
+<p>この構成になっていれば、クライアントがいくら強制リロードしようが、CDN (Firebase Hosting) にキャッシュされたデータバンドルのみが参照されるようになります。
+Firestore へのアクセスが発生するのは、CDN 上のキャッシュが無効になったときのみです。
+クライアント側のキャッシュ時間や、CDN のキャッシュ時間は、Cloud Functions の関数が返すレスポンスヘッダ (<code>Cache-Control</code>) で制御できます。</p>
+<h2 id=cloud-functions-でデータバンドルを作成する>Cloud Functions でデータバンドルを作成する</h2>
+<p>下記のコードでは、Cloud Functions に登録する <code>createBundle</code> 関数を定義しています。
+処理の流れは次のようになっています。</p>
+<ol>
+<li>Firestore のコレクションからドキュメントを取得（ここでは最新の 50 件の books データ）</li>
+<li>データバンドルを作成し、上記 books データを名前付きクエリ結果として格納</li>
+<li>関数のレスポンスとしてデータバンドルを返す</li>
+</ol>
+<p>Firestore には既に <code>books</code> コレクションが登録されているものとします。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>functions/index.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>admin</span> <span class=kr>from</span> <span class=s1>&#39;firebase-admin&#39;</span>
+<span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>functions</span> <span class=kr>from</span> <span class=s1>&#39;firebase-functions&#39;</span>
+
+<span class=kr>const</span> <span class=nx>COLLECTION_NAME</span> <span class=o>=</span> <span class=s1>&#39;books&#39;</span> <span class=c1>// Firestore のコレクション名
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>QUERY_NAME</span> <span class=o>=</span> <span class=s1>&#39;latest-books-query&#39;</span> <span class=c1>// バンドルに作成する名前付きクエリの名前
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>MAX_AGE</span> <span class=o>=</span> <span class=mi>300</span> <span class=c1>// ブラウザにキャッシュさせる秒数
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>S_MAXAGE</span> <span class=o>=</span> <span class=mi>600</span> <span class=c1>// CDN にキャッシュさせる秒数
+</span><span class=c1></span>
+<span class=nx>admin</span><span class=p>.</span><span class=nx>initializeApp</span><span class=p>({</span> <span class=nx>projectId</span><span class=o>:</span> <span class=s1>&#39;myapp-12345&#39;</span> <span class=p>})</span>
+<span class=kr>const</span> <span class=nx>db</span> <span class=o>=</span> <span class=nx>admin</span><span class=p>.</span><span class=nx>firestore</span><span class=p>()</span>
+
+<span class=cm>/** Cloud Functions に登録する関数 */</span>
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>createBundle</span> <span class=o>=</span> <span class=nx>functions</span>
+  <span class=p>.</span><span class=nx>region</span><span class=p>(</span><span class=s1>&#39;us-central1&#39;</span><span class=p>)</span> <span class=c1>// asia-northeast1 にしたいけど Firebase Hosting が対応してない
+</span><span class=c1></span>  <span class=p>.</span><span class=nx>https</span><span class=p>.</span><span class=nx>onRequest</span><span class=p>(</span><span class=kr>async</span> <span class=p>(</span><span class=nx>req</span><span class=p>,</span> <span class=nx>res</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+    <span class=c1>// Firestore からデータを取得する（これは頻繁には呼ばれないようにしたい）
+</span><span class=c1></span>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=sb>`Fetch from Firestore [collection=</span><span class=si>${</span><span class=nx>COLLECTION_NAME</span><span class=si>}</span><span class=sb>]...`</span><span class=p>)</span>
+    <span class=kr>const</span> <span class=nx>books</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>db</span>
+      <span class=p>.</span><span class=nx>collection</span><span class=p>(</span><span class=nx>COLLECTION_NAME</span><span class=p>)</span>
+      <span class=p>.</span><span class=nx>orderBy</span><span class=p>(</span><span class=s1>&#39;date&#39;</span><span class=p>,</span> <span class=s1>&#39;desc&#39;</span><span class=p>)</span> <span class=c1>// 新しい順
+</span><span class=c1></span>      <span class=p>.</span><span class=nx>limit</span><span class=p>(</span><span class=mi>50</span><span class=p>)</span>
+      <span class=p>.</span><span class=kr>get</span><span class=p>()</span>
+
+    <span class=c1>// 取得したデータからデータバンドルと名前付きクエリを作成する
+</span><span class=c1></span>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=sb>`Create a named query [queryName=</span><span class=si>${</span><span class=nx>QUERY_NAME</span><span class=si>}</span><span class=sb>]`</span><span class=p>)</span>
+    <span class=kr>const</span> <span class=nx>builder</span> <span class=o>=</span> <span class=nx>db</span><span class=p>.</span><span class=nx>bundle</span><span class=p>()</span> <span class=c1>// バンドル ID は省略可能
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>bundleBuffer</span> <span class=o>=</span> <span class=nx>builder</span><span class=p>.</span><span class=nx>add</span><span class=p>(</span><span class=nx>QUERY_NAME</span><span class=p>,</span> <span class=nx>books</span><span class=p>).</span><span class=nx>build</span><span class=p>()</span>
+
+    <span class=c1>// 何度もこの関数が呼ばれないようにブラウザと CDN にキャッシュ時間を指示する
+</span><span class=c1></span>    <span class=nx>res</span><span class=p>.</span><span class=kr>set</span><span class=p>(</span><span class=s1>&#39;Cache-Control&#39;</span><span class=p>,</span> <span class=sb>`public, max-age=</span><span class=si>${</span><span class=nx>MAX_AGE</span><span class=si>}</span><span class=sb>, s-maxage=</span><span class=si>${</span><span class=nx>S_MAXAGE</span><span class=si>}</span><span class=sb>`</span><span class=p>)</span>
+
+    <span class=c1>// テストで Client JS から直接呼び出す場合は CORS 対応しておく
+</span><span class=c1></span>    <span class=nx>res</span><span class=p>.</span><span class=kr>set</span><span class=p>(</span><span class=s1>&#39;Access-Control-Allow-Origin&#39;</span><span class=p>,</span> <span class=s1>&#39;*&#39;</span><span class=p>)</span>
+    <span class=nx>res</span><span class=p>.</span><span class=kr>set</span><span class=p>(</span><span class=s1>&#39;Access-Control-Allow-Methods&#39;</span><span class=p>,</span> <span class=s1>&#39;GET, HEAD, OPTIONS, POST&#39;</span><span class=p>)</span>
+    <span class=nx>res</span><span class=p>.</span><span class=kr>set</span><span class=p>(</span><span class=s1>&#39;Access-Control-Allow-Headers&#39;</span><span class=p>,</span> <span class=s1>&#39;Content-Type, Authorization&#39;</span><span class=p>)</span>
+
+    <span class=c1>// データバンドルを返す
+</span><span class=c1></span>    <span class=nx>res</span><span class=p>.</span><span class=nx>end</span><span class=p>(</span><span class=nx>bundleBuffer</span><span class=p>)</span>
+  <span class=p>})</span></code></pre></div></div>
+</figure>
+<p>ポイントは、CDN とクライアントアプリにデータバンドルをキャッシュさせるために <strong><code>Cache-Control</code></strong> レスポンスヘッダを付加するところでしょうか（参考: <a href=https://firebase.google.com/docs/hosting/manage-cache>Manage cache behavior | Firebase</a>）。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>response</span><span class=p>.</span><span class=kr>set</span><span class=p>(</span><span class=s1>&#39;Cache-Control&#39;</span><span class=p>,</span> <span class=s1>&#39;public, max-age=300, s-maxage=600&#39;</span><span class=p>)</span>
+</code></pre></div><p><code>Cache-Control</code> の各値は次のような意味を持っています。</p>
+<ul>
+<li><strong><code>public</code></strong> &mldr; CDN (Firebase Hosting) でもデータバンドルをキャッシュさせます。これを指定しなかった場合のデフォルト値は <code>private</code> で、クライアントアプリ（ブラウザ）のみがデータバンドルをキャッシュ可能になります。</li>
+<li><strong><code>max-age=300</code></strong> &mldr; キャッシュ有効時間（秒）を指示します。クライアントアプリ、および CDN がこの指示に従います。</li>
+<li><strong><code>s-maxage=600</code></strong> &mldr; CDN のキャッシュの有効時間（秒）を別途指示します。これを省略した場合は、CDN のキャッシュ有効時間にも <code>max-age</code> が使用されます。</li>
+</ul>
+<p>つまり、クライアントアプリでデータバンドルを 300 秒間キャッシュに保持、CDN で 600 秒間キャッシュに保持することになります。</p>
+<div class=xNote>
+<span class=xNote_title>☝️ なぜ us-central1 を使う？</span>
+<span class=xNote_body><p><a href="https://firebase.google.com/docs/hosting/full-config?hl=ja">ホスティング動作を構成する | Firebase Documentation</a> のドキュメントで、CDN (Firebase Hosting) をプロキシさせて Cloud Functions を呼び出す場合は、<code>us-central1</code> のみサポートされているとの記載があります（2022-06 現在）。</p>
+<blockquote>
+<p>重要: Firebase Hosting は、us-central1 でのみ Cloud Functions をサポートします。</p>
+</blockquote>
+<p>たしかに、<code>asia-northeast1</code> に Cloud Functions 関数をデプロイしてしまうと、CDN との連携がうまくいかない（問答無用で <code>us-central1</code> の Cloud Functions に転送されてしまう）ので、今はあきらめて <code>us-central1</code> にデプロイしておくしかなさそうです。
+Google さん、対応してね！</p>
+</span>
+</div>
+<h2 id=cdn-firebase-hosting-でデータバンドルをキャッシュする>CDN (Firebase Hosting) でデータバンドルをキャッシュする</h2>
+<p>Firestore のデータバンドルをキャッシュするための CDN (Firebase Hosting) は簡単に作成することができます。
+<a href=./p/fvevcs8/>firebase init functions コマンドなどで Firebase プロジェクトを作成</a> している場合、プロジェクトのルートディレクトリに <strong><code>firebase.json</code></strong> ファイルが生成されているはずです。
+このファイルに次のように追記することで、Cloud Functions へのプロキシとなる CDN を配置できます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>firebase.json</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
+  <span class=s2>&#34;hosting&#34;</span><span class=o>:</span> <span class=p>{</span>
+    <span class=s2>&#34;rewrites&#34;</span><span class=o>:</span> <span class=p>[{</span> <span class=s2>&#34;source&#34;</span><span class=o>:</span> <span class=s2>&#34;/createBundle&#34;</span><span class=p>,</span> <span class=s2>&#34;function&#34;</span><span class=o>:</span> <span class=s2>&#34;createBundle&#34;</span> <span class=p>}],</span>
+    <span class=s2>&#34;headers&#34;</span><span class=o>:</span> <span class=p>[</span>
+      <span class=p>{</span>
+        <span class=s2>&#34;source&#34;</span><span class=o>:</span> <span class=s2>&#34;*&#34;</span><span class=p>,</span>
+        <span class=s2>&#34;headers&#34;</span><span class=o>:</span> <span class=p>[{</span> <span class=s2>&#34;key&#34;</span><span class=o>:</span> <span class=s2>&#34;Access-Control-Allow-Origin&#34;</span><span class=p>,</span> <span class=s2>&#34;value&#34;</span><span class=o>:</span> <span class=s2>&#34;*&#34;</span> <span class=p>}]</span>
+      <span class=p>}</span>
+    <span class=p>]</span>
+  <span class=p>},</span>
+  <span class=c1>// ...
+</span><span class=c1></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<p>設定内容はシンプルで、<code>/createBundle</code> という URL へのアクセスを、Cloud Functions の <code>createBundle</code> 関数の呼び出しに接続しています。
+さらに、別ドメインに配置した Web アプリから CDN へのアクセスを許可するために、CORS 用のレスポンスヘッダ定義を追加しておく必要があります。</p>
+<ul>
+<li>参考: <a href=https://firebase.google.com/docs/hosting/full-config>Configure hosting behavior | Firebase</a>。</li>
+</ul>
+<p>Cloud Functions 関数の実装と、CDN の設定が済んだら、プロジェクトルートで下記コマンドを実行してデプロイします。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>firebase deploy
+</code></pre></div><p>デプロイに成功すると、Cloud Functions と CDN の次のようなエンドポイントが有効になります。</p>
+<ul>
+<li>Cloud Functions: <code>https://us-central1-myapp-12345.cloudfunctions.net/createBundle</code></li>
+<li>CDN (Firestore Hosting): <code>https://myapp-12345.web.app/createBundle</code></li>
+</ul>
+<p>どちらも同じデータバンドルを返しますが、CDN の方はキャッシュ生成後は一瞬でデータを返してくれるはずです。</p>
+<h2 id=クライアントアプリからデータバンドルを取得する>クライアントアプリからデータバンドルを取得する</h2>
+<p>最後に、CDN から Firestore データバンドルを取得するクライアントアプリ側の実装です。
+Firebase SDK の基本的な扱い方は省略します（参考: <a href=./p/m3bjrz7/>Next.js で Firebase: Cloud Firestore データベースを使う</a>）。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>utils/firebase/firestore.ts（抜粋）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>getDocsFromCache</span><span class=p>,</span> <span class=nx>getFirestore</span><span class=p>,</span> <span class=nx>loadBundle</span><span class=p>,</span> <span class=nx>namedQuery</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;firebase/firestore&#39;</span>
+<span class=kr>import</span> <span class=p>{</span> <span class=nx>Book</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@/utils/types&#39;</span>
+
+<span class=kr>const</span> <span class=nx>QUERY_NAME</span> <span class=o>=</span> <span class=s1>&#39;latest-books-query&#39;</span>
+
+<span class=kr>export</span> <span class=kr>async</span> <span class=kd>function</span> <span class=nx>getLatestBooksFromBundle</span><span class=p>()</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>Book</span><span class=err>[]</span><span class=p>&gt;</span> <span class=p>{</span>
+  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;Get latest books from Bundle...&#39;</span><span class=p>)</span>
+  <span class=kr>const</span> <span class=nx>db</span> <span class=o>=</span> <span class=nx>getFirestore</span><span class=p>()</span>
+
+  <span class=c1>// CDN からデータバンドルを取得
+</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>bundle</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>fetch</span><span class=p>(</span><span class=s1>&#39;https://myapp-12345.web.app/createBundle&#39;</span><span class=p>)</span>
+  <span class=k>if</span> <span class=p>(</span><span class=nx>bundle</span><span class=p>.</span><span class=nx>body</span> <span class=o>==</span> <span class=kc>null</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>warn</span><span class=p>(</span><span class=s1>&#39;Bundle has no data&#39;</span><span class=p>)</span>
+    <span class=k>return</span> <span class=p>[]</span>
+  <span class=p>}</span>
+
+  <span class=c1>// フェッチしたバンドルから SDK 内にクライアントキャッシュを生成
+</span><span class=c1></span>  <span class=k>await</span> <span class=nx>loadBundle</span><span class=p>(</span><span class=nx>db</span><span class=p>,</span> <span class=nx>bundle</span><span class=p>.</span><span class=nx>body</span><span class=p>)</span>
+
+  <span class=c1>// クライアントキャッシュから名前付きクエリの Query オブジェクトを生成
+</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>query</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>namedQuery</span><span class=p>(</span><span class=nx>db</span><span class=p>,</span> <span class=nx>QUERY_NAME</span><span class=p>)</span>
+  <span class=k>if</span> <span class=p>(</span><span class=nx>query</span> <span class=o>==</span> <span class=kc>null</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>warn</span><span class=p>(</span><span class=sb>`Bundle does not have namedQuery: </span><span class=si>${</span><span class=nx>QUERY_NAME</span><span class=si>}</span><span class=sb>`</span><span class=p>)</span>
+    <span class=k>return</span> <span class=p>[]</span>
+  <span class=p>}</span>
+
+  <span class=c1>// 名前付きクエリからデータを取り出す（必要に応じてコンバーターを適用するのはいつも通り）
+</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>booksQuery</span> <span class=o>=</span> <span class=nx>query</span><span class=p>.</span><span class=nx>withConverter</span><span class=p>(</span><span class=nx>bookConverter</span><span class=p>)</span>
+  <span class=kr>const</span> <span class=nx>snapshot</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>getDocsFromCache</span><span class=p>(</span><span class=nx>booksQuery</span><span class=p>)</span>
+
+  <span class=k>return</span> <span class=nx>snapshot</span><span class=p>.</span><span class=nx>docs</span><span class=p>.</span><span class=nx>map</span><span class=p>((</span><span class=nx>doc</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>doc</span><span class=p>.</span><span class=nx>data</span><span class=p>())</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>例えば、React のカスタムフックなどから上記の関数を呼び出すことで、データバンドルをもとに生成された <code>Book</code> 配列を取得できます。
+CDN のキャッシュデータだけを参照するので、直接 Firestore にアクセスするも高速に動作し、かつ安価に運用できます。
+もちろん、データ取得の柔軟性は減りますし、キャッシュ期間中は最新データを取得できないといった制約がありますが、多数のユーザーがアクセスするトップページの情報などは、この仕組みを導入する価値がありそうです。</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/vgs4dox/>Firebase の Cloud Functions で定期的に Firestore の集計処理を行う</a></li>
+<li><a href=./p/fvevcs8/>Firebase の Cloud Functions で Hello World</a></li>
+<li><a href=./p/bw9kv6g/>Firestore ドキュメントを TypeScript のユーザー定義型オブジェクトに変換する (withConverter)</a></li>
+<li><a href=./p/m3bjrz7/>Next.js で Firebase: Cloud Firestore データベースを使う</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/firebase/cloudfunctions>Firebase/CloudFunctions</a></span>
+<span class=xPageTags_item><a href=./tags/firebase/firestore>Firebase/Firestore</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/6p3dox9/><span class=xArticle_up_label>Firebase 関連メモ</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -531,20 +755,24 @@
 <figcaption class=xCodeBlock_title>functions/src/index.ts</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>functions</span> <span class=kr>from</span> <span class=s2>&#34;firebase-functions&#34;</span><span class=p>;</span>
 
-<span class=kr>export</span> <span class=kr>const</span> <span class=nx>helloWorld</span> <span class=o>=</span> <span class=nx>functions</span><span class=p>.</span><span class=nx>https</span><span class=p>.</span><span class=nx>onRequest</span><span class=p>((</span><span class=nx>request</span><span class=p>,</span> <span class=nx>response</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=nx>functions</span><span class=p>.</span><span class=nx>logger</span><span class=p>.</span><span class=nx>info</span><span class=p>(</span><span class=s2>&#34;Hello logs!&#34;</span><span class=p>,</span> <span class=p>{</span> <span class=nx>structuredData</span>: <span class=kt>true</span> <span class=p>});</span>
-  <span class=nx>response</span><span class=p>.</span><span class=nx>send</span><span class=p>(</span><span class=s2>&#34;Hello from Firebase!&#34;</span><span class=p>);</span>
-<span class=p>});</span></code></pre></div></div>
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>helloWorld</span> <span class=o>=</span> <span class=nx>functions</span>
+  <span class=p>.</span><span class=nx>region</span><span class=p>(</span><span class=s2>&#34;asia-northeast1&#34;</span><span class=p>)</span>
+  <span class=p>.</span><span class=nx>https</span><span class=p>.</span><span class=nx>onRequest</span><span class=p>((</span><span class=nx>request</span><span class=p>,</span> <span class=nx>response</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+    <span class=nx>functions</span><span class=p>.</span><span class=nx>logger</span><span class=p>.</span><span class=nx>info</span><span class=p>(</span><span class=s2>&#34;Hello logs!&#34;</span><span class=p>,</span> <span class=p>{</span> <span class=nx>structuredData</span>: <span class=kt>true</span> <span class=p>});</span>
+    <span class=nx>response</span><span class=p>.</span><span class=nx>send</span><span class=p>(</span><span class=s2>&#34;Hello from Firebase!&#34;</span><span class=p>);</span>
+  <span class=p>});</span></code></pre></div></div>
 </figure>
-<p>このように <code>helloWorld</code> という名前のオブジェクトを export することで、Cloud Functions に <code>helloWorld</code> 関数を登録することを示しています。</p>
+<p>リージョンの指定方法は若干わかりにくいので要注意です。
+上記では <code>asia-northeast1</code> を指定していますが、省略すると <code>us-central1</code> にデプロイされます。
+上記のように <code>helloWorld</code> という名前のオブジェクトを export することで、Cloud Functions に <code>helloWorld</code> 関数を登録することになります。</p>
 <p>Firebase にデプロイする前にエミュレーターで動作確認をしておきます。
 次のようにして、エミュレーターを起動してください。
 関数コードのビルドも自動的に行われます。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span><span class=nb>cd</span> functions
 <span class=gp>$ </span>npm run serve
 <span class=go>...
-</span><span class=go>✔  functions[us-central1-helloWorld]: http function initialized
-</span><span class=go>   (http://localhost:5001/myapp1-12345/us-central1/helloWorld).
+</span><span class=go>✔  functions[asia-northeast1-helloWorld]: http function initialized
+</span><span class=go>   (http://localhost:5001/myapp1-12345/asia-northeast1/helloWorld).
 </span><span class=go>...
 </span></code></pre></div><p>無事エミュレーターが起動すると、上記のような感じで、関数を呼び出すための URL が表示されるので、Web ブラウザで開くか <code>curl</code> コマンドでアクセスします。
 次のように <code>Hello</code> レスポンスが返って来れば成功です。</p>
@@ -841,179 +1069,6 @@ Go 言語のプロジェクトで生成する実行ファイルのコードを <
 </ul>
 <div class=xPageTags>
 <span class=xPageTags_item><a href=./tags/go>Go</a></span>
-<span class=xPageTags_item><a href=./tags/grpc>gRPC</a></span>
-<span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/88gow5c/><span class=xArticle_up_label>gRPC 関連メモ</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/nd3cmt3/>ネットワーク</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/88gow5c/>gRPC</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/37e6uck/>protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/grpc>gRPC</a></span>
-<span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-05-09>2022-05-09</time><br>
-作成: <time itemprop=datePublished datetime=2022-04-20>2022-04-20</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#protcol-buffers-とは>Protcol Buffers とは</a></li>
-<li><a href=#protoc-本体のインストール>protoc 本体のインストール</a>
-<ul>
-<li><a href=#macos-homebrew-の場合>macOS (Homebrew) の場合</a></li>
-<li><a href=#linux-apt-の場合>Linux (apt) の場合</a></li>
-<li><a href=#プリビルド版を使う場合>プリビルド版を使う場合</a></li>
-</ul>
-</li>
-<li><a href=#proto-ファイルをコンパイルしてみる>.proto ファイルをコンパイルしてみる</a>
-<ul>
-<li><a href=#proto-ファイル>.proto ファイル</a></li>
-<li><a href=#c-のコードを生成>C# のコードを生成</a></li>
-<li><a href=#python-のコードを生成>Python のコードを生成</a></li>
-<li><a href=#その他の言語のコードを生成>その他の言語のコードを生成</a></li>
-</ul>
-</li>
-<li><a href=#言語拡張用のプラグイン-protoc-gen-xxx>言語拡張用のプラグイン (protoc-gen-xxx)</a>
-<ul>
-<li><a href=#go-言語用プラグイン-protoc-gen-go>Go 言語用プラグイン (protoc-gen-go)</a></li>
-</ul>
-</li>
-</ul>
-</nav><h2 id=protcol-buffers-とは>Protcol Buffers とは</h2>
-<p>プロトコルバッファー (Protocol Buffers、protobuf) は、Google が開発した、構造化したデータをシリアライズするためのフォーマットです。
-同じく Google が開発した <strong>gRPC</strong> 通信プラットフォームで採用されており、XML や JSON などのテキストベースの API より効率的な通信を行うことができるという特徴を持っています。</p>
-<ul>
-<li>データをコンパクトに表現できるため、通信やパース処理が高速</li>
-<li>強い型付けを行うことでき、サーバー、クライアントの安全なコーディングが可能</li>
-<li>定義変更時の互換性を考慮したフォーマット</li>
-<li>OS やプログラミング言語などに非依存</li>
-</ul>
-<p>データ構造やサービス形式の定義は、<strong><code>.proto</code></strong> 拡張子を持つ <strong>プロトコル定義ファイル (Proto Definition file)</strong> で行います。
-この <code>.proto</code> ファイルを <strong><code>protoc</code></strong> コマンド（プロトコルバッファーコンパイラ）でコンパイルすると、各言語用のソースコードを生成することができます。</p>
-<div style=text-align:center;font-weight:700>hello.proto ──[protoc]──> hello_pb.rb</div>
-<p><code>protoc</code> コマンドは各種プログラミング言語用のコードを生成するわけですが、そのためには、<strong>protoc コマンド本体</strong> と <strong>各言語用のプラグイン</strong>（<code>protoc-gen-go</code> など）がインストールされている必要があります。
-C++ や C#、Kotlin、Python、Ruby などのコード生成は組み込みで対応していますが、Go 言語用のプラグインなどは別途インストールする必要があります。</p>
-<h2 id=protoc-本体のインストール>protoc 本体のインストール</h2>
-<p><strong><code>protoc</code></strong> コマンド (Protocol Buffers Compiler) は、Linux（Ubuntu 系）や macOS ではパッケージマネージャーを使ってインストールしてしまうのが簡単です。
-インストールするパッケージの名前は <strong><code>protobuf</code></strong> や <strong><code>protobuf-compiler</code></strong> であることに注意してください。</p>
-<h3 id=macos-homebrew-の場合>macOS (Homebrew) の場合</h3>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>brew install protobuf  <span class=c1># インストール</span>
-<span class=gp>$ </span>brew upgrade protobuf  <span class=c1># バージョン更新</span>
-</code></pre></div><h3 id=linux-apt-の場合>Linux (apt) の場合</h3>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>apt install -y protobuf-compiler
-</code></pre></div><h3 id=プリビルド版を使う場合>プリビルド版を使う場合</h3>
-<p>あるいは、各 OS 用のバイナリを <a href=https://github.com/protocolbuffers/protobuf/releases>GitHub のリリースページ</a> からダウンロードし、<code>protoc</code> コマンドにパスを通します。
-例えば、Windows であれば <code>protoc-3.20.0-win64.zip</code> などをダウンロードします。</p>
-<p>次のように <code>protoc</code> コマンドを実行できるようになれば OK です。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>protoc --version
-<span class=go>libprotoc 3.20.0
-</span></code></pre></div><ul>
-<li>参考: <a href=https://grpc.io/docs/protoc-installation/>Protocol Buffer Compiler Installation | gRPC</a></li>
-</ul>
-<h2 id=proto-ファイルをコンパイルしてみる>.proto ファイルをコンパイルしてみる</h2>
-<h3 id=proto-ファイル>.proto ファイル</h3>
-<p>次のような簡単な <code>.proto</code> ファイルを入力ファイルとして用意します。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>protos/person.proto</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
-</span><span class=err>
-</span><span class=err></span><span class=kd>message</span> <span class=nc>Person</span> <span class=p>{</span><span class=err>
-</span><span class=err></span>  <span class=k>optional</span> <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span><span class=err></span>  <span class=k>optional</span> <span class=kt>int32</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span><span class=err></span>  <span class=k>optional</span> <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span><span class=err></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<h3 id=c-のコードを生成>C# のコードを生成</h3>
-<p>例えば、次のように実行すると、C# 用のソースコードを生成することができます。
-<strong><code>--csharp_out=&lt;OUT_DIR></code></strong> というオプションで、C# ソースコードの出力先ディレクトリを指定しています。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mkdir gen
-<span class=gp>$ </span>protoc --csharp_out<span class=o>=</span>gen protos/person.proto
-<span class=gp>$ </span>ls gen
-<span class=go>Person.cs
-</span></code></pre></div><h3 id=python-のコードを生成>Python のコードを生成</h3>
-<p>Python 用のソースコードを生成したければ、同様に次のようにします。
-出力ディレクトリは <strong><code>--python_out=&lt;OUT_DIR></code></strong> オプションで指定します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>protoc --python_out<span class=o>=</span>gen protos/person.proto
-</code></pre></div><h3 id=その他の言語のコードを生成>その他の言語のコードを生成</h3>
-<p>他にも各言語用のソースコードを生成するオプションが用意されており、次のようにヘルプ表示すると標準でサポートしている言語を確認できます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>protoc の言語別出力オプション</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>protoc --help <span class=p>|</span> grep OUT_DIR
-<span class=go>  --cpp_out=OUT_DIR           Generate C++ header and source.
-</span><span class=go>  --csharp_out=OUT_DIR        Generate C# source file.
-</span><span class=go>  --java_out=OUT_DIR          Generate Java source file.
-</span><span class=go>  --js_out=OUT_DIR            Generate JavaScript source.
-</span><span class=go>  --kotlin_out=OUT_DIR        Generate Kotlin file.
-</span><span class=go>  --objc_out=OUT_DIR          Generate Objective-C header and source.
-</span><span class=go>  --php_out=OUT_DIR           Generate PHP source file.
-</span><span class=go>  --python_out=OUT_DIR        Generate Python source file.
-</span><span class=go>  --ruby_out=OUT_DIR          Generate Ruby source file.
-</span></code></pre></div></div>
-</figure>
-<h2 id=言語拡張用のプラグイン-protoc-gen-xxx>言語拡張用のプラグイン (protoc-gen-xxx)</h2>
-<p><code>protoc</code> が標準でサポートしてない言語のコードを生成するには、追加のプラグイン（実際はただのコマンド）をインストールする必要があります。
-追加でインストールするコマンドは <strong><code>protoc-gen-&lt;言語名></code></strong> という名前であり、そのコマンドがシステムに存在していると、<code>protoc</code> コマンドの <strong><code>--&lt;言語名>_out</code></strong> というオプションが有効になります。</p>
-<h3 id=go-言語用プラグイン-protoc-gen-go>Go 言語用プラグイン (protoc-gen-go)</h3>
-<p>例えば、Go 言語用のプラグインである <code>protoc-gen-go</code> をインストールすると、<code>--go_out</code> オプションが使えるようになります。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>protoc-gen-go のインストール</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp># </span>バージョン指定でインストールする場合（推奨）
-<span class=gp>$ </span>go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0
-<span class=err>
-</span><span class=err></span><span class=gp># </span>最新版をインストールする場合
-<span class=gp>$ </span>go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-<span class=err>
-</span><span class=err></span><span class=gp># </span>確認
-<span class=gp>$ </span>protoc-gen-go --version
-<span class=go>protoc-gen-go v1.28.0
-</span></code></pre></div></div>
-</figure>
-<p>Go 言語用のコードを出力する場合は、<code>.proto</code> ファイル内の <strong><code>option go_package</code></strong> でパッケージ名を設定しておく必要があります。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>protos/person.proto</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
-</span><span class=err>
-</span><span class=err></span><span class=k>option</span> <span class=n>go_package</span> <span class=o>=</span> <span class=s>&#34;example.com/myapp&#34;</span><span class=p>;</span><span class=err>
-</span><span class=err>
-</span><span class=err></span><span class=kd>message</span> <span class=nc>Person</span> <span class=p>{</span><span class=err>
-</span><span class=err></span>  <span class=k>optional</span> <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span><span class=err></span>  <span class=k>optional</span> <span class=kt>int32</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span><span class=err></span>  <span class=k>optional</span> <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span><span class=err></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>次のようにすると、<code>gen</code> ディレクトリ以下に Go コードが生成されます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>protoc --go_out<span class=o>=</span>gen protos/person.proto
-</code></pre></div><p><code>.proto</code> ファイルで指定したパッケージ名に従ってディレクトリ階層ができます。</p>
-<pre tabindex=0><code>gen/example.com/myapp/person.pb.go
-</code></pre><p><code>.proto</code> ファイル内でパッケージ名を指定するのではなく、<code>protoc</code> コマンドの <strong><code>--go_opt=M...</code></strong> オプションで次のように指定することもできます。</p>
-<pre tabindex=0><code>$ protoc
-    --go_out=gen \
-    --go_opt=Mprotos/person.proto=example.com/myapp \
-    protos/person.proto
-</code></pre><p><code>=</code> が 2 回出てくるのでちょっと分かりにくいですが、<code>protos/person.proto</code> ファイルのパッケージ名を <code>example.com/myapp</code> に設定しています。</p>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<div class=xPageTags>
 <span class=xPageTags_item><a href=./tags/grpc>gRPC</a></span>
 <span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>
 </div>
