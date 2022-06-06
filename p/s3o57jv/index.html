@@ -2,16 +2,17 @@
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
-<title>AWS SSM のポリシーステートメント例｜まくろぐ</title>
+<title>AWS SSM のポリシーステートメントの記述例｜まくろぐ</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
-<meta property="og:title" content="AWS SSM のポリシーステートメント例">
+<meta property="og:title" content="AWS SSM のポリシーステートメントの記述例">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://maku.blog/p/s3o57jv/">
 <meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
 <meta property="og:image:width" content="1436">
 <meta property="og:image:height" content="746">
-<meta property="og:description" content="パラメーターの説明情報の取得 すべてのパラメーターの説明情報を取得できるようにする { &#34;Version&#34;: &#34;2012-10-17&#34;, &#34;Statement&#34;: [ { &#34;Effect&#34;: &#34;Allow&#34;, &#34;Action&#34;: [ &#34;ssm:DescribeParameters&#34; ], &#34;Resource&#34;: &#34;*&#34; } ] }  ssm:DescribeParameters は、SSM パラメーターストアに格納されたパラメーターの説明情報を取得する権限です。 この権限だけでは、パラメーターの「値」自体は取得できないことに注意してください。
+<meta property="og:description" content="参考: AppSync / Lambda
+パラメーターの説明情報の取得 すべてのパラメーターの説明情報を取得できるようにする { &#34;Version&#34;: &#34;2012-10-17&#34;, &#34;Statement&#34;: [ { &#34;Effect&#34;: &#34;Allow&#34;, &#34;Action&#34;: [ &#34;ssm:DescribeParameters&#34; ], &#34;Resource&#34;: &#34;*&#34; } ] }  ssm:DescribeParameters は、SSM パラメーターストアに格納されたパラメーターの説明情報を取得する権限です。 この権限だけでは、パラメーターの「値」自体は取得できないことに注意してください。
 パラメーターの値の取得 prod- で始まるパラメーターの値を取得できるようにする { &#34;Version&#34;: &#34;2012-10-17&#34;, &#34;Statement&#34;: [ { &#34;Effect&#34;: &#34;Allow&#34;, &#34;Action&#34;: [ &#34;ssm:GetParameter*&#34; ], &#34;Resource&#34;: &#34;arn:aws:ssm:<Region>:<Account>:parameter/prod-*&#34; } ] }  パラメーターの Get 系アクションには、GetParameter/GetParameters/GetParameterHistory/GetParametersByPath など いろいろある ため、上記のように ssm:GetParameter* とワイルドカード指定しておくと確実に取得できるようになります。 GetParameter だけだと、パラメーターの一覧取得などが許可されません。
 パラメーターの追加・削除 prod- で始まるパラメーターの追加と削除を許可する { &#34;Version&#34;: &#34;2012-10-17&#34;, &#34;Statement&#34;: [ { &#34;Effect&#34;: &#34;Allow&#34;, &#34;Action&#34;: [ &#34;ssm:PutParameter&#34;, &#34;ssm:DeleteParameter&#34;, &#34;ssm:DeleteParameters&#34; ], &#34;Resource&#34;: &#34;arn:aws:ssm:<Region>:<Account>:parameter/prod-*&#34; } ] }  暗号化されたパラメーター (SecureString) の取得 暗号化された prod- で始まるパラメーターを読み込む { &#34;Version&#34;: &#34;2012-10-17&#34;, &#34;Statement&#34;: [ { &#34;Effect&#34;: &#34;Allow&#34;, &#34;Action&#34;: [ &#34;ssm:GetParameter*&#34; ], &#34;Resource&#34;: [ &#34;arn:aws:ssm:<Region>:<Account>:parameter/prod-*&#34; ] }, { &#34;Effect&#34;: &#34;Allow&#34;, &#34;Action&#34;: [ &#34;kms:Decrypt&#34; ], &#34;Resource&#34;: [ &#34;arn:aws:kms:<Region>:<Account>:key/<KmsKey>&#34; ] } ] }  SSM パラメーターストアに SecureString タイプとして格納されたパラメーターは、KMS キーによって暗号化されています。 このパラメーターの値を取得するには、ssm:GetParameter* によるパラメーター読み取り権限と、kms:Decrypt による複合化の権限が必要です。">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.413f4d14822ef22d7b54964ba17b601bf4a8a096fe825363faf7a949a34eb3cc.css>
@@ -35,7 +36,7 @@
 </span>
 <span class=xBreadcrumb_item><a href=../../p/5o2cnw8/>SSM</a>
 </span>
-<span class=xBreadcrumb_item>AWS SSM のポリシーステートメント例
+<span class=xBreadcrumb_item>AWS SSM のポリシーステートメントの記述例
 </span>
 </div>
 </aside>
@@ -110,6 +111,7 @@
 <ul>
 </ul>
 <li><a class=xNavTree-dir href=../../p/3nybkv6/>AWS KMS</a>
+<li><a class=xNavTree-dir href=../../p/dxhs2bk/>AppSync</a>
 <li><a class=xNavTree-dir href=../../p/szcbzgt/>AWS のトラブルシューティング</a>
 </ul>
 <li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
@@ -144,7 +146,7 @@
 <div class=xMenu_box_body><div class=xMenu_tag>
 <a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (79)</a>
 </div><div class=xMenu_tag>
-<a href=../../tags/aws>aws (62)</a>
+<a href=../../tags/aws>aws (61)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/azure>azure (58)</a>
 </div><div class=xMenu_tag>
@@ -190,6 +192,8 @@
 </div><div class=xMenu_tag>
 <a href=../../tags/android>android (10)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/aws/lambda>aws/lambda (10)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
@@ -207,8 +211,6 @@
 <a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/3d>3d (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/lambda>aws/lambda (8)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/aws/sam>aws/sam (8)</a>
 </div><div class=xMenu_tag>
@@ -331,6 +333,8 @@
 <a href=../../tags/arib>arib (2)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/aws/amplify>aws/amplify (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/appsync>aws/appsync (2)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
 </div><div class=xMenu_tag>
@@ -504,9 +508,8 @@
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/5o2cnw8/>SSM</a></span></div>
 <div style=display:flex;margin-top:.8em>
 <div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/s3o57jv/>AWS SSM のポリシーステートメント例</a></h1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/s3o57jv/>AWS SSM のポリシーステートメントの記述例</a></h1>
 <div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/aws>AWS</a></span>
 <span class=xPageTags_item><a href=../../tags/aws/ssm>AWS/SSM</a></span>
 </div>
 </div>
@@ -526,7 +529,8 @@
 <li><a href=#暗号化されたパラメーター-securestring-の作成>暗号化されたパラメーター (SecureString) の作成</a></li>
 <li><a href=#principal-で特定のユーザーに権限を絞る>Principal で特定のユーザーに権限を絞る</a></li>
 </ul>
-</nav><h2 id=パラメーターの説明情報の取得>パラメーターの説明情報の取得</h2>
+</nav><p>参考: <a href=../../p/cexcpyc/>AppSync</a> / <a href=../../p/yn7hqx8/>Lambda</a></p>
+<h2 id=パラメーターの説明情報の取得>パラメーターの説明情報の取得</h2>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>すべてのパラメーターの説明情報を取得できるようにする</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
@@ -664,15 +668,8 @@
 <h3 style="border-bottom:1px solid gray">関連記事</h3>
 <ul>
 <li><a href=../../p/aug76s5/>AWS SSM をコマンドライン (CLI) で操作する</a></li>
-<li><a href=../../p/m8jv7hr/>AWS KMS をコマンドライン (CLI) で操作する</a></li>
-<li><a href=../../p/vx5ta85/>AWS CDK で外部パラメーターを扱う（コンテキスト・バリューと環境変数）</a></li>
-<li><a href=../../p/cj9i4m3/>AWS CDK で TypeScript で実装した Lambda 関数をデプロイする (NodejsFunction)</a></li>
-<li><a href=../../p/ap8p7n4/>AWS CDK メモ: Lambda 関数コードだけ高速デプロイする (cdk deploy --hotswap)</a></li>
-<li><a href=../../p/gzkzbny/>AWS CDK のサンプルコード集（TypeScript 版）</a></li>
-<li><a href=../../p/nqkav2m/>AWS CDK メモ: コンストラクトの概念を理解する</a></li>
 </ul>
 <div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/aws>AWS</a></span>
 <span class=xPageTags_item><a href=../../tags/aws/ssm>AWS/SSM</a></span>
 </div>
 </div>
@@ -705,7 +702,7 @@
 </span>
 <span class=xBreadcrumb_item><a href=../../p/5o2cnw8/>SSM</a>
 </span>
-<span class=xBreadcrumb_item>AWS SSM のポリシーステートメント例
+<span class=xBreadcrumb_item>AWS SSM のポリシーステートメントの記述例
 </span>
 </div>
 </aside>
@@ -717,6 +714,6 @@
 </div>
 <script src=../../assets/js/sidebar.js></script>
 <script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c];b.setAttribute('target','_blank'),b.setAttribute('rel','noopener');const d=b.getElementsByTagName('img');if(d.length>0)continue;b.classList.add('xExternalLinkIcon')}})</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"AWS","item":"https://maku.blog/p/7s7hs4e/"},{"@type":"ListItem","position":4,"name":"SSM","item":"https://maku.blog/p/5o2cnw8/"},{"@type":"ListItem","position":5,"name":"AWS SSM のポリシーステートメント例","item":"https://maku.blog/p/s3o57jv/"}]}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"AWS","item":"https://maku.blog/p/7s7hs4e/"},{"@type":"ListItem","position":4,"name":"SSM","item":"https://maku.blog/p/5o2cnw8/"},{"@type":"ListItem","position":5,"name":"AWS SSM のポリシーステートメントの記述例","item":"https://maku.blog/p/s3o57jv/"}]}</script>
 </body>
 </html>
