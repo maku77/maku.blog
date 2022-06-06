@@ -1,9 +1,11 @@
 ---
-title: "AWS SSM のポリシーステートメント例"
-url: "/p/s3o57jv"
+title: "AWS SSM のポリシーステートメントの記述例"
+url: "p/s3o57jv/"
 date: "2021-10-15"
-tags: ["AWS", "AWS/SSM"]
+tags: ["AWS/SSM"]
 ---
+
+参考: [AppSync](/p/cexcpyc/) / [Lambda](/p/yn7hqx8/)
 
 パラメーターの説明情報の取得
 ----

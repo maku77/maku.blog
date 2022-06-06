@@ -222,6 +222,31 @@ $ aws lambda add-permission \
       --source-account 123456789012
 {{< /code >}}
 
+#### その他の例
+
+{{< accordion title="すべての AppSync から Lambda 関数を呼び出せるようにする" >}}
+{{< code lang="console" >}}
+$ aws lambda add-permission \
+      --function-name "my-function" \
+      --action lambda:InvokeFunction \
+      --statement-id "appsync" \
+      --principal appsync.amazonaws.com \
+      --output text
+{{< /code >}}
+{{< /accordion >}}
+
+{{< accordion title="特定の AppSync から Lambda を呼び出せるようにする" >}}
+{{< code lang="console" >}}
+$ aws lambda add-permission \
+      --function-name "my-function" \
+      --action lambda:InvokeFunction \
+      --statement-id "appsync" \
+      --principal appsync.amazonaws.com \
+      --source-arn "<AppSync API ARN>" \
+      --output text
+{{< /code >}}
+{{< /accordion >}}
+
 ### ステートメントを削除する (lambda remove-permission)
 
 {{< code title="例: sns という名前のポリシーステートメントを削除" >}}
