@@ -44,6 +44,10 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/q7q4ahp/>Apollo Server で GraphQL サーバーを作成する (Hello World)
+<time>2022-06-08</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/dtdtbr8/>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する
 <time>2022-06-05</time></a>
 </div>
@@ -57,10 +61,6 @@
 </div>
 <div class=xBoxLink>
 <a href=./p/37e6uck/>protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)
-<time>2022-05-09</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/3vbr2bm/>Next.js でローカル開発時 (next dev) のみ有効なデバッグページを作成する (getStaticProps)
 <time>2022-05-09</time></a>
 </div>
 </div>
@@ -341,6 +341,8 @@
 </div><div class=xMenu_tag>
 <a href=./tags/androidstudio>androidstudio (1)</a>
 </div><div class=xMenu_tag>
+<a href=./tags/apollo-server>apollo-server (1)</a>
+</div><div class=xMenu_tag>
 <a href=./tags/atomic-design>atomic-design (1)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/blender>blender (1)</a>
@@ -436,11 +438,11 @@
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/q7q4ahp/>Apollo Server で GraphQL サーバーを作成する (Hello World)<span class=xRecents_item_tag>Apollo Server</span><time>2022-06-08</time></a>
+</div><div class=xRecents_item>
 <a href=./p/dtdtbr8/>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する<span class=xRecents_item_tag>Firebase/CloudFunctions</span><span class=xRecents_item_tag>Firebase/Firestore</span><time>2022-06-05</time></a>
 </div><div class=xRecents_item>
 <a href=./p/fvevcs8/>Firebase の Cloud Functions で Hello World<span class=xRecents_item_tag>Firebase/CloudFunctions</span><time>2022-06-04</time></a>
-</div><div class=xRecents_item>
-<a href=./p/ij4jv9k/>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）<span class=xRecents_item_tag>Go</span><span class=xRecents_item_tag>gRPC</span><span class=xRecents_item_tag>Protocol Buffers</span><time>2022-05-18</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -448,6 +450,129 @@
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/cm9nyco/>GraphQL</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/aseqzau/>Apollo Server</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/q7q4ahp/>Apollo Server で GraphQL サーバーを作成する (Hello World)</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/apollo-server>Apollo Server</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-06-08>2022-06-08</time><br>
+作成: <time itemprop=datePublished datetime=2022-06-08>2022-06-08</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#何をするか>何をするか？</a></li>
+<li><a href=#typescript-用プロジェクトの準備>TypeScript 用プロジェクトの準備</a></li>
+<li><a href=#apollo-server-と-graphql-のインストール>apollo-server と graphql のインストール</a></li>
+<li><a href=#graphql-サーバーを実装する>GraphQL サーバーを実装する</a></li>
+<li><a href=#graphql-クエリを実行してみる>GraphQL クエリを実行してみる</a></li>
+</ul>
+</nav><h2 id=何をするか>何をするか？</h2>
+<p><a href=https://www.npmjs.com/package/apollo-server>apollo-server</a> NPM パッケージは、Node.js で GraphQL サーバーを実装するためのライブラリです。
+Apollo Graph 社が OSS として公開しており、2022 年時点で最も使用されている JavaScript 用の GraphQL ライブラリです。</p>
+<p>ここでは、簡単な GraphQL スキーマとリゾルバーを定義して、GraphQL サーバーを立ち上げてみます。
+<code>apollo-server</code> は標準で TypeScript の型情報に対応しているため、ここでは TypeScript を使って実装しますが、JavaScript でもほぼ同様に実装できます。</p>
+<h2 id=typescript-用プロジェクトの準備>TypeScript 用プロジェクトの準備</h2>
+<p>TypeScript の実行環境自体は、下記の記事などを参考にしてセットアップします。</p>
+<ul>
+<li>参考: <a href=./p/ak7u3h3/>TypeScriptの環境: Visual Studio Code で TypeScript の開発環境を構築する</a></li>
+</ul>
+<p>でもここでは、<code>.ts</code> ファイルをそのまま実行できる <a href=https://typestrong.org/ts-node/>ts-node</a> を使って楽をしちゃいます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>プロジェクトの作成</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mkdir myserver <span class=o>&amp;&amp;</span> <span class=nb>cd</span> myserver
+<span class=gp>$ </span>npm init -y
+<span class=gp>$ </span>npm install --save-dev typescript ts-node
+</code></pre></div></div>
+</figure>
+<p><code>package.json</code> を少し修正して、<code>npm run dev</code> で <code>main.ts</code> を起動できるようにしておきます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>package.json</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=c1>// ...
+</span><span class=c1></span><span class=s2>&#34;scripts&#34;</span><span class=o>:</span> <span class=p>{</span>
+  <span class=s2>&#34;dev&#34;</span><span class=o>:</span> <span class=s2>&#34;ts-node main&#34;</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>これで準備完了です。</p>
+<h2 id=apollo-server-と-graphql-のインストール>apollo-server と graphql のインストール</h2>
+<p>GraphQL サーバーインスタンスを立ち上げるための <a href=https://www.npmjs.com/package/apollo-server>apollo-server</a> パッケージと、GraphQL スキーマを扱うための <a href=https://www.npmjs.com/package/graphql>graphql</a> パッケージをインストールします。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>npm install --save-dev apollo-server graphql
+</code></pre></div><h2 id=graphql-サーバーを実装する>GraphQL サーバーを実装する</h2>
+<p>Apollo Server ライブラリを使って GraphQL サーバーを実装していきます。
+ここでは、<code>Query</code> のルートフィールドとして <code>hello</code> フィールドを定義して、そのリゾルバー関数で <code>world</code> を返すように実装します。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>main.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>ApolloServer</span><span class=p>,</span> <span class=nx>gql</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;apollo-server&#39;</span>
+
+<span class=c1>// GraphQL スキーマの定義
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>typeDefs</span> <span class=o>=</span> <span class=nx>gql</span><span class=sb>`
+</span><span class=sb>  type Query {
+</span><span class=sb>    hello: String!
+</span><span class=sb>  }
+</span><span class=sb>`</span>
+
+<span class=c1>// リゾルバーの定義
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>resolvers</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>Query</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>hello</span><span class=o>:</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=s1>&#39;world&#39;</span><span class=p>,</span>
+  <span class=p>},</span>
+<span class=p>}</span>
+
+<span class=c1>// GraphQL サーバーを起動する
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>server</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>ApolloServer</span><span class=p>({</span> <span class=nx>typeDefs</span><span class=p>,</span> <span class=nx>resolvers</span> <span class=p>})</span>
+<span class=nx>server</span><span class=p>.</span><span class=nx>listen</span><span class=p>().</span><span class=nx>then</span><span class=p>(({</span> <span class=nx>url</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=sb>`🚀 Server ready at </span><span class=si>${</span><span class=nx>url</span><span class=si>}</span><span class=sb>`</span><span class=p>)</span>
+<span class=p>})</span></code></pre></div></div>
+</figure>
+<p>Hello World なのでとてもシンプル！
+次のように実行すれば GraphQL サーバーが立ち上がります。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>npm -s run dev
+<span class=go>🚀 Server ready at http://localhost:4000/
+</span></code></pre></div><p>デフォルトで 4000 番ポートで起動しますが、<code>server.listen({ port: 5000 })</code> のように変更できます。</p>
+<h2 id=graphql-クエリを実行してみる>GraphQL クエリを実行してみる</h2>
+<p>立ち上げた GraphQL サーバーに対してクエリ実行してみます。
+どんな GraphQL クライアントを使ってもよいのですが、<a href="https://studio.apollographql.com/sandbox?endpoint=http%3A%2F%2Flocalhost%3A4000%2F">Apollo Studio Explorer</a> というサイトから、簡単に <code>localhost:4000</code> に対して GraphQL クエリを投げられます。</p>
+<figure class=xImage>
+<a href=./p/q7q4ahp/img-001.png target=_blank>
+<img style="border:solid #ccc 2px" width=1277 height=402 src=./p/q7q4ahp/img-001.png alt=/p/q7q4ahp/img-001.png>
+</a>
+<figcaption>図: Apollo Studio Explorer からのクエリ実行</figcaption>
+</figure>
+<p><code>hello</code> フィールドを参照すると、正しく <code>world</code> という値が返ってきていることを確認できます。</p>
+<p><code>curl</code> コマンドで直接 GraphQL API を呼び出して確認することもできます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>curl --request POST <span class=se>\
+</span><span class=se></span><span class=go>       --header &#39;content-type: application/json&#39; \
+</span><span class=go>       --url http://localhost:4000/ \
+</span><span class=go>       --data &#39;{&#34;query&#34;:&#34;query { hello }&#34;}&#39;
+</span><span class=go></span><span class=err>
+</span><span class=err></span><span class=go>{&#34;data&#34;:{&#34;hello&#34;:&#34;world&#34;}}
+</span></code></pre></div>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/apollo-server>Apollo Server</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/aseqzau/><span class=xArticle_up_label>Apollo Server 関連記事</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -817,269 +942,6 @@ CDN のキャッシュデータだけを参照するので、直接 Firestore �
 </div>
 <div class=xArticle_up>
 <a href=./p/6p3dox9/><span class=xArticle_up_label>Firebase 関連メモ</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/nd3cmt3/>ネットワーク</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/88gow5c/>gRPC</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/ij4jv9k/>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/go>Go</a></span>
-<span class=xPageTags_item><a href=./tags/grpc>gRPC</a></span>
-<span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-05-18>2022-05-18</time><br>
-作成: <time itemprop=datePublished datetime=2022-05-18>2022-05-18</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#何をするか>何をするか？</a></li>
-<li><a href=#プロジェクトの作成と-grpc-go-のインストール>プロジェクトの作成と gRPC-Go のインストール</a></li>
-<li><a href=#proto-ファイルを作成する>.proto ファイルを作成する</a></li>
-<li><a href=#proto-ファイルをコンパイルする>.proto ファイルをコンパイルする</a></li>
-<li><a href=#grpc-サーバーとクライアントの実装>gRPC サーバーとクライアントの実装</a>
-<ul>
-<li><a href=#grpc-サーバーの実装>gRPC サーバーの実装</a></li>
-<li><a href=#grpc-クライアントの実装>gRPC クライアントの実装</a></li>
-</ul>
-</li>
-<li><a href=#実行してみる>実行してみる</a></li>
-</ul>
-</nav><h2 id=何をするか>何をするか？</h2>
-<p>ここでは、Go 言語用の gRPC ライブラリである <a href=https://pkg.go.dev/google.golang.org/grpc>gRPC-Go (google.golang.org/grpc)</a> を使って、簡単な gRPC サーバーとクライアントを作ってみます。
-通信用のスタブコードなどは、<strong><code>protoc</code></strong> コマンド (Protocl Buffers Compiler) で <code>.proto</code> ファイルから自動生成するので、あらかじめ <code>protoc</code> コマンドをインストールしておいてください。</p>
-<ul>
-<li>参考: <a href=./p/37e6uck/>protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)</a></li>
-</ul>
-<p><code>protoc</code> コマンドで Go 言語用のコードを生成するには、<strong><code>protoc-gen-go</code></strong> プラグインと <strong><code>protoc-gen-go-grpc</code></strong> プラグインをインストールしておく必要があります。
-前者がシリアライズ用のコード、後者が gRPC 用のスタブコードを生成するための <code>protoc</code> プラグインです。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp># </span>バージョンを指定してインストールする方法（推奨）
-<span class=gp>$ </span>go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
-<span class=gp>$ </span>go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
-<span class=err>
-</span><span class=err></span><span class=gp># </span>最新バージョンをインストールする方法
-<span class=gp>$ </span>go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-<span class=gp>$ </span>go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-</code></pre></div><h2 id=プロジェクトの作成と-grpc-go-のインストール>プロジェクトの作成と gRPC-Go のインストール</h2>
-<p>まずは Go 言語用のプロジェクトを作成します。
-モジュール名は <code>com.example/grpc-sample</code> としていますが、GitHub で管理する予定であれば、リポジトリ名に合わせて <code>github.com/&lt;USER>/grpc-sample</code> のような名前にしてください。
-これが、プロジェクト内で作成する Go パッケージをインポートするときのプレフィックスになります。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mkdir grpc-sample <span class=o>&amp;&amp;</span> <span class=nb>cd</span> grpc-sample
-<span class=gp>$ </span>go mod init com.example/grpc-sample
-</code></pre></div><p>あとは、gRPC サーバーとクライアントの実装に使用する gRPC-Go パッケージの依存関係を追加しておきます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>go get google.golang.org/grpc
-</code></pre></div><h2 id=proto-ファイルを作成する>.proto ファイルを作成する</h2>
-<p><code>echo/echo.proto</code> ファイルを作成して、次のように記述します。
-Go 言語用のオプション <code>option go_package</code> で、出力する <code>.go</code> ファイルを <code>echo</code> パッケージに配置するように指定しています。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>echo/echo.proto</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
-</span><span class=err>
-</span><span class=err></span><span class=kn>package</span> <span class=nn>echo</span><span class=p>;</span><span class=err>
-</span><span class=err>
-</span><span class=err></span><span class=k>option</span> <span class=n>go_package</span> <span class=o>=</span> <span class=s>&#34;example.com/grpc-sample/echo&#34;</span><span class=p>;</span><span class=err>
-</span><span class=err>
-</span><span class=err></span><span class=c1>// Echo メソッドを持つ EchoService の定義
-</span><span class=c1></span><span class=kd>service</span> <span class=n>EchoService</span> <span class=p>{</span><span class=err>
-</span><span class=err></span>  <span class=k>rpc</span> <span class=n>Echo</span> <span class=p>(</span><span class=n>EchoRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>EchoResponse</span><span class=p>);</span><span class=err>
-</span><span class=err></span><span class=p>}</span><span class=err>
-</span><span class=err>
-</span><span class=err></span><span class=c1>// Echo に送るリクエストメッセージの定義
-</span><span class=c1></span><span class=kd>message</span> <span class=nc>EchoRequest</span> <span class=p>{</span><span class=err>
-</span><span class=err></span>  <span class=kt>string</span> <span class=kd>message</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span><span class=err></span><span class=p>}</span><span class=err>
-</span><span class=err>
-</span><span class=err></span><span class=c1>// Echo が返すレスポンスメッセージの定義
-</span><span class=c1></span><span class=kd>message</span> <span class=nc>EchoResponse</span> <span class=p>{</span><span class=err>
-</span><span class=err></span>  <span class=kt>string</span> <span class=kd>message</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span><span class=err></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>ここでは、<code>EchoService</code> というサービスが、<code>Echo</code> というメソッドを提供するよう定義しています。</p>
-<h2 id=proto-ファイルをコンパイルする>.proto ファイルをコンパイルする</h2>
-<p><code>protoc</code> コマンドを実行して、<code>.proto</code> ファイルからシリアライズ用のコードと、gRPC 関連のスタブコードを生成します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>protoc --go_out<span class=o>=</span>. --go_opt<span class=o>=</span><span class=nv>paths</span><span class=o>=</span>source_relative <span class=se>\
-</span><span class=se></span><span class=go>    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-</span><span class=go>    echo/echo.proto
-</span></code></pre></div><p>それぞれのオプションは次のような意味があります。</p>
-<ul>
-<li><strong><code>--go_out</code></strong> &mldr; <code>protoc-gen-go</code> プラグインによる生成コードの出力先ディレクトリ</li>
-<li><strong><code>--go_opt</code></strong> &mldr; <code>protoc-gen-go</code> プラグインに渡すオプション</li>
-<li><strong><code>--go-grpc_out</code></strong> &mldr; <code>protoc-gen-go-grpc</code> プラグインによる生成コードの出力先ディレクトリ</li>
-<li><strong><code>--go-grpc_opt</code></strong> &mldr; <code>protoc-gen-go-grpc</code> プラグインに渡すオプション</li>
-</ul>
-<p><strong><code>--go_out</code></strong> オプションを指定することでシリアライズ用のコード (<code>echo.pb.go</code>)、<strong><code>--go-grpc_out</code></strong> オプションを指定することで gRPC 用のスタブコード (<code>echo_grpc.pb.go</code>) を生成してくれます。
-追加のオプションで、<strong><code>paths=source_relative</code></strong> を指定することにより、入力ファイル (<code>.proto</code>) と同じディレクトリ構成で <code>.go</code> ファイルを出力するようにしています。
-今回はカレントディレクトリ (<code>.</code>) を出力のルートに指定しているので、結果的に入力ファイルと同じディレクトリに次のように <code>.go</code> ファイルが生成されることになります。</p>
-<table>
-<thead>
-<tr>
-<th>入力ファイル</th>
-<th>使う protoc プラグイン</th>
-<th>生成されるファイル</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>echo/echo.proto</code></td>
-<td><code>protoc-gen-go</code></td>
-<td><strong><code>echo/echo.pb.go</code></strong></td>
-</tr>
-<tr>
-<td><code>echo/echo.proto</code></td>
-<td><code>protoc-gen-go-grpc</code></td>
-<td><strong><code>echo/echo_grpc.pb.go</code></strong></td>
-</tr>
-</tbody>
-</table>
-<p>生成された <code>echo.pb.go</code> ファイルや <code>echo_grpc.pb.go</code> ファイルを覗いてみると、次のようなパッケージ名で定義されていることがわかります。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>echo/echo.pb.go（抜粋）</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>echo</span></code></pre></div></div>
-</figure>
-<p>このパッケージ名は、<code>.proto</code> ファイル内の <code>options go_package</code> で指定したパスに従って自動生成されています（パスの最後の <code>/echo</code> という部分が採用されています）。
-また、今回はモジュール名を <code>example.com/grpc-sample</code> と定義したので（<code>go.mod</code> ファイルに書かれているので）、自動生成されたこれらのパッケージをインポートするときは、次のような感じで記述することになります。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>import</span> <span class=s>&#34;example.com/grpc-sample/echo&#34;</span>
-</code></pre></div><h2 id=grpc-サーバーとクライアントの実装>gRPC サーバーとクライアントの実装</h2>
-<p>gRPC を使って通信するサーバーとクライアントは、それぞれ独立したコマンドとして <code>cmd/echo-server</code> ディレクトリ、<code>cmd/echo-client</code> ディレクトリ以下に作成することにします（それぞれ <code>main</code> 関数を作成します）。
-Go 言語のプロジェクトで生成する実行ファイルのコードを <code>cmd</code> ディレクトリ以下に配置するのはよくあるプラクティスです。</p>
-<h3 id=grpc-サーバーの実装>gRPC サーバーの実装</h3>
-<p>まずは、<code>EchoService</code> を実装します。
-<code>protoc</code> によって自動生成された <code>echo/echo_grpc.pb.go</code> の関数シグネチャを参考に、次のような感じで <code>Echo</code> メソッドを実装します。
-クライアントから受信したテキストの先頭に <code>*</code> を付加したレスポンスを返しているだけなので実装は簡単です。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>cmd/echo-server/server.go</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
-
-<span class=kn>import</span> <span class=p>(</span>
-	<span class=s>&#34;context&#34;</span>
-	<span class=s>&#34;log&#34;</span>
-
-	<span class=s>&#34;example.com/grpc-sample/echo&#34;</span>
-<span class=p>)</span>
-
-<span class=c1>// EchoService を実装するサーバーの構造体
-</span><span class=c1></span><span class=kd>type</span> <span class=nx>server</span> <span class=kd>struct</span><span class=p>{</span>
-	<span class=nx>echo</span><span class=p>.</span><span class=nx>UnimplementedEchoServiceServer</span>
-<span class=p>}</span>
-
-<span class=c1>// EchoService の Echo メソッドの実装
-</span><span class=c1></span><span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=o>*</span><span class=nx>server</span><span class=p>)</span> <span class=nf>Echo</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>in</span> <span class=o>*</span><span class=nx>echo</span><span class=p>.</span><span class=nx>EchoRequest</span><span class=p>)</span> <span class=p>(</span><span class=o>*</span><span class=nx>echo</span><span class=p>.</span><span class=nx>EchoResponse</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
-	<span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;Received from client: %v&#34;</span><span class=p>,</span> <span class=nx>in</span><span class=p>.</span><span class=nf>GetMessage</span><span class=p>())</span>
-	<span class=k>return</span> <span class=o>&amp;</span><span class=nx>echo</span><span class=p>.</span><span class=nx>EchoResponse</span><span class=p>{</span><span class=nx>Message</span><span class=p>:</span> <span class=s>&#34;*&#34;</span> <span class=o>+</span> <span class=nx>in</span><span class=p>.</span><span class=nf>GetMessage</span><span class=p>()},</span> <span class=kc>nil</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>あとは、<code>main</code> 関数で gRPC サーバーのインスタンスを生成して、上記の実装を登録すれば OK です。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>cmd/echo-server/main.go</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
-
-<span class=kn>import</span> <span class=p>(</span>
-	<span class=s>&#34;fmt&#34;</span>
-	<span class=s>&#34;log&#34;</span>
-	<span class=s>&#34;net&#34;</span>
-
-	<span class=s>&#34;google.golang.org/grpc&#34;</span>
-
-	<span class=s>&#34;example.com/grpc-sample/echo&#34;</span>
-<span class=p>)</span>
-
-<span class=kd>const</span> <span class=nx>port</span> <span class=p>=</span> <span class=mi>52000</span>
-
-<span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
-	<span class=c1>// TCP ポートをオープンできるか確認
-</span><span class=c1></span>	<span class=nx>lis</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>net</span><span class=p>.</span><span class=nf>Listen</span><span class=p>(</span><span class=s>&#34;tcp&#34;</span><span class=p>,</span> <span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;:%d&#34;</span><span class=p>,</span> <span class=nx>port</span><span class=p>))</span>
-	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
-		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;Failed to listen: %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
-	<span class=p>}</span>
-
-	<span class=c1>// gRPC サーバーを生成し、EchoService サーバーの実装を登録する
-</span><span class=c1></span>	<span class=nx>s</span> <span class=o>:=</span> <span class=nx>grpc</span><span class=p>.</span><span class=nf>NewServer</span><span class=p>()</span>
-	<span class=nx>echo</span><span class=p>.</span><span class=nf>RegisterEchoServiceServer</span><span class=p>(</span><span class=nx>s</span><span class=p>,</span> <span class=o>&amp;</span><span class=nx>server</span><span class=p>{})</span>
-
-	<span class=c1>// gRPC サーバーを稼働開始
-</span><span class=c1></span>	<span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;Server listening at %v&#34;</span><span class=p>,</span> <span class=nx>lis</span><span class=p>.</span><span class=nf>Addr</span><span class=p>())</span>
-	<span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>s</span><span class=p>.</span><span class=nf>Serve</span><span class=p>(</span><span class=nx>lis</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
-		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;Failed to serve: %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
-	<span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<h3 id=grpc-クライアントの実装>gRPC クライアントの実装</h3>
-<p>gRPC サーバー側が実装できたら、次はクライアント側の実装です。
-下記の gRPC クライアントでは、<code>Echo</code> メソッドを呼び出して <code>AAAAA</code> というメッセージを送り、その応答を単純に出力しています。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>cmd/echo-client/main.go</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
-
-<span class=kn>import</span> <span class=p>(</span>
-	<span class=s>&#34;context&#34;</span>
-	<span class=s>&#34;log&#34;</span>
-	<span class=s>&#34;time&#34;</span>
-
-	<span class=s>&#34;google.golang.org/grpc&#34;</span>
-	<span class=s>&#34;google.golang.org/grpc/credentials/insecure&#34;</span>
-
-	<span class=s>&#34;example.com/grpc-sample/echo&#34;</span>
-<span class=p>)</span>
-
-<span class=kd>const</span> <span class=nx>addr</span> <span class=p>=</span> <span class=s>&#34;localhost:52000&#34;</span>
-
-<span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
-	<span class=c1>// EchoService サーバーへ接続する
-</span><span class=c1></span>	<span class=nx>conn</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>grpc</span><span class=p>.</span><span class=nf>Dial</span><span class=p>(</span><span class=nx>addr</span><span class=p>,</span> <span class=nx>grpc</span><span class=p>.</span><span class=nf>WithTransportCredentials</span><span class=p>(</span><span class=nx>insecure</span><span class=p>.</span><span class=nf>NewCredentials</span><span class=p>()))</span>
-	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
-		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;Did not connect: %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
-	<span class=p>}</span>
-	<span class=k>defer</span> <span class=nx>conn</span><span class=p>.</span><span class=nf>Close</span><span class=p>()</span>
-	<span class=nx>c</span> <span class=o>:=</span> <span class=nx>echo</span><span class=p>.</span><span class=nf>NewEchoServiceClient</span><span class=p>(</span><span class=nx>conn</span><span class=p>)</span>
-
-	<span class=c1>// Echo メソッドを呼び出す
-</span><span class=c1></span>	<span class=nx>ctx</span><span class=p>,</span> <span class=nx>cancel</span> <span class=o>:=</span> <span class=nx>context</span><span class=p>.</span><span class=nf>WithTimeout</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>Background</span><span class=p>(),</span> <span class=nx>time</span><span class=p>.</span><span class=nx>Second</span><span class=p>)</span>
-	<span class=k>defer</span> <span class=nf>cancel</span><span class=p>()</span>
-	<span class=nx>r</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>c</span><span class=p>.</span><span class=nf>Echo</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span> <span class=o>&amp;</span><span class=nx>echo</span><span class=p>.</span><span class=nx>EchoRequest</span><span class=p>{</span><span class=nx>Message</span><span class=p>:</span> <span class=s>&#34;AAAAA&#34;</span><span class=p>})</span>
-	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
-		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;Could not echo: %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
-	<span class=p>}</span>
-	<span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;Received from server: %s&#34;</span><span class=p>,</span> <span class=nx>r</span><span class=p>.</span><span class=nf>GetMessage</span><span class=p>())</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<h2 id=実行してみる>実行してみる</h2>
-<p>まず、gRPC のサーバー側を起動します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>go run ./cmd/echo-server
-<span class=go>2022/05/17 22:00:47 Server listening at [::]:52000
-</span></code></pre></div><p>次に、gRPC のクライアント側を起動すると、サーバーと通信してメッセージを受信できていることを確認できます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>go run ./cmd/echo-client
-<span class=go>2022/05/17 22:01:32 Received from server: *AAAAA
-</span></code></pre></div><p>やったー！</p>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/37e6uck/>protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)</a></li>
-<li><a href=./p/xnogqgm/>Go 言語で AWS SDK を使う開発環境を整える</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/go>Go</a></span>
-<span class=xPageTags_item><a href=./tags/grpc>gRPC</a></span>
-<span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/88gow5c/><span class=xArticle_up_label>gRPC 関連メモ</span><br>へ戻る</a>
 </div>
 </article><h2>メニュー</h2>
 <div class=xTopMenu>
