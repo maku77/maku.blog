@@ -44,6 +44,10 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/k7eoer5/>AWS CDK で API Gateway の REST API を作成する
+<time>2022-06-13</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/q7q4ahp/>Apollo Server で GraphQL サーバーを作成する (Hello World)
 <time>2022-06-08</time></a>
 </div>
@@ -58,10 +62,6 @@
 <div class=xBoxLink>
 <a href=./p/ij4jv9k/>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）
 <time>2022-05-18</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/37e6uck/>protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)
-<time>2022-05-09</time></a>
 </div>
 </div>
 </div>
@@ -438,11 +438,11 @@
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/k7eoer5/>AWS CDK で API Gateway の REST API を作成する<span class=xRecents_item_tag>AWS</span><span class=xRecents_item_tag>AWS/API Gateway</span><span class=xRecents_item_tag>AWS/CDK</span><time>2022-06-13</time></a>
+</div><div class=xRecents_item>
 <a href=./p/q7q4ahp/>Apollo Server で GraphQL サーバーを作成する (Hello World)<span class=xRecents_item_tag>Apollo Server</span><time>2022-06-08</time></a>
 </div><div class=xRecents_item>
 <a href=./p/dtdtbr8/>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する<span class=xRecents_item_tag>Firebase/CloudFunctions</span><span class=xRecents_item_tag>Firebase/Firestore</span><time>2022-06-05</time></a>
-</div><div class=xRecents_item>
-<a href=./p/fvevcs8/>Firebase の Cloud Functions で Hello World<span class=xRecents_item_tag>Firebase/CloudFunctions</span><time>2022-06-04</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -450,6 +450,369 @@
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/7s7hs4e/>AWS</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/wqamv5d/>API Gateway</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/k7eoer5/>AWS CDK で API Gateway の REST API を作成する</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/aws>AWS</a></span>
+<span class=xPageTags_item><a href=./tags/aws/api-gateway>AWS/API Gateway</a></span>
+<span class=xPageTags_item><a href=./tags/aws/cdk>AWS/CDK</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-06-13>2022-06-13</time><br>
+作成: <time itemprop=datePublished datetime=2022-04-18>2022-04-18</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#概要>概要</a>
+<ul>
+<li><a href=#api-gateway-は-https-で-lambda-関数を呼び出す>API Gateway は HTTPS で Lambda 関数を呼び出す</a></li>
+<li><a href=#lambda-プロキシ統合>Lambda プロキシ統合</a></li>
+</ul>
+</li>
+<li><a href=#cdk-プロジェクトを作成する>CDK プロジェクトを作成する</a></li>
+<li><a href=#lambda-関数を実装する>Lambda 関数を実装する</a></li>
+<li><a href=#スタックを定義する>スタックを定義する</a></li>
+<li><a href=#デプロイ>デプロイ</a></li>
+<li><a href=#応用プロキシリソースで複数階層の-url-をまとめてハンドルする>（応用）プロキシリソースで複数階層の URL をまとめてハンドルする</a>
+<ul>
+<li><a href=#プロキシリソースとは>プロキシリソースとは</a></li>
+<li><a href=#cdk-でプロキシリソースを定義する>CDK でプロキシリソースを定義する</a></li>
+<li><a href=#プロキシリソース用のハンドラーlambda-関数を実装する>プロキシリソース用のハンドラー（Lambda 関数）を実装する</a></li>
+</ul>
+</li>
+</ul>
+</nav><h2 id=概要>概要</h2>
+<h3 id=api-gateway-は-https-で-lambda-関数を呼び出す>API Gateway は HTTPS で Lambda 関数を呼び出す</h3>
+<p>API Gateway で REST API のエンドポイントを定義すると、HTTPS リクエストで Lambda 関数を呼び出せるようになります。</p>
+<div style=text-align:center;font-weight:700>クライアント ─(HTTPS)─> API Gateway ─(AWS API)─> Lambda 関数</div>
+<p>API Gateway には Cognito のユーザープールと連携する機能を備えており、認証済みのユーザーにのみ API 呼び出しを許可するといったことが可能です（具体的に言うと、API Gateway が見えないところで ID トークンの正当性を確認してくれたりします）。</p>
+<div class=xNote>
+<span class=xNote_title>☝️ 新しい Lambda 関数 URL</span>
+<span class=xNote_body>2022 年 4 月に公開された <a href=https://aws.amazon.com/jp/about-aws/whats-new/2022/04/aws-lambda-function-urls-built-in-https-endpoints/>Lambda 関数 URL</a> の仕組みを使うと、直接 Lambda 関数にエンドポイント URL を割り当てて呼び出すことができます。
+Cognito 連携などを使わないシンプルな Web API であれば、Lambda 関数 URL の仕組みで作ってしまうのが手っ取り早いかもしれません。</span>
+</div>
+<h3 id=lambda-プロキシ統合>Lambda プロキシ統合</h3>
+<p>Lambda 関数は様々な AWS サービスからのイベント通知によって起動する仕組みになっており、API Gateway からの HTTPS リクエストもそのうちのひとつです。
+Lambda 関数のハンドラが呼び出されるとき、そのパラメーターとして「イベントオブジェクト」を受け取ることができるのですが、このイベントオブジェクトの中身は発生源によって異なります。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>exports</span><span class=p>.</span><span class=nx>handler</span> <span class=o>=</span> <span class=kr>async</span> <span class=kd>function</span><span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=p>{</span>
+  <span class=c1>// event の中身は呼び出し元によってバラバラ
+</span><span class=c1></span><span class=p>}</span>
+</code></pre></div><p>つまり、Lambda 関数は呼び出し側が想定しているリクエストとレスポンスの型を意識した実装をしなければいけません。
+とはいえ、REST API の呼び出し方は大体決まっており、Lambda 関数側が欲しい情報も、URL パスやクエリ文字列、HTTP メソッドなど決まっています。
+そこで、API Gateway はこういった REST API の実装に都合のよい情報をイベントオブジェクトに詰めてくれる「<strong>Lambda プロキシ統合</strong>」という仕組みを提供しています。
+Lambda プロキシ統合を有効にすると、ハンドラ関数に渡されたイベントオブジェクトから、クエリ文字列などを簡単に取り出すことができます。
+レスポンスも決まった型で返さないといけないことに注意してください（間違った形式で返すと、クライアントに 502 エラーが通知されます）。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Lambda プロキシ統合を有効にしたハンドラ関数のシグネチャ (TypeScript)</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>export</span> <span class=kr>const</span> <span class=nx>handler</span>: <span class=kt>APIGatewayProxyHandler</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=c1>// event.pathParameters でアクセス時の URL パス情報を参照可能
+</span><span class=c1></span>  <span class=c1>// event.queryStringParameters でクエリ文字列を参照可能
+</span><span class=c1></span>
+  <span class=k>return</span> <span class=p>{</span>
+    <span class=nx>statusCode</span>: <span class=kt>200</span><span class=p>,</span>
+    <span class=nx>body</span>: <span class=kt>JSON.stringify</span><span class=p>(</span><span class=nx>data</span><span class=p>),</span>
+    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
+      <span class=s2>&#34;Access-Control-Allow-Origin&#34;</span><span class=o>:</span> <span class=s2>&#34;*&#34;</span><span class=p>,</span>
+    <span class=p>},</span>
+    <span class=c1>// isBase64Encoded: true,  // body が Base64 エンコードされている場合
+</span><span class=c1></span>  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>以下の説明では、この Lambda プロキシ統合を有効にして API Gateway (REST API) の実装を行っています。</p>
+<h2 id=cdk-プロジェクトを作成する>CDK プロジェクトを作成する</h2>
+<p><a href=./p/nujyfsy>CDK プロジェクトの作成</a> は次のような感じで完了しているものとします。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mkdir myapi-sample
+<span class=gp>$ </span><span class=nb>cd</span> myapi-sample
+<span class=gp>$ </span>cdk init app --language typescript
+</code></pre></div><p>ここでは、Lambda 関数の実装にも TypeScript を使います。</p>
+<h2 id=lambda-関数を実装する>Lambda 関数を実装する</h2>
+<p>API Gateway (REST API) 経由で呼び出される Lambda 関数を実装します。
+最初に Lambda 関数用の TypeScript 型情報をインストールしておきます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>npm install --save-dev @types/aws-lambda  <span class=c1># npm の場合</span>
+<span class=gp>$ </span>yarn add --dev @types/aws-lambda          <span class=c1># yarn の場合</span>
+</code></pre></div><p>Lambda 関数の実装ファイル (<code>.ts</code>) は、プロジェクトルートに <code>lambda</code> ディレクトリを作ってそこに入れることにします。
+ここでは、REST API として書籍情報を返す <code>/books</code> と <code>/books/{id}</code> というエンドポイントを作成します。
+それぞれのハンドラとして <code>getBooksHandler</code> 関数と <code>getBookHandler</code> 関数を定義します。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>lambda/books.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>APIGatewayProxyHandler</span><span class=p>,</span> <span class=nx>APIGatewayProxyResult</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;aws-lambda&#34;</span>
+
+<span class=kr>const</span> <span class=nx>BOOKS</span> <span class=o>=</span> <span class=p>[</span>
+  <span class=p>{</span> <span class=nx>id</span><span class=o>:</span> <span class=s2>&#34;1&#34;</span><span class=p>,</span> <span class=nx>title</span><span class=o>:</span> <span class=s2>&#34;Title-1&#34;</span> <span class=p>},</span>
+  <span class=p>{</span> <span class=nx>id</span><span class=o>:</span> <span class=s2>&#34;2&#34;</span><span class=p>,</span> <span class=nx>title</span><span class=o>:</span> <span class=s2>&#34;Title-2&#34;</span> <span class=p>},</span>
+  <span class=p>{</span> <span class=nx>id</span><span class=o>:</span> <span class=s2>&#34;3&#34;</span><span class=p>,</span> <span class=nx>title</span><span class=o>:</span> <span class=s2>&#34;Title-3&#34;</span> <span class=p>},</span>
+<span class=p>]</span>
+
+<span class=cm>/** GET /books */</span>
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>getBooksHandler</span>: <span class=kt>APIGatewayProxyHandler</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span>
+    <span class=s2>&#34;pathParameters = &#34;</span> <span class=o>+</span> <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>(</span><span class=nx>event</span><span class=p>.</span><span class=nx>pathParameters</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=mi>2</span><span class=p>)</span>
+  <span class=p>)</span>
+  <span class=k>return</span> <span class=nx>createResponse</span><span class=p>(</span><span class=nx>BOOKS</span><span class=p>)</span>
+<span class=p>}</span>
+
+<span class=cm>/** GET /books/{id} */</span>
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>getBookHandler</span>: <span class=kt>APIGatewayProxyHandler</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span>
+    <span class=s2>&#34;pathParameters = &#34;</span> <span class=o>+</span> <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>(</span><span class=nx>event</span><span class=p>.</span><span class=nx>pathParameters</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=mi>2</span><span class=p>)</span>
+  <span class=p>)</span>
+  <span class=kr>const</span> <span class=nx>id</span> <span class=o>=</span> <span class=nx>event</span><span class=p>.</span><span class=nx>pathParameters</span><span class=o>?</span><span class=p>.[</span><span class=s2>&#34;id&#34;</span><span class=p>]</span>
+  <span class=k>return</span> <span class=nx>createResponse</span><span class=p>(</span><span class=nx>BOOKS</span><span class=p>.</span><span class=nx>find</span><span class=p>((</span><span class=nx>b</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>b</span><span class=p>.</span><span class=nx>id</span> <span class=o>===</span> <span class=nx>id</span><span class=p>))</span>
+<span class=p>}</span>
+
+<span class=cm>/** レスポンスデータを生成する */</span>
+<span class=kd>function</span> <span class=nx>createResponse</span><span class=p>(</span><span class=nx>body</span>: <span class=kt>any</span><span class=p>)</span><span class=o>:</span> <span class=nx>APIGatewayProxyResult</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=p>{</span>
+    <span class=nx>statusCode</span>: <span class=kt>200</span><span class=p>,</span>
+    <span class=nx>body</span>: <span class=kt>JSON.stringify</span><span class=p>(</span><span class=nx>body</span><span class=p>),</span>
+    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
+      <span class=s2>&#34;Access-Control-Allow-Origin&#34;</span><span class=o>:</span> <span class=s2>&#34;*&#34;</span><span class=p>,</span>
+    <span class=p>},</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>Lambda プロキシ統合を前提とする場合、Lambda 関数の型は、AWS SDK によってあらかじめ定義された型（<code>APIGatewayProxyHandler</code> や <code>APIGatewayProxyResult</code>）を使う必要があります。
+また、Web ブラウザ上の JavaScript からの CORS アクセスを許可するために、レスポンスオブジェクトの <code>headers</code> プロパティで、<strong><code>Access-Control-Allow-Origin</code></strong> を指定しています。</p>
+<ul>
+<li>参考: <a href=https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html>Enabling CORS for a REST API resource - Amazon API Gateway</a></li>
+</ul>
+<h2 id=スタックを定義する>スタックを定義する</h2>
+<p><code>cdk init app</code> による CDK プロジェクトの初期化時に、<code>lib/myapi-sample-stack.ts</code> といった感じの CloudFormation スタック定義用のコードが生成されているので、これを修正して、<strong>Lambda 関数と API Gateway の定義</strong> を行い、両者を Lambda プロキシ統合します。
+TypeScript で実装した Lambda 関数を CDK で扱う方法の詳細は下記を参考にしてください。</p>
+<ul>
+<li>参考: <a href=./p/cj9i4m3>AWS CDK で TypeScript で実装した Lambda 関数をデプロイする (NodejsFunction)</a></li>
+</ul>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>lib/myapi-sample-stack.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// CDK V2 系のインポート（追加インストールの必要なし）
+</span><span class=c1></span><span class=kr>import</span> <span class=p>{</span>
+  <span class=nx>Stack</span><span class=p>,</span>
+  <span class=nx>StackProps</span><span class=p>,</span>
+  <span class=nx>aws_apigateway</span> <span class=kr>as</span> <span class=nx>apigateway</span><span class=p>,</span>
+  <span class=nx>aws_lambda_nodejs</span> <span class=kr>as</span> <span class=nx>lambda</span><span class=p>,</span>
+<span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;aws-cdk-lib&#34;</span>
+<span class=kr>import</span> <span class=p>{</span> <span class=nx>Construct</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;constructs&#34;</span>
+
+<span class=kr>export</span> <span class=kr>class</span> <span class=nx>MyapiSampleStack</span> <span class=kr>extends</span> <span class=nx>Stack</span> <span class=p>{</span>
+  <span class=kr>constructor</span><span class=p>(</span><span class=nx>scope</span>: <span class=kt>Construct</span><span class=p>,</span> <span class=nx>id</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>props?</span>: <span class=kt>StackProps</span><span class=p>)</span> <span class=p>{</span>
+    <span class=kr>super</span><span class=p>(</span><span class=nx>scope</span><span class=p>,</span> <span class=nx>id</span><span class=p>,</span> <span class=nx>props</span><span class=p>)</span>
+
+    <span class=c1>// Lambda 関数（GET books/ 用）
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>getBooksHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>lambda</span><span class=p>.</span><span class=nx>NodejsFunction</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;getBooksHandler&#34;</span><span class=p>,</span> <span class=p>{</span>
+      <span class=nx>entry</span><span class=o>:</span> <span class=s2>&#34;lambda/books.ts&#34;</span><span class=p>,</span>
+      <span class=nx>handler</span><span class=o>:</span> <span class=s2>&#34;getBooksHandler&#34;</span><span class=p>,</span>
+    <span class=p>})</span>
+
+    <span class=c1>// Lambda 関数（GET books/{id} 用）
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>getBookHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>lambda</span><span class=p>.</span><span class=nx>NodejsFunction</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;getBookHandler&#34;</span><span class=p>,</span> <span class=p>{</span>
+      <span class=nx>entry</span><span class=o>:</span> <span class=s2>&#34;lambda/books.ts&#34;</span><span class=p>,</span>
+      <span class=nx>handler</span><span class=o>:</span> <span class=s2>&#34;getBookHandler&#34;</span><span class=p>,</span>
+    <span class=p>})</span>
+
+    <span class=c1>// API Gateway (REST API) の作成
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>api</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>RestApi</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;BookApi&#34;</span><span class=p>)</span>
+
+    <span class=c1>// リソースを定義して Lambda プロキシ統合 (GET books/)
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>books</span> <span class=o>=</span> <span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s2>&#34;books&#34;</span><span class=p>)</span>
+    <span class=nx>books</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s2>&#34;GET&#34;</span><span class=p>,</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>getBooksHandler</span><span class=p>))</span>
+
+    <span class=c1>// リソースを定義して Lambda プロキシ統合 (GET book/)
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>singleBook</span> <span class=o>=</span> <span class=nx>books</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s2>&#34;{id}&#34;</span><span class=p>)</span>
+    <span class=nx>singleBook</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s2>&#34;GET&#34;</span><span class=p>,</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>getBookHandler</span><span class=p>))</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>コードの末尾あたりの、<strong><code>apigateway.LambdaIntegration()</code></strong> の部分が、API Gateway の Lambda プロキシ統合を行っている部分になります。
+指定したリソース（URL パス）と HTTP メソッドを、特定のハンドラ関数に結びつけています。
+こうすることで、その URL (REST API) にアクセスしたときに、扱いやすいイベントオブジェクトをハンドラ関数に渡してくれるようになります。</p>
+<h2 id=デプロイ>デプロイ</h2>
+<p>Lambda 関数の実装とスタックの定義が完了したら、CDK でデプロイを行います。
+デプロイが完了すると、標準出力に API のエンドポイント (URL) を表示してくれます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>cdk deploy
+<span class=err>
+</span><span class=err></span><span class=go>...
+</span><span class=go></span><span class=err>
+</span><span class=err></span><span class=go>Outputs:
+</span><span class=go>MyapiSampleStack.BookApiEndpointCA1C03A3 =
+</span><span class=go>    https://a4chxhlkod.execute-api.ap-northeast-1.amazonaws.com/prod/
+</span></code></pre></div><p>上記 URL の末尾に <code>/books</code> を付けて Web ブラウザからアクセスすれば REST API を呼び出せます。
+次のような書籍一覧情報の JSON データが返ってくれば成功です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>/books のレスポンス</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>[{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;1&#34;</span><span class=p>,</span><span class=nt>&#34;title&#34;</span><span class=p>:</span><span class=s2>&#34;Title-1&#34;</span><span class=p>},{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;2&#34;</span><span class=p>,</span><span class=nt>&#34;title&#34;</span><span class=p>:</span><span class=s2>&#34;Title-2&#34;</span><span class=p>},{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;3&#34;</span><span class=p>,</span><span class=nt>&#34;title&#34;</span><span class=p>:</span><span class=s2>&#34;Title-3&#34;</span><span class=p>}]</span></code></pre></div></div>
+</figure>
+<p>単一の書籍情報を取得する場合は、<code>/books/1</code> のように、書籍 ID まで指定してアクセスします。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>/books/1 のレスポンス</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;1&#34;</span><span class=p>,</span><span class=nt>&#34;title&#34;</span><span class=p>:</span><span class=s2>&#34;Title-1&#34;</span><span class=p>}</span></code></pre></div></div>
+</figure>
+<h2 id=応用プロキシリソースで複数階層の-url-をまとめてハンドルする>（応用）プロキシリソースで複数階層の URL をまとめてハンドルする</h2>
+<h3 id=プロキシリソースとは>プロキシリソースとは</h3>
+<p>前述の例では、ひとつの書籍情報を返す REST API のパスとして<code>/books/{id}</code> を設定し、パスパラメーター <code>{id}</code> で書籍 ID を受け取るようにしていました。
+API Gateway の <strong>プロキシリソース</strong> の仕組みを利用すると、複数階層の URL（例: <code>/aaa/bbb/ccc</code>）を 1 つのパスパラメーター（<strong><code>{proxy+}</code></strong>）で受け取ることができます。
+<strong>プロキシリソースは、前述の Lambda プロキシ統合とは別物</strong> なので注意してください。
+Lambda プロキシ統合の方は、単に REST API 呼び出しを Lambda 関数の呼び出しに変換する機能です。</p>
+<p>プロキシリソースを使うと、1 つのハンドラー関数実装で様々な URL での API 呼び出しを処理することができます。
+例えば、<code>/aaa</code> 、<code>/aaa/bbb/ccc</code> 、<code>/foo/bar</code> といった URL でのアクセスを、1 つのハンドラー関数でまとめて処理できます。
+さらに、ハンドルする HTTP メソッドとして <strong><code>ANY</code></strong> を指定することで、複数の HTTP メソッド（<code>GET</code> や <code>POST</code> など）もまとめて 1 つの関数で処理できます。</p>
+<p>プロキシリソースの <code>{proxy+}</code> の部分のことを <strong>greedy パスパラメーター (greedy path parameter)</strong> とか、<strong>greedy パス変数</strong> と呼びます。
+greedy とは「貪欲な」とか「食いしん坊な」という意味で、いろんな URL を飲み込んじゃうことを示しています。
+個人的には「食いしん坊パス」と呼びたいところです。</p>
+<h3 id=cdk-でプロキシリソースを定義する>CDK でプロキシリソースを定義する</h3>
+<p>先に CloudFormation のスタックを作る CDK コードを見ていきます。
+ここでは、API Gateway の REST API を作成し、プロキシリソース (<code>/greedy/{proxy+}</code>) を追加し、そこにハンドラー関数 (<code>greedyHandler</code>) を Lambda プロキシ統合します（ハンドラーは後ほど実装）。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>lib/myapi-sample-stack.ts（抜粋）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// CDK V2 系のインポート
+</span><span class=c1></span><span class=kr>import</span> <span class=p>{</span>
+  <span class=nx>Stack</span><span class=p>,</span>
+  <span class=nx>StackProps</span><span class=p>,</span>
+  <span class=nx>aws_apigateway</span> <span class=kr>as</span> <span class=nx>apigateway</span><span class=p>,</span>
+  <span class=nx>aws_lambda_nodejs</span> <span class=kr>as</span> <span class=nx>lambda</span><span class=p>,</span>
+<span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;aws-cdk-lib&#34;</span>
+<span class=kr>import</span> <span class=p>{</span> <span class=nx>Construct</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;constructs&#34;</span>
+
+<span class=kr>export</span> <span class=kr>class</span> <span class=nx>MyapiSampleStack</span> <span class=kr>extends</span> <span class=nx>Stack</span> <span class=p>{</span>
+  <span class=kr>constructor</span><span class=p>(</span><span class=nx>scope</span>: <span class=kt>Construct</span><span class=p>,</span> <span class=nx>id</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>props?</span>: <span class=kt>StackProps</span><span class=p>)</span> <span class=p>{</span>
+    <span class=kr>super</span><span class=p>(</span><span class=nx>scope</span><span class=p>,</span> <span class=nx>id</span><span class=p>,</span> <span class=nx>props</span><span class=p>)</span>
+
+    <span class=c1>// API Gateway (REST API) を作成
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>api</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>RestApi</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;SampleApi&#34;</span><span class=p>)</span>
+
+    <span class=c1>// プロキシリソース (/greedy/{proxy+}) を扱うハンドラー関数を作成
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>greedyHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>lambda</span><span class=p>.</span><span class=nx>NodejsFunction</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s1>&#39;GreedyHandler&#39;</span><span class=p>,</span> <span class=p>{</span>
+      <span class=nx>entry</span><span class=o>:</span> <span class=s1>&#39;lambda/api.ts&#39;</span><span class=p>,</span>
+      <span class=nx>handler</span><span class=o>:</span> <span class=s1>&#39;greedyHandler&#39;</span><span class=p>,</span>
+    <span class=p>})</span>
+
+    <span class=c1>// `/greedy/{proxy+}` というプロキシリソースを Lambda プロキシ統合して追加
+</span><span class=c1></span>    <span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s1>&#39;greedy&#39;</span><span class=p>).</span><span class=nx>addProxy</span><span class=p>({</span>
+      <span class=nx>anyMethod</span>: <span class=kt>true</span><span class=p>,</span> <span class=c1>// すべての HTTP メソッド (ANY) をハンドル
+</span><span class=c1></span>      <span class=nx>defaultIntegration</span>: <span class=kt>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>greedyHandler</span><span class=p>),</span>
+    <span class=p>})</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>プロキシリソースを定義している部分は最後の <code>api.root.addResource('greedy').addProxy(...)</code> という部分ですが、greedy パス名としては <strong><code>{proxy+}</code></strong> が自動的に割り当てられるようです。</p>
+<p>ちなみに、API に Cognito ユーザープール認可などの Authorizer を設定するときは、OPTIONS メソッドに Authorizer が設定されないようにしなければいけません。
+上記コードの <code>addProxy</code> 部分に単純に Authorizer を設定してしまうと、OPTIONS メソッドにまで Authorizer が設定されてしまい、HTTP のプリフライトリクエスト（OPTIONS リクエスト）が弾かれてしまいます。
+簡単に言うと、API Gateway で定義した API が Web ブラウザ上の JavaScript から呼び出せなくなります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>ダメな Authorizer 設定方法</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s1>&#39;greedy&#39;</span><span class=p>).</span><span class=nx>addProxy</span><span class=p>({</span>
+  <span class=nx>anyMethod</span>: <span class=kt>true</span><span class=p>,</span> <span class=c1>// OPTIONS メソッドまで Authorizer が設定されてしまう
+</span><span class=c1></span>  <span class=nx>defaultIntegration</span>: <span class=kt>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>greedyHandler</span><span class=p>),</span>
+  <span class=nx>defaultMethodOptions</span><span class=o>:</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>},</span>
+<span class=p>})</span></code></pre></div></div>
+</figure>
+<p>なので、Authorizer は何とかして OPTIONS メソッド以外に設定してやる必要があります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>例えばこうすれば動く</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>greedyResource</span> <span class=o>=</span> <span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s1>&#39;greedy&#39;</span><span class=p>).</span><span class=nx>addProxy</span><span class=p>({</span>
+  <span class=nx>anyMethod</span>: <span class=kt>false</span><span class=p>,</span> <span class=c1>// ここでは HTTP メソッドを追加しない
+</span><span class=c1></span>  <span class=nx>defaultIntegration</span>: <span class=kt>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>greedyHandler</span><span class=p>),</span>
+<span class=p>})</span>
+
+<span class=c1>// OPTIONS 以外の各メソッドに個別に Authorizer を設定する
+</span><span class=c1></span><span class=nx>greedyResource</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;GET&#39;</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>})</span>
+<span class=nx>greedyResource</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;POST&#39;</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>})</span>
+<span class=nx>greedyResource</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;PUT&#39;</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>})</span>
+<span class=nx>greedyResource</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;DELETE&#39;</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>})</span></code></pre></div></div>
+</figure>
+<p>API Gateway に Cognito 認証をかける方法の詳細は <a href=./p/vujw9jv/>こちらを参照</a> してください。</p>
+<h3 id=プロキシリソース用のハンドラーlambda-関数を実装する>プロキシリソース用のハンドラー（Lambda 関数）を実装する</h3>
+<p>上記で定義したプロキシリソース URL (<code>/greedy/{proxy+}</code>) にアクセスしたときに呼び出される Lambda 関数（ハンドラー）を実装します。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>lambda/api.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>APIGatewayProxyHandler</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;aws-lambda&#39;</span>
+
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>greedyHandler</span>: <span class=kt>APIGatewayProxyHandler</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=c1>// レスポンス本文用の JSON テキストを作る
+</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>responseBody</span> <span class=o>=</span> <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>({</span>
+    <span class=nx>message</span><span class=o>:</span> <span class=s1>&#39;I am greedyHandler!&#39;</span><span class=p>,</span>
+    <span class=nx>httpMethod</span>: <span class=kt>event.httpMethod</span><span class=p>,</span>
+    <span class=nx>path</span>: <span class=kt>event.path</span><span class=p>,</span>
+    <span class=nx>pathParameters</span>: <span class=kt>event.pathParameters</span><span class=p>,</span>
+    <span class=nx>queryStringParameters</span>: <span class=kt>event.queryStringParameters</span><span class=p>,</span>
+  <span class=p>})</span>
+
+  <span class=c1>// APIGatewayProxyResult 型のレスポンスを返す
+</span><span class=c1></span>  <span class=k>return</span> <span class=p>{</span>
+    <span class=nx>statusCode</span>: <span class=kt>200</span><span class=p>,</span>
+    <span class=nx>body</span>: <span class=kt>responseBody</span><span class=p>,</span>
+    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
+      <span class=s1>&#39;Access-Control-Allow-Origin&#39;</span><span class=o>:</span> <span class=s1>&#39;*&#39;</span><span class=p>,</span>
+    <span class=p>},</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>実際にどのような URL で REST API が呼び出されたかは、ハンドラー関数に渡されるイベントオブジェクト (<a href=https://github.com/DefinitelyTyped/DefinitelyTyped/blob/48a5faec8eb951a173129e8dfe285a00ca0a426f/types/aws-lambda/trigger/api-gateway-proxy.d.ts#L109>APIGatewayProxyEvent</a>) を参照すると分かります。
+例えば、<code>/greedy/aaa/bbb/ccc/?foo=100&bar</code> という URL でアクセスした場合、イベントオブジェクトの値は次のようになります。</p>
+<table>
+<thead>
+<tr>
+<th>プロパティ</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>event.httpMethod</code></td>
+<td><code>GET</code></td>
+</tr>
+<tr>
+<td><code>event.path</code></td>
+<td><code>/greedy/aaa/bbb/ccc/</code></td>
+</tr>
+<tr>
+<td><strong><code>event.pathParameters</code></strong></td>
+<td><strong><code>{ proxy: "aaa/bbb/ccc" }</code></strong></td>
+</tr>
+<tr>
+<td><code>event.queryStringParameters</code></td>
+<td><code>{ bar: "", foo: "100" }</code></td>
+</tr>
+</tbody>
+</table>
+<p>つまり、<strong><code>event.pathParameters.proxy</code></strong> の値を見ることで、パスに応じた処理を行えるということですね。</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/vujw9jv/>AWS CDK で API Gateway に Cognito 認証によるアクセス制御を追加する</a></li>
+<li><a href=./p/38jt3cm/>AWS CDK で Go 言語で実装した Lambda 関数をデプロイする (GoFunction)</a></li>
+<li><a href=./p/4h3jygw/>AWS CDK メモ: CDK アプリのパッケージ管理に Yarn を使う方法</a></li>
+<li><a href=./p/q7q8p6m/>AWS CDK メモ: ブートストラップ処理を実行する (cdk bootstrap)</a></li>
+<li><a href=./p/54s6es8/>Go 言語で AWS CDK V2 を使う (1) 導入編</a></li>
+<li><a href=./p/qwb6v89/>Amazon API Gateway をコマンドライン (CLI) から操作する</a></li>
+<li><a href=./p/vx5ta85/>AWS CDK で外部パラメーターを扱う（コンテキスト・バリューと環境変数）</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/aws>AWS</a></span>
+<span class=xPageTags_item><a href=./tags/aws/api-gateway>AWS/API Gateway</a></span>
+<span class=xPageTags_item><a href=./tags/aws/cdk>AWS/CDK</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/wqamv5d/><span class=xArticle_up_label>Amazon API Gateway のメモ</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -788,153 +1151,6 @@ CDN のキャッシュデータだけを参照するので、直接 Firestore �
 <div class=xPageTags>
 <span class=xPageTags_item><a href=./tags/firebase/cloudfunctions>Firebase/CloudFunctions</a></span>
 <span class=xPageTags_item><a href=./tags/firebase/firestore>Firebase/Firestore</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/6p3dox9/><span class=xArticle_up_label>Firebase 関連メモ</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/6p3dox9/>Firebase</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/fvevcs8/>Firebase の Cloud Functions で Hello World</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/firebase/cloudfunctions>Firebase/CloudFunctions</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-06-04>2022-06-04</time><br>
-作成: <time itemprop=datePublished datetime=2022-06-04>2022-06-04</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#何をするか>何をするか？</a></li>
-<li><a href=#事前準備>事前準備</a></li>
-<li><a href=#firebase-プロジェクト用のディレクトリを作成する-firebase-init>Firebase プロジェクト用のディレクトリを作成する (firebase init)</a></li>
-<li><a href=#エミュレーターで-functions-の動作を確認してみる>エミュレーターで Functions の動作を確認してみる</a></li>
-<li><a href=#firebase-にデプロイしてみる>Firebase にデプロイしてみる</a></li>
-<li><a href=#デプロイした関数を削除する>デプロイした関数を削除する</a></li>
-</ul>
-</nav><h2 id=何をするか>何をするか？</h2>
-<p>Cloud Functions に関数をデプロイすると、Google Cloud Platform 上でサーバーレス関数として実行できるようになります（Amazon の AWS Lambda や、Microsoft の Azure Functions に相当するものです）。
-この関数は、次のように、様々なイベントをトリガーにして呼び出されます。</p>
-<ul>
-<li>HTTP でのアクセス</li>
-<li>スケジュールされたタイミング</li>
-<li>Firestore データベースの更新時</li>
-</ul>
-<p>ここでは、HTTP によるアクセス時に <code>Hello from Firebase!</code> というレスポンスを返すだけの関数を Cloud Functions に追加してみます。
-また、Firebase にデプロイする前に、エミュレーターでのローカルテストを行います。</p>
-<div class=xNote>
-<span class=xNote_title>☝️ Firebase なのか GCP なのか</span>
-<span class=xNote_body>Cloud Functions は Firebase プロジェクトからも使用できますが、実体は GCP で提供されているサービスです。
-このようなサービスは他にもあり、Firebase のサービスのうち、頭に Cloud と付いてるものは実際には GCP が提供しています（例:「Cloud Firestore」「Cloud Functions」「Cloud Storage」）。</span>
-</div>
-<h2 id=事前準備>事前準備</h2>
-<p>最初に Firebase プロジェクトを作成し、Firebase CLI をインストールしておきます。
-既存の Firebase プロジェクトに Cloud Functions を追加する場合は、プロジェクトの作成は必要ありません。</p>
-<ol>
-<li><a href=https://firebase.google.com/>Firebase</a> のアカウントを作成します</li>
-<li><a href=https://console.firebase.google.com/>Firebase コンソール</a> から新規プロジェクトを作成します
-<ul>
-<li><code>firebase</code> コマンドでもプロジェクトを作成できますが、上記サイトから作成してしまった方が楽です（名前の重複チェックなどをしてくれます）</li>
-</ul>
-</li>
-<li><a href=./p/pamw7hr/>Firebase CLI をインストール</a> して、<code>firebase</code> コマンドを実行できるようにします</li>
-</ol>
-<p>Firebase CLI をインストールしたら、次のように Firebase アカウントでサインインしておきます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>firebase login
-</code></pre></div><h2 id=firebase-プロジェクト用のディレクトリを作成する-firebase-init>Firebase プロジェクト用のディレクトリを作成する (firebase init)</h2>
-<p>任意のディレクトリ内で <strong><code>firebase init</code></strong> コマンドを実行すると、<strong><code>firebase.json</code></strong> ファイル（および <strong><code>.firebaserc</code></strong>）が作成されて、Firebase プロジェクト用のディレクトリと認識されるようになります。
-すでに GitHub などで管理しているプロジェクトディレクトリに対しても実行することができます。</p>
-<p>例えば、次のようにして、<strong>Cloud Functions for Firebase のテンプレートコード</strong> を作成することができます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>Functions のテンプレートを生成する</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mkdir myapp （このディレクトリを Git 管理する想定）
-<span class=gp>$ </span><span class=nb>cd</span> myapp
-<span class=gp>$ </span>firebase init functions
-</code></pre></div></div>
-</figure>
-<p><code>firebase init</code> を実行すると、対話形式で「どのプロジェクトを対象とするか？」「JavaScript と TypeScript のどちらを使用するか？」などを聞かれるので、順番に答えていくと、次のようなファイルおよびディレクトリが生成されます（選択によって微妙に変わってきます）。</p>
-<pre tabindex=0><code>myapp/
- +-- .firebaserc （デプロイ対象とするプロジェクトの情報）
- +-- .gitignore （Git 管理外にするファイルの情報）
- +-- firebase.json （Firebase へのデプロイ情報など）
- +-- functions/
-      +-- .eslintrc.js （ESLint の設定）
-      +-- package.json （Functions 用のプロジェクト設定）
-      +-- src/ （Functions のテンプレートコード）
-      +-- tsconfig.json （TypeScript を選択した場合はその設定ファイル）
-</code></pre><h2 id=エミュレーターで-functions-の動作を確認してみる>エミュレーターで Functions の動作を確認してみる</h2>
-<p>簡単な Hello World 関数を実装して、エミュレーターで動作確認してみます。
-<code>functions</code> ディレクトリを Visual Studio Code などで開いて、<code>src/index.ts</code> ファイルを次のように修正してください。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>functions/src/index.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>functions</span> <span class=kr>from</span> <span class=s2>&#34;firebase-functions&#34;</span><span class=p>;</span>
-
-<span class=kr>export</span> <span class=kr>const</span> <span class=nx>helloWorld</span> <span class=o>=</span> <span class=nx>functions</span>
-  <span class=p>.</span><span class=nx>region</span><span class=p>(</span><span class=s2>&#34;asia-northeast1&#34;</span><span class=p>)</span>
-  <span class=p>.</span><span class=nx>https</span><span class=p>.</span><span class=nx>onRequest</span><span class=p>((</span><span class=nx>request</span><span class=p>,</span> <span class=nx>response</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-    <span class=nx>functions</span><span class=p>.</span><span class=nx>logger</span><span class=p>.</span><span class=nx>info</span><span class=p>(</span><span class=s2>&#34;Hello logs!&#34;</span><span class=p>,</span> <span class=p>{</span> <span class=nx>structuredData</span>: <span class=kt>true</span> <span class=p>});</span>
-    <span class=nx>response</span><span class=p>.</span><span class=nx>send</span><span class=p>(</span><span class=s2>&#34;Hello from Firebase!&#34;</span><span class=p>);</span>
-  <span class=p>});</span></code></pre></div></div>
-</figure>
-<p>リージョンの指定方法は若干わかりにくいので要注意です。
-上記では <code>asia-northeast1</code> を指定していますが、省略すると <code>us-central1</code> にデプロイされます。
-上記のように <code>helloWorld</code> という名前のオブジェクトを export することで、Cloud Functions に <code>helloWorld</code> 関数を登録することになります。</p>
-<p>Firebase にデプロイする前にエミュレーターで動作確認をしておきます。
-次のようにして、エミュレーターを起動してください。
-関数コードのビルドも自動的に行われます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span><span class=nb>cd</span> functions
-<span class=gp>$ </span>npm run serve
-<span class=go>...
-</span><span class=go>✔  functions[asia-northeast1-helloWorld]: http function initialized
-</span><span class=go>   (http://localhost:5001/myapp1-12345/asia-northeast1/helloWorld).
-</span><span class=go>...
-</span></code></pre></div><p>無事エミュレーターが起動すると、上記のような感じで、関数を呼び出すための URL が表示されるので、Web ブラウザで開くか <code>curl</code> コマンドでアクセスします。
-次のように <code>Hello</code> レスポンスが返って来れば成功です。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>curl http://localhost:5001/myapp1-12345/us-central1/helloWorld
-<span class=go>Hello from Firebase!
-</span></code></pre></div><h2 id=firebase-にデプロイしてみる>Firebase にデプロイしてみる</h2>
-<p>エミュレーターでの動作確認が済んだら、Firebase にデプロイしてみます。
-<strong><code>firebase deploy</code></strong> コマンドを実行すると、<code>firebase.json</code> の情報に基づいてデプロイが実行されます（<code>--only functions</code> オプションで、Functions のみをデプロイ対象とすることもできます）。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>firebase deploy
-<span class=err>
-</span><span class=err></span><span class=go>=== Deploying to &#39;myapp1-12345&#39;...
-</span><span class=go>:
-</span><span class=go>i  functions: creating Node.js 16 function helloWorld(us-central1)...
-</span><span class=go>✔  functions[helloWorld(us-central1)] Successful create operation.
-</span><span class=go>Function URL (helloWorld(us-central1)):
-</span><span class=go>   https://us-central1-myapp1-12345.cloudfunctions.net/helloWorld
-</span><span class=go>:
-</span><span class=go>✔  Deploy complete!
-</span></code></pre></div><p>デプロイが成功すると、上記のようにアクセス用の URL が表示されるので、Web ブラウザや <code>curl</code> コマンドで動作確認することができます。
-ちなみに、URL は次のような構成になっています。</p>
-<pre tabindex=0><code>https://&lt;LocationID&gt;-&lt;ProjectID&gt;.cloudfunctions.net/&lt;FunctionName&gt;
-</code></pre><h2 id=デプロイした関数を削除する>デプロイした関数を削除する</h2>
-<p>Cloud Functions にデプロイした関数が必要なくなったら、次のようにして削除します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>firebase functions:delete helloWorld
-</code></pre></div>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/vgs4dox/>Firebase の Cloud Functions で定期的に Firestore の集計処理を行う</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/firebase/cloudfunctions>Firebase/CloudFunctions</a></span>
 </div>
 </div>
 <div style=text-align:right>
