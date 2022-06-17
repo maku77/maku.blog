@@ -59,10 +59,21 @@ VS Code のユーザー設定ファイル (`settings.json`) は、OS ごとに�
 settings.json を素早く開く
 ----
 
-VS Code の設定画面 (`Ctrl/Cmd + P`) の右上の {{< image-inline w="32" src="img-open-json-icon.png" >}} アイコンをクリックすると、`settings.json` ファイルを簡単に開くことができます。
-設定画面のタブで「ユーザー設定」と「ワークスペース設定」を切り替えられるようになっているので、開きたい `settings.json` ファイルのタブを選択してからアイコンをクリックしてください。
+### コマンドパレットから開く
+
+{{< image border="true" w="600" src="img-002.png" >}}
+
+コマンドパレット (`Ctrl/Cmd + Shift + P`) から、__`Open Settings (JSON)`__ という項目を選択することで、`settings.json` ファイルを直接開くことができます。
+コマンドパレットに `settings json` と入力すると、この項目を素早く見つけられます。
+`Open Settings (JSON)` が「ユーザー設定ファイル」で、`Open Workspace Settings (JSON)` が「ワークスペース設定ファイル」です。
+もう一つの、`Open Default Settings (JSON)` はデフォルトの設定値一覧が記述されたファイルであり、ユーザーが変更するものではありません（後述）。
+
+### GUI の設定画面から開く
 
 {{< image border="true" w="600" src="img-001.png" >}}
+
+VS Code の GUI 版の設定画面 (`Ctrl/Cmd + ,`) の右上の {{< image-inline w="32" src="img-open-json-icon.png" >}} アイコンをクリックすることでも、`settings.json` ファイルを開くことができます。
+設定画面のタブで「ユーザー設定」と「ワークスペース設定」を切り替えられるようになっているので、開きたい設定のタブを選択してからアイコンをクリックしてください。
 
 
 デフォルトの設定 (defaultSettings.json)
