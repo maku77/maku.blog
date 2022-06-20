@@ -3,6 +3,7 @@ title: "GitHub GraphQL クエリ例: 組織の情報を取得する (organizatio
 linkTitle: "組織の情報を取得する (organization)"
 url: "/p/3o2doyb"
 date: "2020-09-14"
+lastmod: "2022-06-20"
 tags: ["GitHub", "GraphQL"]
 ---
 
@@ -25,6 +26,7 @@ query {
     url
     membersWithRole(first: 3) {
       nodes {
+        login
         name
         email
         updatedAt
@@ -44,19 +46,22 @@ query {
       "membersWithRole": {
         "nodes": [
           {
-            "name": "Josh Nichols",
-            "email": "technicalpickles@github.com",
-            "updatedAt": "2020-09-09T11:22:35Z"
-          },
-          {
+            "login": "mtodd",
             "name": "Matt Todd",
-            "email": "matt@github.com",
-            "updatedAt": "2020-09-02T21:54:56Z"
+            "email": "xxx@example.com",
+            "updatedAt": "2022-05-28T16:13:01Z"
           },
           {
-            "name": "Pat Nakajima",
-            "email": "patnakajima@gmail.com",
-            "updatedAt": "2020-09-04T21:45:37Z"
+            "login": "jonmagic",
+            "name": "Jonathan Hoyt",
+            "email": "xxx@example.com",
+            "updatedAt": "2022-06-07T18:27:30Z"
+          },
+          {
+            "login": "mislav",
+            "name": "Mislav Marohnić",
+            "email": "xxx@example.com",
+            "updatedAt": "2022-04-07T18:34:52Z"
           }
         ]
       }
