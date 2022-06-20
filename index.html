@@ -44,6 +44,14 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/9bku4cj/>GitHub GraphQL API のクエリ例: ユーザー情報を取得する (viewer, user)
+<time>2022-06-20</time></a>
+</div>
+<div class=xBoxLink>
+<a href=./p/3o2doyb/>GitHub GraphQL クエリ例: 組織の情報を取得する (organization)
+<time>2022-06-20</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/k7eoer5/>AWS CDK で API Gateway の REST API を作成する
 <time>2022-06-13</time></a>
 </div>
@@ -54,14 +62,6 @@
 <div class=xBoxLink>
 <a href=./p/dtdtbr8/>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する
 <time>2022-06-05</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/fvevcs8/>Firebase の Cloud Functions で Hello World
-<time>2022-06-04</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/ij4jv9k/>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）
-<time>2022-05-18</time></a>
 </div>
 </div>
 </div>
@@ -438,11 +438,11 @@
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/9bku4cj/>GitHub GraphQL API のクエリ例: ユーザー情報を取得する (viewer, user)<span class=xRecents_item_tag>GitHub</span><span class=xRecents_item_tag>GraphQL</span><time>2022-06-20</time></a>
+</div><div class=xRecents_item>
+<a href=./p/3o2doyb/>GitHub GraphQL クエリ例: 組織の情報を取得する (organization)<span class=xRecents_item_tag>GitHub</span><span class=xRecents_item_tag>GraphQL</span><time>2022-06-20</time></a>
+</div><div class=xRecents_item>
 <a href=./p/k7eoer5/>AWS CDK で API Gateway の REST API を作成する<span class=xRecents_item_tag>AWS</span><span class=xRecents_item_tag>AWS/API Gateway</span><span class=xRecents_item_tag>AWS/CDK</span><time>2022-06-13</time></a>
-</div><div class=xRecents_item>
-<a href=./p/q7q4ahp/>Apollo Server で GraphQL サーバーを作成する (Hello World)<span class=xRecents_item_tag>Apollo Server</span><time>2022-06-08</time></a>
-</div><div class=xRecents_item>
-<a href=./p/dtdtbr8/>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する<span class=xRecents_item_tag>Firebase/CloudFunctions</span><span class=xRecents_item_tag>Firebase/Firestore</span><time>2022-06-05</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -450,6 +450,409 @@
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/5q4fr3d/>GitHub</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/ubkahpw/>GitHub GraphQL API のクエリ例</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/9bku4cj/>GitHub GraphQL API のクエリ例: ユーザー情報を取得する (viewer, user)</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/github>GitHub</a></span>
+<span class=xPageTags_item><a href=./tags/graphql>GraphQL</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-06-20>2022-06-20</time><br>
+作成: <time itemprop=datePublished datetime=2020-07-31>2020-07-31</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#サインイン済みのユーザー情報を取得する-viewer>サインイン済みのユーザー情報を取得する (viewer)</a></li>
+<li><a href=#指定したログイン-id-のユーザー情報を取得する-user>指定したログイン ID のユーザー情報を取得する (user)</a></li>
+<li><a href=#ユーザーのコミット統計情報を取得する貢献度情報>ユーザーのコミット統計情報を取得する（貢献度情報）</a></li>
+<li><a href=#ある組織に所属するユーザー情報を取得する-organizationmemberswithrole>ある組織に所属するユーザー情報を取得する (Organization.membersWithRole)</a></li>
+</ul>
+</nav><h2 id=サインイン済みのユーザー情報を取得する-viewer>サインイン済みのユーザー情報を取得する (viewer)</h2>
+<p><code>viewer</code> クエリを使用すると、現在アクセスしているユーザー（サインイン中のユーザー）のユーザー情報（<a href=https://docs.github.com/en/graphql/reference/objects#user>User オブジェクト</a>）を取得することができます。</p>
+<ul>
+<li><a href=https://docs.github.com/en/graphql/reference/queries#user>Queries - viewer</a></li>
+</ul>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>GraphQL クエリ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=nc>viewer</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>    </span><span class=py>login</span><span class=w>  </span><span class=c># ログインID</span><span class=w>
+</span><span class=w>    </span><span class=py>name</span><span class=w>   </span><span class=c># ユーザー名</span><span class=w>
+</span><span class=w>    </span><span class=py>email</span><span class=w>  </span><span class=c># メールアドレス（ユーザーが公開していれば）</span><span class=w>
+</span><span class=w>    </span><span class=py>url</span><span class=w>    </span><span class=c># ユーザーの GitHub ホームページ</span><span class=w>
+</span><span class=w>    </span><span class=py>websiteUrl</span><span class=w>  </span><span class=c># ユーザーの Web サイト</span><span class=w>
+</span><span class=w>    </span><span class=py>avatarUrl</span><span class=w>   </span><span class=c># ユーザーのアバター画像</span><span class=w>
+</span><span class=w>  </span><span class=p>}</span><span class=w>
+</span><span class=w></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
+  <span class=nt>&#34;data&#34;</span><span class=p>:</span> <span class=p>{</span>
+    <span class=nt>&#34;viewer&#34;</span><span class=p>:</span> <span class=p>{</span>
+      <span class=nt>&#34;login&#34;</span><span class=p>:</span> <span class=s2>&#34;maku77&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Maku Maku&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;email&#34;</span><span class=p>:</span> <span class=s2>&#34;maku@example.com&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://github.com/maku77&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;websiteUrl&#34;</span><span class=p>:</span> <span class=s2>&#34;https://maku77.github.io/&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;avatarUrl&#34;</span><span class=p>:</span> <span class=s2>&#34;https://avatars2.githubusercontent.com/u/5519503?v=4&#34;</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<h2 id=指定したログイン-id-のユーザー情報を取得する-user>指定したログイン ID のユーザー情報を取得する (user)</h2>
+<p><code>user</code> クエリを使用すると、指定したユーザー名のユーザー情報を取得することができます。</p>
+<ul>
+<li><a href=https://docs.github.com/en/graphql/reference/queries#user>Queries - user</a></li>
+</ul>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>GraphQL クエリ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=nc>user</span><span class=p>(</span><span class=py>login</span><span class=p>:</span><span class=s>&#34;maku77&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>    </span><span class=nc>login</span><span class=w>  </span><span class=c># ログインID</span><span class=w>
+</span><span class=w>    </span><span class=py>name</span><span class=w>   </span><span class=c># ユーザー名</span><span class=w>
+</span><span class=w>    </span><span class=py>email</span><span class=w>  </span><span class=c># メールアドレス（ユーザーが公開していれば）</span><span class=w>
+</span><span class=w>    </span><span class=py>url</span><span class=w>    </span><span class=c># ユーザーの GitHub ホームページ</span><span class=w>
+</span><span class=w>    </span><span class=py>websiteUrl</span><span class=w>  </span><span class=c># ユーザーの Web サイト</span><span class=w>
+</span><span class=w>    </span><span class=py>avatarUrl</span><span class=w>   </span><span class=c># ユーザーのアバター画像</span><span class=w>
+</span><span class=w>  </span><span class=p>}</span><span class=w>
+</span><span class=w></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<p>取得できるオブジェクトは、<code>viewer</code> クエリの場合と同様に <a href=https://docs.github.com/en/graphql/reference/objects#user>User オブジェクト</a> です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
+  <span class=nt>&#34;data&#34;</span><span class=p>:</span> <span class=p>{</span>
+    <span class=nt>&#34;user&#34;</span><span class=p>:</span> <span class=p>{</span>
+      <span class=nt>&#34;login&#34;</span><span class=p>:</span> <span class=s2>&#34;maku77&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Maku Maku&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;email&#34;</span><span class=p>:</span> <span class=s2>&#34;maku@examle.com&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://github.com/maku77&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;websiteUrl&#34;</span><span class=p>:</span> <span class=s2>&#34;https://maku77.github.io/&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;avatarUrl&#34;</span><span class=p>:</span> <span class=s2>&#34;https://avatars2.githubusercontent.com/u/5519503?v=4&#34;</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>ただし、指定したユーザー名が存在しない場合は <code>data.user</code> フィールドの値は <strong><code>null</code></strong> になり、<code>errors</code> フィールドの値が格納されます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>GraphQL クエリ（存在しないユーザーを指定する）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=nc>user</span><span class=p>(</span><span class=py>login</span><span class=p>:</span><span class=s>&#34;no-such-user&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>    </span><span class=nc>login</span><span class=w>
+</span><span class=w>  </span><span class=p>}</span><span class=w>
+</span><span class=w></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
+  <span class=nt>&#34;data&#34;</span><span class=p>:</span> <span class=p>{</span>
+    <span class=nt>&#34;user&#34;</span><span class=p>:</span> <span class=kc>null</span>
+  <span class=p>},</span>
+  <span class=nt>&#34;errors&#34;</span><span class=p>:</span> <span class=p>[</span>
+    <span class=p>{</span>
+      <span class=nt>&#34;type&#34;</span><span class=p>:</span> <span class=s2>&#34;NOT_FOUND&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;path&#34;</span><span class=p>:</span> <span class=p>[</span>
+        <span class=s2>&#34;user&#34;</span>
+      <span class=p>],</span>
+      <span class=nt>&#34;locations&#34;</span><span class=p>:</span> <span class=p>[</span>
+        <span class=p>{</span>
+          <span class=nt>&#34;line&#34;</span><span class=p>:</span> <span class=mi>7</span><span class=p>,</span>
+          <span class=nt>&#34;column&#34;</span><span class=p>:</span> <span class=mi>3</span>
+        <span class=p>}</span>
+      <span class=p>],</span>
+      <span class=nt>&#34;message&#34;</span><span class=p>:</span> <span class=s2>&#34;Could not resolve to a User with the login of &#39;no-such-user&#39;.&#34;</span>
+    <span class=p>}</span>
+  <span class=p>]</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<h2 id=ユーザーのコミット統計情報を取得する貢献度情報>ユーザーのコミット統計情報を取得する（貢献度情報）</h2>
+<p><a href=https://docs.github.com/en/graphql/reference/objects#user>User オブジェクト</a> の <strong><code>contributionsCollection</code></strong> フィールドを参照すると、そのユーザーの一定期間内の <strong>コミット数、PR 作成数、PR レビュー数</strong> などの情報を取得することができます。
+<code>from</code> 引数と <code>to</code> 引数で統計情報の取得期間を指定します（最長 1 年間）。
+日時を省略した場合は、直近の 1 年間の統計情報を取得します。</p>
+<p>次の例では、あるユーザーの 2021 年の Contribution 情報を取得しています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>GraphQL クエリ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=nc>user</span><span class=p>(</span><span class=py>login</span><span class=p>:</span><span class=s>&#34;maku77&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>    </span><span class=nc>login</span><span class=w>  </span><span class=c># ログインID</span><span class=w>
+</span><span class=w>    </span><span class=py>name</span><span class=w>   </span><span class=c># ユーザー名</span><span class=w>
+</span><span class=w>
+</span><span class=w>    </span><span class=py>contributionsCollection</span><span class=p>(</span><span class=py>from</span><span class=p>:</span><span class=w> </span><span class=s>&#34;2021-01-01T00:00:00Z&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>      </span><span class=nc>startedAt</span><span class=w>  </span><span class=c># 統計情報の開始日時</span><span class=w>
+</span><span class=w>      </span><span class=py>endedAt</span><span class=w>    </span><span class=c># 統計情報の終了日時</span><span class=w>
+</span><span class=w>      </span><span class=py>totalCommitContributions</span><span class=w>  </span><span class=c># 合計コミット数</span><span class=w>
+</span><span class=w>      </span><span class=py>totalPullRequestContributions</span><span class=w>  </span><span class=c># 合計 PR 作成数</span><span class=w>
+</span><span class=w>      </span><span class=py>totalPullRequestReviewContributions</span><span class=w>  </span><span class=c># 合計 PR レビュー数</span><span class=w>
+</span><span class=w>
+</span><span class=w>      </span><span class=py>commitContributionsByRepository</span><span class=w> </span><span class=p>{</span><span class=w>  </span><span class=c># リポジトリごとの情報</span><span class=w>
+</span><span class=w>        </span><span class=py>repository</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>          </span><span class=py>nameWithOwner</span><span class=w>  </span><span class=c># Organization/リポジトリ名</span><span class=w>
+</span><span class=w>        </span><span class=p>}</span><span class=w>
+</span><span class=w>        </span><span class=py>contributions</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>          </span><span class=py>totalCount</span><span class=w>  </span><span class=c># このリポジトリへのコミット数</span><span class=w>
+</span><span class=w>        </span><span class=p>}</span><span class=w>
+</span><span class=w>      </span><span class=p>}</span><span class=w>
+</span><span class=w>    </span><span class=p>}</span><span class=w>
+</span><span class=w>  </span><span class=p>}</span><span class=w>
+</span><span class=w></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
+  <span class=nt>&#34;data&#34;</span><span class=p>:</span> <span class=p>{</span>
+    <span class=nt>&#34;user&#34;</span><span class=p>:</span> <span class=p>{</span>
+      <span class=nt>&#34;login&#34;</span><span class=p>:</span> <span class=s2>&#34;maku77&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Maku Maku&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;contributionsCollection&#34;</span><span class=p>:</span> <span class=p>{</span>
+        <span class=nt>&#34;startedAt&#34;</span><span class=p>:</span> <span class=s2>&#34;2021-01-01T00:00:00Z&#34;</span><span class=p>,</span>
+        <span class=nt>&#34;endedAt&#34;</span><span class=p>:</span> <span class=s2>&#34;2022-01-01T00:00:00Z&#34;</span><span class=p>,</span>
+        <span class=nt>&#34;totalCommitContributions&#34;</span><span class=p>:</span> <span class=mi>2000</span><span class=p>,</span>
+        <span class=nt>&#34;totalPullRequestContributions&#34;</span><span class=p>:</span> <span class=mi>400</span><span class=p>,</span>
+        <span class=nt>&#34;totalPullRequestReviewContributions&#34;</span><span class=p>:</span> <span class=mi>150</span><span class=p>,</span>
+        <span class=nt>&#34;commitContributionsByRepository&#34;</span><span class=p>:</span> <span class=p>[</span>
+          <span class=p>{</span>
+            <span class=nt>&#34;repository&#34;</span><span class=p>:</span> <span class=p>{</span>
+              <span class=nt>&#34;nameWithOwner&#34;</span><span class=p>:</span> <span class=s2>&#34;maku77/repo1&#34;</span>
+            <span class=p>},</span>
+            <span class=nt>&#34;contributions&#34;</span><span class=p>:</span> <span class=p>{</span>
+              <span class=nt>&#34;totalCount&#34;</span><span class=p>:</span> <span class=mi>1200</span>
+            <span class=p>}</span>
+          <span class=p>},</span>
+          <span class=p>{</span>
+            <span class=nt>&#34;repository&#34;</span><span class=p>:</span> <span class=p>{</span>
+              <span class=nt>&#34;nameWithOwner&#34;</span><span class=p>:</span> <span class=s2>&#34;maku77/repo2&#34;</span>
+            <span class=p>},</span>
+            <span class=nt>&#34;contributions&#34;</span><span class=p>:</span> <span class=p>{</span>
+              <span class=nt>&#34;totalCount&#34;</span><span class=p>:</span> <span class=mi>800</span>
+            <span class=p>}</span>
+          <span class=p>}</span>
+        <span class=p>]</span>
+      <span class=p>}</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<h2 id=ある組織に所属するユーザー情報を取得する-organizationmemberswithrole>ある組織に所属するユーザー情報を取得する (Organization.membersWithRole)</h2>
+<p>ルートフィールドで <code>organization</code> を指定すれば、特定の組織に所属するユーザーの一覧を取得できます。</p>
+<ul>
+<li>参考: <a href=./p/3o2doyb/#org-members>組織 (org) 内のユーザーの一覧を取得</a></li>
+</ul>
+<p>そこには <code>User</code> オブジェクトの情報が含まれているので、例えば次のようにすれば、組織のメンバー全員 (<code>membersWithRole</code>) の過去 1 年間の貢献情報をまとめて取得することができます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=nc>organization</span><span class=p>(</span><span class=py>login</span><span class=p>:</span><span class=w> </span><span class=s>&#34;Organization名&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>    </span><span class=nc>name</span><span class=w>
+</span><span class=w>    </span><span class=py>membersWithRole</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>100</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>      </span><span class=py>nodes</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>        </span><span class=py>login</span><span class=w>  </span><span class=c># ログインID</span><span class=w>
+</span><span class=w>        </span><span class=py>name</span><span class=w>   </span><span class=c># ユーザー名</span><span class=w>
+</span><span class=w>        </span><span class=py>email</span><span class=w>  </span><span class=c># メールアドレス（ユーザーが公開していれば）</span><span class=w>
+</span><span class=w>        </span><span class=py>contributionsCollection</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>          </span><span class=py>startedAt</span><span class=w>  </span><span class=c># 統計情報の開始日時</span><span class=w>
+</span><span class=w>          </span><span class=py>endedAt</span><span class=w>    </span><span class=c># 統計情報の終了日時</span><span class=w>
+</span><span class=w>          </span><span class=py>totalCommitContributions</span><span class=w>  </span><span class=c># 合計コミット数</span><span class=w>
+</span><span class=w>          </span><span class=py>totalPullRequestContributions</span><span class=w>  </span><span class=c># 合計 PR 数</span><span class=w>
+</span><span class=w>          </span><span class=py>totalPullRequestReviewContributions</span><span class=w>  </span><span class=c># 合計レビュー数</span><span class=w>
+</span><span class=w>        </span><span class=p>}</span><span class=w>
+</span><span class=w>      </span><span class=p>}</span><span class=w>
+</span><span class=w>    </span><span class=p>}</span><span class=w>
+</span><span class=w>  </span><span class=p>}</span><span class=w>
+</span><span class=w></span><span class=p>}</span><span class=w>
+</span></code></pre></div><p>ただし、GitHub GraphQL API の制約上、ユーザー情報は一度に 100 ユーザー分しかとれないので、それ以上のメンバーがいる組織の場合は、<a href=https://graphql.org/learn/pagination/>GraphQL のページネーション処理</a> で繰り返しクエリを実行する必要があります。</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/qcp2cnx/>Apollo Client で GitHub GraphQL API を使う (Node & React)</a></li>
+<li><a href=./p/7r6gr3d/>Node.js で GitHub REST API を使用する (@octokit/rest)</a></li>
+<li><a href=./p/xwfwdy6/>GitHub Pages は早く Jekyll から Hugo に乗り換えるべき</a></li>
+<li><a href=./p/6ez7nuf/>Jekyll (GitHub Pages) でページの最終更新日を表示する</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/github>GitHub</a></span>
+<span class=xPageTags_item><a href=./tags/graphql>GraphQL</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/ubkahpw/><span class=xArticle_up_label>GitHub GraphQL API のクエリ例</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/5q4fr3d/>GitHub</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/ubkahpw/>GitHub GraphQL API のクエリ例</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/3o2doyb/>GitHub GraphQL クエリ例: 組織の情報を取得する (organization)</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/github>GitHub</a></span>
+<span class=xPageTags_item><a href=./tags/graphql>GraphQL</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-06-20>2022-06-20</time><br>
+作成: <time itemprop=datePublished datetime=2020-09-14>2020-09-14</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#org-members>ある組織に所属するユーザー情報を取得する (Organization.membersWithRole)</a></li>
+<li><a href=#ある組織のリポジトリの一覧を取得する-organizationrepositories>ある組織のリポジトリの一覧を取得する (Organization.repositories)</a></li>
+</ul>
+</nav><p>GitHub GraphQL API で指定した組織の情報を（ここでは <code>github</code> organization）の情報を取得には、<a href=https://docs.github.com/en/graphql/reference/queries#organization>organization クエリ</a> を使用します。
+<code>organization</code> クエリには、<code>login</code> パラメーターで組織名を渡します。</p>
+<p><code>organization</code> クエリが返す <a href=https://docs.github.com/en/graphql/reference/objects#organization>Organization オブジェクト</a> を参照すると、そこに所属する <strong>メンバーの一覧</strong>、<strong>チームの一覧</strong>、<strong>リポジトリの一覧</strong> などを取得することができます。</p>
+<h2 id=org-members>ある組織に所属するユーザー情報を取得する (Organization.membersWithRole)</h2>
+<p><code>Organization</code> オブジェクトの <code>membersWithRole</code> フィールドは <a href=https://docs.github.com/en/graphql/reference/objects#organizationmemberconnection>OrganizationMemberConnection</a> オブジェクトを保持しており、この <code>nodes</code> を参照することで、組織に所属するメンバーの一覧を取得できます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>GraphQL クエリ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=nc>organization</span><span class=p>(</span><span class=py>login</span><span class=p>:</span><span class=w> </span><span class=s>&#34;github&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>    </span><span class=nc>name</span><span class=w>
+</span><span class=w>    </span><span class=py>description</span><span class=w>
+</span><span class=w>    </span><span class=py>url</span><span class=w>
+</span><span class=w>    </span><span class=py>membersWithRole</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>3</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>      </span><span class=py>nodes</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>        </span><span class=py>login</span><span class=w>
+</span><span class=w>        </span><span class=py>name</span><span class=w>
+</span><span class=w>        </span><span class=py>email</span><span class=w>
+</span><span class=w>        </span><span class=py>updatedAt</span><span class=w>
+</span><span class=w>      </span><span class=p>}</span><span class=w>
+</span><span class=w>    </span><span class=p>}</span><span class=w>
+</span><span class=w>  </span><span class=p>}</span><span class=w>
+</span><span class=w></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
+  <span class=nt>&#34;data&#34;</span><span class=p>:</span> <span class=p>{</span>
+    <span class=nt>&#34;organization&#34;</span><span class=p>:</span> <span class=p>{</span>
+      <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;GitHub&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;description&#34;</span><span class=p>:</span> <span class=s2>&#34;How people build software.&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://github.com/github&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;membersWithRole&#34;</span><span class=p>:</span> <span class=p>{</span>
+        <span class=nt>&#34;nodes&#34;</span><span class=p>:</span> <span class=p>[</span>
+          <span class=p>{</span>
+            <span class=nt>&#34;login&#34;</span><span class=p>:</span> <span class=s2>&#34;mtodd&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Matt Todd&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;email&#34;</span><span class=p>:</span> <span class=s2>&#34;xxx@example.com&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;updatedAt&#34;</span><span class=p>:</span> <span class=s2>&#34;2022-05-28T16:13:01Z&#34;</span>
+          <span class=p>},</span>
+          <span class=p>{</span>
+            <span class=nt>&#34;login&#34;</span><span class=p>:</span> <span class=s2>&#34;jonmagic&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Jonathan Hoyt&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;email&#34;</span><span class=p>:</span> <span class=s2>&#34;xxx@example.com&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;updatedAt&#34;</span><span class=p>:</span> <span class=s2>&#34;2022-06-07T18:27:30Z&#34;</span>
+          <span class=p>},</span>
+          <span class=p>{</span>
+            <span class=nt>&#34;login&#34;</span><span class=p>:</span> <span class=s2>&#34;mislav&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Mislav Marohnić&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;email&#34;</span><span class=p>:</span> <span class=s2>&#34;xxx@example.com&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;updatedAt&#34;</span><span class=p>:</span> <span class=s2>&#34;2022-04-07T18:34:52Z&#34;</span>
+          <span class=p>}</span>
+        <span class=p>]</span>
+      <span class=p>}</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<h2 id=ある組織のリポジトリの一覧を取得する-organizationrepositories>ある組織のリポジトリの一覧を取得する (Organization.repositories)</h2>
+<p><code>Organization</code> オブジェクトの <code>repositories</code> フィールドを参照することで、その組織に作成されたリポジトリの一覧を取得することができます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>GraphQL クエリ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=nc>organization</span><span class=p>(</span><span class=py>login</span><span class=p>:</span><span class=w> </span><span class=s>&#34;github&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>    </span><span class=nc>name</span><span class=w>
+</span><span class=w>    </span><span class=py>description</span><span class=w>
+</span><span class=w>    </span><span class=py>url</span><span class=w>
+</span><span class=w>    </span><span class=py>repositories</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>3</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>      </span><span class=py>nodes</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>        </span><span class=py>name</span><span class=w>
+</span><span class=w>        </span><span class=py>url</span><span class=w>
+</span><span class=w>      </span><span class=p>}</span><span class=w>
+</span><span class=w>    </span><span class=p>}</span><span class=w>
+</span><span class=w>  </span><span class=p>}</span><span class=w>
+</span><span class=w></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
+  <span class=nt>&#34;data&#34;</span><span class=p>:</span> <span class=p>{</span>
+    <span class=nt>&#34;organization&#34;</span><span class=p>:</span> <span class=p>{</span>
+      <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;GitHub&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;description&#34;</span><span class=p>:</span> <span class=s2>&#34;How people build software.&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://github.com/github&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;repositories&#34;</span><span class=p>:</span> <span class=p>{</span>
+        <span class=nt>&#34;nodes&#34;</span><span class=p>:</span> <span class=p>[</span>
+          <span class=p>{</span>
+            <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;media&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://github.com/github/media&#34;</span>
+          <span class=p>},</span>
+          <span class=p>{</span>
+            <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;albino&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://github.com/github/albino&#34;</span>
+          <span class=p>},</span>
+          <span class=p>{</span>
+            <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;hubahuba&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://github.com/github/hubahuba&#34;</span>
+          <span class=p>}</span>
+        <span class=p>]</span>
+      <span class=p>}</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>取得される各リポジトリの情報は、<a href=https://docs.github.com/en/graphql/reference/objects#repository>Repository オブジェクト</a> として表現されています。</p>
+<p>ここでは、組織内のリポジトリのリストを取得する方法を示しましたが、組織名（ユーザー名）とリポジトリ名があらかじめ分かっている場合は、<code>repository</code> クエリを使って、直接そのリポジトリの情報を取得することができます。</p>
+<ul>
+<li>参考: <a href=./p/du6env5>リポジトリの情報を取得する (repository)</a></li>
+</ul>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/i5ht5ep/>GitHub GraphQL クエリ例: イシュー情報を取得する (search)</a></li>
+<li><a href=./p/du6env5/>GitHub GraphQL クエリ例: リポジトリの情報を取得する (repository)</a></li>
+<li><a href=./p/sk3rykz/>GitHub の GraphQL API Explorer の使い方</a></li>
+<li><a href=./p/h5s6ht5/>Node.js で GitHub GraphQL API を使用する (@octokit/graphql)</a></li>
+<li><a href=./p/whv8it5/>GitHub GraphQL のスキーマ情報を取得する</a></li>
+<li><a href=./p/bqz7emt/>GitHub GraphQL API の呼び出し回数制限 (rate limit) の情報を取得する</a></li>
+<li><a href=./p/qcp2cnx/>Apollo Client で GitHub GraphQL API を使う (Node & React)</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/github>GitHub</a></span>
+<span class=xPageTags_item><a href=./tags/graphql>GraphQL</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/ubkahpw/><span class=xArticle_up_label>GitHub GraphQL API のクエリ例</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -811,356 +1214,6 @@ greedy とは「貪欲な」とか「食いしん坊な」という意味で、�
 </div>
 <div class=xArticle_up>
 <a href=./p/wqamv5d/><span class=xArticle_up_label>Amazon API Gateway のメモ</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/cm9nyco/>GraphQL</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/aseqzau/>Apollo Server</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=./p/cm9nyco/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/q7q4ahp/>Apollo Server で GraphQL サーバーを作成する (Hello World)</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/apollo-server>Apollo Server</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-06-08>2022-06-08</time><br>
-作成: <time itemprop=datePublished datetime=2022-06-08>2022-06-08</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#何をするか>何をするか？</a></li>
-<li><a href=#typescript-用プロジェクトの準備>TypeScript 用プロジェクトの準備</a></li>
-<li><a href=#apollo-server-と-graphql-のインストール>apollo-server と graphql のインストール</a></li>
-<li><a href=#graphql-サーバーを実装する>GraphQL サーバーを実装する</a></li>
-<li><a href=#graphql-クエリを実行してみる>GraphQL クエリを実行してみる</a></li>
-</ul>
-</nav><h2 id=何をするか>何をするか？</h2>
-<p><a href=https://www.npmjs.com/package/apollo-server>apollo-server</a> NPM パッケージは、Node.js で GraphQL サーバーを実装するためのライブラリです。
-Apollo Graph 社が OSS として公開しており、2022 年時点で最も使用されている JavaScript 用の GraphQL ライブラリです。</p>
-<p>ここでは、簡単な GraphQL スキーマとリゾルバーを定義して、GraphQL サーバーを立ち上げてみます。
-<code>apollo-server</code> は標準で TypeScript の型情報に対応しているため、ここでは TypeScript を使って実装しますが、JavaScript でもほぼ同様に実装できます。</p>
-<h2 id=typescript-用プロジェクトの準備>TypeScript 用プロジェクトの準備</h2>
-<p>TypeScript の実行環境自体は、下記の記事などを参考にしてセットアップします。</p>
-<ul>
-<li>参考: <a href=./p/ak7u3h3/>TypeScriptの環境: Visual Studio Code で TypeScript の開発環境を構築する</a></li>
-</ul>
-<p>でもここでは、<code>.ts</code> ファイルをそのまま実行できる <a href=https://typestrong.org/ts-node/>ts-node</a> を使って楽をしちゃいます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>プロジェクトの作成</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mkdir myserver <span class=o>&amp;&amp;</span> <span class=nb>cd</span> myserver
-<span class=gp>$ </span>npm init -y
-<span class=gp>$ </span>npm install --save-dev typescript ts-node
-</code></pre></div></div>
-</figure>
-<p><code>package.json</code> を少し修正して、<code>npm run dev</code> で <code>main.ts</code> を起動できるようにしておきます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>package.json</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=c1>// ...
-</span><span class=c1></span><span class=s2>&#34;scripts&#34;</span><span class=o>:</span> <span class=p>{</span>
-  <span class=s2>&#34;dev&#34;</span><span class=o>:</span> <span class=s2>&#34;ts-node main&#34;</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>これで準備完了です。</p>
-<h2 id=apollo-server-と-graphql-のインストール>apollo-server と graphql のインストール</h2>
-<p>GraphQL サーバーインスタンスを立ち上げるための <a href=https://www.npmjs.com/package/apollo-server>apollo-server</a> パッケージと、GraphQL スキーマを扱うための <a href=https://www.npmjs.com/package/graphql>graphql</a> パッケージをインストールします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>npm install --save-dev apollo-server graphql
-</code></pre></div><h2 id=graphql-サーバーを実装する>GraphQL サーバーを実装する</h2>
-<p>Apollo Server ライブラリを使って GraphQL サーバーを実装していきます。
-ここでは、<code>Query</code> のルートフィールドとして <code>hello</code> フィールドを定義して、そのリゾルバー関数で <code>world</code> を返すように実装します。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>main.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>ApolloServer</span><span class=p>,</span> <span class=nx>gql</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;apollo-server&#39;</span>
-
-<span class=c1>// GraphQL スキーマの定義
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>typeDefs</span> <span class=o>=</span> <span class=nx>gql</span><span class=sb>`
-</span><span class=sb>  type Query {
-</span><span class=sb>    hello: String!
-</span><span class=sb>  }
-</span><span class=sb>`</span>
-
-<span class=c1>// リゾルバーの定義
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>resolvers</span> <span class=o>=</span> <span class=p>{</span>
-  <span class=nx>Query</span><span class=o>:</span> <span class=p>{</span>
-    <span class=nx>hello</span><span class=o>:</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=s1>&#39;world&#39;</span><span class=p>,</span>
-  <span class=p>},</span>
-<span class=p>}</span>
-
-<span class=c1>// GraphQL サーバーを起動する
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>server</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>ApolloServer</span><span class=p>({</span> <span class=nx>typeDefs</span><span class=p>,</span> <span class=nx>resolvers</span> <span class=p>})</span>
-<span class=nx>server</span><span class=p>.</span><span class=nx>listen</span><span class=p>().</span><span class=nx>then</span><span class=p>(({</span> <span class=nx>url</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=sb>`🚀 Server ready at </span><span class=si>${</span><span class=nx>url</span><span class=si>}</span><span class=sb>`</span><span class=p>)</span>
-<span class=p>})</span></code></pre></div></div>
-</figure>
-<p>Hello World なのでとてもシンプル！
-次のように実行すれば GraphQL サーバーが立ち上がります。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>npm -s run dev
-<span class=go>🚀 Server ready at http://localhost:4000/
-</span></code></pre></div><p>デフォルトで 4000 番ポートで起動しますが、<code>server.listen({ port: 5000 })</code> のように変更できます。</p>
-<h2 id=graphql-クエリを実行してみる>GraphQL クエリを実行してみる</h2>
-<p>立ち上げた GraphQL サーバーに対してクエリ実行してみます。
-どんな GraphQL クライアントを使ってもよいのですが、<a href="https://studio.apollographql.com/sandbox?endpoint=http%3A%2F%2Flocalhost%3A4000%2F">Apollo Studio Explorer</a> というサイトから、簡単に <code>localhost:4000</code> に対して GraphQL クエリを投げられます。</p>
-<figure class=xImage>
-<a href=./p/q7q4ahp/img-001.png target=_blank>
-<img style="border:solid #ccc 2px" width=1277 height=402 src=./p/q7q4ahp/img-001.png alt=/p/q7q4ahp/img-001.png>
-</a>
-<figcaption>図: Apollo Studio Explorer からのクエリ実行</figcaption>
-</figure>
-<p><code>hello</code> フィールドを参照すると、正しく <code>world</code> という値が返ってきていることを確認できます。</p>
-<p><code>curl</code> コマンドで直接 GraphQL API を呼び出して確認することもできます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>curl --request POST <span class=se>\
-</span><span class=se></span><span class=go>       --header &#39;content-type: application/json&#39; \
-</span><span class=go>       --url http://localhost:4000/ \
-</span><span class=go>       --data &#39;{&#34;query&#34;:&#34;query { hello }&#34;}&#39;
-</span><span class=go></span><span class=err>
-</span><span class=err></span><span class=go>{&#34;data&#34;:{&#34;hello&#34;:&#34;world&#34;}}
-</span></code></pre></div>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/apollo-server>Apollo Server</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/aseqzau/><span class=xArticle_up_label>Apollo Server 関連記事</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/6p3dox9/>Firebase</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/dtdtbr8/>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/firebase/cloudfunctions>Firebase/CloudFunctions</a></span>
-<span class=xPageTags_item><a href=./tags/firebase/firestore>Firebase/Firestore</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-06-05>2022-06-05</time><br>
-作成: <time itemprop=datePublished datetime=2022-06-05>2022-06-05</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#何をするか>何をするか？</a></li>
-<li><a href=#cloud-functions-でデータバンドルを作成する>Cloud Functions でデータバンドルを作成する</a></li>
-<li><a href=#cdn-firebase-hosting-でデータバンドルをキャッシュする>CDN (Firebase Hosting) でデータバンドルをキャッシュする</a></li>
-<li><a href=#クライアントアプリからデータバンドルを取得する>クライアントアプリからデータバンドルを取得する</a></li>
-</ul>
-</nav><h2 id=何をするか>何をするか？</h2>
-<p>Firestore はクライアントアプリから直接アクセスできることが利点ですが、多数のクライアントから複数のドキュメントを読み込んでいると、あっという間に無料枠を超えて高額な請求が発生してしまいます。</p>
-<figure class=xImage>
-<a href=./p/dtdtbr8/img-001.drawio.svg target=_blank>
-<img width height=auto src=./p/dtdtbr8/img-001.drawio.svg alt=/p/dtdtbr8/img-001.drawio.svg>
-</a>
-<figcaption>図: 同じデータなのに何度もドキュメントの Read が発生する</figcaption>
-</figure>
-<p><a href="https://firebase.google.com/support/release-notes/js?hl=ja#version_820_-_december_11_2020">Firebase 8.2.0</a> でリリースされた <a href=https://firebase.google.com/docs/firestore/bundles>Cloud Firestore Data Bundles</a> という仕組みを使用すると、Firestore から取得したデータ（クエリ結果）をバンドルというデータにまとめておいて、それを使いまわすことができます。
-データバンドルを CDN でキャッシュ、あるいはクライアントサイドでキャッシュすることにより、Firestore へのアクセスを発生させずに、あたかも Firestore からデータフェッチしたかのように動作させることが可能です。
-ユーザー数の多いアプリに導入すれば、大きなコスト削減につながります。</p>
-<p>データバンドルは Cloud Functions を使って作成してしまうのが簡単です。
-下記のような構成にすれば、クライアントアプリは Firestore にアクセスする代わりにデータバンドルを取得して動作するようになります。</p>
-<figure class=xImage>
-<a href=./p/dtdtbr8/img-002.drawio.svg target=_blank>
-<img width height=auto src=./p/dtdtbr8/img-002.drawio.svg alt=/p/dtdtbr8/img-002.drawio.svg>
-</a>
-<figcaption>図: Cloud Functions でバンドルを生成する</figcaption>
-</figure>
-<p>しかし、これだけでは複数のクライアントから Cloud Functions へのアクセスが発生してしまうので、結局はその都度 Firestore へのアクセスが発生してしまいます。
-各クライアントアプリではキャッシュが有効ですが、そのキャッシュでさえ、<code>Ctrl(Cmd) + R</code> によるスーパーリロードで無視されてしまいます。
-そこで、次のようにさらに CDN (Firebase Hosting) を挟んでデータバンドルをキャッシュすることで、各クライアントからのアクセスで Cloud Functions が起動されてしまうのを防ぎます。</p>
-<figure class=xImage>
-<a href=./p/dtdtbr8/img-003.drawio.svg target=_blank>
-<img width height=auto src=./p/dtdtbr8/img-003.drawio.svg alt=/p/dtdtbr8/img-003.drawio.svg>
-</a>
-<figcaption>図: CDN でバンドルをキャッシュする</figcaption>
-</figure>
-<p>この構成になっていれば、クライアントがいくら強制リロードしようが、CDN (Firebase Hosting) にキャッシュされたデータバンドルのみが参照されるようになります。
-Firestore へのアクセスが発生するのは、CDN 上のキャッシュが無効になったときのみです。
-クライアント側のキャッシュ時間や、CDN のキャッシュ時間は、Cloud Functions の関数が返すレスポンスヘッダ (<code>Cache-Control</code>) で制御できます。</p>
-<h2 id=cloud-functions-でデータバンドルを作成する>Cloud Functions でデータバンドルを作成する</h2>
-<p>下記のコードでは、Cloud Functions に登録する <code>createBundle</code> 関数を定義しています。
-処理の流れは次のようになっています。</p>
-<ol>
-<li>Firestore のコレクションからドキュメントを取得（ここでは最新の 50 件の books データ）</li>
-<li>データバンドルを作成し、上記 books データを名前付きクエリ結果として格納</li>
-<li>関数のレスポンスとしてデータバンドルを返す</li>
-</ol>
-<p>Firestore には既に <code>books</code> コレクションが登録されているものとします。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>functions/index.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>admin</span> <span class=kr>from</span> <span class=s1>&#39;firebase-admin&#39;</span>
-<span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>functions</span> <span class=kr>from</span> <span class=s1>&#39;firebase-functions&#39;</span>
-
-<span class=kr>const</span> <span class=nx>COLLECTION_NAME</span> <span class=o>=</span> <span class=s1>&#39;books&#39;</span> <span class=c1>// Firestore のコレクション名
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>QUERY_NAME</span> <span class=o>=</span> <span class=s1>&#39;latest-books-query&#39;</span> <span class=c1>// バンドルに作成する名前付きクエリの名前
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>MAX_AGE</span> <span class=o>=</span> <span class=mi>300</span> <span class=c1>// ブラウザにキャッシュさせる秒数
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>S_MAXAGE</span> <span class=o>=</span> <span class=mi>600</span> <span class=c1>// CDN にキャッシュさせる秒数
-</span><span class=c1></span>
-<span class=nx>admin</span><span class=p>.</span><span class=nx>initializeApp</span><span class=p>({</span> <span class=nx>projectId</span><span class=o>:</span> <span class=s1>&#39;myapp-12345&#39;</span> <span class=p>})</span>
-<span class=kr>const</span> <span class=nx>db</span> <span class=o>=</span> <span class=nx>admin</span><span class=p>.</span><span class=nx>firestore</span><span class=p>()</span>
-
-<span class=cm>/** Cloud Functions に登録する関数 */</span>
-<span class=kr>export</span> <span class=kr>const</span> <span class=nx>createBundle</span> <span class=o>=</span> <span class=nx>functions</span>
-  <span class=p>.</span><span class=nx>region</span><span class=p>(</span><span class=s1>&#39;us-central1&#39;</span><span class=p>)</span> <span class=c1>// asia-northeast1 にしたいけど Firebase Hosting が対応してない
-</span><span class=c1></span>  <span class=p>.</span><span class=nx>https</span><span class=p>.</span><span class=nx>onRequest</span><span class=p>(</span><span class=kr>async</span> <span class=p>(</span><span class=nx>req</span><span class=p>,</span> <span class=nx>res</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-    <span class=c1>// Firestore からデータを取得する（これは頻繁には呼ばれないようにしたい）
-</span><span class=c1></span>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=sb>`Fetch from Firestore [collection=</span><span class=si>${</span><span class=nx>COLLECTION_NAME</span><span class=si>}</span><span class=sb>]...`</span><span class=p>)</span>
-    <span class=kr>const</span> <span class=nx>books</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>db</span>
-      <span class=p>.</span><span class=nx>collection</span><span class=p>(</span><span class=nx>COLLECTION_NAME</span><span class=p>)</span>
-      <span class=p>.</span><span class=nx>orderBy</span><span class=p>(</span><span class=s1>&#39;date&#39;</span><span class=p>,</span> <span class=s1>&#39;desc&#39;</span><span class=p>)</span> <span class=c1>// 新しい順
-</span><span class=c1></span>      <span class=p>.</span><span class=nx>limit</span><span class=p>(</span><span class=mi>50</span><span class=p>)</span>
-      <span class=p>.</span><span class=kr>get</span><span class=p>()</span>
-
-    <span class=c1>// 取得したデータからデータバンドルと名前付きクエリを作成する
-</span><span class=c1></span>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=sb>`Create a named query [queryName=</span><span class=si>${</span><span class=nx>QUERY_NAME</span><span class=si>}</span><span class=sb>]`</span><span class=p>)</span>
-    <span class=kr>const</span> <span class=nx>builder</span> <span class=o>=</span> <span class=nx>db</span><span class=p>.</span><span class=nx>bundle</span><span class=p>()</span> <span class=c1>// バンドル ID は省略可能
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>bundleBuffer</span> <span class=o>=</span> <span class=nx>builder</span><span class=p>.</span><span class=nx>add</span><span class=p>(</span><span class=nx>QUERY_NAME</span><span class=p>,</span> <span class=nx>books</span><span class=p>).</span><span class=nx>build</span><span class=p>()</span>
-
-    <span class=c1>// 何度もこの関数が呼ばれないようにブラウザと CDN にキャッシュ時間を指示する
-</span><span class=c1></span>    <span class=nx>res</span><span class=p>.</span><span class=kr>set</span><span class=p>(</span><span class=s1>&#39;Cache-Control&#39;</span><span class=p>,</span> <span class=sb>`public, max-age=</span><span class=si>${</span><span class=nx>MAX_AGE</span><span class=si>}</span><span class=sb>, s-maxage=</span><span class=si>${</span><span class=nx>S_MAXAGE</span><span class=si>}</span><span class=sb>`</span><span class=p>)</span>
-
-    <span class=c1>// テストで Client JS から直接呼び出す場合は CORS 対応しておく
-</span><span class=c1></span>    <span class=nx>res</span><span class=p>.</span><span class=kr>set</span><span class=p>(</span><span class=s1>&#39;Access-Control-Allow-Origin&#39;</span><span class=p>,</span> <span class=s1>&#39;*&#39;</span><span class=p>)</span>
-    <span class=nx>res</span><span class=p>.</span><span class=kr>set</span><span class=p>(</span><span class=s1>&#39;Access-Control-Allow-Methods&#39;</span><span class=p>,</span> <span class=s1>&#39;GET, HEAD, OPTIONS, POST&#39;</span><span class=p>)</span>
-    <span class=nx>res</span><span class=p>.</span><span class=kr>set</span><span class=p>(</span><span class=s1>&#39;Access-Control-Allow-Headers&#39;</span><span class=p>,</span> <span class=s1>&#39;Content-Type, Authorization&#39;</span><span class=p>)</span>
-
-    <span class=c1>// データバンドルを返す
-</span><span class=c1></span>    <span class=nx>res</span><span class=p>.</span><span class=nx>end</span><span class=p>(</span><span class=nx>bundleBuffer</span><span class=p>)</span>
-  <span class=p>})</span></code></pre></div></div>
-</figure>
-<p>ポイントは、CDN とクライアントアプリにデータバンドルをキャッシュさせるために <strong><code>Cache-Control</code></strong> レスポンスヘッダを付加するところでしょうか（参考: <a href=https://firebase.google.com/docs/hosting/manage-cache>Manage cache behavior | Firebase</a>）。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>response</span><span class=p>.</span><span class=kr>set</span><span class=p>(</span><span class=s1>&#39;Cache-Control&#39;</span><span class=p>,</span> <span class=s1>&#39;public, max-age=300, s-maxage=600&#39;</span><span class=p>)</span>
-</code></pre></div><p><code>Cache-Control</code> の各値は次のような意味を持っています。</p>
-<ul>
-<li><strong><code>public</code></strong> &mldr; CDN (Firebase Hosting) でもデータバンドルをキャッシュさせます。これを指定しなかった場合のデフォルト値は <code>private</code> で、クライアントアプリ（ブラウザ）のみがデータバンドルをキャッシュ可能になります。</li>
-<li><strong><code>max-age=300</code></strong> &mldr; キャッシュ有効時間（秒）を指示します。クライアントアプリ、および CDN がこの指示に従います。</li>
-<li><strong><code>s-maxage=600</code></strong> &mldr; CDN のキャッシュの有効時間（秒）を別途指示します。これを省略した場合は、CDN のキャッシュ有効時間にも <code>max-age</code> が使用されます。</li>
-</ul>
-<p>つまり、クライアントアプリでデータバンドルを 300 秒間キャッシュに保持、CDN で 600 秒間キャッシュに保持することになります。</p>
-<div class=xNote>
-<span class=xNote_title>☝️ なぜ us-central1 を使う？</span>
-<span class=xNote_body><p><a href="https://firebase.google.com/docs/hosting/full-config?hl=ja">ホスティング動作を構成する | Firebase Documentation</a> のドキュメントで、CDN (Firebase Hosting) をプロキシさせて Cloud Functions を呼び出す場合は、<code>us-central1</code> のみサポートされているとの記載があります（2022-06 現在）。</p>
-<blockquote>
-<p>重要: Firebase Hosting は、us-central1 でのみ Cloud Functions をサポートします。</p>
-</blockquote>
-<p>たしかに、<code>asia-northeast1</code> に Cloud Functions 関数をデプロイしてしまうと、CDN との連携がうまくいかない（問答無用で <code>us-central1</code> の Cloud Functions に転送されてしまう）ので、今はあきらめて <code>us-central1</code> にデプロイしておくしかなさそうです。
-Google さん、対応してね！</p>
-</span>
-</div>
-<h2 id=cdn-firebase-hosting-でデータバンドルをキャッシュする>CDN (Firebase Hosting) でデータバンドルをキャッシュする</h2>
-<p>Firestore のデータバンドルをキャッシュするための CDN (Firebase Hosting) は簡単に作成することができます。
-<a href=./p/fvevcs8/>firebase init functions コマンドなどで Firebase プロジェクトを作成</a> している場合、プロジェクトのルートディレクトリに <strong><code>firebase.json</code></strong> ファイルが生成されているはずです。
-このファイルに次のように追記することで、Cloud Functions へのプロキシとなる CDN を配置できます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>firebase.json</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
-  <span class=s2>&#34;hosting&#34;</span><span class=o>:</span> <span class=p>{</span>
-    <span class=s2>&#34;rewrites&#34;</span><span class=o>:</span> <span class=p>[{</span> <span class=s2>&#34;source&#34;</span><span class=o>:</span> <span class=s2>&#34;/createBundle&#34;</span><span class=p>,</span> <span class=s2>&#34;function&#34;</span><span class=o>:</span> <span class=s2>&#34;createBundle&#34;</span> <span class=p>}],</span>
-    <span class=s2>&#34;headers&#34;</span><span class=o>:</span> <span class=p>[</span>
-      <span class=p>{</span>
-        <span class=s2>&#34;source&#34;</span><span class=o>:</span> <span class=s2>&#34;*&#34;</span><span class=p>,</span>
-        <span class=s2>&#34;headers&#34;</span><span class=o>:</span> <span class=p>[{</span> <span class=s2>&#34;key&#34;</span><span class=o>:</span> <span class=s2>&#34;Access-Control-Allow-Origin&#34;</span><span class=p>,</span> <span class=s2>&#34;value&#34;</span><span class=o>:</span> <span class=s2>&#34;*&#34;</span> <span class=p>}]</span>
-      <span class=p>}</span>
-    <span class=p>]</span>
-  <span class=p>},</span>
-  <span class=c1>// ...
-</span><span class=c1></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>設定内容はシンプルで、<code>/createBundle</code> という URL へのアクセスを、Cloud Functions の <code>createBundle</code> 関数の呼び出しに接続しています。
-さらに、別ドメインに配置した Web アプリから CDN へのアクセスを許可するために、CORS 用のレスポンスヘッダ定義を追加しておく必要があります。</p>
-<ul>
-<li>参考: <a href=https://firebase.google.com/docs/hosting/full-config>Configure hosting behavior | Firebase</a>。</li>
-</ul>
-<p>Cloud Functions 関数の実装と、CDN の設定が済んだら、プロジェクトルートで下記コマンドを実行してデプロイします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>firebase deploy
-</code></pre></div><p>デプロイに成功すると、Cloud Functions と CDN の次のようなエンドポイントが有効になります。</p>
-<ul>
-<li>Cloud Functions: <code>https://us-central1-myapp-12345.cloudfunctions.net/createBundle</code></li>
-<li>CDN (Firestore Hosting): <code>https://myapp-12345.web.app/createBundle</code></li>
-</ul>
-<p>どちらも同じデータバンドルを返しますが、CDN の方はキャッシュ生成後は一瞬でデータを返してくれるはずです。</p>
-<h2 id=クライアントアプリからデータバンドルを取得する>クライアントアプリからデータバンドルを取得する</h2>
-<p>最後に、CDN から Firestore データバンドルを取得するクライアントアプリ側の実装です。
-Firebase SDK の基本的な扱い方は省略します（参考: <a href=./p/m3bjrz7/>Next.js で Firebase: Cloud Firestore データベースを使う</a>）。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>utils/firebase/firestore.ts（抜粋）</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>getDocsFromCache</span><span class=p>,</span> <span class=nx>getFirestore</span><span class=p>,</span> <span class=nx>loadBundle</span><span class=p>,</span> <span class=nx>namedQuery</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;firebase/firestore&#39;</span>
-<span class=kr>import</span> <span class=p>{</span> <span class=nx>Book</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@/utils/types&#39;</span>
-
-<span class=kr>const</span> <span class=nx>QUERY_NAME</span> <span class=o>=</span> <span class=s1>&#39;latest-books-query&#39;</span>
-
-<span class=kr>export</span> <span class=kr>async</span> <span class=kd>function</span> <span class=nx>getLatestBooksFromBundle</span><span class=p>()</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>Book</span><span class=err>[]</span><span class=p>&gt;</span> <span class=p>{</span>
-  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;Get latest books from Bundle...&#39;</span><span class=p>)</span>
-  <span class=kr>const</span> <span class=nx>db</span> <span class=o>=</span> <span class=nx>getFirestore</span><span class=p>()</span>
-
-  <span class=c1>// CDN からデータバンドルを取得
-</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>bundle</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>fetch</span><span class=p>(</span><span class=s1>&#39;https://myapp-12345.web.app/createBundle&#39;</span><span class=p>)</span>
-  <span class=k>if</span> <span class=p>(</span><span class=nx>bundle</span><span class=p>.</span><span class=nx>body</span> <span class=o>==</span> <span class=kc>null</span><span class=p>)</span> <span class=p>{</span>
-    <span class=nx>console</span><span class=p>.</span><span class=nx>warn</span><span class=p>(</span><span class=s1>&#39;Bundle has no data&#39;</span><span class=p>)</span>
-    <span class=k>return</span> <span class=p>[]</span>
-  <span class=p>}</span>
-
-  <span class=c1>// フェッチしたバンドルから SDK 内にクライアントキャッシュを生成
-</span><span class=c1></span>  <span class=k>await</span> <span class=nx>loadBundle</span><span class=p>(</span><span class=nx>db</span><span class=p>,</span> <span class=nx>bundle</span><span class=p>.</span><span class=nx>body</span><span class=p>)</span>
-
-  <span class=c1>// クライアントキャッシュから名前付きクエリの Query オブジェクトを生成
-</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>query</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>namedQuery</span><span class=p>(</span><span class=nx>db</span><span class=p>,</span> <span class=nx>QUERY_NAME</span><span class=p>)</span>
-  <span class=k>if</span> <span class=p>(</span><span class=nx>query</span> <span class=o>==</span> <span class=kc>null</span><span class=p>)</span> <span class=p>{</span>
-    <span class=nx>console</span><span class=p>.</span><span class=nx>warn</span><span class=p>(</span><span class=sb>`Bundle does not have namedQuery: </span><span class=si>${</span><span class=nx>QUERY_NAME</span><span class=si>}</span><span class=sb>`</span><span class=p>)</span>
-    <span class=k>return</span> <span class=p>[]</span>
-  <span class=p>}</span>
-
-  <span class=c1>// 名前付きクエリからデータを取り出す（必要に応じてコンバーターを適用するのはいつも通り）
-</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>booksQuery</span> <span class=o>=</span> <span class=nx>query</span><span class=p>.</span><span class=nx>withConverter</span><span class=p>(</span><span class=nx>bookConverter</span><span class=p>)</span>
-  <span class=kr>const</span> <span class=nx>snapshot</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>getDocsFromCache</span><span class=p>(</span><span class=nx>booksQuery</span><span class=p>)</span>
-
-  <span class=k>return</span> <span class=nx>snapshot</span><span class=p>.</span><span class=nx>docs</span><span class=p>.</span><span class=nx>map</span><span class=p>((</span><span class=nx>doc</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>doc</span><span class=p>.</span><span class=nx>data</span><span class=p>())</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>例えば、React のカスタムフックなどから上記の関数を呼び出すことで、データバンドルをもとに生成された <code>Book</code> 配列を取得できます。
-CDN のキャッシュデータだけを参照するので、直接 Firestore にアクセスするも高速に動作し、かつ安価に運用できます。
-もちろん、データ取得の柔軟性は減りますし、キャッシュ期間中は最新データを取得できないといった制約がありますが、多数のユーザーがアクセスするトップページの情報などは、この仕組みを導入する価値がありそうです。</p>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/vgs4dox/>Firebase の Cloud Functions で定期的に Firestore の集計処理を行う</a></li>
-<li><a href=./p/fvevcs8/>Firebase の Cloud Functions で Hello World</a></li>
-<li><a href=./p/bw9kv6g/>Firestore ドキュメントを TypeScript のユーザー定義型オブジェクトに変換する (withConverter)</a></li>
-<li><a href=./p/m3bjrz7/>Next.js で Firebase: Cloud Firestore データベースを使う</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/firebase/cloudfunctions>Firebase/CloudFunctions</a></span>
-<span class=xPageTags_item><a href=./tags/firebase/firestore>Firebase/Firestore</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/6p3dox9/><span class=xArticle_up_label>Firebase 関連メモ</span><br>へ戻る</a>
 </div>
 </article><h2>メニュー</h2>
 <div class=xTopMenu>
