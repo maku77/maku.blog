@@ -2,7 +2,7 @@ var data = [
 {
 url: "/p/ujqinda/",
 title: "プログラミング",
-date: "2022-05-09T00:00:00Z",
+date: "2022-06-22T00:00:00Z",
 body: "プログラミング"
 },
 {
@@ -1470,6 +1470,30 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/fn7m2gu/",
+title: "JavaScript / Node.js 関連メモ",
+date: "2022-06-22T00:00:00Z",
+body: "JavaScript / Node.js 関連メモ"
+},
+{
+url: "/p/oj9nzgt/",
+title: "Node.js で URL のパスを結合する (url-join)",
+date: "2022-06-22T00:00:00Z",
+body: "Node.js で URL のパスを結合する (url-join) José F. Romaniello 氏 (jfromaniello) が公開している NPM パッケージの url-join を使うと、バラバラになった URL のパスをうまいこと結合してくれます。 url-join のインストール $ npm install url-join 使用例 import urlJoin from \u0026#39;url-join\u0026#39; urlJoin(\u0026#39;https://example.com\u0026#39;, \u0026#39;a\u0026#39;, \u0026#39;/b/c\u0026#39;)) //=\u0026gt; https://example.com/a/b/c urlJoin(\u0026#39;https://example.com/\u0026#39;, \u0026#39;/a\u0026#39;, \u0026#39;/b/c/\u0026#39;)) //=\u0026gt; https://example.com/a/b/c/ urlJoin(\u0026#39;https://example.com\u0026#39;, \u0026#39;/foo\u0026#39;, \u0026#39;?q=123\u0026#39;)) //=\u0026gt; https://example.com/foo?q=123 urlJoin(\u0026#39;https://example.com\u0026#39;, \u0026#39;foo/\u0026#39;, \u0026#39;/?q=123\u0026#39;)) //=\u0026gt; https://example.com/foo?q=123 URL の末尾にクエリ文字列 (?q=123) があるときは、パス部分の末尾の / は消されちゃうみたいですね。 ☝️ path.join は URL 結合には使えない path モジュールの path.join は、ローカルファイルシステム用のパス結合関数なので、URL の結合には使ってはいけません。 例えば、Windows 環境ではバックスラッシュが使われてしまったりします。"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2022-06-22T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-06-22T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/aseqzau/",
 title: "Apollo Server 関連記事",
 date: "2022-06-08T00:00:00Z",
@@ -1486,18 +1510,6 @@ url: "/p/cm9nyco/",
 title: "GraphQL 関連記事",
 date: "2022-06-08T00:00:00Z",
 body: "GraphQL 関連記事"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2022-06-08T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-06-08T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/6p3dox9/",
@@ -1642,12 +1654,6 @@ url: "/p/gqo9yoo/",
 title: "TypeScript メモ",
 date: "2022-04-04T00:00:00Z",
 body: "TypeScript メモ"
-},
-{
-url: "/p/fn7m2gu/",
-title: "JavaScript / Node.js 関連メモ",
-date: "2022-03-16T00:00:00Z",
-body: "JavaScript / Node.js 関連メモ"
 },
 {
 url: "/p/ryq6it6/",
