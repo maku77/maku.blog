@@ -513,7 +513,7 @@ body: "Ansible とは？ Ansible をインストールする Ansible とは？ A
 url: "/p/cfnkkhk/",
 title: "Jadeメモ: jade コマンドをインストールする",
 date: "2013-12-28T00:00:00Z",
-body: "Jadeメモ: jade コマンドをインストールする Jade は Node.js 製のテンプレートエンジンです。 HTML ファイルを直接記述するよりも簡潔なフォーマットで Web ページを作成することができます。 jade コマンドは Node Package Manager (npm) を使ってインストールすることができます。 下記のようにグローバルインストールすれば、どのディレクトリからでも jade コマンドを実行できるようになります。 $ sudo npm install jade --global 参考サイト http://jade-lang.com/ http://jade-lang.com/reference/"
+body: "Jadeメモ: jade コマンドをインストールする Jade は Node.js 製のテンプレートエンジンです。 HTML ファイルを直接記述するよりも簡潔なフォーマットで Web ページを作成することができます。 jade コマンドは Node Package Manager (npm) を使ってインストールすることができます。 下記のようにグローバルインストールすれば、どのディレクトリからでも jade コマンドを実行できるようになります。 Jade のインストール $ sudo npm install jade --global 参考サイト http://jade-lang.com/ http://jade-lang.com/reference/"
 },
 {
 url: "/p/je8stcd/",
@@ -591,7 +591,7 @@ body: "TypeScriptの環境: Visual Studio Code で TypeScript の開発環境を
 url: "/p/onvso3a/",
 title: "Jadeメモ: jade コマンドの使い方",
 date: "2013-12-30T00:00:00Z",
-body: "Jadeメモ: jade コマンドの使い方 jade コマンドで HTML を生成する コマンドラインから jade コマンドを実行するには下記のようにします。 いずれの場合も index.jade ファイルの内容から HTML を生成します。 $ jade index.jade # index.html を作成 $ jade \u0026lt; index.jade # 標準出力へ HTML を出力 $ jade --pretty \u0026lt; index.jade # 改行を追加して見やすく出力 テスト 実際に index.jade というファイルから、HTML を生成してみます。 index.jade doctype html html body h1 Hello World $ jade \u0026lt; index.jade \u0026lt;!DOCTYPE html\u0026gt;\u0026lt;html\u0026gt;\u0026lt;body\u0026gt;\u0026lt;h1\u0026gt;Hello World\u0026lt;/h1\u0026gt;\u0026lt;/body\u0026gt;"
+body: "Jadeメモ: jade コマンドの使い方 jade コマンドで HTML を生成する コマンドラインから jade コマンドを実行するには下記のようにします。 いずれの場合も index.jade ファイルの内容から HTML を生成します。 $ jade index.jade # index.html を作成 $ jade \u0026lt; index.jade # 標準出力へ HTML を出力 $ jade --pretty \u0026lt; index.jade # 改行を追加して見やすく出力 テスト 実際に index.jade というファイルから、HTML を生成してみます。 index.jade doctype html html body h1 Hello World jade コマンドの実行 $ jade \u0026lt; index.jade \u0026lt;!DOCTYPE html\u0026gt;\u0026lt;html\u0026gt;\u0026lt;body\u0026gt;\u0026lt;h1\u0026gt;Hello World\u0026lt;/h1\u0026gt;\u0026lt;/body\u0026gt;"
 },
 {
 url: "/p/ffyw55u/",
@@ -867,7 +867,7 @@ body: "AWS CloudFormation の設定例: Lambda 関数から S3 にアクセス�
 url: "/p/ef8i8dx/",
 title: "Jadeの構文: ブロック展開 (block expansion) によってネストを減らす",
 date: "2013-12-29T00:00:00Z",
-body: "Jadeの構文: ブロック展開 (block expansion) によってネストを減らす Jade のブロック展開 (block expansion) を使うと、改行とインデントによるネストを一行で表現できます。 例えば、 div.box div.prompt Hello というネストされた構文は、下記のように一行で記述することができます。 div.box: div.prompt Hello ただし、以下のように、上位の要素にテキストノードが存在する場合は、ブロック展開を使った記述は行えません。 div.box Hello div.prompt World 間違い div.box Hello: div.prompt World"
+body: "Jadeの構文: ブロック展開 (block expansion) によってネストを減らす Jade の ブロック展開 (block expansion) を使うと、改行とインデントによるネストを一行で表現できます。 例えば、 div.box div.prompt Hello というネストされた構文は、下記のように一行で記述することができます。 div.box: div.prompt Hello ただし、以下のように、上位の要素にテキストノードが存在する場合は、ブロック展開を使った記述は行えません。 div.box Hello div.prompt World 間違い div.box Hello: div.prompt World"
 },
 {
 url: "/p/538wdr7/",
@@ -885,7 +885,7 @@ body: "Amazon EC2 関連記事 Amazon EC2 (Amazon Elastic Compute Cloud) は、A
 url: "/p/wwao94j/",
 title: "Jadeの構文: テキストブロックでテキストノードを生成する",
 date: "2013-12-29T00:00:00Z",
-body: "Jadeの構文: テキストブロックでテキストノードを生成する Jade のテンプレートファイルでは、次のように要素名の後ろに続けてテキストを記述することで、要素内にテキストノードを作成することができます。 p Hello World テキストの内容が長くなり、複数行に分けて記述したいときは、**バー記法 (bar notation) やドット記法 (dot notation) を使用した「テキストブロック」**を作成します。 バー記法によるテキストブロックの例 p | long long long long long | long long long long long | long long long description. ドット記法によるテキストブロックの例 p. long long long long long long long long long long long long long description. ドットは、必ずタグ名の直後にスペースを入れずに記述してください。 スペースを入れると、ドットがテキスト内容として認識されてしまいます。 出力 \u0026lt;p\u0026gt;long long long long long long long long long long long long long description.\u0026lt;/p\u0026gt; これらの記法は、ソースコードなど、改行やインデントが重要なテキストを pre 要素として出力する際に便利です。 pre. #include \u0026lt;iostream\u0026gt; int main() { return 0; } バー記法 (bar notation) によるテキストブロックは、テキストノードの前後に同じ階層で別の要素がある場合にも使用します。 div span AAA | BBB span CCC"
+body: "Jadeの構文: テキストブロックでテキストノードを生成する Jade のテンプレートファイルでは、次のように要素名の後ろに続けてテキストを記述することで、要素内にテキストノードを作成 することができます。 p Hello World テキストの内容が長くなり、複数行に分けて記述したいときは、バー記法 (bar notation) やドット記法 (dot notation) を使用した「テキストブロック」 を作成します。 バー記法によるテキストブロックの例 p | long long long long long | long long long long long | long long long description. ドット記法によるテキストブロックの例 p. long long long long long long long long long long long long long description. ドットは、必ずタグ名の直後にスペースを入れずに記述 してください。 スペースを入れると、ドットがテキスト内容として認識されてしまいます。 出力 \u0026lt;p\u0026gt;long long long long long long long long long long long long long description.\u0026lt;/p\u0026gt; これらの記法は、ソースコードなど、改行やインデントが重要なテキストを pre 要素として出力する際に便利です。 pre. #include \u0026lt;iostream\u0026gt; int main() { return 0; } バー記法 (bar notation) によるテキストブロックは、テキストノードの前後に同じ階層で別の要素がある場合にも使用します。 div span AAA | BBB span CCC"
 },
 {
 url: "/p/fyjpvb2/",
@@ -1470,6 +1470,30 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/opyajt3/",
+title: "Let's Encrypt 関連記事",
+date: "2022-06-26T00:00:00Z",
+body: "Let's Encrypt 関連記事"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2022-06-26T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/nd3cmt3/",
+title: "ネットワーク関連技術メモ",
+date: "2022-06-26T00:00:00Z",
+body: "ネットワーク関連技術メモ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-06-26T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/fn7m2gu/",
 title: "JavaScript / Node.js 関連メモ",
 date: "2022-06-22T00:00:00Z",
@@ -1482,16 +1506,10 @@ date: "2022-06-22T00:00:00Z",
 body: "Node.js で URL のパスを結合する (url-join) José F. Romaniello 氏 (jfromaniello) が公開している NPM パッケージの url-join を使うと、バラバラになった URL のパスをうまいこと結合してくれます。 url-join のインストール $ npm install url-join 使用例 import urlJoin from \u0026#39;url-join\u0026#39; urlJoin(\u0026#39;https://example.com\u0026#39;, \u0026#39;a\u0026#39;, \u0026#39;/b/c\u0026#39;)) //=\u0026gt; https://example.com/a/b/c urlJoin(\u0026#39;https://example.com/\u0026#39;, \u0026#39;/a\u0026#39;, \u0026#39;/b/c/\u0026#39;)) //=\u0026gt; https://example.com/a/b/c/ urlJoin(\u0026#39;https://example.com\u0026#39;, \u0026#39;/foo\u0026#39;, \u0026#39;?q=123\u0026#39;)) //=\u0026gt; https://example.com/foo?q=123 urlJoin(\u0026#39;https://example.com\u0026#39;, \u0026#39;foo/\u0026#39;, \u0026#39;/?q=123\u0026#39;)) //=\u0026gt; https://example.com/foo?q=123 URL の末尾にクエリ文字列 (?q=123) があるときは、パス部分の末尾の / は消されちゃうみたいですね。 ☝️ path.join は URL 結合には使えない path モジュールの path.join は、ローカルファイルシステム用のパス結合関数なので、URL の結合には使ってはいけません。 例えば、Windows 環境ではバックスラッシュが使われてしまったりします。"
 },
 {
-url: "/",
-title: "まくろぐ",
-date: "2022-06-22T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-06-22T00:00:00Z",
-body: "技術系のメモ"
+url: "/p/p7q7n4i/",
+title: "Linux ネットワーク: ip コマンドの使い方",
+date: "2022-06-16T00:00:00Z",
+body: "Linux ネットワーク: ip コマンドの使い方 apt で ip コマンドをインストールする ip コマンドは APT の iproute2 パッケージに含まれています。 $ apt update # パッケージリストの更新 $ apt install -y iproute2 iproute2 パッケージには、ip コマンド以外にも いろいろなコマンドが含まれています（例: ip・ss・bridge・rtacct・rtmon・tc・ctstat・lnstat・nstat・routef・routel・rtstat・tipc・arpd・devlink）。 参考: iproute2 に含まれるファイルのリスト ─ Debian / archlinux サブコマンドのヘルプを表示する ip \u0026lt;サブコマンド名\u0026gt; help で各サブコマンドのヘルプを表示できます。 例: ip address コマンドのヘルプを表示する $ ip address help 例: ip link コマンドのヘルプを表示する $ ip link help ip address コマンド（IP アドレスの確認・設定） ip address コマンドは、ホストの（ネットワークインタフェース）に割り当てられている IP アドレスの情報を表示します。 サブコマンドの address は 1 文字まで省略できるので、ip a で実行することができます。 すべてのアドレスを表示 $ ip addr 1: lo: \u0026lt;LOOPBACK,UP,LOWER_UP\u0026gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000 link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00 inet 127.0.0.1/8 scope host lo valid_lft forever preferred_lft forever 2: tunl0@NONE: \u0026lt;NOARP\u0026gt; mtu 1480 qdisc noop state DOWN group default qlen 1000 link/ipip 0.0.0.0 brd 0.0.0.0 3: ip6tnl0@NONE: \u0026lt;NOARP\u0026gt; mtu 1452 qdisc noop state DOWN group default qlen 1000 link/tunnel6 :: brd :: permaddr e28e:402f:dcf2:: 81: eth0@if82: \u0026lt;BROADCAST,MULTICAST,UP,LOWER_UP\u0026gt; mtu 1500 qdisc noqueue state UP group default link/ether 02:42:ac:11:00:03 brd ff:ff:ff:ff:ff:ff link-netnsid 0 inet 172.17.0.3/16 brd 172.17.255.255 scope global eth0 valid_lft forever preferred_lft forever 指定したデバイス (eth0) のアドレスを表示 $ ip addr show dev eth0 81: eth0@if82: \u0026lt;BROADCAST,MULTICAST,UP,LOWER_UP\u0026gt; mtu 1500 qdisc noqueue state UP group default link/ether 02:42:ac:11:00:03 brd ff:ff:ff:ff:ff:ff link-netnsid 0 inet 172.17.0.3/16 brd 172.17.255.255 scope global eth0 valid_lft forever preferred_lft forever"
 },
 {
 url: "/p/aseqzau/",
@@ -1540,12 +1558,6 @@ url: "/p/88gow5c/",
 title: "gRPC 関連メモ",
 date: "2022-05-18T00:00:00Z",
 body: "gRPC 関連メモ"
-},
-{
-url: "/p/nd3cmt3/",
-title: "ネットワーク関連技術メモ",
-date: "2022-05-18T00:00:00Z",
-body: "ネットワーク関連技術メモ"
 },
 {
 url: "/p/saku4ck/",
@@ -3198,12 +3210,6 @@ date: "2019-03-21T00:00:00Z",
 body: "Let's Encrypt certificate expiration notice が来たら Let\u0026rsquo;s Encrypt Expiry Bot からの証明書期限切れメール 2 ヶ月ほど前に、Sakura VPS レンタルサーバーを Let\u0026rsquo;s Encrypt で SSL 対応していたら、こんなメールが来ました。 Your certificate (or certificates) for the names listed below will expire in 20 days (on 10 Apr 19 07:02 +0000). Please make sure to renew your certificate before then, or visitors to your website will encounter errors. We recommend renewing certificates automatically when they have a third of their total lifetime left. For Let\u0026rsquo;s Encrypt\u0026rsquo;s current 90-day certificates, that means renewing 30 days before expiration. See https://letsencrypt.org/docs/integration-guide/ for details. 90 日ごとに証明書 (certificate) が期限切れになってしまうので更新しなきゃヤバイよってメールでした。 更新しないでいると、Web サイトに https でアクセスできなくなってしまいます。 見逃すところでした。 certbot コマンドによる証明書の更新 証明書の更新は、certbot コマンドを使って簡単に実行できます。 まず、certbot コマンドがインストールされていない場合はインストールします。 certbot のインストール $ sudo yum install certbot 証明書を更新するには、下記のように certbot renew を実行します。 証明書の有効期限まで 30 日以上残っている状態で更新する場合は、--force-renew オプションを付けて実行する必要があります。 更新したら、Web サーバをリロードすれば完了です。 SSL 証明書の更新 $ sudo certbot renew --force-renew $ sudo systemctl reload nginx トラブルシューティング: 404 Not Found が出る場合 certbot renew コマンドを実行したときに、下記のようなエラーが出て失敗することがあります（下記の例では、Web サイトのドメイン名は example.com に変えています）。 certbot renew のエラー（抜粋） Attempting to renew cert (example.com) from /etc/letsencrypt/renewal/example.com.conf produced an unexpected error: Failed authorization procedure. example.com (http-01): urn:ietf:params:acme:error:unauthorized :: The client lacks sufficient authorization :: Invalid response from https://example.com/.well-known/acme-challenge/Y1WeUoSwipdo5aZHsUNevZl_ppylAAWJh9bfSv1Xqu0 [225.100.100.100]: \u0026#34;\u0026lt;html\u0026gt;\\r\\n\u0026lt;head\u0026gt;\u0026lt;title\u0026gt;404 Not Found\u0026lt;/title\u0026gt;\u0026lt;/head\u0026gt;\\r\\n\u0026lt;body bgcolor=\\\u0026#34;white\\\u0026#34;\u0026gt;\\r\\n\u0026lt;center\u0026gt;\u0026lt;h1\u0026gt;404 Not Found\u0026lt;/h1\u0026gt;\u0026lt;/center\u0026gt;\\r\\n\u0026lt;hr\u0026gt;\u0026lt;center\u0026gt;\u0026#34;. Skipping. ... All renewal attempts failed. The following certs could not be renewed: /etc/letsencrypt/live/example.com/fullchain.pem (failure) All renewal attempts failed. The following certs could not be renewed: /etc/letsencrypt/live/example.com/fullchain.pem (failure) - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 1 renew failure(s), 0 parse failure(s) このエラーが出る場合、多くの場合は nginx の Web サイトのドキュメントルートを /usr/share/nginx/html から変更していることが原因のようです。 下記の設定ファイルの、webroot_map のパスを、Web サイトの正しいドキュメントルートのディレクトリに変更します。 /etc/letsencrypt/renewal/example.com.conf [[webroot_map]] example.net = /usr/share/nginx/html 例えば、/home/maku/website ディレクトリに設定しているなら、下記のように変更して保存します。 example.net = /home/maku/website これで、certbot renew コマンドの実行は成功するはずです。 cron で自動更新するように設定しておく 3 ヶ月おきに上記のコマンドを実行するのは面倒なので、cron で自動実行されるように設定しておきます。 設定ファイルは、/etc/crontab をテンプレートにして、/etc/cron.d/lets_encrypt を作成します。 /etc/cron.d/lets_encrypt を作成 $ sudo cp /etc/crontab /etc/cron.d/lets_encrypt $ sudo vim /etc/cron.d/lets_encrypt ファイルの中身は下記のようにして、毎週日曜日に、証明書の更新コマンドを実行するようにします。 実際には、証明書の有効期限が 30 日を切っている場合にのみ更新が行われます。 /etc/cron.d/lets_encrypt SHELL=/bin/bash PATH=/sbin:/bin:/usr/sbin:/usr/bin LANG=ja_JP.UTF-8 LC_ALL=ja_JP.UTF-8 CONTENT_TYPE=text/plain; charset=UTF-8 MAILTO=\u0026#34;xxxxx@gmail.com\u0026#34; # Let\u0026#39;s Encrypt の証明書を更新（毎週日曜日2時30分） 30 2 * * sun root /usr/bin/certbot renew \u0026amp;\u0026amp; /usr/bin/systemctl reload nginx ここでは、MAILTO を設定することで、cron のログをメールで送るように設定しています。 例えば、下記のようなメールが届くことになります（まだ証明書の期限は切れないから更新要求はスキップされたよ、というログですね）。 cron からのメールの例 Saving debug log to /var/log/letsencrypt/letsencrypt.log - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Processing /etc/letsencrypt/renewal/example.com.conf - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Cert not yet due for renewal - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - The following certs are not due for renewal yet: /etc/letsencrypt/live/example.com/fullchain.pem expires on 2019-06-19 (skipped) No renewals were attempted. - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ちなみに、cron の日時指定の方法は下記のようになっています（/etc/crontab より抜粋）。 # Example of job definition: # .---------------- minute (0 - 59) # | .------------- hour (0 - 23) # | | .---------- day of month (1 - 31) # | | | .------- month (1 - 12) OR jan,feb,mar,apr ... # | | | | .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat # | | | | | # * * * * * user-name command to be executed Sakura VPS レンタルサーバで Let\u0026rsquo;s Encrypt 設定した場合 Sakura のレンタルサーバの設定で Let\u0026rsquo;s Encrypt を自動設定した場合、下記のような cron 設定ファイルが自動的に生成されているかもしれません。 毎週木曜日の2時14分に証明書の更新をしようとしています。 こういったファイルが自動生成されているのであれば、それを使うのもよいでしょう。 /etc/cron.d/certbot-auto 14 2 * * 4 root /usr/local/certbot/certbot-auto renew --webroot -w /usr/share/nginx/html --post-hook \u0026#39;systemctl reload nginx\u0026#39; ただし、ここでも Web サイトのドキュメントルートとして /usr/share/nginx/html が指定されているので、もしパスを変更しているのであれば、上記のファイルを修正しておく必要があります。 自分で作成した /etc/cron.d/lets_encrypt があるのであれば、上記のファイルは処理が重複しているので削除しちゃいましょう。"
 },
 {
-url: "/p/xdsom3a/",
-title: "Nginx（Web サーバー）のメモ",
-date: "2019-03-21T00:00:00Z",
-body: "Nginx（Web サーバー）のメモ"
-},
-{
 url: "/p/f2kkmnw/",
 title: "クリスタのメモ: 下のレイヤの描画領域だけに描画する（クリッピング）",
 date: "2019-03-12T00:00:00Z",
@@ -3256,6 +3262,12 @@ url: "/p/jowgstm/",
 title: "Nginx の設定: http でアクセスされた場合に https にリダイレクトする",
 date: "2019-01-10T00:00:00Z",
 body: "Nginx の設定: http でアクセスされた場合に https にリダイレクトする nginx サーバの SSL 対応（https 有効化）が終わった後は、http プロトコルによるアクセスは避けてもらいたいですね。 そのような場合は、下記のように設定しておけば、http でアクセスされた場合に、https で再度アクセスしてもらうようにクライアントに応答することができます（301 という値は、Moved Permanently を示す HTTP レスポンスコードです）。 /etc/nginx/conf.d/xxx.conf server { listen 80; server_name example.com; return 301 https://$host$request_uri; } server { listen 443 ssl http2; server_name example.com; # ... } 結果として、Web ブラウザから http://example.com/ にアクセスすると、Web ブラウザは自動的に https://example.com/ という URL でアクセスし直すことになります。"
+},
+{
+url: "/p/xdsom3a/",
+title: "Nginx（Web サーバー）のメモ",
+date: "2019-01-10T00:00:00Z",
+body: "Nginx（Web サーバー）のメモ"
 },
 {
 url: "/p/xkpjfcf/",
@@ -4185,7 +4197,7 @@ body: "Linuxコマンド: ファイルの内容を8進数や16進数でダンプ
 url: "/p/v7bxgmn/",
 title: "CPU のアーキテクチャ名と CPU 名の対応表",
 date: "2011-06-19T00:00:00Z",
-body: "CPU のアーキテクチャ名と CPU 名の対応表 Intel 系 CPU アーキテクチャ名 CPU名 i386 80386 i486 80486 i586 Pentium, MMX Pentium i686 Pentium Pro, Pentium II, Pentium III, Pentium 4 athlon Athlon, Athlon MP, Athlon XP x86_64 Opteron, Athlon64, Xeon (EM64T), Core, Core2Duo メモ x86 (IA-32) \u0026ndash; Intel 社の 8086 系のプロセッサの略称。（binary hacks より） x86_64 (AMD64) \u0026ndash; AMD が設計した x86 上位互換の 64 ビットプロセッサのアーキテクチャ。（binary hacks より）"
+body: "CPU のアーキテクチャ名と CPU 名の対応表 Intel 系 CPU アーキテクチャ名 CPU名 i386 80386 i486 80486 i586 Pentium, MMX Pentium i686 Pentium Pro, Pentium II, Pentium III, Pentium 4 athlon Athlon, Athlon MP, Athlon XP x86_64 Opteron, Athlon64, Xeon (EM64T), Core, Core2Duo メモ x86 (IA-32) Intel 社の 8086 系のプロセッサの略称。（binary hacks より） x86_64 (AMD64) AMD が設計した x86 上位互換の 64 ビットプロセッサのアーキテクチャ。（binary hacks より）"
 },
 {
 url: "/p/89tt5ie/",
