@@ -2,7 +2,7 @@
 title: "Linuxメモ: Netplan で Ubuntu のネットワーク設定を行う"
 url: "/p/7q3dnx8"
 date: "2022-01-20"
-tags: ["Linux", "Ubuntu"]
+tags: ["Linux", "Ubuntu", "ネットワーク"]
 ---
 
 Netplan とは
@@ -51,8 +51,8 @@ Netplan はすべての __`/etc/netplan/*.yaml`__ ファイルを読み込みま
 
 Netplan の公式サイトで設定例や、各項目の意味を参照できます。
 
-- [https://netplan.io/examples/ ... 設定例](https://netplan.io/examples/)
-- [https://netplan.io/reference/ ... 各項目の意味](https://netplan.io/reference/)
+- [https://netplan.io/examples/](https://netplan.io/examples/) ... 設定例
+- [https://netplan.io/reference/](https://netplan.io/reference/) ... 各項目の意味
 
 例えば、次のような感じで設定します。
 
