@@ -3,8 +3,6 @@ title: "ネットワーク関連技術メモ"
 linkTitle: "ネットワーク"
 url: "/p/nd3cmt3"
 categoryIcon: _index.svg
-links:
-  - /tech/nginx/lets-encrypt-expire
 ---
 
 {{% private %}}

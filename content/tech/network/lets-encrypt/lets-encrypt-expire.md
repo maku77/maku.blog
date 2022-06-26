@@ -2,7 +2,7 @@
 title: "Let's Encrypt certificate expiration notice が来たら"
 url: "/p/cniq5vr"
 date: "2019-03-21"
-tags: ["nginx"]
+tags: ["Let's Encrypt", "nginx"]
 ---
 
 Let's Encrypt Expiry Bot からの証明書期限切れメール

@@ -8,7 +8,7 @@ weight: 205
 
 Jade テンプレート内に、直接 CSS や JavaScript のコードを記述するときは、ドット記法によるテキストブロック内に記述します。
 
-{{< code title="test.jade" >}}
+{{< code lang="css" title="test.jade" >}}
 style.
   body {
     color: #111;
@@ -19,7 +19,7 @@ script.
   alert(message);
 {{< /code >}}
 
-{{< code title="実行結果" >}}
+{{< code lang="console" title="実行結果" >}}
 $ jade --pretty < test.jade
 <style>
   body {
@@ -35,7 +35,7 @@ $ jade --pretty < test.jade
 
 `link` タグや `script` タグによって、外部の CSS や JavaScript コードをロードするには、以下のようにします。
 
-{{< code title="test.jade" >}}
+{{< code lang="css" title="test.jade" >}}
 doctype html
 html
   head
@@ -48,7 +48,7 @@ html
     p Hello
 {{< /code >}}
 
-{{< code title="実行結果" >}}
+{{< code lang="console" title="実行結果" >}}
 $ jade --pretty < test.jade
 <!DOCTYPE html>
 <html>

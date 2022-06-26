@@ -12,11 +12,11 @@ HTML ファイルを直接記述するよりも簡潔なフォーマットで We
 `jade` コマンドは Node Package Manager (`npm`) を使ってインストールすることができます。
 下記のようにグローバルインストールすれば、どのディレクトリからでも `jade` コマンドを実行できるようになります。
 
-{{< code >}}
+{{< code lang="console" title="Jade のインストール" >}}
 $ sudo npm install jade --global
 {{< /code >}}
 
 - 参考サイト
-    - http://jade-lang.com/
-    - http://jade-lang.com/reference/
+  - http://jade-lang.com/
+  - http://jade-lang.com/reference/
 

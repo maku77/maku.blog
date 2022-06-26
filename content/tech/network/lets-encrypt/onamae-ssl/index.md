@@ -2,7 +2,7 @@
 title: "お名前.com の共用サーバーを Let's Encrypt で SSL 対応"
 url: "/p/s46j9sq"
 date: "2019-01-12"
-tags: ["Apache", "お名前.com"]
+tags: ["Apache", "Let's Encrypt", "お名前.com"]
 ---
 
 Chrome で https に対応していない Web サイトにアクセスすると、アドレスバーに「**保護されていない通信**」という警告が出るようになりました。

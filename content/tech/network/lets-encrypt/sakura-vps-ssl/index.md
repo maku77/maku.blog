@@ -2,7 +2,7 @@
 title: "Sakura VPS レンタルサーバーを Let's Encrypt で SSL 対応"
 url: "/p/xkpjfcf"
 date: "2019-01-10"
-tags: ["nginx"]
+tags: ["Let's Encrypt", "nginx"]
 ---
 
 今更ですが、さくらインターネットでレンタルしている Sakura VPS の Web サーバーを SSL (https) に対応しました。

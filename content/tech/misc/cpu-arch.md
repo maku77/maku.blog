@@ -21,6 +21,9 @@ Intel 系 CPU
 メモ
 ----
 
-* <b>x86 (IA-32)</b> -- Intel 社の 8086 系のプロセッサの略称。（binary hacks より）
-* <b>x86_64 (AMD64)</b> -- AMD が設計した x86 上位互換の 64 ビットプロセッサのアーキテクチャ。（binary hacks より）
+x86 (IA-32)
+: Intel 社の 8086 系のプロセッサの略称。（binary hacks より）
+
+x86_64 (AMD64)
+: AMD が設計した x86 上位互換の 64 ビットプロセッサのアーキテクチャ。（binary hacks より）
 
