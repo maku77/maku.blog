@@ -1,6 +1,7 @@
 ---
 title: "PlantUML（テキストベースのUML作図ツール）"
-url: "/p/zbgbb5u"
 linkTitle: "PlantUML"
+url: "/p/zbgbb5u"
+categoryIcon: _index.svg
 ---
 

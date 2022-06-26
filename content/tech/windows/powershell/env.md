@@ -1,5 +1,5 @@
 ---
-title: "PowerShell: 環境変数を扱う"
+title: "PowerShell で環境変数を扱う"
 url: "/p/jodtbr8"
 date: "2020-03-19"
 tags: ["PowerShell"]
