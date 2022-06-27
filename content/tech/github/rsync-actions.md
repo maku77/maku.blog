@@ -8,7 +8,7 @@ tags: ["GitHub Actions", "Hugo", "rsync"]
 何をするか？
 ----
 
-Web サイトのコンテンツを GitHub で管理し、さくらの VPS や、お名前.com の VPS で Web サーバーを運用している場合、GitHub Actions でビルドとデプロイを自動化すると便利です。
+Web サイトのコンテンツを GitHub で管理し、さくらの VPS や、{{< ad/onamae-vps-text "お名前.com の VPS" >}} で Web サーバーを運用している場合、GitHub Actions でビルドとデプロイを自動化すると便利です。
 ここでは、Web サイトのビルドに __Hugo__、VPS サーバーへのデプロイに __rsync__ を使う前提で、次のような手順で自動化を進めていきます。
 
 1. SSH 鍵を作成する（自動デプロイのためパスワードは設定しない）
@@ -239,4 +239,8 @@ SSH で新しいホストに接続しようとすると、`known_hosts` への�
 `rsync` コマンドの詳細に関しては、下記の記事を参考にしてください。
 
 - 参考: [rsync コマンドで2つのディレクトリを同期する](/p/c3s7wyx)
+
+さいごに広告（＾＾
+
+- お名前.com の VPS はこちらから → {{< ad/onamae-vps-banner >}}
 

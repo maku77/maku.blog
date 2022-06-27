@@ -7,13 +7,13 @@ tags: ["Apache", "Let's Encrypt", "お名前.com"]
 
 Chrome で https に対応していない Web サイトにアクセスすると、アドレスバーに「**保護されていない通信**」という警告が出るようになりました。
 Web サーバーの管理者は、https (SSL) への対応がほぼ必須になっています。
-ここでは、お名前.com の共用サーバー（SD-11、SD-12 プランなど）で、SSL を有効にし、http によるアクセスがあったときに https なアドレスにリダイレクトする設定方法を説明します。
+ここでは、{{< ad/onamae-rental-text "お名前.com" >}} の共用サーバー（SD-11、SD-12 プランなど）で、SSL を有効にし、http によるアクセスがあったときに https なアドレスにリダイレクトする設定方法を説明します。
 
 
 Let's Encrypt による SSL 対応
 ----
 
-お名前.com の共用サーバーで Web サイトを運用している場合は、下記のコントロールパネルからポチポチやるだけで、簡単に SSL (https) によるアクセスを有効にすることができます。
+{{< ad/onamae-rental-text "お名前.com" >}} の共用サーバーで Web サイトを運用している場合は、下記のコントロールパネルからポチポチやるだけで、簡単に SSL (https) によるアクセスを有効にすることができます。
 
 - [共用サーバーSD コントロールパネル https://cp.rentalserver.jp/](https://cp.rentalserver.jp/)
 
@@ -79,4 +79,10 @@ sftp> quit
 ~~~
 
 これで、`http://example.com/` というアクセスが、自動的に `https://example.com/` にリダイレクトされるようになります。
+
+さいごにちょっと広告（＾＾
+
+- お名前.com のドメイン取得はこちらから → {{< ad/onamae-domain-banner >}}
+- お名前.com のレンタルサーバーはこちらから → {{< ad/onamae-rental-banner >}}
+- お名前.com の VPS はこちらから → {{< ad/onamae-vps-banner >}}
 
