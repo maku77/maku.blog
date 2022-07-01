@@ -5,7 +5,7 @@ date: "2019-01-10"
 tags: ["Let's Encrypt", "nginx"]
 ---
 
-今更ですが、さくらインターネットでレンタルしている Sakura VPS の Web サーバーを SSL (https) に対応しました。
+今更ですが、さくらインターネットでレンタルしている {{< ad/sakura-vps-text "Sakura VPS" >}} の Web サーバーを SSL (https) に対応しました。
 とりあえず今回は無料の Let's Encrypt の証明書を、nginx サーバに設定します。
 
 使っている OS が CentOS6 だったので、ついでに CentOS7 をクリーンインストールすることにしました。
@@ -63,4 +63,8 @@ $ sudo service nginx reload
 https://example.com/ など https でアクセスできれば OK です。
 
 「403 Forbidden」が出るときは、[こちら](/p/ew5zmmw)をチェック。
+
+さいごに広告（＾＾
+
+- さくらの VPS はこちらから → {{< ad/sakura-vps-banner >}}
 

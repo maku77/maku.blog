@@ -42,5 +42,6 @@ Amazon (AWS) などのクラウドサービスでもドメイン取得できた�
 
 - お名前.com でのドメイン取得はこちらから → {{< ad/onamae-domain-banner >}}
 - お名前.com のレンタルサーバーはこちらから → {{< ad/onamae-rental-banner >}}
+- さくらの VPS はこちらから → {{< ad/sakura-vps-banner >}}
 - お名前.com の VPS はこちらから → {{< ad/onamae-vps-banner >}}
 
