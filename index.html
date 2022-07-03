@@ -44,6 +44,11 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/euevcs8/>
+Docker で Ansible の実行環境用のコンテナを作成する
+<time>2022-07-02</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/n5emu3a/>
 ConoHa VPS を借りて独自ドメインでアクセスできるようにする
 <time>2022-06-27</time></a>
@@ -62,11 +67,6 @@ GitHub GraphQL API のクエリ例: ユーザー情報を取得する (viewer, u
 <a href=./p/3o2doyb/>
 GitHub GraphQL クエリ例: 組織の情報を取得する (organization)
 <time>2022-06-20</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/p7q7n4i/>
-Linuxコマンド: ip コマンドの使い方
-<time>2022-06-16</time></a>
 </div>
 </div>
 </div>
@@ -196,6 +196,8 @@ Linuxコマンド: ip コマンドの使い方
 </div><div class=xMenu_tag>
 <a href=./tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a>
 </div><div class=xMenu_tag>
+<a href=./tags/ansible>ansible (5)</a>
+</div><div class=xMenu_tag>
 <a href=./tags/azure-table-storage>azure-table-storage (5)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/luis>luis (5)</a>
@@ -209,8 +211,6 @@ Linuxコマンド: ip コマンドの使い方
 <a href=./tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
-</div><div class=xMenu_tag>
-<a href=./tags/ansible>ansible (4)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/aws/ssm>aws/ssm (4)</a>
 </div><div class=xMenu_tag>
@@ -368,6 +368,8 @@ Linuxコマンド: ip コマンドの使い方
 </div><div class=xMenu_tag>
 <a href=./tags/dns>dns (1)</a>
 </div><div class=xMenu_tag>
+<a href=./tags/docker>docker (1)</a>
+</div><div class=xMenu_tag>
 <a href=./tags/dvb>dvb (1)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/editorconfig>editorconfig (1)</a>
@@ -449,14 +451,14 @@ Linuxコマンド: ip コマンドの使い方
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/euevcs8/>
+Docker で Ansible の実行環境用のコンテナを作成する<span class=xRecents_item_tag>Ansible</span><span class=xRecents_item_tag>Docker</span><time>2022-07-02</time></a>
+</div><div class=xRecents_item>
 <a href=./p/n5emu3a/>
 ConoHa VPS を借りて独自ドメインでアクセスできるようにする<span class=xRecents_item_tag>VPS</span><time>2022-06-27</time></a>
 </div><div class=xRecents_item>
 <a href=./p/oj9nzgt/>
 Node.js で URL のパスを結合する (url-join)<span class=xRecents_item_tag>Node.js</span><span class=xRecents_item_tag>URL</span><time>2022-06-22</time></a>
-</div><div class=xRecents_item>
-<a href=./p/9bku4cj/>
-GitHub GraphQL API のクエリ例: ユーザー情報を取得する (viewer, user)<span class=xRecents_item_tag>GitHub</span><span class=xRecents_item_tag>GraphQL</span><time>2022-06-20</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -464,6 +466,160 @@ GitHub GraphQL API のクエリ例: ユーザー情報を取得する (viewer, u
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/8t6hr3d/>Ansible</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=width:80px;margin-right:.5em>
+<img src=./p/8t6hr3d/_index.svg style=width:80px;height:80px>
+</div>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/euevcs8/>Docker で Ansible の実行環境用のコンテナを作成する</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/ansible>Ansible</a></span>
+<span class=xPageTags_item><a href=./tags/docker>Docker</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-07-02>2022-07-02</time><br>
+作成: <time itemprop=datePublished datetime=2022-07-02>2022-07-02</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#何をするか>何をするか？</a></li>
+<li><a href=#ansible-実行環境用イメージを作成する>Ansible 実行環境用イメージを作成する</a></li>
+<li><a href=#コンテナの-ansible-コマンドを実行する>コンテナの ansible コマンドを実行する</a>
+<ul>
+<li><a href=#ansible-コンテナ内のコマンドを実行する>ansible コンテナ内のコマンドを実行する</a></li>
+<li><a href=#ansible-エイリアスansible-playbook-エイリアスを作成する>ansible エイリアス、ansible-playbook エイリアスを作成する</a></li>
+<li><a href=#もう少し実践的な使用例>もう少し実践的な使用例</a></li>
+</ul>
+</li>
+</ul>
+</nav><h2 id=何をするか>何をするか？</h2>
+<p>Ansible の実行環境は Python がインストールされている環境であれば比較的簡単にインストールできますが、Docker の実行環境があれば、ホスト環境に何もインストールせずに Ansible の実行環境を手に入れることができます（もちろんコンテナは作る必要はありますが）。</p>
+<p>Docker Hub を見ると、Alpine Linux ベースの Ansible 実行環境用イメージ <a href=https://hub.docker.com/r/alpine/ansible>alpine/ansible</a> があるようですが、ここでは <code>Dockerfile</code> を使って自分でイメージを作成することにします。</p>
+<h2 id=ansible-実行環境用イメージを作成する>Ansible 実行環境用イメージを作成する</h2>
+<p><code>Dockerfile</code> で Alpine Linux ベースの Ansible 実行環境を定義します。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Dockerfile</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-docker data-lang=docker><span class=k>FROM</span><span class=s> alpine:3</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=k>WORKDIR</span><span class=s> /app</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=c># --no-cache を付けることで /var/cache/apk 以下にキャッシュが残るのを防ぐ</span><span class=err>
+</span><span class=err></span><span class=c># --update-cache を付けることで先に apk update するのと同じ効果になる</span><span class=err>
+</span><span class=err></span><span class=k>RUN</span> apk --no-cache --update-cache add ansible openssh sshpass</code></pre></div></div>
+</figure>
+<p>APK (Alpine Package Keeper) で次のようなパッケージをインストールしています。</p>
+<ul>
+<li><code>ansible</code> &mldr; Ansible Community パッケージ（<code>ansible</code> コマンドや <code>ansible-playbook</code> コマンドなど）</li>
+<li><code>openssh</code> &mldr; <code>ssh</code> コマンドのため</li>
+<li><code>sshpass</code> &mldr; ターゲットホストにパスワード認証 (<code>--ask-pass</code>) で接続するときのため</li>
+</ul>
+<p>Ansible Community パッケージ (<code>ansible</code>) ではなく、Ansible Core (<code>ansible-core</code>) を使うようにすれば、イメージサイズは 500MB 弱から 80MB 程度に削減できますが、サイズを気にしなくてよいなら Ansible Community パッケージを使っておいた方が楽です。</p>
+<p><code>Dockerfile</code> を記述したら、ビルドしてイメージを作成します。
+ここではイメージ名はシンプルに <code>ansible</code> としています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>ansible という名前のイメージを作成</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker image build -t ansible .
+</code></pre></div></div>
+</figure>
+<p>イメージが作成できているか確認します。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker image ls
+<span class=go>REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
+</span><span class=go>ansible      latest    224bbc474bf8   3 minutes ago   472MB
+</span></code></pre></div><h2 id=コンテナの-ansible-コマンドを実行する>コンテナの ansible コマンドを実行する</h2>
+<h3 id=ansible-コンテナ内のコマンドを実行する>ansible コンテナ内のコマンドを実行する</h3>
+<p>Ansible の各種コマンドをインストールした <code>ansible</code> イメージを作成したので、次のようにして <code>ansible</code> コマンドや <code>ansible-playbook</code> コマンドを実行できます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>#</span><span class=c1># ansible コマンドの実行</span>
+<span class=gp>$ </span>docker container run --rm ansible ansible
+<span class=err>
+</span><span class=err></span><span class=gp>#</span><span class=c1># ansible-playbook コマンドの実行</span>
+<span class=gp>$ </span>docker container run --rm ansible ansible-playbook
+</code></pre></div><p><code>--rm</code> オプションを指定して実行しているので、コマンド実行後にコンテナはすぐに破棄されます。
+でもよく考えたら <code>ansible-galaxy</code> による Ansible コレクションのインストールは適宜必要になるので、<code>--rm</code> オプションは外して使うことになるかもしれません。</p>
+<div class=xNote>
+<span class=xNote_title>☝️ コンテナのシェルを使う</span>
+<span class=xNote_body><p>必要に応じて、<code>ansible</code> コンテナの <code>ash</code> シェルを使って作業することもできます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker container run --rm -it ansible ash
+<span class=go>/app # ansible --help
+</span><span class=go>/app # exit
+</span></code></pre></div></span>
+</div>
+<h3 id=ansible-エイリアスansible-playbook-エイリアスを作成する>ansible エイリアス、ansible-playbook エイリアスを作成する</h3>
+<p>毎回 <code>docker container run</code> コマンドを入力するのは面倒ですし、このままだと、ホスト側のディレクトリにあるインベントリファイル (<code>inventory</code>) や Playbook ファイルを参照できないので、次のようなエイリアスを定義しておくと便利です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>alias-ansible.bashrc（source での読み込み用）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=nb>alias</span> <span class=nv>ansible</span><span class=o>=</span><span class=s1>&#39;docker container run --rm -it --mount type=bind,src=&#34;$(pwd)&#34;,dst=/app ansible ansible&#39;</span>
+<span class=nb>alias</span> ansible-playbook<span class=o>=</span><span class=s1>&#39;docker container run --rm -it --mount type=bind,src=&#34;$(pwd)&#34;,dst=/app ansible ansible-playbook&#39;</span></code></pre></div></div>
+</figure>
+<p><code>--mount</code> オプションによって、ホスト側のカレントディレクトリを、コンテナの作業ディレクトリ (<code>/app</code>) にバインドマウントしています。
+SSH キー用に <code>--mount type=bind,src="$HOME/.ssh",dst=/root/.ssh</code> も追加しておいた方がいいかもしれません。
+これで、あたかもホストマシンに <code>ansible</code> コマンドや <code>ansible-playbook</code> コマンドがインストールされているかのように実行できます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>ansible localhost -m ping
+<span class=go>[WARNING]: No inventory was parsed, only implicit localhost is available
+</span><span class=go>localhost | SUCCESS =&gt; {
+</span><span class=go>    &#34;changed&#34;: false,
+</span><span class=go>    &#34;ping&#34;: &#34;pong&#34;
+</span><span class=go>}
+</span></code></pre></div><h3 id=もう少し実践的な使用例>もう少し実践的な使用例</h3>
+<p><code>example.com</code> というホストに SSH 接続（パスワード認証）して <code>ping</code> モジュールを実行してみます。
+まず、Ansible によるコントロール対象を記述したインベントリファイルを用意します。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>inventory</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>example.com  ansible_ssh_common_args=&#39;-o StrictHostKeyChecking=no&#39;</code></pre></div></div>
+</figure>
+<p>インベントリファイルでは、初回 SSH 接続時の known_hosts 未登録エラーを防ぐための <code>StrictHostKeyChecking</code> オプションを指定しています。</p>
+<div class=xAccordion>
+<input id=id-184256739 type=checkbox>
+<label class=xAccordion_title for=id-184256739>参考: known_hosts 未登録エラーの例</label>
+<div class=xAccordion_body>
+<pre tabindex=0><code>example.com | FAILED! =&gt; {
+    &quot;msg&quot;: &quot;Using a SSH password instead of a key is not possible because Host Key checking is enabled and sshpass does not support this.  Please add this host's fingerprint to your known_hosts file to manage this host.&quot;
+}
+</code></pre> </div>
+</div>
+<p><code>root</code> ユーザーでパスワード認証して <code>ping</code> モジュールを実行してみます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>ansible -i inventory example.com -u root --ask-pass -m ping
+<span class=go>SSH password: （root ユーザーのパスワードを入力）
+</span><span class=go>example.com | SUCCESS =&gt; {
+</span><span class=go>    &#34;ansible_facts&#34;: {
+</span><span class=go>        &#34;discovered_interpreter_python&#34;: &#34;/usr/bin/python3&#34;
+</span><span class=go>    },
+</span><span class=go>    &#34;changed&#34;: false,
+</span><span class=go>    &#34;ping&#34;: &#34;pong&#34;
+</span><span class=go>}
+</span></code></pre></div><p>うまくいきました！</p>
+<p><code>ansible-playbook</code> コマンドも同様に実行できます。</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/uhu7hs4/>Ansible で Hello World</a></li>
+<li><a href=./p/pamv6gq/>Ansible の ansible.cfg ファイルの検索順序</a></li>
+<li><a href=./p/eycnx9i/>Ansible でインベントリーファイルの場所を指定する</a></li>
+<li><a href=./p/m7ju6fq/>Ansible とは？ Ansible をインストールする</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/ansible>Ansible</a></span>
+<span class=xPageTags_item><a href=./tags/docker>Docker</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/8t6hr3d/><span class=xArticle_up_label>Ansible のメモ</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -791,252 +947,6 @@ IPv4 は DHCP が有効になっていますが、うまく固定のアドレス
 </div>
 <div class=xArticle_up>
 <a href=./p/fn7m2gu/><span class=xArticle_up_label>JavaScript / Node.js 関連メモ</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/5q4fr3d/>GitHub</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/ubkahpw/>GitHub GraphQL API のクエリ例</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=./p/5q4fr3d/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/9bku4cj/>GitHub GraphQL API のクエリ例: ユーザー情報を取得する (viewer, user)</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/github>GitHub</a></span>
-<span class=xPageTags_item><a href=./tags/graphql>GraphQL</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-06-20>2022-06-20</time><br>
-作成: <time itemprop=datePublished datetime=2020-07-31>2020-07-31</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#サインイン済みのユーザー情報を取得する-viewer>サインイン済みのユーザー情報を取得する (viewer)</a></li>
-<li><a href=#指定したログイン-id-のユーザー情報を取得する-user>指定したログイン ID のユーザー情報を取得する (user)</a></li>
-<li><a href=#ユーザーのコミット統計情報を取得する貢献度情報>ユーザーのコミット統計情報を取得する（貢献度情報）</a></li>
-<li><a href=#ある組織に所属するユーザー情報を取得する-organizationmemberswithrole>ある組織に所属するユーザー情報を取得する (Organization.membersWithRole)</a></li>
-</ul>
-</nav><h2 id=サインイン済みのユーザー情報を取得する-viewer>サインイン済みのユーザー情報を取得する (viewer)</h2>
-<p><code>viewer</code> クエリを使用すると、現在アクセスしているユーザー（サインイン中のユーザー）のユーザー情報（<a href=https://docs.github.com/en/graphql/reference/objects#user>User オブジェクト</a>）を取得することができます。</p>
-<ul>
-<li><a href=https://docs.github.com/en/graphql/reference/queries#user>Queries - viewer</a></li>
-</ul>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>GraphQL クエリ</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=nc>viewer</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>    </span><span class=py>login</span><span class=w>  </span><span class=c># ログインID</span><span class=w>
-</span><span class=w>    </span><span class=py>name</span><span class=w>   </span><span class=c># ユーザー名</span><span class=w>
-</span><span class=w>    </span><span class=py>email</span><span class=w>  </span><span class=c># メールアドレス（ユーザーが公開していれば）</span><span class=w>
-</span><span class=w>    </span><span class=py>url</span><span class=w>    </span><span class=c># ユーザーの GitHub ホームページ</span><span class=w>
-</span><span class=w>    </span><span class=py>websiteUrl</span><span class=w>  </span><span class=c># ユーザーの Web サイト</span><span class=w>
-</span><span class=w>    </span><span class=py>avatarUrl</span><span class=w>   </span><span class=c># ユーザーのアバター画像</span><span class=w>
-</span><span class=w>  </span><span class=p>}</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>実行結果</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
-  <span class=nt>&#34;data&#34;</span><span class=p>:</span> <span class=p>{</span>
-    <span class=nt>&#34;viewer&#34;</span><span class=p>:</span> <span class=p>{</span>
-      <span class=nt>&#34;login&#34;</span><span class=p>:</span> <span class=s2>&#34;maku77&#34;</span><span class=p>,</span>
-      <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Maku Maku&#34;</span><span class=p>,</span>
-      <span class=nt>&#34;email&#34;</span><span class=p>:</span> <span class=s2>&#34;maku@example.com&#34;</span><span class=p>,</span>
-      <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://github.com/maku77&#34;</span><span class=p>,</span>
-      <span class=nt>&#34;websiteUrl&#34;</span><span class=p>:</span> <span class=s2>&#34;https://maku77.github.io/&#34;</span><span class=p>,</span>
-      <span class=nt>&#34;avatarUrl&#34;</span><span class=p>:</span> <span class=s2>&#34;https://avatars2.githubusercontent.com/u/5519503?v=4&#34;</span>
-    <span class=p>}</span>
-  <span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<h2 id=指定したログイン-id-のユーザー情報を取得する-user>指定したログイン ID のユーザー情報を取得する (user)</h2>
-<p><code>user</code> クエリを使用すると、指定したユーザー名のユーザー情報を取得することができます。</p>
-<ul>
-<li><a href=https://docs.github.com/en/graphql/reference/queries#user>Queries - user</a></li>
-</ul>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>GraphQL クエリ</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=nc>user</span><span class=p>(</span><span class=py>login</span><span class=p>:</span><span class=s>&#34;maku77&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>    </span><span class=nc>login</span><span class=w>  </span><span class=c># ログインID</span><span class=w>
-</span><span class=w>    </span><span class=py>name</span><span class=w>   </span><span class=c># ユーザー名</span><span class=w>
-</span><span class=w>    </span><span class=py>email</span><span class=w>  </span><span class=c># メールアドレス（ユーザーが公開していれば）</span><span class=w>
-</span><span class=w>    </span><span class=py>url</span><span class=w>    </span><span class=c># ユーザーの GitHub ホームページ</span><span class=w>
-</span><span class=w>    </span><span class=py>websiteUrl</span><span class=w>  </span><span class=c># ユーザーの Web サイト</span><span class=w>
-</span><span class=w>    </span><span class=py>avatarUrl</span><span class=w>   </span><span class=c># ユーザーのアバター画像</span><span class=w>
-</span><span class=w>  </span><span class=p>}</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>取得できるオブジェクトは、<code>viewer</code> クエリの場合と同様に <a href=https://docs.github.com/en/graphql/reference/objects#user>User オブジェクト</a> です。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>実行結果</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
-  <span class=nt>&#34;data&#34;</span><span class=p>:</span> <span class=p>{</span>
-    <span class=nt>&#34;user&#34;</span><span class=p>:</span> <span class=p>{</span>
-      <span class=nt>&#34;login&#34;</span><span class=p>:</span> <span class=s2>&#34;maku77&#34;</span><span class=p>,</span>
-      <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Maku Maku&#34;</span><span class=p>,</span>
-      <span class=nt>&#34;email&#34;</span><span class=p>:</span> <span class=s2>&#34;maku@examle.com&#34;</span><span class=p>,</span>
-      <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://github.com/maku77&#34;</span><span class=p>,</span>
-      <span class=nt>&#34;websiteUrl&#34;</span><span class=p>:</span> <span class=s2>&#34;https://maku77.github.io/&#34;</span><span class=p>,</span>
-      <span class=nt>&#34;avatarUrl&#34;</span><span class=p>:</span> <span class=s2>&#34;https://avatars2.githubusercontent.com/u/5519503?v=4&#34;</span>
-    <span class=p>}</span>
-  <span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>ただし、指定したユーザー名が存在しない場合は <code>data.user</code> フィールドの値は <strong><code>null</code></strong> になり、<code>errors</code> フィールドの値が格納されます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>GraphQL クエリ（存在しないユーザーを指定する）</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=nc>user</span><span class=p>(</span><span class=py>login</span><span class=p>:</span><span class=s>&#34;no-such-user&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>    </span><span class=nc>login</span><span class=w>
-</span><span class=w>  </span><span class=p>}</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>実行結果</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
-  <span class=nt>&#34;data&#34;</span><span class=p>:</span> <span class=p>{</span>
-    <span class=nt>&#34;user&#34;</span><span class=p>:</span> <span class=kc>null</span>
-  <span class=p>},</span>
-  <span class=nt>&#34;errors&#34;</span><span class=p>:</span> <span class=p>[</span>
-    <span class=p>{</span>
-      <span class=nt>&#34;type&#34;</span><span class=p>:</span> <span class=s2>&#34;NOT_FOUND&#34;</span><span class=p>,</span>
-      <span class=nt>&#34;path&#34;</span><span class=p>:</span> <span class=p>[</span>
-        <span class=s2>&#34;user&#34;</span>
-      <span class=p>],</span>
-      <span class=nt>&#34;locations&#34;</span><span class=p>:</span> <span class=p>[</span>
-        <span class=p>{</span>
-          <span class=nt>&#34;line&#34;</span><span class=p>:</span> <span class=mi>7</span><span class=p>,</span>
-          <span class=nt>&#34;column&#34;</span><span class=p>:</span> <span class=mi>3</span>
-        <span class=p>}</span>
-      <span class=p>],</span>
-      <span class=nt>&#34;message&#34;</span><span class=p>:</span> <span class=s2>&#34;Could not resolve to a User with the login of &#39;no-such-user&#39;.&#34;</span>
-    <span class=p>}</span>
-  <span class=p>]</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<h2 id=ユーザーのコミット統計情報を取得する貢献度情報>ユーザーのコミット統計情報を取得する（貢献度情報）</h2>
-<p><a href=https://docs.github.com/en/graphql/reference/objects#user>User オブジェクト</a> の <strong><code>contributionsCollection</code></strong> フィールドを参照すると、そのユーザーの一定期間内の <strong>コミット数、PR 作成数、PR レビュー数</strong> などの情報を取得することができます。
-<code>from</code> 引数と <code>to</code> 引数で統計情報の取得期間を指定します（最長 1 年間）。
-日時を省略した場合は、直近の 1 年間の統計情報を取得します。</p>
-<p>次の例では、あるユーザーの 2021 年の Contribution 情報を取得しています。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>GraphQL クエリ</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=nc>user</span><span class=p>(</span><span class=py>login</span><span class=p>:</span><span class=s>&#34;maku77&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>    </span><span class=nc>login</span><span class=w>  </span><span class=c># ログインID</span><span class=w>
-</span><span class=w>    </span><span class=py>name</span><span class=w>   </span><span class=c># ユーザー名</span><span class=w>
-</span><span class=w>
-</span><span class=w>    </span><span class=py>contributionsCollection</span><span class=p>(</span><span class=py>from</span><span class=p>:</span><span class=w> </span><span class=s>&#34;2021-01-01T00:00:00Z&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>      </span><span class=nc>startedAt</span><span class=w>  </span><span class=c># 統計情報の開始日時</span><span class=w>
-</span><span class=w>      </span><span class=py>endedAt</span><span class=w>    </span><span class=c># 統計情報の終了日時</span><span class=w>
-</span><span class=w>      </span><span class=py>totalCommitContributions</span><span class=w>  </span><span class=c># 合計コミット数</span><span class=w>
-</span><span class=w>      </span><span class=py>totalPullRequestContributions</span><span class=w>  </span><span class=c># 合計 PR 作成数</span><span class=w>
-</span><span class=w>      </span><span class=py>totalPullRequestReviewContributions</span><span class=w>  </span><span class=c># 合計 PR レビュー数</span><span class=w>
-</span><span class=w>
-</span><span class=w>      </span><span class=py>commitContributionsByRepository</span><span class=w> </span><span class=p>{</span><span class=w>  </span><span class=c># リポジトリごとの情報</span><span class=w>
-</span><span class=w>        </span><span class=py>repository</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>          </span><span class=py>nameWithOwner</span><span class=w>  </span><span class=c># Organization/リポジトリ名</span><span class=w>
-</span><span class=w>        </span><span class=p>}</span><span class=w>
-</span><span class=w>        </span><span class=py>contributions</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>          </span><span class=py>totalCount</span><span class=w>  </span><span class=c># このリポジトリへのコミット数</span><span class=w>
-</span><span class=w>        </span><span class=p>}</span><span class=w>
-</span><span class=w>      </span><span class=p>}</span><span class=w>
-</span><span class=w>    </span><span class=p>}</span><span class=w>
-</span><span class=w>  </span><span class=p>}</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>実行結果</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
-  <span class=nt>&#34;data&#34;</span><span class=p>:</span> <span class=p>{</span>
-    <span class=nt>&#34;user&#34;</span><span class=p>:</span> <span class=p>{</span>
-      <span class=nt>&#34;login&#34;</span><span class=p>:</span> <span class=s2>&#34;maku77&#34;</span><span class=p>,</span>
-      <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Maku Maku&#34;</span><span class=p>,</span>
-      <span class=nt>&#34;contributionsCollection&#34;</span><span class=p>:</span> <span class=p>{</span>
-        <span class=nt>&#34;startedAt&#34;</span><span class=p>:</span> <span class=s2>&#34;2021-01-01T00:00:00Z&#34;</span><span class=p>,</span>
-        <span class=nt>&#34;endedAt&#34;</span><span class=p>:</span> <span class=s2>&#34;2022-01-01T00:00:00Z&#34;</span><span class=p>,</span>
-        <span class=nt>&#34;totalCommitContributions&#34;</span><span class=p>:</span> <span class=mi>2000</span><span class=p>,</span>
-        <span class=nt>&#34;totalPullRequestContributions&#34;</span><span class=p>:</span> <span class=mi>400</span><span class=p>,</span>
-        <span class=nt>&#34;totalPullRequestReviewContributions&#34;</span><span class=p>:</span> <span class=mi>150</span><span class=p>,</span>
-        <span class=nt>&#34;commitContributionsByRepository&#34;</span><span class=p>:</span> <span class=p>[</span>
-          <span class=p>{</span>
-            <span class=nt>&#34;repository&#34;</span><span class=p>:</span> <span class=p>{</span>
-              <span class=nt>&#34;nameWithOwner&#34;</span><span class=p>:</span> <span class=s2>&#34;maku77/repo1&#34;</span>
-            <span class=p>},</span>
-            <span class=nt>&#34;contributions&#34;</span><span class=p>:</span> <span class=p>{</span>
-              <span class=nt>&#34;totalCount&#34;</span><span class=p>:</span> <span class=mi>1200</span>
-            <span class=p>}</span>
-          <span class=p>},</span>
-          <span class=p>{</span>
-            <span class=nt>&#34;repository&#34;</span><span class=p>:</span> <span class=p>{</span>
-              <span class=nt>&#34;nameWithOwner&#34;</span><span class=p>:</span> <span class=s2>&#34;maku77/repo2&#34;</span>
-            <span class=p>},</span>
-            <span class=nt>&#34;contributions&#34;</span><span class=p>:</span> <span class=p>{</span>
-              <span class=nt>&#34;totalCount&#34;</span><span class=p>:</span> <span class=mi>800</span>
-            <span class=p>}</span>
-          <span class=p>}</span>
-        <span class=p>]</span>
-      <span class=p>}</span>
-    <span class=p>}</span>
-  <span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<h2 id=ある組織に所属するユーザー情報を取得する-organizationmemberswithrole>ある組織に所属するユーザー情報を取得する (Organization.membersWithRole)</h2>
-<p>ルートフィールドで <code>organization</code> を指定すれば、特定の組織に所属するユーザーの一覧を取得できます。</p>
-<ul>
-<li>参考: <a href=./p/3o2doyb/#org-members>組織 (org) 内のユーザーの一覧を取得</a></li>
-</ul>
-<p>そこには <code>User</code> オブジェクトの情報が含まれているので、例えば次のようにすれば、組織のメンバー全員 (<code>membersWithRole</code>) の過去 1 年間の貢献情報をまとめて取得することができます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=nc>organization</span><span class=p>(</span><span class=py>login</span><span class=p>:</span><span class=w> </span><span class=s>&#34;Organization名&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>    </span><span class=nc>name</span><span class=w>
-</span><span class=w>    </span><span class=py>membersWithRole</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>100</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>      </span><span class=py>nodes</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>        </span><span class=py>login</span><span class=w>  </span><span class=c># ログインID</span><span class=w>
-</span><span class=w>        </span><span class=py>name</span><span class=w>   </span><span class=c># ユーザー名</span><span class=w>
-</span><span class=w>        </span><span class=py>email</span><span class=w>  </span><span class=c># メールアドレス（ユーザーが公開していれば）</span><span class=w>
-</span><span class=w>        </span><span class=py>contributionsCollection</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>          </span><span class=py>startedAt</span><span class=w>  </span><span class=c># 統計情報の開始日時</span><span class=w>
-</span><span class=w>          </span><span class=py>endedAt</span><span class=w>    </span><span class=c># 統計情報の終了日時</span><span class=w>
-</span><span class=w>          </span><span class=py>totalCommitContributions</span><span class=w>  </span><span class=c># 合計コミット数</span><span class=w>
-</span><span class=w>          </span><span class=py>totalPullRequestContributions</span><span class=w>  </span><span class=c># 合計 PR 数</span><span class=w>
-</span><span class=w>          </span><span class=py>totalPullRequestReviewContributions</span><span class=w>  </span><span class=c># 合計レビュー数</span><span class=w>
-</span><span class=w>        </span><span class=p>}</span><span class=w>
-</span><span class=w>      </span><span class=p>}</span><span class=w>
-</span><span class=w>    </span><span class=p>}</span><span class=w>
-</span><span class=w>  </span><span class=p>}</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div><p>ただし、GitHub GraphQL API の制約上、ユーザー情報は一度に 100 ユーザー分しかとれないので、それ以上のメンバーがいる組織の場合は、<a href=https://graphql.org/learn/pagination/>GraphQL のページネーション処理</a> で繰り返しクエリを実行する必要があります。</p>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/qcp2cnx/>Apollo Client で GitHub GraphQL API を使う (Node & React)</a></li>
-<li><a href=./p/7r6gr3d/>Node.js で GitHub REST API を使用する (@octokit/rest)</a></li>
-<li><a href=./p/xwfwdy6/>GitHub Pages は早く Jekyll から Hugo に乗り換えるべき</a></li>
-<li><a href=./p/6ez7nuf/>Jekyll (GitHub Pages) でページの最終更新日を表示する</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/github>GitHub</a></span>
-<span class=xPageTags_item><a href=./tags/graphql>GraphQL</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/ubkahpw/><span class=xArticle_up_label>GitHub GraphQL API のクエリ例</span><br>へ戻る</a>
 </div>
 </article><h2>メニュー</h2>
 <div class=xTopMenu>
