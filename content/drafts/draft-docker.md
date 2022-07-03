@@ -6,20 +6,16 @@ tags: ["Docker"]
 draft: true
 ---
 
-docker コマンドの動作確認
-----
-
-```console
-$ docker container run --rm hello-world
-
-（Hello from Docker! のようなメッセージを確認できればうまく動いています）
-```
-
-その他メモ
+Docker 雑多メモ
 ----
 
 - Docker は __Go 言語__ で実装されている。
 - Docker のクライアントとデーモンは __REST API__ で通信している。なので、それぞれは別の PC で動いていても問題ない（クラ・サバモデル）。
+- Linux で動作する Docker Engine では、cgroups (control groups) でリソースへのアクセスを制限している。
+- 停止していないコンテナを強制的に削除する。
+  ```console
+  $ docker rm --force mycontainer
+  ```
 - docker コマンドを root 権限なしで実行できるようにする。
   ```console
   $ sudo usermod -aG docker $(whoami)
@@ -30,6 +26,16 @@ $ docker container run --rm hello-world
   $ docker tag myimg username/myimg
   $ docker push username/myimg
   ```
+
+
+docker コマンドの動作確認
+----
+
+```console
+$ docker container run --rm hello-world
+
+（Hello from Docker! のようなメッセージを確認できればうまく動いています）
+```
 
 
 Docker 関連用語
