@@ -1464,6 +1464,30 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/ruk3gu9/",
+title: "Linux メモ",
+date: "2022-07-05T00:00:00Z",
+body: "Linux メモ"
+},
+{
+url: "/p/sg2m6wm/",
+title: "Linuxコマンド: ss コマンドの使い方",
+date: "2022-07-05T00:00:00Z",
+body: "Linuxコマンド: ss コマンドの使い方 関連コマンド: ip コマンド ss コマンドとは Linux の ss コマンド (socket statistics) は、TCP ポートや UDP ポートの通信状態を確認するためのコマンドで、過去に使われていた net-tools パッケージの netstat コマンドの後継です。 Cent OS 7 ではデフォルトで ss コマンドが採用されています。 APT の iproute2 パッケージをインストールすると、ss コマンドを使用できるようになります。 ss コマンドのインストール $ apt update # パッケージリストの更新 $ apt install -y iproute2 iptable2 パッケージをインストールすると、一緒に ip コマンド などもインストールされます。 ss サブコマンド コマンド 説明 対応する旧コマンド ss -nat TCP ポートの通信状態を確認 netstat -nat ss -nlt LISTEN（待ち受け）状態の TCP ポートを確認 netsta -nlt ss -nau UDP ポートの通信状態を確認UDP ソケットの State カラムは UNCONN と表示される netstat -nau"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2022-07-05T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-07-05T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/8t6hr3d/",
 title: "Ansible のメモ",
 date: "2022-07-02T00:00:00Z",
@@ -1474,18 +1498,6 @@ url: "/p/euevcs8/",
 title: "Docker で Ansible の実行環境用のコンテナを作成する",
 date: "2022-07-02T00:00:00Z",
 body: "Docker で Ansible の実行環境用のコンテナを作成する 何をするか？ Ansible の実行環境は Python がインストールされている環境であれば比較的簡単にインストールできますが、Docker の実行環境があれば、ホスト環境に何もインストールせずに Ansible の実行環境を手に入れることができます（もちろんコンテナは作る必要はありますが）。 Docker Hub を見ると、Alpine Linux ベースの Ansible 実行環境用イメージ alpine/ansible があるようですが、ここでは Dockerfile を使って自分でイメージを作成することにします。 Ansible 実行環境用イメージを作成する Dockerfile で Alpine Linux ベースの Ansible 実行環境を定義します。 Dockerfile FROMalpine:3WORKDIR/app# --no-cache を付けることで /var/cache/apk 以下にキャッシュが残るのを防ぐ# --update-cache を付けることで先に apk update するのと同じ効果になるRUN apk --no-cache --update-cache add ansible openssh sshpass APK (Alpine Package Keeper) で次のようなパッケージをインストールしています。 ansible \u0026hellip; Ansible Community パッケージ（ansible コマンドや ansible-playbook コマンドなど） openssh \u0026hellip; ssh コマンドのため sshpass \u0026hellip; ターゲットホストにパスワード認証 (--ask-pass) で接続するときのため Ansible Community パッケージ (ansible) ではなく、Ansible Core (ansible-core) を使うようにすれば、イメージサイズは 500MB 弱から 80MB 程度に削減できますが、サイズを気にしなくてよいなら Ansible Community パッケージを使っておいた方が楽です。 Dockerfile を記述したら、ビルドしてイメージを作成します。 ここではイメージ名はシンプルに ansible としています。 ansible という名前のイメージを作成 $ docker image build -t ansible . イメージが作成できているか確認します。 $ docker image ls REPOSITORY TAG IMAGE ID CREATED SIZE ansible latest 224bbc474bf8 3 minutes ago 472MB コンテナの ansible コマンドを実行する ansible コンテナ内のコマンドを実行する Ansible の各種コマンドをインストールした ansible イメージを作成したので、次のようにして ansible コマンドや ansible-playbook コマンドを実行できます。 ## ansible コマンドの実行 $ docker container run --rm ansible ansible ## ansible-playbook コマンドの実行 $ docker container run --rm ansible ansible-playbook --rm オプションを指定して実行しているので、コマンド実行後にコンテナはすぐに破棄されます。 でもよく考えたら ansible-galaxy による Ansible コレクションのインストールは適宜必要になるので、--rm オプションは外して使うことになるかもしれません。 ☝️ コンテナのシェルを使う 必要に応じて、ansible コンテナの ash シェルを使って作業することもできます。 $ docker container run --rm -it ansible ash /app # ansible --help /app # exit ansible エイリアス、ansible-playbook エイリアスを作成する 毎回 docker container run コマンドを入力するのは面倒ですし、このままだと、ホスト側のディレクトリにあるインベントリファイル (inventory) や Playbook ファイルを参照できないので、次のようなエイリアスを定義しておくと便利です。 alias-ansible.bashrc（source での読み込み用） alias ansible=\u0026#39;docker container run --rm -it --mount type=bind,src=\u0026#34;$(pwd)\u0026#34;,dst=/app ansible ansible\u0026#39; alias ansible-playbook=\u0026#39;docker container run --rm -it --mount type=bind,src=\u0026#34;$(pwd)\u0026#34;,dst=/app ansible ansible-playbook\u0026#39; --mount オプションによって、ホスト側のカレントディレクトリを、コンテナの作業ディレクトリ (/app) にバインドマウントしています。 SSH キー用に --mount type=bind,src=\u0026quot;$HOME/.ssh\u0026quot;,dst=/root/.ssh も追加しておいた方がいいかもしれません。 これで、あたかもホストマシンに ansible コマンドや ansible-playbook コマンドがインストールされているかのように実行できます。 $ ansible localhost -m ping [WARNING]: No inventory was parsed, only implicit localhost is available localhost | SUCCESS =\u0026gt; { \u0026#34;changed\u0026#34;: false, \u0026#34;ping\u0026#34;: \u0026#34;pong\u0026#34; } もう少し実践的な使用例 example.com というホストに SSH 接続（パスワード認証）して ping モジュールを実行してみます。 まず、Ansible によるコントロール対象を記述したインベントリファイルを用意します。 inventory example.com ansible_ssh_common_args=\u0026#39;-o StrictHostKeyChecking=no\u0026#39; インベントリファイルでは、初回 SSH 接続時の known_hosts 未登録エラーを防ぐための StrictHostKeyChecking オプションを指定しています。 参考: known_hosts 未登録エラーの例 example.com | FAILED! =\u0026gt; { \u0026quot;msg\u0026quot;: \u0026quot;Using a SSH password instead of a key is not possible because Host Key checking is enabled and sshpass does not support this. Please add this host's fingerprint to your known_hosts file to manage this host.\u0026quot; } root ユーザーでパスワード認証して ping モジュールを実行してみます。 $ ansible -i inventory example.com -u root --ask-pass -m ping SSH password: （root ユーザーのパスワードを入力） example.com | SUCCESS =\u0026gt; { \u0026#34;ansible_facts\u0026#34;: { \u0026#34;discovered_interpreter_python\u0026#34;: \u0026#34;/usr/bin/python3\u0026#34; }, \u0026#34;changed\u0026#34;: false, \u0026#34;ping\u0026#34;: \u0026#34;pong\u0026#34; } うまくいきました！ ansible-playbook コマンドも同様に実行できます。"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2022-07-02T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-07-02T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/n5emu3a/",
@@ -1518,16 +1530,10 @@ date: "2022-06-22T00:00:00Z",
 body: "Node.js で URL のパスを結合する (url-join) José F. Romaniello 氏 (jfromaniello) が公開している NPM パッケージの url-join を使うと、バラバラになった URL のパスをうまいこと結合してくれます。 url-join のインストール $ npm install url-join 使用例 import urlJoin from \u0026#39;url-join\u0026#39; urlJoin(\u0026#39;https://example.com\u0026#39;, \u0026#39;a\u0026#39;, \u0026#39;/b/c\u0026#39;)) //=\u0026gt; https://example.com/a/b/c urlJoin(\u0026#39;https://example.com/\u0026#39;, \u0026#39;/a\u0026#39;, \u0026#39;/b/c/\u0026#39;)) //=\u0026gt; https://example.com/a/b/c/ urlJoin(\u0026#39;https://example.com\u0026#39;, \u0026#39;/foo\u0026#39;, \u0026#39;?q=123\u0026#39;)) //=\u0026gt; https://example.com/foo?q=123 urlJoin(\u0026#39;https://example.com\u0026#39;, \u0026#39;foo/\u0026#39;, \u0026#39;/?q=123\u0026#39;)) //=\u0026gt; https://example.com/foo?q=123 URL の末尾にクエリ文字列 (?q=123) があるときは、パス部分の末尾の / は消されちゃうみたいですね。 ☝️ path.join は URL 結合には使えない path モジュールの path.join は、ローカルファイルシステム用のパス結合関数なので、URL の結合には使ってはいけません。 例えば、Windows 環境ではバックスラッシュが使われてしまったりします。"
 },
 {
-url: "/p/ruk3gu9/",
-title: "Linux メモ",
-date: "2022-06-16T00:00:00Z",
-body: "Linux メモ"
-},
-{
 url: "/p/p7q7n4i/",
 title: "Linuxコマンド: ip コマンドの使い方",
 date: "2022-06-16T00:00:00Z",
-body: "Linuxコマンド: ip コマンドの使い方 apt で ip コマンドをインストールする ip コマンドは APT の iproute2 パッケージに含まれています。 Docker の Ubuntu コンテナなどで ip コマンドが見つからない場合は、次のようにインストールできます。 $ apt update # パッケージリストの更新 $ apt install -y iproute2 iproute2 パッケージには、ip コマンド以外にもいろいろなコマンドが含まれています（参考: iproute2 に含まれるファイルのリスト ─ Debian / archlinux）。 arpd - userspace arp daemon bridge - show / manipulate bridge addresses and devices devlink - Devlink tool ip - show / manipulate routing, devices, policy routing and tunnels lnstat - unified linux network statistics nstat - network statistics tools routef - flush routes routel - list routes with pretty output format rtacct - network statistics tools rtmon - listens to and monitors RTnetlink rtstat - unified linux network statistics ss - another utility to investigate sockets tc - show / manipulate traffic control settings tipc - a TIPC configuration and management tool サブコマンドのヘルプを表示する ip \u0026lt;サブコマンド名\u0026gt; help で各サブコマンドのヘルプを表示できます。 例: ip address コマンドのヘルプを表示する $ ip address help 例: ip link コマンドのヘルプを表示する $ ip link help ip address コマンド（IP アドレスの確認・設定） ip address コマンドは、ホストの（ネットワークインタフェース）に割り当てられている IP アドレスの情報を表示します。 サブコマンドの address は 1 文字まで省略できるので、ip a で実行することができます。 すべてのアドレスを表示 $ ip addr 1: lo: \u0026lt;LOOPBACK,UP,LOWER_UP\u0026gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000 link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00 inet 127.0.0.1/8 scope host lo valid_lft forever preferred_lft forever 2: tunl0@NONE: \u0026lt;NOARP\u0026gt; mtu 1480 qdisc noop state DOWN group default qlen 1000 link/ipip 0.0.0.0 brd 0.0.0.0 3: ip6tnl0@NONE: \u0026lt;NOARP\u0026gt; mtu 1452 qdisc noop state DOWN group default qlen 1000 link/tunnel6 :: brd :: permaddr e28e:402f:dcf2:: 81: eth0@if82: \u0026lt;BROADCAST,MULTICAST,UP,LOWER_UP\u0026gt; mtu 1500 qdisc noqueue state UP group default link/ether 02:42:ac:11:00:03 brd ff:ff:ff:ff:ff:ff link-netnsid 0 inet 172.17.0.3/16 brd 172.17.255.255 scope global eth0 valid_lft forever preferred_lft forever 指定したデバイス (eth0) のアドレスを表示 $ ip addr show dev eth0 81: eth0@if82: \u0026lt;BROADCAST,MULTICAST,UP,LOWER_UP\u0026gt; mtu 1500 qdisc noqueue state UP group default link/ether 02:42:ac:11:00:03 brd ff:ff:ff:ff:ff:ff link-netnsid 0 inet 172.17.0.3/16 brd 172.17.255.255 scope global eth0 valid_lft forever preferred_lft forever IPv6 アドレスが割り当てられているか確認する 次のように fe80:: で始まるアドレスしか表示されない場合は、IPv6 アドレスは割り当てられていません。 $ ip -6 a 1: lo: \u0026lt;LOOPBACK,UP,LOWER_UP\u0026gt; mtu 65536 state UNKNOWN qlen 1000 inet6 ::1/128 scope host valid_lft forever preferred_lft forever 2: eth0: \u0026lt;BROADCAST,MULTICAST,UP,LOWER_UP\u0026gt; mtu 1500 state UP qlen 1000 inet6 fe80::2:a0ff:fefb:330a/64 scope link valid_lft forever preferred_lft forever fe80:: で始まるアドレスは、IPv6 におけるリンクローカルアドレスです。 ちなみに、IPv4 のリンクローカルアドレスは 169.254.0.0 〜 169.254.255.255 です。 DHCP などでアドレスが割り当てられない場合に、IP アドレス自己割り当て機能 (APIPA: Automatic Private IP Addressing) を使って、これらの IP アドレスが割り当てられます。"
+body: "Linuxコマンド: ip コマンドの使い方 関連コマンド: ss コマンド ip コマンドとは Linux の ip コマンドを使うと、ネットワークデバイスやルーティングテーブル、ARP テーブルなどの確認・設定を行うことができます。 過去に net-tools パッケージで提供されていた、ifconfig、route、arp、netstat コマンドは deprecated（非推奨）扱いになっています。 ip コマンドをインストールする ip コマンドは APT の iproute2 パッケージに含まれています。 Docker の Ubuntu コンテナなどで ip コマンドが見つからない場合は、次のようにインストールできます。 $ apt update # パッケージリストの更新 $ apt install -y iproute2 iproute2 パッケージには、ip コマンド以外にもいろいろなコマンドが含まれています（参考: iproute2 に含まれるファイルのリスト ─ Debian / archlinux）。 iproute2 のインストールで使えるようになるコマンド arpd - userspace arp daemon bridge - show / manipulate bridge addresses and devices devlink - Devlink tool ip - show / manipulate routing, devices, policy routing and tunnels lnstat - unified linux network statistics nstat - network statistics tools routef - flush routes routel - list routes with pretty output format rtacct - network statistics tools rtmon - listens to and monitors RTnetlink rtstat - unified linux network statistics ss - another utility to investigate sockets tc - show / manipulate traffic control settings tipc - a TIPC configuration and management tool ip サブコマンドのヘルプを表示する ip \u0026lt;サブコマンド名\u0026gt; help で各サブコマンドのヘルプを表示できます。 例: ip address コマンドのヘルプを表示する $ ip address help 例: ip link コマンドのヘルプを表示する $ ip link help ip サブコマンド コマンド 説明 対応する旧コマンド ip r (ip route show) ルーティングテーブルの確認 netstat -r, route ip a (ip address show) IP アドレスや MAC アドレスの確認 ifconfig ip n (ip neigh) ARP テーブルの確認 arp -n ip -s -l ネットワークデバイスのパケット転送量 netstat -i sudo ip link set eth0 up/down ネットワークデバイスの起動／停止 ifconfig eth0 up/down ip address コマンド（IP アドレスの確認・設定） ip address コマンドは、ホストの（ネットワークインタフェース）に割り当てられている IP アドレスの情報を表示します。 サブコマンドの address は 1 文字まで省略できるので、ip a で実行することができます。 すべてのアドレスを表示 $ ip addr 1: lo: \u0026lt;LOOPBACK,UP,LOWER_UP\u0026gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000 link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00 inet 127.0.0.1/8 scope host lo valid_lft forever preferred_lft forever 2: tunl0@NONE: \u0026lt;NOARP\u0026gt; mtu 1480 qdisc noop state DOWN group default qlen 1000 link/ipip 0.0.0.0 brd 0.0.0.0 3: ip6tnl0@NONE: \u0026lt;NOARP\u0026gt; mtu 1452 qdisc noop state DOWN group default qlen 1000 link/tunnel6 :: brd :: permaddr e28e:402f:dcf2:: 81: eth0@if82: \u0026lt;BROADCAST,MULTICAST,UP,LOWER_UP\u0026gt; mtu 1500 qdisc noqueue state UP group default link/ether 02:42:ac:11:00:03 brd ff:ff:ff:ff:ff:ff link-netnsid 0 inet 172.17.0.3/16 brd 172.17.255.255 scope global eth0 valid_lft forever preferred_lft forever 指定したデバイス (eth0) のアドレスを表示 $ ip addr show dev eth0 81: eth0@if82: \u0026lt;BROADCAST,MULTICAST,UP,LOWER_UP\u0026gt; mtu 1500 qdisc noqueue state UP group default link/ether 02:42:ac:11:00:03 brd ff:ff:ff:ff:ff:ff link-netnsid 0 inet 172.17.0.3/16 brd 172.17.255.255 scope global eth0 valid_lft forever preferred_lft forever IPv6 アドレスが割り当てられているか確認する 次のように fe80:: で始まるアドレスしか表示されない場合は、IPv6 アドレスは割り当てられていません。 $ ip -6 a 1: lo: \u0026lt;LOOPBACK,UP,LOWER_UP\u0026gt; mtu 65536 state UNKNOWN qlen 1000 inet6 ::1/128 scope host valid_lft forever preferred_lft forever 2: eth0: \u0026lt;BROADCAST,MULTICAST,UP,LOWER_UP\u0026gt; mtu 1500 state UP qlen 1000 inet6 fe80::2:a0ff:fefb:330a/64 scope link valid_lft forever preferred_lft forever fe80:: で始まるアドレスは、IPv6 におけるリンクローカルアドレスです。 ちなみに、IPv4 のリンクローカルアドレスは 169.254.0.0 〜 169.254.255.255 です。 DHCP などでアドレスが割り当てられない場合に、IP アドレス自己割り当て機能 (APIPA: Automatic Private IP Addressing) を使って、これらの IP アドレスが割り当てられます。"
 },
 {
 url: "/p/aseqzau/",
