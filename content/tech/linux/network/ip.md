@@ -2,7 +2,8 @@
 title: "Linuxコマンド: ip コマンドの使い方"
 url: "p/p7q7n4i/"
 date: "2022-06-16"
-tags: ["ネットワーク"]
+lastmod: "2022-07-06"
+tags: ["Linux", "ネットワーク"]
 ---
 
 {{% private %}}
@@ -10,8 +11,16 @@ tags: ["ネットワーク"]
 - [Wikipedia - iproute2](https://ja.wikipedia.org/wiki/Iproute2)
 {{% /private %}}
 
+関連コマンド: [ss コマンド](/p/sg2m6wm/)
 
-apt で ip コマンドをインストールする
+ip コマンドとは
+----
+
+Linux の __`ip`__ コマンドを使うと、ネットワークデバイスやルーティングテーブル、ARP テーブルなどの確認・設定を行うことができます。
+過去に `net-tools` パッケージで提供されていた、`ifconfig`、`route`、`arp`、`netstat` コマンドは deprecated（非推奨）扱いになっています。
+
+
+ip コマンドをインストールする
 ----
 
 __`ip`__ コマンドは APT の __`iproute2`__ パッケージに含まれています。
@@ -24,6 +33,7 @@ $ apt install -y iproute2
 
 iproute2 パッケージには、`ip` コマンド以外にもいろいろなコマンドが含まれています（参考: iproute2 に含まれるファイルのリスト ─ [Debian](https://packages.debian.org/sid/amd64/iproute2/filelist) / [archlinux](https://archlinux.org/packages/core/x86_64/iproute2/files/)）。
 
+{{% accordion title="iproute2 のインストールで使えるようになるコマンド" %}}
 - `arpd` - userspace arp daemon
 - `bridge` - show / manipulate bridge addresses and devices
 - `devlink` - Devlink tool
@@ -38,9 +48,10 @@ iproute2 パッケージには、`ip` コマンド以外にもいろいろなコ
 - `ss` - another utility to investigate sockets
 - `tc` - show / manipulate traffic control settings
 - `tipc` - a TIPC configuration and management tool
+{{% /accordion %}}
 
 
-サブコマンドのヘルプを表示する
+ip サブコマンドのヘルプを表示する
 ----
 
 __`ip <サブコマンド名> help`__ で各サブコマンドのヘルプを表示できます。
@@ -52,6 +63,18 @@ $ ip address help
 {{< code lang="console" title="例: ip link コマンドのヘルプを表示する" >}}
 $ ip link help
 {{< /code >}}
+
+
+ip サブコマンド
+----
+
+| コマンド | 説明 | 対応する旧コマンド |
+| ---- | ---- | ---- |
+| __`ip r`__ (`ip route show`) | ルーティングテーブルの確認 | `netstat -r`, `route` |
+| __`ip a`__ (`ip address show`) | IP アドレスや MAC アドレスの確認 | `ifconfig` |
+| __`ip n`__ (`ip neigh`) | ARP テーブルの確認 | `arp -n` |
+| __`ip -s -l`__ | ネットワークデバイスのパケット転送量 | `netstat -i` |
+| __`sudo ip link set eth0 up/down`__ | ネットワークデバイスの起動／停止 | `ifconfig eth0 up/down` |
 
 
 ip address コマンド（IP アドレスの確認・設定）

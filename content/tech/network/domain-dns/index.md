@@ -2,7 +2,7 @@
 title: "ドメイン管理と DNS 管理の違いを理解する"
 url: "/p/bwamwgp"
 date: "2021-04-25"
-tags: ["DNS"]
+tags: ["DNS", "ネットワーク"]
 ---
 
 ドメイン管理と DNS サーバー

@@ -4,7 +4,8 @@ linkTitle: "ネットワーク"
 url: "/p/nd3cmt3"
 categoryIcon: _index.svg
 links:
-  - /tech/linux/ip
+  - /tech/linux/network/ip
+  - /tech/linux/network/ss
   - /tech/linux/netplan
 ---
 
