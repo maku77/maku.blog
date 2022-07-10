@@ -1466,8 +1466,56 @@ body: "TypeScriptのサンプルコード"
 {
 url: "/p/ruk3gu9/",
 title: "Linux メモ",
-date: "2022-07-05T00:00:00Z",
+date: "2022-07-10T00:00:00Z",
 body: "Linux メモ"
+},
+{
+url: "/p/h5v6gqz/",
+title: "Linuxメモ: sudo で管理者権限でコマンド実行できるようにする (/etc/sudoers, visudo)",
+date: "2022-07-10T00:00:00Z",
+body: "Linuxメモ: sudo で管理者権限でコマンド実行できるようにする (/etc/sudoers, visudo) sudo とは？ Linux の sudo コマンドは、一時的に root ユーザー（あるいは任意のユーザー）としてコマンドを実行できるようにするためのコマンドです。 システムの管理者的な立場の人であっても、常に root ユーザーとして作業するのはリスクがあるため、必要に応じて sudo でコマンド実行することが推奨されています。 sudo コマンドは、次のような形で実行します。 $ sudo ＜管理者権限が必要なコマンド＞ 例えば、/etc/shadow ファイルの閲覧は root ユーザーにしか許可されていませんが、カレントユーザーが sudoers（後述）に登録されていれば、次のようにして読み込むことができます。 $ sudo cat /etc/shadow [sudo] password for maku: （カレントユーザーのパスワードを入力） APT パッケージのインストールでも sudo はよく使われますね。 $ sudo apt install ansible [sudo] password for maku: （カレントユーザーのパスワードを入力） sudo 経由でコマンドを実行するときにパスワードの入力を求められますが、このとき入力するパスワードは root のものではなく、カレントユーザーのパスワードであることに注意してください（OpenSUSE の場合は例外的に root のパスワード）。 つまり、sudo は一般ユーザーが自分のパスワードで実行権限を切り替えてコマンドを実行する仕組みであり、sudoers の設定は慎重に行わなければいけません。 /etc/sudoers ファイルと visudo コマンド /etc/sudoers ファイル どのユーザーが、どのコマンドを、どのユーザーとして実行できるかを管理しているのが /etc/sudoers ファイルです。 ただし、このファイルは次のように編集ができないよう権限設定されており、直接エディタで開いて編集することはできません。 $ ls -l /etc/sudoers -r--r----- 1 root root 1671 Feb 8 17:41 /etc/sudoers visudo コマンド /etc/sudoers ファイルを編集するには、特別に用意された visudo コマンドを使用する必要があります。 次のように実行すれば、デフォルトエディタで /etc/sudoers ファイルを開くことができます。 /etc/sudoers を編集する # visudo （root ユーザーの場合） $ sudo visudo （一般ユーザーの場合） デフォルトエディタは例えば Ubuntu/Debian の場合は nano ですが、EDITOR 環境変数で任意のエディタで開くよう指定できます。 /etc/sudoers を vim で開く $ sudo EDITOR=vim visudo /etc/sudoers ファイルを記述する /etc/sudoers のフォーマット /etc/sudoers ファイルの各行は次のようなフォーマットで記述されています（他にもエイリアスという変数のようなものを定義できますが、ここでは省略します）。 フォーマット ユーザー ホスト=(RunAs) コマンド [, (RunAs) コマンド, ...] 記述例 maku ALL=(root) /sbin/hogehoge 大まかには、= の前の部分で「どのユーザー」が、= の後ろの部分で「どのユーザーとしてどのコマンド」を実行できるかを表現しています。 ユーザー \u0026hellip; sudo を実行可能にするユーザー名を指定します。%グループ名 とするとグループに対しての設定になります。例えば、%admin と指定すると、admin グループに所属するユーザーに対して sudo 権限を割り当てることになります。 ホスト \u0026hellip; sudo コマンドを実行するホスト（ホスト名あるいは IP アドレス）を指定します。通常は ALL と指定しておけば問題ありません。 (RunAs) \u0026hellip; 後ろに指定するコマンドを、どのユーザーとして実行可能かを指定します。ALL を指定すると、どのユーザーとしてでもコマンドを実行できるようになります（これは root として実行できることを意味します）。sudo はデフォルトで root ユーザーとしてコマンドを実行しようとしますが、-u オプションで、ユーザーを明示して実行できます。(RunAs) 部分に (hoge) と設定した場合は、sudo 実行時に必ず -u hoge オプションを指定しなければいけません。 コマンド \u0026hellip; sudo コマンド経由で、どんなコマンドを実行できるかを指定します。ALL を指定すると、あらゆるコマンドを実行できます。 = の後ろの (RunAs) コマンド は、カンマ区切りで複数列挙することができます。 例えば、(user1) cmd1, (user2) cmd2 と記述すると、ユーザー user1 でコマンド cmd1 を、ユーザー user2 でコマンド cmd2 を実行できるようになります。 また、2 番目以降の (RunAs) 部分を省略すると、前に指定したものが再利用されます。 例えば、(root) cmd1, cmd2, cmd3 と記述すると、root ユーザーで cmd1、cmd2、cmd3 を実行できるようになります。 /etc/sudoers の設定例 ALL ALL=(ALL) ALL 上記のように設定してはいけません。 これは、すべてのユーザーが、管理者権限ですべてのコマンドを実行できることを意味します。 maku ALL=(ALL) ALL ユーザー maku は、管理者権限であらゆるコマンドを実行できます。 デフォルトでは root ユーザーとしてコマンドを実行しますが、-u オプションを使えば、任意のユーザーとしてコマンドを実行することができます（その場合は、指定したユーザーの権限でしかコマンドを実行できなくなります）。 %admin ALL=(ALL) ALL admin グループに所属するユーザーは、すべてのコマンドを管理者権限で実行できます。 例えば、ユーザー maku を admin グループに所属させれば、maku は管理者権限であらゆるコマンドを sudo 実行できるようになります（参考: Linux ユーザーをグループに登録する）。 ちなみに、管理者グループを示すグループ名として、Debian 系 (Ubuntu) では admin という名前が使われ、Red Hat 系 (RHEL, Fedora, CentOS, Rocky, AlmaLinux) では wheel という名前が使われます。 maku ALL=(puni) ALL ユーザー maku は、ユーザー puni としてあらゆるコマンドを実行できます。 ただし、puni が実行権限を持っているコマンドしか実行できません。 sudo コマンドはデフォルトで root ユーザーとしてコマンド実行しようとするので、-u オプションでユーザーを指定して実行する必要があります（例: sudo -u puni command）。 （おまけ）sudo によるコマンド出力をリダイレクトするときの注意 次のように、sudo コマンドの出力をリダイレクトして、root ユーザーのホームディレクトリ /root にファイル保存しようとしても失敗します。 うまくいかない例 $ sudo echo Hello \u0026gt; /root/hello.txt -sh: 15: cannot create /root/hello.txt: Permission denied これは、リダイレクト後のファイル書き込みまでは sudo の効果が及ばないからです。 このようなケースでは、次のように sudo コマンドで sh を実行するようにして、リダイレクト処理まで root ユーザーで実行すればうまくいきます。 $ sudo sh -c \u0026#34;echo Hello \u0026gt; /root/hello.txt\u0026#34;"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2022-07-10T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/qt6fox7/",
+title: "Linux のユーザー管理",
+date: "2022-07-10T00:00:00Z",
+body: "Linux のユーザー管理"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-07-10T00:00:00Z",
+body: "技術系のメモ"
+},
+{
+url: "/p/vdweubq/",
+title: "Linux のバージョンの調べ方まとめ",
+date: "2022-07-09T00:00:00Z",
+body: "Linux のバージョンの調べ方まとめ Linux ディストリビューションのバージョン情報を調べる方法はいくつかありますが、/etc/os-release ファイルの内容を見るのが簡単です。 /etc/os-release ファイル Ubuntu 22.04 の場合 $ cat /etc/os-release PRETTY_NAME=\u0026#34;Ubuntu 22.04 LTS\u0026#34; NAME=\u0026#34;Ubuntu\u0026#34; VERSION_ID=\u0026#34;22.04\u0026#34; VERSION=\u0026#34;22.04 (Jammy Jellyfish)\u0026#34; VERSION_CODENAME=jammy ID=ubuntu ID_LIKE=debian HOME_URL=\u0026#34;https://www.ubuntu.com/\u0026#34; SUPPORT_URL=\u0026#34;https://help.ubuntu.com/\u0026#34; BUG_REPORT_URL=\u0026#34;https://bugs.launchpad.net/ubuntu/\u0026#34; PRIVACY_POLICY_URL=\u0026#34;https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\u0026#34; UBUNTU_CODENAME=jammy Debian 11 の場合 $ cat /etc/os-release PRETTY_NAME=\u0026#34;Debian GNU/Linux 11 (bullseye)\u0026#34; NAME=\u0026#34;Debian GNU/Linux\u0026#34; VERSION_ID=\u0026#34;11\u0026#34; VERSION=\u0026#34;11 (bullseye)\u0026#34; VERSION_CODENAME=bullseye ID=debian HOME_URL=\u0026#34;https://www.debian.org/\u0026#34; SUPPORT_URL=\u0026#34;https://www.debian.org/support\u0026#34; BUG_REPORT_URL=\u0026#34;https://bugs.debian.org/\u0026#34; Rocky Linux 8.6 の場合 $ cat /etc/os-release NAME=\u0026#34;Rocky Linux\u0026#34; VERSION=\u0026#34;8.6 (Green Obsidian)\u0026#34; ID=\u0026#34;rocky\u0026#34; ID_LIKE=\u0026#34;rhel centos fedora\u0026#34; VERSION_ID=\u0026#34;8.6\u0026#34; PLATFORM_ID=\u0026#34;platform:el8\u0026#34; PRETTY_NAME=\u0026#34;Rocky Linux 8.6 (Green Obsidian)\u0026#34; ANSI_COLOR=\u0026#34;0;32\u0026#34; CPE_NAME=\u0026#34;cpe:/o:rocky:rocky:8:GA\u0026#34; HOME_URL=\u0026#34;https://rockylinux.org/\u0026#34; BUG_REPORT_URL=\u0026#34;https://bugs.rockylinux.org/\u0026#34; ROCKY_SUPPORT_PRODUCT=\u0026#34;Rocky Linux\u0026#34; ROCKY_SUPPORT_PRODUCT_VERSION=\u0026#34;8\u0026#34; REDHAT_SUPPORT_PRODUCT=\u0026#34;Rocky Linux\u0026#34; REDHAT_SUPPORT_PRODUCT_VERSION=\u0026#34;8\u0026#34; /etc/issue ファイル Ubuntu 22.04 の場合 $ cat /etc/issue Ubuntu 22.04 LTS \\n \\l Debian 11 の場合 $ cat /etc/issue Debian GNU/Linux 11 \\n \\l Rocky Linux 8.6 の場合（バージョン見えず） $ cat /etc/issue \\S Kernel \\r on an \\m lsb_release コマンド Ubuntu 22.04 の場合 $ lsb_release -a No LSB modules are available. Distributor ID:\tUbuntu Description:\tUbuntu 22.04 LTS Release:\t22.04 Codename:\tjammy Debian 11 の場合 $ lsb_release -a No LSB modules are available. Distributor ID:\tDebian Description:\tDebian GNU/Linux 11 (bullseye) Release:\t11 Codename:\tbullseye Debian で lsb_release コマンドが見つからない場合は、apt install -y lsb-release でインストールできます（インストールするパッケージ名は、ハイフンで単語が区切られていることに注意）。 Rocky Linux 8.6 の場合 $ lsb_release -a LSB Version:\t:core-4.1-aarch64:core-4.1-noarch Distributor ID:\tRocky Description:\tRocky Linux release 8.6 (Green Obsidian) Release:\t8.6 Codename:\tGreenObsidian Rocky Linux で lsb_release コマンドが見つからない場合は、dnf install -y redhat-lsb-core でインストールできます。"
+},
+{
+url: "/p/7m5k3hx/",
+title: "Linuxメモ: Linux のユーザーを管理する (useradd, userdel, passwd)",
+date: "2022-07-09T00:00:00Z",
+body: "Linuxメモ: Linux のユーザーを管理する (useradd, userdel, passwd) Linux をインストールしたばかりの状態では、通常は特権ユーザーの root でログインできる状態になっています。 システム管理以外の日常的な作業には、useradd コマンドで作成した一般ユーザーを用います。 ユーザーを作成する (useradd) 新しいユーザーを作成するには、useradd コマンドを使用します。 -m オプションを指定することで、ユーザーのホームディレクトリを同時に作成することができます。 ユーザー maku を作成する # useradd maku （ユーザーを作成するだけ） # useradd -m maku （ホームディレクトリを同時に作成する） # useradd -m -s /bin/bash maku （ログインシェルを設定する） オプションの意味 -m \u0026hellip; ユーザーのホームディレクトリを同時に作成する -s /bin/bash \u0026hellip; ログインシェルを /bin/bash に設定する /etc/passwd ファイルを見ると、ユーザーが追加されていることを確認できます。 デフォルトでは、最初に作成したユーザーのユーザー ID は 1000 になります（その後追加するユーザーは、1001、1002、1003 となります）。 # grep maku /etc/passwd maku:x:1000:1000::/home/maku:/bin/bash ユーザーを削除する (userdel) Linux のユーザーを削除するには、userdel コマンドを使用します。 -r オプションを指定することで、ユーザーのホームディレクトリを同時に削除することができます。 ユーザー maku とそのホームディレクトリ /home/maku を削除する # userdel -r maku ユーザーのパスワードを設定する (passwd) 作成したユーザーで Linux にログインするには、passwd コマンドでパスワードを設定しておく必要があります。 root ユーザーが、特定のユーザーのパスワードを設定するには次のようにします。 ユーザー maku のパスワードを設定する # passwd maku New password: （パスワードを入力） Retype new password: （パスワードを入力） passwd: password updated successfully ユーザーにパスワードを設定したら、ssh コマンドでローカルホストにログインできるか確認できます。 # ssh maku@localhost maku@localhost's password: （上で設定したパスワードを入力） カレントユーザーのパスワードを変更するには、passwd コマンドを引数なしで実行します。 カレントユーザーのパスワードを変更する $ passwd Changing password for maku. Current password: （現在のパスワードを入力する） New password: （新しいパスワード入力する） Retype new password: （新しいパスワードを入力する） passwd: password updated successfully"
+},
+{
+url: "/p/ceow5cj/",
+title: "各種 Linux のファイアウォール設定ツール",
+date: "2022-07-09T00:00:00Z",
+body: "各種 Linux のファイアウォール設定ツール 従来 Linux のパケットフィルタリングの設定には、iptables が使われていましたが、現在ではより直感的な操作が可能な ufw、firewalld、nftables といったツールが使われています。 ディストリビューション ファイアウォール設定ツール Ubuntu 8.04 LTS 以降 ufw CentOS 7 以降 firewalld Fedora 18 以降 firewalld Rocky Linux firewalld および nftables 参考: ufw (Uncomplicated Firewall) によるファイアウォール設定 参考: firewalld によるファイアウォール設定 どのツールも下回りとしては Linux カーネルの Netfilter サブシステムの仕組みを利用しています。 ufw ---+ | firewalld ---+---\u0026gt; Netfilter (Linux kernel) | iptables ---+"
+},
+{
+url: "/p/ij6kxeq/",
+title: "Linuxメモ: firewalld による Linux のファイアウォール設定",
+date: "2022-07-06T00:00:00Z",
+body: "Linuxメモ: firewalld による Linux のファイアウォール設定 Red Hat 系 Linux のネットワークのアクセス制御には、従来 iptables が用いられていましたが、現在は firewalld に置き換えられています。 Fedora 18 や CentOS 7、および CentOS の後継的な位置付けの Rocky Linux には firewalld が標準搭載されています。 firewalld のインストール apt でのインストール $ sudo apt install firewalld firewalld の使い方 firewalld の起動・停止と自動起動設定 firewalld は、systemd のサービスとして自動起動できます。 $ systemctl status firewalld # 現在の状態を確認 $ systemctl start firewalld # 直ちに firewalld を起動 $ systemctl stop firewalld # 直ちに firewalld を停止 $ systemctl enable firewalld # 自動起動する $ systemctl disable firewalld # 自動起動しない firewalld の設定を確認する $ firewall-cmd --list-all firewalld の設定を変更する firewalld で HTTP 通信を許可するには次のようにします。 $ firewall-cmd --add-service=http --permanent $ firewall-cmd --reload TCP のポート 9200、9300 へのアクセスを許可するには次のように実行します。 例: firewall-cmd コマンド $ sudo firewall-cmd --add-port={9200/tcp, 9300/tcp} --permanent $ sudo firewall-cmd --reload"
 },
 {
 url: "/p/sg2m6wm/",
@@ -1476,16 +1524,16 @@ date: "2022-07-05T00:00:00Z",
 body: "Linuxコマンド: ss コマンドの使い方 関連コマンド: ip コマンド ss コマンドとは Linux の ss コマンド (socket statistics) は、TCP ポートや UDP ポートの通信状態を確認するためのコマンドで、過去に使われていた net-tools パッケージの netstat コマンドの後継です。 Cent OS 7 ではデフォルトで ss コマンドが採用されています。 APT の iproute2 パッケージをインストールすると、ss コマンドを使用できるようになります。 ss コマンドのインストール $ apt update # パッケージリストの更新 $ apt install -y iproute2 iptable2 パッケージをインストールすると、一緒に ip コマンド などもインストールされます。 ss サブコマンド コマンド 説明 対応する旧コマンド ss -nat TCP ポートの通信状態を確認 netstat -nat ss -nlt LISTEN（待ち受け）状態の TCP ポートを確認 netsta -nlt ss -nau UDP ポートの通信状態を確認UDP ソケットの State カラムは UNCONN と表示される netstat -nau"
 },
 {
-url: "/",
-title: "まくろぐ",
-date: "2022-07-05T00:00:00Z",
-body: "まくろぐ"
+url: "/p/uexfvcs/",
+title: "Linuxメモ: Linux のグループを管理する (groupadd, groupdel, gpasswd)",
+date: "2022-07-04T00:00:00Z",
+body: "Linuxメモ: Linux のグループを管理する (groupadd, groupdel, gpasswd) グループの作成と削除 (groupadd, groupdel) Linux でグループを作成／削除するには、groupadd および groupdel コマンドを使用します。 グループ作成時にグループ ID（数値）が自動的に割り当てられますが、-g オプションで明示することもできます。 グループ admin を作成する $ sudo groupadd admin # グループ ID は自動で割り当てる $ sudo groupadd -g 1234 admin # グループ ID を明示する グループ admin を削除する $ sudo groupdel admin ☝️ プライマリ・グループ useradd コマンドでユーザーを作成すると、デフォルトでそのユーザーは、ユーザー名と同じ名前のグループに所属することになります。 このグループをプライマリ・グループと呼びます。 例えば、useradd maku でユーザー maku を作成すると、同時に maku というプライマリ・グループが作成されます。 groupdel コマンドでプライマリ・グループを削除することはできません。 グループにユーザーを追加する (gpasswd) Linux のグループに既存のユーザーを追加／削除するには、gpasswd コマンドを使用します。 グループ admin にユーザー maku を追加する $ sudo gpasswd -a maku admin Adding user maku to group admin グループ admin からユーザー maku を削除する $ sudo gpasswd -d maku admin これらの設定を反映させるには、そのユーザーでログインし直す必要があります。 グループの一覧を確認する (/etc/group) /etc/group ファイルには、既存グループの一覧情報が保存されています。 グループリストを表示する $ cat /etc/group ...（省略）... group1:x:1003:user1,user2,user3 上記の例では、グループ group1 に、3 つのユーザー (user1、user2、user3) が登録されていることがわかります。 また、グループ ID が 1003 であることも分かります。 ユーザーがどのグループに所属しているか調べる (id) id コマンドを使用すると、指定したユーザーがどのグループに所属しているかを確認できます。 ユーザー名を省略すると、カレントユーザーの情報を表示します。 $ id uid=1000(maku) gid=1000(maku) groups=1000(maku),1001(group1),1002(group2) 上記の例では、カレントユーザー maku が、グループ maku、group1、group2 に所属していることが分かります。 グループ名やグループ ID を変更する (groupmod) 既存のグループの名前や ID を変更するには、groupmod コマンドを使用します。 グループ foo のグループ名を bar に変更する $ sudo groupmod -n bar foo グループ foo のグループ ID を 1234 に変更する $ sudo groupmod -g 1234 foo"
 },
 {
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-07-05T00:00:00Z",
-body: "技術系のメモ"
+url: "/p/drar8o4/",
+title: "Linux コマンド: ufw による Ubuntu のファイアウォール設定",
+date: "2022-07-04T00:00:00Z",
+body: "Linux コマンド: ufw による Ubuntu のファイアウォール設定 ufw とは ufw (Uncomplicated Firewall) は Debian/Ubuntu 系 Linux でパケットフィルタリングの設定（ファイアウォール設定）を行うためのツールです。 従来、パケットフィルタリングのツールとしては iptables が使われていましたが、iptables は設定が煩雑で扱いづらいという問題を抱えていたため、直感的な設定を行うためのツールとして ufw が開発されました。 ufw は Ubuntu 8.04 LTS 以降で使用することができます。 ufw のサブコマンド 通常コマンド コマンド 説明 ufw enable enables the firewall ufw disable disables the firewall ufw default ARG set default policy ufw logging LEVEL set logging to LEVEL ufw allow ARGS add allow rule ufw deny ARGS add deny rule ufw reject ARGS add reject rule ufw limit ARGS add limit rule ufw delete RULE|NUM delete RULE ufw insert NUM RULE insert RULE at NUM ufw prepend RULE prepend RULE ufw route RULE add route RULE `ufw route delete RULE NUM` ufw route insert NUM RULE insert route RULE at NUM ufw reload reload firewall ufw reset reset firewall ufw status show firewall status ufw status numbered show firewall status as numbered list of RULES ufw status verbose show verbose firewall status ufw show ARG show firewall report ufw version display version information アプリケーションプロファイル コマンド 説明 ufw app list list application profiles ufw app info PROFILE show information on PROFILE ufw app update PROFILE update PROFILE ufw app default ARG set default application policy ufw の基本的な使い方 ufw で現在の設定を確認する (ufw status) $ sudo ufw status Status: active To Action From -- ------ ---- OpenSSH ALLOW Anywhere OpenSSH (v6) ALLOW Anywhere (v6) 1 行目の表示で、ufw によるファイアウォールが有効 (Status: active) になっているか、無効 (Status: inactive) になっているかを確認することができます。 その下には、どのポート（サービス）へのアクセスが許可 (ALLOW) されているかのルール設定が表示されます。 デフォルトでは、ufw はすべての受信パケットを拒否するため、ここに列挙されていないサービスには外部から接続できないことになります。 ufw を有効・無効にする (ufw enable/disable) ufw を有効にするには、ufw enable コマンドを使用します。 ポート 20 番の SSH 接続を許可 (ufw allow ssh) しておかないと、ufw を有効にすることで SSH 接続ができなくなってしまうので、その警告メッセージが表示されますが、問題なければ y と入力します。 $ sudo ufw enable Command may disrupt existing ssh connections. Proceed with operation (y|n)? y Firewall is active and enabled on system startup $ sudo ufw status Status: active ...（省略）... ufw を無効にする（パケットフィルタリングを停止する）には、ufw disable コマンドを使用します。 $ sudo ufw disable Firewall stopped and disabled on system startup $ sudo ufw status Status: inactive 上記のようにファイアウォールを無効化しても、後ほど ufw enable で有効化すれば、以前の設定を復旧することができます。 ufw の設定は /etc/ufw ディレクトリ以下にルールファイルとして保存されています。 ufw で設定を変更する（ルールの追加） (ufw allow) 例: SSH (22/tcp) でのアクセスを許可 $ sudo ufw allow ssh $ sudo ufw allow 22/tcp # これでも同じ意味 例: TCP ポート 8000 へのアクセスを許可 $ sudo ufw allow 8000/tcp ufw でルールを削除する (ufw delete) ufw で設定したルールを削除するには、ufw delete で「ルール名」あるいは「ルール番号」を指定します。 ルール名を指定する場合は、例えば ufw allow 8000/tcp で追加したルールは次のように削除します。 $ sudo ufw delete allow 8000/tcp 番号で削除するルールを指定する場合は、先に ufw status numbered コマンドで現在設定されているルールの番号を調べます。 # まずルールの番号を確認する $ sudo ufw status numbered Status: active To Action From -- ------ ---- [ 1] 8000/tcp ALLOW IN Anywhere [ 2] 8000/tcp (v6) ALLOW IN Anywhere (v6) # 2 番目のルールを削除する $ sudo ufw delete 2 Deleting: allow 22/tcp"
 },
 {
 url: "/p/8t6hr3d/",
