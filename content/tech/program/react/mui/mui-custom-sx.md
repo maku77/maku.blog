@@ -1,9 +1,8 @@
 ---
-title: "MUI (Material-UI) でカスタムコンポーネントに sx プロパティを渡せるようにする"
+title: "MUI でカスタムコンポーネントに sx プロパティを渡せるようにする"
 url: "/p/5e4cikn"
 date: "2021-12-15"
 tags: ["Material-UI"]
-weight: 20
 ---
 
 何をするか？

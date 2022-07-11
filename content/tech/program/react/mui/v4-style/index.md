@@ -1,10 +1,15 @@
 ---
-title: "Material-UI のコンポーネントに独自の CSS スタイルを設定する (makeStyle)"
+title: "MUI コンポーネント (v4) に独自のスタイルを設定する (makeStyles)"
 url: "/p/cw9ju6f"
 date: "2021-06-06"
 tags: ["Material-UI", "Next.js"]
-weight: 13
 ---
+
+この記事では、MUI v4 以前の `makeStyles()` 関数を使ったカスタムスタイル設定方法を説明しています。
+MUI v5 以降のカスタムスタイル設定では `sx prop` や `styled()` 関数を使用しますので、下記の記事を参照してください。
+
+- 参考: [MUI コンポーネントに独自のスタイルを設定する（v5 以降の sx prop、styled 関数を使う方法）](/p/87p5o2d/)
+
 
 Material-UI コンポーネントのスタイル設定
 ----
@@ -153,7 +158,7 @@ export default IndexPage
 オブジェクト間のマージン用にスタイル設定する
 ----
 
-`makeStyle` で作成したスタイル設定は、Material-UI のコンポーネント以外にも適用できます。
+`makeStyles` で作成したスタイル設定は、Material-UI のコンポーネント以外にも適用できます。
 次の例では、`div` 要素に独自スタイルを適用し、子要素のマージンを現在のテーマのスペース 1 つ分 (`theme.spacing(1)`) に設定しています。
 スタイルオブジェクトを入れ子の形で定義すると、プロパティ名の部分で __`&`__ を使ってカレント要素を参照できます。
 

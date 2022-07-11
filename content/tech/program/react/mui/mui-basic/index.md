@@ -4,7 +4,6 @@ linkTitle: "Material-UI を使う"
 url: "/p/s6djqw3"
 date: "2021-06-02"
 tags: ["Material-UI", "Next.js"]
-weight: 12
 ---
 
 {{< image src="img-001.png" >}}

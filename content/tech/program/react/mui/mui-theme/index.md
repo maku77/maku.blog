@@ -3,7 +3,6 @@ title: "Material-UI のテーマ設定について理解する"
 url: "/p/7nv5ciq"
 date: "2021-06-07"
 tags: ["Material-UI", "Next.js"]
-weight: 14
 draft: true
 ---
 
