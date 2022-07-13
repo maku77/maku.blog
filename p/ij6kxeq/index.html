@@ -11,7 +11,9 @@
 <meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
 <meta property="og:image:width" content="1436">
 <meta property="og:image:height" content="746">
-<meta property="og:description" content="Red Hat 系 Linux のネットワークのアクセス制御には、従来 iptables が用いられていましたが、現在は firewalld に置き換えられています。 Fedora 18 や CentOS 7、および CentOS の後継的な位置付けの Rocky Linux には firewalld が標準搭載されています。
+<meta property="og:description" content="Red Hat 系 Linux のネットワークのアクセス制御には、従来 iptables が用いられていましたが、現在は firewalld に置き換えられています。 Fedora 18 や CentOS 7、および CentOS の後継的な位置付けの Rocky Linux 8、AlmaLinux 8 には firewalld が標準搭載されています（nftables というのもあります）。
+CentOS 6 の頃は iptables が使われていました。 iptables のルールは /etc/sysconfig/iptables というファイルに保存され、システム再起動時にはこのファイルから設定を復帰させるという動作をしていました。 iptables はコマンド体系が煩雑すぎるという問題があり、より直感的な設定が可能な firewalld が作成されました。 firewalld では「一時的な」ルール設定などにも対応しています。
+ファイアウォールの設定ツールは変化してきていますが、下回りとして Linux カーネルの Netfilter (netfilter firewall) が使用されていることに変わりはありません。
 firewalld のインストール apt でのインストール $ sudo apt install firewalld  firewalld の使い方 firewalld の起動・停止と自動起動設定 firewalld は、systemd のサービスとして自動起動できます。
 $ systemctl status firewalld # 現在の状態を確認 $ systemctl start firewalld # 直ちに firewalld を起動 $ systemctl stop firewalld # 直ちに firewalld を停止 $ systemctl enable firewalld # 自動起動する $ systemctl disable firewalld # 自動起動しない firewalld の設定を確認する $ firewall-cmd --list-all firewalld の設定を変更する firewalld で HTTP 通信を許可するには次のようにします。">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.6b77bf17b61a7afcad6c078321c3b838d84d6fd87320e7556ec19bbd273c2794.css>
@@ -60,6 +62,11 @@ $ systemctl status firewalld # 現在の状態を確認 $ systemctl start firewa
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/87p5o2d/>
+MUI コンポーネント (v5) に独自のスタイルを設定する (sx prop、styled)
+<time>2022-07-11</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/h5v6gqz/>
 Linuxメモ: sudo で管理者権限でコマンド実行できるようにする (/etc/sudoers, visudo)
 <time>2022-07-10</time></a>
@@ -79,11 +86,6 @@ Linux のバージョンの調べ方まとめ
 Linuxコマンド: ip コマンドの使い方
 <time>2022-07-06</time></a>
 </div>
-<div class=xBoxLink>
-<a href=../../p/ij6kxeq/>
-Linuxメモ: firewalld による Linux のファイアウォール設定
-<time>2022-07-06</time></a>
-</div>
 </div>
 </div>
 <div class=xMenu_box data-sticky>
@@ -101,6 +103,7 @@ Linuxメモ: firewalld による Linux のファイアウォール設定
 <li><a class=xNavTree-dir href=../../p/ceow5cj/>ファイアウォール</a>
 <ul>
 </ul>
+<li><a class=xNavTree-dir href=../../p/iodgqna/>ネットワーク</a>
 </ul>
 <li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
 <li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a>
@@ -434,6 +437,8 @@ Linuxメモ: firewalld による Linux のファイアウォール設定
 </div><div class=xMenu_tag>
 <a href=../../tags/macos>macos (1)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/mui>mui (1)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/parcel>parcel (1)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/raspberrypi>raspberrypi (1)</a>
@@ -536,7 +541,12 @@ Linuxメモ: firewalld による Linux のファイアウォール設定
 </li>
 </ul>
 </nav><p>Red Hat 系 Linux のネットワークのアクセス制御には、従来 <code>iptables</code> が用いられていましたが、現在は <strong><code>firewalld</code></strong> に置き換えられています。
-Fedora 18 や CentOS 7、および CentOS の後継的な位置付けの Rocky Linux には <code>firewalld</code> が標準搭載されています。</p>
+Fedora 18 や CentOS 7、および CentOS の後継的な位置付けの Rocky Linux 8、AlmaLinux 8 には <code>firewalld</code> が標準搭載されています（<code>nftables</code> というのもあります）。</p>
+<p>CentOS 6 の頃は <code>iptables</code> が使われていました。
+<code>iptables</code> のルールは <code>/etc/sysconfig/iptables</code> というファイルに保存され、システム再起動時にはこのファイルから設定を復帰させるという動作をしていました。
+<code>iptables</code> はコマンド体系が煩雑すぎるという問題があり、より直感的な設定が可能な <code>firewalld</code> が作成されました。
+<code>firewalld</code> では「一時的な」ルール設定などにも対応しています。</p>
+<p>ファイアウォールの設定ツールは変化してきていますが、下回りとして Linux カーネルの Netfilter (netfilter firewall) が使用されていることに変わりはありません。</p>
 <h2 id=firewalld-のインストール>firewalld のインストール</h2>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>apt でのインストール</figcaption>

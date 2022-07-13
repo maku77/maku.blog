@@ -2,19 +2,19 @@
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
-<title>Material-UI のコンポーネントに独自の CSS スタイルを設定する (makeStyle)｜まくろぐ</title>
+<title>MUI コンポーネント (v4) に独自のスタイルを設定する (makeStyles)｜まくろぐ</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
-<meta property="og:title" content="Material-UI のコンポーネントに独自の CSS スタイルを設定する (makeStyle)">
+<meta property="og:title" content="MUI コンポーネント (v4) に独自のスタイルを設定する (makeStyles)">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://maku.blog/p/cw9ju6f/">
 <meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
 <meta property="og:image:width" content="1436">
 <meta property="og:image:height" content="746">
-<meta property="og:description" content="Material-UI コンポーネントのスタイル設定 Material-UI が提供する各種コンポーネントには、表示スタイルを切り替えるためのプロパティが用意されています。 例えば、Button コンポーネント は variant や color プロパティで見た目を切り替えることができます。
+<meta property="og:description" content="この記事では、MUI v4 以前の makeStyles() 関数を使ったカスタムスタイル設定方法を説明しています。 MUI v5 以降のカスタムスタイル設定では sx prop や styled() 関数を使用しますので、下記の記事を参照してください。
+ 参考: MUI コンポーネントに独自のスタイルを設定する（v5 以降の sx prop、styled 関数を使う方法）  Material-UI コンポーネントのスタイル設定 Material-UI が提供する各種コンポーネントには、表示スタイルを切り替えるためのプロパティが用意されています。 例えば、Button コンポーネント は variant や color プロパティで見た目を切り替えることができます。
 <Button>Default</Button> <Button variant=&#34;contained&#34; color=&#34;primary&#34;>Primary</Button> <Button variant=&#34;contained&#34; color=&#34;secondary&#34;>Secondary</Button> <Button variant=&#34;outlined&#34; disabled>Disabled</Button>  多くのケースでは、この仕組みで十分にスタイル設定できるのですが、デフォルトのスタイルから外れた表示をしたり、div 要素など Material-UI 以外のコンポーネントに対して独自の CSS を適用したいことがあります。 このような場合、コンポーネントの実装ファイル内に直接 CSS コードを記述してスタイルをカスタマイズできます（JavaScript 内に記述するので CSS-in-JS と呼びます）。 React の世界では色々な CSS 参照方法がありますが、Material-UI は次のような理由で CSS-in-JS な記述方法を採用しています。
- 現在のテーマ設定に基づいたスタイル設定を行える（例: 基準スペースの2倍のマージンを設定する） コンポーネントの props の値を使って動的にスタイル設定できる（例: <MyButton color=&#34;vivid&#34;> で派手な色のスタイルを設定する）  フックによるスタイル設定 (makeStyle) Material-UI で、コンポーネントに独自スタイルを設定する方法としては、主に次の 3 種類の方法が用意されています。
- Hook API  makeStyle 関数で生成したフック関数をコンポーネント内で呼び出す方法。一番よく使われてる。   Styled components API  既存のコンポーネント (Button など）をラップする形で、スタイルを適用したコンポーネント（MyButton など）を作成する方法。   Higher-order component API  Styled components に似てるけど、HoC の仕組みでスタイル設定したコンポーネントを作成する方法。ちょっとわかりにくい。    ここでは、一番メジャーで分かりやすい、フックを利用したスタイル設定方法を紹介します。 次の例では、Material-UI の Button コンポーネントに、独自の CSS スタイル（customButton クラス）を適用しています。">
+ 現在のテーマ設定に基づいたスタイル設定を行える（例: 基準スペースの2倍のマージンを設定する） コンポーネントの props の値を使って動的にスタイル設定できる（例: <MyButton color=&#34;vivid&#34;> で派手な色のスタイルを設定する）  フックによるスタイル設定 (makeStyle) Material-UI で、コンポーネントに独自スタイルを設定する方法としては、主に次の 3 種類の方法が用意されています。">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.6b77bf17b61a7afcad6c078321c3b838d84d6fd87320e7556ec19bbd273c2794.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -36,11 +36,9 @@
 </span>
 <span class=xBreadcrumb_item><a href=../../p/d7p5jye/>React</a>
 </span>
-<span class=xBreadcrumb_item><a href=../../p/saku4ck/>Next.js</a>
+<span class=xBreadcrumb_item><a href=../../p/bezer6i/>MUI（Material-UI)</a>
 </span>
-<span class=xBreadcrumb_item><a href=../../p/q8hqz7f/>スタイル設定 (CSS)</a>
-</span>
-<span class=xBreadcrumb_item>Material-UI のコンポーネントに独自の CSS スタイルを設定する (makeStyle)
+<span class=xBreadcrumb_item>MUI コンポーネント (v4) に独自のスタイルを設定する (makeStyles)
 </span>
 </div>
 </aside>
@@ -65,6 +63,11 @@
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/87p5o2d/>
+MUI コンポーネント (v5) に独自のスタイルを設定する (sx prop、styled)
+<time>2022-07-11</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/h5v6gqz/>
 Linuxメモ: sudo で管理者権限でコマンド実行できるようにする (/etc/sudoers, visudo)
 <time>2022-07-10</time></a>
@@ -84,11 +87,6 @@ Linux のバージョンの調べ方まとめ
 Linuxコマンド: ip コマンドの使い方
 <time>2022-07-06</time></a>
 </div>
-<div class=xBoxLink>
-<a href=../../p/ij6kxeq/>
-Linuxメモ: firewalld による Linux のファイアウォール設定
-<time>2022-07-06</time></a>
-</div>
 </div>
 </div>
 <div class=xMenu_box data-sticky>
@@ -100,24 +98,17 @@ Linuxメモ: firewalld による Linux のファイアウォール設定
 <ul>
 <li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
 <ul>
-<li><a class=xNavTree-dir href=../../p/fn7m2gu/>JavaScript / Node.js</a>
 <li><a class=xNavTree-dir href=../../p/d7p5jye/>React</a>
 <ul>
 <li><a class=xNavTree-dir href=../../p/ofuan2e/>React の基本と環境構築</a>
+<li><a class=xNavTree-dir href=../../p/bezer6i/>MUI（Material-UI)</a>
+<ul>
+</ul>
 <li><a class=xNavTree-dir href=../../p/saku4ck/>Next.js</a>
-<ul>
-<li><a class=xNavTree-dir href=../../p/3o2ep2c/>Next.js アプリの環境構築</a>
-<li><a class=xNavTree-dir href=../../p/q8hqz7f/>スタイル設定 (CSS)</a>
-<ul>
-</ul>
-<li><a class=xNavTree-dir href=../../p/i5ht5fq/>コンポーネントとレイアイト</a>
-<li><a class=xNavTree-dir href=../../p/3o3fq3d/>プリレンダリングとルーティング</a>
-<li><a class=xNavTree-dir href=../../p/yit3cku/>API Routes</a>
-<li><a class=xNavTree-dir href=../../p/s5m7cbh/>その他</a>
-</ul>
 <li><a class=xNavTree-dir href=../../p/pfdpybm/>React フック関連の記事</a>
 <li><a class=xNavTree-dir href=../../p/m7it4do/>React 雑多記事</a>
 </ul>
+<li><a class=xNavTree-dir href=../../p/fn7m2gu/>JavaScript / Node.js</a>
 <li><a class=xNavTree-dir href=../../p/gqo9yoo/>TypeScript</a>
 <li><a class=xNavTree-dir href=../../p/5398aih/>Android プログラミング</a>
 <li><a class=xNavTree-dir href=../../p/zkw9ju6/>Electron</a>
@@ -468,6 +459,8 @@ Linuxメモ: firewalld による Linux のファイアウォール設定
 </div><div class=xMenu_tag>
 <a href=../../tags/macos>macos (1)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/mui>mui (1)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/parcel>parcel (1)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/raspberrypi>raspberrypi (1)</a>
@@ -530,10 +523,10 @@ Linuxメモ: firewalld による Linux のファイアウォール設定
 <aside>
 <div class=xPrevNextLink>
 <div class=xPrevNextLink_prev>
-<a href=../../p/s6djqw3/>Material-UI を使う</a>
+<a href=../../p/5e4cikn/>MUI でカスタムコンポーネントに sx プロパティを渡せるようにする</a>
 </div>
 <div class=xPrevNextLink_next>
-<a href=../../p/5e4cikn/>MUI (Material-UI) でカスタムコンポーネントに sx プロパティを渡せるようにする</a>
+<a href=../../p/s6djqw3/>Material-UI を使う</a>
 </div>
 </div>
 </aside>
@@ -543,14 +536,13 @@ Linuxメモ: firewalld による Linux のファイアウォール設定
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/ujqinda/>プログラミング</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/d7p5jye/>React</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=../../p/saku4ck/>Next.js</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=../../p/q8hqz7f/>スタイル設定 (CSS)</a></span></div>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/bezer6i/>MUI（Material-UI)</a></span></div>
 <div style=display:flex;margin-top:.8em>
 <div style=width:80px;margin-right:.5em>
 <img src=../../p/ujqinda/_index.svg style=width:80px;height:80px>
 </div>
 <div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/cw9ju6f/>Material-UI のコンポーネントに独自の CSS スタイルを設定する (makeStyle)</a></h1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/cw9ju6f/>MUI コンポーネント (v4) に独自のスタイルを設定する (makeStyles)</a></h1>
 <div class=xPageTags>
 <span class=xPageTags_item><a href=../../tags/material-ui>Material-UI</a></span>
 <span class=xPageTags_item><a href=../../tags/next.js>Next.js</a></span>
@@ -570,7 +562,12 @@ Linuxメモ: firewalld による Linux のファイアウォール設定
 <li><a href=#props-によるスタイル設定の分岐>Props によるスタイル設定の分岐</a></li>
 <li><a href=#オブジェクト間のマージン用にスタイル設定する>オブジェクト間のマージン用にスタイル設定する</a></li>
 </ul>
-</nav><h2 id=material-ui-コンポーネントのスタイル設定>Material-UI コンポーネントのスタイル設定</h2>
+</nav><p>この記事では、MUI v4 以前の <code>makeStyles()</code> 関数を使ったカスタムスタイル設定方法を説明しています。
+MUI v5 以降のカスタムスタイル設定では <code>sx prop</code> や <code>styled()</code> 関数を使用しますので、下記の記事を参照してください。</p>
+<ul>
+<li>参考: <a href=../../p/87p5o2d/>MUI コンポーネントに独自のスタイルを設定する（v5 以降の sx prop、styled 関数を使う方法）</a></li>
+</ul>
+<h2 id=material-ui-コンポーネントのスタイル設定>Material-UI コンポーネントのスタイル設定</h2>
 <p>Material-UI が提供する各種コンポーネントには、表示スタイルを切り替えるためのプロパティが用意されています。
 例えば、<a href=https://material-ui.com/components/buttons/>Button コンポーネント</a> は <code>variant</code> や <code>color</code> プロパティで見た目を切り替えることができます。</p>
 <figure class=xCodeBlock>
@@ -714,7 +711,7 @@ React の世界では色々な CSS 参照方法がありますが、Material-UI 
 <span class=kr>export</span> <span class=k>default</span> <span class=nx>IndexPage</span></code></pre></div></div>
 </figure>
 <h2 id=オブジェクト間のマージン用にスタイル設定する>オブジェクト間のマージン用にスタイル設定する</h2>
-<p><code>makeStyle</code> で作成したスタイル設定は、Material-UI のコンポーネント以外にも適用できます。
+<p><code>makeStyles</code> で作成したスタイル設定は、Material-UI のコンポーネント以外にも適用できます。
 次の例では、<code>div</code> 要素に独自スタイルを適用し、子要素のマージンを現在のテーマのスペース 1 つ分 (<code>theme.spacing(1)</code>) に設定しています。
 スタイルオブジェクトを入れ子の形で定義すると、プロパティ名の部分で <strong><code>&</code></strong> を使ってカレント要素を参照できます。</p>
 <figure class=xImage>
@@ -771,15 +768,15 @@ React の世界では色々な CSS 参照方法がありますが、Material-UI 
 <div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
 </div>
 <div class=xArticle_up>
-<a href=../../p/q8hqz7f/><span class=xArticle_up_label>Next.js のスタイル設定 (CSS)</span><br>へ戻る</a>
+<a href=../../p/bezer6i/><span class=xArticle_up_label>MUI（Material-UI)</span><br>へ戻る</a>
 </div>
 <aside>
 <div class=xPrevNextLink>
 <div class=xPrevNextLink_prev>
-<a href=../../p/s6djqw3/>Material-UI を使う</a>
+<a href=../../p/5e4cikn/>MUI でカスタムコンポーネントに sx プロパティを渡せるようにする</a>
 </div>
 <div class=xPrevNextLink_next>
-<a href=../../p/5e4cikn/>MUI (Material-UI) でカスタムコンポーネントに sx プロパティを渡せるようにする</a>
+<a href=../../p/s6djqw3/>Material-UI を使う</a>
 </div>
 </div>
 </aside>
@@ -799,11 +796,9 @@ React の世界では色々な CSS 参照方法がありますが、Material-UI 
 </span>
 <span class=xBreadcrumb_item><a href=../../p/d7p5jye/>React</a>
 </span>
-<span class=xBreadcrumb_item><a href=../../p/saku4ck/>Next.js</a>
+<span class=xBreadcrumb_item><a href=../../p/bezer6i/>MUI（Material-UI)</a>
 </span>
-<span class=xBreadcrumb_item><a href=../../p/q8hqz7f/>スタイル設定 (CSS)</a>
-</span>
-<span class=xBreadcrumb_item>Material-UI のコンポーネントに独自の CSS スタイルを設定する (makeStyle)
+<span class=xBreadcrumb_item>MUI コンポーネント (v4) に独自のスタイルを設定する (makeStyles)
 </span>
 </div>
 </aside>
@@ -815,6 +810,6 @@ React の世界では色々な CSS 参照方法がありますが、Material-UI 
 </div>
 <script src=../../assets/js/sidebar.js></script>
 <script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c];b.setAttribute('target','_blank'),b.setAttribute('rel','noopener');const d=b.getElementsByTagName('img');if(d.length>0)continue;b.classList.add('xExternalLinkIcon')}})</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"プログラミング","item":"https://maku.blog/p/ujqinda/"},{"@type":"ListItem","position":4,"name":"React","item":"https://maku.blog/p/d7p5jye/"},{"@type":"ListItem","position":5,"name":"Next.js","item":"https://maku.blog/p/saku4ck/"},{"@type":"ListItem","position":6,"name":"スタイル設定 (CSS)","item":"https://maku.blog/p/q8hqz7f/"},{"@type":"ListItem","position":7,"name":"Material-UI のコンポーネントに独自の CSS スタイルを設定する (makeStyle)","item":"https://maku.blog/p/cw9ju6f/"}]}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"プログラミング","item":"https://maku.blog/p/ujqinda/"},{"@type":"ListItem","position":4,"name":"React","item":"https://maku.blog/p/d7p5jye/"},{"@type":"ListItem","position":5,"name":"MUI（Material-UI)","item":"https://maku.blog/p/bezer6i/"},{"@type":"ListItem","position":6,"name":"MUI コンポーネント (v4) に独自のスタイルを設定する (makeStyles)","item":"https://maku.blog/p/cw9ju6f/"}]}</script>
 </body>
 </html>
