@@ -1,13 +1,13 @@
 ---
 title: "Ansible の ansible.cfg ファイルの検索順序"
 linkTitle: "ansible.cfg ファイルの検索順序"
-url: "/p/pamv6gq"
+url: "p/pamv6gq/"
 date: "2016-10-23"
 tags: ["Ansible"]
 weight: 301
 ---
 
-Ansible の実行環境が参照する設定ファイル (`ansible.cfg`) は、下記のようなパスから検索されます。
+Ansible の実行環境が参照する設定ファイル (__`ansible.cfg`__) は、下記のようなパスから検索されます。
 
 1. 環境変数 `ANSIBLE_CONFIG` で指定されたファイル
 2. `ansible.cfg`（カレントディレクトリ以下のファイル）
