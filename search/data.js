@@ -1446,6 +1446,30 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/99qo8zf/",
+title: "Docker コンテナで Nginx サーバーを立ち上げる",
+date: "2022-07-13T00:00:00Z",
+body: "Docker コンテナで Nginx サーバーを立ち上げる 何をするか？ VPS などで Web アプリをホスティングする場合、各種サーバーを Docker コンテナとして立ち上げるようにすると OS 環境をクリーンに保てます。 特に、1 つのホスト（VPS サーバー）で複数の Web アプリを提供するような場合は、各アプリをコンテナで構成することで、関係ないアプリの設定が混ざってしまうのを防げます。 もちろん、Azure Container Instances や AWS Fargate といったコンテナ実行用のクラウドサービスを使えば、より独立した環境を構築できるのですが、これらのサービスは個人が趣味で使うにはまだまだ高価なので、VPS などの環境で Docker コンテナを立ち上げることには価値があります。 ここでは、Nginx サーバーを Docker コンテナとして立ち上げる方法を示します。 Docker Hub で公開されている Nginx イメージ は、デフォルトでコンテナ内の /usr/share/nginx/html ディレクトリに配置されたコンテンツを公開するようになっています。 大きく分けて、次の 2 つのいずれかの方法で簡単にコンテンツを公開できます。 bind マウントで Docker ホスト側のコンテンツを参照する方法 コンテンツを含んだコンテナイメージを作成する方法 以下、それぞれの方法を順番に見ていきます。 bind マウントで Docker ホスト側のコンテンツを参照する方法 Nginx のコンテナを起動するときに、Docker ホスト側のコンテンツディレクトリを bind マウントして、コンテナの /usr/share/nginx/html ディレクトリとして参照できるようにする方法です。 まず、簡単なコンテンツファイルとして次のような HTML ファイルを用意しておきます。 public/index.html \u0026lt;html\u0026gt;Hello\u0026lt;/html\u0026gt; あとは、docker container run コマンドで nginx コンテナを起動するだけです。 $ docker container run --rm -d -p 8000:80 -v \u0026#34;$(pwd)/public\u0026#34;:/usr/share/nginx/html --name web nginx 各引数は次のような意味を持っています。 --rm \u0026hellip; コンテナ停止時にコンテナを削除します。 -d \u0026hellip; コンテナをデーモンとして起動します。この指定によりサーバーがバックグラウンド実行されるようになるため、ターミナルを引き続き利用できます。 -p 8000:80 \u0026hellip; ホスト側のポート 8000 へのアクセスをコンテナのポート 80 へ転送します。これにより、http://localhost:8000 で Web サイトにアクセスできます。 -v ... \u0026hellip; ホスト側のカレントディレクトリにある public ディレクトリを、コンテナ側から /usr/share/nginx/html として見えるようにバインドマウントします。バインド時のパスは絶対パスで記述しないといけないので、Linux シェルの機能の $(pwd) を使って、カレントディレクトリの絶対パスを取得しています。ちなみに -v オプションは旧式のやり方で、Docker 公式で推奨されている --mount オプションを使うと次のようになります（バインドマウントであることが明確です）。 --mount type=bind,src=\u0026quot;$(pwd)/public\u0026quot;,dst=/usr/share/nginx/html --name web \u0026hellip; 起動するコンテナに web という名前を付けます。必須ではありませんが、名前が付いていると docker container stop web でコンテナ停止できたりして便利です。 nginx \u0026hellip; Docker Hub から nginx:latest イメージを取得するよう指定しています。本番環境では、nginx:1.23 のようにバージョンタグまで指定した方がよいでしょう。 無事コンテナが起動したら、次のように動作中であることを確認できます。 $ docker container ls CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES dd4b471044b1 nginx \u0026#34;/docker-entrypoint.…\u0026#34; 2 minutes ago Up 2 minutes 0.0.0.0:8000-\u0026gt;80/tcp, :::8000-\u0026gt;80/tcp web あとは、Web ブラウザや curl コマンドで http://localhost:8000 にアクセスできれば成功です！ $ curl localhost:8000 \u0026lt;html\u0026gt;Hello\u0026lt;/html\u0026gt; 最後にコンテナを停止して後片付けします。 $ docker container stop web コンテンツを含んだイメージを作成する方法 コンテンツディレクトリの内容を埋め込んだコンテナイメージを作成する方法です。 ここでも、上記と同様に public/index.html というコンテンツファイルを用意します。 イメージを作成するための Dockerfile を次のような感じで作成します。 Dockerfile FROMnginx:1.23COPY public /usr/share/nginx/html Dockerfile をビルドして、web という名前のイメージを作成します。 $ docker image build -t web . イメージが作成できているか確認します。 $ docker image ls REPOSITORY TAG IMAGE ID CREATED SIZE web latest 1e2497edf7e0 3 minutes ago 142MB nginx 1.23 41b0e86104ba 30 hours ago 142MB あとは、このイメージでコンテナを起動すれば OK です。 今回は、nginx イメージではなく、独自に作成した web イメージを使って起動することに注意してください（最後の部分が nginx から web に変わっています）。 $ docker container run --rm -d -p 8000:80 --name web web 先ほどと同様に、http://localhost:8000 にアクセスできれば成功です。 このやり方は、作成したイメージをそのまま別の Docker 環境で実行できるというポータビリティがありますが、コンテンツを変更したときはイメージの再ビルドが必要になります。 最後にコンテナを停止してお片付けしておきます。 $ docker container stop web （おまけ）Docker Compose を使う Docker Compose を使う と、docker container run ... の長いコマンドを入力せずに docker compose up という短いコマンドでコンテナを起動できるようになります。 また、Docker Compose はイメージのビルド機能も備えており、Dockerfile を用いたイメージのビルドからコンテナの起動までをワンステップで実行できます。 バインドマウントを使う場合の Compose ファイル (docker-compose.yml) は次のような感じで作成します。 内容は docker container run で指定したオプションとほぼ同様なので、簡単に理解できると思います。 docker-compose.yml（nginx イメージをそのまま使う場合） version:\u0026#34;3\u0026#34;services:web:image:nginx:1.23volumes:- ./public:/usr/share/nginx/htmlports:- \u0026#34;8000:80\u0026#34; あとは、この docker-compose.yml ファイルがあるディレクトリで、次のように実行すればコンテナを起動できます（-d オプションを付けるとバックグラウンド実行になります）。 $ docker compose up -d コンテナを停止＆削除するときは、次のようにします（down の代わりに stop を使うと、コンテナの停止だけで削除されません）。 $ docker compose down web Dockerfile からイメージをビルドして、そのイメージでコンテナ起動する場合は、Compose ファイルを次のように記述します。 イメージ名を指定する image: nginx:1.23 の代わりに build: . を指定して、カレントディレクトリの Dockerfile をビルドするように指示しています。 docker-compose.yml（Dockerfile からイメージをビルドする場合） version:\u0026#34;3\u0026#34;services:web:build:.ports:- \u0026#34;8000:80\u0026#34; あとは、同様に次のように実行すれば、イメージのビルドからコンテナの起動まで一気に終わります。ステキ！ $ docker compose up -d 次のステップ（のヒント） ここまでで、単独の Web サーバーをコンテナとして起動する方法が分かりました。 1 つの VPS サーバー上で、複数の Web サーバーを立ち上げるような場合は、次のような感じで入り口にリバースプロキシ（これも nginx だったりする）を配置し、そこから各 Web サーバーにアクセスを振り分ける構成にします。 振り分けの基準は、ドメイン名であったり、URL のパスであったり様々です。 実際にインターネット上で Web サービスを公開する場合は、リバースプロキシ部分を SSL 対応することになります（https://... でアクセスできるようにする）。 リバースプロキシとバックエンド（Web サーバー）の間の通信は HTTP アクセスで OK です。"
+},
+{
+url: "/p/dj28oy5/",
+title: "Docker 関連メモ",
+date: "2022-07-13T00:00:00Z",
+body: "Docker 関連メモ"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2022-07-13T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-07-13T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/87p5o2d/",
 title: "MUI コンポーネント (v5) に独自のスタイルを設定する (sx prop、styled)",
 date: "2022-07-11T00:00:00Z",
@@ -1462,18 +1486,6 @@ url: "/p/d7p5jye/",
 title: "React 関連記事",
 date: "2022-07-11T00:00:00Z",
 body: "React 関連記事"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2022-07-11T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-07-11T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/ruk3gu9/",
