@@ -6,7 +6,14 @@ tags: ["Linux", "セキュリティ"]
 ---
 
 Red Hat 系 Linux のネットワークのアクセス制御には、従来 `iptables` が用いられていましたが、現在は __`firewalld`__ に置き換えられています。
-Fedora 18 や CentOS 7、および CentOS の後継的な位置付けの Rocky Linux には `firewalld` が標準搭載されています。
+Fedora 18 や CentOS 7、および CentOS の後継的な位置付けの Rocky Linux 8、AlmaLinux 8 には `firewalld` が標準搭載されています（`nftables` というのもあります）。
+
+CentOS 6 の頃は `iptables` が使われていました。
+`iptables` のルールは `/etc/sysconfig/iptables` というファイルに保存され、システム再起動時にはこのファイルから設定を復帰させるという動作をしていました。
+`iptables` はコマンド体系が煩雑すぎるという問題があり、より直感的な設定が可能な `firewalld` が作成されました。
+`firewalld` では「一時的な」ルール設定などにも対応しています。
+
+ファイアウォールの設定ツールは変化してきていますが、下回りとして Linux カーネルの Netfilter (netfilter firewall) が使用されていることに変わりはありません。
 
 
 firewalld のインストール
