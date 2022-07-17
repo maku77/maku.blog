@@ -6,7 +6,7 @@ categoryIcon: _index.svg
 links:
   - /tech/linux/network/ip
   - /tech/linux/network/ss
-  - /tech/linux/netplan
+  - /tech/linux/network/netplan
 ---
 
 {{% private %}}
