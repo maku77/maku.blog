@@ -1440,6 +1440,12 @@ date: "2022-07-18T00:00:00Z",
 body: "Ansible のメモ"
 },
 {
+url: "/p/n3jygwd/",
+title: "Ansible の SSH 接続で使用するユーザーと秘密鍵を指定する",
+date: "2022-07-18T00:00:00Z",
+body: "Ansible の SSH 接続で使用するユーザーと秘密鍵を指定する Ansible でマネージドノードに SSH 接続するときに使用するユーザー名と秘密鍵は、-u (--user) オプションと --private-key オプションで指定することができます。 $ ansible-playbook -i hosts.ini site.yml -u maku --private-key ~/.ssh/test/id_rsa インベントリファイルで指定する場合は、ansible_user 変数と ansible_ssh_private_key 変数を使います。 hosts.ini（ホストごとに指定する場合） [servers] www1.example.com ansible_user=maku ansible_ssh_private_key_file=~/.ssh/test/id_rsa www2.example.com ansible_user=maku ansible_ssh_private_key_file=~/.ssh/test/id_rsa hosts.ini（グループ単位で指定する場合） [servers] www1.example.com www2.example.com [servers:vars] ansible_user=maku ansible_ssh_private_key_file=~/.ssh/test/id_rsa YAML 形式でインベントリファイルを記述する場合も、同様の変数で設定できます。 hosts.yml all:hosts:www1.example.com:www2.example.com:vars:ansible_user:makuansible_ssh_private_key_file:~/.ssh/test/id_rsa"
+},
+{
 url: "/p/csctaq7/",
 title: "Docker コンテナで Ansible のテストベッド環境を用意する",
 date: "2022-07-18T00:00:00Z",
@@ -1828,6 +1834,12 @@ url: "/p/xx7enu3/",
 title: "Ansible モジュールのヘルプを表示する (ansible-doc)",
 date: "2022-02-18T00:00:00Z",
 body: "Ansible モジュールのヘルプを表示する (ansible-doc) ansible-doc コマンドを使うと、Ansible モジュールのドキュメントを表示することができます。 ping モジュールのドキュメントを表示 $ ansible-doc ping \u0026gt; ANSIBLE.BUILTIN.PING (/Users/maku/Library/Python/3.10/lib/python/site-packages/ansible/modules/ping.py) A trivial test module, this module always returns `pong\u0026#39; on successful contact. It does not make sense in playbooks, but it is useful from `/usr/bin/ansible\u0026#39; to verify the ability to login and that a usable Python is configured. This is NOT ICMP ping, this is just a trivial test module that requires Python on the remote-node. For Windows targets, use the [ansible.windows.win_ping] module instead. For Network targets, use the [ansible.netcommon.net_ping] module instead. ADDED IN: historical OPTIONS (= is mandatory): - data Data to return for the `ping\u0026#39; return value. If this parameter is set to `crash\u0026#39;, the module will cause an exception. [Default: pong] type: str ...（省略）... 例えば、上記のように ping モジュールのドキュメントを確認すると、data というオプションを指定できることがわかります。 次のように data オプションを付けて ping モジュールを実行すると、指定した値がターゲットホストからそのまま返ってきます。 モジュールのオプションは -a に続けて入力します。 $ ansible localhost -m ping -a data=Hello localhost | SUCCESS =\u0026gt; { \u0026#34;changed\u0026#34;: false, \u0026#34;ping\u0026#34;: \u0026#34;Hello\u0026#34; }"
+},
+{
+url: "/p/urbs9p6/",
+title: "Ansible モジュールの使用例",
+date: "2022-02-18T00:00:00Z",
+body: "Ansible モジュールの使用例"
 },
 {
 url: "/p/2mzbmw8/",
