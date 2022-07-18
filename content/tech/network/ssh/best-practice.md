@@ -112,7 +112,7 @@ $ ssh -p 1943 maku@example.com
 あるいは、特定のホストに SSH 接続するときのポート番号を設定ファイルで指定しておくこともできます。
 
 {{< code title="~/.ssh/config" >}}
-Host example
+Host example.com
     HostName examle.com
     Port 1943
 {{< /code >}}
