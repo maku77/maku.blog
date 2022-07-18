@@ -6,6 +6,10 @@ tags: ["Ansible", "Docker"]
 draft: true
 ---
 
+{{% private %}}
+この記事は削除して OK。
+{{% /private %}}
+
 SSH 接続できる Docker コンテナを作成する
 ----
 

@@ -4,7 +4,6 @@ linkTitle: "インベントリーファイルの場所を指定する"
 url: "/p/eycnx9i"
 date: "2016-10-22"
 tags: ["Ansible"]
-weight: 202
 ---
 
 Ansible のコマンド（`ansible` や `ansible-playbook`）を実行すると、下記の順でインベントリーファイルが検索されます。
