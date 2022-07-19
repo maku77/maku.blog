@@ -6,7 +6,8 @@ date: "2022-07-19"
 tags: ["Ansible"]
 ---
 
-- 参考: [ansible.builtin.apt module](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_module.html)
+Debian 系の Linux ディストリビューション（Ubuntu など）では、パッケージ管理に APT を使用します。
+Ansible 組み込みの [ansible.builtin.apt](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_module.html) モジュールを使用して、APT パッケージのインストールを行うことができます。
 
 
 APK パッケージを 1 つインストールする
