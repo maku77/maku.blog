@@ -14,7 +14,7 @@
 <meta property="og:description" content="何をするか？ Firestore データベースは、コレクションデータを手軽に格納していくのにはとても便利ですが、全データを集計するような処理は苦手です。 例えば、各ドキュメントに付けられた「タグ」情報をすべて回収して、タグの一覧を生成したい場合、全てのドキュメントを read する必要があるため、ドキュメント数が Firebase の使用料金にダイレクトに効いてきます。 もし、Firestore にドキュメントが追加されるたびに Cloud Functions を起動してこのような集計処理を行うと、凄まじい勢いで課金されてしまいます。
 ここでは、Cloud Functions による 集計処理を定期的なスケジュールで起動する ことで、Firestore ドキュメントの read 処理を削減してみます。 もちろん、リアルタイムな更新が必要なデータには使えませんが、カタログ的なデータであれば、定期的なデータ更新で間に合うケースは多いはずです。
 事前準備  Firebase コンソール からテスト用のプロジェクトを作成してください。ここでは、自動生成されたアプリ ID を myapp-58138 とします。 Firestore データベースに books コレクションを追加し、次のようなサンプルドキュメントを追加してください。tag フィールドは本来は配列 (tags) であるべきですが、ここではシンプル化のために文字列型のスカラデータとしています。  id: 001 (title: Title1, author: Author1, tag: Tag1) id: 002 (title: Title2, author: Author2, tag: Tag2) id: 003 (title: Title3, author: Author3, tag: Tag3)   Firebase CLI をインストール して、firebase コマンドを使用できるようにしてください。作成した関数を Cloud Functions にデプロイするために使います。  プロジェクトの雛形の生成 プロジェクト用のディレクトリを作成します。">
-<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.6b77bf17b61a7afcad6c078321c3b838d84d6fd87320e7556ec19bbd273c2794.css>
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.912f23940528fc207a4dcbe6a6be831d1a99bf78143db42f914622722f63ad0b.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
 <link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
@@ -679,8 +679,8 @@ Firestore Database のページを開き、データタブを選択すると、<
 更新が必要ない場合は、<code>books</code> コレクション内のドキュメントは 1 つだけ read するだけで済む（最新の <code>updatedAt</code> を持つドキュメントを 1 つだけ read する）ので、Firestore の課金を最小限に抑えられます。</p>
 <p>以下にこの対応を入れた Cloud Functions の関数実装を載せておきます。</p>
 <div class=xAccordion>
-<input id=id-683497215 type=checkbox>
-<label class=xAccordion_title for=id-683497215>functions/src/index.ts</label>
+<input id=id-847169523 type=checkbox>
+<label class=xAccordion_title for=id-847169523>functions/src/index.ts</label>
 <div class=xAccordion_body>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>admin</span> <span class=kr>from</span> <span class=s1>&#39;firebase-admin&#39;</span>
