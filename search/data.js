@@ -2,7 +2,7 @@ var data = [
 {
 url: "/p/ujqinda/",
 title: "プログラミング",
-date: "2022-07-11T00:00:00Z",
+date: "2022-07-25T00:00:00Z",
 body: "プログラミング"
 },
 {
@@ -1458,6 +1458,30 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/jbv7gox/",
+title: "MUI のスナックバーを簡単に表示できるようにする (@mui/material/Snackbar)",
+date: "2022-07-25T00:00:00Z",
+body: "MUI のスナックバーを簡単に表示できるようにする (@mui/material/Snackbar) 何をするか？ React 用の UI ライブラリである mui（旧: Material-UI）が提供している Snackbar コンポーネント を使うと、次のようなスナックバーを表示することができます。 ただ、MUI はあくまで UI ライブラリなので、表示の制御は React コンポーネントのステート管理の仕組み（useState など）を使って自力で行わなければいけません。 ただメッセージを表示したいだけなのに、ステート管理とか面倒です。 ここでは、MUI のスナックバーを簡単に表示できるようなフック関数 (useSnackbar) を作成してみます。 使い方のイメージは次のような感じです。 pages/sample.tsx import { NextPage } from \u0026#39;next\u0026#39; import { Button } from \u0026#39;@mui/material\u0026#39; import { useSnackbar } from \u0026#39;../libs/snackbar/Snackbar\u0026#39; const SamplePage: NextPage = () =\u0026gt; { const { showSnackbar } = useSnackbar() return ( \u0026lt;Button onClick={() =\u0026gt; showSnackbar(\u0026#39;This is an error message!\u0026#39;, \u0026#39;error\u0026#39;)}\u0026gt; Show \u0026lt;/Button\u0026gt; ) } export default SamplePage 任意の React コンポーネント（あるいは Next.js のページ）から、上記のように useSnackbar フック関数を呼び出して、返された showSnackbar 関数を呼び出すだけです。 なお、以下の実装では React のコンテキストの仕組み（グローバル変数的なもの）をふんだんに利用しているので、そのあたりは下記記事を参考にすると理解しやすいと思います。 参考: React Context で複数のコンポーネント間でデータを共有する スナックバー用の UI コンポーネントの作成 まずはスナックバーを表示するための UI コンポーネントを作成しておきます。 コンポーネント名は MUI の Snackbar と被らないように、GlobalSnackbar としました（AppSnackbar でもいいかも）。 実装はほぼ MUI の Snackbar ドキュメント からの流用ですが、props で onClose ハンドラの登録や、色の指定を行えるようにしています。 libs/snackbar/GlobalSnackbar.tsx import * as React from \u0026#39;react\u0026#39; import { Snackbar } from \u0026#39;@mui/material\u0026#39; import MuiAlert, { AlertColor, AlertProps } from \u0026#39;@mui/material/Alert\u0026#39; /** スナックバーの表示をカスタマイズ */ const Alert = React.forwardRef\u0026lt;HTMLDivElement, AlertProps\u0026gt;(function Alert(props, ref) { return \u0026lt;MuiAlert elevation={6} ref={ref} variant=\u0026#34;filled\u0026#34; {...props} /\u0026gt; }) /** GlobalSnackbar コンポーネントに渡す props の型情報 */ type Props = { /** スナックバーを表示するか */ open: boolean /** スナックバーに表示するメッセージ */ message: string /** スナックバーの色 (error | warning | info | success) */ severity?: AlertColor /** スナックバーを閉じるべきタイミングで呼び出されます */ onClose?: () =\u0026gt; void } /** スナックバーを表示するコンポーネント */ export const GlobalSnackbar: React.FC\u0026lt;Props\u0026gt; = ({ open, message, severity = \u0026#39;info\u0026#39;, onClose }) =\u0026gt; { return ( \u0026lt;Snackbar open={open} onClose={onClose} autoHideDuration={6000} anchorOrigin={{ vertical: \u0026#39;bottom\u0026#39;, horizontal: \u0026#39;center\u0026#39; }} \u0026gt; \u0026lt;Alert severity={severity}\u0026gt;{message}\u0026lt;/Alert\u0026gt; \u0026lt;/Snackbar\u0026gt; ) } スナックバーは 6 秒放置で自動クローズするようにしていますが、このあたりは props でカスタマイズできるようにしておいてもいいかもしれません。 表示位置は anchorOrigin prop で柔軟に制御できますが、ここはアプリ内で統一されていた方がよいので、props に切り出す必要はありません。 コンテキストおよびフック関数の実装 今回のキモとなるコンテキストオブジェクトの定義です。 SnackbarContext というコンテキストオブジェクトを定義して、スナックバーに表示すべき内容をグローバルに管理します。 コンテキストオブジェクトには、showSnackbar という関数も持たせるようにして、どの階層のコンポーネントからでもスナックバーを表示できるようにしています。 libs/snackbar/Snackbar.tsx import * as React from \u0026#39;react\u0026#39; import { AlertColor } from \u0026#39;@mui/material\u0026#39; import { GlobalSnackbar } from \u0026#39;./GlobalSnacbar\u0026#39; /** SnackbarContext コンテキストオブジェクトの型 */ export type SnackbarContextType = { /** Snackbar に表示する文字列。空文字列のときは Snackbar を表示しないことを意味します */ message: string /** Snackbar の色 */ severity: AlertColor // \u0026#39;error\u0026#39; | \u0026#39;warning\u0026#39; | \u0026#39;info\u0026#39; | \u0026#39;success\u0026#39; /** Snackbar を表示したいときに呼び出します */ showSnackbar: (message: string, severity: AlertColor) =\u0026gt; void } /** スナックバーの表示状態を管理するコンテキストオブジェクト */ export const SnackbarContext = React.createContext\u0026lt;SnackbarContextType\u0026gt;({ message: \u0026#39;\u0026#39;, // デフォルト値 severity: \u0026#39;error\u0026#39;, // デフォルト値 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function showSnackbar: (_message: string, _severity: AlertColor) =\u0026gt; {}, // ダミー関数 }) /** * SnackbarContext コンテキストオブジェクトを提供するコンポーネント。 * * このコンポーネント以下に配置した子コンポーネントであれば、 * useSnackbar フック関数を呼び出すことができます。 */ export const SnackbarContextProvider: React.FC\u0026lt;{ children: React.ReactNode }\u0026gt; = ({ children }) =\u0026gt; { const context: SnackbarContextType = React.useContext(SnackbarContext) const [message, setMessage] = React.useState(context.message) const [severity, setSeverity] = React.useState(context.severity) // コンテクストオブジェクトに自分自身の値を変更する関数をセットする const newContext: SnackbarContextType = React.useMemo( () =\u0026gt; ({ message, severity, showSnackbar: (message: string, severity: AlertColor) =\u0026gt; { setMessage(message) setSeverity(severity) }, }), [message, severity, setMessage, setSeverity] ) // スナックバーを閉じるためのハンドラー関数 const handleClose = React.useCallback(() =\u0026gt; { setMessage(\u0026#39;\u0026#39;) }, [setMessage]) return ( \u0026lt;SnackbarContext.Provider value={newContext}\u0026gt; {children} \u0026lt;GlobalSnackbar open={newContext.message !== \u0026#39;\u0026#39;} message={newContext.message} severity={newContext.severity} onClose={handleClose} /\u0026gt; \u0026lt;/SnackbarContext.Provider\u0026gt; ) } /** SnackbarContext を簡単に使うためのユーティリティ関数 */ export function useSnackbar(): SnackbarContextType { return React.useContext(SnackbarContext) } ここでは、コンテキストオブジェクトの Provider コンポーネント (SnackbarContext.Provider) の下に、スナックバーの UI コンポーネント (GlobalSnackbar) も配置しちゃってます。 ちょっと行儀悪いかもしれませんが、このコンポーネントを使う側で楽をしたかったので。 アプリの上位にコンテキストオブジェクトの Provider を配置 作成した SnackbarContextProvider は、その子コンポーネントに対してスナックバー用のコンテキストオブジェクト (SnackbarContext) を提供します。 具体的には、スナックバーの表示状態や、表示トリガーとなる関数です。 この Provider クラスは、コンポーネント階層の上の方に配置しておきます。 Next.js であれば、pages/_app.tsx あたりでしょうか。 pages/_app.tsx // ...（省略）... export default function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps, }: Props): JSX.Element { return ( \u0026lt;CacheProvider value={emotionCache}\u0026gt; \u0026lt;Head\u0026gt; \u0026lt;title\u0026gt;Next.js App with MUI\u0026lt;/title\u0026gt; \u0026lt;meta name=\u0026#34;viewport\u0026#34; content=\u0026#34;minimum-scale=1, initial-scale=1, width=device-width\u0026#34; /\u0026gt; \u0026lt;/Head\u0026gt; \u0026lt;ThemeProvider theme={theme}\u0026gt; \u0026lt;CssBaseline /\u0026gt; \u0026lt;SnackbarContextProvider\u0026gt; \u0026lt;Component {...pageProps} /\u0026gt; \u0026lt;/SnackbarContextProvider\u0026gt; \u0026lt;/ThemeProvider\u0026gt; \u0026lt;/CacheProvider\u0026gt; ) } これで、任意のコンポーネントから showSnackbar 関数を呼び出せるようになります。 // ...（省略）... const SamplePage: NextPage = () =\u0026gt; { const { showSnackbar } = useSnackbar() return \u0026lt;Button onClick={() =\u0026gt; showSnackbar(\u0026#39;Success!\u0026#39;, \u0026#39;success\u0026#39;)}\u0026gt;Show\u0026lt;/Button\u0026gt; }"
+},
+{
+url: "/p/d7p5jye/",
+title: "React 関連記事",
+date: "2022-07-25T00:00:00Z",
+body: "React 関連記事"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2022-07-25T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-07-25T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/8t6hr3d/",
 title: "Ansible のメモ",
 date: "2022-07-19T00:00:00Z",
@@ -1486,18 +1510,6 @@ url: "/p/o4o7o6m/",
 title: "Ansible タスク例: when による Playbook の条件分岐",
 date: "2022-07-19T00:00:00Z",
 body: "Ansible タスク例: when による Playbook の条件分岐 コマンドが既に存在するかどうかチェックする 次の例では、docker コマンドが存在しない場合のみ、get-docker.sh スクリプトを実行して Docker をインストールしています。 - name:Check if docker command existsansible.builtin.shell:cmd:command -v dockerregister:docker_existsignore_errors:yes- name:Install Dockerwhen:docker_exists is failedansible.builtin.shell:cmd:sh ~/get-docker.shcommand -v \u0026lt;コマンド名\u0026gt; とすると、指定したコマンドがインストールされているときのみリターンコードが 0（成功）になることを利用しています。 この振る舞いは、次のように $?（リターンコード）の値を参照することで確かめられます。 $ command -v pwd pwd $ echo $? 0 （pwd コマンドは存在するのでリターンコードは 0） $ command -v hoge $ echo $? 1 （hoge コマンドは存在しないのでリターンコードは 1）"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2022-07-19T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-07-19T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/n3jygwd/",
@@ -1582,12 +1594,6 @@ url: "/p/bezer6i/",
 title: "MUI（Material-UI)",
 date: "2022-07-11T00:00:00Z",
 body: "MUI（Material-UI)"
-},
-{
-url: "/p/d7p5jye/",
-title: "React 関連記事",
-date: "2022-07-11T00:00:00Z",
-body: "React 関連記事"
 },
 {
 url: "/p/h5v6gqz/",

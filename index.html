@@ -44,6 +44,11 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/jbv7gox/>
+MUI のスナックバーを簡単に表示できるようにする (@mui/material/Snackbar)
+<time>2022-07-25</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/o4o7o6m/>
 Ansible タスク例: when による Playbook の条件分岐
 <time>2022-07-19</time></a>
@@ -62,11 +67,6 @@ Ansible タスク例: UFW でファイアウォールを設定する (community.
 <a href=./p/efqyair/>
 Ansible タスク例: APT パッケージをインストールする (ansible.builtin.apt)
 <time>2022-07-19</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/csctaq7/>
-Docker コンテナで Ansible のテストベッド環境を用意する
-<time>2022-07-18</time></a>
 </div>
 </div>
 </div>
@@ -196,6 +196,8 @@ Docker コンテナで Ansible のテストベッド環境を用意する
 </div><div class=xMenu_tag>
 <a href=./tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a>
 </div><div class=xMenu_tag>
+<a href=./tags/material-ui>material-ui (6)</a>
+</div><div class=xMenu_tag>
 <a href=./tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a>
@@ -203,8 +205,6 @@ Docker コンテナで Ansible のテストベッド環境を用意する
 <a href=./tags/azure-table-storage>azure-table-storage (5)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/luis>luis (5)</a>
-</div><div class=xMenu_tag>
-<a href=./tags/material-ui>material-ui (5)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/qna-maker>qna-maker (5)</a>
 </div><div class=xMenu_tag>
@@ -453,14 +453,14 @@ Docker コンテナで Ansible のテストベッド環境を用意する
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/jbv7gox/>
+MUI のスナックバーを簡単に表示できるようにする (@mui/material/Snackbar)<span class=xRecents_item_tag>Material-UI</span><time>2022-07-25</time></a>
+</div><div class=xRecents_item>
 <a href=./p/o4o7o6m/>
 Ansible タスク例: when による Playbook の条件分岐<span class=xRecents_item_tag>Ansible</span><time>2022-07-19</time></a>
 </div><div class=xRecents_item>
 <a href=./p/s9tctaq/>
 Ansible タスク例: Web からファイルをダウンロードする (ansible.builtin.get_url)<span class=xRecents_item_tag>Ansible</span><time>2022-07-19</time></a>
-</div><div class=xRecents_item>
-<a href=./p/evdubr7/>
-Ansible タスク例: UFW でファイアウォールを設定する (community.general.ufw)<span class=xRecents_item_tag>Ansible</span><time>2022-07-19</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -468,6 +468,255 @@ Ansible タスク例: UFW でファイアウォールを設定する (community.
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/ujqinda/>プログラミング</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/d7p5jye/>React</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/bezer6i/>MUI（Material-UI)</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=width:80px;margin-right:.5em>
+<img src=./p/bezer6i/_index.svg style=width:80px;height:80px>
+</div>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/jbv7gox/>MUI のスナックバーを簡単に表示できるようにする (@mui/material/Snackbar)</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/material-ui>Material-UI</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-07-25>2022-07-25</time><br>
+作成: <time itemprop=datePublished datetime=2022-07-25>2022-07-25</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#何をするか>何をするか？</a></li>
+<li><a href=#スナックバー用の-ui-コンポーネントの作成>スナックバー用の UI コンポーネントの作成</a></li>
+<li><a href=#コンテキストおよびフック関数の実装>コンテキストおよびフック関数の実装</a></li>
+<li><a href=#アプリの上位にコンテキストオブジェクトの-provider-を配置>アプリの上位にコンテキストオブジェクトの Provider を配置</a></li>
+</ul>
+</nav><h2 id=何をするか>何をするか？</h2>
+<p>React 用の UI ライブラリである mui（旧: Material-UI）が提供している <a href=https://mui.com/material-ui/react-snackbar/>Snackbar コンポーネント</a> を使うと、次のようなスナックバーを表示することができます。</p>
+<figure class=xImage>
+<a href=./p/jbv7gox/img-001.png target=_blank>
+<img width=343 height=93 src=./p/jbv7gox/img-001.png alt=/p/jbv7gox/img-001.png>
+</a>
+</figure>
+<p>ただ、MUI はあくまで UI ライブラリなので、表示の制御は React コンポーネントのステート管理の仕組み（<code>useState</code> など）を使って自力で行わなければいけません。
+ただメッセージを表示したいだけなのに、ステート管理とか面倒です。
+ここでは、MUI のスナックバーを簡単に表示できるようなフック関数 (<code>useSnackbar</code>) を作成してみます。
+使い方のイメージは次のような感じです。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>pages/sample.tsx</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>NextPage</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;next&#39;</span>
+<span class=kr>import</span> <span class=p>{</span> <span class=nx>Button</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@mui/material&#39;</span>
+<span class=kr>import</span> <span class=p>{</span> <span class=nx>useSnackbar</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;../libs/snackbar/Snackbar&#39;</span>
+
+<span class=kr>const</span> <span class=nx>SamplePage</span>: <span class=kt>NextPage</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=p>{</span> <span class=nx>showSnackbar</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSnackbar</span><span class=p>()</span>
+  <span class=k>return</span> <span class=p>(</span>
+    <span class=p>&lt;</span><span class=nt>Button</span> <span class=na>onClick</span><span class=o>=</span><span class=p>{()</span> <span class=o>=&gt;</span> <span class=nx>showSnackbar</span><span class=p>(</span><span class=s1>&#39;This is an error message!&#39;</span><span class=p>,</span> <span class=s1>&#39;error&#39;</span><span class=p>)}&gt;</span>
+      <span class=nx>Show</span>
+    <span class=p>&lt;/</span><span class=nt>Button</span><span class=p>&gt;</span>
+  <span class=p>)</span>
+<span class=p>}</span>
+
+<span class=kr>export</span> <span class=k>default</span> <span class=nx>SamplePage</span></code></pre></div></div>
+</figure>
+<p>任意の React コンポーネント（あるいは Next.js のページ）から、上記のように <code>useSnackbar</code> フック関数を呼び出して、返された <code>showSnackbar</code> 関数を呼び出すだけです。
+なお、以下の実装では React のコンテキストの仕組み（グローバル変数的なもの）をふんだんに利用しているので、そのあたりは下記記事を参考にすると理解しやすいと思います。</p>
+<ul>
+<li>参考: <a href=./p/qoz8fow/>React Context で複数のコンポーネント間でデータを共有する</a></li>
+</ul>
+<h2 id=スナックバー用の-ui-コンポーネントの作成>スナックバー用の UI コンポーネントの作成</h2>
+<p>まずはスナックバーを表示するための UI コンポーネントを作成しておきます。
+コンポーネント名は MUI の <code>Snackbar</code> と被らないように、<code>GlobalSnackbar</code> としました（<code>AppSnackbar</code> でもいいかも）。
+実装はほぼ <a href=https://mui.com/material-ui/react-snackbar/>MUI の Snackbar ドキュメント</a> からの流用ですが、props で <code>onClose</code> ハンドラの登録や、色の指定を行えるようにしています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>libs/snackbar/GlobalSnackbar.tsx</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>React</span> <span class=kr>from</span> <span class=s1>&#39;react&#39;</span>
+<span class=kr>import</span> <span class=p>{</span> <span class=nx>Snackbar</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@mui/material&#39;</span>
+<span class=kr>import</span> <span class=nx>MuiAlert</span><span class=p>,</span> <span class=p>{</span> <span class=nx>AlertColor</span><span class=p>,</span> <span class=nx>AlertProps</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@mui/material/Alert&#39;</span>
+
+<span class=cm>/** スナックバーの表示をカスタマイズ */</span>
+<span class=kr>const</span> <span class=nx>Alert</span> <span class=o>=</span> <span class=nx>React</span><span class=p>.</span><span class=nx>forwardRef</span><span class=p>&lt;</span><span class=nt>HTMLDivElement</span><span class=err>,</span> <span class=na>AlertProps</span><span class=p>&gt;(</span><span class=kd>function</span> <span class=nx>Alert</span><span class=p>(</span><span class=nx>props</span><span class=p>,</span> <span class=nx>ref</span><span class=p>)</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=p>&lt;</span><span class=nt>MuiAlert</span> <span class=na>elevation</span><span class=o>=</span><span class=p>{</span><span class=mi>6</span><span class=p>}</span> <span class=na>ref</span><span class=o>=</span><span class=p>{</span><span class=nx>ref</span><span class=p>}</span> <span class=na>variant</span><span class=o>=</span><span class=s>&#34;filled&#34;</span> <span class=p>{</span><span class=na>...props</span><span class=p>}</span> <span class=p>/&gt;</span>
+<span class=p>})</span>
+
+<span class=cm>/** GlobalSnackbar コンポーネントに渡す props の型情報 */</span>
+<span class=kr>type</span> <span class=nx>Props</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=cm>/** スナックバーを表示するか */</span>
+  <span class=nx>open</span>: <span class=kt>boolean</span>
+
+  <span class=cm>/** スナックバーに表示するメッセージ */</span>
+  <span class=nx>message</span>: <span class=kt>string</span>
+
+  <span class=cm>/** スナックバーの色 (error | warning | info | success) */</span>
+  <span class=nx>severity?</span>: <span class=kt>AlertColor</span>
+
+  <span class=cm>/** スナックバーを閉じるべきタイミングで呼び出されます */</span>
+  <span class=nx>onClose</span><span class=o>?:</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=k>void</span>
+<span class=p>}</span>
+
+<span class=cm>/** スナックバーを表示するコンポーネント */</span>
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>GlobalSnackbar</span>: <span class=kt>React.FC</span><span class=p>&lt;</span><span class=nt>Props</span><span class=p>&gt;</span> <span class=o>=</span> <span class=p>({</span>
+  <span class=nx>open</span><span class=p>,</span> <span class=nx>message</span><span class=p>,</span> <span class=nx>severity</span> <span class=o>=</span> <span class=s1>&#39;info&#39;</span><span class=p>,</span> <span class=nx>onClose</span>
+<span class=p>})</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=p>(</span>
+    <span class=p>&lt;</span><span class=nt>Snackbar</span> <span class=na>open</span><span class=o>=</span><span class=p>{</span><span class=nx>open</span><span class=p>}</span> <span class=na>onClose</span><span class=o>=</span><span class=p>{</span><span class=nx>onClose</span><span class=p>}</span> <span class=na>autoHideDuration</span><span class=o>=</span><span class=p>{</span><span class=mi>6000</span><span class=p>}</span>
+      <span class=na>anchorOrigin</span><span class=o>=</span><span class=p>{{</span> <span class=nx>vertical</span><span class=o>:</span> <span class=s1>&#39;bottom&#39;</span><span class=p>,</span> <span class=nx>horizontal</span><span class=o>:</span> <span class=s1>&#39;center&#39;</span> <span class=p>}}</span>
+    <span class=p>&gt;</span>
+      <span class=p>&lt;</span><span class=nt>Alert</span> <span class=na>severity</span><span class=o>=</span><span class=p>{</span><span class=nx>severity</span><span class=p>}&gt;{</span><span class=nx>message</span><span class=p>}&lt;/</span><span class=nt>Alert</span><span class=p>&gt;</span>
+    <span class=p>&lt;/</span><span class=nt>Snackbar</span><span class=p>&gt;</span>
+  <span class=p>)</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>スナックバーは 6 秒放置で自動クローズするようにしていますが、このあたりは props でカスタマイズできるようにしておいてもいいかもしれません。
+表示位置は <code>anchorOrigin</code> prop で柔軟に制御できますが、ここはアプリ内で統一されていた方がよいので、props に切り出す必要はありません。</p>
+<h2 id=コンテキストおよびフック関数の実装>コンテキストおよびフック関数の実装</h2>
+<p>今回のキモとなるコンテキストオブジェクトの定義です。
+<code>SnackbarContext</code> というコンテキストオブジェクトを定義して、スナックバーに表示すべき内容をグローバルに管理します。
+コンテキストオブジェクトには、<code>showSnackbar</code> という関数も持たせるようにして、どの階層のコンポーネントからでもスナックバーを表示できるようにしています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>libs/snackbar/Snackbar.tsx</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=o>*</span> <span class=kr>as</span> <span class=nx>React</span> <span class=kr>from</span> <span class=s1>&#39;react&#39;</span>
+<span class=kr>import</span> <span class=p>{</span> <span class=nx>AlertColor</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@mui/material&#39;</span>
+<span class=kr>import</span> <span class=p>{</span> <span class=nx>GlobalSnackbar</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;./GlobalSnacbar&#39;</span>
+
+<span class=cm>/** SnackbarContext コンテキストオブジェクトの型 */</span>
+<span class=kr>export</span> <span class=kr>type</span> <span class=nx>SnackbarContextType</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=cm>/** Snackbar に表示する文字列。空文字列のときは Snackbar を表示しないことを意味します */</span>
+  <span class=nx>message</span>: <span class=kt>string</span>
+
+  <span class=cm>/** Snackbar の色 */</span>
+  <span class=nx>severity</span>: <span class=kt>AlertColor</span> <span class=c1>// &#39;error&#39; | &#39;warning&#39; | &#39;info&#39; | &#39;success&#39;
+</span><span class=c1></span>
+  <span class=cm>/** Snackbar を表示したいときに呼び出します */</span>
+  <span class=nx>showSnackbar</span><span class=o>:</span> <span class=p>(</span><span class=nx>message</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>severity</span>: <span class=kt>AlertColor</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=k>void</span>
+<span class=p>}</span>
+
+<span class=cm>/** スナックバーの表示状態を管理するコンテキストオブジェクト */</span>
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>SnackbarContext</span> <span class=o>=</span> <span class=nx>React</span><span class=p>.</span><span class=nx>createContext</span><span class=p>&lt;</span><span class=nt>SnackbarContextType</span><span class=p>&gt;({</span>
+  <span class=nx>message</span><span class=o>:</span> <span class=s1>&#39;&#39;</span><span class=p>,</span> <span class=c1>// デフォルト値
+</span><span class=c1></span>  <span class=nx>severity</span><span class=o>:</span> <span class=s1>&#39;error&#39;</span><span class=p>,</span> <span class=c1>// デフォルト値
+</span><span class=c1></span>  <span class=c1>// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+</span><span class=c1></span>  <span class=nx>showSnackbar</span><span class=o>:</span> <span class=p>(</span><span class=nx>_message</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>_severity</span>: <span class=kt>AlertColor</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{},</span> <span class=c1>// ダミー関数
+</span><span class=c1></span><span class=p>})</span>
+
+<span class=cm>/**
+</span><span class=cm> * SnackbarContext コンテキストオブジェクトを提供するコンポーネント。
+</span><span class=cm> *
+</span><span class=cm> * このコンポーネント以下に配置した子コンポーネントであれば、
+</span><span class=cm> * useSnackbar フック関数を呼び出すことができます。
+</span><span class=cm> */</span>
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>SnackbarContextProvider</span>: <span class=kt>React.FC</span><span class=o>&lt;</span><span class=p>{</span>
+  <span class=nx>children</span>: <span class=kt>React.ReactNode</span>
+<span class=p>}</span><span class=o>&gt;</span> <span class=o>=</span> <span class=p>({</span> <span class=nx>children</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=nx>context</span>: <span class=kt>SnackbarContextType</span> <span class=o>=</span> <span class=nx>React</span><span class=p>.</span><span class=nx>useContext</span><span class=p>(</span><span class=nx>SnackbarContext</span><span class=p>)</span>
+  <span class=kr>const</span> <span class=p>[</span><span class=nx>message</span><span class=p>,</span> <span class=nx>setMessage</span><span class=p>]</span> <span class=o>=</span> <span class=nx>React</span><span class=p>.</span><span class=nx>useState</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nx>message</span><span class=p>)</span>
+  <span class=kr>const</span> <span class=p>[</span><span class=nx>severity</span><span class=p>,</span> <span class=nx>setSeverity</span><span class=p>]</span> <span class=o>=</span> <span class=nx>React</span><span class=p>.</span><span class=nx>useState</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nx>severity</span><span class=p>)</span>
+
+  <span class=c1>// コンテクストオブジェクトに自分自身の値を変更する関数をセットする
+</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>newContext</span>: <span class=kt>SnackbarContextType</span> <span class=o>=</span> <span class=nx>React</span><span class=p>.</span><span class=nx>useMemo</span><span class=p>(</span>
+    <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>({</span>
+      <span class=nx>message</span><span class=p>,</span>
+      <span class=nx>severity</span><span class=p>,</span>
+      <span class=nx>showSnackbar</span><span class=o>:</span> <span class=p>(</span><span class=nx>message</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>severity</span>: <span class=kt>AlertColor</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+        <span class=nx>setMessage</span><span class=p>(</span><span class=nx>message</span><span class=p>)</span>
+        <span class=nx>setSeverity</span><span class=p>(</span><span class=nx>severity</span><span class=p>)</span>
+      <span class=p>},</span>
+    <span class=p>}),</span>
+    <span class=p>[</span><span class=nx>message</span><span class=p>,</span> <span class=nx>severity</span><span class=p>,</span> <span class=nx>setMessage</span><span class=p>,</span> <span class=nx>setSeverity</span><span class=p>]</span>
+  <span class=p>)</span>
+
+  <span class=c1>// スナックバーを閉じるためのハンドラー関数
+</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>handleClose</span> <span class=o>=</span> <span class=nx>React</span><span class=p>.</span><span class=nx>useCallback</span><span class=p>(()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+    <span class=nx>setMessage</span><span class=p>(</span><span class=s1>&#39;&#39;</span><span class=p>)</span>
+  <span class=p>},</span> <span class=p>[</span><span class=nx>setMessage</span><span class=p>])</span>
+
+  <span class=k>return</span> <span class=p>(</span>
+    <span class=p>&lt;</span><span class=nt>SnackbarContext.Provider</span> <span class=na>value</span><span class=o>=</span><span class=p>{</span><span class=nx>newContext</span><span class=p>}&gt;</span>
+      <span class=p>{</span><span class=nx>children</span><span class=p>}</span>
+      <span class=p>&lt;</span><span class=nt>GlobalSnackbar</span>
+        <span class=na>open</span><span class=o>=</span><span class=p>{</span><span class=nx>newContext</span><span class=p>.</span><span class=nx>message</span> <span class=o>!==</span> <span class=s1>&#39;&#39;</span><span class=p>}</span>
+        <span class=na>message</span><span class=o>=</span><span class=p>{</span><span class=nx>newContext</span><span class=p>.</span><span class=nx>message</span><span class=p>}</span>
+        <span class=na>severity</span><span class=o>=</span><span class=p>{</span><span class=nx>newContext</span><span class=p>.</span><span class=nx>severity</span><span class=p>}</span>
+        <span class=na>onClose</span><span class=o>=</span><span class=p>{</span><span class=nx>handleClose</span><span class=p>}</span>
+      <span class=p>/&gt;</span>
+    <span class=p>&lt;/</span><span class=nt>SnackbarContext.Provider</span><span class=p>&gt;</span>
+  <span class=p>)</span>
+<span class=p>}</span>
+
+<span class=cm>/** SnackbarContext を簡単に使うためのユーティリティ関数 */</span>
+<span class=kr>export</span> <span class=kd>function</span> <span class=nx>useSnackbar</span><span class=p>()</span><span class=o>:</span> <span class=nx>SnackbarContextType</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=nx>React</span><span class=p>.</span><span class=nx>useContext</span><span class=p>(</span><span class=nx>SnackbarContext</span><span class=p>)</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>ここでは、コンテキストオブジェクトの Provider コンポーネント (<code>SnackbarContext.Provider</code>) の下に、スナックバーの UI コンポーネント (<code>GlobalSnackbar</code>) も配置しちゃってます。
+ちょっと行儀悪いかもしれませんが、このコンポーネントを使う側で楽をしたかったので。</p>
+<h2 id=アプリの上位にコンテキストオブジェクトの-provider-を配置>アプリの上位にコンテキストオブジェクトの Provider を配置</h2>
+<p>作成した <code>SnackbarContextProvider</code> は、その子コンポーネントに対してスナックバー用のコンテキストオブジェクト (<code>SnackbarContext</code>) を提供します。
+具体的には、スナックバーの表示状態や、表示トリガーとなる関数です。
+この Provider クラスは、コンポーネント階層の上の方に配置しておきます。
+Next.js であれば、<code>pages/_app.tsx</code> あたりでしょうか。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>pages/_app.tsx</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=c1>// ...（省略）...
+</span><span class=c1></span><span class=kr>export</span> <span class=k>default</span> <span class=kd>function</span> <span class=nx>MyApp</span><span class=p>({</span>
+  <span class=nx>Component</span><span class=p>,</span>
+  <span class=nx>emotionCache</span> <span class=o>=</span> <span class=nx>clientSideEmotionCache</span><span class=p>,</span>
+  <span class=nx>pageProps</span><span class=p>,</span>
+<span class=p>}</span><span class=o>:</span> <span class=nx>Props</span><span class=p>)</span><span class=o>:</span> <span class=nx>JSX</span><span class=p>.</span><span class=nx>Element</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=p>(</span>
+    <span class=p>&lt;</span><span class=nt>CacheProvider</span> <span class=na>value</span><span class=o>=</span><span class=p>{</span><span class=nx>emotionCache</span><span class=p>}&gt;</span>
+      <span class=p>&lt;</span><span class=nt>Head</span><span class=p>&gt;</span>
+        <span class=p>&lt;</span><span class=nt>title</span><span class=p>&gt;</span><span class=nx>Next</span><span class=p>.</span><span class=nx>js</span> <span class=nx>App</span> <span class=kd>with</span> <span class=nx>MUI</span><span class=p>&lt;/</span><span class=nt>title</span><span class=p>&gt;</span>
+        <span class=p>&lt;</span><span class=nt>meta</span> <span class=na>name</span><span class=o>=</span><span class=s>&#34;viewport&#34;</span> <span class=na>content</span><span class=o>=</span><span class=s>&#34;minimum-scale=1, initial-scale=1, width=device-width&#34;</span> <span class=p>/&gt;</span>
+      <span class=p>&lt;/</span><span class=nt>Head</span><span class=p>&gt;</span>
+      <span class=p>&lt;</span><span class=nt>ThemeProvider</span> <span class=na>theme</span><span class=o>=</span><span class=p>{</span><span class=nx>theme</span><span class=p>}&gt;</span>
+        <span class=p>&lt;</span><span class=nt>CssBaseline</span> <span class=p>/&gt;</span>
+        <span class=p>&lt;</span><span class=nt>SnackbarContextProvider</span><span class=p>&gt;</span>
+          <span class=p>&lt;</span><span class=nt>Component</span> <span class=p>{</span><span class=na>...pageProps</span><span class=p>}</span> <span class=p>/&gt;</span>
+        <span class=p>&lt;/</span><span class=nt>SnackbarContextProvider</span><span class=p>&gt;</span>
+      <span class=p>&lt;/</span><span class=nt>ThemeProvider</span><span class=p>&gt;</span>
+    <span class=p>&lt;/</span><span class=nt>CacheProvider</span><span class=p>&gt;</span>
+  <span class=p>)</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>これで、任意のコンポーネントから <code>showSnackbar</code> 関数を呼び出せるようになります。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=c1>// ...（省略）...
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>SamplePage</span>: <span class=kt>NextPage</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=p>{</span> <span class=nx>showSnackbar</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useSnackbar</span><span class=p>()</span>
+  <span class=k>return</span> <span class=p>&lt;</span><span class=nt>Button</span> <span class=na>onClick</span><span class=o>=</span><span class=p>{()</span> <span class=o>=&gt;</span> <span class=nx>showSnackbar</span><span class=p>(</span><span class=s1>&#39;Success!&#39;</span><span class=p>,</span> <span class=s1>&#39;success&#39;</span><span class=p>)}&gt;</span><span class=nx>Show</span><span class=p>&lt;/</span><span class=nt>Button</span><span class=p>&gt;</span>
+<span class=p>}</span>
+</code></pre></div>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/5e4cikn/>MUI でカスタムコンポーネントに sx プロパティを渡せるようにする</a></li>
+<li><a href=./p/m7is4dn/>Next.js のページコンポーネントが Client と Server どちらで実行されているか調べる (isServer, isClient, NoSsr)</a></li>
+<li><a href=./p/vgs4dnw/>Next.js アプリでのリンク方法まとめ（Material-UI との連携なども） (next/link, next/router)</a></li>
+<li><a href=./p/cw9ju6f/>MUI コンポーネント (v4) に独自のスタイルを設定する (makeStyles)</a></li>
+<li><a href=./p/s6djqw3/>Next.js で Material-UI を使う</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/material-ui>Material-UI</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/bezer6i/><span class=xArticle_up_label>MUI（Material-UI)</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -612,104 +861,6 @@ certificate verify failed: unable to get local issuer certificate (_ssl.c:997)&g
 <ul>
 <li><a href=./p/efqyair/>Ansible タスク例: APT パッケージをインストールする (ansible.builtin.apt)</a></li>
 <li><a href=./p/evdubr7/>Ansible タスク例: UFW でファイアウォールを設定する (community.general.ufw)</a></li>
-<li><a href=./p/o4o7o6m/>Ansible タスク例: when による Playbook の条件分岐</a></li>
-<li><a href=./p/n3jygwd/>Ansible の SSH 接続で使用するユーザーと秘密鍵を指定する</a></li>
-<li><a href=./p/csctaq7/>Docker コンテナで Ansible のテストベッド環境を用意する</a></li>
-<li><a href=./p/a9twaog/>Ansible 関連用語</a></li>
-<li><a href=./p/euevcs8/>Docker で Ansible の実行環境用のコンテナを作成する</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/ansible>Ansible</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/urbs9p6/><span class=xArticle_up_label>Ansible モジュールの使用例</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/8t6hr3d/>Ansible</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/urbs9p6/>モジュールの使用例</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=./p/8t6hr3d/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/evdubr7/>Ansible タスク例: UFW でファイアウォールを設定する (community.general.ufw)</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/ansible>Ansible</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-07-19>2022-07-19</time><br>
-作成: <time itemprop=datePublished datetime=2022-07-19>2022-07-19</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#ufw-をインストールする>UFW をインストールする</a></li>
-<li><a href=#ufw-を有効化する>UFW を有効化する</a></li>
-<li><a href=#特定ポートへのアクセスを許可する>特定ポートへのアクセスを許可する</a></li>
-<li><a href=#特定ポートへの連続アクセスを制限する>特定ポートへの連続アクセスを制限する</a></li>
-</ul>
-</nav><p>Ubuntu のファイアウォール（パケットフィルタ）設定には、UFW というツールが使用されています。</p>
-<ul>
-<li>参考: <a href=./p/drar8o4/>Linux コマンド: ufw による Ubuntu のファイアウォール設定</a></li>
-</ul>
-<p>Ansible の <a href=https://docs.ansible.com/ansible/latest/collections/community/general/ufw_module.html>community.general.ufw</a> モジュールを使用して [UFW (Uncomplicated Firewall)[https://help.ubuntu.com/community/UFW] の設定を行うことができます。
-<code>community.general</code> コレクションは、Ansible のコミュニティパッケージをインストールした場合は標準でインストールされています。</p>
-<h2 id=ufw-をインストールする>UFW をインストールする</h2>
-<p>UFW の設定は <code>community.general.ufw</code> モジュールで行うのですが、UFW の本体（<code>ufw</code> コマンド）はあらかじめ APT でインストールしておく必要があります。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Install UFW</span><span class=w>
-</span><span class=w>  </span><span class=nt>ansible.builtin.apt</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ufw</span><span class=w>
-</span><span class=w>    </span><span class=nt>state</span><span class=p>:</span><span class=w> </span><span class=l>present</span><span class=w>
-</span><span class=w>    </span><span class=nt>update_cache</span><span class=p>:</span><span class=w> </span><span class=kc>yes</span><span class=w>
-</span></code></pre></div><h2 id=ufw-を有効化する>UFW を有効化する</h2>
-<p>UFW をインストールしたら、有効化する必要があります。
-次の例では、デフォルトポリシーを接続拒否 (deny) にして UFW を有効化しています。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Enable UFW</span><span class=w>
-</span><span class=w>  </span><span class=nt>community.general.ufw</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=nt>state</span><span class=p>:</span><span class=w> </span><span class=l>enabled</span><span class=w>
-</span><span class=w>    </span><span class=nt>policy</span><span class=p>:</span><span class=w> </span><span class=l>deny</span><span class=w>
-</span></code></pre></div><h2 id=特定ポートへのアクセスを許可する>特定ポートへのアクセスを許可する</h2>
-<p>次の例では、22 番ポート (SSH) と、80 番ポート (Web) へのアクセスを許可しています。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>UFW - Allow all access to tcp port 22 (SSH)</span><span class=w>
-</span><span class=w>  </span><span class=nt>community.general.ufw</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=nt>rule</span><span class=p>:</span><span class=w> </span><span class=l>allow</span><span class=w>
-</span><span class=w>    </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;22&#39;</span><span class=w>
-</span><span class=w>    </span><span class=nt>proto</span><span class=p>:</span><span class=w> </span><span class=l>tcp</span><span class=w>
-</span><span class=w>
-</span><span class=w></span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>UFW - Allow all access to tcp port 80 (Web)</span><span class=w>
-</span><span class=w>  </span><span class=nt>community.general.ufw</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=nt>rule</span><span class=p>:</span><span class=w> </span><span class=l>allow</span><span class=w>
-</span><span class=w>    </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;80&#39;</span><span class=w>
-</span><span class=w>    </span><span class=nt>proto</span><span class=p>:</span><span class=w> </span><span class=l>tcp</span><span class=w>
-</span></code></pre></div><h2 id=特定ポートへの連続アクセスを制限する>特定ポートへの連続アクセスを制限する</h2>
-<p>特定ポートに対して、30 秒以内に 6 回以上のアクセスがあった場合に、一定時間接続を拒否します。
-次のようにすると、SSH ポートへのブルートフォースアタックを検出したときに、アクセスを遮断します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>UFW - Protecting against brute-force login attacks</span><span class=w>
-</span><span class=w>  </span><span class=nt>community.general.ufw</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=nt>rule</span><span class=p>:</span><span class=w> </span><span class=l>limit</span><span class=w>
-</span><span class=w>    </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=l>ssh</span><span class=w>
-</span><span class=w>    </span><span class=nt>proto</span><span class=p>:</span><span class=w> </span><span class=l>tcp</span><span class=w>
-</span></code></pre></div><p><code>rule: limit</code> を設定した場合は、そのポートに対して <code>rule: allow</code> でアクセス許可する必要はありません。
-<code>rule: limit</code> は制限付きの <code>rule: allow</code> を意味します。</p>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/efqyair/>Ansible タスク例: APT パッケージをインストールする (ansible.builtin.apt)</a></li>
-<li><a href=./p/s9tctaq/>Ansible タスク例: Web からファイルをダウンロードする (ansible.builtin.get_url)</a></li>
 <li><a href=./p/o4o7o6m/>Ansible タスク例: when による Playbook の条件分岐</a></li>
 <li><a href=./p/n3jygwd/>Ansible の SSH 接続で使用するユーザーと秘密鍵を指定する</a></li>
 <li><a href=./p/csctaq7/>Docker コンテナで Ansible のテストベッド環境を用意する</a></li>
