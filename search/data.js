@@ -1458,6 +1458,30 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/dj28oy5/",
+title: "Docker 関連メモ",
+date: "2022-07-29T00:00:00Z",
+body: "Docker 関連メモ"
+},
+{
+url: "/p/ehxgwt4/",
+title: "TypeScript を使った Node.js アプリを Docker コンテナ化する",
+date: "2022-07-29T00:00:00Z",
+body: "TypeScript を使った Node.js アプリを Docker コンテナ化する 何をするか？ TypeScript + Node.js で作成したサーバーアプリを、Docker コンテナ化する話です。 サーバーアプリは Express で簡単な Hello レスポンスを返すようなものを用意します。 Docker イメージビルド用の Dockerfile ファイルは、マルチステージビルドの構成にして、最終的な実行イメージができるだけ小さくなるようにします（それでも Node.js アプリだと、どうしても 100MB 超えになってしまいますが）。 NPM パッケージの管理には yarn を使わず、シンプルに npm だけでいきます。 Node.js アプリの用意 Node.js アプリは何でもよいのですが、ここでは Express で簡単な Web サーバーを作ることにします。 TypeScript プロジェクトのセットアップ $ npm init --yes # package.json を生成 $ npm install express $ npm install --save-dev typescript @types/express @types/node $ npx tsc --init # tsconfig.json を生成 package.json に、TypeScript のビルドと、サーバー起動のための NPM スクリプトを追加しておきます。 package.json（抜粋） \u0026#34;scripts\u0026#34;: { \u0026#34;build\u0026#34;: \u0026#34;tsc\u0026#34;, \u0026#34;start\u0026#34;: \u0026#34;node out/index.js\u0026#34; }, package.json（全体） { \u0026#34;name\u0026#34;: \u0026#34;myapp\u0026#34;, \u0026#34;version\u0026#34;: \u0026#34;1.0.0\u0026#34;, \u0026#34;author\u0026#34;: \u0026#34;maku\u0026#34;, \u0026#34;private\u0026#34;: true, \u0026#34;license\u0026#34;: \u0026#34;UNLICENSED\u0026#34;, \u0026#34;scripts\u0026#34;: { \u0026#34;build\u0026#34;: \u0026#34;tsc\u0026#34;, \u0026#34;start\u0026#34;: \u0026#34;node out/index.js\u0026#34; }, \u0026#34;devDependencies\u0026#34;: { \u0026#34;@types/express\u0026#34;: \u0026#34;^4.17.13\u0026#34;, \u0026#34;@types/node\u0026#34;: \u0026#34;^18.6.2\u0026#34;, \u0026#34;typescript\u0026#34;: \u0026#34;^4.7.4\u0026#34; }, \u0026#34;dependencies\u0026#34;: { \u0026#34;express\u0026#34;: \u0026#34;^4.18.1\u0026#34; } } tsconfig.json の内容は次のような感じで、src ディレクトリ以下の *.ts ファイルをトランスパイルして out ディレクトリに出力するようにしておきます。 これは、ビルド前の .ts ファイルと、ビルド後の .js ファイルが混ざらないようにするためです。 tsconfig.json { \u0026#34;compilerOptions\u0026#34;: { \u0026#34;target\u0026#34;: \u0026#34;ESNEXT\u0026#34;, \u0026#34;module\u0026#34;: \u0026#34;commonjs\u0026#34;, \u0026#34;outDir\u0026#34;: \u0026#34;./out\u0026#34;, \u0026#34;esModuleInterop\u0026#34;: true, \u0026#34;forceConsistentCasingInFileNames\u0026#34;: true, \u0026#34;strict\u0026#34;: true, \u0026#34;skipLibCheck\u0026#34;: true }, \u0026#34;includes\u0026#34;: [ \u0026#34;src/**/*\u0026#34; ], } Express アプリを適当に実装します。 http://localhost:3000/ にアクセスしたときに Hello と返すだけの簡単な Web サーバーです。 src/index.ts import express, { Express, Request, Response } from \u0026#39;express\u0026#39; const app: Express = express() const port = process.env.PORT || 3000 app.get(\u0026#39;/\u0026#39;, (req: Request, res: Response) =\u0026gt; { res.send(\u0026#39;Hello\u0026#39;) }) app.listen(port, () =\u0026gt; { console.log(`⚡️ Server is running on port ${port}`) }) 次のようにして、ビルド＆起動できるかを確認しておきます。 $ npm run build $ npm start Dockerfile の作成 Docker イメージをビルドするための Dockerfile を作成します。 この Dockerfile は マルチステージビルド構成 になっており、前半で TypeScript コードのビルド、後半で Node.js アプリ実行用のイメージをビルドしています。 Dockerfile ############################################################## ビルドステージFROMnode:18.7.0-alpine3.15 as builderWORKDIR/work# ビルド用の依存パッケージをインストールCOPY package*.json ./RUN npm install# TypeScript コードをコピーしてビルドCOPY src tsconfig.json ./RUN npm run build############################################################## 実行用イメージの作成FROMnode:18.7.0-alpine3.15 as runnerWORKDIR/workENV NODE_ENV productionENV PORT 3000EXPOSE3000# 本番環境用のパッケージをインストールCOPY package*.json ./RUN npm install --omit=dev \u0026amp;\u0026amp; npm cache clean --force# builder からビルド結果だけコピーCOPY --from=builder /work/out ./out# Node.js アプリを起動CMD [\u0026#34;node\u0026#34;, \u0026#34;./out/index.js\u0026#34;] 以下、それぞれのステージの内容を見ていきます。 ビルドステージ #### ビルドステージFROMnode:18.7.0-alpine3.15 as builderWORKDIR/workイメージをできるだけ小さくするために、Alpine Linux ベースの node イメージを親イメージとして使用します。 node イメージの具体的なタグ名（バージョン情報）は Docker Hub で確認してください。 作業ディレクトリは /work としています。 # ビルド用の依存パッケージをインストールCOPY package*.json ./RUN npm installNPM パッケージをインストールするために、package.json や package-lock.json ファイルをコピーし、npm install しています。 このタイミングでの COPY 命令では、アプリのソースコードはコピーしないところがポイントです。 ソースコードを一緒にコピーしてしまうと、実装を少し変更するだけで npm install を実行することになってしまいます。 # TypeScript コードをコピーしてビルドCOPY src tsconfig.json ./RUN npm run buildTypeScript コードのビルドに必要なファイルをコピーし、npm run build（実体は tsc）でビルドします。 ビルドステージはここまでです。 ビルド結果の .js ファイル群が out ディレクトリに出力されているので、これらを次のステージで利用します。 実行イメージのビルド #### 実行用イメージの作成FROMnode:18.7.0-alpine3.15 as runnerWORKDIR/workENV NODE_ENV productionENV PORT 3000EXPOSE3000実行イメージ用の親イメージも、同じ Alpine Linux ベースの node イメージを使用します。 このイメージは Docker にキャッシュされているので、イメージが再度ダウンロードされることはありません。 Node.js アプリを本番モードで動作させるために、NODE_ENV 環境変数を production にセットしておきます。 また、Node.js アプリ内で PORT 環境変数を参照しているので、デフォルト値を ENV PORT 3000 で設定しておきます（コンテナ実行時の -e オプションで上書きできます）。 EXPOSE 3000 は、このイメージが 3000 番ポートを使いますよという単なる印で、あまり重要なものではありません。 # 本番環境用のパッケージをインストールCOPY package*.json ./RUN npm install --omit=dev \u0026amp;\u0026amp; npm cache clean --force本番環境用の NPM パッケージをインストールするときは、npm install に --omit=dev オプションを付けて実行します（ver.7 までは --production オプションが使われていました）。 同じ RUN 命令の中でキャッシュをクリアして、イメージサイズの肥大化を防ぎます。 # builder からビルド結果だけコピーCOPY --from=builder /work/out ./outビルドステージでビルドされた .js ファイルは、builder イメージ側の out ディレクトリ内に格納されているので、これを実行イメージの方にコピーします。 これがアプリの本体（エントリポイント）です。 # Node.js アプリを起動CMD [\u0026#34;node\u0026#34;, \u0026#34;./out/index.js\u0026#34;]最後に、コンテナ起動時のデフォルトコマンド (CMD) を定義しておきます。 node コマンドで out/index.js を起動しています。 イメージをビルドしてコンテナを起動する Dockerfile ができたら、あとは docker image build でビルドすればよいのですが、先に .dockerignore ファイルを作成して、Docker に無視させるディレクトリ／ファイルを列挙しておきます。 これを用意しておかないと、イメージビルド時の Sending build context to Docker daemon というプロセスで node_modules 以下の大量のファイルを転送しようとしてしまいます（無駄に時間がかかります）。 .dockerignore node_modules npm-debug.log 次のようにビルドすると、myapp という名前のイメージができます。 Docker イメージをビルド $ docker image build -t myapp . イメージができたらコンテナを起動すればよいのですが、ここでも注意するポイントがあります。 Docker コンテナを起動すると、起動したコマンドのプロセス ID は 1 になります (PID=1)。 一方で、Node.js アプリは PID=1 での起動を想定していないので、そのまま node コマンドを起動すると振る舞いがおかしくなってしまいます。 例えば、Ctrl + C (SIGINT) をハンドルできず、docker container stop にも反応しません（10 秒後に SIGKILL で強制終了されます）。 Docker 1.13 以降では、この PID=1 問題に対応するために --init オプションが用意されており、簡易的な init モジュール (/sbin/docker-init) 経由でアプリを起動することができます。 コンテナを起動 $ docker container run --rm -p 3000:3000 --init --name myapp myapp コンテナを起動したら、Web ブラウザで http://localhost:3000 にアクセスするか、curl コマンドで次のように実行すれば、Node.js のサーバーアプリが起動していることを確認できます。 $ curl http://localhost:3000 Hello Docker Compose でイメージビルド＆コンテナ起動 上記の例では、イメージのビルドと、コンテナの実行を docker コマンドで個別に行っていましたが、Docker Compose を使えば、Dockerfile を使ったイメージのビルドと、コンテナの起動をワンステップで行えます。 最初からこちらの方法を使った方が早いかもしれません（＾＾； docker-compose.yml version:\u0026#39;3\u0026#39;services:myapp:build:.init:trueports:- \u0026#39;3000:3000\u0026#39; Dockerfile と同じディレクトリに、上記のような Compose ファイルを作成したら次のように実行するだけです。 お手軽！ イメージのビルド ＆ コンテナの起動 $ docker compose up コンテナを止めたいときは、同じディレクトリで別のターミナルを開いて、次のようにします。 コンテナの停止 # コンテナの停止と削除を別々に実行する場合 $ docker compose stop $ docker compose rm # 停止と同時に削除する場合 $ docker compose down あるいは、コンテナを実行しているターミナル上で Ctrl + C と入力して、SIGINT シグナルで停止することもできます。 ちゃんと Docker の init オプションが効いて、PID=1 問題に対処できていることが分かります。"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2022-07-29T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-07-29T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/jbv7gox/",
 title: "MUI のスナックバーを簡単に表示できるようにする (@mui/material/Snackbar)",
 date: "2022-07-25T00:00:00Z",
@@ -1468,18 +1492,6 @@ url: "/p/d7p5jye/",
 title: "React 関連記事",
 date: "2022-07-25T00:00:00Z",
 body: "React 関連記事"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2022-07-25T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-07-25T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/8t6hr3d/",
@@ -1576,12 +1588,6 @@ url: "/p/99qo8zf/",
 title: "Docker コンテナで Nginx サーバーを立ち上げる",
 date: "2022-07-13T00:00:00Z",
 body: "Docker コンテナで Nginx サーバーを立ち上げる 何をするか？ VPS などで Web アプリをホスティングする場合、各種サーバーを Docker コンテナとして立ち上げるようにすると OS 環境をクリーンに保てます。 特に、1 つのホスト（VPS サーバー）で複数の Web アプリを提供するような場合は、各アプリをコンテナで構成することで、関係ないアプリの設定が混ざってしまうのを防げます。 もちろん、Azure Container Instances や AWS Fargate といったコンテナ実行用のクラウドサービスを使えば、より独立した環境を構築できるのですが、これらのサービスは個人が趣味で使うにはまだまだ高価なので、VPS などの環境で Docker コンテナを立ち上げることには価値があります。 ここでは、Nginx サーバーを Docker コンテナとして立ち上げる方法を示します。 Docker Hub で公開されている Nginx イメージ は、デフォルトでコンテナ内の /usr/share/nginx/html ディレクトリに配置されたコンテンツを公開するようになっています。 大きく分けて、次の 2 つのいずれかの方法で簡単にコンテンツを公開できます。 bind マウントで Docker ホスト側のコンテンツを参照する方法 コンテンツを含んだコンテナイメージを作成する方法 以下、それぞれの方法を順番に見ていきます。 bind マウントで Docker ホスト側のコンテンツを参照する方法 Nginx のコンテナを起動するときに、Docker ホスト側のコンテンツディレクトリを bind マウントして、コンテナの /usr/share/nginx/html ディレクトリとして参照できるようにする方法です。 まず、簡単なコンテンツファイルとして次のような HTML ファイルを用意しておきます。 public/index.html \u0026lt;html\u0026gt;Hello\u0026lt;/html\u0026gt; あとは、docker container run コマンドで nginx コンテナを起動するだけです。 $ docker container run --rm -d -p 8000:80 -v \u0026#34;$(pwd)/public\u0026#34;:/usr/share/nginx/html --name web nginx 各引数は次のような意味を持っています。 --rm \u0026hellip; コンテナ停止時にコンテナを削除します。 -d (--detach) \u0026hellip; コンテナをバックグラウンドで動作させることで、現在の端末を引き続き利用できるようにします。 -p 8000:80 \u0026hellip; ホスト側のポート 8000 へのアクセスをコンテナのポート 80 へ転送します。これにより、http://localhost:8000 で Web サイトにアクセスできます。 -v ... \u0026hellip; ホスト側のカレントディレクトリにある public ディレクトリを、コンテナ側から /usr/share/nginx/html として見えるようにバインドマウントします。バインド時のパスは絶対パスで記述しないといけないので、Linux シェルの機能の $(pwd) を使って、カレントディレクトリの絶対パスを取得しています。ちなみに -v オプションは旧式のやり方で、Docker 公式で推奨されている --mount オプションを使うと次のようになります（バインドマウントであることが明確です）。 --mount type=bind,src=\u0026quot;$(pwd)/public\u0026quot;,dst=/usr/share/nginx/html --name web \u0026hellip; 起動するコンテナに web という名前を付けます。必須ではありませんが、名前が付いていると docker container stop web でコンテナ停止できたりして便利です。 nginx \u0026hellip; Docker Hub から nginx:latest イメージを取得するよう指定しています。本番環境では、nginx:1.23 のようにバージョンタグまで指定した方がよいでしょう。 無事コンテナが起動したら、次のように動作中であることを確認できます。 $ docker container ls CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES dd4b471044b1 nginx \u0026#34;/docker-entrypoint.…\u0026#34; 2 minutes ago Up 2 minutes 0.0.0.0:8000-\u0026gt;80/tcp, :::8000-\u0026gt;80/tcp web あとは、Web ブラウザや curl コマンドで http://localhost:8000 にアクセスできれば成功です！ $ curl localhost:8000 \u0026lt;html\u0026gt;Hello\u0026lt;/html\u0026gt; 最後にコンテナを停止して後片付けします。 $ docker container stop web コンテンツを含んだイメージを作成する方法 コンテンツディレクトリの内容を埋め込んだコンテナイメージを作成する方法です。 ここでも、上記と同様に public/index.html というコンテンツファイルを用意します。 イメージを作成するための Dockerfile を次のような感じで作成します。 Dockerfile FROMnginx:1.23COPY public /usr/share/nginx/html Dockerfile をビルドして、web という名前のイメージを作成します。 $ docker image build -t web . イメージが作成できているか確認します。 $ docker image ls REPOSITORY TAG IMAGE ID CREATED SIZE web latest 1e2497edf7e0 3 minutes ago 142MB nginx 1.23 41b0e86104ba 30 hours ago 142MB あとは、このイメージでコンテナを起動すれば OK です。 今回は、nginx イメージではなく、独自に作成した web イメージを使って起動することに注意してください（最後の部分が nginx から web に変わっています）。 $ docker container run --rm -d -p 8000:80 --name web web 先ほどと同様に、http://localhost:8000 にアクセスできれば成功です。 このやり方は、作成したイメージをそのまま別の Docker 環境で実行できるというポータビリティがありますが、コンテンツを変更したときはイメージの再ビルドが必要になります。 最後にコンテナを停止してお片付けしておきます。 $ docker container stop web （おまけ）Docker Compose を使う Docker Compose を使う と、docker container run ... の長いコマンドを入力せずに docker compose up という短いコマンドでコンテナを起動できるようになります。 また、Docker Compose はイメージのビルド機能も備えており、Dockerfile を用いたイメージのビルドからコンテナの起動までをワンステップで実行できます。 バインドマウントを使う場合の Compose ファイル (docker-compose.yml) は次のような感じで作成します。 内容は docker container run で指定したオプションとほぼ同様なので、簡単に理解できると思います。 docker-compose.yml（nginx イメージをそのまま使う場合） version:\u0026#34;3\u0026#34;services:web:image:nginx:1.23volumes:- ./public:/usr/share/nginx/htmlports:- \u0026#34;8000:80\u0026#34; あとは、この docker-compose.yml ファイルがあるディレクトリで、次のように実行すればコンテナを起動できます（-d オプションを付けるとバックグラウンド実行になります）。 $ docker compose up -d コンテナを停止＆削除するときは、次のようにします（down の代わりに stop を使うと、コンテナの停止だけで削除されません）。 $ docker compose down web Dockerfile からイメージをビルドして、そのイメージでコンテナ起動する場合は、Compose ファイルを次のように記述します。 イメージ名を指定する image: nginx:1.23 の代わりに build: . を指定して、カレントディレクトリの Dockerfile をビルドするように指示しています。 docker-compose.yml（Dockerfile からイメージをビルドする場合） version:\u0026#34;3\u0026#34;services:web:build:.ports:- \u0026#34;8000:80\u0026#34; あとは、同様に次のように実行すれば、イメージのビルドからコンテナの起動まで一気に終わります。ステキ！ $ docker compose up -d 次のステップ（のヒント） ここまでで、単独の Web サーバーをコンテナとして起動する方法が分かりました。 1 つの VPS サーバー上で、複数の Web サーバーを立ち上げるような場合は、次のような感じで入り口にリバースプロキシ（これも nginx だったりする）を配置し、そこから各 Web サーバーにアクセスを振り分ける構成にします。 振り分けの基準は、ドメイン名であったり、URL のパスであったり様々です。 実際にインターネット上で Web サービスを公開する場合は、リバースプロキシ部分を SSL 対応することになります（https://... でアクセスできるようにする）。 リバースプロキシとバックエンド（Web サーバー）の間の通信は HTTP アクセスで OK です。"
-},
-{
-url: "/p/dj28oy5/",
-title: "Docker 関連メモ",
-date: "2022-07-13T00:00:00Z",
-body: "Docker 関連メモ"
 },
 {
 url: "/p/87p5o2d/",
