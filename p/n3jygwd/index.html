@@ -11,10 +11,11 @@
 <meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
 <meta property="og:image:width" content="1436">
 <meta property="og:image:height" content="746">
-<meta property="og:description" content="Ansible でマネージドノードに SSH 接続するときに使用するユーザー名と秘密鍵は、-u (--user) オプションと --private-key オプションで指定することができます。
-$ ansible-playbook -i hosts.ini site.yml -u maku --private-key ~/.ssh/test/id_rsa インベントリファイルで指定する場合は、ansible_user 変数と ansible_ssh_private_key 変数を使います。
-hosts.ini（ホストごとに指定する場合） [servers] www1.example.com ansible_user=maku ansible_ssh_private_key_file=~/.ssh/test/id_rsa www2.example.com ansible_user=maku ansible_ssh_private_key_file=~/.ssh/test/id_rsa  hosts.ini（グループ単位で指定する場合） [servers] www1.example.com www2.example.com [servers:vars] ansible_user=maku ansible_ssh_private_key_file=~/.ssh/test/id_rsa  YAML 形式でインベントリファイルを記述する場合も、同様の変数で設定できます。
-hosts.yml all:hosts:www1.example.com:www2.example.com:vars:ansible_user:makuansible_ssh_private_key_file:~/.ssh/test/id_rsa  ">
+<meta property="og:description" content="Ansible コマンド（ansible や ansible-playbook）でマネージドノードを制御するとき、デフォルトでは SSH ユーザーとしてコントロールノードのカレントユーザーが使用されます。 異なる SSH ユーザー（と秘密鍵）で接続したい場合は、コマンドライン引数やインベントリファイルで指定することができます。
+ コマンドライン引数で指定する方法 インベントリファイルで指定する方法 ansible.cfg でデフォルトユーザーを指定する方法 ~/.ssh/config で接続先ごとにユーザーを指定する方法  コマンドライン引数で SSH ユーザーを指定する方法 ansible-playbook コマンドの、-u (--user) オプションと --private-key オプションで、SSH 接続に使用するユーザー名と秘密鍵を指定することができます。
+$ ansible-playbook -i hosts.ini site.yml -u maku --private-key ~/.ssh/maku/id_rsa インベントリファイルで SSH ユーザーを指定する方法 インベントリファイルで指定する場合は、ansible_user 変数と ansible_ssh_private_key 変数を使います。
+hosts.ini（ホストごとに指定する場合） [servers] www1.example.com ansible_user=maku ansible_ssh_private_key_file=~/.ssh/maku/id_rsa www2.example.com ansible_user=maku ansible_ssh_private_key_file=~/.ssh/maku/id_rsa  hosts.ini（グループ単位で指定する場合） [servers] www1.example.com www2.example.com [servers:vars] ansible_user=maku ansible_ssh_private_key_file=~/.ssh/maku/id_rsa  YAML 形式でインベントリファイルを記述する場合も、同様の変数で設定できます。
+hosts.yml all:hosts:www1.example.com:www2.example.com:vars:ansible_user:makuansible_ssh_private_key_file:~/.ssh/maku/id_rsa  ~/.ssh/config で接続先ごとにユーザーを指定する方法 インベントリファイルに SSH のユーザー名や秘密鍵のパスを記述するのが煩わしいときは、SSH クライアントの設定ファイル (~/.">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.912f23940528fc207a4dcbe6a6be831d1a99bf78143db42f914622722f63ad0b.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -61,6 +62,21 @@ hosts.yml all:hosts:www1.example.com:www2.example.com:vars:ansible_user:makuansi
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/2yahqx6/>
+Ansible で VPS を設定するための準備
+<time>2022-08-07</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/hufvdta/>
+Ansible で SSH サーバーをセキュアにする (ansible.builtin.lineinfile, ansible.builtin.service)
+<time>2022-08-06</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/cqaq7n4/>
+Linuxメモ: ユーザーのデフォルトシェルを変更する (chsh)
+<time>2022-08-05</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/ehxgwt4/>
 TypeScript を使った Node.js アプリを Docker コンテナ化する
 <time>2022-07-29</time></a>
@@ -69,21 +85,6 @@ TypeScript を使った Node.js アプリを Docker コンテナ化する
 <a href=../../p/jbv7gox/>
 MUI のスナックバーを簡単に表示できるようにする (@mui/material/Snackbar)
 <time>2022-07-25</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/o4o7o6m/>
-Ansible タスク例: when による Playbook の条件分岐
-<time>2022-07-19</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/s9tctaq/>
-Ansible タスク例: Web からファイルをダウンロードする (ansible.builtin.get_url)
-<time>2022-07-19</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/evdubr7/>
-Ansible タスク例: UFW でファイアウォールを設定する (community.general.ufw)
-<time>2022-07-19</time></a>
 </div>
 </div>
 </div>
@@ -96,7 +97,6 @@ Ansible タスク例: UFW でファイアウォールを設定する (community.
 <ul>
 <li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
 <li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
-<li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a>
 <li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
 <ul>
 <li><a class=xNavTree-dir href=../../p/u6p6n4i/>操作／設定</a>
@@ -106,6 +106,7 @@ Ansible タスク例: UFW でファイアウォールを設定する (community.
 <li><a class=xNavTree-dir href=../../p/5j4jygw/>応用</a>
 </ul>
 <li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
+<li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a>
 <li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a>
 <li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
 <li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
@@ -157,7 +158,7 @@ Ansible タスク例: UFW でファイアウォールを設定する (community.
 </div><div class=xMenu_tag>
 <a href=../../tags/aws/cdk>aws/cdk (26)</a>
 </div><div class=xMenu_tag>
-<a href=../../tags/linux>linux (24)</a>
+<a href=../../tags/linux>linux (25)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/github>github (23)</a>
 </div><div class=xMenu_tag>
@@ -171,11 +172,11 @@ Ansible タスク例: UFW でファイアウォールを設定する (community.
 </div><div class=xMenu_tag>
 <a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/ansible>ansible (15)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/electron>electron (15)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/vs-code>vs-code (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ansible>ansible (13)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/javascript>javascript (13)</a>
 </div><div class=xMenu_tag>
@@ -255,6 +256,8 @@ Ansible タスク例: UFW でファイアウォールを設定する (community.
 </div><div class=xMenu_tag>
 <a href=../../tags/qna-maker>qna-maker (5)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/ssh>ssh (5)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a>
@@ -276,8 +279,6 @@ Ansible タスク例: UFW でファイアウォールを設定する (community.
 <a href=../../tags/html/css>html/css (4)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/sql>sql (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ssh>ssh (4)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/windows>windows (4)</a>
 </div><div class=xMenu_tag>
@@ -528,14 +529,30 @@ Ansible タスク例: UFW でファイアウォールを設定する (community.
 </span>
 </header>
 <div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents></nav><p>Ansible でマネージドノードに SSH 接続するときに使用するユーザー名と秘密鍵は、<strong><code>-u (--user)</code></strong> オプションと <strong><code>--private-key</code></strong> オプションで指定することができます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>ansible-playbook -i hosts.ini site.yml -u maku --private-key ~/.ssh/test/id_rsa
-</code></pre></div><p>インベントリファイルで指定する場合は、<strong><code>ansible_user</code></strong> 変数と <strong><code>ansible_ssh_private_key</code></strong> 変数を使います。</p>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#cmd-line>コマンドライン引数で SSH ユーザーを指定する方法</a></li>
+<li><a href=#inventory>インベントリファイルで SSH ユーザーを指定する方法</a></li>
+<li><a href=#ssh-config>~/.ssh/config で接続先ごとにユーザーを指定する方法</a></li>
+</ul>
+</nav><p>Ansible コマンド（<code>ansible</code> や <code>ansible-playbook</code>）でマネージドノードを制御するとき、デフォルトでは SSH ユーザーとしてコントロールノードのカレントユーザーが使用されます。
+異なる SSH ユーザー（と秘密鍵）で接続したい場合は、コマンドライン引数やインベントリファイルで指定することができます。</p>
+<ul>
+<li><a href=#cmd-line>コマンドライン引数で指定する方法</a></li>
+<li><a href=#inventory>インベントリファイルで指定する方法</a></li>
+<li><code>ansible.cfg</code> でデフォルトユーザーを指定する方法</li>
+<li><a href=#ssh-config><code>~/.ssh/config</code> で接続先ごとにユーザーを指定する方法</a></li>
+</ul>
+<h2 id=cmd-line>コマンドライン引数で SSH ユーザーを指定する方法</h2>
+<p><code>ansible-playbook</code> コマンドの、<strong><code>-u (--user)</code></strong> オプションと <strong><code>--private-key</code></strong> オプションで、SSH 接続に使用するユーザー名と秘密鍵を指定することができます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>ansible-playbook -i hosts.ini site.yml -u maku --private-key ~/.ssh/maku/id_rsa
+</code></pre></div><h2 id=inventory>インベントリファイルで SSH ユーザーを指定する方法</h2>
+<p>インベントリファイルで指定する場合は、<strong><code>ansible_user</code></strong> 変数と <strong><code>ansible_ssh_private_key</code></strong> 変数を使います。</p>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>hosts.ini（ホストごとに指定する場合）</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ini data-lang=ini><span class=k>[servers]</span>
-<span class=na>www1.example.com ansible_user</span><span class=o>=</span><span class=s>maku ansible_ssh_private_key_file=~/.ssh/test/id_rsa</span>
-<span class=na>www2.example.com ansible_user</span><span class=o>=</span><span class=s>maku ansible_ssh_private_key_file=~/.ssh/test/id_rsa</span></code></pre></div></div>
+<span class=na>www1.example.com ansible_user</span><span class=o>=</span><span class=s>maku ansible_ssh_private_key_file=~/.ssh/maku/id_rsa</span>
+<span class=na>www2.example.com ansible_user</span><span class=o>=</span><span class=s>maku ansible_ssh_private_key_file=~/.ssh/maku/id_rsa</span></code></pre></div></div>
 </figure>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>hosts.ini（グループ単位で指定する場合）</figcaption>
@@ -545,7 +562,7 @@ Ansible タスク例: UFW でファイアウォールを設定する (community.
 
 <span class=k>[servers:vars]</span>
 <span class=na>ansible_user</span><span class=o>=</span><span class=s>maku</span>
-<span class=na>ansible_ssh_private_key_file</span><span class=o>=</span><span class=s>~/.ssh/test/id_rsa</span></code></pre></div></div>
+<span class=na>ansible_ssh_private_key_file</span><span class=o>=</span><span class=s>~/.ssh/maku/id_rsa</span></code></pre></div></div>
 </figure>
 <p>YAML 形式でインベントリファイルを記述する場合も、同様の変数で設定できます。</p>
 <figure class=xCodeBlock>
@@ -556,7 +573,25 @@ Ansible タスク例: UFW でファイアウォールを設定する (community.
 </span><span class=w>    </span><span class=nt>www2.example.com</span><span class=p>:</span><span class=w>
 </span><span class=w>  </span><span class=nt>vars</span><span class=p>:</span><span class=w>
 </span><span class=w>    </span><span class=nt>ansible_user</span><span class=p>:</span><span class=w> </span><span class=l>maku</span><span class=w>
-</span><span class=w>    </span><span class=nt>ansible_ssh_private_key_file</span><span class=p>:</span><span class=w> </span><span class=l>~/.ssh/test/id_rsa</span></code></pre></div></div>
+</span><span class=w>    </span><span class=nt>ansible_ssh_private_key_file</span><span class=p>:</span><span class=w> </span><span class=l>~/.ssh/maku/id_rsa</span></code></pre></div></div>
+</figure>
+<h2 id=ssh-config>~/.ssh/config で接続先ごとにユーザーを指定する方法</h2>
+<p>インベントリファイルに SSH のユーザー名や秘密鍵のパスを記述するのが煩わしいときは、SSH クライアントの設定ファイル (<code>~/.ssh/config</code>) で、接続先ごとに使用する SSH ユーザーや秘密鍵を定義してしまう方法があります。
+次の例では、<code>maku-example.com</code> という名前で、SSH 接続設定を定義しています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>~/.ssh/config</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ini data-lang=ini><span class=na>Host maku-example.com</span>
+    <span class=na>Hostname example.com</span>
+    <span class=na>User maku</span>
+    <span class=na>Port 22</span>
+    <span class=na>IdentityFile ~/ssh/maku/id_rsa</span></code></pre></div></div>
+</figure>
+<p>これで、次のようにするだけで、自動的にユーザー <code>maku</code>、およびその秘密鍵を使って SSH 接続されるようになります。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>ssh maku-example.com
+</code></pre></div><p>この設定は、内部で ssh を使用しているプロダクトにも有効なので、Ansible のインベントリファイルは次のようにシンプルに記述できるようになります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>hosts.ini</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ini data-lang=ini><span class=na>maku-example.com</span></code></pre></div></div>
 </figure>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
