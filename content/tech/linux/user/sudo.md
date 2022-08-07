@@ -126,6 +126,75 @@ maku ALL=(puni) ALL
 `sudo` コマンドはデフォルトで `root` ユーザーとしてコマンド実行しようとするので、`-u` オプションでユーザーを指定して実行する必要があります（例: `sudo -u puni command`）。
 
 
+/etc/sudoers.d ディレクトリを使う方法
+----
+
+多くの Linux ディストリビューションでは、`/etc/sudoers` ファイルの末尾で、次のように __`/etc/sudoers.d`__ ディレクトリ以下のファイルをインクルードするようになっています。
+
+{{< code title="/etc/sudoers（抜粋）" >}}
+@includedir /etc/sudoers.d
+{{< /code >}}
+
+つまり、このディレクトリに追加の設定ファイルを配置することでも、`sudoers` の設定を行うことができます。
+`/etc/sudoers` を直接変更するよりも、カスタマイズした内容を管理しやすくなります。
+`/etc/sudoers.d` ディレクトリ以下に設定ファイルを作成（あるいは既存のファイルを編集）する場合も、__`visudo`__ コマンドを使用します。
+
+{{< code lang="console" title="/etc/sudoers.d 以下にファイルを作成／編集" >}}
+$ sudo visudo /etc/sudoers.d/xxxx
+{{< /code >}}
+
+エディタでファイルが開かれるので、次のような感じで必要な設定を記述します。
+
+{{< code title="/etc/sudoers.d/xxxx" >}}
+xxxx ALL=(ALL) NOPASSWD:ALL
+{{< /code >}}
+
+`/etc/sudoers.d` ディレクトリ内のファイルのモードは `0400` に設定されている必要がありますが、`visudo` コマンドでファイルを作成した場合は、自動的にこのモードに設定してくれます。
+
+
+管理者グループ (admin、wheel) を使う方法
+----
+
+上記では、個々のユーザーを `/etc/sudoers` に登録する方法を説明しましたが、実はユーザーを特定の管理者グループに所属させるだけで、sudo でコマンド実行できるようになります。
+
+- Debian/Ubuntu の場合 ... __admin__、__sudo__ グループ
+- CentOS/RockyLinux の場合 ... __wheel__ グループ
+
+なぜなら、`/etc/sudoers` ファイルに次のようにグループが登録されているからです。
+
+{{< code title="/etc/sudoers 抜粋（Debian の場合）" >}}
+# Members of the admin group may gain root privileges
+%admin ALL=(ALL) ALL
+
+# Allow members of group sudo to execute any command
+%sudo	ALL=(ALL:ALL) ALL
+{{< /code >}}
+
+{{< code title="/etc/sudoers 抜粋（CentOS の場合）" >}}
+## Allows people in group wheel to run all commands
+%wheel	ALL=(ALL)	ALL
+{{< /code >}}
+
+よって、管理者権限で sudo 実行したいユーザーを、次のようにグループ登録するだけで済みます。
+
+```console
+# Debian/Ubuntu の場合
+$ sudo gpasswd -a maku admin
+
+# CentOS/RockyLinux の場合
+$ sudo gpasswd -a maku wheel
+```
+
+ユーザーを登録するときに、同時にこれらのグループに所属させてしまうこともできます。
+
+```console
+$ sudo useradd -m -G admin maku
+```
+
+- 参考: [Linux のユーザーを管理する (useradd, userdel, passwd)](/p/7m5k3hx/)
+- 参考: [Linux のグループを管理する (groupadd, groupdel, gpasswd)](/p/uexfvcs/)
+
+
 （おまけ）sudo によるコマンド出力をリダイレクトするときの注意
 ----
 

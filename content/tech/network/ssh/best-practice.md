@@ -1,5 +1,5 @@
 ---
-title: "sshd 設定のベストプラクティス"
+title: "SSH サーバー (sshd) 設定のベストプラクティス"
 url: "p/42cmu5d/"
 date: "2022-07-17"
 tags: ["SSH"]
