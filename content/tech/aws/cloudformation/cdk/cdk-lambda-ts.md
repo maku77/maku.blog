@@ -56,7 +56,7 @@ Lambda 関数を含むスタックの定義とデプロイ
 
 ### NodejsFunction コンストラクト
 
-AWS CDK の ml) が提供する `NodejsFunction` コンストラクトを使用すると、TypeScript 言語で実装した Lambda 関数を簡単にビルド＆デプロイできます。
+AWS CDK が提供する `NodejsFunction` コンストラクトを使用すると、TypeScript 言語で実装した Lambda 関数を簡単にビルド＆デプロイできます。
 
 - [CDK V2 用の NodejsFunction コンストラクト (aws-cdk-lib/aws_lambda_nodejs)](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_lambda_nodejs-readme.html)
 - [CDK V1 用の NodejsFunction コンストラクト (@aws-cdk/aws-lambda-nodejs)](https://docs.aws.amazon.com/cdk/api/v1/docs/aws-lambda-nodejs-readme.html)
@@ -66,7 +66,7 @@ Lambda 関数用の汎用的なコンストラクトとしては、[aws-cdk-lib/
 * esbuild による Lambda 関数関連アセットの高速なパッケージング（バンドル）。
 * Lambda 関数の TypeScript コードをいちいちコンパイルしなくてよい。
 
-ちょっとややこしいのですが、CDK コード（TypeScript で書いた場合）の実行は `ts-code` で実行され、Lambda 関数のビルドとパッケージングは `esbuild` で行われます。
+ちょっとややこしいのですが、（TypeScript で記述された）CDK コードの実行は `ts-node` で行われ、Lambda 関数のビルドとパッケージングは `esbuild` で行われるようになっています。
 
 CDK V1 のコンストラクトパッケージは次のようにインストールします。
 CDK V2 の場合は、`aws-cdk-lib` に含まれているので、追加でパッケージをインストールする必要はありません。
@@ -109,9 +109,9 @@ export class MyappStack extends Stack {
 
 スタックの定義が済んだら、__`cdk deploy`__ を実行して Lambda 関数をデプロイすることができます。
 
-{{< code >}}
+```console
 $ npm run cdk -- deploy
-{{< /code >}}
+```
 
 デプロイが完了したら、[CloudFormation コンソール](https://console.aws.amazon.com/cloudformation/) を開いて、実際にスタックと Lambda 関数が生成されているか確認しましょう。
 TypeScript コードのトランスパイルも esbuild で自動でやってくれるし、ZIP パッケージ化とアップロードも自動でやってくれる（これは CDK の機能ですが）ので、とっても楽ですね！
@@ -126,11 +126,11 @@ TypeScript コードのトランスパイルも esbuild で自動でやってく
 
 Windows や macOS で `cdk diff` や `cdk deploy` を実行したときに、__`spawnSync docker ENOENT`__ というエラーが発生する場合は、[esbuild をインストール](https://docs.aws.amazon.com/cdk/api/latest/docs/aws-lambda-nodejs-readme.html#local-bundling) するとうまくいくようです。
 
-{{< code >}}
+```console
 $ yarn add --dev esbuild@0
 あるいは
 $ npm install --save-dev esbuild@0
-{{< /code >}}
+```
 
 ### NodejsFunction の第1引数の this でエラーになるとき
 
