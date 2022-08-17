@@ -604,7 +604,7 @@ Lambda 関数のビルドもデプロイ時に自動で行われるようにし�
 </figure>
 <h2 id=lambda-関数を含むスタックの定義とデプロイ>Lambda 関数を含むスタックの定義とデプロイ</h2>
 <h3 id=nodejsfunction-コンストラクト>NodejsFunction コンストラクト</h3>
-<p>AWS CDK の ml) が提供する <code>NodejsFunction</code> コンストラクトを使用すると、TypeScript 言語で実装した Lambda 関数を簡単にビルド＆デプロイできます。</p>
+<p>AWS CDK が提供する <code>NodejsFunction</code> コンストラクトを使用すると、TypeScript 言語で実装した Lambda 関数を簡単にビルド＆デプロイできます。</p>
 <ul>
 <li><a href=https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_lambda_nodejs-readme.html>CDK V2 用の NodejsFunction コンストラクト (aws-cdk-lib/aws_lambda_nodejs)</a></li>
 <li><a href=https://docs.aws.amazon.com/cdk/api/v1/docs/aws-lambda-nodejs-readme.html>CDK V1 用の NodejsFunction コンストラクト (@aws-cdk/aws-lambda-nodejs)</a></li>
@@ -614,7 +614,7 @@ Lambda 関数のビルドもデプロイ時に自動で行われるようにし�
 <li>esbuild による Lambda 関数関連アセットの高速なパッケージング（バンドル）。</li>
 <li>Lambda 関数の TypeScript コードをいちいちコンパイルしなくてよい。</li>
 </ul>
-<p>ちょっとややこしいのですが、CDK コード（TypeScript で書いた場合）の実行は <code>ts-code</code> で実行され、Lambda 関数のビルドとパッケージングは <code>esbuild</code> で行われます。</p>
+<p>ちょっとややこしいのですが、（TypeScript で記述された）CDK コードの実行は <code>ts-node</code> で行われ、Lambda 関数のビルドとパッケージングは <code>esbuild</code> で行われるようになっています。</p>
 <p>CDK V1 のコンストラクトパッケージは次のようにインストールします。
 CDK V2 の場合は、<code>aws-cdk-lib</code> に含まれているので、追加でパッケージをインストールする必要はありません。</p>
 <figure class=xCodeBlock>
@@ -651,10 +651,8 @@ CDK V2 の場合は、<code>aws-cdk-lib</code> に含まれているので、追
 <p>最小構成では、上記のように props オブジェクトの <strong><code>entry</code></strong> プロパティで Lambda 関数の <code>index.ts</code> ファイルパスを指定するだけで OK です。</p>
 <h3 id=デプロイ>デプロイ</h3>
 <p>スタックの定義が済んだら、<strong><code>cdk deploy</code></strong> を実行して Lambda 関数をデプロイすることができます。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ npm run cdk -- deploy</code></pre></div></div>
-</figure>
-<p>デプロイが完了したら、<a href=https://console.aws.amazon.com/cloudformation/>CloudFormation コンソール</a> を開いて、実際にスタックと Lambda 関数が生成されているか確認しましょう。
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>npm run cdk -- deploy
+</code></pre></div><p>デプロイが完了したら、<a href=https://console.aws.amazon.com/cloudformation/>CloudFormation コンソール</a> を開いて、実際にスタックと Lambda 関数が生成されているか確認しましょう。
 TypeScript コードのトランスパイルも esbuild で自動でやってくれるし、ZIP パッケージ化とアップロードも自動でやってくれる（これは CDK の機能ですが）ので、とっても楽ですね！</p>
 <ul>
 <li>参考: <a href=../../p/ap8p7n4>AWS CDK メモ: Lambda 関数コードだけ高速デプロイする (cdk deploy &ndash;hotswap)</a></li>
@@ -662,12 +660,10 @@ TypeScript コードのトランスパイルも esbuild で自動でやってく
 <h2 id=トラブルシューティング>トラブルシューティング</h2>
 <h3 id=デプロイ時に-spawnsync-docker-enoent-が出る場合>デプロイ時に spawnSync docker ENOENT が出る場合</h3>
 <p>Windows や macOS で <code>cdk diff</code> や <code>cdk deploy</code> を実行したときに、<strong><code>spawnSync docker ENOENT</code></strong> というエラーが発生する場合は、<a href=https://docs.aws.amazon.com/cdk/api/latest/docs/aws-lambda-nodejs-readme.html#local-bundling>esbuild をインストール</a> するとうまくいくようです。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ yarn add --dev esbuild@0
-あるいは
-$ npm install --save-dev esbuild@0</code></pre></div></div>
-</figure>
-<h3 id=nodejsfunction-の第1引数の-this-でエラーになるとき>NodejsFunction の第1引数の this でエラーになるとき</h3>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>yarn add --dev esbuild@0
+<span class=go>あるいは
+</span><span class=go></span><span class=gp>$ </span>npm install --save-dev esbuild@0
+</code></pre></div><h3 id=nodejsfunction-の第1引数の-this-でエラーになるとき>NodejsFunction の第1引数の this でエラーになるとき</h3>
 <p>CDK V1 の <code>NodejsFunction</code> のコンストラクタの <code>this</code> を渡している部分で、次のような型情報エラーが発生するときは、<code>aws-cdk</code> 本体と、コンストラクトライブラリ（<code>@aws-cdk/aws-lambda-nodejs</code> など）のバージョンが合っていない可能性があります。</p>
 <blockquote>
 <p>Argument of type &lsquo;this&rsquo; is not assignable to parameter of type &lsquo;Construct&rsquo;.
