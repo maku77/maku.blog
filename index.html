@@ -501,6 +501,7 @@ MUI で GitHub のようなリソース削除の確認ダイアログを作る�
 <li><a href=#github-actions-で-hugo-ビルド>GitHub Actions で Hugo ビルド</a></li>
 </ul>
 </li>
+<li><a href=#おまけ普段の記事の執筆中はどうするか>（おまけ）普段の記事の執筆中はどうするか？</a></li>
 </ul>
 </nav><h2 id=何をするか>何をするか？</h2>
 <p>こことは違う Web サイト (GitHub Pages) の話ですが、いい加減 <a href=./p/xwfwdy6/>Jekyll での Web サイト管理は限界</a> になってきたので、重い腰を上げて全面的に Hugo に乗り換えようと思います。
@@ -652,7 +653,7 @@ Hugo プロジェクトがまだ存在しない場合は、次のような感じ
 </figure>
 <p>Linux の <code>cp</code> コマンドで <code>-RT</code> オプションを指定することで、<code>hugo-files/public</code> ディレクトリの中身だけをまるごと <code>_site</code> へコピーしています（ちなみに、macOS の <code>cp</code> コマンドの場合は BSD 版なので <code>-T</code> オプションが存在せず、代わりに <code>cp -Rn hugo-files/public/ _site</code> のように、src ディレクトリ名に <code>/</code> サフィックスを付けます）。
 さらに、<code>cp</code> コマンドの <code>-n</code> オプションを指定することで、コピー先に同名のファイルがある場合に上書きしないようにしています。
-おそらく、トップページ用の <code>index.html</code> は両方のビルド結果として出力されていますが、今回は Jekyll の方のファイルを採用することになります。</p>
+おそらく、トップページ用の <code>index.html</code> は両方のビルド結果として出力されていますが、今回は Jekyll の方のファイルを採用することになります（Hugo の方のトップページを使わないのであれば、最初から <a href=https://gohugo.io/commands/hugo/><code>hugo</code> コマンドのオプション</a> で <code>--disableKinds home</code> を指定して出力しないのがよいかもしれません）。</p>
 <p>サイトマップファイル (<code>sitemap.xml</code>) を両方のプロジェクトで生成している場合は、どちらのファイルもデプロイしたいので、次のような感じで Hugo 側のファイルをリネームしてコピーしておきます。
 サイトマップファイルが 2 つに分かれるので、Google Search Console などでサイトマップを送信する場合は、2 つの XML ファイル（<code>sitemap.xml</code> と <code>sitemap-hugo.xml</code>）を指定することになります。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Rename and copy Hugo&#39;s sitemap.xml</span><span class=w>
@@ -660,6 +661,47 @@ Hugo プロジェクトがまだ存在しない場合は、次のような感じ
 </span></code></pre></div><p>これで、Hugo と Jekyll の共存環境は完成です。
 GitHub リポジトリに Markdown コンテンツをプッシュするたびに、両方のビルド結果がマージされてホスティングされるようになります。
 最終的な <a href=https://github.com/maku77/jekyll-with-hugo/blob/main/.github/workflows/github-pages.yml>Workflow ファイルはこちら</a> を参照してください。</p>
+<h2 id=おまけ普段の記事の執筆中はどうするか>（おまけ）普段の記事の執筆中はどうするか？</h2>
+<p>GitHub Actions で Jekyll と Hugo を同時にビルドするときはよいのですが、ローカルサーバーを起動して記事を執筆しているときはどうやって共存させればよいでしょうか？
+デフォルトでは、Jekyll のローカルサーバー (<code>bundle exec jekyll serve</code>) は 4000 番ポートで動作し、Hugo のローカルサーバー (<code>hugo serve</code>) は 1313 番ポートで動作します。
+<code>-p</code> オプションでポート番号を変更することはできますが、TCP/IP の仕様上、同じポート番号でサーバーを立ち上げることはできません。
+よって、どちらかのサーバーに相乗りする形で動作させる必要があります。</p>
+<p>ここでは、Jekyll のローカルサーバーが <code>_site</code> ディレクトリを使う性質を利用して、Hugo のコンテンツをそこに随時放り込むという方法をとってみます。
+まず、Jekyll のローカルサーバーを起動します。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Jekyll サーバーを起動 (http://localhost:4000)</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>bundle <span class=nb>exec</span> jekyll serve --baseurl <span class=s2>&#34;&#34;</span>
+</code></pre></div></div>
+</figure>
+<p>ここでは、<code>--baseurl ""</code> オプションを指定して、<code>http://localhost:4000</code> というシンプルな URL でトップページにアクセスできるようにしています。
+これは、GitHub のリポジトリ名に合わせて、Jekyll の設定ファイル (<code>_config.yml</code>) で <code>baseurl: "/jekyll-with-hugo"</code> のような設定をしているからです。
+baseurl をクリアしておかないと、トップページにアクセスするときに、<code>http://localhost:4000/jekyll-with-hugo/</code> という URL を使わないといけません。</p>
+<p>次に、Hugo のビルドコマンドを、Watch モードで起動します。
+Hugo はサーバーとしては起動しないところがポイントです。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Hugo ビルドを Watch モードで起動</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span><span class=nb>cd</span> hugo-files
+<span class=gp>$ </span>hugo --watch --destination ../_site --disableKinds home
+</code></pre></div></div>
+</figure>
+<p><code>-w</code> (<code>--watch</code>) オプションを付けて Hugo ビルドを実行すると、記事ディレクトリ (<code>content</code>) を監視して随時ビルドをかけてくれるようになります。
+そのビルド結果は <code>--destination ../_site</code> という指定により、Jekyll がホスティングしているディレクトリ (<code>../_site</code>) にマージされていきます。
+さらに、<code>--disableKinds home</code> というオプションで、Hugo 側のトップページ (<code>index.html</code>) の出力を抑制し、Jekyll 側のトップページが上書きされてしまうのを防いでいます。</p>
+<p>これで、ブラウザで <code>http://localhost:4000</code> を開いたまま、記事の執筆を進めることができます。
+ただ、ちょっと強引な組み合わせ方をしているので、いくつか問題もあります。</p>
+<ul>
+<li>Jekyll 側の記事を更新すると <code>_site</code> 内の Hugo 記事が消されてしまう
+<ul>
+<li>これは Jekyll が出力をきれいにしてくれるための機能なので、この振る舞いを変えることはできないみたいです。もし、Hugo 側の記事が必ず <code>p</code> ディレクトリ以下に出力されるなど決まっているのであれば、<code>_config.yml</code> に <code>keep_files: ["p"]</code> と記述しておけば、それらの記事だけは消去されずに済みます。</li>
+</ul>
+</li>
+<li>Live Reload などの機能が使えない
+<ul>
+<li>Jekyll の出力先ディレクトリに直接ファイルを突っ込んでいるので、記事の修正を検出してくれないのは仕方ないですね…。</li>
+</ul>
+</li>
+</ul>
+<p>まぁこのあたりは、Hugo への完全移行が終わるまでの辛抱です。</p>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">
