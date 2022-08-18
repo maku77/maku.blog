@@ -174,7 +174,7 @@ GitHub Actions の Workflow ファイルを修正して、Hugo のインスト�
 
 Linux の `cp` コマンドで `-RT` オプションを指定することで、`hugo-files/public` ディレクトリの中身だけをまるごと `_site` へコピーしています（ちなみに、macOS の `cp` コマンドの場合は BSD 版なので `-T` オプションが存在せず、代わりに `cp -Rn hugo-files/public/ _site` のように、src ディレクトリ名に `/` サフィックスを付けます）。
 さらに、`cp` コマンドの `-n` オプションを指定することで、コピー先に同名のファイルがある場合に上書きしないようにしています。
-おそらく、トップページ用の `index.html` は両方のビルド結果として出力されていますが、今回は Jekyll の方のファイルを採用することになります。
+おそらく、トップページ用の `index.html` は両方のビルド結果として出力されていますが、今回は Jekyll の方のファイルを採用することになります（Hugo の方のトップページを使わないのであれば、最初から [`hugo` コマンドのオプション](https://gohugo.io/commands/hugo/) で `--disableKinds home` を指定して出力しないのがよいかもしれません）。
 
 サイトマップファイル (`sitemap.xml`) を両方のプロジェクトで生成している場合は、どちらのファイルもデプロイしたいので、次のような感じで Hugo 側のファイルをリネームしてコピーしておきます。
 サイトマップファイルが 2 つに分かれるので、Google Search Console などでサイトマップを送信する場合は、2 つの XML ファイル（`sitemap.xml` と `sitemap-hugo.xml`）を指定することになります。
@@ -187,4 +187,46 @@ Linux の `cp` コマンドで `-RT` オプションを指定することで、`
 これで、Hugo と Jekyll の共存環境は完成です。
 GitHub リポジトリに Markdown コンテンツをプッシュするたびに、両方のビルド結果がマージされてホスティングされるようになります。
 最終的な [Workflow ファイルはこちら](https://github.com/maku77/jekyll-with-hugo/blob/main/.github/workflows/github-pages.yml) を参照してください。
+
+
+（おまけ）普段の記事の執筆中はどうするか？
+----
+
+GitHub Actions で Jekyll と Hugo を同時にビルドするときはよいのですが、ローカルサーバーを起動して記事を執筆しているときはどうやって共存させればよいでしょうか？
+デフォルトでは、Jekyll のローカルサーバー (`bundle exec jekyll serve`) は 4000 番ポートで動作し、Hugo のローカルサーバー (`hugo serve`) は 1313 番ポートで動作します。
+`-p` オプションでポート番号を変更することはできますが、TCP/IP の仕様上、同じポート番号でサーバーを立ち上げることはできません。
+よって、どちらかのサーバーに相乗りする形で動作させる必要があります。
+
+ここでは、Jekyll のローカルサーバーが `_site` ディレクトリを使う性質を利用して、Hugo のコンテンツをそこに随時放り込むという方法をとってみます。
+まず、Jekyll のローカルサーバーを起動します。
+
+{{< code lang="console" title="Jekyll サーバーを起動 (http://localhost:4000)" >}}
+$ bundle exec jekyll serve --baseurl ""
+{{< /code >}}
+
+ここでは、`--baseurl ""` オプションを指定して、`http://localhost:4000` というシンプルな URL でトップページにアクセスできるようにしています。
+これは、GitHub のリポジトリ名に合わせて、Jekyll の設定ファイル (`_config.yml`) で `baseurl: "/jekyll-with-hugo"` のような設定をしているからです。
+baseurl をクリアしておかないと、トップページにアクセスするときに、`http://localhost:4000/jekyll-with-hugo/` という URL を使わないといけません。
+
+次に、Hugo のビルドコマンドを、Watch モードで起動します。
+Hugo はサーバーとしては起動しないところがポイントです。
+
+{{< code lang="console" title="Hugo ビルドを Watch モードで起動" >}}
+$ cd hugo-files
+$ hugo --watch --destination ../_site --disableKinds home
+{{< /code >}}
+
+`-w` (`--watch`) オプションを付けて Hugo ビルドを実行すると、記事ディレクトリ (`content`) を監視して随時ビルドをかけてくれるようになります。
+そのビルド結果は `--destination ../_site` という指定により、Jekyll がホスティングしているディレクトリ (`../_site`) にマージされていきます。
+さらに、`--disableKinds home` というオプションで、Hugo 側のトップページ (`index.html`) の出力を抑制し、Jekyll 側のトップページが上書きされてしまうのを防いでいます。
+
+これで、ブラウザで `http://localhost:4000` を開いたまま、記事の執筆を進めることができます。
+ただ、ちょっと強引な組み合わせ方をしているので、いくつか問題もあります。
+
+- Jekyll 側の記事を更新すると `_site` 内の Hugo 記事が消されてしまう
+  - これは Jekyll が出力をきれいにしてくれるための機能なので、この振る舞いを変えることはできないみたいです。もし、Hugo 側の記事が必ず `p` ディレクトリ以下に出力されるなど決まっているのであれば、`_config.yml` に `keep_files: ["p"]` と記述しておけば、それらの記事だけは消去されずに済みます。
+- Live Reload などの機能が使えない
+  - Jekyll の出力先ディレクトリに直接ファイルを突っ込んでいるので、記事の修正を検出してくれないのは仕方ないですね…。
+
+まぁこのあたりは、Hugo への完全移行が終わるまでの辛抱です。
 
