@@ -14,7 +14,7 @@ tags: ["Hugo", "Jekyll", "GitHub Actions", "GitHub Pages"]
 
 とはいえ、現状 Jekyll で管理している Web ページは何千ページにも膨れ上がっており、一気に乗り換えるのは困難です。
 そこで、Jekyll 運用されている Web サイトに、少しずつ Hugo 管理のページを加えていく、という作戦を取りたいと思います。
-ドメイン名はこれまで通り `xxx.github.io` を使いたいので、ホスティングはこれまで通り GitHub Pages で行い、ビルドやデプロイには GitHub Actions を使うことにします。
+ドメイン名はそのまま `xxx.github.io` を使いたいので、ホスティングはこれまで通り GitHub Pages で行い、ビルドやデプロイには GitHub Actions を使うことにします。
 
 
 基本方針
@@ -104,16 +104,16 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.0' # Not needed with a .ruby-version file
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          bundler-cache: true # Runs 'bundle install' and caches installed gems automatically
 
       - name: Build with Jekyll
-        run: bundle exec jekyll build --destination public
+        run: bundle exec jekyll build # Default destination is _site
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: public
+          publish_dir: _site # Default is public
 {{< /code >}}
 
 GitHub Pages のデフォルトの振る舞いでは、ソースブランチ（今回は `gh-pages`）内のファイルを自動的に Jekyll で処理しようとします。
@@ -150,12 +150,11 @@ exclude:
   - gemfiles/
   - hugo-files/
   - node_modules/
-  - public/
   - vendor/
 {{< /code >}}
 
 GitHub Actions の Workflow ファイルを修正して、Hugo のインストールとビルドを行うようにします。
-ここでは、いったん Hugo 用のビルド結果はデフォルトのまま `hugo-files/public` ディレクトリに出力しておき、ビルド後にリポジトリルートの `public` ディレクトリに中身をマージすることにします。
+ここでは、いったん Hugo 用のビルド結果はデフォルトのまま `hugo-files/public` ディレクトリに出力しておき、ビルド後にリポジトリルートの `_site` ディレクトリに中身をマージすることにします。
 このように段階的に出力結果をマージすることで、同名ファイルの扱いを制御しやすくなります。
 
 {{< code lang="yaml" title=".github/workflows/github-pages.yml（抜粋）" >}}
@@ -169,20 +168,20 @@ GitHub Actions の Workflow ファイルを修正して、Hugo のインスト�
   run: hugo --minify
   working-directory: hugo-files
 
-- name: Merge public directories without overriding
-  run: cp -RTn hugo-files/public public
+- name: Merge build results without overriding
+  run: cp -RTn hugo-files/public _site
 {{< /code >}}
 
-Linux の `cp` コマンドで `-RT` オプションを指定することで、`public` ディレクトリの中身だけをまるごとコピーしています（ちなみに、macOS の `cp` コマンドの場合は BSD 版なので `-T` オプションが存在せず、代わりに `cp -Rn hugo-files/public/ public` のように、src ディレクトリ名に `/` サフィックスを付けます）。
+Linux の `cp` コマンドで `-RT` オプションを指定することで、`hugo-files/public` ディレクトリの中身だけをまるごと `_site` へコピーしています（ちなみに、macOS の `cp` コマンドの場合は BSD 版なので `-T` オプションが存在せず、代わりに `cp -Rn hugo-files/public/ _site` のように、src ディレクトリ名に `/` サフィックスを付けます）。
 さらに、`cp` コマンドの `-n` オプションを指定することで、コピー先に同名のファイルがある場合に上書きしないようにしています。
-おそらく、トップページ用の `index.html` は両方の `public` ディレクトリに出力されていますが、今回は Jekyll の方のファイルを採用することになります。
+おそらく、トップページ用の `index.html` は両方のビルド結果として出力されていますが、今回は Jekyll の方のファイルを採用することになります。
 
 サイトマップファイル (`sitemap.xml`) を両方のプロジェクトで生成している場合は、どちらのファイルもデプロイしたいので、次のような感じで Hugo 側のファイルをリネームしてコピーしておきます。
 サイトマップファイルが 2 つに分かれるので、Google Search Console などでサイトマップを送信する場合は、2 つの XML ファイル（`sitemap.xml` と `sitemap-hugo.xml`）を指定することになります。
 
 ```yaml
 - name: Rename and copy Hugo's sitemap.xml
-  run: cp hugo-files/public/sitemap.xml public/sitemap-hugo.xml
+  run: cp hugo-files/public/sitemap.xml _site/sitemap-hugo.xml
 ```
 
 これで、Hugo と Jekyll の共存環境は完成です。
