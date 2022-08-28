@@ -15,17 +15,17 @@ SSH サーバーを安全に運用するには、[いくつかのベストプラ
   become: true
 
   tasks:
-    - name: prohibit root login
+    - name: Prohibit root login
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         state: present
         regexp: '^PermitRootLogin '
         line: 'PermitRootLogin no'
       notify:
-        - reload ssh daemon
+        - Reload ssh daemon
 
   handlers:
-    - name: reload ssh daemon
+    - name: Reload ssh daemon
       ansible.builtin.service:
         name: sshd
         state: reloaded

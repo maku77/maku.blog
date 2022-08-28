@@ -6,6 +6,11 @@ tags: ["Ansible"]
 weight: 110
 ---
 
+{{% private %}}
+- https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html
+- https://docs.ansible.com/ansible/latest/reference_appendices/playbooks_keywords.html
+{{% /private %}}
+
 モジュール
 : Ansible で使う機能の単位。例えば、`ansible.builtin.systemd` など。
 プレイブック中の各プレイで指定するタスクリストは、モジュールを指定して定義していきます。
@@ -36,6 +41,9 @@ INI ファイル用の `ansible.builtin.ini` や、YAML ファイル用の `ansi
 プラグイン
 : Ansible 本体に対して機能を追加する仕組み。
 参考: [Indexes of all modules and plugins — Ansible Documentation](https://docs.ansible.com/ansible/latest/collections/all_plugins.html)
+
+ホスト / Host
+: Ansible のコントロール対象となるリモートマシン。
 
 ansible.cfg
 : Ansible 本体に対する設定ファイルで、INI 形式で記述します。
