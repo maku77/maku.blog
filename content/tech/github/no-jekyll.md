@@ -1,5 +1,5 @@
 ---
-title: "GitHub Pages で Jekyll による変換を無効化する（プッシュした HTML をそのまま表示する）"
+title: "GitHub Pages で Jekyll による自動変換を無効化する (.nojekyll)"
 url: "/p/my8fmsy"
 date: "2020-09-03"
 tags: ["GitHub Pages", "Jekyll"]

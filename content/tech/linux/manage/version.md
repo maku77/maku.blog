@@ -1,5 +1,5 @@
 ---
-title: "Linux のバージョンの調べ方まとめ"
+title: "Linux ディストリビューションのバージョンの調べ方まとめ"
 url: "p/vdweubq/"
 date: "2022-07-09"
 tags: ["Linux"]
