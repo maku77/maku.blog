@@ -1,6 +1,6 @@
 ---
 title: "Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）"
-url: "/p/ij4jv9k"
+url: "p/ij4jv9k/"
 date: "2022-05-18"
 tags: ["Go", "gRPC", "Protocol Buffers"]
 ---
@@ -49,10 +49,10 @@ $ go get google.golang.org/grpc
 .proto ファイルを作成する
 ----
 
-`echo/echo.proto` ファイルを作成して、次のように記述します。
+`protos/echo/echo.proto` ファイルを作成して、次のように記述します。
 Go 言語用のオプション `option go_package` で、出力する `.go` ファイルを `echo` パッケージに配置するように指定しています。
 
-{{< code lang="proto" title="echo/echo.proto" >}}
+{{< code lang="proto" title="protos/echo/echo.proto" >}}
 syntax = "proto3";
 
 package echo;
@@ -83,10 +83,13 @@ message EchoResponse {
 
 `protoc` コマンドを実行して、`.proto` ファイルからシリアライズ用のコードと、gRPC 関連のスタブコードを生成します。
 
-```console
-$ protoc --go_out=. --go_opt=paths=source_relative \
-    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-    echo/echo.proto
+```
+$ protoc --go_out=. \
+         --go_opt=paths=source_relative \
+         --go-grpc_out=. \
+         --go-grpc_opt=paths=source_relative \
+         --proto_path=protos \
+         protos/echo/*.proto
 ```
 
 それぞれのオプションは次のような意味があります。
@@ -95,15 +98,18 @@ $ protoc --go_out=. --go_opt=paths=source_relative \
 - __`--go_opt`__ ... `protoc-gen-go` プラグインに渡すオプション
 - __`--go-grpc_out`__ ... `protoc-gen-go-grpc` プラグインによる生成コードの出力先ディレクトリ
 - __`--go-grpc_opt`__ ... `protoc-gen-go-grpc` プラグインに渡すオプション
+- __`--proto_path`__ ... `.proto` ファイル内で別の `.proto` ファイルをインポートしようとする場合、ここで指定したディレクトリからの相対パスで指定することになります。また、出力ファイル (`.pg.go`) のディレクトリ構造を入力ファイル (`.proto`) のディレクトリ構造に合わせるとき（後述）、ここで指定したパスを取り除いた階層構造で出力されます。
 
-__`--go_out`__ オプションを指定することでシリアライズ用のコード (`echo.pb.go`)、__`--go-grpc_out`__ オプションを指定することで gRPC 用のスタブコード (`echo_grpc.pb.go`) を生成してくれます。
+__`--go_out`__ オプションを指定することでシリアライズ用のコード (`echo.pb.go`) を生成、__`--go-grpc_out`__ オプションを指定することで gRPC 用のスタブコード (`echo_grpc.pb.go`) を生成してくれます。
 追加のオプションで、__`paths=source_relative`__ を指定することにより、入力ファイル (`.proto`) と同じディレクトリ構成で `.go` ファイルを出力するようにしています。
-今回はカレントディレクトリ (`.`) を出力のルートに指定しているので、結果的に入力ファイルと同じディレクトリに次のように `.go` ファイルが生成されることになります。
+さらに、__`--proto_path=protos`__ というオプションを指定することで、出力先のディレクトリ階層には `protos` を含めないようにしています。
+
+今回はカレントディレクトリ (`.`) を出力のルートに指定しているので、結果的に次のように `.go` ファイルが生成されることになります。
 
 | 入力ファイル | 使う protoc プラグイン | 生成されるファイル |
 | ---- | ---- | ---- |
-| `echo/echo.proto` | `protoc-gen-go` | __`echo/echo.pb.go`__ |
-| `echo/echo.proto` | `protoc-gen-go-grpc` | __`echo/echo_grpc.pb.go`__ |
+| `protos/echo/echo.proto` | `protoc-gen-go` | __`echo/echo.pb.go`__ |
+| `protos/echo/echo.proto` | `protoc-gen-go-grpc` | __`echo/echo_grpc.pb.go`__ |
 
 生成された `echo.pb.go` ファイルや `echo_grpc.pb.go` ファイルを覗いてみると、次のようなパッケージ名で定義されていることがわかります。
 

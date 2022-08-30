@@ -1,6 +1,6 @@
 ---
 title: "protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)"
-url: "/p/37e6uck"
+url: "p/37e6uck/"
 date: "2022-04-20"
 lastmod: "2022-05-09"
 tags: ["gRPC", "Protocol Buffers"]
@@ -14,7 +14,7 @@ tags: ["gRPC", "Protocol Buffers"]
 Protcol Buffers とは
 ----
 
-プロトコルバッファー (Protocol Buffers、protobuf) は、Google が開発した、構造化したデータをシリアライズするためのフォーマットです。
+プロトコルバッファー (Protocol Buffers、または protobuf) は、Google が開発した、構造化したデータをシリアライズするためのフォーマットです。
 同じく Google が開発した __gRPC__ 通信プラットフォームで採用されており、XML や JSON などのテキストベースの API より効率的な通信を行うことができるという特徴を持っています。
 
 - データをコンパクトに表現できるため、通信やパース処理が高速
@@ -25,7 +25,7 @@ Protcol Buffers とは
 データ構造やサービス形式の定義は、__`.proto`__ 拡張子を持つ __プロトコル定義ファイル (Proto Definition file)__ で行います。
 この `.proto` ファイルを __`protoc`__ コマンド（プロトコルバッファーコンパイラ）でコンパイルすると、各言語用のソースコードを生成することができます。
 
-{{< shout "hello.proto ──[protoc]──> hello_pb.rb" >}}
+{{< image src="img-001.drawio.svg" title="protoc コマンドによるコード生成" >}}
 
 `protoc` コマンドは各種プログラミング言語用のコードを生成するわけですが、そのためには、__protoc コマンド本体__ と __各言語用のプラグイン__（`protoc-gen-go` など）がインストールされている必要があります。
 C++ や C#、Kotlin、Python、Ruby などのコード生成は組み込みで対応していますが、Go 言語用のプラグインなどは別途インストールする必要があります。
@@ -67,8 +67,6 @@ libprotoc 3.20.0
 
 .proto ファイルをコンパイルしてみる
 ----
-
-### .proto ファイル
 
 次のような簡単な `.proto` ファイルを入力ファイルとして用意します。
 
@@ -121,7 +119,7 @@ $ protoc --help | grep OUT_DIR
 {{< /code >}}
 
 
-言語拡張用のプラグイン (protoc-gen-xxx)
+言語拡張 (protoc-gen-xxx)
 ----
 
 {{% private %}}
@@ -131,9 +129,9 @@ $ protoc --help | grep OUT_DIR
 `protoc` が標準でサポートしてない言語のコードを生成するには、追加のプラグイン（実際はただのコマンド）をインストールする必要があります。
 追加でインストールするコマンドは __`protoc-gen-<言語名>`__ という名前であり、そのコマンドがシステムに存在していると、`protoc` コマンドの __`--<言語名>_out`__ というオプションが有効になります。
 
-### Go 言語用プラグイン (protoc-gen-go)
+### 例: Go 言語用プラグイン (protoc-gen-go)
 
-例えば、Go 言語用のプラグインである `protoc-gen-go` をインストールすると、`--go_out` オプションが使えるようになります。
+例えば、Go 言語用のプラグインである [`protoc-gen-go`](https://developers.google.com/protocol-buffers/docs/reference/go-generated) をインストールすると、__`--go_out`__ オプションが使えるようになります。
 
 {{< code lang="console" title="protoc-gen-go のインストール" >}}
 # バージョン指定でインストールする場合（推奨）
@@ -176,11 +174,14 @@ gen/example.com/myapp/person.pb.go
 `.proto` ファイル内でパッケージ名を指定するのではなく、`protoc` コマンドの __`--go_opt=M...`__ オプションで次のように指定することもできます。
 
 ```
-$ protoc
-    --go_out=gen \
-    --go_opt=Mprotos/person.proto=example.com/myapp \
-    protos/person.proto
+$ protoc --go_out=gen \
+         --go_opt=Mprotos/person.proto=example.com/myapp \
+         protos/person.proto
 ```
 
 `=` が 2 回出てくるのでちょっと分かりにくいですが、`protos/person.proto` ファイルのパッケージ名を `example.com/myapp` に設定しています。
+
+{{% reference %}}
+- [Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）](/p/ij4jv9k/)
+{{% /reference %}}
 
