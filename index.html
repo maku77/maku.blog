@@ -44,6 +44,16 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/s2fs5gs/>
+Ansible タスク例: ユーザーを特定のグループに参加させる (ansible.builtin.user)
+<time>2022-08-29</time></a>
+</div>
+<div class=xBoxLink>
+<a href=./p/zw7emu3/>
+Ansible で facts 情報を表示する
+<time>2022-08-29</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/uas9p6m/>
 Ansible タスク例: 空のファイルを作成する (ansible.builtin.file)
 <time>2022-08-28</time></a>
@@ -57,16 +67,6 @@ Ansible タスク例: 空のディレクトリを作成する (ansible.builtin.f
 <a href=./p/ihqz7em/>
 Ansible タスク例: 任意のコマンドを実行する (ansible.builtin.command/shell)
 <time>2022-08-28</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/8k4j2gw/>
-Ansible タスク例: Docker と Docker Compose をインストールする
-<time>2022-08-28</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/v9r8o5k/>
-GitHub Actions でコンテナイメージをビルドして Docker Hub へ push する
-<time>2022-08-26</time></a>
 </div>
 </div>
 </div>
@@ -114,9 +114,9 @@ GitHub Actions でコンテナイメージをビルドして Docker Hub へ push
 </div><div class=xMenu_tag>
 <a href=./tags/github>github (24)</a>
 </div><div class=xMenu_tag>
-<a href=./tags/bot-builder-sdk>bot-builder-sdk (21)</a>
+<a href=./tags/ansible>ansible (21)</a>
 </div><div class=xMenu_tag>
-<a href=./tags/ansible>ansible (19)</a>
+<a href=./tags/bot-builder-sdk>bot-builder-sdk (21)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/node.js>node.js (19)</a>
 </div><div class=xMenu_tag>
@@ -453,14 +453,14 @@ GitHub Actions でコンテナイメージをビルドして Docker Hub へ push
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/s2fs5gs/>
+Ansible タスク例: ユーザーを特定のグループに参加させる (ansible.builtin.user)<span class=xRecents_item_tag>Ansible</span><time>2022-08-29</time></a>
+</div><div class=xRecents_item>
+<a href=./p/zw7emu3/>
+Ansible で facts 情報を表示する<span class=xRecents_item_tag>Ansible</span><time>2022-08-29</time></a>
+</div><div class=xRecents_item>
 <a href=./p/uas9p6m/>
 Ansible タスク例: 空のファイルを作成する (ansible.builtin.file)<span class=xRecents_item_tag>Ansible</span><time>2022-08-28</time></a>
-</div><div class=xRecents_item>
-<a href=./p/25gqyai/>
-Ansible タスク例: 空のディレクトリを作成する (ansible.builtin.file)<span class=xRecents_item_tag>Ansible</span><time>2022-08-28</time></a>
-</div><div class=xRecents_item>
-<a href=./p/ihqz7em/>
-Ansible タスク例: 任意のコマンドを実行する (ansible.builtin.command/shell)<span class=xRecents_item_tag>Ansible</span><time>2022-08-28</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -468,6 +468,163 @@ Ansible タスク例: 任意のコマンドを実行する (ansible.builtin.comm
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/8t6hr3d/>Ansible</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/urbs9p6/>モジュールの使用例</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=width:80px;margin-right:.5em>
+<img src=./p/8t6hr3d/_index.svg style=width:80px;height:80px>
+</div>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/s2fs5gs/>Ansible タスク例: ユーザーを特定のグループに参加させる (ansible.builtin.user)</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/ansible>Ansible</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-08-29>2022-08-29</time><br>
+作成: <time itemprop=datePublished datetime=2022-08-29>2022-08-29</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents></nav><p>Ansible の <a href=https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html>ansible.builtin.user モジュール</a> を使用すると、ターゲットノード上に指定したユーザーを作成することができます。
+このモジュールは、既存のユーザーの情報を変更する場合にも使えるので、例えば、あるユーザーを指定したグループに参加させる、といったことが可能です。</p>
+<p>次の Playbook では、ユーザー <code>maku</code> をグループ <code>docker</code> に参加させています。
+ユーザーが存在しない場合は、ユーザー自体の作成も行います。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>hosts</span><span class=p>:</span><span class=w> </span><span class=l>all</span><span class=w>
+</span><span class=w>  </span><span class=nt>become</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>
+</span><span class=w>  </span><span class=nt>tasks</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Append the group &#39;docker&#39; to the user&#39;s groups</span><span class=w>
+</span><span class=w>      </span><span class=nt>ansible.builtin.user</span><span class=p>:</span><span class=w>
+</span><span class=w>        </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>maku</span><span class=w>
+</span><span class=w>        </span><span class=nt>groups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=l>docker]</span><span class=w>
+</span><span class=w>        </span><span class=nt>append</span><span class=p>:</span><span class=w> </span><span class=kc>yes</span><span class=w>
+</span></code></pre></div><p>注意点としては、<strong><code>groups</code></strong> でグループ名を列挙すると同時に、<strong><code>append: yes</code></strong> と指定するところです。
+<code>append</code> 指定がないと、現在参加しているグループの情報が消えて、<code>groups</code> で指定したグループにしか参加していない状態になります。</p>
+<p>ユーザー名をハードコードするのではなく、SSH 接続しているカレントユーザーを対象にしてグループ参加させたいときは、ユーザー名として <strong><code>"{{ ansible_facts.env.SUDO_USER }}"</code></strong> を指定します。
+これにより、<code>sudo</code> 実行前のユーザー名を取得できます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>hosts</span><span class=p>:</span><span class=w> </span><span class=l>all</span><span class=w>
+</span><span class=w>  </span><span class=nt>gather_facts</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>  </span><span class=nt>become</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>
+</span><span class=w>  </span><span class=nt>tasks</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Append the group &#39;docker&#39; to the current user&#39;s groups</span><span class=w>
+</span><span class=w>      </span><span class=nt>ansible.builtin.user</span><span class=p>:</span><span class=w>
+</span><span class=w>        </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;{{ ansible_facts.env.SUDO_USER }}&#34;</span><span class=w>
+</span><span class=w>        </span><span class=nt>groups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=l>docker]</span><span class=w>
+</span><span class=w>        </span><span class=nt>append</span><span class=p>:</span><span class=w> </span><span class=kc>yes</span><span class=w>
+</span></code></pre></div><p><code>{{ ansible_user_id }}</code> とすると、<code>sudo</code> した結果のユーザー名である <code>root</code> になってしまうので注意してください。</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/zw7emu3/>Ansible で facts 情報を表示する</a></li>
+<li><a href=./p/8k4j2gw/>Ansible タスク例: Docker と Docker Compose をインストールする</a></li>
+<li><a href=./p/ihqz7em/>Ansible タスク例: 任意のコマンドを実行する (ansible.builtin.command/shell)</a></li>
+<li><a href=./p/25gqyai/>Ansible タスク例: 空のディレクトリを作成する (ansible.builtin.file)</a></li>
+<li><a href=./p/uas9p6m/>Ansible タスク例: 空のファイルを作成する (ansible.builtin.file)</a></li>
+<li><a href=./p/2yahqx6/>Ansible で VPS を設定するための準備</a></li>
+<li><a href=./p/hufvdta/>Ansible で SSH サーバーをセキュアにする (ansible.builtin.lineinfile, ansible.builtin.service)</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/ansible>Ansible</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/urbs9p6/><span class=xArticle_up_label>Ansible モジュールの使用例</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/8t6hr3d/>Ansible</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/5j4jygw/>応用</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=width:80px;margin-right:.5em>
+<img src=./p/8t6hr3d/_index.svg style=width:80px;height:80px>
+</div>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/zw7emu3/>Ansible で facts 情報を表示する</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/ansible>Ansible</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-08-29>2022-08-29</time><br>
+作成: <time itemprop=datePublished datetime=2022-08-29>2022-08-29</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents></nav><p>Ansible の Playbook を実行すると、最初にリモートホストの情報 (<a href=https://docs.ansible.com/ansible/latest/user_guide/playbooks_vars_facts.html#vars-and-facts>Ansible facts</a>) の収集が行われます。
+ここには、OS の情報や IP アドレスの情報などが含まれており、タスクの中でこれらの情報を参照することができます。
+実際に Ansible facts にどのような情報が含まれているかは、次のような Playbook で確認することができます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>show-facts.yml</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>hosts</span><span class=p>:</span><span class=w> </span><span class=l>all</span><span class=w>
+</span><span class=w>  </span><span class=nt>gather_facts</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>  </span><span class=nt>tasks</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Show facts</span><span class=w>
+</span><span class=w>      </span><span class=nt>ansible.builtin.debug</span><span class=p>:</span><span class=w>
+</span><span class=w>        </span><span class=nt>var</span><span class=p>:</span><span class=w> </span><span class=l>ansible_facts</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果（抜粋）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>TASK [Show facts] *********************************
+ok: [example.com] =&gt; {
+    &#34;ansible_facts&#34;: {
+        &#34;all_ipv4_addresses&#34;: [
+            &#34;172.xxx.xx.xx&#34;,
+            &#34;160.xxx.xx.xx&#34;
+        ],
+        &#34;all_ipv6_addresses&#34;: [
+            &#34;xxxx:xxxx:xxxx:xxx:xxx:xxx:xx:xx&#34;,
+            &#34;xxxx::x:xxxx:xxxx:xxxx&#34;
+        ],
+        ...</code></pre></div></div>
+</figure>
+<p><code>ansible_facts</code> 変数の値がからっぽになってしまう場合は、<code>gather_facts: false</code> と指定していないか確認してください。</p>
+<p><code>ansible_facts</code> オブジェクトの個々のプロパティを参照するには次のようにします。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Show architecture</span><span class=w>
+</span><span class=w>  </span><span class=nt>ansible.builtin.debug</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=nt>msg</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Architecture: {{ ansible_architecture }}&#34;</span><span class=w>
+</span></code></pre></div>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/s2fs5gs/>Ansible タスク例: ユーザーを特定のグループに参加させる (ansible.builtin.user)</a></li>
+<li><a href=./p/8k4j2gw/>Ansible タスク例: Docker と Docker Compose をインストールする</a></li>
+<li><a href=./p/ihqz7em/>Ansible タスク例: 任意のコマンドを実行する (ansible.builtin.command/shell)</a></li>
+<li><a href=./p/25gqyai/>Ansible タスク例: 空のディレクトリを作成する (ansible.builtin.file)</a></li>
+<li><a href=./p/uas9p6m/>Ansible タスク例: 空のファイルを作成する (ansible.builtin.file)</a></li>
+<li><a href=./p/2yahqx6/>Ansible で VPS を設定するための準備</a></li>
+<li><a href=./p/hufvdta/>Ansible で SSH サーバーをセキュアにする (ansible.builtin.lineinfile, ansible.builtin.service)</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/ansible>Ansible</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/5j4jygw/><span class=xArticle_up_label>Ansible 応用</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -525,202 +682,6 @@ Linux の <code>touch</code> コマンドに相当する動きをするので、
 <li><a href=./p/8k4j2gw/>Ansible タスク例: Docker と Docker Compose をインストールする</a></li>
 <li><a href=./p/ihqz7em/>Ansible タスク例: 任意のコマンドを実行する (ansible.builtin.command/shell)</a></li>
 <li><a href=./p/25gqyai/>Ansible タスク例: 空のディレクトリを作成する (ansible.builtin.file)</a></li>
-<li><a href=./p/2yahqx6/>Ansible で VPS を設定するための準備</a></li>
-<li><a href=./p/hufvdta/>Ansible で SSH サーバーをセキュアにする (ansible.builtin.lineinfile, ansible.builtin.service)</a></li>
-<li><a href=./p/efqyair/>Ansible タスク例: APT パッケージをインストールする (ansible.builtin.apt)</a></li>
-<li><a href=./p/evdubr7/>Ansible タスク例: UFW でファイアウォールを設定する (community.general.ufw)</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/ansible>Ansible</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/urbs9p6/><span class=xArticle_up_label>Ansible モジュールの使用例</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/8t6hr3d/>Ansible</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/urbs9p6/>モジュールの使用例</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=./p/8t6hr3d/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/25gqyai/>Ansible タスク例: 空のディレクトリを作成する (ansible.builtin.file)</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/ansible>Ansible</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-08-28>2022-08-28</time><br>
-作成: <time itemprop=datePublished datetime=2022-08-28>2022-08-28</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#空のディレクトリを作成する>空のディレクトリを作成する</a></li>
-<li><a href=#ディレクトリのパーミッションや所有者を指定する>ディレクトリのパーミッションや所有者を指定する</a></li>
-</ul>
-</nav><p>Ansible で空のディレクトリ作成するには、<a href=https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html>ansible.builtin.file モジュール</a> の <strong><code>state</code></strong> パラメーターに <strong><code>directory</code></strong> を指定します。</p>
-<h2 id=空のディレクトリを作成する>空のディレクトリを作成する</h2>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>hosts</span><span class=p>:</span><span class=w> </span><span class=l>all</span><span class=w>
-</span><span class=w>  </span><span class=nt>gather_facts</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
-</span><span class=w>  </span><span class=nt>become</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>
-</span><span class=w>  </span><span class=nt>tasks</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Create directory</span><span class=w>
-</span><span class=w>      </span><span class=nt>ansible.builtin.file</span><span class=p>:</span><span class=w>
-</span><span class=w>        </span><span class=nt>path</span><span class=p>:</span><span class=w> </span><span class=l>/var/cache/myapp</span><span class=w>
-</span><span class=w>        </span><span class=nt>state</span><span class=p>:</span><span class=w> </span><span class=l>directory</span><span class=w>
-</span></code></pre></div><p><code>path</code> パラメーターで指定したディレクトリ <code>/var/cache/myapp</code> を作成します。
-すでにディレクトリが存在する場合は、このタスクはスキップされます。
-ディレクトリは再帰的に作成されるので、深い階層のパスを指定しても大丈夫です（<code>mkdir</code> の <code>-p</code> オプションに相当）。</p>
-<h2 id=ディレクトリのパーミッションや所有者を指定する>ディレクトリのパーミッションや所有者を指定する</h2>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>hosts</span><span class=p>:</span><span class=w> </span><span class=l>all</span><span class=w>
-</span><span class=w>  </span><span class=nt>gather_facts</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
-</span><span class=w>  </span><span class=nt>become</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>
-</span><span class=w>  </span><span class=nt>tasks</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Create directory</span><span class=w>
-</span><span class=w>      </span><span class=nt>ansible.builtin.file</span><span class=p>:</span><span class=w>
-</span><span class=w>        </span><span class=nt>path</span><span class=p>:</span><span class=w> </span><span class=l>/var/cache/myapp</span><span class=w>
-</span><span class=w>        </span><span class=nt>state</span><span class=p>:</span><span class=w> </span><span class=l>directory</span><span class=w>
-</span><span class=w>        </span><span class=nt>mode</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;0755&#34;</span><span class=w>
-</span><span class=w>        </span><span class=nt>owner</span><span class=p>:</span><span class=w> </span><span class=l>myapp-user</span><span class=w>
-</span><span class=w>        </span><span class=nt>group</span><span class=p>:</span><span class=w> </span><span class=l>myapp-group</span><span class=w>
-</span></code></pre></div><p>ディレクトリ作成時のパーミッションは <code>mode</code>、所有ユーザーは <code>owner</code>、グループは <code>group</code> で指定することができます。
-パーミッションは、<code>0755</code> のような 8 進数指定の代わりに、<code>u=rw,g=r,o=r</code> のようなシンボリックモードでも指定可能です。</p>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/8k4j2gw/>Ansible タスク例: Docker と Docker Compose をインストールする</a></li>
-<li><a href=./p/ihqz7em/>Ansible タスク例: 任意のコマンドを実行する (ansible.builtin.command/shell)</a></li>
-<li><a href=./p/uas9p6m/>Ansible タスク例: 空のファイルを作成する (ansible.builtin.file)</a></li>
-<li><a href=./p/2yahqx6/>Ansible で VPS を設定するための準備</a></li>
-<li><a href=./p/hufvdta/>Ansible で SSH サーバーをセキュアにする (ansible.builtin.lineinfile, ansible.builtin.service)</a></li>
-<li><a href=./p/efqyair/>Ansible タスク例: APT パッケージをインストールする (ansible.builtin.apt)</a></li>
-<li><a href=./p/evdubr7/>Ansible タスク例: UFW でファイアウォールを設定する (community.general.ufw)</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/ansible>Ansible</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/urbs9p6/><span class=xArticle_up_label>Ansible モジュールの使用例</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/8t6hr3d/>Ansible</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/urbs9p6/>モジュールの使用例</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=./p/8t6hr3d/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/ihqz7em/>Ansible タスク例: 任意のコマンドを実行する (ansible.builtin.command/shell)</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/ansible>Ansible</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-08-28>2022-08-28</time><br>
-作成: <time itemprop=datePublished datetime=2022-08-28>2022-08-28</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#command-モジュールの基本>command モジュールの基本</a></li>
-<li><a href=#ファイルの有無で実行するかどうか制御する-createsremoves>ファイルの有無で実行するかどうか制御する (creates/removes)</a>
-<ul>
-<li><a href=#creates-パラメーター>creates パラメーター</a></li>
-<li><a href=#removes-パラメーター>removes パラメーター</a></li>
-</ul>
-</li>
-<li><a href=#リダイレクトやパイプなどのシェル機能を利用する>リダイレクトやパイプなどのシェル機能を利用する</a></li>
-<li><a href=#コマンドを複数行に分けて記述する>コマンドを複数行に分けて記述する</a></li>
-</ul>
-</nav><p>Ansible のターゲットノード上で任意のコマンドを実行するには、次のような組み込みモジュールを使用します。</p>
-<dl>
-<dt><a href=https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html>ansible.builtin.command モジュール</a></dt>
-<dd>任意のコマンドを実行します。
-シェルを経由せず、指定したコマンドを直接実行するので、シェル特有の機能は使えません。
-Windows の場合は代わりに <a href=https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_command_module.html>ansible.builtin.win_command</a> を使用します。</dd>
-<dt><a href=https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html>ansible.builtin.shell モジュール</a></dt>
-<dd>シェル (<code>/bin/sh</code>) で任意のコマンドを実行します。
-シェルの機能（<code>$HOSTNAME</code> のような変数展開や <code>*</code> によるファイルグロブ、<code>></code> によるリダイレクトなど）を使用することができます。
-Windows の場合は代わりに <a href=https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_shell_module.html>ansible.builtin.win_shell</a> を使用します。</dd>
-</dl>
-<h2 id=command-モジュールの基本>command モジュールの基本</h2>
-<p>指定したコマンドを実行したいときは、<strong><code>command</code></strong> モジュールの <strong><code>cmd</code></strong> パラメーターでそのコマンド（と引数）を指定します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Run command</span><span class=w>
-</span><span class=w>  </span><span class=nt>ansible.builtin.command</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=nt>cmd</span><span class=p>:</span><span class=w> </span><span class=l>cat /etc/hostname</span><span class=w>
-</span></code></pre></div><p>上記のような簡単なコマンドであれば、次のように省略して記述できます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Run command</span><span class=w>
-</span><span class=w>  </span><span class=nt>ansible.builtin.command</span><span class=p>:</span><span class=w> </span><span class=l>cat /etc/hostname</span><span class=w>
-</span></code></pre></div><p>実行するコマンドの引数として <code>"user name"</code> のようなスペースを含む値を渡したいときは、次のように <strong><code>argv</code></strong> を使ってコマンドと各引数を分割して指定します（この場合、<code>cmd</code> パラメーターは使用しません）。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Run command</span><span class=w>
-</span><span class=w>  </span><span class=nt>ansible.builtin.command</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=nt>argv</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span>- <span class=l>/usr/bin/add_user_to_db.sh</span><span class=w>
-</span><span class=w>      </span>- <span class=l>user name</span><span class=w>
-</span><span class=w>      </span>- <span class=l>database name</span><span class=w>
-</span></code></pre></div><h2 id=ファイルの有無で実行するかどうか制御する-createsremoves>ファイルの有無で実行するかどうか制御する (creates/removes)</h2>
-<p><code>command</code> モジュールで指定したコマンドは、デフォルトで毎回実行されますが、<strong><code>creates</code></strong> および <strong><code>removes</code></strong> パラメーターを使用すると、特定のファイルの有無によってコマンドを実行するかしないかを制御することができます。</p>
-<h3 id=creates-パラメーター>creates パラメーター</h3>
-<p><strong><code>creates</code></strong> パラメーターでファイル名を指定しておくと、そのファイルが存在しない場合だけタスクを実行します。
-つまり、そのファイルを生成するようなコマンドを実行することを示唆します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Create an empty database</span><span class=w>
-</span><span class=w>  </span><span class=nt>ansible.builtin.command</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=nt>cmd</span><span class=p>:</span><span class=w> </span><span class=l>/usr/bin/make_database.sh</span><span class=w>
-</span><span class=w>    </span><span class=nt>creates</span><span class=p>:</span><span class=w> </span><span class=l>/path/to/database</span><span class=w>
-</span></code></pre></div><h3 id=removes-パラメーター>removes パラメーター</h3>
-<p>逆に、特定のファイルが存在する場合だけコマンドを実行したいときは、<strong><code>removes</code></strong> パラメーターでそのファイル名を指定します。</p>
-<h2 id=リダイレクトやパイプなどのシェル機能を利用する>リダイレクトやパイプなどのシェル機能を利用する</h2>
-<p>リダイレクト (<code>></code>) やパイプ (<code>|</code>) はシェル特有の機能なので、これらの機能を使う場合は、<code>command</code> モジュールの代わりに <strong><code>shell</code></strong> モジュールを使用する必要があります。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>List all entries in etc</span><span class=w>
-</span><span class=w>  </span><span class=nt>ansible.builtin.shell</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=nt>cmd</span><span class=p>:</span><span class=w> </span><span class=l>ls /etc &gt; files.txt</span><span class=w>
-</span><span class=w>    </span><span class=nt>creates</span><span class=p>:</span><span class=w> </span><span class=l>files.txt</span><span class=w>
-</span></code></pre></div><p><code>shell</code> モジュールで指定可能なパラメーターは、<code>command</code> モジュールとほぼ同様です。</p>
-<h2 id=コマンドを複数行に分けて記述する>コマンドを複数行に分けて記述する</h2>
-<p>長いコマンドは複数行に分けて記述した方が見やすくなります。
-これは Ansible というより YAML の構文ですが、次のようにして <code>cmd</code> パラメーターの値を複数行に分けて記述できます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Multi-line command</span><span class=w>
-</span><span class=w>  </span><span class=nt>ansible.builtin.shell</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=nt>cmd</span><span class=p>:</span><span class=w> </span><span class=p>&gt;</span><span class=sd>
-</span><span class=sd>      echo AAA &gt; aaa.txt &amp;&amp;
-</span><span class=sd>      echo BBB &gt; bbb.txt &amp;&amp;
-</span><span class=sd>      echo CCC &gt; ccc.txt</span><span class=w>      
-</span></code></pre></div><p>末尾の <code>></code> は、複数行にわたるテキストをスペースで結合するという意味を持っています。</p>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/8k4j2gw/>Ansible タスク例: Docker と Docker Compose をインストールする</a></li>
-<li><a href=./p/25gqyai/>Ansible タスク例: 空のディレクトリを作成する (ansible.builtin.file)</a></li>
-<li><a href=./p/uas9p6m/>Ansible タスク例: 空のファイルを作成する (ansible.builtin.file)</a></li>
 <li><a href=./p/2yahqx6/>Ansible で VPS を設定するための準備</a></li>
 <li><a href=./p/hufvdta/>Ansible で SSH サーバーをセキュアにする (ansible.builtin.lineinfile, ansible.builtin.service)</a></li>
 <li><a href=./p/efqyair/>Ansible タスク例: APT パッケージをインストールする (ansible.builtin.apt)</a></li>

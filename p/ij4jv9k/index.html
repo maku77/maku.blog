@@ -60,6 +60,16 @@
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/s2fs5gs/>
+Ansible タスク例: ユーザーを特定のグループに参加させる (ansible.builtin.user)
+<time>2022-08-29</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/zw7emu3/>
+Ansible で facts 情報を表示する
+<time>2022-08-29</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/uas9p6m/>
 Ansible タスク例: 空のファイルを作成する (ansible.builtin.file)
 <time>2022-08-28</time></a>
@@ -73,16 +83,6 @@ Ansible タスク例: 空のディレクトリを作成する (ansible.builtin.f
 <a href=../../p/ihqz7em/>
 Ansible タスク例: 任意のコマンドを実行する (ansible.builtin.command/shell)
 <time>2022-08-28</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/8k4j2gw/>
-Ansible タスク例: Docker と Docker Compose をインストールする
-<time>2022-08-28</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/v9r8o5k/>
-GitHub Actions でコンテナイメージをビルドして Docker Hub へ push する
-<time>2022-08-26</time></a>
 </div>
 </div>
 </div>
@@ -160,9 +160,9 @@ GitHub Actions でコンテナイメージをビルドして Docker Hub へ push
 </div><div class=xMenu_tag>
 <a href=../../tags/github>github (24)</a>
 </div><div class=xMenu_tag>
-<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
+<a href=../../tags/ansible>ansible (21)</a>
 </div><div class=xMenu_tag>
-<a href=../../tags/ansible>ansible (19)</a>
+<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/node.js>node.js (19)</a>
 </div><div class=xMenu_tag>
@@ -567,10 +567,10 @@ GitHub Actions でコンテナイメージをビルドして Docker Hub へ push
 </code></pre></div><p>あとは、gRPC サーバーとクライアントの実装に使用する gRPC-Go パッケージの依存関係を追加しておきます。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>go get google.golang.org/grpc
 </code></pre></div><h2 id=proto-ファイルを作成する>.proto ファイルを作成する</h2>
-<p><code>echo/echo.proto</code> ファイルを作成して、次のように記述します。
+<p><code>protos/echo/echo.proto</code> ファイルを作成して、次のように記述します。
 Go 言語用のオプション <code>option go_package</code> で、出力する <code>.go</code> ファイルを <code>echo</code> パッケージに配置するように指定しています。</p>
 <figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>echo/echo.proto</figcaption>
+<figcaption class=xCodeBlock_title>protos/echo/echo.proto</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
 </span><span class=err>
 </span><span class=err></span><span class=kn>package</span> <span class=nn>echo</span><span class=p>;</span><span class=err>
@@ -595,19 +595,24 @@ Go 言語用のオプション <code>option go_package</code> で、出力する
 <p>ここでは、<code>EchoService</code> というサービスが、<code>Echo</code> というメソッドを提供するよう定義しています。</p>
 <h2 id=proto-ファイルをコンパイルする>.proto ファイルをコンパイルする</h2>
 <p><code>protoc</code> コマンドを実行して、<code>.proto</code> ファイルからシリアライズ用のコードと、gRPC 関連のスタブコードを生成します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>protoc --go_out<span class=o>=</span>. --go_opt<span class=o>=</span><span class=nv>paths</span><span class=o>=</span>source_relative <span class=se>\
-</span><span class=se></span><span class=go>    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-</span><span class=go>    echo/echo.proto
-</span></code></pre></div><p>それぞれのオプションは次のような意味があります。</p>
+<pre tabindex=0><code>$ protoc --go_out=. \
+         --go_opt=paths=source_relative \
+         --go-grpc_out=. \
+         --go-grpc_opt=paths=source_relative \
+         --proto_path=protos \
+         protos/echo/*.proto
+</code></pre><p>それぞれのオプションは次のような意味があります。</p>
 <ul>
 <li><strong><code>--go_out</code></strong> &mldr; <code>protoc-gen-go</code> プラグインによる生成コードの出力先ディレクトリ</li>
 <li><strong><code>--go_opt</code></strong> &mldr; <code>protoc-gen-go</code> プラグインに渡すオプション</li>
 <li><strong><code>--go-grpc_out</code></strong> &mldr; <code>protoc-gen-go-grpc</code> プラグインによる生成コードの出力先ディレクトリ</li>
 <li><strong><code>--go-grpc_opt</code></strong> &mldr; <code>protoc-gen-go-grpc</code> プラグインに渡すオプション</li>
+<li><strong><code>--proto_path</code></strong> &mldr; <code>.proto</code> ファイル内で別の <code>.proto</code> ファイルをインポートしようとする場合、ここで指定したディレクトリからの相対パスで指定することになります。また、出力ファイル (<code>.pg.go</code>) のディレクトリ構造を入力ファイル (<code>.proto</code>) のディレクトリ構造に合わせるとき（後述）、ここで指定したパスを取り除いた階層構造で出力されます。</li>
 </ul>
-<p><strong><code>--go_out</code></strong> オプションを指定することでシリアライズ用のコード (<code>echo.pb.go</code>)、<strong><code>--go-grpc_out</code></strong> オプションを指定することで gRPC 用のスタブコード (<code>echo_grpc.pb.go</code>) を生成してくれます。
+<p><strong><code>--go_out</code></strong> オプションを指定することでシリアライズ用のコード (<code>echo.pb.go</code>) を生成、<strong><code>--go-grpc_out</code></strong> オプションを指定することで gRPC 用のスタブコード (<code>echo_grpc.pb.go</code>) を生成してくれます。
 追加のオプションで、<strong><code>paths=source_relative</code></strong> を指定することにより、入力ファイル (<code>.proto</code>) と同じディレクトリ構成で <code>.go</code> ファイルを出力するようにしています。
-今回はカレントディレクトリ (<code>.</code>) を出力のルートに指定しているので、結果的に入力ファイルと同じディレクトリに次のように <code>.go</code> ファイルが生成されることになります。</p>
+さらに、<strong><code>--proto_path=protos</code></strong> というオプションを指定することで、出力先のディレクトリ階層には <code>protos</code> を含めないようにしています。</p>
+<p>今回はカレントディレクトリ (<code>.</code>) を出力のルートに指定しているので、結果的に次のように <code>.go</code> ファイルが生成されることになります。</p>
 <table>
 <thead>
 <tr>
@@ -618,12 +623,12 @@ Go 言語用のオプション <code>option go_package</code> で、出力する
 </thead>
 <tbody>
 <tr>
-<td><code>echo/echo.proto</code></td>
+<td><code>protos/echo/echo.proto</code></td>
 <td><code>protoc-gen-go</code></td>
 <td><strong><code>echo/echo.pb.go</code></strong></td>
 </tr>
 <tr>
-<td><code>echo/echo.proto</code></td>
+<td><code>protos/echo/echo.proto</code></td>
 <td><code>protoc-gen-go-grpc</code></td>
 <td><strong><code>echo/echo_grpc.pb.go</code></strong></td>
 </tr>
