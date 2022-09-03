@@ -13,9 +13,10 @@
 <meta property="og:image:height" content="746">
 <meta property="og:description" content="Ansible の ansible.builtin.user モジュール を使用すると、ターゲットノード上に指定したユーザーを作成することができます。 このモジュールは、既存のユーザーの情報を変更する場合にも使えるので、例えば、あるユーザーを指定したグループに参加させる、といったことが可能です。
 次の Playbook では、ユーザー maku をグループ docker に参加させています。 ユーザーが存在しない場合は、ユーザー自体の作成も行います。
-- hosts:allbecome:truetasks:- name:Append the group 'docker' to the user's groupsansible.builtin.user:name:makugroups:[docker]append:yes注意点としては、groups でグループ名を列挙すると同時に、append: yes と指定するところです。 append 指定がないと、現在参加しているグループの情報が消えて、groups で指定したグループにしか参加していない状態になります。
-ユーザー名をハードコードするのではなく、SSH 接続しているカレントユーザーを対象にしてグループ参加させたいときは、ユーザー名として &#34;{{ ansible_facts.env.SUDO_USER }}&#34; を指定します。 これにより、sudo 実行前のユーザー名を取得できます。
-- hosts:allgather_facts:truebecome:truetasks:- name:Append the group 'docker' to the current user's groupsansible.builtin.user:name:&#34;{{ ansible_facts.env.SUDO_USER }}&#34;groups:[docker]append:yes{{ ansible_user_id }} とすると、sudo した結果のユーザー名である root になってしまうので注意してください。">
+- hosts:allbecome:truetasks:- name:Append the group 'docker' to the user's groupsansible.builtin.user:name:makugroups:[docker]append:yes注意点としては、groups でグループ名を列挙すると同時に、append: yes と指定するところです。 この指定により、ユーザー maku がすでに存在している場合に、現在のグループ情報はそのままで、追加で docker グループに参加するという意味になります。
+逆に、純粋に docker グループにしか参加していないユーザーにしたいのであれば、append: yes の指定は省略して次のように記述すれば OK です（デフォルトは append: false です）。
+ansible.builtin.user:name:makugroups:[docker]ユーザー名をハードコードするのではなく、SSH 接続しているカレントユーザーを対象にしてグループ参加させたいときは、ユーザー名として &#34;{{ ansible_facts.env.SUDO_USER }}&#34; を指定します。 これにより、sudo 実行前のユーザー名を取得できます。
+- hosts:allgather_facts:truebecome:truetasks:- name:Append the group 'docker' to the current user's groupsansible.builtin.user:name:&#34;{{ ansible_facts.env.SUDO_USER }}&#34;groups:[docker]append:yes似たような変数に {{ ansible_user_id }} がありますが、この値は sudo した結果のユーザー名である root になるので注意してください（become: true していない場合は恐らく同じ値になります）。">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.912f23940528fc207a4dcbe6a6be831d1a99bf78143db42f914622722f63ad0b.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -543,8 +544,12 @@ Ansible タスク例: 任意のコマンドを実行する (ansible.builtin.comm
 </span><span class=w>        </span><span class=nt>groups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=l>docker]</span><span class=w>
 </span><span class=w>        </span><span class=nt>append</span><span class=p>:</span><span class=w> </span><span class=kc>yes</span><span class=w>
 </span></code></pre></div><p>注意点としては、<strong><code>groups</code></strong> でグループ名を列挙すると同時に、<strong><code>append: yes</code></strong> と指定するところです。
-<code>append</code> 指定がないと、現在参加しているグループの情報が消えて、<code>groups</code> で指定したグループにしか参加していない状態になります。</p>
-<p>ユーザー名をハードコードするのではなく、SSH 接続しているカレントユーザーを対象にしてグループ参加させたいときは、ユーザー名として <strong><code>"{{ ansible_facts.env.SUDO_USER }}"</code></strong> を指定します。
+この指定により、ユーザー <code>maku</code> がすでに存在している場合に、現在のグループ情報はそのままで、追加で <code>docker</code> グループに参加するという意味になります。</p>
+<p>逆に、純粋に <code>docker</code> グループにしか参加していないユーザーにしたいのであれば、<code>append: yes</code> の指定は省略して次のように記述すれば OK です（デフォルトは <code>append: false</code> です）。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>ansible.builtin.user</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>maku</span><span class=w>
+</span><span class=w>  </span><span class=nt>groups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=l>docker]</span><span class=w>
+</span></code></pre></div><p>ユーザー名をハードコードするのではなく、SSH 接続しているカレントユーザーを対象にしてグループ参加させたいときは、ユーザー名として <strong><code>"{{ ansible_facts.env.SUDO_USER }}"</code></strong> を指定します。
 これにより、<code>sudo</code> 実行前のユーザー名を取得できます。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>hosts</span><span class=p>:</span><span class=w> </span><span class=l>all</span><span class=w>
 </span><span class=w>  </span><span class=nt>gather_facts</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
@@ -556,7 +561,7 @@ Ansible タスク例: 任意のコマンドを実行する (ansible.builtin.comm
 </span><span class=w>        </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;{{ ansible_facts.env.SUDO_USER }}&#34;</span><span class=w>
 </span><span class=w>        </span><span class=nt>groups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=l>docker]</span><span class=w>
 </span><span class=w>        </span><span class=nt>append</span><span class=p>:</span><span class=w> </span><span class=kc>yes</span><span class=w>
-</span></code></pre></div><p><code>{{ ansible_user_id }}</code> とすると、<code>sudo</code> した結果のユーザー名である <code>root</code> になってしまうので注意してください。</p>
+</span></code></pre></div><p>似たような変数に <code>{{ ansible_user_id }}</code> がありますが、この値は <code>sudo</code> した結果のユーザー名である <code>root</code> になるので注意してください（<code>become: true</code> していない場合は恐らく同じ値になります）。</p>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">
