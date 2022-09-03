@@ -25,7 +25,15 @@ Ansible の [ansible.builtin.user モジュール](https://docs.ansible.com/ansi
 ```
 
 注意点としては、__`groups`__ でグループ名を列挙すると同時に、__`append: yes`__ と指定するところです。
-`append` 指定がないと、現在参加しているグループの情報が消えて、`groups` で指定したグループにしか参加していない状態になります。
+この指定により、ユーザー `maku` がすでに存在している場合に、現在のグループ情報はそのままで、追加で `docker` グループに参加するという意味になります。
+
+逆に、純粋に `docker` グループにしか参加していないユーザーにしたいのであれば、`append: yes` の指定は省略して次のように記述すれば OK です（デフォルトは `append: false` です）。
+
+```yaml
+ansible.builtin.user:
+  name: maku
+  groups: [docker]
+```
 
 ユーザー名をハードコードするのではなく、SSH 接続しているカレントユーザーを対象にしてグループ参加させたいときは、ユーザー名として __`"{{ ansible_facts.env.SUDO_USER }}"`__ を指定します。
 これにより、`sudo` 実行前のユーザー名を取得できます。
@@ -43,6 +51,5 @@ Ansible の [ansible.builtin.user モジュール](https://docs.ansible.com/ansi
         append: yes
 ```
 
-`{{ ansible_user_id }}` とすると、`sudo` した結果のユーザー名である `root` になってしまうので注意してください。
-
+似たような変数に `{{ ansible_user_id }}` がありますが、この値は `sudo` した結果のユーザー名である `root` になるので注意してください（`become: true` していない場合は恐らく同じ値になります）。
 
