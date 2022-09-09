@@ -124,6 +124,25 @@ package echo
 import "example.com/grpc-sample/echo"
 ```
 
+生成された `echo/echo_grpc.pb.go` ファイルを覗いてみると、次のようなクライアント実装用の `EchoServiceClient` インタフェースや、サーバー実装用の `EchoServiceServer` インタフェースが生成されていることが分かります。
+
+{{< code lang="go" title="echo/echo_grpc.pb.go" >}}
+type EchoServiceClient interface {
+	Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error)
+	// ...
+}
+
+type EchoServiceServer interface {
+	Echo(context.Context, *EchoRequest) (*EchoResponse, error)
+	// ...
+}
+
+// ...（省略）...
+{{< /code >}}
+
+クライアントスタブに関しては、実装も提供されているので、`NewEchoServiceClient` 関数でそのままインスタンス化して gRPC の API を呼び出すことができます。
+サーバー側は各 API の実装を行う必要があります。
+
 
 gRPC サーバーとクライアントの実装
 ----
@@ -133,9 +152,22 @@ Go 言語のプロジェクトで生成する実行ファイルのコードを `
 
 ### gRPC サーバーの実装
 
-まずは、`EchoService` を実装します。
-`protoc` によって自動生成された `echo/echo_grpc.pb.go` の関数シグネチャを参考に、次のような感じで `Echo` メソッドを実装します。
-クライアントから受信したテキストの先頭に `*` を付加したレスポンスを返しているだけなので実装は簡単です。
+まずは、`EchoServiceServer` を実装します。
+`protoc` によって自動生成された `echo/echo_grpc.pb.go` ファイルで定義されている `EchoServiceServer` インタフェースを実装していくわけですが、このとき、同じく自動生成されている次のようなモック実装を利用することができます。
+このモック実装は空っぽの実装なので、名前に __`Unimplemented`__ プレフィックスが付いています。
+
+{{< code lang="go" title="自動生成されたサーバーのモック実装（echo/echo_grpc.pb.go 内）" >}}
+// UnimplementedEchoServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedEchoServiceServer struct {
+}
+
+func (UnimplementedEchoServiceServer) Echo(context.Context, *EchoRequest) (*EchoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Echo not implemented")
+}
+{{< /code >}}
+
+サーバー実装用の構造体（下記のコードでは `type server struct`）を定義するときに、上記のモック実装を [Golang の構造体埋め込みの仕組み](https://maku77.github.io/p/tbf357g/) で埋め込むことで、各 API をとりあえず `not implemented` エラーを返すだけの実装として提供することができます。
+こうすることで、すべての API を一度に実装せずに、1 つずつ実装して提供していくことができます。
 
 {{< code lang="go" title="cmd/echo-server/server.go" >}}
 package main
@@ -148,18 +180,22 @@ import (
 )
 
 // EchoService を実装するサーバーの構造体
-type server struct{
-	echo.UnimplementedEchoServiceServer
+type server struct {
+	echo.UnimplementedEchoServiceServer // とりあえず Not implemented の実装を入れておく
 }
 
-// EchoService の Echo メソッドの実装
+// EchoServiceServer インタフェースの Echo メソッドの実装（本物の Echo 実装）
 func (s *server) Echo(ctx context.Context, in *echo.EchoRequest) (*echo.EchoResponse, error) {
 	log.Printf("Received from client: %v", in.GetMessage())
 	return &echo.EchoResponse{Message: "*" + in.GetMessage()}, nil
 }
 {{< /code >}}
 
-あとは、`main` 関数で gRPC サーバーのインスタンスを生成して、上記の実装を登録すれば OK です。
+上記の例では、`server` 構造体に `UnimplementedEchoServiceServer` のモック実装を埋め込みつつ、`Echo` メソッドをオーバーライドしています。
+結果として、モック実装側の `Echo` メソッドは使われないのですが、`UnimplementedEchoServiceServer` は `server` 構造体に埋め込んだままにしておいて大丈夫です。
+上記の `Echo` メソッドは、クライアントから受信したテキストの先頭に `*` を付加したテキストをレスポンスとして返しています。
+
+あとは、`main` 関数で gRPC サーバー (`grpc.Server`) のインスタンスを生成して、上記の実装を登録すれば OK です。
 
 {{< code lang="go" title="cmd/echo-server/main.go" >}}
 package main
@@ -198,7 +234,8 @@ func main() {
 ### gRPC クライアントの実装
 
 gRPC サーバー側が実装できたら、次はクライアント側の実装です。
-下記の gRPC クライアントでは、`Echo` メソッドを呼び出して `AAAAA` というメッセージを送り、その応答を単純に出力しています。
+通信用のクライアントスタブは、`protoc` で自動生成された __`NewEchoServiceClient`__ 関数を使って生成することができます。
+下記の gRPC クライアント実装では、`Echo` メソッドを呼び出して `AAAAA` というメッセージを送り、その応答 (`*AAAAA`) を単純に出力しています。
 
 {{< code lang="go" title="cmd/echo-client/main.go" >}}
 package main
