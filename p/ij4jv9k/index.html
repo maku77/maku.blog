@@ -14,7 +14,7 @@
 <meta property="og:description" content="何をするか？ ここでは、Go 言語用の gRPC ライブラリである gRPC-Go (google.golang.org/grpc) を使って、簡単な gRPC サーバーとクライアントを作ってみます。 通信用のスタブコードなどは、protoc コマンド (Protocl Buffers Compiler) で .proto ファイルから自動生成するので、あらかじめ protoc コマンドをインストールしておいてください。
  参考: protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)  protoc コマンドで Go 言語用のコードを生成するには、protoc-gen-go プラグインと protoc-gen-go-grpc プラグインをインストールしておく必要があります。 前者がシリアライズ用のコード、後者が gRPC 用のスタブコードを生成するための protoc プラグインです。
 # バージョンを指定してインストールする方法（推奨） $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2 # 最新バージョンをインストールする方法 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest プロジェクトの作成と gRPC-Go のインストール まずは Go 言語用のプロジェクトを作成します。 モジュール名は com.example/grpc-sample としていますが、GitHub で管理する予定であれば、リポジトリ名に合わせて github.">
-<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.912f23940528fc207a4dcbe6a6be831d1a99bf78143db42f914622722f63ad0b.css>
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
 <link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
@@ -642,13 +642,43 @@ Go 言語用のオプション <code>option go_package</code> で、出力する
 <p>このパッケージ名は、<code>.proto</code> ファイル内の <code>options go_package</code> で指定したパスに従って自動生成されています（パスの最後の <code>/echo</code> という部分が採用されています）。
 また、今回はモジュール名を <code>example.com/grpc-sample</code> と定義したので（<code>go.mod</code> ファイルに書かれているので）、自動生成されたこれらのパッケージをインポートするときは、次のような感じで記述することになります。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>import</span> <span class=s>&#34;example.com/grpc-sample/echo&#34;</span>
-</code></pre></div><h2 id=grpc-サーバーとクライアントの実装>gRPC サーバーとクライアントの実装</h2>
+</code></pre></div><p>生成された <code>echo/echo_grpc.pb.go</code> ファイルを覗いてみると、次のようなクライアント実装用の <code>EchoServiceClient</code> インタフェースや、サーバー実装用の <code>EchoServiceServer</code> インタフェースが生成されていることが分かります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>echo/echo_grpc.pb.go</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>EchoServiceClient</span> <span class=kd>interface</span> <span class=p>{</span>
+	<span class=nf>Echo</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>in</span> <span class=o>*</span><span class=nx>EchoRequest</span><span class=p>,</span> <span class=nx>opts</span> <span class=o>...</span><span class=nx>grpc</span><span class=p>.</span><span class=nx>CallOption</span><span class=p>)</span> <span class=p>(</span><span class=o>*</span><span class=nx>EchoResponse</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span>
+	<span class=c1>// ...
+</span><span class=c1></span><span class=p>}</span>
+
+<span class=kd>type</span> <span class=nx>EchoServiceServer</span> <span class=kd>interface</span> <span class=p>{</span>
+	<span class=nf>Echo</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=o>*</span><span class=nx>EchoRequest</span><span class=p>)</span> <span class=p>(</span><span class=o>*</span><span class=nx>EchoResponse</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span>
+	<span class=c1>// ...
+</span><span class=c1></span><span class=p>}</span>
+
+<span class=c1>// ...（省略）...
+</span></code></pre></div></div>
+</figure>
+<p>クライアントスタブに関しては、実装も提供されているので、<code>NewEchoServiceClient</code> 関数でそのままインスタンス化して gRPC の API を呼び出すことができます。
+サーバー側は各 API の実装を行う必要があります。</p>
+<h2 id=grpc-サーバーとクライアントの実装>gRPC サーバーとクライアントの実装</h2>
 <p>gRPC を使って通信するサーバーとクライアントは、それぞれ独立したコマンドとして <code>cmd/echo-server</code> ディレクトリ、<code>cmd/echo-client</code> ディレクトリ以下に作成することにします（それぞれ <code>main</code> 関数を作成します）。
 Go 言語のプロジェクトで生成する実行ファイルのコードを <code>cmd</code> ディレクトリ以下に配置するのはよくあるプラクティスです。</p>
 <h3 id=grpc-サーバーの実装>gRPC サーバーの実装</h3>
-<p>まずは、<code>EchoService</code> を実装します。
-<code>protoc</code> によって自動生成された <code>echo/echo_grpc.pb.go</code> の関数シグネチャを参考に、次のような感じで <code>Echo</code> メソッドを実装します。
-クライアントから受信したテキストの先頭に <code>*</code> を付加したレスポンスを返しているだけなので実装は簡単です。</p>
+<p>まずは、<code>EchoServiceServer</code> を実装します。
+<code>protoc</code> によって自動生成された <code>echo/echo_grpc.pb.go</code> ファイルで定義されている <code>EchoServiceServer</code> インタフェースを実装していくわけですが、このとき、同じく自動生成されている次のようなモック実装を利用することができます。
+このモック実装は空っぽの実装なので、名前に <strong><code>Unimplemented</code></strong> プレフィックスが付いています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>自動生成されたサーバーのモック実装（echo/echo_grpc.pb.go 内）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=c1>// UnimplementedEchoServiceServer must be embedded to have forward compatible implementations.
+</span><span class=c1></span><span class=kd>type</span> <span class=nx>UnimplementedEchoServiceServer</span> <span class=kd>struct</span> <span class=p>{</span>
+<span class=p>}</span>
+
+<span class=kd>func</span> <span class=p>(</span><span class=nx>UnimplementedEchoServiceServer</span><span class=p>)</span> <span class=nf>Echo</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=o>*</span><span class=nx>EchoRequest</span><span class=p>)</span> <span class=p>(</span><span class=o>*</span><span class=nx>EchoResponse</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+	<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>status</span><span class=p>.</span><span class=nf>Errorf</span><span class=p>(</span><span class=nx>codes</span><span class=p>.</span><span class=nx>Unimplemented</span><span class=p>,</span> <span class=s>&#34;method Echo not implemented&#34;</span><span class=p>)</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>サーバー実装用の構造体（下記のコードでは <code>type server struct</code>）を定義するときに、上記のモック実装を <a href=https://maku77.github.io/p/tbf357g/>Golang の構造体埋め込みの仕組み</a> で埋め込むことで、各 API をとりあえず <code>not implemented</code> エラーを返すだけの実装として提供することができます。
+こうすることで、すべての API を一度に実装せずに、1 つずつ実装して提供していくことができます。</p>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>cmd/echo-server/server.go</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
@@ -661,17 +691,20 @@ Go 言語のプロジェクトで生成する実行ファイルのコードを <
 <span class=p>)</span>
 
 <span class=c1>// EchoService を実装するサーバーの構造体
-</span><span class=c1></span><span class=kd>type</span> <span class=nx>server</span> <span class=kd>struct</span><span class=p>{</span>
-	<span class=nx>echo</span><span class=p>.</span><span class=nx>UnimplementedEchoServiceServer</span>
-<span class=p>}</span>
+</span><span class=c1></span><span class=kd>type</span> <span class=nx>server</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>echo</span><span class=p>.</span><span class=nx>UnimplementedEchoServiceServer</span> <span class=c1>// とりあえず Not implemented の実装を入れておく
+</span><span class=c1></span><span class=p>}</span>
 
-<span class=c1>// EchoService の Echo メソッドの実装
+<span class=c1>// EchoServiceServer インタフェースの Echo メソッドの実装（本物の Echo 実装）
 </span><span class=c1></span><span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=o>*</span><span class=nx>server</span><span class=p>)</span> <span class=nf>Echo</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>in</span> <span class=o>*</span><span class=nx>echo</span><span class=p>.</span><span class=nx>EchoRequest</span><span class=p>)</span> <span class=p>(</span><span class=o>*</span><span class=nx>echo</span><span class=p>.</span><span class=nx>EchoResponse</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
 	<span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;Received from client: %v&#34;</span><span class=p>,</span> <span class=nx>in</span><span class=p>.</span><span class=nf>GetMessage</span><span class=p>())</span>
 	<span class=k>return</span> <span class=o>&amp;</span><span class=nx>echo</span><span class=p>.</span><span class=nx>EchoResponse</span><span class=p>{</span><span class=nx>Message</span><span class=p>:</span> <span class=s>&#34;*&#34;</span> <span class=o>+</span> <span class=nx>in</span><span class=p>.</span><span class=nf>GetMessage</span><span class=p>()},</span> <span class=kc>nil</span>
 <span class=p>}</span></code></pre></div></div>
 </figure>
-<p>あとは、<code>main</code> 関数で gRPC サーバーのインスタンスを生成して、上記の実装を登録すれば OK です。</p>
+<p>上記の例では、<code>server</code> 構造体に <code>UnimplementedEchoServiceServer</code> のモック実装を埋め込みつつ、<code>Echo</code> メソッドをオーバーライドしています。
+結果として、モック実装側の <code>Echo</code> メソッドは使われないのですが、<code>UnimplementedEchoServiceServer</code> は <code>server</code> 構造体に埋め込んだままにしておいて大丈夫です。
+上記の <code>Echo</code> メソッドは、クライアントから受信したテキストの先頭に <code>*</code> を付加したテキストをレスポンスとして返しています。</p>
+<p>あとは、<code>main</code> 関数で gRPC サーバー (<code>grpc.Server</code>) のインスタンスを生成して、上記の実装を登録すれば OK です。</p>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>cmd/echo-server/main.go</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
@@ -708,7 +741,8 @@ Go 言語のプロジェクトで生成する実行ファイルのコードを <
 </figure>
 <h3 id=grpc-クライアントの実装>gRPC クライアントの実装</h3>
 <p>gRPC サーバー側が実装できたら、次はクライアント側の実装です。
-下記の gRPC クライアントでは、<code>Echo</code> メソッドを呼び出して <code>AAAAA</code> というメッセージを送り、その応答を単純に出力しています。</p>
+通信用のクライアントスタブは、<code>protoc</code> で自動生成された <strong><code>NewEchoServiceClient</code></strong> 関数を使って生成することができます。
+下記の gRPC クライアント実装では、<code>Echo</code> メソッドを呼び出して <code>AAAAA</code> というメッセージを送り、その応答 (<code>*AAAAA</code>) を単純に出力しています。</p>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>cmd/echo-client/main.go</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
