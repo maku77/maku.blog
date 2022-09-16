@@ -1,6 +1,6 @@
 ---
 title: "Apollo Client の Pagenation 機能を使って GraphQL API を呼び出す"
-url: "/p/cu6eox7"
+url: "p/cu6eox7/"
 date: "2020-10-02"
 lastmod: "2021-09-15"
 tags: ["Apollo", "GitHub", "GraphQL", "React"]

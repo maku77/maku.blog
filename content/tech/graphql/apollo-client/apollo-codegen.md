@@ -1,6 +1,6 @@
 ---
 title: "Apollo CLI の codegen で GraphQL クエリレスポンスの TypeScript 型を自動生成する"
-url: "/p/bnrrqpn"
+url: "p/bnrrqpn/"
 date: "2021-08-11"
 tags: ["Apollo", "GitHub", "GraphQL"]
 ---

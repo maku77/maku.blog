@@ -1,6 +1,6 @@
 ---
 title: "Apollo Client の fetchMore を自動で呼び出して GitHub GraphQL の100件制限を乗り越える (useAutoFetchMore)"
-url: "/p/w7igunc"
+url: "p/w7igunc/"
 date: "2021-09-16"
 tags: ["Apollo", "GitHub", "GraphQL", "React"]
 ---

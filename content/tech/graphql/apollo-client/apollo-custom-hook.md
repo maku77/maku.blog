@@ -1,6 +1,6 @@
 ---
 title: "Apollo Client の useQuery 呼び出し部分をカスタムフックで分離する"
-url: "/p/kmj7sdv"
+url: "p/kmj7sdv/"
 date: "2020-11-30"
 lastmod: "2021-07-20"
 tags: ["Apollo", "GitHub", "GraphQL", "React"]

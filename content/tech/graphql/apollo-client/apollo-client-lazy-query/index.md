@@ -1,6 +1,6 @@
 ---
 title: "Apollo Client でクリック時に GraphQL クエリを実行する"
-url: "/p/m7ju6gr"
+url: "p/m7ju6gr/"
 date: "2020-11-12"
 tags: ["Apollo", "GitHub", "GraphQL", "React"]
 ---
