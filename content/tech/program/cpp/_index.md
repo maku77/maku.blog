@@ -1,6 +1,6 @@
 ---
 title: "C/C++ のメモ"
 linkTitle: "C/C++"
-url: "/p/8zhwcq6"
+url: "p/8zhwcq6/"
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: "C/C++サンプル: エンディアンの判定"
-url: "/p/g9q6kyf"
+url: "p/g9q6kyf/"
 date: "2001-05-11"
 tags: ["C/C++"]
 ---

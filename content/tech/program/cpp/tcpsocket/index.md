@@ -1,6 +1,6 @@
 ---
 title: "C/C++サンプル: TCP クライアント／サーバー"
-url: "/p/tgt7it6"
+url: "p/tgt7it6/"
 date: "2001-05-11"
 tags: ["C/C++"]
 ---
