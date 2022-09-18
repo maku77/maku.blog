@@ -97,7 +97,7 @@ fragment userFragment on User {
 これは、フラグメントの定義だけを GraphQL サーバーに送ることが無駄だからです。
 例えば、GitHub の GraphQL API では、フラグメントの定義だけして参照しないと、次のようなエラーが返されます。
 
-> "Fragment basicUserInfo was defined, but not used"
+> "Fragment userFragment was defined, but not used"
 
 
 インライン・フラグメント (Inline fragments)
