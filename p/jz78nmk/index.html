@@ -11,7 +11,7 @@
 <meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
 <meta property="og:image:width" content="1436">
 <meta property="og:image:height" content="746">
-<meta property="og:description" content="GraphQL 関連用語  クエリ文字列 (query string) query {...} という文字列全体のこと。 操作タイプ (operation type, root type) query {...} などの query というキーワード部分のこと。操作の種類を表しており、query の他には mutation と subscription があります。 操作名 (operation name) query HogeHoge {...} などの HogeHoge の部分のこと。特に query 操作の場合は query name、mutation 操作の場合は mutation name と呼ぶことがあります。操作名の指定は multi-operation documents じゃない限りオプショナルですが、ログ解析やデバッグをしやすくするために、名前を付けることが推奨されています。 クエリ変数 (query variables) query User($name: String!) {...} などの $name の部分のこと。 クエリ引数 (query arguments) book(id: &#34;xyz&#34;) {...} など、フィールド参照時に指定する id: &#34;xyz&#34; の部分のこと。クエリに変数が渡されている場合は、ここで book(id: $bookId) のような感じで参照できます。 選択セット、セレクションセット (selection sets) query HogeHoge {.">
+<meta property="og:description" content="ドキュメント (document) GraphQL リクエストで送る全体の文字列のこと。 HTTP Get リクエストで指定する場合は、query というクエリパラメーターで指定します（これは紛らわしいので、本当は document という名前になっているべきでした）。 HTTP Post リクエストで指定する場合は、ペイロードの JSON 内の query プロパティで指定します。 複数の GraphQL Operation（操作）や Fragment（フラグメント）を含むことができます。 クエリ (query) ドキュメント全体のことを示す場合と、query {...} という個々のクエリ操作を示す場合があります。後者の場合は、データの取得要求を表しています。 操作タイプ (operation type, root type) query {...} などの query というキーワード部分のこと。操作の種類を表しており、query の他には mutation と subscription があります。 操作名 (operation name) query GetHoge {...} などの GetHoge の部分のこと。特に query 操作の場合は query name、mutation 操作の場合は mutation name と呼ぶことがあります。操作名の指定は multi-operation documents じゃない限りオプショナルですが、ログ解析やデバッグをしやすくするために、名前を付けることが推奨されています。 HTTP Get リクエストで指定する場合は、operationName というクエリパラメーターで指定します。 HTTP Post リクエストで指定する場合は、ペイロードの JSON 内の operationName プロパティで指定します。 マルチ操作ドキュメント (multi-operation documents) 複数の query や mutation リクエストを含むドキュメント。どの操作を実行するかは、操作名 (operation name) で指定します。 クエリ変数 (query variables) query User($name: String!">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -526,28 +526,36 @@ Ansible タスク例: 空のファイルを作成する (ansible.builtin.file)
 </span>
 </header>
 <div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#graphql-関連用語>GraphQL 関連用語</a></li>
-</ul>
-</nav><h2 id=graphql-関連用語>GraphQL 関連用語</h2>
-<dl>
-<dt><strong>クエリ文字列 (query string)</strong></dt>
-<dd><code>query {...}</code> という文字列全体のこと。</dd>
-<dt><strong>操作タイプ (operation type, root type)</strong></dt>
-<dd><code>query {...}</code> などの <code>query</code> というキーワード部分のこと。操作の種類を表しており、<code>query</code> の他には <code>mutation</code> と <code>subscription</code> があります。</dd>
-<dt><strong>操作名 (operation name)</strong></dt>
-<dd><code>query HogeHoge {...}</code> などの <code>HogeHoge</code> の部分のこと。特に query 操作の場合は <strong>query name</strong>、mutation 操作の場合は <strong>mutation name</strong> と呼ぶことがあります。操作名の指定は multi-operation documents じゃない限りオプショナルですが、ログ解析やデバッグをしやすくするために、名前を付けることが推奨されています。</dd>
-<dt><strong>クエリ変数 (query variables)</strong></dt>
-<dd><code>query User($name: String!) {...}</code> などの <code>$name</code> の部分のこと。</dd>
-<dt><strong>クエリ引数 (query arguments)</strong></dt>
+<nav id=TableOfContents></nav><dl>
+<dt>ドキュメント (document)</dt>
+<dd>GraphQL リクエストで送る全体の文字列のこと。
+HTTP Get リクエストで指定する場合は、<code>query</code> というクエリパラメーターで指定します（これは紛らわしいので、本当は <code>document</code> という名前になっているべきでした）。
+HTTP Post リクエストで指定する場合は、ペイロードの JSON 内の <code>query</code> プロパティで指定します。
+複数の GraphQL Operation（操作）や Fragment（フラグメント）を含むことができます。</dd>
+<dt>クエリ (query)</dt>
+<dd>ドキュメント全体のことを示す場合と、<code>query {...}</code> という個々のクエリ操作を示す場合があります。後者の場合は、データの取得要求を表しています。</dd>
+<dt>操作タイプ (operation type, root type)</dt>
+<dd><code>query {...}</code> などの <code>query</code> というキーワード部分のこと。操作の種類を表しており、<strong><code>query</code></strong> の他には <strong><code>mutation</code></strong> と <strong><code>subscription</code></strong> があります。</dd>
+<dt>操作名 (operation name)</dt>
+<dd><code>query GetHoge {...}</code> などの <code>GetHoge</code> の部分のこと。特に query 操作の場合は <strong>query name</strong>、mutation 操作の場合は <strong>mutation name</strong> と呼ぶことがあります。操作名の指定は multi-operation documents じゃない限りオプショナルですが、ログ解析やデバッグをしやすくするために、名前を付けることが推奨されています。
+HTTP Get リクエストで指定する場合は、<code>operationName</code> というクエリパラメーターで指定します。
+HTTP Post リクエストで指定する場合は、ペイロードの JSON 内の <code>operationName</code> プロパティで指定します。</dd>
+<dt>マルチ操作ドキュメント (multi-operation documents)</dt>
+<dd>複数の query や mutation リクエストを含むドキュメント。どの操作を実行するかは、操作名 (operation name) で指定します。</dd>
+<dt>クエリ変数 (query variables)</dt>
+<dd><code>query User($name: String!) {...}</code> などの <code>$name</code> の部分のこと。<code>{"name": "maku"}</code> のように表現します。
+HTTP Get リクエストで指定する場合は、<code>variable</code> というクエリパラメーターで指定します。
+HTTP Post リクエストで指定する場合は、ペイロードの JSON 内の <code>variables</code> プロパティで指定します。</dd>
+<dt>クエリ引数 (query arguments)</dt>
 <dd><code>book(id: "xyz") {...}</code> など、フィールド参照時に指定する <code>id: "xyz"</code> の部分のこと。クエリに変数が渡されている場合は、ここで <code>book(id: $bookId)</code> のような感じで参照できます。</dd>
-<dt><strong>選択セット、セレクションセット (selection sets)</strong></dt>
-<dd><code>query HogeHoge {...}</code> などの <code>{...}</code> の部分のこと。どのフィールドを取得したいかを選択するので、選択セットと呼びます。</dd>
-<dt><strong>フィールド (field)</strong></dt>
+<dt>選択セット、セレクションセット (selection sets)</dt>
+<dd><code>query GetHoge {...}</code> などの <code>{...}</code> の部分のこと。どのフィールドを取得したいかを選択するので、選択セットと呼びます。</dd>
+<dt>フィールド (field)</dt>
 <dd>GraphQL オブジェクトの各プロパティ部分のこと。例えば、<code>book { id title }</code> というクエリで Book オブジェクトを取得するときの <code>id</code> とか <code>title</code> の部分。大きく分けて 2 種類あり、Scalar types（末端ノードそれ自体が値）と、Object types（ネストされたフィールドから構成される）があります。</dd>
-<dt><strong>入力オブジェクト型 (input object type, input types)</strong></dt>
+<dt>入力オブジェクト型 (input object type, input types)</dt>
 <dd>引数専用のオブジェクト型のこと。文字列 (String) や数値 (Int) などのスカラー値と比べて、複雑なデータを渡せます。例えば、新規データの作成要求 (mutation) を行うときに、新規データの内容を表現するために使われます。定義方法自体は普通のオブジェクト型 (<code>type</code>) と同様ですが、入力型 (<code>input</code>) はそれ自身のデータを取得する用途には使えないところが異なります（つまり、クエリ内のフィールドとしては指定できないということです）。</dd>
+<dt>GraphQL over HTTP</dt>
+<dd><a href=https://spec.graphql.org/>GraphQL の仕様 (Spec)</a> はクエリやスキーマの扱い方などを定義したものですが、現実的に GraphQL API は HTTP 経由で提供することが多いので、<a href=https://graphql.github.io/graphql-over-http/>GraphQL over HTTP</a> という仕様が別途定義されています。</dd>
 </dl>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
