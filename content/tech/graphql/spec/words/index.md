@@ -5,6 +5,8 @@ date: "2021-07-26"
 tags: ["GraphQL"]
 ---
 
+{{< image src="img-001.drawio.svg" >}}
+
 ドキュメント (document)
 : GraphQL リクエストで送る全体の文字列のこと。
 HTTP Get リクエストで指定する場合は、`query` というクエリパラメーターで指定します（これは紛らわしいので、本当は `document` という名前になっているべきでした）。
