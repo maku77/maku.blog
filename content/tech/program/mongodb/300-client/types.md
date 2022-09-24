@@ -1,5 +1,5 @@
 ---
-title: "mongo シェルで各フィールドの型を調べる"
+title: "mongo シェルで各フィールドの型を調べる (typeof, instanceof)"
 url: "/p/yejmu4v"
 date: "2013-10-22"
 tags: ["MongoDB"]

@@ -1,5 +1,5 @@
 ---
-title: "mongo シェルで find() の結果をインデントして見やすく表示する"
+title: "mongo シェルで find の結果をインデントして見やすく表示する (pretty)"
 url: "/p/uvusqb7"
 date: "2014-03-31"
 tags: ["MongoDB"]
@@ -7,7 +7,7 @@ tags: ["MongoDB"]
 
 `mongo` シェルで `find()` を実行した結果を見やすいように整形するには、実行結果に対して __`pretty()`__ を適用します。
 
-{{< code >}}
+```console
 > db.books.find().pretty()
 {
      "_id" : ObjectId("533973de50b35840de2dda25"),
@@ -33,5 +33,5 @@ tags: ["MongoDB"]
           "AAA"
      ]
 }
-{{< /code >}}
+```
 

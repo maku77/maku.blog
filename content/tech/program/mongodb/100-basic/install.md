@@ -12,7 +12,7 @@ weight: 3
 
 MongoDB のクライアント (__`mongo`__) やサーバー (__`mongod`__)、その他の各種コマンド（`mongoexport` や `mongostat` など） は、下記のサイトから各種 OS 用のバイナリをダウンロードしてインストールすることができます。
 
-- [MongoDB Download Center | MongoDB](https://www.mongodb.com/download-center/community)
+- [MongoDB Community Download | MongoDB](https://www.mongodb.com/try/download/community)
 
 Windows 用のインストーラを使うと、簡単に `mongod` を Windows サービスとして登録したりすることができます（[手動でサービス登録する](/p/tm4jzet)こともできます）。
 インストールして、`bin` ディレクトリへのパスが通ったら、`mongo` コマンドを実行できるか確認しておきましょう。

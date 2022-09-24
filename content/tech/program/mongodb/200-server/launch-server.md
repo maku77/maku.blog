@@ -17,7 +17,7 @@ MongoDB サーバーは、単純にコマンドラインから __`mongod`__ と�
 `mongod` コマンドを実行するときに、__`--dbpath`__ オプションを使ってデータの格納先ディレクトリを指定することができます（デフォルトは __`/data/db`__）。
 下記の例では、`mydata` ディレクトリをデータ格納先に指定しています。
 
-{{< code title="MongoDB サーバーの起動" >}}
+{{< code lang="console" title="MongoDB サーバーの起動" >}}
 $ mkdir mydata
 $ mongod --dbpath mydata
 {{< /code >}}
@@ -29,7 +29,7 @@ $ mongod --dbpath mydata
 MongoDB サーバーのログはデフォルトで標準出力に出力されますが、__`--logpath`__ オプションを使って、出力先のログファイル名を指定することもできます。
 さらに、__`--logappend`__ オプションを指定すると、これまでのログに追記される形で書き込まれます（このオプションを付けないと、ログファイルが上書きされてしまいます）。
 
-{{< code title="ログを log.txt に保存する" >}}
+{{< code lang="console" title="ログを log.txt に保存する" >}}
 $ mongod --dbpath mydata --logpath log.txt --logappend
 {{< /code >}}
 
@@ -42,7 +42,7 @@ $ mongod --dbpath mydata --logpath log.txt --logappend
 `mongod` が使用するデフォルトのポート番号は __`27017`__ ですが、__`--port`__ オプションを使用して、任意のポート番号で起動することができます。
 ポート番号を変更しておけば、1 台のホスト上で複数の `mongod` を立ち上げることができます。
 
-{{< code title="ポート番号 40001 で起動する" >}}
+{{< code lang="console" title="ポート番号 40001 で起動する" >}}
 $ mongod --dbpath mydata --port 40001
 {{< /code >}}
 

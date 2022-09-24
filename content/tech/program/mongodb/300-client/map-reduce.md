@@ -78,13 +78,13 @@ $ mongo < mapreduce.js
 
 実際に `tags` コレクションが生成されているか確認してみます。
 
-{{< code >}}
+```console
 $ mongo testdb
 > db.tags.find()
 { "_id" : "AAA", "value" : 2 }
 { "_id" : "BBB", "value" : 2 }
 { "_id" : "CCC", "value" : 2 }
-{{< /code >}}
+```
 
 できてますね！
 
