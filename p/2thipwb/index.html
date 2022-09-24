@@ -13,7 +13,7 @@
 <meta property="og:image:height" content="746">
 <meta property="og:description" content="例えば、input.js というスクリプトを mongo シェルで実行するには以下のようにします。 ここでは、mydb という名前のデータベースの books コレクションに、テスト用のドキュメントを追加しています。
 $ mongo mydb input.js  input.js db.books.insert({title: 'Title 1'}); db.books.insert({title: 'Title 2'}); db.books.insert({title: 'Title 3'});  ドキュメントには書いてありませんが、標準入力から読み込ませることもできるようです。 この方法を使うと、mongo コマンドのオプションのフォーマット的に、データベース名を省略してスクリプトファイル名を指定できるようになるので、スクリプトの中でデータベースを切り替えることができます。
-$ mongo < input2.js $ mongo --port 40001 < input2.js $ mongo localhost:40001 < input2.js  input2.js use testdb; db.books.insert({title: 'Title 1', tags: ['AAA', 'BBB']}); db.books.insert({title: 'Title 2', tags: ['BBB', 'CCC']}); db.books.insert({title: 'Title 3', tags: ['CCC', 'AAA']});   参考: http://docs.mongodb.org/manual/tutorial/write-scripts-for-the-mongo-shell/#execute-a-javascript-file  ">
+$ mongo < input2.js $ mongo --port 40001 < input2.js $ mongo localhost:40001 < input2.js  input2.js use testdb; db.books.insert({title: 'Title 1', tags: ['AAA', 'BBB']}); db.books.insert({title: 'Title 2', tags: ['BBB', 'CCC']}); db.books.insert({title: 'Title 3', tags: ['CCC', 'AAA']});  ">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -525,7 +525,7 @@ Ansible タスク例: 空のファイルを作成する (ansible.builtin.file)
 <a href=../../p/pwx5kf7/>mongo シェルの基本的な使い方</a>
 </div>
 <div class=xPrevNextLink_next>
-<a href=../../p/uvusqb7/>mongo シェルで find() の結果をインデントして見やすく表示する</a>
+<a href=../../p/uvusqb7/>mongo シェルで find の結果をインデントして見やすく表示する (pretty)</a>
 </div>
 </div>
 </aside>
@@ -555,9 +555,8 @@ Ansible タスク例: 空のファイルを作成する (ansible.builtin.file)
 <div itemprop=articleBody class=xArticle_content>
 <nav id=TableOfContents></nav><p>例えば、<code>input.js</code> というスクリプトを <code>mongo</code> シェルで実行するには以下のようにします。
 ここでは、<code>mydb</code> という名前のデータベースの <code>books</code> コレクションに、テスト用のドキュメントを追加しています。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ mongo mydb input.js</code></pre></div></div>
-</figure>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mongo mydb input.js
+</code></pre></div>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>input.js</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>db</span><span class=p>.</span><span class=nx>books</span><span class=p>.</span><span class=nx>insert</span><span class=p>({</span><span class=nx>title</span><span class=o>:</span> <span class=s1>&#39;Title 1&#39;</span><span class=p>});</span>
@@ -566,11 +565,10 @@ Ansible タスク例: 空のファイルを作成する (ansible.builtin.file)
 </figure>
 <p>ドキュメントには書いてありませんが、標準入力から読み込ませることもできるようです。
 この方法を使うと、<code>mongo</code> コマンドのオプションのフォーマット的に、データベース名を省略してスクリプトファイル名を指定できるようになるので、<strong>スクリプトの中でデータベースを切り替えることができます</strong>。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ mongo &lt; input2.js
-$ mongo --port 40001 &lt; input2.js
-$ mongo localhost:40001 &lt; input2.js</code></pre></div></div>
-</figure>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mongo &lt; input2.js
+<span class=gp>$ </span>mongo --port <span class=m>40001</span> &lt; input2.js
+<span class=gp>$ </span>mongo localhost:40001 &lt; input2.js
+</code></pre></div>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>input2.js</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>use</span> <span class=nx>testdb</span><span class=p>;</span>
@@ -578,9 +576,6 @@ $ mongo localhost:40001 &lt; input2.js</code></pre></div></div>
 <span class=nx>db</span><span class=p>.</span><span class=nx>books</span><span class=p>.</span><span class=nx>insert</span><span class=p>({</span><span class=nx>title</span><span class=o>:</span> <span class=s1>&#39;Title 2&#39;</span><span class=p>,</span> <span class=nx>tags</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;BBB&#39;</span><span class=p>,</span> <span class=s1>&#39;CCC&#39;</span><span class=p>]});</span>
 <span class=nx>db</span><span class=p>.</span><span class=nx>books</span><span class=p>.</span><span class=nx>insert</span><span class=p>({</span><span class=nx>title</span><span class=o>:</span> <span class=s1>&#39;Title 3&#39;</span><span class=p>,</span> <span class=nx>tags</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;CCC&#39;</span><span class=p>,</span> <span class=s1>&#39;AAA&#39;</span><span class=p>]});</span></code></pre></div></div>
 </figure>
-<ul>
-<li>参考: <a href=http://docs.mongodb.org/manual/tutorial/write-scripts-for-the-mongo-shell/#execute-a-javascript-file>http://docs.mongodb.org/manual/tutorial/write-scripts-for-the-mongo-shell/#execute-a-javascript-file</a></li>
-</ul>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">
@@ -588,12 +583,12 @@ $ mongo localhost:40001 &lt; input2.js</code></pre></div></div>
 <h3 style="border-bottom:1px solid gray">関連記事</h3>
 <ul>
 <li><a href=../../p/qvkkcuj/>mongo シェルで MapReduce を実行する</a></li>
-<li><a href=../../p/uvusqb7/>mongo シェルで find() の結果をインデントして見やすく表示する</a></li>
+<li><a href=../../p/uvusqb7/>mongo シェルで find の結果をインデントして見やすく表示する (pretty)</a></li>
 <li><a href=../../p/tm4jzet/>MongoDB サーバー (mongod) を Windows サービスとして登録する</a></li>
 <li><a href=../../p/jyn7v9y/>MongoDB (mongo, mongod) をインストールする</a></li>
 <li><a href=../../p/gbs79ua/>MongoDB と RDB の用語比較</a></li>
 <li><a href=../../p/wdbr8dx/>MongoDB の ObjectId について（Document の生成時間を調べる）</a></li>
-<li><a href=../../p/yejmu4v/>mongo シェルで各フィールドの型を調べる</a></li>
+<li><a href=../../p/yejmu4v/>mongo シェルで各フィールドの型を調べる (typeof, instanceof)</a></li>
 </ul>
 <div class=xPageTags>
 <span class=xPageTags_item><a href=../../tags/mongodb>MongoDB</a></span>
@@ -611,7 +606,7 @@ $ mongo localhost:40001 &lt; input2.js</code></pre></div></div>
 <a href=../../p/pwx5kf7/>mongo シェルの基本的な使い方</a>
 </div>
 <div class=xPrevNextLink_next>
-<a href=../../p/uvusqb7/>mongo シェルで find() の結果をインデントして見やすく表示する</a>
+<a href=../../p/uvusqb7/>mongo シェルで find の結果をインデントして見やすく表示する (pretty)</a>
 </div>
 </div>
 </aside>
