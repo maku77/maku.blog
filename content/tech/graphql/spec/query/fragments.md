@@ -100,7 +100,7 @@ fragment userFragment on User {
 > "Fragment userFragment was defined, but not used"
 
 
-インライン・フラグメント (Inline fragments)
+インライン・フラグメント (Inline fragments) {#inline}
 ----
 
 __インライン・フラグメント (Inline fragments)__ は、インタフェース型や union 型として定義されたデータの中から、特定の型のオブジェクトのフィールドを参照するときに使用します（オブジェクト指向言語におけるダウンキャストと同じ概念です）。
