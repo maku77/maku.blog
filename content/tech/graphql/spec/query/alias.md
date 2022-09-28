@@ -66,6 +66,8 @@ fragment basicUserInfo on User {
 }
 {{< /code >}}
 
+なお、上記クエリ内の `...basiUserInfo` という部分では、[フラグメントの仕組み](/p/wiv7it5/)  を使って、取得するフィールドの定義を使いまわしています。
+
 {{% private %}}
 GraphQL in Action p.91 3.4.3 がよい例。
 {{% /private %}}

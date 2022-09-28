@@ -8,6 +8,8 @@ tags: ["GitHub", "GraphQL"]
 GraphQL フラグメントでクエリをパーツ化する
 ----
 
+### フラグメントの基本
+
 GraphQL クエリの中で、同じようなフィールドの指定（選択セット）を複数回使用する場合、それを [フラグメント (Fragments)](https://graphql.org/learn/queries/#fragments) という再利用可能な選択セットとして切り出して定義しておくことができます。
 
 例えば次の GraphQL クエリは、GitHub から自分のユーザー情報 (`viewer`) と、特定のユーザーの情報 (`user`) を一度に取得しています。
@@ -36,10 +38,9 @@ query QueryTwoUsers {
 明らかに冗長な書き方です。
 
 このようなケースでは、あるオブジェクトの特定のフィールドを参照するための選択セット (selection set) を、フラグメントの形で定義することができます。
-次の例では、`User` オブジェクトの特定のフィールドを選択するための `userFragment` というフラグメントを定義しています。
-フラグメントを使用する場所では、__`...userFragment`__ のようにドットを 3 つ付けて参照します。
+次の例では、`User` オブジェクトの特定のフィールドを選択するための `userFragment` というフラグメントを定義し、クエリ内で参照しています。
 
-{{< code lang="graphql" title="GraphQL クエリ" >}}
+{{< code lang="graphql" title="GraphQL クエリ" hl_lines="12" >}}
 query QueryTwoUsers {
   viewer {
     ...userFragment
@@ -60,13 +61,16 @@ fragment userFragment on User {
 }
 {{< /code >}}
 
-`...userFragment` のような記述を、GraphQL 用語で __フラグメント・スプレッド（fragment spread)__ といいます。
+フラグメントを使用する場所では、__`...userFragment`__ のようにドットを 3 つ付けて参照します。
+これを GraphQL 用語で __フラグメント・スプレッド（fragment spread)__ といいます。
 その場所にフラグメントの内容を「展開する」という意味です。
 JavaScript でオブジェクトを展開するときのスプレッド構文 (`...obj`) と同様のフォーマットが採用されています。
 
 `fragment` の定義は、`query` の定義と同じ階層に記述することに注意してください。
 また、__`on User`__ というのは、`User` オブジェクトのフィールドを選択するフラグメントであることを示しており、このフラグメントは `User` オブジェクトのフィールド部分でしか使えません。
 上記の例では、`viewer` も `user` も `User` 型のフィールドなので、その中で問題なく `...userFragment` と参照できています。
+
+### フラグメントの使用例
 
 上記のサンプルコードはあまり実用的じゃなかったので、もう少し実際のアプリで使いそうなクエリを載せておきます。
 次の GraphQL クエリでは、ログイン中のユーザー情報と、そのユーザーの Issue 情報を取得しています。
@@ -98,6 +102,35 @@ fragment userFragment on User {
 例えば、GitHub の GraphQL API では、フラグメントの定義だけして参照しないと、次のようなエラーが返されます。
 
 > "Fragment userFragment was defined, but not used"
+
+### フラグメント定義内から変数を参照する
+
+クエリ内でフラグメント・スプレッドを使用した場合、そのクエリに渡された変数 (variablse) をフラグメントの定義内からも参照できます。
+次の公式サイトの例では、クエリ変数 `$first` の値（デフォルト値は 3）を、フラグメントの定義内から参照しています。
+フラグメント・スプレッドを記述する場所で、変数をたらい回しにしなくてよいということですね。
+
+{{< code lang="graphql" hl_lines="1 12" >}}
+query HeroComparison($first: Int = 3) {
+  leftComparison: hero(episode: EMPIRE) {
+    ...comparisonFields
+  }
+  rightComparison: hero(episode: JEDI) {
+    ...comparisonFields
+  }
+}
+
+fragment comparisonFields on Character {
+  name
+  friendsConnection(first: $first) {
+    totalCount
+    edges {
+      node {
+        name
+      }
+    }
+  }
+}
+{{< /code >}}
 
 
 インライン・フラグメント (Inline fragments) {#inline}
