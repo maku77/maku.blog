@@ -65,6 +65,37 @@ type Query {
 
 - 参考: [GraphQL スキーマ仕様: 列挙型 (enum type) を定義する](/p/isotm77/)
 
+### ミューテーション操作単位で一貫性を保つ
+
+GraphQL クライアントがミューテーション要求を行う場合、`mutation` ドキュメントには複数のミューテーション操作を含めることができます。
+
+{{< code lang="graphql" title="Not Good（かもしれない）" >}}
+mutation ConfigServer {
+  setAddress(address: "192.168.0.100") {
+     ...serverConfig
+  }
+  setPort(port: 25052) {
+     ...serverConfig
+  }
+}
+{{< /code >}}
+
+これらのミューテーション操作は上から順番に処理されていきますが、いずれかのミューテーション操作でエラーが発生すると、その後のミューテーション処理は実行されません。
+GraphQL には、リレーショナルデータベース (RDB) のようなトランザクション処理の仕組みはないため、すでに実行されてしまったミューテーション操作をロールバックすることはできません。
+上記の `setAddress` 操作と `setPort` 操作が必ずセットで実行しなければいけない処理であるなら、そもそもミューテーション操作の定義を 1 つにまとめるべきです。
+
+{{< code lang="graphql" title="Good" >}}
+mutation ConfigServer {
+  changeServerConfig(address: "192.168.0.100", port: 25052) {
+     ...serverConfig
+  }
+}
+{{< /code >}}
+
+このように、ミューテーション操作は整合性を保てる単位（RDB で言うところのトランザクション単位）で実行できるようにフィールド設計します。
+
+- 参考: [GraphQL スキーマ仕様: ミューテーションを定義する（データ更新 API）](/p/pk9c9qs/)
+
 
 セキュリティ
 ----
