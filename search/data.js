@@ -1470,10 +1470,28 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/dj28oy5/",
+title: "Docker 関連メモ",
+date: "2022-10-02T00:00:00Z",
+body: "Docker 関連メモ"
+},
+{
+url: "/p/wbtbr8o/",
+title: "Go アプリを実行する軽量な Docker コンテナイメージを作成する",
+date: "2022-10-02T00:00:00Z",
+body: "Go アプリを実行する軽量な Docker コンテナイメージを作成する 何をするか？ Go 言語 (Golang) で簡単な Web サーバーを作成して、それを動かす軽量な Docker コンテナイメージを作成します。 Dockerfile には マルチステージのビルド構成 を適用し、Go 言語アプリのビルドと、実行イメージのビルドのステージを分けます。 実行用のコンテナイメージとしては、Alpine Linux ベースと、scratch ベースの 2 種類のイメージを作成してみます。 Golang は軽量なシングルバイナリを生成するのに適した言語で、Docker イメージの生成にも向いています。 Node.js などでイメージを作ろうとすると、Hello World でも 100MB 超えになってしまいますが、Golang を使えば、その 1/10 程度のサイズのイメージを生成できます。 軽量のイメージを作れるようになると、頻繁なビルドとデプロイを気兼ねなく行えるようになります。 Golang アプリを準備する Golang で作るアプリは何でもよいのですが、ここでは Golang 標準の net/http パッケージを使って、Hello World というレスポンスを返すだけの簡単な Web サーバーアプリを用意します。 まずは、お馴染みの go.mod の作成から。 $ mkdir hello \u0026amp;\u0026amp; cd hello $ go mod init hello あとは、次のような main.go ファイルを作成すれば完成です。 main.go package main import ( \u0026#34;log\u0026#34; \u0026#34;net/http\u0026#34; ) func main() { http.HandleFunc(\u0026#34;/\u0026#34;, func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte(\u0026#34;Hello World\u0026#34;)) }) log.Fatal(http.ListenAndServe(\u0026#34;:8080\u0026#34;, nil)) } go run . でサーバーを起動して、Web ブラウザーなどで http://localhost:8080 にアクセスすれば、Hello World というレスポンスが返ってくることを確認できます。 参考リンク Golang で HTTP サーバーを作成する (net/http, rs/cors) - まくまく Golang ノート Alpine Linux ベースの実行イメージを作成する Dockerfile # syntax=docker/dockerfile:1###### Build stage （アプリをビルドするための 1st ステージ）###FROMgolang:1.19-alpine AS buildWORKDIR/work# 外部モジュールを使い始めたら下記を追加# COPY go.mod go.sum ./# RUN go mod downloadCOPY . .RUN GOOS=linux GOARCH=amd64 go build -ldflags \u0026#39;-w -s\u0026#39; -o hello###### Deploy stage （実行用のイメージをビルドするための 2nd ステージ）###FROMalpine:3.16COPY --from=build /work/hello /app/helloCMD [\u0026#34;/app/hello\u0026#34;] ここでは上記のような Dockerfile を作成してイメージをビルドします。 Go アプリをビルドするための build ステージと、実行用の Docker イメージをビルドするための deploy ステージに分かれています。 このようなマルチステージのビルド構成にすると、最終的にできる実行用のイメージに Go アプリのビルド環境を入れなくてすむので、イメージサイズを小さくすることができます。 最終的に生成される実行イメージはコンパクトな Alpine Linux をベースとしており、これもイメージサイズの削減につながっています。 以下、2 つのステージを順に見ていきます。 アプリをビルドするための 1st ステージ FROMgolang:1.19-alpine AS buildWORKDIR/workCOPY . .RUN GOOS=linux GOARCH=amd64 go build -ldflags \u0026#39;-w -s\u0026#39; -o hello1st ステージでは、Golang のビルド環境で main.go ファイルをビルドします。 ここでは親イメージに Alpine Linux ベースの Golang ビルド環境である golang:1.19-alpine を指定していますが、最新のタグは、Docker Hub の golang イメージ のページで確認してください。 処理内容は単純で、ホスト側のファイルをコンテナ側へコピー (COPY . .) して、そこに含まれる main.go ファイルをビルドしているだけです。 ワーキングディレクトリを WORKDIR /work で移動しているので、ビルド後の実行ファイルのパスは /work/hello になります。 ☝️ go build の -ldflags について go build 時に -ldflags '-s -w' オプションを指定すると、デバッグ用のシンボル情報を除いて実行ファイルのサイズを小さくできます（20％程度？）。 このフラグは、内部的には go tool link に渡されます。 # 通常ビルドした場合 $ go build -o hello $ du -h hello 5.9M\thello # デバッグシンボル情報を削った場合 $ go build -o hello -ldflags \u0026#39;-s -w\u0026#39; $ du -h hello 4.4M\thello この 1st ステージには、FROM 命令の AS build オプションで build というエイリアス名を付けています。 以下の 2nd ステージからは、このエイリアス名を使って 1st ステージで生成したファイルを参照できます。 実行用のイメージをビルドするための 2nd ステージ FROMalpine:3.16COPY --from=build /work/hello /app/helloCMD [\u0026#34;/app/hello\u0026#34;]2nd ステージでは、1st ステージで生成した Golang 製のアプリ（/work/hello) を実行するための Docker イメージをビルドします。 このイメージには、もう Golang のビルド環境は必要ないので、軽量 Linux である Alpine Linux を親イメージとして指定します（5MB くらい！）。 ここでは、alpine:3.16 を指定していますが、最新のタグは Docker Hub の alpine イメージ のページで確認してください。 COPY 命令では、--from=build 指定により、1st ステージ (build) の /work/hello ファイルを、2nd ステージの /app/hello へコピーしています。 最後の CMD 命令で、コンテナ起動時に /app/hello を起動するように指定しています。 イメージのビルド Dockerfile の作成が終わったら、docker image build コマンドでビルドして Docker イメージを作成します。 ここではイメージ名を hello としています。 $ docker image build -t hello . イメージのビルドが完了したら、ちゃんとできているか確認します。 $ docker image ls REPOSITORY TAG IMAGE ID CREATED SIZE hello latest b8e4afa8a2a3 3 seconds ago 9.75MB Docker イメージの完成です！ イメージサイズは 10MB 弱なので、まぁまぁコンパクトなイメージになっています。 これは、Go アプリと Alpine Linux の合計サイズです。 次のようにすれば、このイメージからコンテナを起動できます。 コンテナの起動 $ docker container run --rm -p 8080:8080 hello -p 8080:8080 オプションで、ホスト PC の 8080 ポートを、コンテナ内の 8080 ポートに転送しているので、ホスト PC 上の Web ブラウザーで http://localhost:8080 を開けばアクセスできます。 コンテナは Ctrl + C で停止できます。 起動時に --rm オプションを指定しておいたので、コンテナは停止と同時に削除されます。 Scratch ベースの実行イメージを作成する 上記では、Alpine Linux + Go アプリという構成のイメージを作成しましたが、scratch イメージというのを親イメージとして指定すると、OS を含まない Go アプリだけのイメージを作成できます。 正確には、カーネル自体は Docker ホスト側のものが使われるので、その機能だけで動作させられる実行ファイルであれば、scratch ベースのイメージにすることができます。 Linux の各種機能（ライブラリやシェル）が使えなくなるので、トラブル発生時の調査などが難しくなりますが、非常に軽量なイメージ を作成することができます。 Dockerfile # syntax=docker/dockerfile:1### Build stageFROMgolang:1.19-alpine AS buildWORKDIR/work# 外部モジュールを使い始めたら下記を追加# COPY go.mod go.sum ./# RUN go mod downloadCOPY . .RUN GOOS=linux GOARCH=amd64 go build -ldflags \u0026#39;-w -s -extldflags \u0026#34;-static\u0026#34;\u0026#39; -o hello### Deploy stageFROMscratchEXPOSE8080COPY --from=build /work/hello /helloCMD [\u0026#34;/hello\u0026#34;] scratch イメージを使用するときに注意しなければいけないのは、Go アプリをビルドするときに 外部ライブラリを静的リンク しておく必要があるということです（ライブラリがまったく入っていないので）。 この設定は、上記のように -ldflags オプションの引数に -extldflags \u0026quot;-static\u0026quot; を追加することで行えます（オプション指定が入れ子になってるので分かりにくいですね ^^;）。 多くの場合はこの指定をしなくても静的リンクでビルドされるようですが、cgo パッケージ（C ライブラリ連携）などを使っていると自動的に動的リンクになるなどの振る舞いをするので、明示的なオプション指定をしておいた方がよさそうです。 ライブラリの動的リンクが残っていると、コンテナ起動時に exec /hello: no such file or directory といったエラーが発生します。 上記の Dockerfile をビルドすると、小さな Docker イメージができあがります。 $ docker image build -t hello . $ docker image ls REPOSITORY TAG IMAGE ID CREATED SIZE hello latest 757922277d94 4 seconds ago 4.46MB 10MB 弱だったのが、5MB 弱まで小さくなりました！ ちょうど Alpine Linux のサイズ分だけ小さくなっています。 ☝️ file コマンドで実行ファイルの種類を調べる go build コマンドで指定するオプションによって生成される実行ファイルの形式が変わってきます。 実行ファイルのフォーマットは、file コマンドで確認できます。 # macOS で何もオプション指定せずにビルドした場合 $ go build -o hello $ file hello hello: Mach-O 64-bit executable x86_64 # OS やアーキテクチャを指定してクロスコンパイルした場合 $ GOOS=linux GOARCH=amd64 go build -o hello $ file hello hello: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, Go BuildID=MjRBk0jRAbyfXWsLUypa/ZDyt22XXA4ZiyzbfYl8i/5chB8hOVmP2fY1XwpT95/R7p5BmDr9QZtUfrx80RH, not stripped その他の Tips コンテナから HTTPS 通信するとき コンテナ内のアプリから HTTPS 通信するときは、Root CA 証明書や、タイムゾーン情報が必要になります。 親イメージにこれらのファイルがない場合は、何らかのイメージからファイルをコピーすることで対応できます。 FROMscratchCOPY --from=golang:1.19 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crtCOPY --from=golang:1.19 /usr/share/zoneinfo /usr/share/zoneinfo"
+},
+{
 url: "/",
 title: "まくろぐ",
-date: "2022-09-20T00:00:00Z",
+date: "2022-10-02T00:00:00Z",
 body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-10-02T00:00:00Z",
+body: "技術系のメモ"
 },
 {
 url: "/p/pziygwd/",
@@ -1504,12 +1522,6 @@ url: "/p/vnkd4ur/",
 title: "GraphQL クエリ仕様: フィールド名にエイリアスを付ける",
 date: "2022-09-14T00:00:00Z",
 body: "GraphQL クエリ仕様: フィールド名にエイリアスを付ける GraphQL クエリ言語の フィールド・エイリアス 機能を使うと、取得したフィールド値を参照するときに、任意の別名を付けて参照することができます。 例えば、GraphQL スキーマとしては company というフィールド名で定義されているものを、companyName という JSON プロパティ名で返して欲しいときは、次のようにフィールド・エイリアスを使用します。 GraphQL クエリ queryProfileInfoWithAlias{user(login:\u0026#34;maku77\u0026#34;){namecompanyName:companybio}} レスポンス { \u0026#34;data\u0026#34;: { \u0026#34;user\u0026#34;: { \u0026#34;name\u0026#34;: \u0026#34;Makkuma\u0026#34;, \u0026#34;companyName\u0026#34;: \u0026#34;maku maku company\u0026#34;, \u0026#34;bio\u0026#34;: \u0026#34;すーぱーぷにぐらまー\u0026#34; } } } フィールド・エイリアスは、同名のフィールドを異なる引数で取得するときに役立ちます。 GraphQL クエリ query{maku77:user(login:\u0026#34;maku77\u0026#34;){...basicUserInfo}puni:user(login:\u0026#34;puni\u0026#34;){...basicUserInfo}}fragmentbasicUserInfoonUser{namebio} 上記のように 1 つのクエリの中で同名のフィールド（ここでは user）を要求する場合に、フィールド・エイリアス（ここでは maku と puni）を付けることで、レスポンスのプロパティ名がコンフリクトしないようにします。 というより、このケースではエイリアスを設定しないと、リクエスト時にエラーになります。 レスポンス { \u0026#34;data\u0026#34;: { \u0026#34;maku77\u0026#34;: { \u0026#34;name\u0026#34;: \u0026#34;Makkuma\u0026#34;, \u0026#34;bio\u0026#34;: \u0026#34;すーぱーぷにぐらまー\u0026#34; }, \u0026#34;puni\u0026#34;: { \u0026#34;name\u0026#34;: \u0026#34;Puni Puni\u0026#34;, \u0026#34;bio\u0026#34;: \u0026#34;ぷにぷにぷにょーん\u0026#34; }, } }"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-09-14T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/8t6hr3d/",
@@ -1630,12 +1642,6 @@ url: "/p/qt6fox7/",
 title: "Linux のユーザー管理",
 date: "2022-08-05T00:00:00Z",
 body: "Linux のユーザー管理"
-},
-{
-url: "/p/dj28oy5/",
-title: "Docker 関連メモ",
-date: "2022-07-29T00:00:00Z",
-body: "Docker 関連メモ"
 },
 {
 url: "/p/ehxgwt4/",

@@ -1,0 +1,778 @@
+<!doctype html><html lang=ja-jp>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Go アプリを実行する軽量な Docker コンテナイメージを作成する｜まくろぐ</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
+<meta property="og:title" content="Go アプリを実行する軽量な Docker コンテナイメージを作成する">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maku.blog/p/wbtbr8o/">
+<meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
+<meta property="og:image:width" content="1436">
+<meta property="og:image:height" content="746">
+<meta property="og:description" content="何をするか？ Go 言語 (Golang) で簡単な Web サーバーを作成して、それを動かす軽量な Docker コンテナイメージを作成します。 Dockerfile には マルチステージのビルド構成 を適用し、Go 言語アプリのビルドと、実行イメージのビルドのステージを分けます。 実行用のコンテナイメージとしては、Alpine Linux ベースと、scratch ベースの 2 種類のイメージを作成してみます。
+Golang は軽量なシングルバイナリを生成するのに適した言語で、Docker イメージの生成にも向いています。 Node.js などでイメージを作ろうとすると、Hello World でも 100MB 超えになってしまいますが、Golang を使えば、その 1/10 程度のサイズのイメージを生成できます。 軽量のイメージを作れるようになると、頻繁なビルドとデプロイを気兼ねなく行えるようになります。
+Golang アプリを準備する Golang で作るアプリは何でもよいのですが、ここでは Golang 標準の net/http パッケージを使って、Hello World というレスポンスを返すだけの簡単な Web サーバーアプリを用意します。
+まずは、お馴染みの go.mod の作成から。
+$ mkdir hello && cd hello $ go mod init hello あとは、次のような main.go ファイルを作成すれば完成です。
+main.go package main import ( &#34;log&#34; &#34;net/http&#34; ) func main() { http.">
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
+<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
+<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
+<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
+<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
+<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
+</head>
+<body>
+<div id=xRoot>
+<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/dj28oy5/>Docker 関連メモ</a>
+</span>
+<span class=xBreadcrumb_item>Go アプリを実行する軽量な Docker コンテナイメージを作成する
+</span>
+</div>
+</aside>
+<div id=xContainer>
+<nav id=xMenu aria-label=メニュー>
+<div id=sidebar style=height:100%>
+<div id=sidebar_notFixed>
+<a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a>
+<div class=xMenu_box data-sticky>
+<form action=https://cse.google.com/cse target=_blank>
+<div class=xSearchBox>
+<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<input type=hidden name=ie value=UTF-8>
+<input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
+<input type=submit value=検索></input>
+</div>
+</form>
+<div class=xMenu_box_body>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
+<div class=xMenu_box_body>
+<div class=xBoxLink>
+<a href=../../p/wbtbr8o/>
+Go アプリを実行する軽量な Docker コンテナイメージを作成する
+<time>2022-10-02</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/pziygwd/>
+メカニカルキーボードが逝く
+<time>2022-09-24</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/vnkd4ur/>
+GraphQL クエリ仕様: フィールド名にエイリアスを付ける
+<time>2022-09-14</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/s2fs5gs/>
+Ansible タスク例: ユーザーを特定のグループに参加させる (ansible.builtin.user)
+<time>2022-08-29</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/zw7emu3/>
+Ansible で facts 情報を表示する
+<time>2022-08-29</time></a>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3>
+<div class=xMenu_box_body>
+<div class=xNavTree>
+<ul>
+<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
+<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
+<li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a>
+<ul>
+</ul>
+<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
+<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
+<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
+<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
+<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
+<li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a>
+<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
+<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
+<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
+<li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a>
+<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
+<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
+<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
+<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
+<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
+<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
+<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
+<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
+<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
+<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
+<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
+<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
+<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
+<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
+</ul>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
+<div class=xMenu_box_body><div class=xMenu_tag>
+<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (80)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws>aws (61)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure>azure (58)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/typescript>typescript (58)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/next.js>next.js (37)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/chatbot>chatbot (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/react>react (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/gnuplot>gnuplot (27)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cdk>aws/cdk (26)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/linux>linux (25)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github>github (24)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ansible>ansible (21)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/graphql>graphql (19)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/node.js>node.js (19)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/electron>electron (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vs-code>vs-code (14)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/javascript>javascript (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mongodb>mongodb (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cognito>aws/cognito (12)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/android>android (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/lambda>aws/lambda (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/nginx>nginx (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/java>java (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/python>python (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/uml>uml (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/3d>3d (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sam>aws/sam (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/firestore>firebase/firestore (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unity>unity (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webgl>webgl (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-cli>azure-cli (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/docker>docker (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jade>jade (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/material-ui>material-ui (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apollo>apollo (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cli>aws/cli (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-storage>azure-storage (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/doxygen>doxygen (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/c/c++>c/c++ (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-actions>github-actions (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/luis>luis (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/qna-maker>qna-maker (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ssh>ssh (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/ssm>aws/ssm (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/eslint>eslint (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase>firebase (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-pages>github-pages (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html/css>html/css (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jekyll>jekyll (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sql>sql (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/windows>windows (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-functions>azure-functions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/cosmos-db>cosmos-db (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/hugo>hugo (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/kotlin>kotlin (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/lets-encrypt>lets-encrypt (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mac>mac (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/powershell>powershell (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/prettier>prettier (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sqlite>sqlite (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/textlint>textlint (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tv>tv (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apache>apache (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/arib>arib (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/amplify>aws/amplify (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/appsync>aws/appsync (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/iam>aws/iam (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/kms>aws/kms (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/s3>aws/s3 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sdk>aws/sdk (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-app-service>azure-app-service (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/excel>excel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/go>go (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/grpc>grpc (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/http>http (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/npm>npm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/oauth>oauth (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/opengl>opengl (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/protocol-buffers>protocol-buffers (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/rsync>rsync (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/scp>scp (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/slack>slack (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teraterm>teraterm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unicode>unicode (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vercel>vercel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/zip>zip (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/.net>.net (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/androidstudio>androidstudio (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apollo-server>apollo-server (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/atomic-design>atomic-design (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/blender>blender (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bluetooth>bluetooth (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bootstrap>bootstrap (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-framework>bot-framework (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/boto3>boto3 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/css>css (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dns>dns (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dvb>dvb (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/editorconfig>editorconfig (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/evernote>evernote (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/git>git (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/golang>golang (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/groovy>groovy (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html>html (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/iso>iso (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jest>jest (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/json>json (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/macos>macos (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mui>mui (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/parcel>parcel (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/raspberrypi>raspberrypi (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teams>teams (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tex>tex (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ubuntu>ubuntu (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/url>url (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vim>vim (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vps>vps (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/web>web (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webpack>webpack (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/wsl>wsl (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
+</div></div>
+</div>
+<div class=xMenu_box data-sticky><br></div>
+</div>
+<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
+</div>
+</div>
+</nav>
+<main id=xMain>
+<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_next>
+<a href=../../p/ehxgwt4/>TypeScript を使った Node.js アプリを Docker コンテナ化する</a>
+</div>
+</div>
+</aside>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/dj28oy5/>Docker 関連メモ</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/wbtbr8o/>Go アプリを実行する軽量な Docker コンテナイメージを作成する</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/docker>Docker</a></span>
+<span class=xPageTags_item><a href=../../tags/golang>Golang</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-10-02>2022-10-02</time><br>
+作成: <time itemprop=datePublished datetime=2022-10-02>2022-10-02</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#何をするか>何をするか？</a></li>
+<li><a href=#golang-アプリを準備する>Golang アプリを準備する</a></li>
+<li><a href=#alpine-linux-ベースの実行イメージを作成する>Alpine Linux ベースの実行イメージを作成する</a>
+<ul>
+<li><a href=#アプリをビルドするための-1st-ステージ>アプリをビルドするための 1st ステージ</a></li>
+<li><a href=#実行用のイメージをビルドするための-2nd-ステージ>実行用のイメージをビルドするための 2nd ステージ</a></li>
+<li><a href=#イメージのビルド>イメージのビルド</a></li>
+</ul>
+</li>
+<li><a href=#scratch-ベースの実行イメージを作成する>Scratch ベースの実行イメージを作成する</a></li>
+<li><a href=#その他の-tips>その他の Tips</a>
+<ul>
+<li><a href=#コンテナから-https-通信するとき>コンテナから HTTPS 通信するとき</a></li>
+</ul>
+</li>
+</ul>
+</nav><h2 id=何をするか>何をするか？</h2>
+<p>Go 言語 (Golang) で簡単な Web サーバーを作成して、それを動かす軽量な Docker コンテナイメージを作成します。
+<code>Dockerfile</code> には <strong>マルチステージのビルド構成</strong> を適用し、Go 言語アプリのビルドと、実行イメージのビルドのステージを分けます。
+実行用のコンテナイメージとしては、<strong>Alpine Linux</strong> ベースと、<strong>scratch</strong> ベースの 2 種類のイメージを作成してみます。</p>
+<p>Golang は軽量なシングルバイナリを生成するのに適した言語で、Docker イメージの生成にも向いています。
+Node.js などでイメージを作ろうとすると、Hello World でも 100MB 超えになってしまいますが、Golang を使えば、その 1/10 程度のサイズのイメージを生成できます。
+軽量のイメージを作れるようになると、頻繁なビルドとデプロイを気兼ねなく行えるようになります。</p>
+<h2 id=golang-アプリを準備する>Golang アプリを準備する</h2>
+<p>Golang で作るアプリは何でもよいのですが、ここでは Golang 標準の <code>net/http</code> パッケージを使って、<code>Hello World</code> というレスポンスを返すだけの簡単な Web サーバーアプリを用意します。</p>
+<p>まずは、お馴染みの <code>go.mod</code> の作成から。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mkdir hello <span class=o>&amp;&amp;</span> <span class=nb>cd</span> hello
+<span class=gp>$ </span>go mod init hello
+</code></pre></div><p>あとは、次のような <code>main.go</code> ファイルを作成すれば完成です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>main.go</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
+
+<span class=kn>import</span> <span class=p>(</span>
+	<span class=s>&#34;log&#34;</span>
+	<span class=s>&#34;net/http&#34;</span>
+<span class=p>)</span>
+
+<span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+	<span class=nx>http</span><span class=p>.</span><span class=nf>HandleFunc</span><span class=p>(</span><span class=s>&#34;/&#34;</span><span class=p>,</span> <span class=kd>func</span><span class=p>(</span><span class=nx>w</span> <span class=nx>http</span><span class=p>.</span><span class=nx>ResponseWriter</span><span class=p>,</span> <span class=nx>_</span> <span class=o>*</span><span class=nx>http</span><span class=p>.</span><span class=nx>Request</span><span class=p>)</span> <span class=p>{</span>
+		<span class=nx>w</span><span class=p>.</span><span class=nf>Write</span><span class=p>([]</span><span class=nb>byte</span><span class=p>(</span><span class=s>&#34;Hello World&#34;</span><span class=p>))</span>
+	<span class=p>})</span>
+	<span class=nx>log</span><span class=p>.</span><span class=nf>Fatal</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nf>ListenAndServe</span><span class=p>(</span><span class=s>&#34;:8080&#34;</span><span class=p>,</span> <span class=kc>nil</span><span class=p>))</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p><strong><code>go run .</code></strong> でサーバーを起動して、Web ブラウザーなどで <code>http://localhost:8080</code> にアクセスすれば、<code>Hello World</code> というレスポンスが返ってくることを確認できます。</p>
+<div style="border:solid 1px #ccc;border-radius:.5em;background:#eee;padding:.5em">
+<h2 style="font-size:1rem;margin:.3em .5em;color:#333">参考リンク</h2>
+<ul>
+<li><a href=https://maku77.github.io/p/goruwy4/>Golang で HTTP サーバーを作成する (net/http, rs/cors) - まくまく Golang ノート</a></li>
+</ul>
+</div>
+<h2 id=alpine-linux-ベースの実行イメージを作成する>Alpine Linux ベースの実行イメージを作成する</h2>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Dockerfile</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-docker data-lang=docker><span class=c># syntax=docker/dockerfile:1</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=c>###</span><span class=err>
+</span><span class=err></span><span class=c>### Build stage （アプリをビルドするための 1st ステージ）</span><span class=err>
+</span><span class=err></span><span class=c>###</span><span class=err>
+</span><span class=err></span><span class=k>FROM</span><span class=s> golang:1.19-alpine AS build</span><span class=err>
+</span><span class=err></span><span class=k>WORKDIR</span><span class=s> /work</span><span class=err>
+</span><span class=err></span><span class=c># 外部モジュールを使い始めたら下記を追加</span><span class=err>
+</span><span class=err></span><span class=c># COPY go.mod go.sum ./</span><span class=err>
+</span><span class=err></span><span class=c># RUN go mod download</span><span class=err>
+</span><span class=err></span><span class=k>COPY</span> . .<span class=err>
+</span><span class=err></span><span class=k>RUN</span> <span class=nv>GOOS</span><span class=o>=</span>linux <span class=nv>GOARCH</span><span class=o>=</span>amd64 go build -ldflags <span class=s1>&#39;-w -s&#39;</span> -o hello<span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=c>###</span><span class=err>
+</span><span class=err></span><span class=c>### Deploy stage （実行用のイメージをビルドするための 2nd ステージ）</span><span class=err>
+</span><span class=err></span><span class=c>###</span><span class=err>
+</span><span class=err></span><span class=k>FROM</span><span class=s> alpine:3.16</span><span class=err>
+</span><span class=err></span><span class=k>COPY</span> --from<span class=o>=</span>build /work/hello /app/hello<span class=err>
+</span><span class=err></span><span class=k>CMD</span> <span class=p>[</span><span class=s2>&#34;/app/hello&#34;</span><span class=p>]</span></code></pre></div></div>
+</figure>
+<p>ここでは上記のような <code>Dockerfile</code> を作成してイメージをビルドします。
+Go アプリをビルドするための build ステージと、実行用の Docker イメージをビルドするための deploy ステージに分かれています。
+このようなマルチステージのビルド構成にすると、最終的にできる実行用のイメージに Go アプリのビルド環境を入れなくてすむので、イメージサイズを小さくすることができます。
+最終的に生成される実行イメージはコンパクトな Alpine Linux をベースとしており、これもイメージサイズの削減につながっています。
+以下、2 つのステージを順に見ていきます。</p>
+<h3 id=アプリをビルドするための-1st-ステージ>アプリをビルドするための 1st ステージ</h3>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-docker data-lang=docker><span class=k>FROM</span><span class=s> golang:1.19-alpine AS build</span><span class=err>
+</span><span class=err></span><span class=k>WORKDIR</span><span class=s> /work</span><span class=err>
+</span><span class=err></span><span class=k>COPY</span> . .<span class=err>
+</span><span class=err></span><span class=k>RUN</span> <span class=nv>GOOS</span><span class=o>=</span>linux <span class=nv>GOARCH</span><span class=o>=</span>amd64 go build -ldflags <span class=s1>&#39;-w -s&#39;</span> -o hello<span class=err>
+</span></code></pre></div><p>1st ステージでは、Golang のビルド環境で <code>main.go</code> ファイルをビルドします。
+ここでは親イメージに Alpine Linux ベースの Golang ビルド環境である <strong><code>golang:1.19-alpine</code></strong> を指定していますが、最新のタグは、<a href=https://hub.docker.com/_/golang>Docker Hub の golang イメージ</a> のページで確認してください。
+処理内容は単純で、ホスト側のファイルをコンテナ側へコピー (<code>COPY . .</code>) して、そこに含まれる <code>main.go</code> ファイルをビルドしているだけです。
+ワーキングディレクトリを <code>WORKDIR /work</code> で移動しているので、ビルド後の実行ファイルのパスは <code>/work/hello</code> になります。</p>
+<div class=xNote>
+<span class=xNote_title>☝️ go build の -ldflags について</span>
+<span class=xNote_body><p><code>go build</code> 時に <strong><code>-ldflags '-s -w'</code></strong> オプションを指定すると、デバッグ用のシンボル情報を除いて実行ファイルのサイズを小さくできます（20％程度？）。
+このフラグは、内部的には <a href=https://pkg.go.dev/cmd/link>go tool link</a> に渡されます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp># </span>通常ビルドした場合
+<span class=gp>$ </span>go build -o hello
+<span class=gp>$ </span>du -h hello
+<span class=go>5.9M	hello
+</span><span class=go></span><span class=err>
+</span><span class=err></span><span class=gp># </span>デバッグシンボル情報を削った場合
+<span class=gp>$ </span>go build -o hello -ldflags <span class=s1>&#39;-s -w&#39;</span>
+<span class=gp>$ </span>du -h hello
+<span class=go>4.4M	hello
+</span></code></pre></div></span>
+</div>
+<p>この 1st ステージには、<code>FROM</code> 命令の <strong><code>AS build</code></strong> オプションで <code>build</code> というエイリアス名を付けています。
+以下の 2nd ステージからは、このエイリアス名を使って 1st ステージで生成したファイルを参照できます。</p>
+<h3 id=実行用のイメージをビルドするための-2nd-ステージ>実行用のイメージをビルドするための 2nd ステージ</h3>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-docker data-lang=docker><span class=k>FROM</span><span class=s> alpine:3.16</span><span class=err>
+</span><span class=err></span><span class=k>COPY</span> --from<span class=o>=</span>build /work/hello /app/hello<span class=err>
+</span><span class=err></span><span class=k>CMD</span> <span class=p>[</span><span class=s2>&#34;/app/hello&#34;</span><span class=p>]</span><span class=err>
+</span></code></pre></div><p>2nd ステージでは、1st ステージで生成した Golang 製のアプリ（<code>/work/hello</code>) を実行するための Docker イメージをビルドします。
+このイメージには、もう Golang のビルド環境は必要ないので、軽量 Linux である Alpine Linux を親イメージとして指定します（5MB くらい！）。
+ここでは、<strong><code>alpine:3.16</code></strong> を指定していますが、最新のタグは <a href=https://hub.docker.com/_/alpine>Docker Hub の alpine イメージ</a> のページで確認してください。
+<code>COPY</code> 命令では、<strong><code>--from=build</code></strong> 指定により、1st ステージ (<code>build</code>) の <code>/work/hello</code> ファイルを、2nd ステージの <code>/app/hello</code> へコピーしています。
+最後の <code>CMD</code> 命令で、コンテナ起動時に <code>/app/hello</code> を起動するように指定しています。</p>
+<h3 id=イメージのビルド>イメージのビルド</h3>
+<p><code>Dockerfile</code> の作成が終わったら、<strong><code>docker image build</code></strong> コマンドでビルドして Docker イメージを作成します。
+ここではイメージ名を <code>hello</code> としています。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker image build -t hello .
+</code></pre></div><p>イメージのビルドが完了したら、ちゃんとできているか確認します。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker image ls
+<span class=go>REPOSITORY     TAG       IMAGE ID       CREATED          SIZE
+</span><span class=go>hello          latest    b8e4afa8a2a3   3 seconds ago    9.75MB
+</span></code></pre></div><p>Docker イメージの完成です！
+イメージサイズは 10MB 弱なので、まぁまぁコンパクトなイメージになっています。
+これは、Go アプリと Alpine Linux の合計サイズです。
+次のようにすれば、このイメージからコンテナを起動できます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>コンテナの起動</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker container run --rm -p 8080:8080 hello
+</code></pre></div></div>
+</figure>
+<p><strong><code>-p 8080:8080</code></strong> オプションで、ホスト PC の 8080 ポートを、コンテナ内の 8080 ポートに転送しているので、ホスト PC 上の Web ブラウザーで <code>http://localhost:8080</code> を開けばアクセスできます。
+コンテナは <kbd>Ctrl + C</kbd> で停止できます。
+起動時に <code>--rm</code> オプションを指定しておいたので、コンテナは停止と同時に削除されます。</p>
+<h2 id=scratch-ベースの実行イメージを作成する>Scratch ベースの実行イメージを作成する</h2>
+<p>上記では、Alpine Linux + Go アプリという構成のイメージを作成しましたが、<strong>scratch</strong> イメージというのを親イメージとして指定すると、OS を含まない Go アプリだけのイメージを作成できます。
+正確には、カーネル自体は Docker ホスト側のものが使われるので、その機能だけで動作させられる実行ファイルであれば、scratch ベースのイメージにすることができます。
+Linux の各種機能（ライブラリやシェル）が使えなくなるので、トラブル発生時の調査などが難しくなりますが、<strong>非常に軽量なイメージ</strong> を作成することができます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Dockerfile</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-docker data-lang=docker><span class=c># syntax=docker/dockerfile:1</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=c>### Build stage</span><span class=err>
+</span><span class=err></span><span class=k>FROM</span><span class=s> golang:1.19-alpine AS build</span><span class=err>
+</span><span class=err></span><span class=k>WORKDIR</span><span class=s> /work</span><span class=err>
+</span><span class=err></span><span class=c># 外部モジュールを使い始めたら下記を追加</span><span class=err>
+</span><span class=err></span><span class=c># COPY go.mod go.sum ./</span><span class=err>
+</span><span class=err></span><span class=c># RUN go mod download</span><span class=err>
+</span><span class=err></span><span class=k>COPY</span> . .<span class=err>
+</span><span class=err></span><span class=k>RUN</span> <span class=nv>GOOS</span><span class=o>=</span>linux <span class=nv>GOARCH</span><span class=o>=</span>amd64 go build -ldflags <span class=s1>&#39;-w -s -extldflags &#34;-static&#34;&#39;</span> -o hello<span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=c>### Deploy stage</span><span class=err>
+</span><span class=err></span><span class=k>FROM</span><span class=s> scratch</span><span class=err>
+</span><span class=err></span><span class=k>EXPOSE</span><span class=s> 8080</span><span class=err>
+</span><span class=err></span><span class=k>COPY</span> --from<span class=o>=</span>build /work/hello /hello<span class=err>
+</span><span class=err></span><span class=k>CMD</span> <span class=p>[</span><span class=s2>&#34;/hello&#34;</span><span class=p>]</span></code></pre></div></div>
+</figure>
+<p>scratch イメージを使用するときに注意しなければいけないのは、Go アプリをビルドするときに <strong>外部ライブラリを静的リンク</strong> しておく必要があるということです（ライブラリがまったく入っていないので）。
+この設定は、上記のように <code>-ldflags</code> オプションの引数に <strong><code>-extldflags "-static"</code></strong> を追加することで行えます（オプション指定が入れ子になってるので分かりにくいですね ^^;）。
+多くの場合はこの指定をしなくても静的リンクでビルドされるようですが、cgo パッケージ（C ライブラリ連携）などを使っていると自動的に動的リンクになるなどの振る舞いをするので、明示的なオプション指定をしておいた方がよさそうです。
+ライブラリの動的リンクが残っていると、コンテナ起動時に <code>exec /hello: no such file or directory</code> といったエラーが発生します。</p>
+<p>上記の <code>Dockerfile</code> をビルドすると、小さな Docker イメージができあがります。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker image build -t hello .
+<span class=gp>$ </span>docker image ls
+<span class=go>REPOSITORY     TAG       IMAGE ID       CREATED             SIZE
+</span><span class=go>hello          latest    757922277d94   4 seconds ago       4.46MB
+</span></code></pre></div><p>10MB 弱だったのが、5MB 弱まで小さくなりました！
+ちょうど Alpine Linux のサイズ分だけ小さくなっています。</p>
+<div class=xNote>
+<span class=xNote_title>☝️ file コマンドで実行ファイルの種類を調べる</span>
+<span class=xNote_body><p><code>go build</code> コマンドで指定するオプションによって生成される実行ファイルの形式が変わってきます。
+実行ファイルのフォーマットは、<strong><code>file</code></strong> コマンドで確認できます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp># </span>macOS で何もオプション指定せずにビルドした場合
+<span class=gp>$ </span>go build -o hello
+<span class=gp>$ </span>file hello
+<span class=go>hello: Mach-O 64-bit executable x86_64
+</span><span class=go></span><span class=err>
+</span><span class=err></span><span class=gp># </span>OS やアーキテクチャを指定してクロスコンパイルした場合
+<span class=gp>$ </span><span class=nv>GOOS</span><span class=o>=</span>linux <span class=nv>GOARCH</span><span class=o>=</span>amd64 go build -o hello
+<span class=gp>$ </span>file hello
+<span class=go>hello: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, Go BuildID=MjRBk0jRAbyfXWsLUypa/ZDyt22XXA4ZiyzbfYl8i/5chB8hOVmP2fY1XwpT95/R7p5BmDr9QZtUfrx80RH, not stripped
+</span></code></pre></div></span>
+</div>
+<h2 id=その他の-tips>その他の Tips</h2>
+<h3 id=コンテナから-https-通信するとき>コンテナから HTTPS 通信するとき</h3>
+<p>コンテナ内のアプリから HTTPS 通信するときは、Root CA 証明書や、タイムゾーン情報が必要になります。
+親イメージにこれらのファイルがない場合は、何らかのイメージからファイルをコピーすることで対応できます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-docker data-lang=docker><span class=k>FROM</span><span class=s> scratch</span><span class=err>
+</span><span class=err></span><span class=k>COPY</span> --from<span class=o>=</span>golang:1.19 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt<span class=err>
+</span><span class=err></span><span class=k>COPY</span> --from<span class=o>=</span>golang:1.19 /usr/share/zoneinfo /usr/share/zoneinfo<span class=err>
+</span></code></pre></div>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=../../p/8k4j2gw/>Ansible タスク例: Docker と Docker Compose をインストールする</a></li>
+<li><a href=../../p/v9r8o5k/>GitHub Actions でコンテナイメージをビルドして Docker Hub へ push する</a></li>
+<li><a href=../../p/ehxgwt4/>TypeScript を使った Node.js アプリを Docker コンテナ化する</a></li>
+<li><a href=../../p/csctaq7/>Docker コンテナで Ansible のテストベッド環境を用意する</a></li>
+<li><a href=../../p/99qo8zf/>Docker コンテナで Nginx サーバーを立ち上げる</a></li>
+<li><a href=../../p/euevcs8/>Docker で Ansible の実行環境用のコンテナを作成する</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/docker>Docker</a></span>
+<span class=xPageTags_item><a href=../../tags/golang>Golang</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=../../p/dj28oy5/><span class=xArticle_up_label>Docker 関連メモ</span><br>へ戻る</a>
+</div>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_next>
+<a href=../../p/ehxgwt4/>TypeScript を使った Node.js アプリを Docker コンテナ化する</a>
+</div>
+</div>
+</aside>
+</article>
+<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
+</main>
+</div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/dj28oy5/>Docker 関連メモ</a>
+</span>
+<span class=xBreadcrumb_item>Go アプリを実行する軽量な Docker コンテナイメージを作成する
+</span>
+</div>
+</aside>
+<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
+<div id=xSiteFooter2>
+<a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
+</div>
+</div>
+<script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c],d=b.getElementsByTagName('img');if(d.length>0)continue;const e=b.getElementsByTagName('svg');if(e.length>0)continue;b.classList.add('xExternalLinkIcon'),b.setAttribute('target','_blank'),b.setAttribute('rel','noopener')}})</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"Docker 関連メモ","item":"https://maku.blog/p/dj28oy5/"},{"@type":"ListItem","position":4,"name":"Go アプリを実行する軽量な Docker コンテナイメージを作成する","item":"https://maku.blog/p/wbtbr8o/"}]}</script>
+</body>
+</html>
