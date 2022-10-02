@@ -534,8 +534,9 @@ Ansible で facts 情報を表示する
 </ul>
 </li>
 <li><a href=#scratch-ベースの実行イメージを作成する>Scratch ベースの実行イメージを作成する</a></li>
-<li><a href=#その他の-tips>その他の Tips</a>
+<li><a href=#おまけ>おまけ</a>
 <ul>
+<li><a href=#docker-compose-でビルド実行をワンステップで行う>Docker Compose でビルド＆実行をワンステップで行う</a></li>
 <li><a href=#コンテナから-https-通信するとき>コンテナから HTTPS 通信するとき</a></li>
 </ul>
 </li>
@@ -708,7 +709,30 @@ Linux の各種機能（ライブラリやシェル）が使えなくなるの�
 <span class=go>hello: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, Go BuildID=MjRBk0jRAbyfXWsLUypa/ZDyt22XXA4ZiyzbfYl8i/5chB8hOVmP2fY1XwpT95/R7p5BmDr9QZtUfrx80RH, not stripped
 </span></code></pre></div></span>
 </div>
-<h2 id=その他の-tips>その他の Tips</h2>
+<h2 id=おまけ>おまけ</h2>
+<h3 id=docker-compose-でビルド実行をワンステップで行う>Docker Compose でビルド＆実行をワンステップで行う</h3>
+<p><a href=https://maku77.github.io/p/qm5k2hx/>Docker Compose を使う</a> と、Docker イメージのビルドからコンテナ起動までをワンステップで実行できるようになります。
+<code>Dockerfile</code> と同じディレクトリに、次のようなファイルを作成すれば準備完了です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>docker-compose.yml</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;3&#34;</span><span class=w>
+</span><span class=w>
+</span><span class=w></span><span class=nt>services</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>web</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=nt>build</span><span class=p>:</span><span class=w> </span><span class=l>.</span><span class=w>
+</span><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=m>8080</span><span class=p>:</span><span class=m>8080</span></code></pre></div></div>
+</figure>
+<p>あとは、<code>docker image</code> や <code>docker container</code> コマンドの代わりに次のような <strong><code>docker compose</code></strong> コマンドを使います。
+イメージ名やコンテナ名は、ディレクトリ名と <code>docker-compose.yml</code> に記述したサービス名から自動生成されるので、コマンド実行時に指定する必要はありません。
+今回の例の場合は、イメージ名は <code>hello_web</code>、コンテナ名は <code>hello-web-1</code> という感じになります。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker compose up     <span class=c1># イメージビルド＆コンテナ起動（-d でバックグラウンド起動）</span>
+<span class=gp>$ </span>docker compose ps     <span class=c1># コンテナの一覧を表示</span>
+<span class=gp>$ </span>docker compose stop   <span class=c1># コンテナを停止</span>
+<span class=gp>$ </span>docker compose start  <span class=c1># 停止されたコンテナを起動</span>
+<span class=gp>$ </span>docker compose rm     <span class=c1># 停止されたコンテナを削除</span>
+<span class=gp>$ </span>docker compose down   <span class=c1># コンテナの停止＆削除</span>
+</code></pre></div><p>とりあえず、<code>docker compose up -d</code> で起動、<code>docker compose down</code> で停止＆削除を覚えておけばなんとかなります。</p>
 <h3 id=コンテナから-https-通信するとき>コンテナから HTTPS 通信するとき</h3>
 <p>コンテナ内のアプリから HTTPS 通信するときは、Root CA 証明書や、タイムゾーン情報が必要になります。
 親イメージにこれらのファイルがない場合は、何らかのイメージからファイルをコピーすることで対応できます。</p>
