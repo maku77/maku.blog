@@ -228,8 +228,38 @@ hello: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, G
 {{% /note %}}
 
 
-その他の Tips
+おまけ
 ----
+
+### Docker Compose でビルド＆実行をワンステップで行う
+
+[Docker Compose を使う](https://maku77.github.io/p/qm5k2hx/) と、Docker イメージのビルドからコンテナ起動までをワンステップで実行できるようになります。
+`Dockerfile` と同じディレクトリに、次のようなファイルを作成すれば準備完了です。
+
+{{< code lang="yaml" title="docker-compose.yml" >}}
+version: "3"
+
+services:
+  web:
+    build: .
+    ports:
+      - 8080:8080
+{{< /code >}}
+
+あとは、`docker image` や `docker container` コマンドの代わりに次のような __`docker compose`__ コマンドを使います。
+イメージ名やコンテナ名は、ディレクトリ名と `docker-compose.yml` に記述したサービス名から自動生成されるので、コマンド実行時に指定する必要はありません。
+今回の例の場合は、イメージ名は `hello_web`、コンテナ名は `hello-web-1` という感じになります。
+
+```console
+$ docker compose up     # イメージビルド＆コンテナ起動（-d でバックグラウンド起動）
+$ docker compose ps     # コンテナの一覧を表示
+$ docker compose stop   # コンテナを停止
+$ docker compose start  # 停止されたコンテナを起動
+$ docker compose rm     # 停止されたコンテナを削除
+$ docker compose down   # コンテナの停止＆削除
+```
+
+とりあえず、`docker compose up -d` で起動、`docker compose down` で停止＆削除を覚えておけばなんとかなります。
 
 ### コンテナから HTTPS 通信するとき
 
