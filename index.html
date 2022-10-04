@@ -518,13 +518,11 @@ GraphQL クライアントの開発中は、接続先の GraphQL サーバーも
 開発中にのみ使用するツールなので、<strong><code>-D</code></strong> オプションを付けて <code>devDependencies</code> としてインストールします。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp># </span>yarn の場合
 <span class=gp>$ </span>yarn add graphql
-<span class=gp>$ </span>yarn add -D typescript
-<span class=gp>$ </span>yarn add -D @graphql-codegen/cli
+<span class=gp>$ </span>yarn add -D typescript @graphql-codegen/cli
 <span class=err>
 </span><span class=err></span><span class=gp># </span>npm の場合
 <span class=gp>$ </span>npm install graphql
-<span class=gp>$ </span>npm install -D typescript
-<span class=gp>$ </span>npm install -D @graphql-codegen/cli
+<span class=gp>$ </span>npm install -D typescript @graphql-codegen/cli
 </code></pre></div><p>これにより、<code>node_modules/.bin</code> 以下に <strong><code>graphql-codegen</code></strong> というコマンドがインストールされます。
 <code>graphql-code-generator</code> というコマンドもインストールされますが、ただのエイリアスなので前者の短いコマンドを使えば OK です。
 次のようにヘルプを確認できます（<code>-s</code> オプションは <code>yarn</code> の冗長な出力を抑制するオプションです）。</p>
@@ -582,8 +580,19 @@ GraphQL クライアントの開発中は、接続先の GraphQL サーバーも
 </figure>
 <p><strong><code>schema</code></strong> プロパティが「入力するスキーマ」の場所を示していて、<strong><code>documents</code></strong> プロパティが「クエリ（ドキュメント）」を抽出する場所を示しています。
 <code>documents</code> プロパティのデフォルトは <code>.tsx</code> ファイルのみを参照するようになっていますが、<strong><code>.ts</code> ファイルも参照するように</strong> 次のように修正しておいた方がよいかもしれません。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts>  <span class=nx>documents</span><span class=o>:</span> <span class=s2>&#34;src/**/*.{ts,tsx}&#34;</span><span class=p>,</span>
-</code></pre></div><p><code>graphql-codegen init</code> コマンドは <code>package.json</code> を更新することがあるので、依存パッケージをインストールしておきます（これも指示される通り実行すれば OK）。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>documents</span><span class=o>:</span> <span class=s2>&#34;src/**/*.{ts,tsx}&#34;</span><span class=p>,</span>
+</code></pre></div><p>設定ファイルは <code>.ts</code> 形式ではなく、<code>.yml</code> 形式で作成することもできます。
+設定ファイルの編集時に入力補完されなくてもよいのであれば、YAML 形式を使った方がスッキリするかもしれません。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>codegen.yml</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>overwrite</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w></span><span class=nt>schema</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;http://localhost:8080/graphql&#39;</span><span class=w>
+</span><span class=w></span><span class=nt>documents</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;src/**/*.{ts,tsx}&#39;</span><span class=w>
+</span><span class=w></span><span class=nt>generates</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>src/gql</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=nt>preset</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;client&#39;</span></code></pre></div></div>
+</figure>
+<p><code>graphql-codegen init</code> コマンドは <code>package.json</code> を更新することがあるので、依存パッケージをインストールしておきます（これも指示される通り実行すれば OK）。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>yarn         <span class=c1># yarn の場合</span>
 <span class=gp>$ </span>npm install  <span class=c1># npm の場合</span>
 </code></pre></div><h2 id=型情報の自動生成>型情報の自動生成</h2>
