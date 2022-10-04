@@ -34,13 +34,11 @@ GraphQL Code Generator のコマンドラインツール (CLI) は __`@graphql-c
 ```console
 # yarn の場合
 $ yarn add graphql
-$ yarn add -D typescript
-$ yarn add -D @graphql-codegen/cli
+$ yarn add -D typescript @graphql-codegen/cli
 
 # npm の場合
 $ npm install graphql
-$ npm install -D typescript
-$ npm install -D @graphql-codegen/cli
+$ npm install -D typescript @graphql-codegen/cli
 ```
 
 これにより、`node_modules/.bin` 以下に __`graphql-codegen`__ というコマンドがインストールされます。
@@ -114,9 +112,20 @@ __`schema`__ プロパティが「入力するスキーマ」の場所を示し�
 `documents` プロパティのデフォルトは `.tsx` ファイルのみを参照するようになっていますが、__`.ts` ファイルも参照するように__ 次のように修正しておいた方がよいかもしれません。
 
 ```ts
-  documents: "src/**/*.{ts,tsx}",
+documents: "src/**/*.{ts,tsx}",
 ```
 
+設定ファイルは `.ts` 形式ではなく、`.yml` 形式で作成することもできます。
+設定ファイルの編集時に入力補完されなくてもよいのであれば、YAML 形式を使った方がスッキリするかもしれません。
+
+{{< code lang="yaml" title="codegen.yml" >}}
+overwrite: true
+schema: 'http://localhost:8080/graphql'
+documents: 'src/**/*.{ts,tsx}'
+generates:
+  src/gql:
+    preset: 'client'
+{{< /code >}}
 
 `graphql-codegen init` コマンドは `package.json` を更新することがあるので、依存パッケージをインストールしておきます（これも指示される通り実行すれば OK）。
 
