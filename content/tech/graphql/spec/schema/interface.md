@@ -3,33 +3,78 @@ title: "GraphQL スキーマ仕様: インタフェース型 (interface type)"
 url: "p/yp9mv5d/"
 date: "2022-09-14"
 tags: ["GraphQL"]
-draft: true
 ---
 
-インタフェース型は、それを `implements` する具象型が必ず備えているべきフィールド群を定義します。
+GraphQL のインタフェース型は、複数の型が共通して持つフィールドを定義するための抽象型で、__`interface`__ キーワードを使って定義します。
+次の `ScheduleItem` インタフェースは、2 つのフィールド（`id` と `title`）を持つことを示しています。
+インタフェースを実装する (__`imlements`__) 側の型は、必ず `id` と `title` フィールドを持つ必要があります。
 
-```graphql
-interface SearchResultItem {
-    id: ID!
-    content: String!
+{{< code lang="graphql" title="スキーマ定義" >}}
+# 共通のインタフェースを定義
+interface ScheduleItem {
+  id: ID!
+  title: String!
 }
 
-type Task implements SearchResultItem {
-    # ...
-    approachCount: Int!
+# Task 型は必ず id と title フィールドを持つ
+type Task implements ScheduleItem {
+  id: ID!
+  title: String!
+  content: String
 }
 
-type Approach implements SearchResultItem {
-    # ...
-    task: Task!
+# Milestone 型は必ず id と title フィールドを持つ
+type Milestone implements ScheduleItem {
+  id: ID!
+  title: String!
+  date: DateTime
 }
+
+scalar DateTime
 
 type Query {
-    # ...
-    search(term: String!): [SearchResultItem!]
+  allItems(): [ScheduleItem!]
+}
+{{< /code >}}
+
+上記の `Task` 型と `Milestone` 型は、`ScheduleItem` というインタフェースを実装しています。
+`allItems` クエリは、`Task` と `Milestone` を要素に持つリストを返すことを想定していますが、戻り値のリスト要素の型が `ScheduleItem` になっているため、必ず `id` と `title` フィールドが含まれることが保証されています。
+クエリ内でリスト要素を参照するときは、次のように直接これらのフィールドを参照できます。
+
+{{< code lang="graphql" title="クエリ" >}}
+query QueryAllItems {
+  allItems {
+    id
+    title
+  }
+}
+{{< /code >}}
+
+一方、`Task` 型や `Milestone` 型にしか含まれないフィールドを取得したいときは、次のように [インラインフラグメント (`... on Xxx`)](/p/wiv7it5/#inline) の形で分岐させて参照する必要があります。
+
+{{< code lang="graphql" title="クエリ" >}}
+query QueryAllItems {
+  allItems {
+    id
+    title
+    ... on Task {
+      content
+    }
+    ... on Milestone {
+      date
+    }
+  }
+}
+{{< /code >}}
+
+複数のインタフェースを実装したいときは、次のように `implements` の後ろにインタフェース名を __`&`__ で並べます。
+
+```graphql
+"""
+Represents a Milestone object on a given repository.
+"""
+type Milestone implements Closable & Node & UniformResourceLocatable {
+  # ...
 }
 ```
-
-上記の `Task` 型と `Approach` 型は、`SearchResultItem` というインタフェースを備えていることを保証しています。
-`search` クエリは `Task` 型と `Approarch` 型のどちらかのオブジェクトを返すことを想定していますが、いずれも `SearchResultItem` インタフェースを備えているため、インラインフィールド (`... on Task`) による分岐を行わずにそのフィールドを参照できます。
 

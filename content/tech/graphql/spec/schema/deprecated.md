@@ -3,7 +3,6 @@ title: "GraphQL スキーマ仕様: @deprecated ディレクティブで非推�
 url: "p/bg9g8rc/"
 date: "2022-09-14"
 tags: ["GraphQL"]
-draft: true
 ---
 
 {{% private %}}

@@ -3,6 +3,7 @@ title: "GraphQL 関連用語"
 url: "p/jz78nmk/"
 date: "2021-07-26"
 tags: ["GraphQL"]
+weight: 1
 ---
 
 {{< image src="img-001.drawio.svg" >}}
@@ -27,12 +28,12 @@ HTTP Post リクエストで指定する場合は、ペイロードの JSON 内�
 マルチ操作ドキュメント (multi-operation documents)
 : 複数の query や mutation リクエストを含むドキュメント。どの操作を実行するかは、操作名 (operation name) で指定します。
 
-クエリ変数 (query variables)
-: `query User($name: String!) {...}` などの `$name` の部分のこと。`{"name": "maku"}` のように表現します。
-HTTP Get リクエストで指定する場合は、`variable` というクエリパラメーターで指定します。
-HTTP Post リクエストで指定する場合は、ペイロードの JSON 内の `variables` プロパティで指定します。
+変数 (variables)
+: `query` や `mutation` などの各操作に与えることのできる、キー＆バリューの形で定義する値。`query GetUser($id: ID!) {...}` などの `($id: ID!)` の部分で変数の名前と型を定義し、実際に渡す変数値は `{"id": "maku"}` のような JSON 形式のキー＆バリューで定義します。
+HTTP Get リクエストで変数値を指定する場合は、`variable` というクエリパラメーターで指定します。
+HTTP Post リクエストで変数値を指定する場合は、ペイロードの JSON 内の `variables` プロパティで指定します。
 
-クエリ引数 (query arguments)
+フィールド引数 (field arguments)
 : `book(id: "xyz") {...}` など、フィールド参照時に指定する `id: "xyz"` の部分のこと。クエリに変数が渡されている場合は、ここで `book(id: $bookId)` のような感じで参照できます。
 
 選択セット、セレクションセット (selection sets)
