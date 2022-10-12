@@ -60,7 +60,7 @@ query QueryAllItems {
     ... on Task {
       content
     }
-    ... onMilestone {
+    ... on Milestone {
       date
     }
   }

@@ -45,7 +45,7 @@ type Character {
 
 列挙型の典型的な使用例として、ソート用のフィールド・パラメーターがあります。
 下記は、GitHub の GraphQL スキーマで定義されている列挙型の例です。
-`GistOrder` [入力型](/p/nhhwqtu/) のフィールドに、`GitOrderField` 列挙型が使われています。
+`GistOrder` [入力型](/p/nhhwqtu/) のフィールドに、`GistOrderField` 列挙型が使われています。
 
 {{< code lang="graphql" title="GitHub の GraphQL スキーマ（抜粋）" >}}
 """

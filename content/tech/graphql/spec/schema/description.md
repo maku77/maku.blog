@@ -5,7 +5,7 @@ date: "2022-09-14"
 tags: ["GraphQL"]
 ---
 
-GraphQL スキーマには、Python の docstring と同様のフォーマットで __description__ というドキュメントを付加できます。
+GraphQL スキーマで定義する型には、Python の docstring と同様のフォーマットで __description__ というドキュメントを付加できます。
 description は型の直前、あるいはフィールドの直前に、3 つのクォート (`"""`) で囲む形で記述します。
 
 {{< code lang="graphql" title="description の記述例" >}}
@@ -36,7 +36,7 @@ type Query {
 }
 {{< /code >}}
 
-description 情報は、各種ツール（GraphiQL など）が参照して利用します。
+GraphQL スキーマ内の description はただのコメントではなく、その型のプロパティとして扱われ、[GraphiQL](https://github.com/graphql/graphiql) などの各種ツールがその情報を参照して利用します。
 GraphQL スキーマの型名やフィールド名だけで表現できる情報は限られているので、ほぼすべての型、フィールドに対して description を設定するのはよいプラクティスです。
 下記は GitHub の GraphQL API のスキーマです。
 description の記述方法の参考になります。

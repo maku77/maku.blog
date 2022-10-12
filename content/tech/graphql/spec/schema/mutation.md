@@ -42,6 +42,9 @@ func (r *mutationResolver) CreateBook(
 		Author: author,
 	}
 	// 本当はこのあたりで DB などに book を追加
+	// if err := db.AddBook(book); err != nil {
+	//     return nil, err
+	// }
 	return book, nil
 }
 {{< /code >}}
