@@ -3,6 +3,8 @@ title: "GraphQL Code Generator でスキーマから TypeScript の型情報を�
 url: "p/n2k2hxd/"
 date: "2022-10-03"
 tags: ["GraphQL"]
+changes:
+  - 2022-10-14: ESLint の無視設定について
 ---
 
 GraphQL Code Generator とは
@@ -239,4 +241,18 @@ export const MyComponent: FC = () => {
 
 これで GraphQL クエリ用の型情報を自力で定義する必要がなくなりました！
 ちなみに、自動生成された `graphql` 関数は、引数で渡す GraphQL ドキュメント（文字列リテラル）をキーにして戻り値を決めるという実装になっているため、文字列リテラルを 1 文字でも変えたら（スペースでも）、`graphql-codegen` によるコードの再生成が必要になることに注意してください。
+
+
+自動生成されたコードを ESLint の解析対象外にする
+----
+
+ESLint による TypeScript コードの静的解析を行っている場合は、`graphql-codegen` で生成されたコードに対する警告がいっぱい出ると思います。
+[ESLint の無視設定](https://eslint.org/docs/latest/user-guide/configuring/ignoring-code) で、`graphql-codegen` の出力先ディレクトリを無視するように設定しましょう。
+
+{{< code lang="yaml" title=".eslintrc.yml" >}}
+root: true
+# 自動生成されるコードは ESLint の解析対象外にする
+ignorePatterns:
+  - src/gql/
+{{< /code >}}
 
