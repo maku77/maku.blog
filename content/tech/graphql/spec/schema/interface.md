@@ -1,5 +1,5 @@
 ---
-title: "GraphQL スキーマ仕様: インタフェース型 (interface type)"
+title: "GraphQL スキーマ仕様: インタフェース型 (interface type) を定義する"
 url: "p/yp9mv5d/"
 date: "2022-09-14"
 tags: ["GraphQL"]
