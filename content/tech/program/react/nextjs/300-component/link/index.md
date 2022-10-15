@@ -3,6 +3,8 @@ title: "Next.js アプリでのリンク方法まとめ（Material-UI との連�
 url: "/p/vgs4dnw"
 date: "2021-08-10"
 tags: ["Material-UI", "Next.js"]
+changes:
+  - 2022-10-11: クエリパラメーター部分の変更方法について
 ---
 
 {{% private %}}
@@ -96,7 +98,7 @@ export const ExternalLink: FC<Props> = ({ url, title }: Props) => {
 Next.js の Link コンポーネント以下に Material-UI の UI コンポーネントを配置する
 ----
 
-Next.js の Link コンポーネント (`next/link`) で独自のコンポーネントをリンクとして動作させるためには、ちょっとしたポイントがあります。
+Next.js の Link コンポーネント (`next/link`) で独自のコンポーネントをリンクとして動作させるためには、ちょっとしたコツがあります。
 
 Material-UI は独自のコンポーネントとして、[Link](https://next.material-ui.com/components/links/) や [Button](https://next.material-ui.com/components/buttons/) を持っており、これらに `href` プロパティを指定することによって、`a` 要素としてレンダリングするようになっています（Material-UI の `Link` と Next.js の `Link` は別物なので注意）。
 ダイレクトに `a` 要素を使わないのは、Material-UI が提供する UI 表現を使用するためですね。
@@ -129,7 +131,7 @@ Next.js の `Link` コンポーネント (`next/link`) の `href` プロパテ�
 `passHref` を指定しなくても、Next.js のクライアントサイド JS でリンク機能が動作するため、一見正しく動いているかのように見えますが、`a` 要素の `href` 属性がされないため、SEO 的に不利な Web サイトになってしまいます（さらに、Material-UI の `Button` コンポーネントの場合は、`href` が渡されないと、`a` 要素ではなく `button` 要素として出力されてしまいます）。
 
 
-プログラム内部でリダイレクト
+プログラム内部でリダイレクト (Router.replace, window.location)
 ----
 
 {{< code lang="tsx" >}}
@@ -138,8 +140,68 @@ Next.js の `Link` コンポーネント (`next/link`) の `href` プロパテ�
 Router.replace('/list/users')
 {{< /code >}}
 
-`Router.replace` を使うと、リダイレクト前の URL がブラウザの履歴に残りません（最初からこの URL でアクセスしたかのように振る舞います）。
+__`Router.replace`__ を使うと、リダイレクト前の URL がブラウザの履歴に残りません（最初からこの URL でアクセスしたかのように振る舞います）。
 
-アプリ内のルーティングではなく、外部 URL へ移動する場合は、`next/router` ではなく `window.location` を使用します。
+アプリ内のルーティングではなく、外部 URL へ移動する場合は、`next/router` ではなく __`window.location`__ を使用します。
 これは、外部リンク用のコンポーネントとして `next/link` ではなく `<a>` を使用するのと同じ理由です。
+
+
+クエリパラメーターを変更するリンク
+----
+
+リンクをクリックしたときに、URL 末尾のクエリパラメーター部分（`?key=value` みたいなところ）を変更したいときは、Next.js の `Link` コンポーネントの `href` 属性に、URL を表す文字列の代わりに `UrlObject` オブジェクトを指定します。
+このオブジェクトの __`query`__ プロパティで指定した値が、遷移先の URL の末尾にクエリパラメーターとして付加されます。
+
+```tsx
+// import Link from 'next/link'
+
+<Link href={{
+  query: {
+    key1: 'value1',
+    key2: 'value2',
+  },
+}}>...</Link>
+```
+
+上記のようにすると、ページのパス自体は変更されず、クエリパラメーター部分だけが変更されます。
+例えば、`https://example.com/hello` ページから上記リンクをクリックすると、URL は `https://example.com/hello?key1=value1&key2=value2` に変化します。
+
+リンククリック時にパス部分も変更したい場合（ページ遷移したい場合）は、次のように __`href`__ プロパティを一緒に指定します。
+
+```tsx
+<Link href={{
+  href: './other-page',
+  query: {
+    key1: 'value1',
+    key2: 'value2',
+  },
+}}>
+```
+
+カレント URL に含まれているクエリパラメーターの一部だけを変更したい場合は、`useRouter` フックで現在のクエリパラメーターを取得した上で、変更する値を組み合わせます。
+
+```tsx
+import { RC } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+
+export const MyComponent: FC = () => {
+  const router = useRouter()
+  const query = router.query  // カレント URL に含まれるクエリパラメーター
+
+  return <>
+    <Link
+      href={{
+        query: {
+          ...query,
+          key2: 'newValue',
+        },
+      }}
+    >...</Link>
+  </>
+}
+```
+
+上記のリンクをクリックすると、URL のクエリパラメーターの `key2=newValue` という部分だけが書き変わります（他のパラメーターは維持されます）。
+`Link` コンポーネントではなく、関数呼び出しでクエリパラメーターを変更したいときは、__`router.push`__ や __`router.replace`__ に同様のオブジェクトを渡してやれば OK です。
 

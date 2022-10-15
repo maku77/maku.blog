@@ -69,12 +69,11 @@ Pre-rendering じゃないのは、CSR: Client-side Rendering のみです。
 例として、ローカルファイルや、データベースなどに格納された「本の一覧」を表示する `books` インデックスページを考えてみます。
 こういった __インデックスページ__ を Web サイトのビルド時に生成するには、__`getStaticProps`__ 関数を実装して、戻り値の __`props`__ プロパティで一覧情報を返すように実装します。
 `props` プロパティの値はページコンポーネントの引数として渡されるため、その値を参照して「本の一覧」を表示することができます。
-下記のサンプルコードでは、`props` プロパティの型を `Props` として定義しています。
+下記のサンプルコードでは、`props` プロパティの型を `PageProps` として定義しています。
 
 {{< code lang="tsx" title="pages/books/index.tsx" >}}
+import { GetStaticProps, NextPage } from 'next'
 import Link from 'next/link'
-import React from 'react'
-import { GetStaticProps } from 'next'
 
 type Book = {
   id: string;
@@ -82,12 +81,12 @@ type Book = {
 }
 
 // ページコンポーネントに渡されるデータ
-type Props = {
+type PageProps = {
   books: Book[];
 }
 
 // この関数がビルド時に呼び出され、戻り値の props の値がページコンポーネントに渡される
-export const getStaticProps: GetStaticProps<Props> = async context => {
+export const getStaticProps: GetStaticProps<PageProps> = async context => {
   // 本来は、ここで外部 API などを呼び出してデータを取得する
   const books = [
     { id: '001', title: 'Title-1' },
@@ -100,7 +99,7 @@ export const getStaticProps: GetStaticProps<Props> = async context => {
 }
 
 // ページコンポーネントの実装
-const BooksPage: React.FC<Props> = ({ books }) => (
+const BooksPage: NextPage<PageProps> = ({ books }) => (
   <>
     <h2>Book list</h2>
     <ul>
