@@ -578,7 +578,8 @@ GraphQL スキーマ仕様: 列挙型 (enum type) を定義する
 </li>
 <li><a href=#外部リンク>外部リンク</a></li>
 <li><a href=#nextjs-の-link-コンポーネント以下に-material-ui-の-ui-コンポーネントを配置する>Next.js の Link コンポーネント以下に Material-UI の UI コンポーネントを配置する</a></li>
-<li><a href=#プログラム内部でリダイレクト>プログラム内部でリダイレクト</a></li>
+<li><a href=#プログラム内部でリダイレクト-routerreplace-windowlocation>プログラム内部でリダイレクト (Router.replace, window.location)</a></li>
+<li><a href=#クエリパラメーターを変更するリンク>クエリパラメーターを変更するリンク</a></li>
 </ul>
 </nav><h2 id=アプリ内ページへのリンク基本>アプリ内ページへのリンク（基本）</h2>
 <figure class=xCodeBlock>
@@ -652,7 +653,7 @@ GraphQL スキーマ仕様: 列挙型 (enum type) を定義する
 <figcaption>図: 表示結果</figcaption>
 </figure>
 <h2 id=nextjs-の-link-コンポーネント以下に-material-ui-の-ui-コンポーネントを配置する>Next.js の Link コンポーネント以下に Material-UI の UI コンポーネントを配置する</h2>
-<p>Next.js の Link コンポーネント (<code>next/link</code>) で独自のコンポーネントをリンクとして動作させるためには、ちょっとしたポイントがあります。</p>
+<p>Next.js の Link コンポーネント (<code>next/link</code>) で独自のコンポーネントをリンクとして動作させるためには、ちょっとしたコツがあります。</p>
 <p>Material-UI は独自のコンポーネントとして、<a href=https://next.material-ui.com/components/links/>Link</a> や <a href=https://next.material-ui.com/components/buttons/>Button</a> を持っており、これらに <code>href</code> プロパティを指定することによって、<code>a</code> 要素としてレンダリングするようになっています（Material-UI の <code>Link</code> と Next.js の <code>Link</code> は別物なので注意）。
 ダイレクトに <code>a</code> 要素を使わないのは、Material-UI が提供する UI 表現を使用するためですね。</p>
 <figure class=xCodeBlock>
@@ -680,15 +681,58 @@ GraphQL スキーマ仕様: 列挙型 (enum type) を定義する
 </figure>
 <p>Next.js の <code>Link</code> コンポーネント (<code>next/link</code>) の <code>href</code> プロパティで指定した値を子要素に伝搬させるために、<strong><code>passHref</code></strong> プロパティを指定するのがポイントです。
 <code>passHref</code> を指定しなくても、Next.js のクライアントサイド JS でリンク機能が動作するため、一見正しく動いているかのように見えますが、<code>a</code> 要素の <code>href</code> 属性がされないため、SEO 的に不利な Web サイトになってしまいます（さらに、Material-UI の <code>Button</code> コンポーネントの場合は、<code>href</code> が渡されないと、<code>a</code> 要素ではなく <code>button</code> 要素として出力されてしまいます）。</p>
-<h2 id=プログラム内部でリダイレクト>プログラム内部でリダイレクト</h2>
+<h2 id=プログラム内部でリダイレクト-routerreplace-windowlocation>プログラム内部でリダイレクト (Router.replace, window.location)</h2>
 <figure class=xCodeBlock>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=c1>// import Router from &#39;next/router&#39;
 </span><span class=c1></span>
 <span class=nx>Router</span><span class=p>.</span><span class=nx>replace</span><span class=p>(</span><span class=s1>&#39;/list/users&#39;</span><span class=p>)</span></code></pre></div></div>
 </figure>
-<p><code>Router.replace</code> を使うと、リダイレクト前の URL がブラウザの履歴に残りません（最初からこの URL でアクセスしたかのように振る舞います）。</p>
-<p>アプリ内のルーティングではなく、外部 URL へ移動する場合は、<code>next/router</code> ではなく <code>window.location</code> を使用します。
+<p><strong><code>Router.replace</code></strong> を使うと、リダイレクト前の URL がブラウザの履歴に残りません（最初からこの URL でアクセスしたかのように振る舞います）。</p>
+<p>アプリ内のルーティングではなく、外部 URL へ移動する場合は、<code>next/router</code> ではなく <strong><code>window.location</code></strong> を使用します。
 これは、外部リンク用のコンポーネントとして <code>next/link</code> ではなく <code>&lt;a></code> を使用するのと同じ理由です。</p>
+<h2 id=クエリパラメーターを変更するリンク>クエリパラメーターを変更するリンク</h2>
+<p>リンクをクリックしたときに、URL 末尾のクエリパラメーター部分（<code>?key=value</code> みたいなところ）を変更したいときは、Next.js の <code>Link</code> コンポーネントの <code>href</code> 属性に、URL を表す文字列の代わりに <code>UrlObject</code> オブジェクトを指定します。
+このオブジェクトの <strong><code>query</code></strong> プロパティで指定した値が、遷移先の URL の末尾にクエリパラメーターとして付加されます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=c1>// import Link from &#39;next/link&#39;
+</span><span class=c1></span>
+<span class=p>&lt;</span><span class=nt>Link</span> <span class=na>href</span><span class=o>=</span><span class=p>{{</span>
+  <span class=nx>query</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>key1</span><span class=o>:</span> <span class=s1>&#39;value1&#39;</span><span class=p>,</span>
+    <span class=nx>key2</span><span class=o>:</span> <span class=s1>&#39;value2&#39;</span><span class=p>,</span>
+  <span class=p>},</span>
+<span class=p>}}&gt;...&lt;/</span><span class=nt>Link</span><span class=p>&gt;</span>
+</code></pre></div><p>上記のようにすると、ページのパス自体は変更されず、クエリパラメーター部分だけが変更されます。
+例えば、<code>https://example.com/hello</code> ページから上記リンクをクリックすると、URL は <code>https://example.com/hello?key1=value1&key2=value2</code> に変化します。</p>
+<p>リンククリック時にパス部分も変更したい場合（ページ遷移したい場合）は、次のように <strong><code>href</code></strong> プロパティを一緒に指定します。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=p>&lt;</span><span class=nt>Link</span> <span class=na>href</span><span class=o>=</span><span class=p>{{</span>
+  <span class=nx>href</span><span class=o>:</span> <span class=s1>&#39;./other-page&#39;</span><span class=p>,</span>
+  <span class=nx>query</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>key1</span><span class=o>:</span> <span class=s1>&#39;value1&#39;</span><span class=p>,</span>
+    <span class=nx>key2</span><span class=o>:</span> <span class=s1>&#39;value2&#39;</span><span class=p>,</span>
+  <span class=p>},</span>
+<span class=p>}}&gt;</span>
+</code></pre></div><p>カレント URL に含まれているクエリパラメーターの一部だけを変更したい場合は、<code>useRouter</code> フックで現在のクエリパラメーターを取得した上で、変更する値を組み合わせます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>RC</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;react&#39;</span>
+<span class=kr>import</span> <span class=nx>Link</span> <span class=kr>from</span> <span class=s1>&#39;next/link&#39;</span>
+<span class=kr>import</span> <span class=p>{</span> <span class=nx>useRouter</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;next/router&#39;</span>
+
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>MyComponent</span>: <span class=kt>FC</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=nx>router</span> <span class=o>=</span> <span class=nx>useRouter</span><span class=p>()</span>
+  <span class=kr>const</span> <span class=nx>query</span> <span class=o>=</span> <span class=nx>router</span><span class=p>.</span><span class=nx>query</span>  <span class=c1>// カレント URL に含まれるクエリパラメーター
+</span><span class=c1></span>
+  <span class=k>return</span> <span class=p>&lt;&gt;</span>
+    <span class=p>&lt;</span><span class=nt>Link</span>
+      <span class=na>href</span><span class=o>=</span><span class=p>{{</span>
+        <span class=nx>query</span><span class=o>:</span> <span class=p>{</span>
+          <span class=p>...</span><span class=nx>query</span><span class=p>,</span>
+          <span class=nx>key2</span><span class=o>:</span> <span class=s1>&#39;newValue&#39;</span><span class=p>,</span>
+        <span class=p>},</span>
+      <span class=p>}}</span>
+    <span class=p>&gt;...&lt;/</span><span class=nt>Link</span><span class=p>&gt;</span>
+  <span class=p>&lt;/&gt;</span>
+<span class=p>}</span>
+</code></pre></div><p>上記のリンクをクリックすると、URL のクエリパラメーターの <code>key2=newValue</code> という部分だけが書き変わります（他のパラメーターは維持されます）。
+<code>Link</code> コンポーネントではなく、関数呼び出しでクエリパラメーターを変更したいときは、<strong><code>router.push</code></strong> や <strong><code>router.replace</code></strong> に同様のオブジェクトを渡してやれば OK です。</p>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">

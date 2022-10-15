@@ -13,7 +13,7 @@
 <meta property="og:image:height" content="746">
 <meta property="og:description" content="クエリ文字列とは https://example.com/todos?sortby=title&order=asc  URL のクエリ文字列（クエリパラメーター）というのは、上記のような URL の末尾の ? 以降の、sortby=title&order=asc の部分のことを指します。 この部分を参照する方法としては、主に次の 2 種類の方法があります。
  クライアントサイド JS &mldr; useRouter フックを使う サーバーサイド JS &mldr; getServerSideProps に渡されるパラメーターを使う  クライアントサイド JS からクエリパラメーターを参照する (router.query) Next.js の useRouter フック を使うと、上記のようなクエリパラメーター部分を簡単に抽出することができます。 次の例では、クエリパラメーターとして渡された sortby と order の値を取得しています。 値が省略された場合は、それぞれの値は undefined になります。
-src/pages/todos.tsx import { FC } from 'react' import { useRouter } from 'next/router' const TodosPage: FC = () => { const router = useRouter() const { sortby, order } = router.">
+src/pages/todos.tsx import { NextPage } from 'next' import { useRouter } from 'next/router' const TodosPage: NextPage = () => { const router = useRouter() const { sortby, order } = router.">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -589,13 +589,16 @@ GraphQL スキーマ仕様: 列挙型 (enum type) を定義する
 値が省略された場合は、それぞれの値は <code>undefined</code> になります。</p>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>src/pages/todos.tsx</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>FC</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;react&#39;</span>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>NextPage</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;next&#39;</span>
 <span class=kr>import</span> <span class=p>{</span> <span class=nx>useRouter</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;next/router&#39;</span>
 
-<span class=kr>const</span> <span class=nx>TodosPage</span>: <span class=kt>FC</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+<span class=kr>const</span> <span class=nx>TodosPage</span>: <span class=kt>NextPage</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
   <span class=kr>const</span> <span class=nx>router</span> <span class=o>=</span> <span class=nx>useRouter</span><span class=p>()</span>
   <span class=kr>const</span> <span class=p>{</span> <span class=nx>sortby</span><span class=p>,</span> <span class=nx>order</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>router</span><span class=p>.</span><span class=nx>query</span>
 
+  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>sortby</span><span class=p>)</span>  <span class=c1>// 指定されていなければ undefined
+</span><span class=c1></span>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>order</span><span class=p>)</span>   <span class=c1>// 指定されていなければ undefined
+</span><span class=c1></span>
   <span class=k>return</span> <span class=p>(</span>
     <span class=p>&lt;</span><span class=nt>p</span><span class=p>&gt;{</span> <span class=nx>sortby</span> <span class=p>}</span> <span class=err>で</span> <span class=p>{</span> <span class=nx>order</span> <span class=o>===</span> <span class=s1>&#39;asc&#39;</span> <span class=o>?</span> <span class=s1>&#39;昇順&#39;</span> <span class=o>:</span> <span class=s1>&#39;降順&#39;</span> <span class=p>}</span> <span class=err>ソートします</span><span class=p>&lt;/</span><span class=nt>p</span><span class=p>&gt;</span>
   <span class=p>)</span>
@@ -615,21 +618,35 @@ GraphQL スキーマ仕様: 列挙型 (enum type) を定義する
 <p>Web サイトへのアクセス時に必ずサーバーサイドで呼び出される <code>getServerSideProps</code> 関数では、関数のパラメーターとしてクエリパラメーターを受け取ることができます。</p>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>serverSideProps 内でのクエリパラメーターの参照</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>GetServerSideProps</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;next&#39;</span>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>GetServerSideProps</span><span class=p>,</span> <span class=nx>NextPage</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;next&#39;</span>
 
-<span class=kr>export</span> <span class=kr>const</span> <span class=nx>getServerSideProps</span>: <span class=kt>GetServerSideProps</span><span class=p>&lt;</span><span class=nt>PageProps</span><span class=p>&gt;</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>context</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=p>{</span> <span class=nx>id</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>context</span><span class=p>.</span><span class=nx>params</span> <span class=kr>as</span> <span class=nx>PathParams</span> <span class=c1>// /books/[id] の id 部分など
-</span><span class=c1></span>  <span class=kr>const</span> <span class=p>{</span> <span class=nx>sortby</span><span class=p>,</span> <span class=nx>order</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>context</span><span class=p>.</span><span class=nx>query</span>  <span class=c1>// URL の ? 以降のクエリパラメーター
-</span><span class=c1></span>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>id</span><span class=p>)</span>
-  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>sortby</span><span class=p>)</span>
-  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>order</span><span class=p>)</span>
+<span class=cm>/** ページの描画に使用するデータ（NextPage コンポーネントへの入力） */</span>
+<span class=kr>type</span> <span class=nx>PageProps</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>todos</span>: <span class=kt>Todo</span><span class=p>[]</span>
+<span class=p>}</span>
 
-  <span class=k>return</span> <span class=p>{</span>
-    <span class=nx>props</span><span class=o>:</span> <span class=p>{</span>
-      <span class=c1>// PageProps 型の情報を詰める
-</span><span class=c1></span>    <span class=p>}</span>
+<span class=cm>/** サーバーサイドでのデータ取得処理 */</span>
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>getServerSideProps</span>: <span class=kt>GetServerSideProps</span><span class=p>&lt;</span><span class=nt>PageProps</span><span class=p>&gt;</span> <span class=o>=</span>
+  <span class=kr>async</span> <span class=p>(</span><span class=nx>context</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=p>{</span> <span class=nx>sortby</span><span class=p>,</span> <span class=nx>order</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>context</span><span class=p>.</span><span class=nx>query</span>  <span class=c1>// URL の ? 以降のクエリパラメーター
+</span><span class=c1></span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>sortby</span><span class=p>)</span>  <span class=c1>// 指定されていなければ undefined
+</span><span class=c1></span>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>order</span><span class=p>)</span>   <span class=c1>// 指定されていなければ undefined
+</span><span class=c1></span>
+    <span class=c1>// 指定されたクエリパラメーターに基づいてデータ取得
+</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>props</span>: <span class=kt>PageProps</span> <span class=o>=</span> <span class=p>{</span>
+      <span class=nx>todos</span>: <span class=kt>db.getTodos</span><span class=p>(</span><span class=nx>sortBy</span><span class=p>,</span> <span class=nx>order</span><span class=p>)</span>
+    <span class=p>}</span>
+
+    <span class=k>return</span> <span class=p>{</span> <span class=nx>props</span> <span class=p>}</span>
   <span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
+
+<span class=cm>/** ページコンポーネント */</span>
+<span class=kr>const</span> <span class=nx>TodoPage</span>: <span class=kt>NextPage</span><span class=p>&lt;</span><span class=nt>PageProps</span><span class=p>&gt;</span> <span class=o>=</span> <span class=p>({</span> <span class=nx>todos</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=c1>// ...
+</span><span class=c1></span><span class=p>}</span>
+
+<span class=kr>export</span> <span class=k>default</span> <span class=nx>TodoPage</span></code></pre></div></div>
 </figure>
 <p>ちなみに、ビルド時に呼び出される <code>getStaticProps</code> 関数の中では、クエリパラメーターを取得することはできません。
 クエリパラメーターは、あくまで実際にユーザーが Web サイトにアクセスするときに指定されるものという扱いであり、ビルド時にはクエリパラメーターまで含んだページを出力できないからです。

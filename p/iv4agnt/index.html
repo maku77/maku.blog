@@ -627,12 +627,11 @@ Pre-rendering じゃないのは、CSR: Client-side Rendering のみです。</p
 <p>例として、ローカルファイルや、データベースなどに格納された「本の一覧」を表示する <code>books</code> インデックスページを考えてみます。
 こういった <strong>インデックスページ</strong> を Web サイトのビルド時に生成するには、<strong><code>getStaticProps</code></strong> 関数を実装して、戻り値の <strong><code>props</code></strong> プロパティで一覧情報を返すように実装します。
 <code>props</code> プロパティの値はページコンポーネントの引数として渡されるため、その値を参照して「本の一覧」を表示することができます。
-下記のサンプルコードでは、<code>props</code> プロパティの型を <code>Props</code> として定義しています。</p>
+下記のサンプルコードでは、<code>props</code> プロパティの型を <code>PageProps</code> として定義しています。</p>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>pages/books/index.tsx</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=nx>Link</span> <span class=kr>from</span> <span class=s1>&#39;next/link&#39;</span>
-<span class=kr>import</span> <span class=nx>React</span> <span class=kr>from</span> <span class=s1>&#39;react&#39;</span>
-<span class=kr>import</span> <span class=p>{</span> <span class=nx>GetStaticProps</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;next&#39;</span>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>GetStaticProps</span><span class=p>,</span> <span class=nx>NextPage</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;next&#39;</span>
+<span class=kr>import</span> <span class=nx>Link</span> <span class=kr>from</span> <span class=s1>&#39;next/link&#39;</span>
 
 <span class=kr>type</span> <span class=nx>Book</span> <span class=o>=</span> <span class=p>{</span>
   <span class=nx>id</span>: <span class=kt>string</span><span class=p>;</span>
@@ -640,12 +639,12 @@ Pre-rendering じゃないのは、CSR: Client-side Rendering のみです。</p
 <span class=p>}</span>
 
 <span class=c1>// ページコンポーネントに渡されるデータ
-</span><span class=c1></span><span class=kr>type</span> <span class=nx>Props</span> <span class=o>=</span> <span class=p>{</span>
+</span><span class=c1></span><span class=kr>type</span> <span class=nx>PageProps</span> <span class=o>=</span> <span class=p>{</span>
   <span class=nx>books</span>: <span class=kt>Book</span><span class=p>[];</span>
 <span class=p>}</span>
 
 <span class=c1>// この関数がビルド時に呼び出され、戻り値の props の値がページコンポーネントに渡される
-</span><span class=c1></span><span class=kr>export</span> <span class=kr>const</span> <span class=nx>getStaticProps</span>: <span class=kt>GetStaticProps</span><span class=p>&lt;</span><span class=nt>Props</span><span class=p>&gt;</span> <span class=o>=</span> <span class=kr>async</span> <span class=nx>context</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span><span class=c1></span><span class=kr>export</span> <span class=kr>const</span> <span class=nx>getStaticProps</span>: <span class=kt>GetStaticProps</span><span class=p>&lt;</span><span class=nt>PageProps</span><span class=p>&gt;</span> <span class=o>=</span> <span class=kr>async</span> <span class=nx>context</span> <span class=o>=&gt;</span> <span class=p>{</span>
   <span class=c1>// 本来は、ここで外部 API などを呼び出してデータを取得する
 </span><span class=c1></span>  <span class=kr>const</span> <span class=nx>books</span> <span class=o>=</span> <span class=p>[</span>
     <span class=p>{</span> <span class=nx>id</span><span class=o>:</span> <span class=s1>&#39;001&#39;</span><span class=p>,</span> <span class=nx>title</span><span class=o>:</span> <span class=s1>&#39;Title-1&#39;</span> <span class=p>},</span>
@@ -658,7 +657,7 @@ Pre-rendering じゃないのは、CSR: Client-side Rendering のみです。</p
 <span class=p>}</span>
 
 <span class=c1>// ページコンポーネントの実装
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>BooksPage</span>: <span class=kt>React.FC</span><span class=p>&lt;</span><span class=nt>Props</span><span class=p>&gt;</span> <span class=o>=</span> <span class=p>({</span> <span class=nx>books</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=p>(</span>
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>BooksPage</span>: <span class=kt>NextPage</span><span class=p>&lt;</span><span class=nt>PageProps</span><span class=p>&gt;</span> <span class=o>=</span> <span class=p>({</span> <span class=nx>books</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=p>(</span>
   <span class=p>&lt;&gt;</span>
     <span class=p>&lt;</span><span class=nt>h2</span><span class=p>&gt;</span><span class=nx>Book</span> <span class=nx>list</span><span class=p>&lt;/</span><span class=nt>h2</span><span class=p>&gt;</span>
     <span class=p>&lt;</span><span class=nt>ul</span><span class=p>&gt;</span>
