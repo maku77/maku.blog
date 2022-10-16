@@ -1335,7 +1335,7 @@ body: "プロキシ環境から Electron をインストールできない場合
 url: "/p/yhs2bjs/",
 title: "MongoDB 雑多メモ",
 date: "2013-10-22T00:00:00Z",
-body: "MongoDB 雑多メモ"
+body: "MongoDB 雑多メモ 参考リンク Golang で MongoDB を扱う (go.mongodb.org/mongo-driver) - まくまく Golang ノート"
 },
 {
 url: "/p/5q4epyb/",
@@ -3531,7 +3531,7 @@ body: "2019-05-26 ゲームマーケット2019春に行ってきた 今日はア
 url: "/p/qikq9o8/",
 title: "MongoDB 関連記事",
 date: "2019-05-20T00:00:00Z",
-body: "MongoDB 関連記事 参考リンク Azure Cosmos DB にアカウントを作って MongoDB API でアクセスする"
+body: "MongoDB 関連記事"
 },
 {
 url: "/p/x2zrq7f/",
