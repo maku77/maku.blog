@@ -65,8 +65,7 @@ $ curl -d "client_id=XXXX&client_secret=XXXX&grant_type=client_credentials" \
 
 {{% note title="OAuth フローの種類" %}}
 ここでは、直接レスポンスでアクセストークンを取得する OAuth Client Credentials Flow というフローを使いましたが、これは、サーバーサイドでトークンのやりとりを完結できる場合のみに使用できるフローです。
-静的 Web サイトなどでユーザーに Twitch サインインさせて API アクセスするようなケースでは、別の OAuth フローが必要になります。
-詳しくは、下記のドキュメントを参照してください。
+他の OAuth フローに関しては、下記のドキュメントを参照してください。
 
 - 参考: [Getting OAuth Access Tokens | Twitch Developers](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth)
 {{% /note %}}
