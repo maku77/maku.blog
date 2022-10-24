@@ -4,10 +4,12 @@ url: "p/4reqy9i/"
 date: "2022-10-12"
 tags: ["GraphQL"]
 weight: 1
+changes:
+  - 2022-10-24: static なクエリドキュメントについて
 ---
 
 GraphQL のスキーマ定義やクエリドキュメントを記述するときのノウハウ集です（主にスキーマ設計に関するもの）。
-主要なライブラリ (Apollo や gqlgen）の設計や、{{< amazon-inline title="GraphQL in Action" id="161729568X" >}}、Production Ready GraphQL などの書籍を参考にしています。
+主要なライブラリ (Apollo や gqlgen）の設計や、{{< amazon-inline title="GraphQL in Action" id="161729568X" >}}、『Production Ready GraphQL』などの書籍を参考にしています。
 
 
 クライアントファースト、スキーマファースト
@@ -304,7 +306,7 @@ type Query {
 似たようなフィールドが増えるのは抵抗があるかもしれませんが、GraphQL においてそれがオーバーヘッドになることはありません。
 むしろ、リゾルバー実装がシンプルになるため、パフォーマンスは向上します。
 また、フィールドを参照しているクライアントを絞り込むことが容易になるので、フィールドの再設計をしやすくなるという利点もあります。
-例外的に、SQL のような高度な検索機能を提供したい場合は、汎用的な検索クエリを扱うフィールドがあってよいかもしれません。
+例外的に、SQL のような高度な検索機能を提供したい場合は、汎用的な検索クエリを扱うフィールドがあってよいかもしれません（OSFA: One-Size-Fits-All な API）。
 ただし、やはりユースケースごとに特化した方が通常はうまくいきます。
 
 ### 暗黙的なデフォルト値をリゾルバー内部で定義しない
@@ -515,7 +517,9 @@ GraphQL API を使用するクライアント側で指定するドキュメン�
 
 ### query や mutation には操作名を付ける
 
-操作名 (operation name) はマルチ操作ドキュメント (multi-operation document) 以外ではオプショナルとされていますが、サーバーサイドでのロギングに役立つので、なるべく記述するようにすべきです。HTTP リクエストのペイロードに `operationName` が含まれるようになるので、Chrome のデベロッパーツールを使ったクライアントサイドでのデバッグにも役立ちます。
+操作名 (operation name) はマルチ操作ドキュメント (multi-operation document) 以外ではオプショナルとされていますが、サーバーサイドでのロギングに役立つので、なるべく記述するようにすべきです。
+REST API の場合は、操作ごとにエンドポイントが変わるので、どのような API 呼び出しが行われたかトラックしやすいのですが、GraphQL の場合は単一のエンドポイントになるので、分かりやすい操作名を付けることがロギングのポイントになります。
+HTTP リクエストのペイロードに `operationName` が含まれるようになるので、Chrome のデベロッパーツールを使ったクライアントサイドでのデバッグにも役立ちます。
 
 {{< code lang="graphql" title="NG" >}}
 query {
@@ -528,4 +532,50 @@ query QueryBooks {
   books { title author }
 }
 {{< /code >}}
+
+### static なクエリドキュメントを使用する
+
+クエリドキュメント (`query {...}`) をプログラム実行時に動的に組み立てることは避け、静的な (static) クエリ文字列をそのまま扱うようにします（`StringBuilder` や `QueryBuilder` のようなものを使わない）。
+通常は、クエリドキュメントを専用のファイル (`.graphql`) として作成するか、JavaScript のタグ付きテンプレート (`` gql`...` ``) などを使っていれば大丈夫です。
+static なクエリドキュメントには、様々な利点があります。
+
+クエリ編集時のサポート機能
+: VS Code や IntelliJ といった IDE には、GraphQL クエリ言語を扱うプラグインが用意されており、ほぼ実装言語を意識せずに使用できます。スキーマ定義を入力データとして設定しておけば、エディタ上での補完や検証ができるようになっています。
+
+各クエリ用の型ファイルの自動生成 (easier code generation)
+: static なクエリドキュメント（とスキーマ定義）から、クエリレスポンスの型情報を自動生成することで、型安全かつ効率的なコーディングが可能になります。こういったツールとしては、[TypeScript の graphql-codegen](/p/n2k2hxd/) や、[Golang の gqlgen](https://maku77.github.io/p/v48adgi/) などがあります。
+
+永続化クエリ (persisted queries)
+: クライアントからの高コストなクエリを防ぐ方法として、永続化クエリという考え方があります。これは、アプリのリリース時に、必要なクエリに ID を割り当ててしまい、実際のクエリでは ID だけを送るという方法です。永続化クエリを取り入れるには、static なクエリ定義が必須になります。クエリ言語では変数を分離できるようになっているので、多少変化する部分があってもクエリの永続化が可能です。
+
+外部ツールとの連携 (better tooling)
+: コード内で static なクエリドキュメントを使う設計になっていれば、GraphiQL などの開発ツールで試行錯誤して完成させたクエリをそのままコードに取り込むことができます。逆に、コード内のクエリを GraphiQL でテストするのも容易です。
+
+要するに、共通言語としてクエリ言語があるのだから、それを最大限に活用せよということです。
+
+mutation 操作の場合は、可変なクエリになりやすいのではと思うかもしれません。
+例えば、次のようなスケジュール追加の mutation が定義されているとします。
+
+```graphql
+type Mutation {
+  addSchedule(input: AddScheduleInput!): AddSchedulePayload
+}
+```
+
+クライアントが複数のスケジュールを同時に登録しようとした場合、複数の `addSchedule` 操作を呼び出すクエリを動的に生成することになってしまいます。
+このようなユースケースが存在する場合は、入力変数のフィールドとして複数の値を渡せるような API を用意します。
+
+```graphql
+type Mutation {
+  addSchedule(input: AddScheduleInput!): AddSchedulePayload
+  addSchedules(input: AddSchedulesInput!): AddSchedulesPayload
+}
+
+input AddSchedulesInput {
+  schedules: [ScheduleInput!]!
+  # ...
+}
+```
+
+こうすることで、可変部分は変数に切り出せるので、クエリ文字列を static に記述することができます。
 
