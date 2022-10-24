@@ -44,6 +44,11 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/mu7gqya/>
+IGDB API でゲーム情報のデータベースにアクセスしてみる
+<time>2022-10-24</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/4reqy9i/>
 GraphQL ベストプラクティス
 <time>2022-10-12</time></a>
@@ -62,11 +67,6 @@ GraphQL Code Generator でスキーマから TypeScript の型情報を生成す
 <a href=./p/wbtbr8o/>
 Go アプリを実行する軽量な Docker コンテナイメージを作成する
 <time>2022-10-02</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/isotm77/>
-GraphQL スキーマ仕様: 列挙型 (enum type) を定義する
-<time>2022-09-28</time></a>
 </div>
 </div>
 </div>
@@ -386,6 +386,8 @@ GraphQL スキーマ仕様: 列挙型 (enum type) を定義する
 </div><div class=xMenu_tag>
 <a href=./tags/html>html (1)</a>
 </div><div class=xMenu_tag>
+<a href=./tags/igdb>igdb (1)</a>
+</div><div class=xMenu_tag>
 <a href=./tags/iso>iso (1)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/jest>jest (1)</a>
@@ -455,14 +457,14 @@ GraphQL スキーマ仕様: 列挙型 (enum type) を定義する
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/mu7gqya/>
+IGDB API でゲーム情報のデータベースにアクセスしてみる<span class=xRecents_item_tag>IGDB</span><time>2022-10-24</time></a>
+</div><div class=xRecents_item>
 <a href=./p/4reqy9i/>
 GraphQL ベストプラクティス<span class=xRecents_item_tag>GraphQL</span><time>2022-10-12</time></a>
 </div><div class=xRecents_item>
 <a href=./p/vqsyz9j/>
 GraphQL スキーマ仕様: ユニオン型 (Union types) を定義する<span class=xRecents_item_tag>GraphQL</span><time>2022-10-10</time></a>
-</div><div class=xRecents_item>
-<a href=./p/n2k2hxd/>
-GraphQL Code Generator でスキーマから TypeScript の型情報を生成する (graphql-codegen)<span class=xRecents_item_tag>GraphQL</span><time>2022-10-03</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -470,6 +472,350 @@ GraphQL Code Generator でスキーマから TypeScript の型情報を生成す
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/e58h5in/>雑多な技術メモ</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/mu7gqya/>IGDB API でゲーム情報のデータベースにアクセスしてみる</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/igdb>IGDB</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-10-24>2022-10-24</time><br>
+作成: <time itemprop=datePublished datetime=2022-10-24>2022-10-24</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#twitch-アカウントを登録する>Twitch アカウントを登録する</a></li>
+<li><a href=#アプリケーションを登録してクライアント-id-とシークレットを発行する>アプリケーションを登録してクライアント ID とシークレットを発行する</a></li>
+<li><a href=#アクセストークンを発行する>アクセストークンを発行する</a></li>
+<li><a href=#igdb-api-でゲーム情報を取得する>IGDB API でゲーム情報を取得する</a></li>
+</ul>
+</nav><p><a href=https://www.igdb.com/>IGDB</a> は、世の中の（ビデオ）ゲームの情報をデータベースとして集約しようとしている壮大なプロジェクトで、現在 Twitch が運営しています。
+この情報には <a href=https://api-docs.igdb.com/>IGDB API</a> という Web API でアクセスできるようになっていて、簡単に試す程度なら無料で利用できます。
+ちょっと試してみたのでメモに残しておきます。
+とりあえず、<code>curl</code> コマンドで API のレスポンスを確認するところまで。</p>
+<p>大まかには、Twitch developers console でアプリクライアントを登録し、アクセストークンを発行して API を叩く、という流れになります。</p>
+<h2 id=twitch-アカウントを登録する>Twitch アカウントを登録する</h2>
+<p>IGDB API を使うには、Twitch developers コンソールでアプリケーション（クライアント）の登録が必要です。
+このサイトにサインインするには、<strong>Twitch のアカウントが必要</strong> なので、下記から作成します。
+すでに Twitch アカウントを持っている場合は、そのまま使えます。</p>
+<ul>
+<li><a href=https://dev.twitch.tv/login>Twitch Developers - Login</a></li>
+</ul>
+<p>さらに、API を使用する場合は、さらに二段階認証の設定が必須になっているので、次のような感じでたどって設定しておきます。
+メールアドレスや電話番号を登録すれば二段階認証を有効化できます。</p>
+<ul>
+<li><a href=https://www.twitch.tv/settings/security>Twitch - 設定 - セキュリティとプライバシー</a></li>
+</ul>
+<h2 id=アプリケーションを登録してクライアント-id-とシークレットを発行する>アプリケーションを登録してクライアント ID とシークレットを発行する</h2>
+<p><a href=https://dev.twitch.tv/console/>Twitch developers コンソール</a> の <a href=https://dev.twitch.tv/console/apps/>アプリ管理画面</a> でアプリを登録すると、クライアント ID とシークレットキーを取得できます。</p>
+<ol>
+<li><strong><code>アプリケーションを登録</code></strong> ボタンをクリック
+<ul>
+<li><code>名前</code>: 適当な名前を入力（グローバルに一意な名前じゃないといけないっぽい）</li>
+<li><code>OAuthのリダイレクトURL</code>: 決まっていないなら <code>http://localhost:3000</code> などを入力しておけば OK</li>
+<li><code>カテゴリー</code>: プルダウンから適当に選択（Website Integration など）</li>
+</ul>
+</li>
+<li><strong><code>作成</code></strong> ボタンを押して完了</li>
+<li>作成されたアプリの <strong><code>管理</code></strong> ボタンをクリック</li>
+<li><strong><code>新しい秘密</code></strong> ボタンを押してクライアントシークレットを発行</li>
+</ol>
+<p>上記の手順で、IGDB API を呼び出すためのクライアント ID とシークレットを確認できます。</p>
+<ul>
+<li>クライアント ID の例: <code>mhtlekfud5qy706n5wpl568uz1k7j9</code></li>
+<li>クライアントシークレットの例: <code>aoz73xqlpnry1lnw7ohdz7ry5qb4nu</code></li>
+</ul>
+<h2 id=アクセストークンを発行する>アクセストークンを発行する</h2>
+<p>IGDB API でゲーム情報を取得するためには、<strong>アクセストークンが必要</strong> なのですが、これは前述の手順で発行したシークレットとは異なります。
+<a href=https://api-docs.igdb.com/#authentication>Authentication API</a> でクライアント ID とシークレット情報を送ることで、一時的なアクセストークンを発行する必要があります。
+次のように <code>curl</code> コマンドで POST リクエストを送れば、レスポンスでアクセストークンを取得できます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>アクセストークンの取得</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ curl -d &#34;client_id=XXXX&amp;client_secret=XXXX&amp;grant_type=client_credentials&#34; \
+       https://id.twitch.tv/oauth2/token</code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>レスポンスの例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span><span class=nt>&#34;access_token&#34;</span><span class=p>:</span><span class=s2>&#34;1rp02cemrb59wzbhoi2ei8yx6nms3l&#34;</span><span class=p>,</span><span class=nt>&#34;expires_in&#34;</span><span class=p>:</span><span class=mi>5217184</span><span class=p>,</span><span class=nt>&#34;token_type&#34;</span><span class=p>:</span><span class=s2>&#34;bearer&#34;</span><span class=p>}</span></code></pre></div></div>
+</figure>
+<div class=xNote>
+<span class=xNote_title>☝️ OAuth フローの種類</span>
+<span class=xNote_body><p>ここでは、直接レスポンスでアクセストークンを取得する OAuth Client Credentials Flow というフローを使いましたが、これは、サーバーサイドでトークンのやりとりを完結できる場合のみに使用できるフローです。
+他の OAuth フローに関しては、下記のドキュメントを参照してください。</p>
+<ul>
+<li>参考: <a href=https://dev.twitch.tv/docs/authentication/getting-tokens-oauth>Getting OAuth Access Tokens | Twitch Developers</a></li>
+</ul>
+</span>
+</div>
+<h2 id=igdb-api-でゲーム情報を取得する>IGDB API でゲーム情報を取得する</h2>
+<p>アクセストークンを取得したら、ゲーム情報を取得するための API を呼び出すことができます。
+下記はゲームのリストを取得する API (<code>https://api.igdb.com/v4/games</code>) の呼び出し例です。
+REST API なので、取得する情報ごとにエンドポイント (URL) を使い分ける必要があります。</p>
+<pre tabindex=0><code>$ curl -H &quot;Client-ID: mhtlekfud5qy706n5wpl568uz1k7j9&quot; \
+       -H &quot;Authorization: Bearer 1rp02cemrb59wzbhoi2ei8yx6nms3l&quot;
+       -d &quot;fields *;&quot;
+       https://api.igdb.com/v4/games
+</code></pre><p>アクセストークンは、上記のように <code>Authorization</code> ヘッダーで指定してください。
+デフォルトでは 10 件分のゲーム ID が返ってくるようです（本当に ID だけ）。
+POST リクエストの Body 部分（<code>-d</code> オプション）で <code>fields *;</code> と指定すると、ゲームの詳細情報が含まれるようになります。</p>
+<div class=xAccordion>
+<input id=id-579831462 type=checkbox>
+<label class=xAccordion_title for=id-579831462>レスポンスの例（JSON 形式）</label>
+<div class=xAccordion_body>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>[</span>
+  <span class=p>{</span>
+    <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=mi>40104</span><span class=p>,</span>
+    <span class=nt>&#34;category&#34;</span><span class=p>:</span> <span class=mi>0</span><span class=p>,</span>
+    <span class=nt>&#34;created_at&#34;</span><span class=p>:</span> <span class=mi>1498435200</span><span class=p>,</span>
+    <span class=nt>&#34;external_games&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>20127</span><span class=p>,</span>
+      <span class=mi>1988884</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;first_release_date&#34;</span><span class=p>:</span> <span class=mi>536457600</span><span class=p>,</span>
+    <span class=nt>&#34;genres&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>5</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Dogou Souken&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;platforms&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>52</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;release_dates&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>91007</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;similar_games&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>12364</span><span class=p>,</span>
+      <span class=mi>27270</span><span class=p>,</span>
+      <span class=mi>43367</span><span class=p>,</span>
+      <span class=mi>103281</span><span class=p>,</span>
+      <span class=mi>103292</span><span class=p>,</span>
+      <span class=mi>103298</span><span class=p>,</span>
+      <span class=mi>103301</span><span class=p>,</span>
+      <span class=mi>105049</span><span class=p>,</span>
+      <span class=mi>106805</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;slug&#34;</span><span class=p>:</span> <span class=s2>&#34;dogou-souken&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;summary&#34;</span><span class=p>:</span> <span class=s2>&#34;An overhead-view shoot\u0027em up game.&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;tags&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>268435461</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;updated_at&#34;</span><span class=p>:</span> <span class=mi>1604620800</span><span class=p>,</span>
+    <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://www.igdb.com/games/dogou-souken&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;checksum&#34;</span><span class=p>:</span> <span class=s2>&#34;5e7446ff-58d9-e744-f0d3-5e10241304c1&#34;</span>
+  <span class=p>},</span>
+  <span class=p>{</span>
+    <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=mi>85031</span><span class=p>,</span>
+    <span class=nt>&#34;age_ratings&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>37944</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;category&#34;</span><span class=p>:</span> <span class=mi>0</span><span class=p>,</span>
+    <span class=nt>&#34;cover&#34;</span><span class=p>:</span> <span class=mi>61466</span><span class=p>,</span>
+    <span class=nt>&#34;created_at&#34;</span><span class=p>:</span> <span class=mi>1517392813</span><span class=p>,</span>
+    <span class=nt>&#34;external_games&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>216805</span><span class=p>,</span>
+      <span class=mi>1969751</span><span class=p>,</span>
+      <span class=mi>2005770</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;first_release_date&#34;</span><span class=p>:</span> <span class=mi>1404345600</span><span class=p>,</span>
+    <span class=nt>&#34;genres&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>9</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;involved_companies&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>130531</span><span class=p>,</span>
+      <span class=mi>130532</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;City Mysteries&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;platforms&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>37</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;release_dates&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>138333</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;screenshots&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>155025</span><span class=p>,</span>
+      <span class=mi>155026</span><span class=p>,</span>
+      <span class=mi>155027</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;similar_games&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>10603</span><span class=p>,</span>
+      <span class=mi>19222</span><span class=p>,</span>
+      <span class=mi>25905</span><span class=p>,</span>
+      <span class=mi>41349</span><span class=p>,</span>
+      <span class=mi>86974</span><span class=p>,</span>
+      <span class=mi>87507</span><span class=p>,</span>
+      <span class=mi>88511</span><span class=p>,</span>
+      <span class=mi>90788</span><span class=p>,</span>
+      <span class=mi>95776</span><span class=p>,</span>
+      <span class=mi>106992</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;slug&#34;</span><span class=p>:</span> <span class=s2>&#34;city-mysteries&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;summary&#34;</span><span class=p>:</span> <span class=s2>&#34;Search buildings, streets, landmarks as you seek and find hidden objects in New York, Paris, Moscow and London!&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;tags&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>268435465</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;updated_at&#34;</span><span class=p>:</span> <span class=mi>1641425677</span><span class=p>,</span>
+    <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://www.igdb.com/games/city-mysteries&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;checksum&#34;</span><span class=p>:</span> <span class=s2>&#34;87b342e7-b912-ca8d-4ffb-f91f9e4f1870&#34;</span>
+  <span class=p>},</span>
+  <span class=p>{</span>
+    <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=mi>99234</span><span class=p>,</span>
+    <span class=nt>&#34;category&#34;</span><span class=p>:</span> <span class=mi>0</span><span class=p>,</span>
+    <span class=nt>&#34;cover&#34;</span><span class=p>:</span> <span class=mi>91582</span><span class=p>,</span>
+    <span class=nt>&#34;created_at&#34;</span><span class=p>:</span> <span class=mi>1524843905</span><span class=p>,</span>
+    <span class=nt>&#34;external_games&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>603512</span><span class=p>,</span>
+      <span class=mi>1857496</span><span class=p>,</span>
+      <span class=mi>1917109</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;first_release_date&#34;</span><span class=p>:</span> <span class=mi>1527120000</span><span class=p>,</span>
+    <span class=nt>&#34;game_modes&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>1</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;genres&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>31</span><span class=p>,</span>
+      <span class=mi>32</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;involved_companies&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>155850</span><span class=p>,</span>
+      <span class=mi>155852</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Sword of the Black Stone&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;platforms&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>6</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;player_perspectives&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>2</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;release_dates&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>188385</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;screenshots&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>231528</span><span class=p>,</span>
+      <span class=mi>231529</span><span class=p>,</span>
+      <span class=mi>231530</span><span class=p>,</span>
+      <span class=mi>231531</span><span class=p>,</span>
+      <span class=mi>231532</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;similar_games&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>25646</span><span class=p>,</span>
+      <span class=mi>29783</span><span class=p>,</span>
+      <span class=mi>68271</span><span class=p>,</span>
+      <span class=mi>80916</span><span class=p>,</span>
+      <span class=mi>96217</span><span class=p>,</span>
+      <span class=mi>105269</span><span class=p>,</span>
+      <span class=mi>106987</span><span class=p>,</span>
+      <span class=mi>111130</span><span class=p>,</span>
+      <span class=mi>113360</span><span class=p>,</span>
+      <span class=mi>113895</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;slug&#34;</span><span class=p>:</span> <span class=s2>&#34;sword-of-the-black-stone&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;summary&#34;</span><span class=p>:</span> <span class=s2>&#34;If your looking for action and adventure then Sword of the Black Stone is for you.&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;tags&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>1</span><span class=p>,</span>
+      <span class=mi>268435487</span><span class=p>,</span>
+      <span class=mi>268435488</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;themes&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>1</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;updated_at&#34;</span><span class=p>:</span> <span class=mi>1643857546</span><span class=p>,</span>
+    <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://www.igdb.com/games/sword-of-the-black-stone&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;websites&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>84617</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;checksum&#34;</span><span class=p>:</span> <span class=s2>&#34;0b575316-96dc-b056-86e0-c958c1c95efb&#34;</span>
+  <span class=p>},</span>
+  <span class=p>{</span>
+    <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=mi>50524</span><span class=p>,</span>
+    <span class=nt>&#34;category&#34;</span><span class=p>:</span> <span class=mi>0</span><span class=p>,</span>
+    <span class=nt>&#34;created_at&#34;</span><span class=p>:</span> <span class=mi>1500048896</span><span class=p>,</span>
+    <span class=nt>&#34;external_games&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>72115</span><span class=p>,</span>
+      <span class=mi>1974683</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;first_release_date&#34;</span><span class=p>:</span> <span class=mi>1499904000</span><span class=p>,</span>
+    <span class=nt>&#34;game_modes&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>2</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;genres&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>32</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;OtterBash&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;platforms&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>6</span><span class=p>,</span>
+      <span class=mi>14</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;release_dates&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>93447</span><span class=p>,</span>
+      <span class=mi>93448</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;screenshots&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>110966</span><span class=p>,</span>
+      <span class=mi>110967</span><span class=p>,</span>
+      <span class=mi>110968</span><span class=p>,</span>
+      <span class=mi>110969</span><span class=p>,</span>
+      <span class=mi>110970</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;similar_games&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>32902</span><span class=p>,</span>
+      <span class=mi>37419</span><span class=p>,</span>
+      <span class=mi>40524</span><span class=p>,</span>
+      <span class=mi>76263</span><span class=p>,</span>
+      <span class=mi>96217</span><span class=p>,</span>
+      <span class=mi>105233</span><span class=p>,</span>
+      <span class=mi>106987</span><span class=p>,</span>
+      <span class=mi>111130</span><span class=p>,</span>
+      <span class=mi>113895</span><span class=p>,</span>
+      <span class=mi>119121</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;slug&#34;</span><span class=p>:</span> <span class=s2>&#34;otterbash&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;summary&#34;</span><span class=p>:</span> <span class=s2>&#34;Otter Bash!!! The Otters have escaped their habitat and are now wreaking havoc for world dominance. Battle your friends with the cute and adorable little critters. Destroy your opponents with unique weapons; dousing each other with Tar Balloons, smack them with the nifty Taco Boomerang, shove them into your \&#34;Portable Oven\&#34; and see them roast!!!&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;tags&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>1</span><span class=p>,</span>
+      <span class=mi>268435488</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;themes&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>1</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;updated_at&#34;</span><span class=p>:</span> <span class=mi>1643856963</span><span class=p>,</span>
+    <span class=nt>&#34;url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://www.igdb.com/games/otterbash&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;websites&#34;</span><span class=p>:</span> <span class=p>[</span>
+      <span class=mi>52093</span><span class=p>,</span>
+      <span class=mi>52094</span>
+    <span class=p>],</span>
+    <span class=nt>&#34;checksum&#34;</span><span class=p>:</span> <span class=s2>&#34;4a9c2852-25c3-91bb-ad34-5379507ce2d3&#34;</span>
+  <span class=p>},</span>
+  <span class=c1>// ...省略...
+</span><span class=c1></span><span class=p>]</span></code></pre></div></div>
+</figure>
+</div>
+</div>
+<p>ここまでできれば、あとはいろんな API を試せますね。</p>
+<p>٩(๑❛ᴗ❛๑)۶ わーぃ</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/igdb>IGDB</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/e58h5in/><span class=xArticle_up_label>雑多な技術メモ</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -550,12 +896,13 @@ GraphQL Code Generator でスキーマから TypeScript の型情報を生成す
 <li><a href=#クエリクライアント側>クエリ（クライアント側）</a>
 <ul>
 <li><a href=#query-や-mutation-には操作名を付ける>query や mutation には操作名を付ける</a></li>
+<li><a href=#static-なクエリドキュメントを使用する>static なクエリドキュメントを使用する</a></li>
 </ul>
 </li>
 </ul>
 </nav><p>GraphQL のスキーマ定義やクエリドキュメントを記述するときのノウハウ集です（主にスキーマ設計に関するもの）。
 主要なライブラリ (Apollo や gqlgen）の設計や、<a target=_blank href="https://www.amazon.co.jp/dp/161729568X?tag=maku04-22">『GraphQL in Action』</a>
-、Production Ready GraphQL などの書籍を参考にしています。</p>
+、『Production Ready GraphQL』などの書籍を参考にしています。</p>
 <h2 id=クライアントファーストスキーマファースト>クライアントファースト、スキーマファースト</h2>
 <h3 id=クライアントファースト-client-first-で考える>クライアントファースト (Client First) で考える</h3>
 <p>何よりも、クライアントのユースケースを念頭において考えます。
@@ -791,7 +1138,7 @@ GraphQL はもともと HTTP 前提ではないのですが、実際には Web �
 <p>似たようなフィールドが増えるのは抵抗があるかもしれませんが、GraphQL においてそれがオーバーヘッドになることはありません。
 むしろ、リゾルバー実装がシンプルになるため、パフォーマンスは向上します。
 また、フィールドを参照しているクライアントを絞り込むことが容易になるので、フィールドの再設計をしやすくなるという利点もあります。
-例外的に、SQL のような高度な検索機能を提供したい場合は、汎用的な検索クエリを扱うフィールドがあってよいかもしれません。
+例外的に、SQL のような高度な検索機能を提供したい場合は、汎用的な検索クエリを扱うフィールドがあってよいかもしれません（OSFA: One-Size-Fits-All な API）。
 ただし、やはりユースケースごとに特化した方が通常はうまくいきます。</p>
 <h3 id=暗黙的なデフォルト値をリゾルバー内部で定義しない>暗黙的なデフォルト値をリゾルバー内部で定義しない</h3>
 <p>フィールドパラメーターとして、ソート順序やフィルタ条件などのオプションを追加する場合、パラメーター省略時の振る舞いをスキーマから読み取れるようにすべきです。
@@ -943,7 +1290,9 @@ GitHub の GraphQL API にも Rate Limit が採用されています。</p>
 <h2 id=クエリクライアント側>クエリ（クライアント側）</h2>
 <p>GraphQL API を使用するクライアント側で指定するドキュメント（クエリ）に関してのベストプラクティスです。</p>
 <h3 id=query-や-mutation-には操作名を付ける>query や mutation には操作名を付ける</h3>
-<p>操作名 (operation name) はマルチ操作ドキュメント (multi-operation document) 以外ではオプショナルとされていますが、サーバーサイドでのロギングに役立つので、なるべく記述するようにすべきです。HTTP リクエストのペイロードに <code>operationName</code> が含まれるようになるので、Chrome のデベロッパーツールを使ったクライアントサイドでのデバッグにも役立ちます。</p>
+<p>操作名 (operation name) はマルチ操作ドキュメント (multi-operation document) 以外ではオプショナルとされていますが、サーバーサイドでのロギングに役立つので、なるべく記述するようにすべきです。
+REST API の場合は、操作ごとにエンドポイントが変わるので、どのような API 呼び出しが行われたかトラックしやすいのですが、GraphQL の場合は単一のエンドポイントになるので、分かりやすい操作名を付けることがロギングのポイントになります。
+HTTP リクエストのペイロードに <code>operationName</code> が含まれるようになるので、Chrome のデベロッパーツールを使ったクライアントサイドでのデバッグにも役立ちます。</p>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>NG</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
@@ -956,6 +1305,38 @@ GitHub の GraphQL API にも Rate Limit が採用されています。</p>
 </span><span class=w>  </span><span class=py>books</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=py>title</span><span class=w> </span><span class=py>author</span><span class=w> </span><span class=p>}</span><span class=w>
 </span><span class=w></span><span class=p>}</span></code></pre></div></div>
 </figure>
+<h3 id=static-なクエリドキュメントを使用する>static なクエリドキュメントを使用する</h3>
+<p>クエリドキュメント (<code>query {...}</code>) をプログラム実行時に動的に組み立てることは避け、静的な (static) クエリ文字列をそのまま扱うようにします（<code>StringBuilder</code> や <code>QueryBuilder</code> のようなものを使わない）。
+通常は、クエリドキュメントを専用のファイル (<code>.graphql</code>) として作成するか、JavaScript のタグ付きテンプレート (<code>gql`...`</code>) などを使っていれば大丈夫です。
+static なクエリドキュメントには、様々な利点があります。</p>
+<dl>
+<dt>クエリ編集時のサポート機能</dt>
+<dd>VS Code や IntelliJ といった IDE には、GraphQL クエリ言語を扱うプラグインが用意されており、ほぼ実装言語を意識せずに使用できます。スキーマ定義を入力データとして設定しておけば、エディタ上での補完や検証ができるようになっています。</dd>
+<dt>各クエリ用の型ファイルの自動生成 (easier code generation)</dt>
+<dd>static なクエリドキュメント（とスキーマ定義）から、クエリレスポンスの型情報を自動生成することで、型安全かつ効率的なコーディングが可能になります。こういったツールとしては、<a href=./p/n2k2hxd/>TypeScript の graphql-codegen</a> や、<a href=https://maku77.github.io/p/v48adgi/>Golang の gqlgen</a> などがあります。</dd>
+<dt>永続化クエリ (persisted queries)</dt>
+<dd>クライアントからの高コストなクエリを防ぐ方法として、永続化クエリという考え方があります。これは、アプリのリリース時に、必要なクエリに ID を割り当ててしまい、実際のクエリでは ID だけを送るという方法です。永続化クエリを取り入れるには、static なクエリ定義が必須になります。クエリ言語では変数を分離できるようになっているので、多少変化する部分があってもクエリの永続化が可能です。</dd>
+<dt>外部ツールとの連携 (better tooling)</dt>
+<dd>コード内で static なクエリドキュメントを使う設計になっていれば、GraphiQL などの開発ツールで試行錯誤して完成させたクエリをそのままコードに取り込むことができます。逆に、コード内のクエリを GraphiQL でテストするのも容易です。</dd>
+</dl>
+<p>要するに、共通言語としてクエリ言語があるのだから、それを最大限に活用せよということです。</p>
+<p>mutation 操作の場合は、可変なクエリになりやすいのではと思うかもしれません。
+例えば、次のようなスケジュール追加の mutation が定義されているとします。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Mutation</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=py>addSchedule</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>AddScheduleInput</span><span class=p>!):</span><span class=w> </span><span class=nc>AddSchedulePayload</span><span class=w>
+</span><span class=w></span><span class=p>}</span><span class=w>
+</span></code></pre></div><p>クライアントが複数のスケジュールを同時に登録しようとした場合、複数の <code>addSchedule</code> 操作を呼び出すクエリを動的に生成することになってしまいます。
+このようなユースケースが存在する場合は、入力変数のフィールドとして複数の値を渡せるような API を用意します。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Mutation</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=py>addSchedule</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>AddScheduleInput</span><span class=p>!):</span><span class=w> </span><span class=nc>AddSchedulePayload</span><span class=w>
+</span><span class=w>  </span><span class=nc>addSchedules</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>AddSchedulesInput</span><span class=p>!):</span><span class=w> </span><span class=nc>AddSchedulesPayload</span><span class=w>
+</span><span class=w></span><span class=p>}</span><span class=w>
+</span><span class=w>
+</span><span class=w></span><span class=nc>input</span><span class=w> </span><span class=py>AddSchedulesInput</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=py>schedules</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>ScheduleInput</span><span class=p>!]!</span><span class=w>
+</span><span class=w>  </span><span class=c># ...</span><span class=w>
+</span><span class=w></span><span class=p>}</span><span class=w>
+</span></code></pre></div><p>こうすることで、可変部分は変数に切り出せるので、クエリ文字列を static に記述することができます。</p>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">
@@ -1079,265 +1460,6 @@ GitHub の GraphQL API にも Rate Limit が採用されています。</p>
 </div>
 <div class=xArticle_up>
 <a href=./p/amwwuo5/><span class=xArticle_up_label>GraphQL スキーマ仕様</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/cm9nyco/>GraphQL</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=./p/cm9nyco/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/n2k2hxd/>GraphQL Code Generator でスキーマから TypeScript の型情報を生成する (graphql-codegen)</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/graphql>GraphQL</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-10-03>2022-10-03</time><br>
-作成: <time itemprop=datePublished datetime=2022-10-03>2022-10-03</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#graphql-code-generator-とは>GraphQL Code Generator とは</a></li>
-<li><a href=#cli-ツールのインストール>CLI ツールのインストール</a></li>
-<li><a href=#ツールの初期セットアップ>ツールの初期セットアップ</a></li>
-<li><a href=#型情報の自動生成>型情報の自動生成</a></li>
-<li><a href=#自動生成されたコードを-eslint-の解析対象外にする>自動生成されたコードを ESLint の解析対象外にする</a></li>
-</ul>
-</nav><h2 id=graphql-code-generator-とは>GraphQL Code Generator とは</h2>
-<p><strong>GraphQL Code Generator</strong> は、GraphQL スキーマ (<code>schema.graphqls</code>) とクエリ用のドキュメント (<code>query {...}</code>) を入力として与えることで、さまざまな言語とライブラリに対応した型情報を生成するツールです。</p>
-<ul>
-<li><a href=https://www.the-guild.dev/graphql/codegen>公式 Web サイト - GraphQL Code Generator</a></li>
-<li><a href=https://github.com/dotansimha/graphql-code-generator>GitHub リポジトリ - dotansimha/graphql-code-generator</a></li>
-</ul>
-<p>C# や Dart 用のコードも生成できるようですが、ツール自体が NPM パッケージとして提供されているので、やはり TypeScript がメインターゲットですね。
-クライアント側で、React + Apollo Client のフレームワークを使用している場合は、Apollo Client のフック API (<code>useQuery</code>) に渡すためのオブジェクトを生成してくれます。
-GraphQL サーバー側のリゾルバー実装に使用する型情報を生成するのにも使用できますが、<a href=https://maku77.github.io/p/v48adgi/>GraphQL サーバーを Golang の gqlgen で作る</a> 場合などは、スキーマから Golang コードを生成する仕組みがそれ自体に備わっていたりするので、そこではこのツールは使いません。
-一方、フロントエンドは React + TypeScript で作ることが比較的多いので、このツールの出番も多くなります。</p>
-<p>入力するスキーマ情報としては、スキーマファイル（<code>schema.graphqls</code> など）を指定することも、GraphQL サーバーのアドレスを指定して Introspection 機能で取得することもできます。
-GraphQL クライアントの開発中は、接続先の GraphQL サーバーも動いているでしょうから、そこから直接スキーマ情報を取得するのは理にかなっています。
-例えば、GraphQL サーバー側の Git リポジトリでスキーマファイルを管理している場合、クライアント開発時にこのスキーマファイル自体を共有しなくて済みます。</p>
-<p>ここでは、クライアントアプリを <strong>TypeScript + React (Apollo Client)</strong> の組み合わせで作ることを想定して、GraphQL クエリ用の型情報を自動生成してみます。</p>
-<h2 id=cli-ツールのインストール>CLI ツールのインストール</h2>
-<p>GraphQL Code Generator のコマンドラインツール (CLI) は <strong><code>@graphql-codegen/cli</code></strong> パッケージとして提供されています。
-開発中にのみ使用するツールなので、<strong><code>-D</code></strong> オプションを付けて <code>devDependencies</code> としてインストールします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp># </span>yarn の場合
-<span class=gp>$ </span>yarn add graphql
-<span class=gp>$ </span>yarn add -D typescript @graphql-codegen/cli
-<span class=err>
-</span><span class=err></span><span class=gp># </span>npm の場合
-<span class=gp>$ </span>npm install graphql
-<span class=gp>$ </span>npm install -D typescript @graphql-codegen/cli
-</code></pre></div><p>これにより、<code>node_modules/.bin</code> 以下に <strong><code>graphql-codegen</code></strong> というコマンドがインストールされます。
-<code>graphql-code-generator</code> というコマンドもインストールされますが、ただのエイリアスなので前者の短いコマンドを使えば OK です。
-次のようにヘルプを確認できます（<code>-s</code> オプションは <code>yarn</code> の冗長な出力を抑制するオプションです）。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>yarn -s graphql-codegen --help
-<span class=go>Options:
-</span><span class=go>      --help         Show help                                         [boolean]
-</span><span class=go>      --version      Show version number                               [boolean]
-</span><span class=go>  -c, --config       Path to GraphQL codegen YAML config file, defaults to
-</span><span class=go>                     &#34;codegen.yml&#34; on the current directory             [string]
-</span><span class=go>  -w, --watch        Watch for changes and execute generation automatically. You
-</span><span class=go>                     can also specify a glob expression for custom watch list.
-</span><span class=go>  -r, --require      Loads specific require.extensions before running the
-</span><span class=go>                     codegen and reading the configuration [array] [default: []]
-</span><span class=go>  -o, --overwrite    Overwrites existing files                         [boolean]
-</span><span class=go>  -s, --silent       Suppresses printing errors                        [boolean]
-</span><span class=go>  -e, --errors-only  Only print errors                                 [boolean]
-</span><span class=go>      --profile      Use profiler to measure performance               [boolean]
-</span><span class=go>  -p, --project      Name of a project in GraphQL Config                [string]
-</span><span class=go>  -v, --verbose      output more detailed information about performed tasks
-</span><span class=go>                                                      [boolean] [default: false]
-</span><span class=go>  -d, --debug        Print debug logs to stdout       [boolean] [default: false]
-</span></code></pre></div><h2 id=ツールの初期セットアップ>ツールの初期セットアップ</h2>
-<p>最初に <strong><code>graphql-codegen init</code></strong> コマンドを使って、設定ファイル (<code>codegen.ts</code>) を生成します。
-ウィザード形式で質問されるので、プロジェクトで使用しているライブラリなどを選択していきます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>yarn graphql-codegen init  <span class=c1># yarn の場合</span>
-<span class=gp>$ </span>npx graphql-codegen init   <span class=c1># npm (npx) の場合</span>
-</code></pre></div><p>下記は回答項目の例ですが、指示に従っていけば簡単に終わります。</p>
-<ul>
-<li>What type of application are you building? Application built with <strong><code>React</code></strong></li>
-<li>Where is your schema?: (path or url) <strong><code>http://localhost:8080/graphql</code></strong></li>
-<li>Where are your operations and fragments?: <strong><code>src/**/*.tsx</code></strong></li>
-<li>Where to write the output: <strong><code>src/gql</code></strong></li>
-<li>Do you want to generate an introspection file? <strong><code>No</code></strong></li>
-<li>How to name the config file? <strong><code>codegen.ts</code></strong></li>
-<li>What script in package.json should run the codegen? <strong><code>codegen</code></strong></li>
-</ul>
-<p>入力が終わると、設定ファイルが生成されます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>codegen.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=kr>type</span> <span class=p>{</span> <span class=nx>CodegenConfig</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@graphql-codegen/cli&#39;</span><span class=p>;</span>
-
-<span class=kr>const</span> <span class=nx>config</span>: <span class=kt>CodegenConfig</span> <span class=o>=</span> <span class=p>{</span>
-  <span class=nx>overwrite</span>: <span class=kt>true</span><span class=p>,</span>
-<span class=hl>  <span class=nx>schema</span><span class=o>:</span> <span class=s2>&#34;http://localhost:8080/graphql&#34;</span><span class=p>,</span>
-</span><span class=hl>  <span class=nx>documents</span><span class=o>:</span> <span class=s2>&#34;src/**/*.tsx&#34;</span><span class=p>,</span>
-</span>  <span class=nx>generates</span><span class=o>:</span> <span class=p>{</span>
-    <span class=s2>&#34;src/gql&#34;</span><span class=o>:</span> <span class=p>{</span>
-      <span class=nx>preset</span><span class=o>:</span> <span class=s2>&#34;client&#34;</span><span class=p>,</span>
-      <span class=nx>plugins</span><span class=o>:</span> <span class=p>[]</span>
-    <span class=p>}</span>
-  <span class=p>}</span>
-<span class=p>};</span>
-
-<span class=kr>export</span> <span class=k>default</span> <span class=nx>config</span><span class=p>;</span></code></pre></div></div>
-</figure>
-<p><strong><code>schema</code></strong> プロパティが「入力するスキーマ」の場所を示していて、<strong><code>documents</code></strong> プロパティが「クエリ（ドキュメント）」を抽出する場所を示しています。
-<code>documents</code> プロパティのデフォルトは <code>.tsx</code> ファイルのみを参照するようになっていますが、<strong><code>.ts</code> ファイルも参照するように</strong> 次のように修正しておいた方がよいかもしれません。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>documents</span><span class=o>:</span> <span class=s2>&#34;src/**/*.{ts,tsx}&#34;</span><span class=p>,</span>
-</code></pre></div><p>設定ファイルは <code>.ts</code> 形式ではなく、<code>.yml</code> 形式で作成することもできます。
-設定ファイルの編集時に入力補完されなくてもよいのであれば、YAML 形式を使った方がスッキリするかもしれません。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>codegen.yml</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>overwrite</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w></span><span class=nt>schema</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;http://localhost:8080/graphql&#39;</span><span class=w>
-</span><span class=w></span><span class=nt>documents</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;src/**/*.{ts,tsx}&#39;</span><span class=w>
-</span><span class=w></span><span class=nt>generates</span><span class=p>:</span><span class=w>
-</span><span class=w>  </span><span class=nt>src/gql</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=nt>preset</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;client&#39;</span></code></pre></div></div>
-</figure>
-<p><code>graphql-codegen init</code> コマンドは <code>package.json</code> を更新することがあるので、依存パッケージをインストールしておきます（これも指示される通り実行すれば OK）。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>yarn         <span class=c1># yarn の場合</span>
-<span class=gp>$ </span>npm install  <span class=c1># npm の場合</span>
-</code></pre></div><h2 id=型情報の自動生成>型情報の自動生成</h2>
-<p>GraphQL Code Generator（<code>graphql-codegen</code> コマンド）のセットアップが完了したので、実際に React (Apollo Client) アプリの型情報を自動生成してみます。
-React + Apollo Client のアプリのコードは次のような感じになっていると思います。
-GraphQL API を呼び出すための、<code>useQuery</code> フックに渡す <code>Games</code> 型をマニュアル定義しています。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-src/components/MyComponent.tsx data-lang=src/components/MyComponent.tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>FC</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;react&#39;</span>
-<span class=kr>import</span> <span class=p>{</span> <span class=nx>gql</span><span class=p>,</span> <span class=nx>useQuery</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@apollo/client&#39;</span>
-
-<span class=c1>// GraphQL ドキュメント（これが graphql-codegen への入力になる）
-</span><span class=c1></span><span class=kr>export</span> <span class=kr>const</span> <span class=nx>QUERY_GAMES</span> <span class=o>=</span> <span class=nx>gql</span><span class=sb>`
-</span><span class=sb>  query QueryGames {
-</span><span class=sb>    games {
-</span><span class=sb>      title
-</span><span class=sb>      date
-</span><span class=sb>      genre
-</span><span class=sb>    }
-</span><span class=sb>  }
-</span><span class=sb>`</span>
-
-<span class=c1>// 自力で型定義（これをやめたい！）
-</span><span class=c1></span><span class=kr>type</span> <span class=nx>Games</span> <span class=o>=</span> <span class=p>{</span>
-  <span class=nx>games</span>: <span class=kt>Game</span><span class=p>[]</span>
-<span class=p>}</span>
-
-<span class=kr>type</span> <span class=nx>Game</span> <span class=o>=</span> <span class=p>{</span>
-  <span class=nx>title</span>: <span class=kt>string</span>
-  <span class=nx>date?</span>: <span class=kt>string</span>
-  <span class=nx>genre?</span>: <span class=kt>string</span>
-<span class=p>}</span>
-
-<span class=kr>export</span> <span class=kr>const</span> <span class=nx>MyComponent</span>: <span class=kt>FC</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-<span class=hl>  <span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span><span class=p>,</span> <span class=nx>error</span><span class=p>,</span> <span class=nx>loading</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useQuery</span><span class=p>&lt;</span><span class=nt>Games</span><span class=p>&gt;(</span><span class=nx>QUERY_GAMES</span><span class=p>)</span>
-</span>  <span class=k>if</span> <span class=p>(</span><span class=nx>error</span><span class=p>)</span> <span class=k>return</span> <span class=p>&lt;</span><span class=nt>b</span><span class=p>&gt;</span><span class=nb>Error</span><span class=o>:</span> <span class=p>{</span><span class=nx>error</span><span class=p>.</span><span class=nx>message</span><span class=p>}&lt;/</span><span class=nt>b</span><span class=p>&gt;</span>
-  <span class=k>if</span> <span class=p>(</span><span class=nx>loading</span><span class=p>)</span> <span class=k>return</span> <span class=p>&lt;</span><span class=nt>b</span><span class=p>&gt;</span><span class=nx>Loading</span><span class=p>...&lt;/</span><span class=nt>b</span><span class=p>&gt;</span>
-  <span class=kr>const</span> <span class=nx>games</span> <span class=o>=</span> <span class=nx>data</span><span class=o>?</span><span class=p>.</span><span class=nx>games</span> <span class=o>??</span> <span class=p>[]</span>
-  <span class=k>return</span>
-    <span class=p>&lt;</span><span class=nt>ul</span><span class=p>&gt;</span>
-      <span class=p>{</span><span class=nx>games</span><span class=p>.</span><span class=nx>map</span><span class=p>((</span><span class=nx>g</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>&lt;</span><span class=nt>li</span> <span class=na>key</span><span class=o>=</span><span class=p>{</span><span class=nx>g</span><span class=p>.</span><span class=nx>title</span><span class=p>}&gt;{</span><span class=nx>g</span><span class=p>.</span><span class=nx>title</span><span class=p>}</span> <span class=p>{</span><span class=nx>g</span><span class=p>.</span><span class=nx>date</span><span class=p>}&lt;/</span><span class=nt>li</span><span class=p>&gt;)}</span>
-    <span class=p>&lt;/</span><span class=nt>ul</span><span class=p>&gt;</span>
-  <span class=p>)</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>このコードには、Apollo Client の <strong><code>gql</code></strong> 関数の引数部分に GraphQL ドキュメントが記述されており、この文字列は <strong><code>graphql-codege</code></strong> コマンドが型情報を生成するための入力情報として参照します。
-次のように実行すると、型情報のコードを生成できます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>コード生成</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>yarn graphql-codegen --config codegen.ts  <span class=c1># yarn の場合</span>
-<span class=gp>$ </span>npx graphql-codegen --config codegen.ts   <span class=c1># npm (npx) の場合</span>
-</code></pre></div></div>
-</figure>
-<p>実は、最初に <code>graphql-codegen init</code> コマンドを実行したときに、上記と同じことをする NPM スクリプトを <code>package.json</code> に追加してくれているので、次のようなショートカットで実行することもできます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>コード生成（同上）</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>yarn codegen     <span class=c1># yarn の場合</span>
-<span class=gp>$ </span>npm run codegen  <span class=c1># npm の場合</span>
-</code></pre></div></div>
-</figure>
-<p>すると、設定ファイル (<code>codegen.ts</code>) で指定したディレクトリ (今回は <code>src/gql</code>) にいくつかの <code>.ts</code> ファイルが生成されます。
-例えば次のような型が定義されています。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>自動生成された型情報の一部</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>export</span> <span class=kr>type</span> <span class=nx>QueryGamesQuery</span> <span class=o>=</span> <span class=p>{</span>
-  <span class=nx>__typename</span><span class=o>?:</span> <span class=s1>&#39;Query&#39;</span><span class=p>,</span>
-  <span class=nx>games</span>: <span class=kt>Array</span><span class=o>&lt;</span><span class=p>{</span>
-    <span class=nx>__typename</span><span class=o>?:</span> <span class=s1>&#39;Game&#39;</span><span class=p>,</span>
-    <span class=nx>title</span>: <span class=kt>string</span><span class=p>,</span>
-    <span class=nx>date?</span>: <span class=kt>string</span> <span class=o>|</span> <span class=kc>null</span><span class=p>,</span>
-    <span class=nx>genre?</span>: <span class=kt>string</span> <span class=o>|</span> <span class=kc>null</span>
-  <span class=p>}</span><span class=o>&gt;</span>
-<span class=p>};</span></code></pre></div></div>
-</figure>
-<p>型情報が生成されたあとは、元のコードを書き換えて Apollo Client が提供する <code>gql</code> 関数の代わりに、自動生成された <strong><code>graphql</code></strong> 関数を使ってクエリ（ドキュメント）を定義するようにします。
-この関数は <code>TypedDocumentNode</code> という型のオブジェクトを返すようになっており、これを <code>useQuery</code> フックに渡すと、戻り値の <code>data</code> オブジェクトが自動的に型付けされるようになります。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>src/components/MyComponent.tsx</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>FC</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;react&#39;</span>
-<span class=hl><span class=kr>import</span> <span class=p>{</span> <span class=nx>graphql</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;../gql&#39;</span>
-</span><span class=kr>import</span> <span class=p>{</span> <span class=nx>useQuery</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@apollo/client&#39;</span>
-
-<span class=c1>// TypedDocumentNode という型のオブジェクトが返される
-</span><span class=hl><span class=c1></span><span class=kr>export</span> <span class=kr>const</span> <span class=nx>QUERY_GAMES</span> <span class=o>=</span> <span class=nx>graphql</span><span class=p>(</span><span class=sb>`
-</span></span><span class=sb>  query QueryGames {
-</span><span class=sb>    games {
-</span><span class=sb>      title
-</span><span class=sb>      date
-</span><span class=sb>      genre
-</span><span class=sb>    }
-</span><span class=sb>  }
-</span><span class=sb>`</span><span class=p>)</span>
-
-<span class=kr>export</span> <span class=kr>const</span> <span class=nx>MyComponent</span>: <span class=kt>FC</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=c1>// こうするだけで型情報付きの data としてアクセスできる
-</span><span class=hl><span class=c1></span>  <span class=kr>const</span> <span class=p>{</span> <span class=nx>data</span><span class=p>,</span> <span class=nx>error</span><span class=p>,</span> <span class=nx>loading</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>useQuery</span><span class=p>(</span><span class=nx>QUERY_GAMES</span><span class=p>)</span>
-</span>  <span class=c1>// ...
-</span><span class=c1></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>これで GraphQL クエリ用の型情報を自力で定義する必要がなくなりました！
-ちなみに、自動生成された <code>graphql</code> 関数は、引数で渡す GraphQL ドキュメント（文字列リテラル）をキーにして戻り値を決めるという実装になっているため、文字列リテラルを 1 文字でも変えたら（スペースでも）、<code>graphql-codegen</code> によるコードの再生成が必要になることに注意してください。</p>
-<h2 id=自動生成されたコードを-eslint-の解析対象外にする>自動生成されたコードを ESLint の解析対象外にする</h2>
-<p>ESLint による TypeScript コードの静的解析を行っている場合は、<code>graphql-codegen</code> で生成されたコードに対する警告がいっぱい出ると思います。
-<a href=https://eslint.org/docs/latest/user-guide/configuring/ignoring-code>ESLint の無視設定</a> で、<code>graphql-codegen</code> の出力先ディレクトリを無視するように設定しましょう。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>.eslintrc.yml</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>root</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w></span><span class=c># 自動生成されるコードは ESLint の解析対象外にする</span><span class=w>
-</span><span class=w></span><span class=nt>ignorePatterns</span><span class=p>:</span><span class=w>
-</span><span class=w>  </span>- <span class=l>src/gql/</span></code></pre></div></div>
-</figure>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/dtwtpzj/>GraphQL クエリ仕様: クエリで変数を使用する</a></li>
-<li><a href=./p/pk9c9qs/>GraphQL スキーマ仕様: ミューテーションを定義する（データ更新 API）</a></li>
-<li><a href=./p/nhhwqtu/>GraphQL スキーマ仕様: 入力型 (input type) を定義する</a></li>
-<li><a href=./p/isotm77/>GraphQL スキーマ仕様: 列挙型 (enum type) を定義する</a></li>
-<li><a href=./p/tw75a7p/>GraphQL スキーマ仕様: 組み込みのスカラー型とカスタムスカラー型</a></li>
-<li><a href=./p/dcdv7rv/>GraphQL クエリ仕様: ディレクティブによる条件分岐 (@include, @skip)</a></li>
-<li><a href=./p/vnkd4ur/>GraphQL クエリ仕様: フィールド名にエイリアスを付ける</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/graphql>GraphQL</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/cm9nyco/><span class=xArticle_up_label>GraphQL 関連記事</span><br>へ戻る</a>
 </div>
 </article><h2>メニュー</h2>
 <div class=xTopMenu>
