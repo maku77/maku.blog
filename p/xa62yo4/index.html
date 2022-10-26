@@ -1,0 +1,864 @@
+<!doctype html><html lang=ja-jp>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマイズする｜まくろぐ</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
+<meta property="og:title" content="Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマイズする">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maku.blog/p/xa62yo4/">
+<meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
+<meta property="og:image:width" content="1436">
+<meta property="og:image:height" content="746">
+<meta property="og:description" content="ApolloLink とは？  図: Apollo Client の Link チェ―ン  Apollo Client を使って GraphQL API を呼び出すとき、GraphQL サーバーに対して HTTP リクエストが送られるわけですが、Apollo Client は内部で Link チェーンというものを作って具体的な HTTP リクエストを構築します。 この構築処理を実装するものが Link オブジェクトであり、具体的には ApolloLink クラスのインスタンスです。 Link オブジェクトは図のように Link チェーンの形で連結して使用できるようになっており、通信内容を加工する一連のミドルウェア として機能します。 Link オブジェクトの用途としては、次のようなものがあります。
+ HTTP リクエストヘッダの付加  認証情報の付加（authorization ヘッダー） GraphQL サーバーで独自定義したヘッダー   アクセス先 URL（GraphQL エンドポイント）の切り替え デバッグログの出力  自動リトライ（参考: RetryLink） リクエスト回数をカウント サーバー応答速度（ラウンドトリップ時間）の計測   複数のクエリのバッチ送信（参考: BatchHttpLink） Persisted クエリ（参考: PersistedQueryLink）  Link オブジェクトは任意の順序でチェーンできますが、末端の GraphQL サーバーに接続する部分は Teminating link として振る舞う必要があり、通常は HttpLink クラスのインスタンスを設定します。 HttpLink クラスは ApolloLink を継承して実装されています。">
+<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
+<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
+<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
+<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
+<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
+<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
+<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
+</head>
+<body>
+<div id=xRoot>
+<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/cm9nyco/>GraphQL</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/uyw4qan/>Apollo Client</a>
+</span>
+<span class=xBreadcrumb_item>Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマイズする
+</span>
+</div>
+</aside>
+<div id=xContainer>
+<nav id=xMenu aria-label=メニュー>
+<div id=sidebar style=height:100%>
+<div id=sidebar_notFixed>
+<a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a>
+<div class=xMenu_box data-sticky>
+<form action=https://cse.google.com/cse target=_blank>
+<div class=xSearchBox>
+<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<input type=hidden name=ie value=UTF-8>
+<input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
+<input type=submit value=検索></input>
+</div>
+</form>
+<div class=xMenu_box_body>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
+<div class=xMenu_box_body>
+<div class=xBoxLink>
+<a href=../../p/xa62yo4/>
+Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマイズする
+<time>2022-10-26</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/mu7gqya/>
+IGDB API でゲーム情報のデータベースにアクセスしてみる
+<time>2022-10-24</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/4reqy9i/>
+GraphQL ベストプラクティス
+<time>2022-10-12</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/vqsyz9j/>
+GraphQL スキーマ仕様: ユニオン型 (Union types) を定義する
+<time>2022-10-10</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/n2k2hxd/>
+GraphQL Code Generator でスキーマから TypeScript の型情報を生成する (graphql-codegen)
+<time>2022-10-03</time></a>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3>
+<div class=xMenu_box_body>
+<div class=xNavTree>
+<ul>
+<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
+<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
+<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
+<ul>
+<li><a class=xNavTree-dir href=../../p/mkc8gv2/>GraphQL 仕様</a>
+<li><a class=xNavTree-dir href=../../p/uyw4qan/>Apollo Client</a>
+<ul>
+</ul>
+<li><a class=xNavTree-dir href=../../p/aseqzau/>Apollo Server</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
+<li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a>
+<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
+<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
+<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
+<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
+<li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a>
+<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
+<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
+<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
+<li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a>
+<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
+<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
+<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
+<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
+<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
+<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
+<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
+</ul>
+<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
+<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
+<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
+<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
+<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
+<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
+<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
+</ul>
+</div>
+</div>
+</div>
+<div class=xMenu_box data-sticky>
+<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
+<div class=xMenu_box_body><div class=xMenu_tag>
+<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (80)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws>aws (61)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure>azure (58)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/typescript>typescript (58)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/next.js>next.js (37)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/graphql>graphql (33)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/chatbot>chatbot (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/react>react (28)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/gnuplot>gnuplot (27)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cdk>aws/cdk (26)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/linux>linux (25)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github>github (24)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ansible>ansible (21)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/node.js>node.js (19)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/electron>electron (15)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vs-code>vs-code (14)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/javascript>javascript (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mongodb>mongodb (13)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cognito>aws/cognito (12)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/android>android (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/lambda>aws/lambda (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/nginx>nginx (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/java>java (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/python>python (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/uml>uml (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/3d>3d (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sam>aws/sam (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/firestore>firebase/firestore (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unity>unity (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webgl>webgl (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apollo>apollo (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-cli>azure-cli (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/docker>docker (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jade>jade (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/material-ui>material-ui (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/cli>aws/cli (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-storage>azure-storage (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/doxygen>doxygen (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/c/c++>c/c++ (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-actions>github-actions (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/luis>luis (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/qna-maker>qna-maker (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ssh>ssh (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/ssm>aws/ssm (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/eslint>eslint (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase>firebase (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/github-pages>github-pages (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html/css>html/css (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jekyll>jekyll (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sql>sql (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/windows>windows (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-functions>azure-functions (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/cosmos-db>cosmos-db (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/hugo>hugo (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/kotlin>kotlin (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/lets-encrypt>lets-encrypt (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mac>mac (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/powershell>powershell (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/prettier>prettier (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/sqlite>sqlite (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/textlint>textlint (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tv>tv (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apache>apache (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/arib>arib (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/amplify>aws/amplify (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/appsync>aws/appsync (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/iam>aws/iam (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/kms>aws/kms (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/s3>aws/s3 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/aws/sdk>aws/sdk (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/azure-app-service>azure-app-service (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/excel>excel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/go>go (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/grpc>grpc (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/http>http (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/npm>npm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/oauth>oauth (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/opengl>opengl (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/protocol-buffers>protocol-buffers (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/rsync>rsync (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/scp>scp (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/slack>slack (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teraterm>teraterm (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/unicode>unicode (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vercel>vercel (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/zip>zip (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/.net>.net (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/androidstudio>androidstudio (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/apollo-server>apollo-server (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/atomic-design>atomic-design (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/blender>blender (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bluetooth>bluetooth (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bootstrap>bootstrap (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/bot-framework>bot-framework (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/boto3>boto3 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/css>css (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dns>dns (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/dvb>dvb (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/editorconfig>editorconfig (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/evernote>evernote (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/git>git (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/golang>golang (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/groovy>groovy (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/html>html (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/igdb>igdb (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/iso>iso (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/jest>jest (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/json>json (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/macos>macos (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/mui>mui (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/parcel>parcel (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/raspberrypi>raspberrypi (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/teams>teams (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/tex>tex (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/ubuntu>ubuntu (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/url>url (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vim>vim (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/vps>vps (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/web>web (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/webpack>webpack (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/wsl>wsl (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
+</div></div>
+</div>
+<div class=xMenu_box data-sticky><br></div>
+</div>
+<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
+</div>
+</div>
+</nav>
+<main id=xMain>
+<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_next>
+<a href=../../p/w7igunc/>Apollo Client の fetchMore を自動で呼び出して GitHub GraphQL の100件制限を乗り越える (useAutoFetchMore)</a>
+</div>
+</div>
+</aside>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/cm9nyco/>GraphQL</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/uyw4qan/>Apollo Client</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=width:80px;margin-right:.5em>
+<img src=../../p/cm9nyco/_index.svg style=width:80px;height:80px>
+</div>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/xa62yo4/>Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマイズする</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/apollo>Apollo</a></span>
+<span class=xPageTags_item><a href=../../tags/graphql>GraphQL</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-10-26>2022-10-26</time><br>
+作成: <time itemprop=datePublished datetime=2022-10-26>2022-10-26</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#apollolink-とは>ApolloLink とは？</a></li>
+<li><a href=#apolloclient-に-apollolink-を設定する>ApolloClient に ApolloLink を設定する</a></li>
+<li><a href=#link-チェーンを構築する>Link チェーンを構築する</a></li>
+<li><a href=#独自の-apollolink-を実装する>独自の ApolloLink を実装する</a>
+<ul>
+<li><a href=#apollolink-コンストラクタを使う方法>ApolloLink コンストラクタを使う方法</a></li>
+<li><a href=#apollolink-を継承したクラスを作成する方法>ApolloLink を継承したクラスを作成する方法</a></li>
+</ul>
+</li>
+<li><a href=#apollolink-の実装サンプル>ApolloLink の実装サンプル</a>
+<ul>
+<li><a href=#graphql-クエリの内容を出力する>GraphQL クエリの内容を出力する</a></li>
+<li><a href=#graphql-クエリの呼び出し回数をカウントする>GraphQL クエリの呼び出し回数をカウントする</a></li>
+<li><a href=#graphql-サーバーの応答時間を計測する>GraphQL サーバーの応答時間を計測する</a></li>
+<li><a href=#認証用のリクエストヘッダーを付加する>認証用のリクエストヘッダーを付加する</a></li>
+</ul>
+</li>
+</ul>
+</nav><h2 id=apollolink-とは>ApolloLink とは？</h2>
+<figure class=xImage>
+<a href=../../p/xa62yo4/img-001.drawio.svg target=_blank>
+<img width=600 height=auto src=../../p/xa62yo4/img-001.drawio.svg alt=/p/xa62yo4/img-001.drawio.svg>
+</a>
+<figcaption>図: Apollo Client の Link チェ―ン</figcaption>
+</figure>
+<p>Apollo Client を使って GraphQL API を呼び出すとき、GraphQL サーバーに対して HTTP リクエストが送られるわけですが、Apollo Client は内部で Link チェーンというものを作って具体的な HTTP リクエストを構築します。
+この構築処理を実装するものが Link オブジェクトであり、具体的には <a href=https://github.com/apollographql/apollo-client/blob/main/src/link/core/ApolloLink.ts>ApolloLink</a> クラスのインスタンスです。
+Link オブジェクトは図のように Link チェーンの形で連結して使用できるようになっており、<strong>通信内容を加工する一連のミドルウェア</strong> として機能します。
+Link オブジェクトの用途としては、次のようなものがあります。</p>
+<ul>
+<li>HTTP リクエストヘッダの付加
+<ul>
+<li>認証情報の付加（<code>authorization</code> ヘッダー）</li>
+<li>GraphQL サーバーで独自定義したヘッダー</li>
+</ul>
+</li>
+<li>アクセス先 URL（GraphQL エンドポイント）の切り替え</li>
+<li>デバッグログの出力
+<ul>
+<li>自動リトライ（参考: <a href=https://www.apollographql.com/docs/react/api/link/apollo-link-retry>RetryLink</a>）</li>
+<li>リクエスト回数をカウント</li>
+<li>サーバー応答速度（ラウンドトリップ時間）の計測</li>
+</ul>
+</li>
+<li>複数のクエリのバッチ送信（参考: <a href=https://www.apollographql.com/docs/react/api/link/apollo-link-batch-http>BatchHttpLink</a>）</li>
+<li>Persisted クエリ（参考: <a href=https://www.apollographql.com/docs/react/api/link/persisted-queries>PersistedQueryLink</a>）</li>
+</ul>
+<p>Link オブジェクトは任意の順序でチェーンできますが、末端の GraphQL サーバーに接続する部分は Teminating link として振る舞う必要があり、通常は <a href=https://www.apollographql.com/docs/react/api/link/apollo-link-http/>HttpLink</a> クラスのインスタンスを設定します。
+<code>HttpLink</code> クラスは <code>ApolloLink</code> を継承して実装されています。</p>
+<h2 id=apolloclient-に-apollolink-を設定する>ApolloClient に ApolloLink を設定する</h2>
+<p><code>ApolloClient</code> コンストラクタに渡すオブジェクトの <strong><code>link</code></strong> プロパティで、任意の <code>ApolloLink</code> インスタンスを設定できるようになっています。
+下記は、GraphQL API のエンドポイントやリクエストヘッダーを設定する簡単な <code>HttpLink</code> を生成して設定する例です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Link チェーンに HttpLink を設定</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>ApolloClient</span><span class=p>,</span> <span class=nx>HttpLink</span><span class=p>,</span> <span class=nx>InMemoryCache</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@apollo/client&#39;</span>
+
+<span class=c1>// Creates a GraphQL client
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>httpLink</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>HttpLink</span><span class=p>({</span>
+  <span class=nx>uri</span><span class=o>:</span> <span class=s1>&#39;/graphql&#39;</span><span class=p>,</span> <span class=c1>// GraphQL エンドポイント (default: &#34;/graphql&#34;)
+</span><span class=c1></span>  <span class=c1>// headers: （任意の HTTP リクエストヘッダー）
+</span><span class=c1></span>  <span class=c1>// fetch: （任意の fetch 関数）
+</span><span class=c1></span><span class=p>})</span>
+
+<span class=kr>const</span> <span class=nx>apolloClient</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>ApolloClient</span><span class=p>({</span>
+  <span class=nx>link</span>: <span class=kt>httpLink</span><span class=p>,</span>
+  <span class=nx>cache</span>: <span class=kt>new</span> <span class=nx>InMemoryCache</span><span class=p>(),</span>
+<span class=p>})</span></code></pre></div></div>
+</figure>
+<p>実は、GraphQL エンドポイントを表す <code>uri</code> プロパティや、ヘッダーを設定する <code>headers</code> プロパティは、<code>ApolloClient</code> のコンストラクタで直接指定できるようになっています。
+単純な GraphQL リクエストであれば、<code>link</code> プロパティを設定せずに、これらのプロパティだけで済ませることができます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>apolloClient</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>ApolloClient</span><span class=p>({</span>
+  <span class=nx>uri</span><span class=o>:</span> <span class=s1>&#39;http://localhost:8080/graphql&#39;</span><span class=p>,</span>
+  <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span><span class=nx>Authorization</span><span class=o>:</span> <span class=s1>&#39;Bearer abc123&#39;</span><span class=p>},</span>
+  <span class=nx>cache</span>: <span class=kt>new</span> <span class=nx>InMemoryCache</span><span class=p>(),</span>
+<span class=p>})</span>
+</code></pre></div><p>ただ、複数の処理を組み合わせた Link チェーンを構築したいときは、前述の <code>link</code> プロパティの設定が必要です。</p>
+<h2 id=link-チェーンを構築する>Link チェーンを構築する</h2>
+<p>複数の <code>ApolloLink</code> インスタンスを連結することによって Link チェーンを作成することができます。
+<code>ApolloLink</code> を連結して Link チェーンを構築するには、次のようなメソッド（および関数）を使用します。</p>
+<ul>
+<li><strong><code>ApolloLink#concat(link)</code></strong> &mldr; 既存の <code>ApolloLink</code> の後ろに別の <code>ApolloLink</code> を連結した <code>ApolloLink</code> を作る。</li>
+<li><strong><code>from([link1, link2, link3])</code></strong> &mldr; 複数の <code>ApolloLink</code> を連結した <code>ApolloLink</code> を作る。</li>
+</ul>
+<p>連結後の Link チェーンも、<code>ApolloLink</code> インスタンスとして表現されるので、そのまま <code>ApolloClient</code> の <code>link</code> プロパティにセットできます。
+次のコードでは、3 つの <code>ApolloLink</code> インスタンスを連結して作った Link チェーンを <code>ApolloClient</code> に設定しています。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>ApolloClient</span><span class=p>,</span> <span class=nx>ApolloLink</span><span class=p>,</span> <span class=kr>from</span><span class=p>,</span> <span class=nx>HttpLink</span><span class=p>,</span> <span class=nx>InMemoryCache</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@apollo/client&#39;</span>
+
+<span class=c1>// 1 つ目の Link オブジェクト（実装は空っぽ）
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>link1</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>ApolloLink</span><span class=p>((</span><span class=nx>operation</span><span class=p>,</span> <span class=nx>forward</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=nx>forward</span><span class=p>(</span><span class=nx>operation</span><span class=p>)</span>
+<span class=p>})</span>
+
+<span class=c1>// 2 つ目の Link オブジェクト（実装は空っぽ）
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>link2</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>ApolloLink</span><span class=p>((</span><span class=nx>operation</span><span class=p>,</span> <span class=nx>forward</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=nx>forward</span><span class=p>(</span><span class=nx>operation</span><span class=p>)</span>
+<span class=p>})</span>
+
+<span class=c1>// 3 つ目の Link オブジェクト（末端の teminating link）
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>httpLink</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>HttpLink</span><span class=p>({</span>
+  <span class=nx>uri</span><span class=o>:</span> <span class=s1>&#39;http://localhost:4000/graphql&#39;</span><span class=p>,</span>
+<span class=p>})</span>
+
+<span class=c1>// 上記 3 つの Link オブジェクトを連結して Link チェーンを作成
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>linkChain</span> <span class=o>=</span> <span class=kr>from</span><span class=p>([</span><span class=nx>link1</span><span class=p>,</span> <span class=nx>link2</span><span class=p>,</span> <span class=nx>httpLink</span><span class=p>])</span>
+<span class=c1>// 次のようにも記述できるけど、3 つ以上連結する場合は from を使った方が楽
+</span><span class=c1>// const linkChain = link1.concat(link2).concat(httpLink)
+</span><span class=c1></span>
+<span class=kr>const</span> <span class=nx>apolloClient</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>ApolloClient</span><span class=p>({</span>
+  <span class=nx>link</span>: <span class=kt>linkChain</span><span class=p>,</span>
+  <span class=nx>cache</span>: <span class=kt>new</span> <span class=nx>InMemoryCache</span><span class=p>(),</span>
+<span class=p>})</span>
+</code></pre></div><p>いずれの方法で <code>ApolloLink</code> を連結する場合も、末尾に terminating link となる <code>HttpLink</code> を配置しなければいけないことに注意してください。</p>
+<h2 id=独自の-apollolink-を実装する>独自の ApolloLink を実装する</h2>
+<p>Apollo Client ライブラリは、いくつかの <code>ApolloLink</code> 実装を提供しています (<code>HttpLink</code>、<code>RetryLink</code>、<code>PersistedQueryLink</code>）が、次のような方法で独自の <code>ApolloLink</code> インスタンスを作成できます。</p>
+<ul>
+<li><code>new ApolloLink(request?: RequestHandler)</code> コンストラクタでハンドラー関数を渡して <code>ApolloLink</code> インスタンスを生成する。</li>
+<li><code>ApolloLink</code> を継承した独自クラスで <code>request</code> メソッドを実装して、独自クラスのインスタンスを生成する。</li>
+</ul>
+<p>前者のように、直接 <code>ApolloLink</code> インスタンスを生成する方法を使うとシンプルなコードになりますが、<code>ApolloLink</code> 実装をモジュール化しておきたいときは、後者の方法でサブクラス化しておくのがよさそうです（<code>new PuniPuniLink()</code> のように分かりやすい名前で使えるようになる）。</p>
+<h3 id=apollolink-コンストラクタを使う方法>ApolloLink コンストラクタを使う方法</h3>
+<p><code>ApolloLink</code> コンストラクタで直接 <code>ApolloLink</code> インスタンスを生成するときは、引数としてハンドラー関数 (<code>RequestHander</code>) を渡します。
+この中で任意の処理を行い、最後に <code>forward(operation)</code> を呼び出すことで、次の Link オブジェクトに処理を引き継ぎます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>dumpOperationNameLink</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>ApolloLink</span><span class=p>((</span><span class=nx>operation</span><span class=p>,</span> <span class=nx>forward</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=c1>// ここで任意の処理を行う
+</span><span class=c1></span>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=sb>`operationName = </span><span class=si>${</span><span class=nx>operation</span><span class=p>.</span><span class=nx>operationName</span><span class=si>}</span><span class=sb>`</span><span class=p>)</span>
+
+  <span class=c1>// 次の Link オブジェクトへ処理をつなぐ
+</span><span class=c1></span>  <span class=k>return</span> <span class=nx>forward</span><span class=p>(</span><span class=nx>operation</span><span class=p>)</span>
+<span class=p>})</span>
+</code></pre></div><p>ハンドラー関数のパラメーターとして渡されてくる <a href=https://www.apollographql.com/docs/react/api/link/introduction/#the-operation-object>operation</a> オブジェクトには、その名の通り GraphQL 操作 (operation) に関する情報、例えば、操作名 (<code>operationName</code>) や、クエリ文字列 (<code>query</code>) が含まれています。
+上記の例では、GraphQL クエリに付けた操作名をコンソールに出力しています。</p>
+<h3 id=apollolink-を継承したクラスを作成する方法>ApolloLink を継承したクラスを作成する方法</h3>
+<p>独自の Link クラスを作りたいときは、<code>ApolloLink</code> を継承して <strong><code>request</code></strong> メソッドを実装します。
+実装方法は、前述のハンドラー関数と同じです。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>class</span> <span class=nx>DumpOperationNameLink</span> <span class=kr>extends</span> <span class=nx>ApolloLink</span> <span class=p>{</span>
+  <span class=nx>request</span><span class=p>(</span><span class=nx>operation</span>: <span class=kt>Operation</span><span class=p>,</span> <span class=nx>forward</span>: <span class=kt>NextLink</span><span class=p>)</span><span class=o>:</span> <span class=nx>Observable</span><span class=p>&lt;</span><span class=nt>FetchResult</span><span class=p>&gt;</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=sb>`operationName = </span><span class=si>${</span><span class=nx>operation</span><span class=p>.</span><span class=nx>operationName</span><span class=si>}</span><span class=sb>`</span><span class=p>)</span>
+    <span class=k>return</span> <span class=nx>forward</span><span class=p>(</span><span class=nx>operation</span><span class=p>)</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=c1>// 使用例
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>linkChain</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>DumpOperationNameLink</span><span class=p>().</span><span class=nx>concat</span><span class=p>(</span><span class=nx>httpLink</span><span class=p>)</span>
+</code></pre></div><h2 id=apollolink-の実装サンプル>ApolloLink の実装サンプル</h2>
+<p>よくありそうな独自 <code>ApolloLink</code> の実装例を載せておきます。</p>
+<h3 id=graphql-クエリの内容を出力する>GraphQL クエリの内容を出力する</h3>
+<p>GraphQL クエリを実行するたびに、クエリの内容をコンソールに出力します。
+操作名や要求しているフィールド、変数などの情報を確認できます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>dumpQueryLink</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>ApolloLink</span><span class=p>((</span><span class=nx>operation</span><span class=p>,</span> <span class=nx>forward</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=nx>jsonText</span> <span class=o>=</span> <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>(</span><span class=nx>operation</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=mi>2</span><span class=p>)</span>
+  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>jsonText</span><span class=p>)</span>
+  <span class=k>return</span> <span class=nx>forward</span><span class=p>(</span><span class=nx>operation</span><span class=p>)</span>
+<span class=p>})</span>
+</code></pre></div><p>ただ、こういった情報は、Web ブラウザーの開発コンソール (<code>F12</code>) で見たほうが早いですね (^^;</p>
+<h3 id=graphql-クエリの呼び出し回数をカウントする>GraphQL クエリの呼び出し回数をカウントする</h3>
+<p>Link オブジェクトにインスタンス変数を持たせることで、複数の GraphQL クエリにまたがって状態を保持することができます。
+このような Link オブジェクトを <strong>stateful link</strong> と呼びます。
+次の <code>OperationCounterLink</code> クラスは、GraphQL API の呼び出し回数を操作名ごとにカウントします。
+GraphQL クエリで操作名が指定されていないときは、<code>ANONYMOUS_OPERATION</code> という操作名でカウントします。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=cm>/**
+</span><span class=cm> * GraphQL の操作 (operation name) ごとに呼び出し回数を保持し、
+</span><span class=cm> * コンソールに出力する ApolloLink 実装です。
+</span><span class=cm> */</span>
+<span class=kr>class</span> <span class=nx>OperationCounterLink</span> <span class=kr>extends</span> <span class=nx>ApolloLink</span> <span class=p>{</span>
+  <span class=kr>private</span> <span class=nx>counters</span><span class=o>:</span> <span class=p>{</span> <span class=p>[</span><span class=nx>operationName</span>: <span class=kt>string</span><span class=p>]</span><span class=o>:</span> <span class=kt>number</span> <span class=p>}</span>
+
+  <span class=kr>constructor</span><span class=p>()</span> <span class=p>{</span>
+    <span class=kr>super</span><span class=p>()</span>
+    <span class=k>this</span><span class=p>.</span><span class=nx>counters</span> <span class=o>=</span> <span class=p>{}</span>
+  <span class=p>}</span>
+
+  <span class=nx>request</span><span class=p>(</span><span class=nx>operation</span>: <span class=kt>Operation</span><span class=p>,</span> <span class=nx>forward</span>: <span class=kt>NextLink</span><span class=p>)</span><span class=o>:</span> <span class=nx>Observable</span><span class=p>&lt;</span><span class=nt>FetchResult</span><span class=p>&gt;</span> <span class=p>{</span>
+    <span class=k>this</span><span class=p>.</span><span class=nx>incCount</span><span class=p>(</span><span class=nx>operation</span><span class=p>.</span><span class=nx>operationName</span> <span class=o>||</span> <span class=s1>&#39;ANONYMOUS_OPERATION&#39;</span><span class=p>)</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>counters</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=mi>2</span><span class=p>))</span>
+    <span class=k>return</span> <span class=nx>forward</span><span class=p>(</span><span class=nx>operation</span><span class=p>)</span>
+  <span class=p>}</span>
+
+  <span class=kr>private</span> <span class=nx>incCount</span><span class=p>(</span><span class=nx>operationName</span>: <span class=kt>string</span><span class=p>)</span> <span class=p>{</span>
+    <span class=kd>let</span> <span class=nx>prev</span> <span class=o>=</span> <span class=k>this</span><span class=p>.</span><span class=nx>counters</span><span class=p>[</span><span class=nx>operationName</span><span class=p>]</span>
+    <span class=k>if</span> <span class=p>(</span><span class=nx>prev</span> <span class=o>==</span> <span class=kc>undefined</span><span class=p>)</span> <span class=nx>prev</span> <span class=o>=</span> <span class=mi>0</span>
+    <span class=k>this</span><span class=p>.</span><span class=nx>counters</span><span class=p>[</span><span class=nx>operationName</span><span class=p>]</span> <span class=o>=</span> <span class=nx>prev</span> <span class=o>+</span> <span class=mi>1</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><p>この Link オブジェクトを <code>ApolloClient</code> の Link チェーンに設定しておくと、GraphQL クエリの呼び出しごとに、ブラウザのコンソールに各 GraphQL 操作の呼び出し回数が出力されるようになります。
+無駄なクエリが実行されていないか調査するときに便利です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>出力例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
+  <span class=nt>&#34;QueryBook&#34;</span><span class=p>:</span> <span class=mi>2</span><span class=p>,</span>
+  <span class=nt>&#34;QueryBooks&#34;</span><span class=p>:</span> <span class=mi>17</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<h3 id=graphql-サーバーの応答時間を計測する>GraphQL サーバーの応答時間を計測する</h3>
+<p>ハンドラー関数に渡される <code>operation</code> オブジェクトの <strong><code>setContext</code></strong> を使って、コンテキスト情報を設定することができます。
+コンテキスト情報というのは、Link チェーンの中で共有されるグローバル変数のようなもので、設定されたコンテキスト情報は <strong><code>getContext</code></strong> で参照することができます。
+次の例では、リクエスト時に <code>start</code> という名前のプロパティで現在時刻を保存し、レスポンス時に現在時刻との差分を取ることで、GraphQL サーバーの応答時間（ラウンドトリップタイム）を計算しています。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>roundTripLink</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>ApolloLink</span><span class=p>((</span><span class=nx>operation</span><span class=p>,</span> <span class=nx>forward</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=c1>// リクエスト時に現在時刻をコンテキストに保存
+</span><span class=c1></span>  <span class=nx>operation</span><span class=p>.</span><span class=nx>setContext</span><span class=p>({</span> <span class=nx>start</span>: <span class=kt>new</span> <span class=nb>Date</span><span class=p>().</span><span class=nx>getMilliseconds</span><span class=p>()</span> <span class=p>})</span>
+
+  <span class=c1>// レスポンス時にラウンドトリップタイムを出力
+</span><span class=c1></span>  <span class=k>return</span> <span class=nx>forward</span><span class=p>(</span><span class=nx>operation</span><span class=p>).</span><span class=nx>map</span><span class=p>((</span><span class=nx>data</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+    <span class=kr>const</span> <span class=nx>time</span> <span class=o>=</span> <span class=k>new</span> <span class=nb>Date</span><span class=p>().</span><span class=nx>getMilliseconds</span><span class=p>()</span> <span class=o>-</span> <span class=nx>operation</span><span class=p>.</span><span class=nx>getContext</span><span class=p>().</span><span class=nx>start</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span>
+      <span class=sb>`Operation </span><span class=si>${</span><span class=nx>operation</span><span class=p>.</span><span class=nx>operationName</span><span class=si>}</span><span class=sb> took </span><span class=si>${</span><span class=nx>time</span><span class=si>}</span><span class=sb> ms to complete`</span>
+    <span class=p>)</span>
+    <span class=k>return</span> <span class=nx>data</span>
+  <span class=p>})</span>
+<span class=p>})</span>
+</code></pre></div><p>Link オブジェクトでは、GraphQL API のリクエスト時の割り込み処理だけでなく、<strong>レスポンス時の処理</strong> も記述することができます。
+レスポンス時の処理を定義するには、ハンドラー関数の戻り値で <code>forward(opeartion)</code> をそのまま返すのではなく、上記のように <strong><code>map</code></strong> 関数で処理内容を追加します。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>出力例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>Operation QueryBooks took 7 ms to complete</code></pre></div></div>
+</figure>
+<h3 id=認証用のリクエストヘッダーを付加する>認証用のリクエストヘッダーを付加する</h3>
+<p><code>operation</code> オブジェクトのコンテキスト情報の <strong><code>headers</code></strong> プロパティには、HTTP リクエストとして送られる（予定の）ヘッダー情報が含まれています。
+Link オブジェクトの実装でこのプロパティを書き換えることで、任意の HTTP リクエストヘッダーを付加できます。
+通常のコンテキスト情報は Link チェーン内で使われるものなので、GraphQL サーバーに送られることはありませんが、この <code>headers</code> プロパティの値は <code>HttpLink</code> によって GraphQL サーバーに送られます。</p>
+<p>次の Link オブジェクトでは、認証用の <code>authorization</code> ヘッダーを付加しています。
+Link チェーン内で設定されたヘッダー情報が上書きされないように、ヘッダー情報をマージしていることに注意してください。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>authLink</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>ApolloLink</span><span class=p>((</span><span class=nx>operation</span><span class=p>,</span> <span class=nx>forward</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=c1>// Get the access token from local storage if it exists
+</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>token</span> <span class=o>=</span> <span class=nx>localStorage</span><span class=p>.</span><span class=nx>getItem</span><span class=p>(</span><span class=s1>&#39;ACCESS_TOKEN&#39;</span><span class=p>)</span>
+
+  <span class=c1>// Return the headers to the context so httpLink can read them
+</span><span class=c1></span>  <span class=nx>operation</span><span class=p>.</span><span class=nx>setContext</span><span class=p>({</span>
+    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
+      <span class=p>...</span><span class=nx>operation</span><span class=p>.</span><span class=nx>getContext</span><span class=p>().</span><span class=nx>headers</span><span class=p>,</span>
+      <span class=nx>authorization</span>: <span class=kt>token</span> <span class=o>?</span> <span class=sb>`Bearer </span><span class=si>${</span><span class=nx>token</span><span class=si>}</span><span class=sb>`</span> <span class=o>:</span> <span class=s1>&#39;&#39;</span><span class=p>,</span>
+    <span class=p>},</span>
+  <span class=p>})</span>
+
+  <span class=k>return</span> <span class=nx>forward</span><span class=p>(</span><span class=nx>operation</span><span class=p>)</span>
+<span class=p>})</span>
+</code></pre></div><p>実は、このように Link オブジェクト内でコンテキスト情報を付加するだけの場合は、簡単に実装するためのユーティリティ関数 (<a href=https://www.apollographql.com/docs/react/api/link/apollo-link-context>setContext</a>) が用意されています。
+上記と同等の <code>ApolloLink</code> インスタンスは、次のように生成することができます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// import { setContext } from &#39;@apollo/client/link/context&#39;
+</span><span class=c1></span>
+<span class=kr>const</span> <span class=nx>authLink</span> <span class=o>=</span> <span class=nx>setContext</span><span class=p>((</span><span class=nx>_</span><span class=p>,</span> <span class=nx>prevContext</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=nx>token</span> <span class=o>=</span> <span class=nx>localStorage</span><span class=p>.</span><span class=nx>getItem</span><span class=p>(</span><span class=s1>&#39;ACCESS_TOKEN&#39;</span><span class=p>)</span>
+  <span class=kr>const</span> <span class=p>{</span> <span class=nx>headers</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>prevContext</span>
+
+  <span class=k>return</span> <span class=p>{</span>
+    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
+      <span class=p>...</span><span class=nx>headers</span><span class=p>,</span>
+      <span class=nx>authorization</span>: <span class=kt>token</span> <span class=o>?</span> <span class=sb>`Bearer </span><span class=si>${</span><span class=nx>token</span><span class=si>}</span><span class=sb>`</span> <span class=o>:</span> <span class=s1>&#39;&#39;</span><span class=p>,</span>
+    <span class=p>},</span>
+  <span class=p>}</span>
+<span class=p>})</span>
+</code></pre></div><p>非同期関数の結果を利用してコンテキスト情報をセットしたいときは、<code>setContext</code> に渡す関数で <code>Promise</code> オブジェクトを返すようにします。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// アクセストークンを非同期で取得する関数（1 秒待つフェイク実装）
+</span><span class=c1></span><span class=kr>async</span> <span class=kd>function</span> <span class=nx>getToken</span><span class=p>()</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>string</span><span class=p>&gt;</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=k>new</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>string</span><span class=p>&gt;((</span><span class=nx>resolve</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+    <span class=nx>setTimeout</span><span class=p>(()</span> <span class=o>=&gt;</span> <span class=p>{</span> <span class=nx>resolve</span><span class=p>(</span><span class=s1>&#39;FAKE_TOKEN&#39;</span><span class=p>)</span> <span class=p>},</span> <span class=mi>1000</span><span class=p>)</span>
+  <span class=p>})</span>
+<span class=p>}</span>
+
+<span class=kr>const</span> <span class=nx>authLink</span> <span class=o>=</span> <span class=nx>setContext</span><span class=p>(</span><span class=kr>async</span> <span class=p>(</span><span class=nx>_</span><span class=p>,</span> <span class=nx>prevContext</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=nx>token</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>getToken</span><span class=p>()</span>  <span class=c1>// 非同期関数を呼ぶことが可能
+</span><span class=c1></span>  <span class=kr>const</span> <span class=p>{</span> <span class=nx>headers</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>prevContext</span>
+  <span class=k>return</span> <span class=p>{</span>
+    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span> <span class=p>...</span><span class=nx>headers</span><span class=p>,</span> <span class=nx>authorization</span><span class=o>:</span> <span class=sb>`Bearer </span><span class=si>${</span><span class=nx>token</span><span class=si>}</span><span class=sb>`</span> <span class=p>},</span>
+  <span class=p>}</span>
+<span class=p>})</span>
+</code></pre></div><p>ただし、このような実装にすると、リクエスト毎に非同期関数が呼び出されることに注意してください。</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=../../p/w7igunc/>Apollo Client の fetchMore を自動で呼び出して GitHub GraphQL の100件制限を乗り越える (useAutoFetchMore)</a></li>
+<li><a href=../../p/bnrrqpn/>Apollo CLI の codegen で GraphQL クエリレスポンスの TypeScript 型を自動生成する</a></li>
+<li><a href=../../p/kmj7sdv/>Apollo Client の useQuery 呼び出し部分をカスタムフックで分離する</a></li>
+<li><a href=../../p/m7ju6gr/>Apollo Client でクリック時に GraphQL クエリを実行する</a></li>
+<li><a href=../../p/cu6eox7/>Apollo Client の Pagenation 機能を使って GraphQL API を呼び出す</a></li>
+<li><a href=../../p/qcp2cnx/>Apollo Client で GitHub GraphQL API を使う (Node & React)</a></li>
+<li><a href=../../p/4reqy9i/>GraphQL ベストプラクティス</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=../../tags/apollo>Apollo</a></span>
+<span class=xPageTags_item><a href=../../tags/graphql>GraphQL</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=../../p/uyw4qan/><span class=xArticle_up_label>Apollo Client 関連記事</span><br>へ戻る</a>
+</div>
+<aside>
+<div class=xPrevNextLink>
+<div class=xPrevNextLink_next>
+<a href=../../p/w7igunc/>Apollo Client の fetchMore を自動で呼び出して GitHub GraphQL の100件制限を乗り越える (useAutoFetchMore)</a>
+</div>
+</div>
+</aside>
+</article>
+<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
+</main>
+</div>
+<aside>
+<div class=xBreadcrumb>
+<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/cm9nyco/>GraphQL</a>
+</span>
+<span class=xBreadcrumb_item><a href=../../p/uyw4qan/>Apollo Client</a>
+</span>
+<span class=xBreadcrumb_item>Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマイズする
+</span>
+</div>
+</aside>
+<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
+<div id=xSiteFooter2>
+<a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
+</div>
+</div>
+<script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c],d=b.getElementsByTagName('img');if(d.length>0)continue;const e=b.getElementsByTagName('svg');if(e.length>0)continue;b.classList.add('xExternalLinkIcon'),b.setAttribute('target','_blank'),b.setAttribute('rel','noopener')}})</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"GraphQL","item":"https://maku.blog/p/cm9nyco/"},{"@type":"ListItem","position":4,"name":"Apollo Client","item":"https://maku.blog/p/uyw4qan/"},{"@type":"ListItem","position":5,"name":"Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマイズする","item":"https://maku.blog/p/xa62yo4/"}]}</script>
+</body>
+</html>
