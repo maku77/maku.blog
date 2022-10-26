@@ -330,6 +330,8 @@ export const App: React.FC = () => {
 
 ローカルストレージに保存されたアクセストークンは、GraphQL のリクエストを実行するたびに参照してくれるので、`ApolloClient` インスタンスを生成した後でアクセストークンが設定された場合にもうまく動作します。
 
+- 参考: [Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマイズする](/p/xa62yo4/)
+
 ### 環境変数に設定したアクセストークンを使用する
 
 ローカル環境での開発時に、何らかの理由で、環境変数に保存した GitHub アクセストークン ([Personal access token](https://github.com/settings/tokens)) を使用したい場合は、`index.tsx` の最初の方で、次のような感じで環境変数の値をローカルストレージにコピーしてしまえば OK です。
