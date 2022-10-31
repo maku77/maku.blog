@@ -85,7 +85,7 @@ $ npx graphql-codegen init   # npm (npx) の場合
 - What type of application are you building? Application built with __`React`__
 - Where is your schema?: (path or url) __`http://localhost:8080/graphql`__
 - Where are your operations and fragments?: __`src/**/*.tsx`__
-- Where to write the output: __`src/gql`__
+- Where to write the output: __`src/gql/`__
 - Do you want to generate an introspection file? __`No`__
 - How to name the config file? __`codegen.ts`__
 - What script in package.json should run the codegen? __`codegen`__
@@ -100,7 +100,7 @@ const config: CodegenConfig = {
   schema: "http://localhost:8080/graphql",
   documents: "src/**/*.tsx",
   generates: {
-    "src/gql": {
+    "src/gql/": {
       preset: "client",
       plugins: []
     }
@@ -125,7 +125,7 @@ overwrite: true
 schema: 'http://localhost:8080/graphql'
 documents: 'src/**/*.{ts,tsx}'
 generates:
-  src/gql:
+  src/gql/:
     preset: 'client'
 {{< /code >}}
 
@@ -241,6 +241,36 @@ export const MyComponent: FC = () => {
 
 これで GraphQL クエリ用の型情報を自力で定義する必要がなくなりました！
 ちなみに、自動生成された `graphql` 関数は、引数で渡す GraphQL ドキュメント（文字列リテラル）をキーにして戻り値を決めるという実装になっているため、文字列リテラルを 1 文字でも変えたら（スペースでも）、`graphql-codegen` によるコードの再生成が必要になることに注意してください。
+
+
+カスタムスカラー型のマッピング
+----
+
+GraphQL のスキーマ定義の中で次のようにカスタムスカラー型が定義されている場合、`graphql-codegen` はデフォルトで TypeScript の __`any`__ 型にマッピングしようとします。
+
+{{< code lang="graphql" title="GraphQL スキーマ定義（抜粋）" >}}
+scalar DateTime
+scalar Email
+scalar URI
+{{< /code >}}
+
+これらのカスタムスカラー型を TypeScript の `string` 型にマッピングしたいときは、`codegen.yml` の中で次のように __`scalars`__ プロパティを設定します。
+
+{{< code lang="yaml" title="codegen.yml" >}}
+overwrite: true
+schema: 'http://localhost:8080/graphql'
+documents: 'src/**/*.{ts,tsx}'
+generates:
+  src/gql/:
+    preset: 'client'
+    config:
+      scalars:
+        DateTime: string
+        Email: string
+        URI: string
+{{< /code >}}
+
+注: `scalars` オプションを使うには `@graphql-codegen/client-preset` パッケージ v1.0.4 以上が必要です（v1.0.3 までは不具合で `scalars` オプションを認識せず）
 
 
 自動生成されたコードを ESLint の解析対象外にする
