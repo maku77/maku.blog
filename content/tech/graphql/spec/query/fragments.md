@@ -150,7 +150,7 @@ __インライン・フラグメント (Inline fragments)__ は、インタフ�
 下記は、GitHub の GraphQL API を使って、特定のリポジトリの Issue と PullRequest の一覧を取得するクエリの例です。
 
 ```graphql
-query {
+query QueryRecentActivities {
   search(type: ISSUE, query: "repo:graphql/graphql-spec", last: 10) {
     nodes {
       ... on Issue {

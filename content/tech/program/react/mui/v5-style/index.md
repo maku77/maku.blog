@@ -285,6 +285,31 @@ const StyledDiv = styled('div')(({ theme }) => ({
 const Anchor = styled('a')({});
 ```
 
+ネストされた HTML 要素のスタイルを定義することもできます。
+次の `StyledTable` を `table` コンポーネントの代わりに使用すれば、子要素の `th` や `td` のスタイルも設定されます。
+
+```tsx
+const StyledTable = styled('table')({
+  borderCollapse: 'collapse',
+  fontSize: '12pt',
+  '& th': {
+    color: '#ddd',
+    background: '#333',
+    textAlign: 'left',
+    padding: '0.2em',
+    border: '0.5px solid black',
+  },
+  '& td': {
+    color: '#333',
+    background: '#f6f6f6',
+    padding: '0.2em',
+    border: '0.5px solid black',
+    fontFamily: 'Consolas, "Courier New"',
+  },
+})
+```
+
+
 （おまけ）styled API によるスタイル定義サンプル
 ----
 
