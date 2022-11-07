@@ -59,6 +59,11 @@
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/vuo4px3/>
+GraphQL スキーマ仕様: ページネーション (pagination)
+<time>2022-11-07</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/xa62yo4/>
 Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマイズする
 <time>2022-10-26</time></a>
@@ -77,11 +82,6 @@ GraphQL ベストプラクティス
 <a href=../../p/vqsyz9j/>
 GraphQL スキーマ仕様: ユニオン型 (Union types) を定義する
 <time>2022-10-10</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/n2k2hxd/>
-GraphQL Code Generator でスキーマから TypeScript の型情報を生成する (graphql-codegen)
-<time>2022-10-03</time></a>
 </div>
 </div>
 </div>
@@ -145,7 +145,7 @@ GraphQL Code Generator でスキーマから TypeScript の型情報を生成す
 </div><div class=xMenu_tag>
 <a href=../../tags/next.js>next.js (37)</a>
 </div><div class=xMenu_tag>
-<a href=../../tags/graphql>graphql (33)</a>
+<a href=../../tags/graphql>graphql (34)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/chatbot>chatbot (28)</a>
 </div><div class=xMenu_tag>
@@ -572,8 +572,8 @@ GraphQL Code Generator でスキーマから TypeScript の型情報を生成す
 <li><a href=#有名な実装パターン>有名な実装パターン</a>
 <ul>
 <li><a href=#サインイン済みユーザーを表す-me-フィールド>サインイン済みユーザーを表す me フィールド</a></li>
-<li><a href=#ページネーション-pagination>ページネーション (pagination)</a></li>
-<li><a href=#node-インタフェース>Node インタフェース</a></li>
+<li><a href=#ページネーションconnection-パターン>ページネーション（Connection パターン）</a></li>
+<li><a href=#node-インタフェースと-global-object-identification>Node インタフェースと Global Object Identification</a></li>
 </ul>
 </li>
 <li><a href=#セキュリティパフォーマンス>セキュリティ、パフォーマンス</a>
@@ -659,8 +659,8 @@ API 名に一貫性がないと、間違った使用の危険性があるだけ�
 <figcaption class=xCodeBlock_title>NG</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=c># 名詞と動詞が混ざってしまっている</span><span class=w>
 </span><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>products</span><span class=p>(</span><span class=py>ids</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>ID</span><span class=p>!]):</span><span class=w> </span><span class=p>[</span><span class=nc>Product</span><span class=p>!]!</span><span class=w>
-</span><span class=w>  </span><span class=py>findPost</span><span class=p>(</span><span class=py>ids</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>ID</span><span class=p>!]):</span><span class=w> </span><span class=p>[</span><span class=nc>Post</span><span class=p>!]!</span><span class=w>
+</span><span class=w>  </span><span class=py>products</span><span class=p>(</span><span class=py>ids</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>ID</span><span class=p>!]):</span><span class=w> </span><span class=p>[</span><span class=nc>Product</span><span class=p>!]</span><span class=w>
+</span><span class=w>  </span><span class=py>findPost</span><span class=p>(</span><span class=py>ids</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>ID</span><span class=p>!]):</span><span class=w> </span><span class=p>[</span><span class=nc>Post</span><span class=p>!]</span><span class=w>
 </span><span class=w></span><span class=p>}</span><span class=w>
 </span><span class=w>
 </span><span class=w></span><span class=c># 使用する動詞に一貫性がない（add と create）</span><span class=w>
@@ -794,7 +794,7 @@ GraphQL はもともと HTTP 前提ではないのですが、実際には Web �
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>NG</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>posts</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=p>!,</span><span class=w> </span><span class=py>includeArchived</span><span class=p>:</span><span class=w> </span><span class=nc>Boolean</span><span class=p>):</span><span class=w> </span><span class=p>[</span><span class=nc>Post</span><span class=p>!]!</span><span class=w>
+</span><span class=w>  </span><span class=py>posts</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=p>!,</span><span class=w> </span><span class=py>includeArchived</span><span class=p>:</span><span class=w> </span><span class=nc>Boolean</span><span class=p>):</span><span class=w> </span><span class=p>[</span><span class=nc>Post</span><span class=p>!]</span><span class=w>
 </span><span class=w></span><span class=p>}</span></code></pre></div></div>
 </figure>
 <p>上記の <code>posts</code> フィールドは、アーカイブ済みポストも返せるように汎用化が進んでいます。
@@ -802,8 +802,8 @@ GraphQL はもともと HTTP 前提ではないのですが、実際には Web �
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>Good</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>posts</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=p>!):</span><span class=w> </span><span class=p>[</span><span class=nc>Post</span><span class=p>!]!</span><span class=w>
-</span><span class=w>  </span><span class=py>archivedPosts</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=p>!)</span><span class=w> </span><span class=p>[</span><span class=py>Post</span><span class=p>!]!</span><span class=w>
+</span><span class=w>  </span><span class=py>posts</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=p>!):</span><span class=w> </span><span class=p>[</span><span class=nc>Post</span><span class=p>!]</span><span class=w>
+</span><span class=w>  </span><span class=py>archivedPosts</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=p>!)</span><span class=w> </span><span class=p>[</span><span class=py>Post</span><span class=p>!]</span><span class=w>
 </span><span class=w></span><span class=p>}</span></code></pre></div></div>
 </figure>
 <p>このように特化されたフィールドとして定義されていると、その API の使い方が明確になるため、クライアント実装の不具合が減ります。
@@ -833,7 +833,7 @@ GraphQL はもともと HTTP 前提ではないのですが、実際には Web �
 <p>フィールドパラメーターとして、ソート順序やフィルタ条件などのオプションを追加する場合、パラメーター省略時の振る舞いをスキーマから読み取れるようにすべきです。
 次の例では、パラメーターのデフォルト値を設定することで、API の振る舞いを明確にしています。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>games</span><span class=p>(</span><span class=py>sort</span><span class=p>:</span><span class=w> </span><span class=nc>SortOrder</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=py>DESC</span><span class=p>):</span><span class=w> </span><span class=p>[</span><span class=nc>Game</span><span class=p>!]!</span><span class=w>
+</span><span class=w>  </span><span class=py>games</span><span class=p>(</span><span class=py>sort</span><span class=p>:</span><span class=w> </span><span class=nc>SortOrder</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=py>DESC</span><span class=p>):</span><span class=w> </span><span class=p>[</span><span class=nc>Game</span><span class=p>!]</span><span class=w>
 </span><span class=w></span><span class=p>}</span><span class=w>
 </span></code></pre></div><ul>
 <li>参考: <a href=../../p/isotm77/>GraphQL スキーマ仕様: 列挙型 (enum type) を定義する</a></li>
@@ -938,11 +938,76 @@ GraphQL には、リレーショナルデータベース (RDB) のようなト�
 </span><span class=w>
 </span><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>User</span><span class=w> </span><span class=p>{</span><span class=w>
 </span><span class=w>  </span><span class=py>taskList</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>Task</span><span class=p>!]!</span><span class=w>
+</span><span class=w>  </span><span class=c># ...</span><span class=w>
+</span><span class=w></span><span class=p>}</span><span class=w>
 </span></code></pre></div><p>ユーザーがサインインしていない場合は、<code>me</code> フィールドの値は <code>null</code> になるので、サインイン済みかどうかの判断にも利用できます。</p>
-<h3 id=ページネーション-pagination>ページネーション (pagination)</h3>
-<p>かきかき中( ..)φ&mldr;</p>
-<h3 id=node-インタフェース>Node インタフェース</h3>
-<p>かきかき中( ..)φ&mldr;</p>
+<h3 id=ページネーションconnection-パターン>ページネーション（Connection パターン）</h3>
+<p>クエリのレスポンスとして多数のデータを返す可能性がある場合は、ページネーションに対応したフィールドとして定義することで、データを部分的に取得できるようにします。
+ページネーションの実装方法は自由ですが、Facebook の Relay ライブラリが提唱している <strong>Connection パターン</strong> を採用するのが一般的です。
+Connection パターンでは、フィールドを定義するときに、値のリストの代わりに Connection 型のオブジェクトを返すようにし、統一された方法でページネーション処理を行えるようにします。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=py>games</span><span class=p>(</span><span class=w>
+</span><span class=w>    </span><span class=py>after</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
+</span><span class=w>    </span><span class=py>before</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
+</span><span class=w>    </span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=w>
+</span><span class=w>    </span><span class=py>last</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=w>
+</span><span class=w>  </span><span class=p>):</span><span class=w> </span><span class=nc>GameConnection</span><span class=w>
+</span><span class=w></span><span class=p>}</span><span class=w>
+</span></code></pre></div><ul>
+<li>参考: <a href=../../p/vuo4px3/>GraphQL スキーマ仕様: ページネーション (pagination)</a></li>
+<li>参考: <a href=https://relay.dev/graphql/connections.htm>GraphQL Cursor Connections Specification - Relay</a></li>
+</ul>
+<p>Connection パターンに従ってスキーマ定義を行うことで、クライアントアプリの実装者は見慣れた方法でページネーション処理を実装できるようになります。
+また、GraphQL ライブラリによっては、Connection パターンでのスキーマ定義を前提としていることがあります。</p>
+<h3 id=node-インタフェースと-global-object-identification>Node インタフェースと Global Object Identification</h3>
+<p>GraphQL スキーマでは、<code>id: ID!</code> フィールドを持つ <strong><code>Node</code> インタフェース</strong> を定義し、すべてのオブジェクト型がこれを実装するようにします。
+この <code>id</code> フィールドにはシステム全体でユニークな ID を格納し、すべてのオブジェクトを ID で特定できるようにします (<strong>Global Object Identification</strong>)。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=c># An object with a Globally Unique ID</span><span class=w>
+</span><span class=w></span><span class=kd>interface</span><span class=w> </span><span class=nc>Node</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=c># The ID of the object.</span><span class=w>
+</span><span class=w>  </span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>ID</span><span class=p>!</span><span class=w>
+</span><span class=w></span><span class=p>}</span><span class=w>
+</span><span class=w>
+</span><span class=w></span><span class=c># The query root of GitHub&#39;s GraphQL interface.</span><span class=w>
+</span><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=c># Fetches an object given its ID.</span><span class=w>
+</span><span class=w>  </span><span class=py>node</span><span class=p>(</span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>ID</span><span class=p>!):</span><span class=w> </span><span class=nc>Node</span><span class=w>
+</span><span class=w></span><span class=p>}</span><span class=w>
+</span><span class=w>
+</span><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>User</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=nc>Node</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>ID</span><span class=p>!</span><span class=w>
+</span><span class=w>  </span><span class=py>login</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!</span><span class=w>
+</span><span class=w>  </span><span class=py>name</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
+</span><span class=w>  </span><span class=c># ...</span><span class=w>
+</span><span class=w></span><span class=p>}</span><span class=w>
+</span></code></pre></div><p><code>Node</code> インタフェースを備えるすべてのオブジェクトは、トップレベルの <strong><code>node</code></strong> クエリを使って参照できるようにします。
+下記は、GitHub の GraphQL API を使ってユーザー情報 (<code>User</code>) を取得するクエリの例です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>node クエリの例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=nc>QueryUser</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>  </span><span class=py>node</span><span class=p>(</span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=s>&#34;MDQ6VXNlcjU1MTk1MDM=&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>    </span><span class=kd>...</span><span class=w> </span><span class=nc>on</span><span class=w> </span><span class=py>User</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>      </span><span class=py>id</span><span class=w>
+</span><span class=w>      </span><span class=py>login</span><span class=w>
+</span><span class=w>      </span><span class=py>name</span><span class=w>
+</span><span class=w>    </span><span class=p>}</span><span class=w>
+</span><span class=w>  </span><span class=p>}</span><span class=w>
+</span><span class=w></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<div class=xNote>
+<span class=xNote_title>☝️ 一意な ID の作り方</span>
+<span class=xNote_body>上記のクエリ例で指定している <code>MDQ6VXNlcjU1MTk1MDM=</code> という ID は、ランダムな文字列のように見えますが、実は <code>04:User5519503</code> という文字列を Base64 エンコードしたものです。
+この文字列は <strong>APIバージョン + オブジェクトタイプ + オブジェクトID</strong> という構成になっており、GitHub 内部の API 実装で利用されています。
+このテクニックを使うと、GraphQL API のリゾルバーを実装する際に、ID のマッピングテーブルを作成する必要がなくなります。</span>
+</div>
+<p>すべてのオブジェクト型に <code>Node</code> インタフェースを実装し、一意の ID を割り当てることには様々なメリットがあります。</p>
+<ul>
+<li>GraphQL ライブラリは、ID 情報をキーにしてオブジェクトをキャッシュすることができます（実際に Apollo Client ライブラリなどは、オブジェクト型が <code>id</code> フィールドを備えていることを前提とした作りになっています）</li>
+<li>クライアントアプリがオブジェクトの更新情報を取得するときに、統一された方法でフェッチできます</li>
+<li>GraphQL API サーバーで、あるオブジェクトの情報を構築するときに、複雑に階層化されたノードを処理する必要がなくなります（ワンステップでデータソースから情報を取り出せます）</li>
+<li>インタフェースが統一されることで、様々なツールとの連携が可能になります。例えば、ページネーション用のクエリを自動生成できます（ページネーション実装に使われる Connection パターンも <code>Node</code> インタフェースを利用しています）</li>
+</ul>
+<p><code>Node</code> インタフェースは、Facebook の Relay フレームワークの実装から生まれたコンセプトですが、<a href=https://graphql.org/learn/global-object-identification/>GraphQL 公式のベストプラクティス</a> としても掲載されるようになりました。</p>
 <h2 id=セキュリティパフォーマンス>セキュリティ、パフォーマンス</h2>
 <h3 id=エラーレスポンスに実装の詳細情報を含めない>エラーレスポンスに実装の詳細情報を含めない</h3>
 <p>GraphQL API の呼び出しでエラーが発生したときに、エラー情報としてサーバー側の実装詳細（スタックトレースなど）を返してしまうと、悪意のあるユーザーに不正アクセスのヒントを与えてしまいます。
