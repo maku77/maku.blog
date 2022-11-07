@@ -95,8 +95,8 @@ API 名に一貫性がないと、間違った使用の危険性があるだけ�
 {{< code lang="graphql" title="NG" >}}
 # 名詞と動詞が混ざってしまっている
 type Query {
-  products(ids: [ID!]): [Product!]!
-  findPost(ids: [ID!]): [Post!]!
+  products(ids: [ID!]): [Product!]
+  findPost(ids: [ID!]): [Post!]
 }
 
 # 使用する動詞に一貫性がない（add と create）
@@ -268,7 +268,7 @@ scalar CreditCardNumber
 
 {{< code lang="graphql" title="NG" >}}
 type Query {
-  posts(first: Int!, includeArchived: Boolean): [Post!]!
+  posts(first: Int!, includeArchived: Boolean): [Post!]
 }
 {{< /code >}}
 
@@ -277,8 +277,8 @@ type Query {
 
 {{< code lang="graphql" title="Good" >}}
 type Query {
-  posts(first: Int!): [Post!]!
-  archivedPosts(first: Int!) [Post!]!
+  posts(first: Int!): [Post!]
+  archivedPosts(first: Int!) [Post!]
 }
 {{< /code >}}
 
@@ -315,7 +315,7 @@ type Query {
 
 ```graphql
 type Query {
-  games(sort: SortOrder = DESC): [Game!]!
+  games(sort: SortOrder = DESC): [Game!]
 }
 ```
 
@@ -386,7 +386,6 @@ type CreditCard {
 3. あるオブジェクト型のフィールドであり、そのオブジェクトが存在するときに必ず存在することが分かっているデータあれば、そのフィールドは __Non-null__ で定義することができます（そのフィールドを含むオブジェクト自身は Nullable になり得ます）。
 
 
-
 ミューテーション (mutation)
 ----
 
@@ -446,17 +445,90 @@ type Query {
 
 type User {
   taskList: [Task!]!
+  # ...
+}
 ```
 
 ユーザーがサインインしていない場合は、`me` フィールドの値は `null` になるので、サインイン済みかどうかの判断にも利用できます。
 
-### ページネーション (pagination)
+### ページネーション（Connection パターン）
 
-かきかき中( ..)φ...
+クエリのレスポンスとして多数のデータを返す可能性がある場合は、ページネーションに対応したフィールドとして定義することで、データを部分的に取得できるようにします。
+ページネーションの実装方法は自由ですが、Facebook の Relay ライブラリが提唱している __Connection パターン__ を採用するのが一般的です。
+Connection パターンでは、フィールドを定義するときに、値のリストの代わりに Connection 型のオブジェクトを返すようにし、統一された方法でページネーション処理を行えるようにします。
 
-### Node インタフェース
+```graphql
+type Query {
+  games(
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): GameConnection
+}
+```
 
-かきかき中( ..)φ...
+- 参考: [GraphQL スキーマ仕様: ページネーション (pagination)](/p/vuo4px3/)
+- 参考: [GraphQL Cursor Connections Specification - Relay](https://relay.dev/graphql/connections.htm)
+
+Connection パターンに従ってスキーマ定義を行うことで、クライアントアプリの実装者は見慣れた方法でページネーション処理を実装できるようになります。
+また、GraphQL ライブラリによっては、Connection パターンでのスキーマ定義を前提としていることがあります。
+
+### Node インタフェースと Global Object Identification
+
+GraphQL スキーマでは、`id: ID!` フィールドを持つ __`Node` インタフェース__ を定義し、すべてのオブジェクト型がこれを実装するようにします。
+この `id` フィールドにはシステム全体でユニークな ID を格納し、すべてのオブジェクトを ID で特定できるようにします (__Global Object Identification__)。
+
+```graphql
+# An object with a Globally Unique ID
+interface Node {
+  # The ID of the object.
+  id: ID!
+}
+
+# The query root of GitHub's GraphQL interface.
+type Query {
+  # Fetches an object given its ID.
+  node(id: ID!): Node
+}
+
+type User implements Node {
+  id: ID!
+  login: String!
+  name: String
+  # ...
+}
+```
+
+`Node` インタフェースを備えるすべてのオブジェクトは、トップレベルの __`node`__ クエリを使って参照できるようにします。
+下記は、GitHub の GraphQL API を使ってユーザー情報 (`User`) を取得するクエリの例です。
+
+{{< code lang="graphql" title="node クエリの例" >}}
+query QueryUser {
+  node(id: "MDQ6VXNlcjU1MTk1MDM=") {
+    ... on User {
+      id
+      login
+      name
+    }
+  }
+}
+{{< /code >}}
+
+{{% note title="一意な ID の作り方" %}}
+上記のクエリ例で指定している `MDQ6VXNlcjU1MTk1MDM=` という ID は、ランダムな文字列のように見えますが、実は `04:User5519503` という文字列を Base64 エンコードしたものです。
+この文字列は __APIバージョン + オブジェクトタイプ + オブジェクトID__ という構成になっており、GitHub 内部の API 実装で利用されています。
+このテクニックを使うと、GraphQL API のリゾルバーを実装する際に、ID のマッピングテーブルを作成する必要がなくなります。
+{{% /note %}}
+
+すべてのオブジェクト型に `Node` インタフェースを実装し、一意の ID を割り当てることには様々なメリットがあります。
+
+- GraphQL ライブラリは、ID 情報をキーにしてオブジェクトをキャッシュすることができます（実際に Apollo Client ライブラリなどは、オブジェクト型が `id` フィールドを備えていることを前提とした作りになっています）
+- クライアントアプリがオブジェクトの更新情報を取得するときに、統一された方法でフェッチできます
+- GraphQL API サーバーで、あるオブジェクトの情報を構築するときに、複雑に階層化されたノードを処理する必要がなくなります（ワンステップでデータソースから情報を取り出せます）
+- インタフェースが統一されることで、様々なツールとの連携が可能になります。例えば、ページネーション用のクエリを自動生成できます（ページネーション実装に使われる Connection パターンも `Node` インタフェースを利用しています）
+
+`Node` インタフェースは、Facebook の Relay フレームワークの実装から生まれたコンセプトですが、[GraphQL 公式のベストプラクティス](https://graphql.org/learn/global-object-identification/) としても掲載されるようになりました。
 
 
 セキュリティ、パフォーマンス

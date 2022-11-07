@@ -2,19 +2,23 @@
 title: "GraphQL スキーマ仕様: ページネーション (pagination)"
 url: "p/vuo4px3/"
 date: "2022-10-24"
+lastmod: "2022-11-07"
 tags: ["GraphQL"]
-draft: true
 ---
+
+{{% private %}}
+- [Pagination | GraphQL](https://graphql.org/learn/pagination/)
+{{% /private %}}
 
 ページネーションとは？
 ----
 
 GraphQL API で数百件を超えるような大量のデータを取得できるようにする場合は、ページネーション処理を考慮した API 定義を行うのが一般的です。
 ページネーションというのは、Google の検索結果にあるような「次へ」「前へ」というような機能のことです。
-ページネーションをどう実装すべきかは、GraphQL の仕様として定義されているわけではないのですが、デファクトスタンダードな実装方法が確立されています。
+ページネーションをどう実装すべきかは、GraphQL の仕様として定義されているわけではないのですが、デファクトスタンダードな実装方法が確立されており、大きく次の 2 種類の実装方法があります。
 
-- 方法1: オフセット・ページネーション (offset pagination)
-- 方法2: カーソル・ページネーション (cursor pagination)
+- __オフセット・ページネーション (offset pagination)__
+- __カーソル・ページネーション (cursor pagination)__
 
 それぞれの方法を順に見ていきます。
 
@@ -45,13 +49,16 @@ SELECT * FROM books LIMIT 100 OFFSET 500;
 ```
 
 クライアントは 100 件分のデータしか要求していませんが、RDB 側の処理としては、500 + 100 件分の読み出しが必要になります。
-しかも厄介なことに、`OFFSET` が増加するごとに読み出し量が増えていくため、後ろの方のページを表示しようとするとパフォーマンスが悪くなります。
+しかも厄介なことに、`OFFSET` が増加するごとに読み出し量が増えていくため、ページを進めていくたびにパフォーマンスが悪化していきます。
 クラウド系の RDB サービスを使っている場合は、多額の料金を請求されることになります。
 
-### 結果の一貫性が保てないことがある
+### 結果の一貫性を保てないことがある
 
-あるページを表示しているときに、バックグラウンドでレコードが追加されると、その次のページに移ったときに、同じレコードが表示されたりします。
-まぁこのあたりは表示仕様で妥協することはできるかもしれませんが、1 つ目の DB アクセスのコスト問題は解決が難しく、多くの API では、次のカーソルベースのページネーションが採用されています。
+あるページを表示しているときに、バックグラウンドでレコードが追加されると、その次のページに移ったときに、同じレコードが表示される可能性があります。
+逆にレコードが削除された場合は、次のページに移ったときに、表示されるべきレコードが飛ばされてしまったりします。
+これは、表示位置を常に先頭レコードからのオフセットで指定していることが原因です。
+
+結果の一貫性に関しては表示仕様で妥協することはできるかもしれませんが、1 つ目の DB アクセスのコスト問題は解決が難しく、多くの Public API では、次のカーソルベースのページネーションが採用されています。
 
 
 カーソル・ページネーション (cursor pagination)
@@ -87,20 +94,38 @@ query GetBooks {
 }
 {{< /code >}}
 
-カーソル・ページネーションの明らかな欠点は、ページのスキップができないということです。
+カーソル・ページネーションの明らかな欠点は、__ページのスキップができない__ ということです。
 あるページにたどり着くには、先頭ページ、あるいは末尾ページからページ送りしていくしかありません。
-また、全体で何ページ分のデータが存在するかを簡単に取得する方法もありません（これはバックエンドで使用する DB にもよりますが）。
+また、全体で何ページ分のデータが存在するかを効率的に取得する方法がなかったりします。
+とはいえ、このあたりの制約は、バックエンドで使用する DB サービス側で緩和されていく可能性があります。
+例えば、Firebase の Firestore データベースでは、2022 年末にコレクション内のドキュメント数を取得する `count` 関数が [実験導入](https://firebase.blog/posts/2022/10/whats-new-at-Firebase-Summit-2022) されています。
 
 
 Connection パターン（Relay ライブラリ）
 ----
 
-カーソル・ページネーションの実装は、Facebook の Relay ライブラリの Connections という設計を参考にしていることが多く、これを __Connection パターン__ と呼んだりします。
+{{% private %}}
+- [GraphQL Server Specification | Relay](https://relay.dev/docs/guides/graphql-server-specification/#connections)
+{{% /private %}}
+
+カーソル・ページネーションの実装は、[Facebook の Relay ライブラリ](https://relay.dev/) の Connections という実装を参考にしていることが多く、これを __Connection パターン__ と呼んだりします。
 GitHub の GraphQL API もこれを採用しています。
 Connection パターンでは、ページングの必要なリストデータを返す際に、__Connection 型__ のオブジェクトを返します。
-Connection 型は、__`edges`__ と __`pageInfo`__ という 2 つのフィールドを持っています。
 
-{{< code lang="graphql" title="Connection オブジェクトを返すクエリの例" >}}
+{{< code lang="graphql" title="Connection 型を返すフィールドの定義" >}}
+type Query {
+  books(
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): BookConnection!
+}
+{{< /code >}}
+
+`Connection` 型は、__`edges`__ と __`pageInfo`__ という 2 つのフィールドを持っています。
+
+{{< code lang="graphql" title="Connection 型を扱うクエリ" >}}
 query GetBooks {
   books(first: 100, after: "e4d75f") {
     edges {  # 指定されたサイズ (=100) の Edge オブジェクト
@@ -137,15 +162,49 @@ type PageInfo {
   hasPreviousPage: Boolean!
 }
 
-type Book {
+type Book implements Node {
+  id: ID!
   title: String!
   authors: [String!]!
 }
 ```
 
 `PageInfo` 型のフィールド定義を見ると分かるように、ページング処理では、前方に進む (`hasPreviousPage` & `startCursor`) ことも、後方に進む (`hasNextPage` & `endCursor`) こともできるようになっています。
-ただし、前述の通り、ランダムアクセスはできません。
+ただし、これはいわゆるリンクリスト構造であり、前述の通りランダムアクセスはできません。
 
 GitHub API の場合、`Edge` 型に追加の `role` フィールドを持たせていたりします。
 取得したいデータ (上記の例では `Book` 型の `node` フィールド）が `Edge` 型でラップされているので、こういったメタ情報を付加することが可能です。
+また、GitHub API は `Connection` 型にも追加のフィールドを用意しています。
+
+{{< code lang="graphql" title="GitHub GraphQL スキーマの TeamMemberConnection オブジェクト型" >}}
+"""
+The connection type for User.
+"""
+type TeamMemberConnection {
+  """
+  A list of edges.
+  """
+  edges: [TeamMemberEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [User]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+{{< /code >}}
+
+上記の例では、`nodes` フィールドが `edges { node }` というクエリのショートカットとして使えるようになっており、`totalCount` でデータの総数を取得できるようになっています（クエリで返された `nodes` のサイズではなく、全データの数）。
+`nodes` フィールドに関しては採用してもよいかもしれませんが、__`Connection` 型への `totalCount` フィールドの追加は慎重に行うべき__ です。
+データソースによっては、リゾルバー内で `totalCount` を求めるのにコストがかかることがあるからです。
+`totalCount` フィールドの有無はフロントエンドの仕様に影響を与えやすいところであり、一度追加した `totalCount` フィールドを削除するのは困難です。
 
