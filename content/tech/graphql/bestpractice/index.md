@@ -367,7 +367,7 @@ type Payment {
 {{< code lang="graphql" title="Good" >}}
 type Payment {
   creditCard: CreaditCard
-  giftCode
+  giftCode: String
 }
 
 type CreditCard {
