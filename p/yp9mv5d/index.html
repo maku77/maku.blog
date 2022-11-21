@@ -11,10 +11,12 @@
 <meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
 <meta property="og:image:width" content="1436">
 <meta property="og:image:height" content="746">
-<meta property="og:description" content="GraphQL のインタフェース型は、複数の型が共通して持つフィールドを定義するための抽象型で、interface キーワードを使って定義します。 次の ScheduleItem インタフェースは、2 つのフィールド（id と title）を持つことを示しています。 インタフェースを実装する (imlements) 側の型は、必ず id と title フィールドを持つ必要があります。
-スキーマ定義 # 共通のインタフェースを定義interfaceScheduleItem{id:ID!title:String!}# Task 型は必ず id と title フィールドを持つtypeTaskimplementsScheduleItem{id:ID!title:String!content:String}# Milestone 型は必ず id と title フィールドを持つtypeMilestoneimplementsScheduleItem{id:ID!title:String!date:DateTime}scalarDateTimetypeQuery{allItems():[ScheduleItem!]}  上記の Task 型と Milestone 型は、ScheduleItem というインタフェースを実装しています。 allItems クエリは、Task と Milestone を要素に持つリストを返すことを想定していますが、戻り値のリスト要素の型が ScheduleItem になっているため、必ず id と title フィールドが含まれることが保証されています。 クエリ内でリスト要素を参照するときは、次のように直接これらのフィールドを参照できます。
+<meta property="og:description" content="インタフェース型を定義する GraphQL のインタフェース型は、複数の型が共通して持つフィールドを定義するための抽象型で、interface キーワードを使って定義します。 次の ScheduleItem インタフェースは、2 つのフィールド（id と title）を持つことを示しています。
+スキーマ定義 # 共通のインタフェースを定義interfaceScheduleItem{id:ID!title:String!}  インタフェースを実装する (imlements) 側の型は、必ず id と title フィールドを持つ必要があります。 次の Task オブジェクト型と Milestone オブジェクト型は、ScheduleItem というインタフェースを実装しています。
+スキーマ定義（続き） # Task 型は必ず id と title フィールドを持つtypeTaskimplementsScheduleItem{id:ID!title:String!content:String}# Milestone 型は必ず id と title フィールドを持つtypeMilestoneimplementsScheduleItem{id:ID!title:String!date:DateTime}scalarDateTimetypeQuery{allItems():[ScheduleItem!]}  トップレベルの allItems クエリは、Task あるいは Milestone を要素とするリストを返すことを想定していますが、戻り値のリスト要素の型が ScheduleItem になっているため、必ず id と title フィールドが含まれることが保証されています。
+クエリでインタフェース型を使う GraphQL クエリでインタフェース型のオブジェクトを返すフィールドを参照する場合、インタフェースで定義されたフィールドは、次のように直接参照することができます。
 クエリ queryQueryAllItems{allItems{idtitle}}  一方、Task 型や Milestone 型にしか含まれないフィールドを取得したいときは、次のように インラインフラグメント (... on Xxx) の形で分岐させて参照する必要があります。
-クエリ queryQueryAllItems{allItems{idtitle...onTask{content}...onMilestone{date}}}  複数のインタフェースを実装したいときは、次のように implements の後ろにインタフェース名を & で並べます。">
+クエリ queryQueryAllItems{allItems{idtitle.">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -63,6 +65,11 @@
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/4reqy9i/>
+GraphQL ベストプラクティス
+<time>2022-11-21</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/vgs4dnw/>
 Next.js アプリでのリンク方法まとめ（mui/Material-UI との連携なども） (next/link, next/router)
 <time>2022-11-19</time></a>
@@ -81,11 +88,6 @@ Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマ
 <a href=../../p/mu7gqya/>
 IGDB API でゲーム情報のデータベースにアクセスしてみる
 <time>2022-10-24</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/4reqy9i/>
-GraphQL ベストプラクティス
-<time>2022-10-12</time></a>
 </div>
 </div>
 </div>
@@ -542,18 +544,29 @@ GraphQL ベストプラクティス
 </span>
 </header>
 <div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents></nav><p>GraphQL のインタフェース型は、複数の型が共通して持つフィールドを定義するための抽象型で、<strong><code>interface</code></strong> キーワードを使って定義します。
-次の <code>ScheduleItem</code> インタフェースは、2 つのフィールド（<code>id</code> と <code>title</code>）を持つことを示しています。
-インタフェースを実装する (<strong><code>imlements</code></strong>) 側の型は、必ず <code>id</code> と <code>title</code> フィールドを持つ必要があります。</p>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#インタフェース型を定義する>インタフェース型を定義する</a></li>
+<li><a href=#クエリでインタフェース型を使う>クエリでインタフェース型を使う</a></li>
+<li><a href=#複数のインタフェースを実装するオブジェクト型>複数のインタフェースを実装するオブジェクト型</a></li>
+<li><a href=#インタフェース型とユニオン型の使い分け>インタフェース型とユニオン型の使い分け</a></li>
+</ul>
+</nav><h2 id=インタフェース型を定義する>インタフェース型を定義する</h2>
+<p>GraphQL のインタフェース型は、複数の型が共通して持つフィールドを定義するための抽象型で、<strong><code>interface</code></strong> キーワードを使って定義します。
+次の <code>ScheduleItem</code> インタフェースは、2 つのフィールド（<code>id</code> と <code>title</code>）を持つことを示しています。</p>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>スキーマ定義</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=c># 共通のインタフェースを定義</span><span class=w>
 </span><span class=w></span><span class=kd>interface</span><span class=w> </span><span class=nc>ScheduleItem</span><span class=w> </span><span class=p>{</span><span class=w>
 </span><span class=w>  </span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>ID</span><span class=p>!</span><span class=w>
 </span><span class=w>  </span><span class=py>title</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span><span class=w>
-</span><span class=w></span><span class=c># Task 型は必ず id と title フィールドを持つ</span><span class=w>
+</span><span class=w></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<p>インタフェースを実装する (<strong><code>imlements</code></strong>) 側の型は、必ず <code>id</code> と <code>title</code> フィールドを持つ必要があります。
+次の <code>Task</code> オブジェクト型と <code>Milestone</code> オブジェクト型は、<code>ScheduleItem</code> というインタフェースを実装しています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>スキーマ定義（続き）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=c># Task 型は必ず id と title フィールドを持つ</span><span class=w>
 </span><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>Task</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=nc>ScheduleItem</span><span class=w> </span><span class=p>{</span><span class=w>
 </span><span class=w>  </span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>ID</span><span class=p>!</span><span class=w>
 </span><span class=w>  </span><span class=py>title</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!</span><span class=w>
@@ -573,9 +586,9 @@ GraphQL ベストプラクティス
 </span><span class=w>  </span><span class=py>allItems</span><span class=p>():</span><span class=w> </span><span class=p>[</span><span class=nc>ScheduleItem</span><span class=p>!]</span><span class=w>
 </span><span class=w></span><span class=p>}</span></code></pre></div></div>
 </figure>
-<p>上記の <code>Task</code> 型と <code>Milestone</code> 型は、<code>ScheduleItem</code> というインタフェースを実装しています。
-<code>allItems</code> クエリは、<code>Task</code> と <code>Milestone</code> を要素に持つリストを返すことを想定していますが、戻り値のリスト要素の型が <code>ScheduleItem</code> になっているため、必ず <code>id</code> と <code>title</code> フィールドが含まれることが保証されています。
-クエリ内でリスト要素を参照するときは、次のように直接これらのフィールドを参照できます。</p>
+<p>トップレベルの <code>allItems</code> クエリは、<code>Task</code> あるいは <code>Milestone</code> を要素とするリストを返すことを想定していますが、戻り値のリスト要素の型が <code>ScheduleItem</code> になっているため、必ず <code>id</code> と <code>title</code> フィールドが含まれることが保証されています。</p>
+<h2 id=クエリでインタフェース型を使う>クエリでインタフェース型を使う</h2>
+<p>GraphQL クエリでインタフェース型のオブジェクトを返すフィールドを参照する場合、インタフェースで定義されたフィールドは、次のように直接参照することができます。</p>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>クエリ</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=nc>QueryAllItems</span><span class=w> </span><span class=p>{</span><span class=w>
@@ -601,14 +614,20 @@ GraphQL ベストプラクティス
 </span><span class=w>  </span><span class=p>}</span><span class=w>
 </span><span class=w></span><span class=p>}</span></code></pre></div></div>
 </figure>
-<p>複数のインタフェースを実装したいときは、次のように <code>implements</code> の後ろにインタフェース名を <strong><code>&</code></strong> で並べます。</p>
+<h2 id=複数のインタフェースを実装するオブジェクト型>複数のインタフェースを実装するオブジェクト型</h2>
+<p>あるオブジェクト型に複数のインタフェースを実装したいときは、次のように <code>implements</code> の後ろにインタフェース名を <strong><code>&</code></strong> で並べます。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=s>&#34;&#34;&#34;
 </span><span class=s>Represents a Milestone object on a given repository.
 </span><span class=s>&#34;&#34;&#34;</span><span class=w>
 </span><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>Milestone</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=nc>Closable</span><span class=w> </span><span class=err>&amp;</span><span class=w> </span><span class=py>Node</span><span class=w> </span><span class=err>&amp;</span><span class=w> </span><span class=py>UniformResourceLocatable</span><span class=w> </span><span class=p>{</span><span class=w>
 </span><span class=w>  </span><span class=c># ...</span><span class=w>
 </span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div>
+</span></code></pre></div><h2 id=インタフェース型とユニオン型の使い分け>インタフェース型とユニオン型の使い分け</h2>
+<p>インタフェース型とユニオン型は、どちらも抽象型 (abstract types) を構成するための仕組みですが、両者は全く逆の意味を持っています。
+インタフェース型が、<strong>複数の型が同じ振る舞い</strong> をすることを表現するのに対し、ユニオン型は、あるオブジェクトの実体が <strong>異なる型になり得る</strong> ことを表現しています。</p>
+<ul>
+<li>参考: <a href=../../p/vqsyz9j/>ユニオン型 (Union types) を定義する</a></li>
+</ul>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">

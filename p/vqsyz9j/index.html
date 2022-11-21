@@ -11,10 +11,12 @@
 <meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
 <meta property="og:image:width" content="1436">
 <meta property="og:image:height" content="746">
-<meta property="og:description" content="GraphQL スキーマの ユニオン型 (Union types) は、複数の型のうち、いずれかの型であることを表現する型です。 典型的には、検索系のフィールドにおいて、様々な種類のデータを返す場合に使われます。 ユニオン型は、union キーワードを使って次のように定義します。
+<meta property="og:description" content="ユニオン型を定義する GraphQL スキーマの ユニオン型 (Union types) は、複数の型のうち、いずれかの型であることを表現する型です。 典型的には、検索系のフィールドにおいて、様々な種類のデータを返す場合に使われます。 ユニオン型は、union キーワードを使って次のように定義します。
 ユニオン型の定義 unionTaskOrTodo=Task|TodotypeQuery{search(term:String!):[TaskOrTodo!]}  下記は GitHub の GraphQL スキーマで定義されているユニオン型の例です。
-GitHub API の union 型の例 &#34;&#34;&#34; Used for return value of Repository.issueOrPullRequest. &#34;&#34;&#34;unionIssueOrPullRequest=Issue|PullRequest&#34;&#34;&#34; Types that can be inside a Milestone. &#34;&#34;&#34;unionMilestoneItem=Issue|PullRequest  GraphQL クエリにおいてユニオン型のフィールドを参照するときは、インラインフラグメント を使って、具体的な型ごとにフィールドを参照する必要があります。
-ユニオン型のフィールドを参照するクエリ queryQueryRecentActivities{search(type:ISSUE,query:&#34;repo:graphql/graphql-spec&#34;,last:10){nodes{...onIssue{numbertitle}...onPullRequest{titlebaseRefName}}}}  ユニオン型は、エラーを表現するためにも使用できます。 次の createBook は新しい書籍データを登録するための mutation ですが、登録に成功したときは Book オブジェクトを返し、失敗したときは各種エラーを表すオブジェクトを返します。">
+GitHub API の union 型の例 &#34;&#34;&#34; Used for return value of Repository.issueOrPullRequest. &#34;&#34;&#34;unionIssueOrPullRequest=Issue|PullRequest&#34;&#34;&#34; Types that can be inside a Milestone. &#34;&#34;&#34;unionMilestoneItem=Issue|PullRequest  クエリでユニオン型を使う GraphQL クエリにおいてユニオン型のフィールドを参照するときは、インラインフラグメント を使って、具体的な型ごとにフィールドを参照する必要があります。
+ユニオン型のフィールドを参照するクエリ queryQueryRecentActivities{search(type:ISSUE,query:&#34;repo:graphql/graphql-spec&#34;,last:10){nodes{...onIssue{numbertitle}...onPullRequest{titlebaseRefName}}}}  ユニオン型をエラー表現に利用する ユニオン型は、エラーを表現するためにも使用できます。 次の createBook は新しい書籍データを登録するための mutation ですが、登録に成功したときは Book オブジェクトを返し、失敗したときは各種エラーを表すオブジェクトを返します。
+typeMutation{addBook(input:AddBookInput!):AddBookPayload!}unionAddBookPayload=Book|AlreadyExistError|InvalidTitleErrorユニオン型とインタフェース型の使い分け ユニオン型とインタフェース型は、どちらも抽象型 (abstract types) を構成するための仕組みですが、両者は全く逆の意味を持っています。 ユニオン型が、あるオブジェクトの実体が 異なる型になり得る ことを表現するのに対し、インタフェース型は、複数の型が同じ振る舞い をすることを表現しています。
+ 参考: インタフェース型 (interface type) を定義する  ">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -63,6 +65,11 @@ GitHub API の union 型の例 &#34;&#34;&#34; Used for return value of Reposito
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/4reqy9i/>
+GraphQL ベストプラクティス
+<time>2022-11-21</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/vgs4dnw/>
 Next.js アプリでのリンク方法まとめ（mui/Material-UI との連携なども） (next/link, next/router)
 <time>2022-11-19</time></a>
@@ -81,11 +88,6 @@ Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマ
 <a href=../../p/mu7gqya/>
 IGDB API でゲーム情報のデータベースにアクセスしてみる
 <time>2022-10-24</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/4reqy9i/>
-GraphQL ベストプラクティス
-<time>2022-10-12</time></a>
 </div>
 </div>
 </div>
@@ -542,7 +544,15 @@ GraphQL ベストプラクティス
 </span>
 </header>
 <div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents></nav><p>GraphQL スキーマの <strong>ユニオン型 (Union types)</strong> は、複数の型のうち、いずれかの型であることを表現する型です。
+<nav id=TableOfContents>
+<ul>
+<li><a href=#ユニオン型を定義する>ユニオン型を定義する</a></li>
+<li><a href=#クエリでユニオン型を使う>クエリでユニオン型を使う</a></li>
+<li><a href=#ユニオン型をエラー表現に利用する>ユニオン型をエラー表現に利用する</a></li>
+<li><a href=#ユニオン型とインタフェース型の使い分け>ユニオン型とインタフェース型の使い分け</a></li>
+</ul>
+</nav><h2 id=ユニオン型を定義する>ユニオン型を定義する</h2>
+<p>GraphQL スキーマの <strong>ユニオン型 (Union types)</strong> は、複数の型のうち、いずれかの型であることを表現する型です。
 典型的には、検索系のフィールドにおいて、様々な種類のデータを返す場合に使われます。
 ユニオン型は、<strong><code>union</code></strong> キーワードを使って次のように定義します。</p>
 <figure class=xCodeBlock>
@@ -567,6 +577,7 @@ GraphQL ベストプラクティス
 </span><span class=s>&#34;&#34;&#34;</span><span class=w>
 </span><span class=w></span><span class=kd>union</span><span class=w> </span><span class=nc>MilestoneItem</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=py>Issue</span><span class=w> </span><span class=p>|</span><span class=w> </span><span class=py>PullRequest</span></code></pre></div></div>
 </figure>
+<h2 id=クエリでユニオン型を使う>クエリでユニオン型を使う</h2>
 <p>GraphQL クエリにおいてユニオン型のフィールドを参照するときは、<a href=../../p/wiv7it5/#inline>インラインフラグメント</a> を使って、具体的な型ごとにフィールドを参照する必要があります。</p>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>ユニオン型のフィールドを参照するクエリ</figcaption>
@@ -585,6 +596,7 @@ GraphQL ベストプラクティス
 </span><span class=w>  </span><span class=p>}</span><span class=w>
 </span><span class=w></span><span class=p>}</span></code></pre></div></div>
 </figure>
+<h2 id=ユニオン型をエラー表現に利用する>ユニオン型をエラー表現に利用する</h2>
 <p>ユニオン型は、エラーを表現するためにも使用できます。
 次の <code>createBook</code> は新しい書籍データを登録するための mutation ですが、登録に成功したときは <code>Book</code> オブジェクトを返し、失敗したときは各種エラーを表すオブジェクトを返します。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Mutation</span><span class=w> </span><span class=p>{</span><span class=w>
@@ -592,7 +604,12 @@ GraphQL ベストプラクティス
 </span><span class=w></span><span class=p>}</span><span class=w>
 </span><span class=w>
 </span><span class=w></span><span class=nc>union</span><span class=w> </span><span class=py>AddBookPayload</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=py>Book</span><span class=w> </span><span class=p>|</span><span class=w> </span><span class=py>AlreadyExistError</span><span class=w> </span><span class=p>|</span><span class=w> </span><span class=py>InvalidTitleError</span><span class=w>
-</span></code></pre></div>
+</span></code></pre></div><h2 id=ユニオン型とインタフェース型の使い分け>ユニオン型とインタフェース型の使い分け</h2>
+<p>ユニオン型とインタフェース型は、どちらも抽象型 (abstract types) を構成するための仕組みですが、両者は全く逆の意味を持っています。
+ユニオン型が、あるオブジェクトの実体が <strong>異なる型になり得る</strong> ことを表現するのに対し、インタフェース型は、<strong>複数の型が同じ振る舞い</strong> をすることを表現しています。</p>
+<ul>
+<li>参考: <a href=../../p/yp9mv5d/>インタフェース型 (interface type) を定義する</a></li>
+</ul>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">

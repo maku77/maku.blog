@@ -59,6 +59,11 @@
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/4reqy9i/>
+GraphQL ベストプラクティス
+<time>2022-11-21</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/vgs4dnw/>
 Next.js アプリでのリンク方法まとめ（mui/Material-UI との連携なども） (next/link, next/router)
 <time>2022-11-19</time></a>
@@ -77,11 +82,6 @@ Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマ
 <a href=../../p/mu7gqya/>
 IGDB API でゲーム情報のデータベースにアクセスしてみる
 <time>2022-10-24</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/4reqy9i/>
-GraphQL ベストプラクティス
-<time>2022-10-12</time></a>
 </div>
 </div>
 </div>
@@ -522,7 +522,7 @@ GraphQL ベストプラクティス
 </div>
 </div>
 <span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-10-12>2022-10-12</time><br>
+更新: <time itemprop=dateModified datetime=2022-11-21>2022-11-21</time><br>
 作成: <time itemprop=datePublished datetime=2022-10-12>2022-10-12</time>
 </span>
 </header>
@@ -576,8 +576,11 @@ GraphQL ベストプラクティス
 <li><a href=#node-インタフェースと-global-object-identification>Node インタフェースと Global Object Identification</a></li>
 </ul>
 </li>
-<li><a href=#セキュリティパフォーマンス>セキュリティ、パフォーマンス</a>
+<li><a href=#リゾルバー実装保守性パフォーマンスセキュリティ>リゾルバー実装（保守性、パフォーマンス、セキュリティ）</a>
 <ul>
+<li><a href=#ドメインロジックをリゾルバー関数から分離する>ドメインロジックをリゾルバー関数から分離する</a></li>
+<li><a href=#サブフィールド用のリゾルバー関数を実装して-dataloader-で-n1-問題に対応する>サブフィールド用のリゾルバー関数を実装して DataLoader で N+1 問題に対応する</a></li>
+<li><a href=#データソースや認証情報をコンテキストで共有する>データソースや認証情報をコンテキストで共有する</a></li>
 <li><a href=#エラーレスポンスに実装の詳細情報を含めない>エラーレスポンスに実装の詳細情報を含めない</a></li>
 <li><a href=#公開-api-には-rate-limit-やクエリのネスト制限を設ける>公開 API には Rate Limit やクエリのネスト制限を設ける</a></li>
 </ul>
@@ -943,7 +946,7 @@ GraphQL には、リレーショナルデータベース (RDB) のようなト�
 </span></code></pre></div><p>ユーザーがサインインしていない場合は、<code>me</code> フィールドの値は <code>null</code> になるので、サインイン済みかどうかの判断にも利用できます。</p>
 <h3 id=ページネーションconnection-パターン>ページネーション（Connection パターン）</h3>
 <p>クエリのレスポンスとして多数のデータを返す可能性がある場合は、ページネーションに対応したフィールドとして定義することで、データを部分的に取得できるようにします。
-ページネーションの実装方法は自由ですが、Facebook の Relay ライブラリが提唱している <strong>Connection パターン</strong> を採用するのが一般的です。
+ページネーションの実装方法は自由ですが、Facebook の Relay ライブラリが提唱している <strong>Connection パターン（カーソルベースのページネーション）</strong> を採用するのが一般的です。
 Connection パターンでは、フィールドを定義するときに、値のリストの代わりに Connection 型のオブジェクトを返すようにし、統一された方法でページネーション処理を行えるようにします。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
 </span><span class=w>  </span><span class=py>games</span><span class=p>(</span><span class=w>
@@ -1008,7 +1011,62 @@ Connection パターンでは、フィールドを定義するときに、値の
 <li>インタフェースが統一されることで、様々なツールとの連携が可能になります。例えば、ページネーション用のクエリを自動生成できます（ページネーション実装に使われる Connection パターンも <code>Node</code> インタフェースを利用しています）</li>
 </ul>
 <p><code>Node</code> インタフェースは、Facebook の Relay フレームワークの実装から生まれたコンセプトですが、<a href=https://graphql.org/learn/global-object-identification/>GraphQL 公式のベストプラクティス</a> としても掲載されるようになりました。</p>
-<h2 id=セキュリティパフォーマンス>セキュリティ、パフォーマンス</h2>
+<h2 id=リゾルバー実装保守性パフォーマンスセキュリティ>リゾルバー実装（保守性、パフォーマンス、セキュリティ）</h2>
+<h3 id=ドメインロジックをリゾルバー関数から分離する>ドメインロジックをリゾルバー関数から分離する</h3>
+<p><strong>リゾルバー関数の実装はできるだけ短く記述する</strong> ことがベストプラクティスとされています。</p>
+<blockquote>
+<p>By keeping resolvers thin as a best practice, you can safely refactor your backing logic while reducing the likelihood of breaking your API.
+&mdash; Apollo GraphQL Tutorial</p>
+</blockquote>
+<p>多くのケースでは、データの取得や加工処理といったドメインロジックを分離することで、リゾルバー関数の実装を 1 行～数行に抑えることができます。
+ドメインロジックを分離することは、ユニットテストを記述できる設計にするということであり、安定した API をリリースし続けるためにも必要です。
+次の例では、3 つのルートクエリに対するリゾルバーをすべて 1 行で実装しています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Apollo Server でのリゾルバー実装例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>module</span><span class=p>.</span><span class=nx>exports</span> <span class=o>=</span> <span class=p>{</span>
+  <span class=nx>Query</span><span class=o>:</span> <span class=p>{</span>
+    <span class=nx>launches</span><span class=o>:</span> <span class=p>(</span><span class=nx>_</span><span class=p>,</span> <span class=nx>__</span><span class=p>,</span> <span class=p>{</span> <span class=nx>dataSources</span> <span class=p>})</span> <span class=p>=&gt;</span> <span class=nx>dataSources</span><span class=p>.</span><span class=nx>launchAPI</span><span class=p>.</span><span class=nx>getAllLaunches</span><span class=p>(),</span>
+    <span class=nx>launch</span><span class=o>:</span> <span class=p>(</span><span class=nx>_</span><span class=p>,</span> <span class=p>{</span> <span class=nx>id</span> <span class=p>},</span> <span class=p>{</span> <span class=nx>dataSources</span> <span class=p>})</span> <span class=p>=&gt;</span> <span class=nx>dataSources</span><span class=p>.</span><span class=nx>launchAPI</span><span class=p>.</span><span class=nx>getLaunchById</span><span class=p>({</span> <span class=nx>launchId</span><span class=o>:</span> <span class=nx>id</span> <span class=p>}),</span>
+    <span class=nx>me</span><span class=o>:</span> <span class=p>(</span><span class=nx>_</span><span class=p>,</span> <span class=nx>__</span><span class=p>,</span> <span class=p>{</span> <span class=nx>dataSources</span> <span class=p>})</span> <span class=p>=&gt;</span> <span class=nx>dataSources</span><span class=p>.</span><span class=nx>userAPI</span><span class=p>.</span><span class=nx>findOrCreateUser</span><span class=p>(),</span>
+  <span class=p>},</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>ドメインロジック部分は、GraphQL サーバーがなくても単独で動作するように実装すべきです。
+リゾルバー関数は、ドメインロジックを呼び出すだけの橋渡しの役割になります。</p>
+<h3 id=サブフィールド用のリゾルバー関数を実装して-dataloader-で-n1-問題に対応する>サブフィールド用のリゾルバー関数を実装して DataLoader で N+1 問題に対応する</h3>
+<p>入れ子構造になったオブジェクトを返す必要があるときは、サブフィールドの処理をそれ専用のリゾルバー関数に委譲することで、リゾルバーの実装をシンプルに保つことができます。
+もちろん、すべてのオブジェクトフィールド用にリゾルバー関数を定義する必要はありません。</p>
+<ul>
+<li>参考: <a href=https://maku77.github.io/p/wdvdtap/>gqlgen で子フィールドの情報を返すリゾルバーを実装する</a></li>
+</ul>
+<p>サブフィールド用のリゾルバー関数を分けて定義すると、<strong>N+1 問題</strong> が発生することがあります。
+これは、サブフィールドの処理ごとにリゾルバー関数が呼び出され（N 回）、その中で毎回同じデータソースへのフェッチが実行されてしまうというパフォーマンス問題です。
+これを解決する手法として、<strong>DataLoader</strong> という実装パターン（ライブラリ）があります。
+DataLoader は、連続したデータフェッチをバッチ処理化、キャッシュするためのユーティリティライブラリです。
+<a href=https://github.com/graphql/dataloader>DataLoader ライブラリ</a>は、もともと Facebook が作成したものですが、今では GraphQL コミュニティで管理されており、多数のプロジェクトが採用しています。</p>
+<h3 id=データソースや認証情報をコンテキストで共有する>データソースや認証情報をコンテキストで共有する</h3>
+<p>GraphQL API の <strong>コンテキスト</strong> は、すべてのリゾルバーで共有されるオブジェクトです。
+データベースのコネクションプールなどをコンテキストで共有すれば、複数のリゾルバー関数が呼び出されたときに、毎回データベースに接続し直すという無駄を省くことができます。
+リゾルバー間で共有するといっても、コンテキストはリクエストごとに生成されることに注意してください（異なるユーザーからのリクエストでデータが共有されるとおかしなことになるので）。
+あくまで、一つのリクエストで複数のリゾルバー関数が呼び出される場合に、そのリゾルバ間でコンテキストが共有されるということです。
+コンテキストは、データソースの保持以外にも、認証情報（ユーザー情報やアクセス権限）の保持にも利用されます。</p>
+<p>コンテキストを保持する方法は GraphQL のサーバーライブラリによって異なりますが、例えば、Apollo Server ライブラリであれば、<code>ApolloServer</code> インスタンスを生成するときに、<code>context</code> プロパティに任意のコンテキスト生成関数をセットすることができます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>コンテキストでデータベース接続を保持する例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>context</span>: <span class=kt>async</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>({</span>
+  <span class=nx>db</span>: <span class=kt>await</span> <span class=nx>client</span><span class=p>.</span><span class=nx>connect</span><span class=p>(),</span>  <span class=c1>// 各リゾルバー関数内で context.db で参照できる
+</span><span class=c1></span><span class=p>}),</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>コンテキストでユーザー情報を保持する例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>context</span>: <span class=kt>async</span> <span class=p>({</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>res</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=kr>const</span> <span class=nx>token</span> <span class=o>=</span> <span class=nx>req</span><span class=p>.</span><span class=nx>headers</span><span class=o>?</span><span class=p>.</span><span class=nx>authorization</span> <span class=o>||</span> <span class=s1>&#39;&#39;</span>
+  <span class=k>return</span> <span class=p>{</span>
+    <span class=nx>user</span>: <span class=kt>await</span> <span class=nx>getUser</span><span class=p>(</span><span class=nx>token</span><span class=p>),</span>  <span class=c1>// 各リゾルバー関数内で context.user で参照できる
+</span><span class=c1></span>  <span class=p>}</span>
+<span class=p>},</span></code></pre></div></div>
+</figure>
+<p>コンテキストオブジェクトをセットするのではなく、コンテキスト生成関数をセットしているのは、前述した通り、リクエスト時にコンテキストを生成する必要があるからです。</p>
 <h3 id=エラーレスポンスに実装の詳細情報を含めない>エラーレスポンスに実装の詳細情報を含めない</h3>
 <p>GraphQL API の呼び出しでエラーが発生したときに、エラー情報としてサーバー側の実装詳細（スタックトレースなど）を返してしまうと、悪意のあるユーザーに不正アクセスのヒントを与えてしまいます。
 とはいえ、API の実装中はサーバー側の詳細なエラー情報を返した方が都合がよかったりします。
