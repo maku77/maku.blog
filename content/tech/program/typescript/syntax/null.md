@@ -84,7 +84,7 @@ function dumpPoint(enemy: Enemy) {
 {{< /code >}}
 
 
-オプショナルチェイニング演算子 (?:)
+オプショナルチェイニング演算子 (?.)
 ----
 
 ES2020 では、[オプショナルチェイニング演算子 (Optional Chaining Operator)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Optional_chaining) の __`?.`__ も導入されています。
