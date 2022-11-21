@@ -5,9 +5,11 @@ date: "2022-09-14"
 tags: ["GraphQL"]
 ---
 
+インタフェース型を定義する
+----
+
 GraphQL のインタフェース型は、複数の型が共通して持つフィールドを定義するための抽象型で、__`interface`__ キーワードを使って定義します。
 次の `ScheduleItem` インタフェースは、2 つのフィールド（`id` と `title`）を持つことを示しています。
-インタフェースを実装する (__`imlements`__) 側の型は、必ず `id` と `title` フィールドを持つ必要があります。
 
 {{< code lang="graphql" title="スキーマ定義" >}}
 # 共通のインタフェースを定義
@@ -15,7 +17,12 @@ interface ScheduleItem {
   id: ID!
   title: String!
 }
+{{< /code >}}
 
+インタフェースを実装する (__`imlements`__) 側の型は、必ず `id` と `title` フィールドを持つ必要があります。
+次の `Task` オブジェクト型と `Milestone` オブジェクト型は、`ScheduleItem` というインタフェースを実装しています。
+
+{{< code lang="graphql" title="スキーマ定義（続き）" >}}
 # Task 型は必ず id と title フィールドを持つ
 type Task implements ScheduleItem {
   id: ID!
@@ -37,9 +44,13 @@ type Query {
 }
 {{< /code >}}
 
-上記の `Task` 型と `Milestone` 型は、`ScheduleItem` というインタフェースを実装しています。
-`allItems` クエリは、`Task` と `Milestone` を要素に持つリストを返すことを想定していますが、戻り値のリスト要素の型が `ScheduleItem` になっているため、必ず `id` と `title` フィールドが含まれることが保証されています。
-クエリ内でリスト要素を参照するときは、次のように直接これらのフィールドを参照できます。
+トップレベルの `allItems` クエリは、`Task` あるいは `Milestone` を要素とするリストを返すことを想定していますが、戻り値のリスト要素の型が `ScheduleItem` になっているため、必ず `id` と `title` フィールドが含まれることが保証されています。
+
+
+クエリでインタフェース型を使う
+----
+
+GraphQL クエリでインタフェース型のオブジェクトを返すフィールドを参照する場合、インタフェースで定義されたフィールドは、次のように直接参照することができます。
 
 {{< code lang="graphql" title="クエリ" >}}
 query QueryAllItems {
@@ -67,7 +78,11 @@ query QueryAllItems {
 }
 {{< /code >}}
 
-複数のインタフェースを実装したいときは、次のように `implements` の後ろにインタフェース名を __`&`__ で並べます。
+
+複数のインタフェースを実装するオブジェクト型
+----
+
+あるオブジェクト型に複数のインタフェースを実装したいときは、次のように `implements` の後ろにインタフェース名を __`&`__ で並べます。
 
 ```graphql
 """
@@ -77,4 +92,12 @@ type Milestone implements Closable & Node & UniformResourceLocatable {
   # ...
 }
 ```
+
+インタフェース型とユニオン型の使い分け
+----
+
+インタフェース型とユニオン型は、どちらも抽象型 (abstract types) を構成するための仕組みですが、両者は全く逆の意味を持っています。
+インタフェース型が、__複数の型が同じ振る舞い__ をすることを表現するのに対し、ユニオン型は、あるオブジェクトの実体が __異なる型になり得る__ ことを表現しています。
+
+- 参考: [ユニオン型 (Union types) を定義する](/p/vqsyz9j/)
 
