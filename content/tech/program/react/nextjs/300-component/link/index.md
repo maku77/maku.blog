@@ -1,34 +1,38 @@
 ---
-title: "Next.js アプリでのリンク方法まとめ（Material-UI との連携なども） (next/link, next/router)"
+title: "Next.js アプリでのリンク方法まとめ（mui/Material-UI との連携なども） (next/link, next/router)"
 url: "/p/vgs4dnw"
 date: "2021-08-10"
-tags: ["Material-UI", "Next.js"]
+lastmod: "2022-11-19"
+tags: ["Material-UI", "mui", "Next.js"]
 changes:
+  - 2022-11-19: mui バージョンのコード、Next.js 13 バージョンのコードに対応
   - 2022-10-11: クエリパラメーター部分の変更方法について
 ---
 
 {{% private %}}
-- https://next.material-ui.com/guides/routing/
+- （新） https://mui.com/material-ui/guides/routing/
+- （旧） https://next.material-ui.com/guides/routing/
 {{% /private %}}
 
 アプリ内ページへのリンク（基本）
 ----
 
-{{< code lang="html" >}}
+{{< code lang="tsx" >}}
 // import Link from 'next/link'
-
-<Link href="/about">
-  <a>About us</a>
-</Link>
+<Link href="/about">About us</Link>
 {{< /code >}}
 
-`pages/about.tsx` ページコンポーネントが生成するページへのリンクになります。
-リンクを `<a>` コンポーネントとして出力するために、上記のように子要素として明示的に `<a>` タグの記載が必要です。
-`<a>` を省略しても、リンククリック時は JavaScript でハンドルされるので動作しますが、HTML 的には正しく `<a>` 要素を出力しておくべきです（SEO 的にも）。
+Next.js でアプリ内部で閉じるページリンクを張るには、[next/link](https://nextjs.org/docs/api-reference/next/link) モジュールを使用します。
+上記のようにすると、`pages/about.tsx` ページコンポーネントが生成するページへのリンクになります。
 
-### replace オプション
+{{% note title="a 要素は必要ない" %}}
+Next.js 12 以前は `Link` 要素の下に明示的に `a` 要素を配置する必要がありました。
+これは、HTML 的に正しく `a` 要素を配置するためでしたが、Next.js 13 では自動的に `a` 要素を挿入するようになったので、`a` 要素の記述は必要ありません。
+{{% /note %}}
 
-{{< code lang="html" >}}
+### 遷移前の履歴を置き換える replace オプション
+
+{{< code lang="tsx" >}}
 <Link href="/about" replace>
 {{< /code >}}
 
@@ -43,30 +47,34 @@ changes:
 外部リンクを開く場合は、安全性のために一律で `rel="noopener noreferrer"` を付けましょう。
 リンククリック時に必ず別タブで開きたいときは、`target="_blank"` を指定してください。
 
-{{< code lang="html" >}}
+{{< code lang="tsx" >}}
 <a href="https://example.com/" target="_blank" rel="noopener noreferrer">
-  サイト名
+  Website title
 </a>
 {{< /code >}}
 
-Material-UI を採用したサイトの場合は、`a` の代わりに `@material-ui/core/Link` コンポーネントを使用することで、サイト内のデザインを統一することができます。
-`Link` という名前のコンポーネントはいろいろなライブラリが提供しているので、下記のように別名 (`MuiLink`) を付けて使用すると混乱を防ぐことができます。
+mui (Material-UI) を採用したサイトの場合は、`a` の代わりに mui が提供する `Link` コンポーネントを使用することで、サイト内のデザインを統一することができます。
+`next/link` が提供する `Link` コンポーネントと混同しないように、次のように別名 (`MuiLink`) を付けて使用すると分かりやすくなります。
 
-{{< code lang="html" >}}
-// import { Link as MuiLink } from '@material-ui/core'
+{{< code lang="tsx" >}}
+// import { Link as MuiLink } from '@mui/material'     // mui 版
+// import { Link as MuiLink } from '@material-ui/core' // material-ui 版
 
 <MuiLink href="https://example.com/" target="_blank" rel="noopener noreferrer">
-  サイト名
+  Website title
 </MuiLink>
 {{< /code >}}
 
 外部リンクを出力するときに、毎回上記のような長ったらしいコードを書くのは大変なので、次のような独自コンポーネント (`ExternalLink`) などを定義しておくと便利です。
-ここでは、外部リンクを示すアイコン (`@material-ui/icons/Launch`) を末尾に表示するようにしています。
+ここでは、ついでに、外部リンクを示す `Launch` アイコンを末尾に表示するようにしています。
 
 {{< code lang="tsx" title="src/components/ExternalLink.tsx" >}}
 import { FC } from 'react'
-import LaunchIcon from '@material-ui/icons/Launch'
-import { Link as MuiLink } from '@material-ui/core'
+import LaunchIcon from '@mui/icons-material/Launch'
+import { Link as MuiLink } from '@mui/material'
+// 古い material-ui バージョンの場合
+// import LaunchIcon from '@material-ui/icons/Launch'
+// import { Link as MuiLink } from '@material-ui/core'
 
 type Props = {
   url: string
@@ -86,7 +94,7 @@ export const ExternalLink: FC<Props> = ({ url, title }: Props) => {
 }
 {{< /code >}}
 
-`MuiLink` コンポーネントの `style` プロパティは、`LaunchIcon` の上下位置をリンク名のテキストに合わせるためのものです。
+`MuiLink` コンポーネントの `style` プロパティは、`LaunchIcon` の上下位置をリンク名のテキストに合わせるために設定しています。
 
 {{< code lang="tsx" title="使用例" >}}
 <ExternalLink url="https://example.com/" title="サイト名" />
@@ -95,29 +103,30 @@ export const ExternalLink: FC<Props> = ({ url, title }: Props) => {
 {{< image src="img-001.png" w="150" border="true" title="表示結果" >}}
 
 
-Next.js の Link コンポーネント以下に Material-UI の UI コンポーネントを配置する
+Next.js の Link コンポーネント以下に mui (Material-UI) の UI コンポーネントを配置する
 ----
 
 Next.js の Link コンポーネント (`next/link`) で独自のコンポーネントをリンクとして動作させるためには、ちょっとしたコツがあります。
 
-Material-UI は独自のコンポーネントとして、[Link](https://next.material-ui.com/components/links/) や [Button](https://next.material-ui.com/components/buttons/) を持っており、これらに `href` プロパティを指定することによって、`a` 要素としてレンダリングするようになっています（Material-UI の `Link` と Next.js の `Link` は別物なので注意）。
-ダイレクトに `a` 要素を使わないのは、Material-UI が提供する UI 表現を使用するためですね。
+mui (Material-UI) は独自のコンポーネントとして、[Link](https://mui.com/material-ui/react-link/) や [Button](https://mui.com/material-ui/react-button/) を持っており、これらに `href` プロパティを指定することによって、`a` 要素としてレンダリングするようになっています（mui の `Link` と Next.js の `Link` は別物なので注意）。
+ダイレクトに `a` 要素を使わないのは、mui (Material-UI) が提供する UI 表現を使用するためですね。
 
 {{< code lang="tsx" title="Material-UI のリンク系コンポーネント" >}}
-import Link from '@material-ui/core/Link'
-import Button from '@material-ui/core/Button'
+// import { Button, Link as MuiLink } from '@mui/material' // mui の場合
+// import { Button, Link as MuiLink } from '@material-ui/core' // material-ui の場合
 
-<Link href="/about" underline="none">About us</Link>
+<MuiLink href="/about" underline="none">About us</Link>
 <Button href="/about" variant="contained">About us</Button>
 {{< /code >}}
 
 これはこれで便利なのですが、Next.js アプリ内での遷移には `next/link` を使ったルーティングを行う必要があるため、上記のようには記述できません（クライアントサイド JS でのルーティングが動作しません）。
-`next/link` モジュールの `Link` 要素を使って、Material-UI の UI コンポーネントをリンクとして機能させるには、次のように記述します。
+`next/link` モジュールの `Link` 要素を使って、mui (Material-UI) の UI コンポーネントをリンクとして機能させるには、次のように記述します。
 `Link` という名前がコンフリクトするため、ここでは、それぞれ `NextLink`、`MuiLink` という名前でインポートしています（片方だけリネームすれば十分ですが分かりやすくするため両方リネームしています）。
 
-{{< code lang="tsx" title="next/link と Material-UI を組み合わせて使う" >}}
-import NextLink from 'next/link'
-import { Button, Link as MuiLink } from '@material-ui/core'
+{{< code lang="tsx" title="next/link と mui (Material-UI) を組み合わせて使う" >}}
+// import NextLink from 'next/link'
+// import { Button, Link as MuiLink } from '@mui/material' // mui の場合
+// import { Button, Link as MuiLink } from '@material-ui/core' // material-ui の場合
 
 <NextLink href="/about" passHref>
   <MuiLink underline="none">About us</MuiLink>
@@ -128,7 +137,7 @@ import { Button, Link as MuiLink } from '@material-ui/core'
 {{< /code >}}
 
 Next.js の `Link` コンポーネント (`next/link`) の `href` プロパティで指定した値を子要素に伝搬させるために、__`passHref`__ プロパティを指定するのがポイントです。
-`passHref` を指定しなくても、Next.js のクライアントサイド JS でリンク機能が動作するため、一見正しく動いているかのように見えますが、`a` 要素の `href` 属性がされないため、SEO 的に不利な Web サイトになってしまいます（さらに、Material-UI の `Button` コンポーネントの場合は、`href` が渡されないと、`a` 要素ではなく `button` 要素として出力されてしまいます）。
+`passHref` を指定しなくても、Next.js のクライアントサイド JS でリンク機能が動作するため、一見正しく動いているかのように見えますが、`a` 要素の `href` 属性がされないため、SEO 的に不利な Web サイトになってしまいます（さらに、mui の `Button` コンポーネントの場合は、`href` が渡されないと、`a` 要素ではなく `button` 要素として出力されてしまいます）。
 
 
 プログラム内部でリダイレクト (Router.replace, window.location)
@@ -136,7 +145,6 @@ Next.js の `Link` コンポーネント (`next/link`) の `href` プロパテ�
 
 {{< code lang="tsx" >}}
 // import Router from 'next/router'
-
 Router.replace('/list/users')
 {{< /code >}}
 
@@ -153,14 +161,14 @@ __`Router.replace`__ を使うと、リダイレクト前の URL がブラウザ
 このオブジェクトの __`query`__ プロパティで指定した値が、遷移先の URL の末尾にクエリパラメーターとして付加されます。
 
 ```tsx
-// import Link from 'next/link'
+// import NextLink from 'next/link'
 
-<Link href={{
+<NextLink href={{
   query: {
     key1: 'value1',
     key2: 'value2',
   },
-}}>...</Link>
+}}>...</NextLink>
 ```
 
 上記のようにすると、ページのパス自体は変更されず、クエリパラメーター部分だけが変更されます。
@@ -169,7 +177,7 @@ __`Router.replace`__ を使うと、リダイレクト前の URL がブラウザ
 リンククリック時にパス部分も変更したい場合（ページ遷移したい場合）は、次のように __`href`__ プロパティを一緒に指定します。
 
 ```tsx
-<Link href={{
+<NextLink href={{
   href: './other-page',
   query: {
     key1: 'value1',
@@ -182,7 +190,7 @@ __`Router.replace`__ を使うと、リダイレクト前の URL がブラウザ
 
 ```tsx
 import { RC } from 'react'
-import Link from 'next/link'
+import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 
 export const MyComponent: FC = () => {
@@ -190,14 +198,14 @@ export const MyComponent: FC = () => {
   const query = router.query  // カレント URL に含まれるクエリパラメーター
 
   return <>
-    <Link
+    <NextLink
       href={{
         query: {
           ...query,
           key2: 'newValue',
         },
       }}
-    >...</Link>
+    >...</NextLink>
   </>
 }
 ```
