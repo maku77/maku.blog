@@ -1,5 +1,5 @@
 ---
-title: "SSH の接続先ごとにキーを使い分ける"
+title: "SSH キーの管理: SSH の接続先ごとにキーを使い分ける (~/.ssh/config)"
 url: "p/szajt4d/"
 date: "2022-07-17"
 tags: ["SSH"]
