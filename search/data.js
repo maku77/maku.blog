@@ -144,6 +144,12 @@ date: "2015-04-13T00:00:00Z",
 body: "MongoDB サーバー (mongod) を起動する MongoDB クライアント（mongo コマンドや Web アプリケーション）から MongoDB のデータベースにアクセスするには、あらかじめ MongoDB サーバー（mongod）を起動しておく必要があります。 MongoDB サーバーを起動する (mongod) MongoDB サーバーは、単純にコマンドラインから mongod と実行するだけで起動できます（Windows のサービスとして起動 しておくことも可能です）。 mongod コマンドを実行するときに、--dbpath オプションを使ってデータの格納先ディレクトリを指定することができます（デフォルトは /data/db）。 下記の例では、mydata ディレクトリをデータ格納先に指定しています。 MongoDB サーバーの起動 $ mkdir mydata $ mongod --dbpath mydata ログファイル名を指定する (\u0026ndash;logpath, \u0026ndash;logappped) MongoDB サーバーのログはデフォルトで標準出力に出力されますが、--logpath オプションを使って、出力先のログファイル名を指定することもできます。 さらに、--logappend オプションを指定すると、これまでのログに追記される形で書き込まれます（このオプションを付けないと、ログファイルが上書きされてしまいます）。 ログを log.txt に保存する $ mongod --dbpath mydata --logpath log.txt --logappend --dbpath にはディレクトリ名を指定しますが、--logpath にはファイル名を指定することに注意してください。 ポート番号を指定する (\u0026ndash;port) mongod が使用するデフォルトのポート番号は 27017 ですが、--port オプションを使用して、任意のポート番号で起動することができます。 ポート番号を変更しておけば、1 台のホスト上で複数の mongod を立ち上げることができます。 ポート番号 40001 で起動する $ mongod --dbpath mydata --port 40001 サーバー側のポート番号を変更した場合は、mongo クライアントを起動するときにも mongo localhost:40001/dbname や --port 40001 のようにポート番号の指定が必要になることに注意してください。 MongoDB サーバー用の設定ファイル 設定を YAML ファイルに記述する MongoDB サーバー用の起動オプションは、YAML 形式の設定ファイルに記述しておくことができます（YAML 形式は ver 2.6 から対応）。 mongod.yml（mongod 用の設定ファイル） storage:dbPath:data/dbsystemLog:destination:filepath:data/log/mongod.loglogAppend:truenet:port:40001 設定ファイルを指定して起動する $ mongod --config mongod.yml 設定ファイルの詳細については下記の公式ドキュメントを参照してください。 参考リンク Configuration File Options — MongoDB Manual 起動用のスクリプトを作成する いずれにしても、データ格納先のディレクトリ（上記の例では data）はあらかじめ作成しておく必要があるので、簡単な設定だけであれば、シェルスクリプトやバッチファイルで起動するようにしておいた方が楽かもしれません。 mongod-start.sh（Linux 用） #!/bin/bash PORT=40001 mkdir -p data/db mkdir -p data/log echo Start mongod on port $PORT ... mongod --dbpath data/db --logpath data/log/mongod.log --logappend --port $PORT \u0026amp; mongod-stop.sh（Linux 用） #!/bin/bash killall mongod mongod-start.bat（Windows 用） @echo off md data\\db \u0026gt; NUL 2\u0026gt;\u0026amp;1 md data\\log \u0026gt; NUL 2\u0026gt;\u0026amp;1 echo Start mongod ... mongod --dbpath data\\db --logpath data\\log\\mongod.log --logappend --port 40001"
 },
 {
+url: "/p/ftducs9/",
+title: "SSH キーの管理: SSH キーを作成する (ssh-keygen)",
+date: "2008-08-13T00:00:00Z",
+body: "SSH キーの管理: SSH キーを作成する (ssh-keygen) SSH (Secure Shell) によるマシン間接続を有効にするには、接続元のマシンで SSH のキーペア（秘密鍵＋公開鍵）を作成し、接続先のマシンに公開鍵を登録する必要があります。 ここでは OpenSSH の ssh-keygen コマンドを使用した SSH キーの作成方法を紹介します。 SSH 鍵の作成 ssh-keygen コマンドをオプションなしで実行すると、SSH キー（秘密鍵＋公開鍵）を作成できます（SSH プロトコル ver.2 用）。 デフォルトでは暗号アルゴリズムとして RSA を使用するキーが生成されますが、-t オプションで暗号アルゴリズムを指定することができます。 SSH キーペアの生成 $ ssh-keygen -t ed25519 # Ed25519 鍵を作成する場合 -t オプション アルゴリズム 説明 rsa RSA 鍵 4096 bits の長い鍵長を選べば強度は出るが遅くなる ecdsa ECDSA 鍵 楕円曲線暗号。少ない鍵長で強度あり。ED25519 より普及している ed25519 Ed25519 鍵 楕円曲線暗号。少ない鍵長で強度あり。ECDSA より高速 dsa DSA 鍵 （非推奨）SSH2 の環境で使えるが、1024 bits しか選べないことが多い rsa1 RSA1 鍵 （非推奨）SSH1 のレガシー環境用。強度が弱いので使わない方がよい 実際に ssh-keygen コマンドを実行すると、パスワード (passphrase) の入力を求められるので、秘密鍵を使用する際のパスワードを設定しておきます。 このパスワードは、ssh コマンドでリモートホストに接続する際に入力することになります。 パスワード入力時に、何も入力せずに Enter を入力すれば、パスワードなしの SSH キーを生成できますが、通常はパスワードを設定してください。 SSH キーを作成してみる（デフォルトの RSA で） $ ssh-keygen Generating public/private rsa key pair. Enter file in which to save the key (/Users/maku/.ssh/id_rsa): （出力するファイル名） Created directory \u0026#39;/Users/maku/.ssh\u0026#39;. Enter passphrase (empty for no passphrase): （秘密鍵のパスワードを入力） Enter same passphrase again: （秘密鍵のパスワードをもう一度入力） Your identification has been saved in /Users/maku/.ssh/id_rsa Your public key has been saved in /Users/maku/.ssh/id_rsa.pub The key fingerprint is: SHA256:4qBU6wehiisfj5V686F2cQLCQ3Dws8dRnVG6C02xyxA maku@macbook.local The key\u0026#39;s randomart image is: +---[RSA 3072]----+ |oo. E.o+. | | o. . .o+ | | oo + . + | | +*.+ = o | | +o*.o S | |.o + =oo.. | |o o + ++. | |.. *+o.. | |o.+oo+. | +----[SHA256]-----+ 例えば、上記のようにデフォルトの RSA 鍵を生成した場合は、次の 2 つのファイルが ~/.ssh ディレクトリに保存されます（ディレクトリが存在しなければ自動的に作成されます）。 ~/.ssh/id_rsa \u0026hellip; 秘密鍵 (private key) ~/.ssh/id_rsa.pub \u0026hellip; 公開鍵 (public key) 公開鍵 (id_rsa.pub) は接続先ホストに登録する情報で、秘密鍵 (id_rsa) は SSH 接続時にクライアント側で使うファイルです。 ☝️ パスワードなしの SSH キー 例外的に、パスワードを設定しない SSH キーを生成する場合もあります。 例えば、GitHub Actions などの CI/CD 環境や、Ansible などの自動設定環境で使用する SSH キーの場合は、対話的にパスワードを入力できないことがあるので、パスワードなしの SSH キーを使ったりします。 ただし、そのように作成した SSH キー（秘密鍵）は、ファイルさえ手に入れれば誰でも使えてしまうため、厳重に管理する必要があります。 接続先への公開鍵の登録 SSH のキーペアを作成したら、公開鍵ファイルの内容を接続先ホストの ~/.ssh/authorized_keys ファイルに登録することで、この PC から SSH 接続が可能になります。 この登録作業は、ssh-id-copy コマンドを使うと簡単に済ませることができます（参考: ssh-id-copy で SSH の公開鍵をリモートホストに登録する）。 接続先に SSH 公開鍵を登録する $ ssh-copy-id -i ~/.ssh/id_rsa.pub maku@192.168.1.20 maku@192.168.1.20\u0026#39;s password: （接続先ホストのユーザー maku のパスワードを入力） これで、SSH キーを使った接続が可能になります。 SSH キーを使って SSH 接続する $ ssh maku@192.168.1.20 Enter passphrase for key \u0026#39;/Users/maku/.ssh/id_rsa\u0026#39;: （SSH 秘密鍵のパスフレーズを入力） どのタイプの SSH キーを作成すべきか？ パフォーマンスや安全度を考慮すると、楕円曲線暗号の Ed25519 アルゴリズム (-t ed25519)、あるいは、ECDSA アルゴリズム (-t ecdsa) を使用しておくのがよさそうです（2022 年現在）。 可能であれば、ECDSA よりも高速な Ed25519 を使うのがよいです。 $ ssh-keygen -t ed25519 GitHub の公式ドキュメントでも、SSH 鍵の作成方法として、Ed25519 鍵の作成例 が示されています（2022 年時点）。 GitHub 推奨の方法 $ ssh-keygen -t ed25519 -C \u0026#34;your_email@example.com\u0026#34; 昔は、RSA 4096 bits の作成例が示されていましたが（2016 年時点）、現状は上記の方法で作成した方がパフォーマンスがよくなります。 古い方法 $ ssh-keygen -t rsa -b 4096 -C \u0026#34;your_email@example.com\u0026#34; 米国 NIST の提示している暗号化方式としては、2031 年以降は下記のものしか使えなくなるとあります（参考: 米国における暗号技術をめぐる動向（2016年10月）: 図表10）。 RSA/DSA 3072 bit 以上 ECDSA 256 bit 以上"
+},
+{
 url: "/p/7gmjvza/",
 title: "１時間で分かる GoF デザインパターン",
 date: "2008-05-13T00:00:00Z",
@@ -1488,6 +1494,48 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/gwnatcs/",
+title: "SSH 関連記事",
+date: "2022-11-24T00:00:00Z",
+body: "SSH 関連記事"
+},
+{
+url: "/p/o3m4j2h/",
+title: "SSH キーの管理: SSH キーのコメントを確認する／変更する (ssh-keygen -c)",
+date: "2022-11-24T00:00:00Z",
+body: "SSH キーの管理: SSH キーのコメントを確認する／変更する (ssh-keygen -c) SSH 鍵ファイルのコメントを確認する OpenSSH の ssh-keygen コマンド で生成した SSH キーペア（秘密鍵＋公開鍵）には、デフォルトで ユーザー名@ホスト名 という形のコメントが付加されます。 このコメントは、公開鍵ファイル (~/.ssh/id_XXX.pub) の末尾を見ると確認できます。 ~/.ssh/id_ed25519.pub ssh-ed25519 AAA3NzaC1AA...省略...COst+87ciWFY maku@macobook.local あるいは、ssh-keygen -l コマンドで確認することもできます。 SSH キーの内容を確認 $ ssh-keygen -l -f ~/.ssh/id_ed25519 256 SHA256:vd6Ab577wzS6/so1BR1zGP8r7br0smWV4Wklw28Rre0 maku@macbook.local (ED25519) SSH 鍵ファイルのコメントを設定する SSH キーのコメントは、キーの作成時に -C オプションで自由に設定できます。 コメントを指定して SSH キーを生成 $ ssh-keygen -t ed25519 -C \u0026#34;your_email@example.com\u0026#34; 既存の SSH キーのコメントを修正するには、ssh-keygen -c コマンドを使用します。 SSH キーのコメントを変更 $ ssh-keygen -c -C \u0026#34;新しいコメント\u0026#34; -f ~/.ssh/id_ed25519 オプションの大文字と小文字に注意してください。 最初は小文字 (-c) で、後ろは大文字 (-C) です。"
+},
+{
+url: "/p/as2ahpw/",
+title: "SSH キーの管理: SSH キーのパスワードを変更する (ssh-keygen -p)",
+date: "2022-11-24T00:00:00Z",
+body: "SSH キーの管理: SSH キーのパスワードを変更する (ssh-keygen -p) 既存の SSH キー（秘密鍵）のパスワード（パスフレーズ）を変更するには、ssh-keygen -p コマンドを使用します。 $ ssh-keygen -p [-a rounds] [-f keyfile] [-m format] [-N new_passphrase] [-P old_passphrase] 変更する SSH キーのファイルパス (-f) や、旧パスワード (-P)、新パスワード (-N) をオプションで指定することもできますが、次のようにオプションなしで実行すれば、対話的に変更内容を入力していけます。 $ ssh-keygen -p Enter file in which the key is (/Users/maku/.ssh/id_rsa): Enter old passphrase: ******** Key has comment \u0026#39;maku@macbook.local\u0026#39; Enter new passphrase (empty for no passphrase): ******** Enter same passphrase again: ******** Your identification has been saved with the new passphrase. パスワードはオプションで指定すると入力内容が見えてしまうので、上記のように対話的に入力した方がよいでしょう。"
+},
+{
+url: "/p/m2k4j2h/",
+title: "SSH キーの管理: SSH キーの種類やフィンガープリントを確認する (ssh-keygen -l)",
+date: "2022-11-24T00:00:00Z",
+body: "SSH キーの管理: SSH キーの種類やフィンガープリントを確認する (ssh-keygen -l) 作成済みの SSH 鍵ファイルの種類（暗号アルゴリズム）やフィンガープリントを確認したいときは、ssh-keygen -l コマンドを使用します。 -f オプションで指定する鍵ファイルのパスは、秘密鍵でも公開鍵でも構いません。 次の例では、OpenSSH の ssh-keygen コマンドで作成したさまざまな種類の SSH キーの内容を表示しています。 $ ssh-keygen -l -f ~/.ssh/id_ed25519.pub 256 SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx yourname@example.com (ED25519) $ ssh-keygen -l -f ~/.ssh/id_ecdsa.pub 256 SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx yourname@example.com (ECDSA) $ ssh-keygen -l -f ~/.ssh/id_rsa.pub 2048 SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx yourname@example.com (RSA) $ ssh-keygen -l -f ~/.ssh/id_dsa.pub 1024 SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx yourname@example.com (DSA) 各フィールドは、「鍵のビット長」「フィンガープリント」「コメント」「暗号アルゴリズム」を示しています。 Windows PC の場合は、~/.ssh の部分は %USERPROFILE%\\.ssh と読みかえてください。"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2022-11-24T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/nd3cmt3/",
+title: "ネットワーク関連技術メモ",
+date: "2022-11-24T00:00:00Z",
+body: "ネットワーク関連技術メモ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-11-24T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/uyw4qan/",
 title: "Apollo Client 関連記事",
 date: "2022-10-26T00:00:00Z",
@@ -1504,18 +1552,6 @@ url: "/p/cm9nyco/",
 title: "GraphQL 関連記事",
 date: "2022-10-26T00:00:00Z",
 body: "GraphQL 関連記事"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2022-10-26T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-10-26T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/amwwuo5/",
@@ -1818,22 +1854,16 @@ date: "2022-07-17T00:00:00Z",
 body: "Linux で起動しているサービスの一覧を表示する pstree コマンドを使う方法 $ pstree systemd─┬─ModemManager───2*[{ModemManager}] ├─acpid ├─2*[agetty] ├─cron ├─dbus-daemon ├─fail2ban-server───4*[{fail2ban-server}] ├─irqbalance───{irqbalance} ├─multipathd───6*[{multipathd}] ├─networkd-dispat ├─ntpd───{ntpd} ├─packagekitd───2*[{packagekitd}] ├─polkitd───2*[{polkitd}] ├─rsyslogd───3*[{rsyslogd}] ├─snapd───10*[{snapd}] ├─sshd───sshd───sh───pstree ├─sshd───sshd───sshd ├─systemd───(sd-pam) ├─systemd-journal ├─systemd-logind ├─systemd-network ├─systemd-resolve ├─systemd-udevd ├─udisksd───4*[{udisksd}] └─unattended-upgr───{unattended-upgr} systemd で各種サービスが動作していることを確認できます。 systemctl コマンドを使う方法 $ systemctl list-unit-files --type=service UNIT FILE STATE VENDOR PRESET acpid.service enabled enabled apparmor.service enabled enabled apport-autoreport.service static - apport-forward@.service static - apport.service generated - apt-daily-upgrade.service static - apt-daily.service static - autovt@.service alias - blk-availability.service enabled enabled bolt.service static - cloud-config.service enabled enabled cloud-final.service enabled enabled cloud-init-hotplugd.service static - ...（省略）... $ systemctl status service コマンドを使う方法 $ service --status-all ...（省略）... [ + ] resolvconf [ - ] rsync [ - ] screen-cleanup [ + ] ssh [ + ] udev [ + ] ufw ...（省略）... 記号の意味: + \u0026hellip; サービスが起動しています – \u0026hellip; サービスが停止しています ? \u0026hellip; 状態を把握できません"
 },
 {
-url: "/p/gwnatcs/",
-title: "SSH 関連記事",
-date: "2022-07-17T00:00:00Z",
-body: "SSH 関連記事"
-},
-{
 url: "/p/szajt4d/",
-title: "SSH の接続先ごとにキーを使い分ける",
+title: "SSH キーの管理: SSH の接続先ごとにキーを使い分ける (~/.ssh/config)",
 date: "2022-07-17T00:00:00Z",
-body: "SSH の接続先ごとにキーを使い分ける 何をするか？ SSH 鍵を使って複数の SSH サーバーに接続する場合、1 つの SSH 鍵ファイルを使い回すこともできますが、場合によっては SSH サーバーごと（SSH ユーザーごと）に鍵ファイルを使い分けたいこともあるかもしれません。 ここでは、SSH サーバーごとの SSH キーを用意する方法を説明します。 鍵ファイルを作成する 例えば、ConoHa VPS に maku というユーザーで SSH 接続するための SSH キーを作成するとします。 一般的に SSH のキーペアは ~/.ssh ディレクトリ以下に保存しますが、次のような感じで接続先ごとにディレクトリ (\u0026lt;接続先\u0026gt;-\u0026lt;ユーザー\u0026gt;) を作ると管理しやすくなります（ファイル名で表現することもできます）。 ~/.ssh/conoha-maku/id_rsa \u0026hellip; 秘密鍵 ~/.ssh/conoha-maku/id_rsa.pub \u0026hellip; 公開鍵 # SSH キーペア用のディレクトリを作成 $ mkdir -p -m 0700 ~/.ssh/conoha-maku # SSH キーペアを作成 $ ssh-keygen -t rsa -f ~/.ssh/conoha-maku/id_rsa 公開鍵を SSH サーバーに登録 SSH キーで SSH 接続するには、接続先の SSH サーバーの ~/.ssh/authorized_keys に公開鍵を登録しておく必要があります。 この作業は、ssh-copy-id コマンドを使うと簡単に済ませられます（参考: ssh-id-copy で SSH の公開鍵をリモートホストに登録する）。 $ ssh-copy-id -i ~/.ssh/conoha-maku/id_rsa.pub maku@xxx.xxx.xxx.xxx xxx.xxx.xxx.xxx は接続先のアドレスを示しています。 これで、次のように SSH キーで接続できるようになります。 $ ssh -i ~/.ssh/conoha-maku/id_rsa maku@xxx.xxx.xxx.xxx 接続先ごとに使用する SSH キーを切り替える ここまでの設定で、SSH キーを使った接続はできるようになっているのですが、毎回秘密鍵のパスやユーザー名などを入力するのは面倒です。 このような場合は、~/.ssh/config ファイルを作って、任意のエイリアス名を使って SSH 接続できるようにしておくと便利です。 ~/.ssh/config Host conoha Hostname xxx.xxx.xxx.xxx User maku Port 22 IdentityFile ~/.ssh/conoha-maku/id_rsa 上記のように設定しておくと、次のようなコマンドで簡単に SSH 接続できるようになります。 $ ssh conoha あとは、同様の手順を接続先の SSH サーバーごとに繰り返せば OK です。 ~/.ssh/config の設定方法の詳細は、man ssh_config で確認できます。 ☝️ Dropbox で SSH キーを共有 セキュリティ的に微妙かもしれませんが、Dropbox などで SSH キーを管理しておくと、いろんな環境から SSH 接続できるようになるので便利です。 IdentityFile ~/Dropbox/share/appdata/ssh/conoha-maku/id_rsa （おまけ）シェルの alias じゃダメなの？ bash の alias などで、次のように定義しておけば同じことが簡単に実現できるのでは？と思うかもしれません。 ~/.bash_profile alias ssh-conoha=\u0026#39;ssh -i ~/.ssh/conoha-maku/id_rsa maku@xxx.xxx.xxx.xxx\u0026#39; これでもよいのですが、~/.ssh/config で接続設定をしておけば、内部的に SSH を使ったツールでもその設定を利用できます。 例えば、下記の config ファイルは GitHub 用の接続設定です（GitHub に SSH 接続するときのユーザー名は必ず git になることに注意）。 ~/.ssh/config Host github HostName github.com User git IdentityFile ~/.ssh/github-maku/id_rsa この設定を、Git の設定ファイルから次のように参照することができます。 \u0026lt;REPO\u0026gt;/.git/config（抜粋） [remote \u0026#34;origin\u0026#34;] url = github:\u0026lt;GITHUB_USER\u0026gt;/\u0026lt;REPO\u0026gt;.git"
+body: "SSH キーの管理: SSH の接続先ごとにキーを使い分ける (~/.ssh/config) 何をするか？ SSH 鍵を使って複数の SSH サーバーに接続する場合、1 つの SSH 鍵ファイルを使い回すこともできますが、場合によっては SSH サーバーごと（SSH ユーザーごと）に鍵ファイルを使い分けたいこともあるかもしれません。 ここでは、SSH サーバーごとの SSH キーを用意する方法を説明します。 鍵ファイルを作成する 例えば、ConoHa VPS に maku というユーザーで SSH 接続するための SSH キーを作成するとします。 一般的に SSH のキーペアは ~/.ssh ディレクトリ以下に保存しますが、次のような感じで接続先ごとにディレクトリ (\u0026lt;接続先\u0026gt;-\u0026lt;ユーザー\u0026gt;) を作ると管理しやすくなります（ファイル名で表現することもできます）。 ~/.ssh/conoha-maku/id_rsa \u0026hellip; 秘密鍵 ~/.ssh/conoha-maku/id_rsa.pub \u0026hellip; 公開鍵 # SSH キーペア用のディレクトリを作成 $ mkdir -p -m 0700 ~/.ssh/conoha-maku # SSH キーペアを作成 $ ssh-keygen -t rsa -f ~/.ssh/conoha-maku/id_rsa 公開鍵を SSH サーバーに登録 SSH キーで SSH 接続するには、接続先の SSH サーバーの ~/.ssh/authorized_keys に公開鍵を登録しておく必要があります。 この作業は、ssh-copy-id コマンドを使うと簡単に済ませられます（参考: ssh-id-copy で SSH の公開鍵をリモートホストに登録する）。 $ ssh-copy-id -i ~/.ssh/conoha-maku/id_rsa.pub maku@xxx.xxx.xxx.xxx xxx.xxx.xxx.xxx は接続先のアドレスを示しています。 これで、次のように SSH キーで接続できるようになります。 $ ssh -i ~/.ssh/conoha-maku/id_rsa maku@xxx.xxx.xxx.xxx 接続先ごとに使用する SSH キーを切り替える ここまでの設定で、SSH キーを使った接続はできるようになっているのですが、毎回秘密鍵のパスやユーザー名などを入力するのは面倒です。 このような場合は、~/.ssh/config ファイルを作って、任意のエイリアス名を使って SSH 接続できるようにしておくと便利です。 ~/.ssh/config Host conoha Hostname xxx.xxx.xxx.xxx User maku Port 22 IdentityFile ~/.ssh/conoha-maku/id_rsa 上記のように設定しておくと、次のようなコマンドで簡単に SSH 接続できるようになります。 $ ssh conoha あとは、同様の手順を接続先の SSH サーバーごとに繰り返せば OK です。 ~/.ssh/config の設定方法の詳細は、man ssh_config で確認できます。 ☝️ Dropbox で SSH キーを共有 セキュリティ的に微妙かもしれませんが、Dropbox などで SSH キーを管理しておくと、いろんな環境から SSH 接続できるようになるので便利です。 IdentityFile ~/Dropbox/share/appdata/ssh/conoha-maku/id_rsa （おまけ）シェルの alias じゃダメなの？ bash の alias などで、次のように定義しておけば同じことが簡単に実現できるのでは？と思うかもしれません。 ~/.bash_profile alias ssh-conoha=\u0026#39;ssh -i ~/.ssh/conoha-maku/id_rsa maku@xxx.xxx.xxx.xxx\u0026#39; これでもよいのですが、~/.ssh/config で接続設定をしておけば、内部的に SSH を使ったツールでもその設定を利用できます。 例えば、下記の config ファイルは GitHub 用の接続設定です（GitHub に SSH 接続するときのユーザー名は必ず git になることに注意）。 ~/.ssh/config Host github HostName github.com User git IdentityFile ~/.ssh/github-maku/id_rsa この設定を、Git の設定ファイルから次のように参照することができます。 \u0026lt;REPO\u0026gt;/.git/config（抜粋） [remote \u0026#34;origin\u0026#34;] url = github:\u0026lt;GITHUB_USER\u0026gt;/\u0026lt;REPO\u0026gt;.git"
 },
 {
 url: "/p/9gs3cmu/",
 title: "SSH サーバー (sshd) の起動・停止・再起動方法まとめ",
 date: "2022-07-17T00:00:00Z",
-body: "SSH サーバー (sshd) の起動・停止・再起動方法まとめ Debian 系 (Ubuntu/Debian) Ubuntu 15.04 以降 $ sudo systemctl start ssh （起動） $ sudo systemctl stop ssh （停止） $ sudo systemctl restart ssh （再起動） $ sudo systemctl reload ssh （設定リロード） Ubuntu 14.10 以前 $ sudo service ssh start （起動） $ sudo service ssh stop （停止） $ sudo service ssh restart （再起動） $ sudo service ssh reload （設定リロード） ☝️ ssh でも sshd でも OK /lib/systemd/system/ssh.service ファイルに、エイリアスとして sshd.service が定義されています。 なので、上記コマンドの ssh の部分は sshd としても動作します。 サービス名のサフィックス (.service) はほとんどのケースで省略できます。 Red Hat 系 (RHEL/Fedora/CentOS/Rocky Linux) CentOS 7.x/8.x # systemctl start sshd.service （起動） # systemctl stop sshd.service （停止） # systemctl restart sshd.service （再起動） # systemctl reload sshd.service （設定リロード） CentOS 4.x/5.x/6.x # service sshd start （起動） # service sshd stop （停止） # service sshd restart （再起動） # service sshd reload （設定リロード） OR # /etc/init.d/sshd start （起動） # /etc/init.d/sshd stop （停止） # /etc/init.d/sshd restart （再起動） # /etc/init.d/sshd reload （設定リロード） FreeBSD / OpenBSD # /etc/rc.d/sshd start （起動） # /etc/rc.d/sshd stop （停止） # /etc/rc.d/sshd restart （再起動） # /etc/rc.d/sshd reload （設定リロード）"
+body: "SSH サーバー (sshd) の起動・停止・再起動方法まとめ 各 OS（ディストリビューション）で SSH サーバーを起動・停止するときのコマンドのまとめです。 Debian 系 (Ubuntu/Debian) Ubuntu 15.04 以降 $ sudo systemctl start ssh （起動） $ sudo systemctl stop ssh （停止） $ sudo systemctl restart ssh （再起動） $ sudo systemctl reload ssh （設定リロード） Ubuntu 14.10 以前 $ sudo service ssh start （起動） $ sudo service ssh stop （停止） $ sudo service ssh restart （再起動） $ sudo service ssh reload （設定リロード） ☝️ ssh でも sshd でも OK /lib/systemd/system/ssh.service ファイルに、エイリアスとして sshd.service が定義されています。 なので、上記コマンドの ssh の部分は sshd としても動作します。 サービス名のサフィックス (.service) はほとんどのケースで省略できます。 Red Hat 系 (RHEL/Fedora/CentOS/Rocky Linux) CentOS 7.x/8.x # systemctl start sshd.service （起動） # systemctl stop sshd.service （停止） # systemctl restart sshd.service （再起動） # systemctl reload sshd.service （設定リロード） CentOS 4.x/5.x/6.x # service sshd start （起動） # service sshd stop （停止） # service sshd restart （再起動） # service sshd reload （設定リロード） OR # /etc/init.d/sshd start （起動） # /etc/init.d/sshd stop （停止） # /etc/init.d/sshd restart （再起動） # /etc/init.d/sshd reload （設定リロード） FreeBSD / OpenBSD # /etc/rc.d/sshd start （起動） # /etc/rc.d/sshd stop （停止） # /etc/rc.d/sshd restart （再起動） # /etc/rc.d/sshd reload （設定リロード）"
 },
 {
 url: "/p/42cmu5d/",
@@ -1846,12 +1876,6 @@ url: "/p/iwfwds9/",
 title: "Linux のシステム管理",
 date: "2022-07-17T00:00:00Z",
 body: "Linux のシステム管理"
-},
-{
-url: "/p/nd3cmt3/",
-title: "ネットワーク関連技術メモ",
-date: "2022-07-17T00:00:00Z",
-body: "ネットワーク関連技術メモ"
 },
 {
 url: "/p/99qo8zf/",
@@ -2137,9 +2161,9 @@ body: "Ansible モジュールのヘルプを表示する (ansible-doc) ansible-
 },
 {
 url: "/p/2mzbmw8/",
-title: "ssh-id-copy で SSH の公開鍵をリモートホストに登録する",
+title: "SSH キーの管理: ssh-id-copy で SSH の公開鍵をリモートホストに登録する",
 date: "2022-02-17T00:00:00Z",
-body: "ssh-id-copy で SSH の公開鍵をリモートホストに登録する ssh-id-copy とは SSH で公開鍵認証方式を使ってリモートホストに接続するには、リモートホスト側の ~/.ssh/authorized_keys ファイルに公開鍵を書き込んでおく必要がありますが、ssh-copy-id コマンドを使うと、この作業を一撃で済ますことができます。 ssh-copy-id コマンドは Linux 環境であれば標準でインストールされているはずです。 前提条件として、パスワード認証で SSH 接続できる状態にはしておく必要があります。 （必要があれば）鍵ファイルの作成 (ssh-keygen) 接続元のマシンに次のような秘密鍵＆公開鍵のペアが存在しないときは、ssh-keygen コマンドなどで作成しておきます。 ~/.ssh/id_rsa \u0026hellip; 秘密鍵 ~/.ssh/id_rsa.pub \u0026hellip; 公開鍵（これをリモートホストに登録します） 秘密鍵と公開鍵を生成する $ ssh-keygen Generating public/private rsa key pair. Enter file in which to save the key (/Users/maku/.ssh/id_rsa): （このパスでよければ Enter） Enter passphrase (empty for no passphrase): （鍵のパスワードを入力） Enter same passphrase again: （パスワードを再入力） Your identification has been saved in /Users/maku/.ssh/id_rsa. Your public key has been saved in /Users/maku/.ssh/id_rsa.pub. The key fingerprint is: SHA256:hmOfShQhPstmuGyB3qj0wpdosKXD82ibJs+7Jsb+wSl maku@makumac.local The key\u0026#39;s randomart image is: +---[RSA 3072]----+ | | | | |o.* * . | |O O O = S | |o . . . | |.@ o * . . | |oB * B o | | *E+o+ | |++oOOo | +----[SHA256]-----+ リモートホストに公開鍵を登録する (ssh-copy-id) 公開鍵の準備ができたら、ssh-copy-id コマンドでリモートホストの ~/.ssh/authorized_keys に書き込みます。 最初は、-n オプションをつけて dry-run 実行してみるのがよいです。 実際には実行されませんが、どの公開鍵が登録されるかを確認できます。 dry-run 実行 $ ssh-copy-id -n user@192.168.1.20 /usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: \u0026#34;/Users/maku/.ssh/id_rsa.pub\u0026#34; /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys =-=-=-=-=-=-=-= Would have added the following key(s): ssh-rsa AAAAB3NzaCn21Bq...(省略)...Qu4cIuQFG92hxMqU= maku@makumac.local =-=-=-=-=-=-=-= 公開鍵ファイルは、デフォルトで ~/.ssh/id*.pub というファイルが検索されて使用されますが、-i オプションで明示することもできます。 $ ssh-copy-id -n -i ~/.ssh/id_rsa_XXX.pub user@192.168.1.20 登録内容に問題なさそうであれば、今度は -n オプションを外して実際に実行します。 ここでは、まだパスワード認証が使われるので、リモートホスト側のユーザーのパスワードを入力する必要があります。 $ ssh-copy-id user@192.168.1.20 /usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: \u0026#34;/Users/maku/.ssh/id_rsa.pub\u0026#34; /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys user@192.168.1.20\u0026#39;s password: （リモートホストのユーザーのパスワードを入力） Number of key(s) added: 1 Now try logging into the machine, with: \u0026#34;ssh \u0026#39;user@192.168.1.20\u0026#39;\u0026#34; and check to make sure that only the key(s) you wanted were added. これで、ssh コマンド実行時に SSH 鍵を使って（公開鍵認証方式で） 接続するようになります。 $ ssh user@192.168.1.20 Enter passphrase for key \u0026#39;/Users/maku/.ssh/id_rsa\u0026#39;: （SSH鍵のパスワードを入力） ssh-copy-id で -i オプションを使って標準と異なる名前の公開鍵を登録した場合は、ssh で接続するときも -i オプションを使って対となる秘密鍵を指定します。 $ ssh -i ~/.ssh/id_rsa_XXX user@192.168.1.20 SSH 鍵のパスワード入力に失敗すると、従来のリモートホストのパスワード認証が実行されますが、この振る舞いは後述のように無効化することができます。 パスワード認証を無効にする SSH 鍵でリモートホストに接続できるようになったら、パスワード認証による接続は無効にしておくと安全です。 次のように vim や nano エディタで SSH デーモンの設定ファイルを開き、 $ sudo vim /etc/ssh/sshd_config 下記の行を修正して保存します。 PasswordAuthentication yes ↓ PasswordAuthentication no あとは、SSH デーモンを再起動して反映します。 $ sudo systemctl restart ssh （おまけ）ssh-copy-id を使わずに authorized_keys に登録する場合 何らかの理由で ssh-copy-id コマンドが使えない場合は、次のようにして ssh コマンド経由で公開鍵を登録することができます。 $ cat ~/.ssh/id_rsa.pub | ssh user@192.168.1.20 \u0026#34;cat \u0026gt;\u0026gt; ~/.ssh/authorized_keys\u0026#34; こちらでも簡単に登録できますが、~/.ssh ディレクトリが存在しない場合は先に作成しておくなどの対応が必要になってくるので、できれば ssh-copy-id コマンドを使った方がよいです。"
+body: "SSH キーの管理: ssh-id-copy で SSH の公開鍵をリモートホストに登録する ssh-id-copy とは SSH で公開鍵認証方式を使ってリモートホストに接続するには、リモートホスト側の ~/.ssh/authorized_keys ファイルに公開鍵を書き込んでおく必要がありますが、ssh-copy-id コマンドを使うと、この作業を一撃で済ますことができます。 ssh-copy-id コマンドは Linux 環境であれば標準でインストールされているはずです。 前提条件として、接続先ホストにパスワード認証で SSH 接続できる状態 にしておく必要があります。 公開鍵の内容をコピーする段階では、まだ SSH キーを使った接続ができないからです。 例えば、次のような感じで、接続先ホストに登録されている「ユーザー名」と「ユーザーパスワード」のペアで接続できるようになっていれば OK です。 パスワード認証で接続できるか確認 $ ssh maku@192.168.1.20 maku@192.168.1.20\u0026#39;s password: （接続先ホストのユーザー maku のパスワードを入力） 本記事の作業が完了すれば、SSH 接続時に「ユーザーパスワード」を送信する必要はなくなり、代わりに「SSH 秘密鍵」を使って接続できるようになります。 SSH 秘密鍵のパスフレーズを入力する必要があるかもしれませんが、このパスフレーズがネットワーク上に流れることはないので安全です。 （必要があれば）鍵ファイルの作成 (ssh-keygen) 接続元のマシンに次のような秘密鍵＆公開鍵のペアが存在しないときは、ssh-keygen コマンドなどで作成しておきます。 ~/.ssh/id_rsa \u0026hellip; 秘密鍵 ~/.ssh/id_rsa.pub \u0026hellip; 公開鍵（これをリモートホストに登録します） 秘密鍵と公開鍵を生成する $ ssh-keygen Generating public/private rsa key pair. Enter file in which to save the key (/Users/maku/.ssh/id_rsa): （このパスでよければ Enter） Enter passphrase (empty for no passphrase): （鍵のパスワードを入力） Enter same passphrase again: （パスワードを再入力） Your identification has been saved in /Users/maku/.ssh/id_rsa. Your public key has been saved in /Users/maku/.ssh/id_rsa.pub. The key fingerprint is: SHA256:hmOfShQhPstmuGyB3qj0wpdosKXD82ibJs+7Jsb+wSl maku@makumac.local The key\u0026#39;s randomart image is: +---[RSA 3072]----+ | | | | |o.* * . | |O O O = S | |o . . . | |.@ o * . . | |oB * B o | | *E+o+ | |++oOOo | +----[SHA256]-----+ リモートホストに公開鍵を登録する (ssh-copy-id) 公開鍵の準備ができたら、ssh-copy-id コマンドでリモートホストの ~/.ssh/authorized_keys に書き込みます。 最初は、-n オプションをつけて dry-run 実行 してみるのがよいです。 実際には実行されませんが、どの公開鍵が登録されるかを確認できます。 dry-run で処理内容を確認 $ ssh-copy-id -n user@192.168.1.20 /usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: \u0026#34;/Users/maku/.ssh/id_rsa.pub\u0026#34; /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys =-=-=-=-=-=-=-= Would have added the following key(s): ssh-rsa AAAAB3NzaCn21Bq...(省略)...Qu4cIuQFG92hxMqU= maku@makumac.local =-=-=-=-=-=-=-= 公開鍵ファイルは、デフォルトで ~/.ssh/id*.pub というファイル名で検索されて使用されますが、-i オプションで明示することもできます。 $ ssh-copy-id -n -i ~/.ssh/id_rsa_XXX.pub user@192.168.1.20 登録内容に問題なさそうであれば、今度は -n (dry-run) オプションを外して実際に実行します。 ここでは、まだパスワード認証が使われるので、リモートホスト側のユーザーのパスワードを入力する必要があります。 $ ssh-copy-id user@192.168.1.20 /usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: \u0026#34;/Users/maku/.ssh/id_rsa.pub\u0026#34; /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys user@192.168.1.20\u0026#39;s password: （リモートホストのユーザーのパスワードを入力） Number of key(s) added: 1 Now try logging into the machine, with: \u0026#34;ssh \u0026#39;user@192.168.1.20\u0026#39;\u0026#34; and check to make sure that only the key(s) you wanted were added. これで、ssh コマンド実行時に SSH 鍵を使って（公開鍵認証方式で） 接続するようになります。 $ ssh user@192.168.1.20 Enter passphrase for key \u0026#39;/Users/maku/.ssh/id_rsa\u0026#39;: （SSH鍵のパスワードを入力） ssh-copy-id で -i オプションを使って標準と異なる名前の公開鍵を登録した場合は、ssh で接続するときも -i オプションを使って対となる秘密鍵を指定します（参考: SSH の接続先ごとにキーを使い分ける）。 $ ssh -i ~/.ssh/id_rsa_XXX user@192.168.1.20 SSH 鍵のパスワード入力に失敗すると、従来のリモートホストのパスワード認証が実行されますが、この振る舞いは後述のように無効化することができます。 パスワード認証を無効にする SSH 鍵でリモートホストに接続できるようになったら、パスワード認証による接続は無効にしておくと安全です。 次のように vim や nano エディタで SSH デーモンの設定ファイルを開き、 $ sudo vim /etc/ssh/sshd_config 下記の行を修正して保存します。 PasswordAuthentication yes ↓ PasswordAuthentication no あとは、SSH デーモンを再起動して反映します。 $ sudo systemctl restart ssh （おまけ）ssh-copy-id を使わずに authorized_keys に登録する場合 何らかの理由で ssh-copy-id コマンドが使えない場合は、次のようにして ssh コマンド経由で公開鍵を登録することができます。 $ cat ~/.ssh/id_rsa.pub | ssh user@192.168.1.20 \u0026#34;cat \u0026gt;\u0026gt; ~/.ssh/authorized_keys\u0026#34; こちらでも簡単に登録できますが、~/.ssh ディレクトリが存在しない場合は先に作成しておくなどの対応が必要になってくるので、できれば ssh-copy-id コマンドを使った方がよいです。 接続先ホストに .ssh ディレクトリがない場合の事前準備 $ mkdir -m 700 ~/.ssh # ディレクトリがなければ作成しておく $ touch ~/.ssh/authorized_keys $ chmod 600 ~/.ssh/authorized_keys"
 },
 {
 url: "/p/dw9jt4e/",

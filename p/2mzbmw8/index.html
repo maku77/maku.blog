@@ -2,19 +2,20 @@
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
-<title>ssh-id-copy で SSH の公開鍵をリモートホストに登録する｜まくろぐ</title>
+<title>SSH キーの管理: ssh-id-copy で SSH の公開鍵をリモートホストに登録する｜まくろぐ</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
-<meta property="og:title" content="ssh-id-copy で SSH の公開鍵をリモートホストに登録する">
+<meta property="og:title" content="SSH キーの管理: ssh-id-copy で SSH の公開鍵をリモートホストに登録する">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://maku.blog/p/2mzbmw8/">
 <meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
 <meta property="og:image:width" content="1436">
 <meta property="og:image:height" content="746">
 <meta property="og:description" content="ssh-id-copy とは SSH で公開鍵認証方式を使ってリモートホストに接続するには、リモートホスト側の ~/.ssh/authorized_keys ファイルに公開鍵を書き込んでおく必要がありますが、ssh-copy-id コマンドを使うと、この作業を一撃で済ますことができます。 ssh-copy-id コマンドは Linux 環境であれば標準でインストールされているはずです。
-前提条件として、パスワード認証で SSH 接続できる状態にはしておく必要があります。
+前提条件として、接続先ホストにパスワード認証で SSH 接続できる状態 にしておく必要があります。 公開鍵の内容をコピーする段階では、まだ SSH キーを使った接続ができないからです。 例えば、次のような感じで、接続先ホストに登録されている「ユーザー名」と「ユーザーパスワード」のペアで接続できるようになっていれば OK です。
+パスワード認証で接続できるか確認 $ ssh maku@192.168.1.20 maku@192.168.1.20's password: （接続先ホストのユーザー maku のパスワードを入力）   本記事の作業が完了すれば、SSH 接続時に「ユーザーパスワード」を送信する必要はなくなり、代わりに「SSH 秘密鍵」を使って接続できるようになります。 SSH 秘密鍵のパスフレーズを入力する必要があるかもしれませんが、このパスフレーズがネットワーク上に流れることはないので安全です。
 （必要があれば）鍵ファイルの作成 (ssh-keygen) 接続元のマシンに次のような秘密鍵＆公開鍵のペアが存在しないときは、ssh-keygen コマンドなどで作成しておきます。
- ~/.ssh/id_rsa &mldr; 秘密鍵 ~/.ssh/id_rsa.pub &mldr; 公開鍵（これをリモートホストに登録します）  秘密鍵と公開鍵を生成する $ ssh-keygen Generating public/private rsa key pair. Enter file in which to save the key (/Users/maku/.ssh/id_rsa): （このパスでよければ Enter） Enter passphrase (empty for no passphrase): （鍵のパスワードを入力） Enter same passphrase again: （パスワードを再入力） Your identification has been saved in /Users/maku/.ssh/id_rsa. Your public key has been saved in /Users/maku/.">
+ ~/.ssh/id_rsa &mldr; 秘密鍵 ~/.ssh/id_rsa.pub &mldr; 公開鍵（これをリモートホストに登録します）  秘密鍵と公開鍵を生成する $ ssh-keygen Generating public/private rsa key pair. Enter file in which to save the key (/Users/maku/.ssh/id_rsa): （このパスでよければ Enter） Enter passphrase (empty for no passphrase): （鍵のパスワードを入力） Enter same passphrase again: （パスワードを再入力） Your identification has been saved in /Users/maku/.">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -36,7 +37,7 @@
 </span>
 <span class=xBreadcrumb_item><a href=../../p/gwnatcs/>SSH</a>
 </span>
-<span class=xBreadcrumb_item>ssh-id-copy で SSH の公開鍵をリモートホストに登録する
+<span class=xBreadcrumb_item>SSH キーの管理: ssh-id-copy で SSH の公開鍵をリモートホストに登録する
 </span>
 </div>
 </aside>
@@ -61,6 +62,21 @@
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/m2k4j2h/>
+SSH キーの管理: SSH キーの種類やフィンガープリントを確認する (ssh-keygen -l)
+<time>2022-11-24</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/as2ahpw/>
+SSH キーの管理: SSH キーのパスワードを変更する (ssh-keygen -p)
+<time>2022-11-24</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/o3m4j2h/>
+SSH キーの管理: SSH キーのコメントを確認する／変更する (ssh-keygen -c)
+<time>2022-11-24</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/4reqy9i/>
 GraphQL ベストプラクティス
 <time>2022-11-21</time></a>
@@ -69,21 +85,6 @@ GraphQL ベストプラクティス
 <a href=../../p/vgs4dnw/>
 Next.js アプリでのリンク方法まとめ（mui/Material-UI との連携なども） (next/link, next/router)
 <time>2022-11-19</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/vuo4px3/>
-GraphQL スキーマ仕様: ページネーション (pagination)
-<time>2022-11-07</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/xa62yo4/>
-Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマイズする
-<time>2022-10-26</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/mu7gqya/>
-IGDB API でゲーム情報のデータベースにアクセスしてみる
-<time>2022-10-24</time></a>
 </div>
 </div>
 </div>
@@ -96,13 +97,6 @@ IGDB API でゲーム情報のデータベースにアクセスしてみる
 <ul>
 <li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
 <li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
-<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
-<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
-<li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a>
-<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
-<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
-<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
-<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
 <li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a>
 <ul>
 <li><a class=xNavTree-dir href=../../p/gwnatcs/>SSH</a>
@@ -111,6 +105,13 @@ IGDB API でゲーム情報のデータベースにアクセスしてみる
 <li><a class=xNavTree-dir href=../../p/opyajt3/>Let's Encrypt</a>
 <li><a class=xNavTree-dir href=../../p/88gow5c/>gRPC</a>
 </ul>
+<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
+<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
+<li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a>
+<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
+<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
+<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
+<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
 <li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
 <li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
 <li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
@@ -199,6 +200,8 @@ IGDB API でゲーム情報のデータベースにアクセスしてみる
 </div><div class=xMenu_tag>
 <a href=../../tags/python>python (9)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/ssh>ssh (9)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/uml>uml (9)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
@@ -262,8 +265,6 @@ IGDB API でゲーム情報のデータベースにアクセスしてみる
 <a href=../../tags/luis>luis (5)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/qna-maker>qna-maker (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ssh>ssh (5)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
 </div><div class=xMenu_tag>
@@ -517,10 +518,10 @@ IGDB API でゲーム情報のデータベースにアクセスしてみる
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/gwnatcs/>SSH</a></span></div>
 <div style=display:flex;margin-top:.8em>
 <div style=width:80px;margin-right:.5em>
-<img src=../../p/nd3cmt3/_index.svg style=width:80px;height:80px>
+<img src=../../p/gwnatcs/_index.svg style=width:80px;height:80px>
 </div>
 <div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/2mzbmw8/>ssh-id-copy で SSH の公開鍵をリモートホストに登録する</a></h1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/2mzbmw8/>SSH キーの管理: ssh-id-copy で SSH の公開鍵をリモートホストに登録する</a></h1>
 <div class=xPageTags>
 <span class=xPageTags_item><a href=../../tags/ssh>SSH</a></span>
 </div>
@@ -543,9 +544,19 @@ IGDB API でゲーム情報のデータベースにアクセスしてみる
 </nav><h2 id=ssh-id-copy-とは>ssh-id-copy とは</h2>
 <p>SSH で公開鍵認証方式を使ってリモートホストに接続するには、リモートホスト側の <code>~/.ssh/authorized_keys</code> ファイルに公開鍵を書き込んでおく必要がありますが、<a href=https://manpages.ubuntu.com/manpages/en/man1/ssh-copy-id.1.html>ssh-copy-id</a> コマンドを使うと、この作業を一撃で済ますことができます。
 <code>ssh-copy-id</code> コマンドは Linux 環境であれば標準でインストールされているはずです。</p>
-<p>前提条件として、パスワード認証で SSH 接続できる状態にはしておく必要があります。</p>
+<p><strong>前提条件として、接続先ホストにパスワード認証で SSH 接続できる状態</strong> にしておく必要があります。
+公開鍵の内容をコピーする段階では、まだ SSH キーを使った接続ができないからです。
+例えば、次のような感じで、接続先ホストに登録されている「ユーザー名」と「ユーザーパスワード」のペアで接続できるようになっていれば OK です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>パスワード認証で接続できるか確認</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>ssh maku@192.168.1.20
+<span class=go>maku@192.168.1.20&#39;s password: （接続先ホストのユーザー maku のパスワードを入力）
+</span></code></pre></div></div>
+</figure>
+<p>本記事の作業が完了すれば、SSH 接続時に「ユーザーパスワード」を送信する必要はなくなり、代わりに「SSH 秘密鍵」を使って接続できるようになります。
+SSH 秘密鍵のパスフレーズを入力する必要があるかもしれませんが、このパスフレーズがネットワーク上に流れることはないので安全です。</p>
 <h2 id=必要があれば鍵ファイルの作成-ssh-keygen>（必要があれば）鍵ファイルの作成 (ssh-keygen)</h2>
-<p>接続元のマシンに次のような秘密鍵＆公開鍵のペアが存在しないときは、<code>ssh-keygen</code> コマンドなどで作成しておきます。</p>
+<p>接続元のマシンに次のような秘密鍵＆公開鍵のペアが存在しないときは、<a href=../../p/ftducs9/>ssh-keygen コマンドなどで作成</a>しておきます。</p>
 <ul>
 <li><code>~/.ssh/id_rsa</code> &mldr; 秘密鍵</li>
 <li><code>~/.ssh/id_rsa.pub</code> &mldr; 公開鍵（これをリモートホストに登録します）</li>
@@ -576,11 +587,11 @@ IGDB API でゲーム情報のデータベースにアクセスしてみる
 </span></code></pre></div></div>
 </figure>
 <h2 id=リモートホストに公開鍵を登録する-ssh-copy-id>リモートホストに公開鍵を登録する (ssh-copy-id)</h2>
-<p>公開鍵の準備ができたら、<code>ssh-copy-id</code> コマンドでリモートホストの <code>~/.ssh/authorized_keys</code> に書き込みます。</p>
-<p>最初は、<strong><code>-n</code></strong> オプションをつけて dry-run 実行してみるのがよいです。
+<p>公開鍵の準備ができたら、<code>ssh-copy-id</code> コマンドでリモートホストの <code>~/.ssh/authorized_keys</code> に書き込みます。
+最初は、<strong><code>-n</code></strong> オプションをつけて <strong>dry-run 実行</strong> してみるのがよいです。
 実際には実行されませんが、どの公開鍵が登録されるかを確認できます。</p>
 <figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>dry-run 実行</figcaption>
+<figcaption class=xCodeBlock_title>dry-run で処理内容を確認</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>ssh-copy-id -n user@192.168.1.20
 <span class=go>/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: &#34;/Users/maku/.ssh/id_rsa.pub&#34;
 </span><span class=go>/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s),
@@ -594,9 +605,9 @@ IGDB API でゲーム情報のデータベースにアクセスしてみる
 </span><span class=go>=-=-=-=-=-=-=-=
 </span></code></pre></div></div>
 </figure>
-<p>公開鍵ファイルは、デフォルトで <strong><code>~/.ssh/id*.pub</code></strong> というファイルが検索されて使用されますが、<code>-i</code> オプションで明示することもできます。</p>
+<p>公開鍵ファイルは、デフォルトで <strong><code>~/.ssh/id*.pub</code></strong> というファイル名で検索されて使用されますが、<code>-i</code> オプションで明示することもできます。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>ssh-copy-id -n -i ~/.ssh/id_rsa_XXX.pub user@192.168.1.20
-</code></pre></div><p>登録内容に問題なさそうであれば、今度は <code>-n</code> オプションを外して実際に実行します。
+</code></pre></div><p>登録内容に問題なさそうであれば、今度は <code>-n</code> (dry-run) オプションを外して実際に実行します。
 ここでは、まだパスワード認証が使われるので、リモートホスト側のユーザーのパスワードを入力する必要があります。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>ssh-copy-id user@192.168.1.20
 <span class=go>/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: &#34;/Users/maku/.ssh/id_rsa.pub&#34;
@@ -613,7 +624,7 @@ IGDB API でゲーム情報のデータベースにアクセスしてみる
 </span></code></pre></div><p>これで、<code>ssh</code> コマンド実行時に SSH 鍵を使って（公開鍵認証方式で） 接続するようになります。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>ssh user@192.168.1.20
 <span class=go>Enter passphrase for key &#39;/Users/maku/.ssh/id_rsa&#39;: （SSH鍵のパスワードを入力）
-</span></code></pre></div><p><code>ssh-copy-id</code> で <code>-i</code> オプションを使って標準と異なる名前の公開鍵を登録した場合は、<code>ssh</code> で接続するときも <code>-i</code> オプションを使って対となる秘密鍵を指定します。</p>
+</span></code></pre></div><p><code>ssh-copy-id</code> で <code>-i</code> オプションを使って標準と異なる名前の公開鍵を登録した場合は、<code>ssh</code> で接続するときも <code>-i</code> オプションを使って対となる秘密鍵を指定します（参考: <a href=../../p/szajt4d/>SSH の接続先ごとにキーを使い分ける</a>）。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>ssh -i ~/.ssh/id_rsa_XXX user@192.168.1.20
 </code></pre></div><p>SSH 鍵のパスワード入力に失敗すると、従来のリモートホストのパスワード認証が実行されますが、この振る舞いは後述のように無効化することができます。</p>
 <h2 id=パスワード認証を無効にする>パスワード認証を無効にする</h2>
@@ -630,10 +641,21 @@ PasswordAuthentication no
 <p>何らかの理由で <code>ssh-copy-id</code> コマンドが使えない場合は、次のようにして <code>ssh</code> コマンド経由で公開鍵を登録することができます。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>cat ~/.ssh/id_rsa.pub <span class=p>|</span> ssh user@192.168.1.20 <span class=s2>&#34;cat &gt;&gt; ~/.ssh/authorized_keys&#34;</span>
 </code></pre></div><p>こちらでも簡単に登録できますが、<code>~/.ssh</code> ディレクトリが存在しない場合は先に作成しておくなどの対応が必要になってくるので、できれば <code>ssh-copy-id</code> コマンドを使った方がよいです。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>接続先ホストに .ssh ディレクトリがない場合の事前準備</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mkdir -m <span class=m>700</span> ~/.ssh  <span class=c1># ディレクトリがなければ作成しておく</span>
+<span class=gp>$ </span>touch ~/.ssh/authorized_keys
+<span class=gp>$ </span>chmod <span class=m>600</span> ~/.ssh/authorized_keys
+</code></pre></div></div>
+</figure>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">
 </span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=../../p/ftducs9/>SSH キーの管理: SSH キーを作成する (ssh-keygen)</a></li>
+</ul>
 <div class=xPageTags>
 <span class=xPageTags_item><a href=../../tags/ssh>SSH</a></span>
 </div>
@@ -650,7 +672,7 @@ PasswordAuthentication no
 <a href=../../p/42cmu5d/>SSH サーバー (sshd) 設定のベストプラクティス</a>
 </div>
 <div class=xPrevNextLink_next>
-<a href=../../p/szajt4d/>SSH の接続先ごとにキーを使い分ける</a>
+<a href=../../p/ftducs9/>SSH キーの管理: SSH キーを作成する (ssh-keygen)</a>
 </div>
 </div>
 </aside>
@@ -670,7 +692,7 @@ PasswordAuthentication no
 </span>
 <span class=xBreadcrumb_item><a href=../../p/gwnatcs/>SSH</a>
 </span>
-<span class=xBreadcrumb_item>ssh-id-copy で SSH の公開鍵をリモートホストに登録する
+<span class=xBreadcrumb_item>SSH キーの管理: ssh-id-copy で SSH の公開鍵をリモートホストに登録する
 </span>
 </div>
 </aside>
@@ -682,6 +704,6 @@ PasswordAuthentication no
 </div>
 <script src=../../assets/js/sidebar.js></script>
 <script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c],d=b.getElementsByTagName('img');if(d.length>0)continue;const e=b.getElementsByTagName('svg');if(e.length>0)continue;b.classList.add('xExternalLinkIcon'),b.setAttribute('target','_blank'),b.setAttribute('rel','noopener')}})</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"ネットワーク","item":"https://maku.blog/p/nd3cmt3/"},{"@type":"ListItem","position":4,"name":"SSH","item":"https://maku.blog/p/gwnatcs/"},{"@type":"ListItem","position":5,"name":"ssh-id-copy で SSH の公開鍵をリモートホストに登録する","item":"https://maku.blog/p/2mzbmw8/"}]}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"ネットワーク","item":"https://maku.blog/p/nd3cmt3/"},{"@type":"ListItem","position":4,"name":"SSH","item":"https://maku.blog/p/gwnatcs/"},{"@type":"ListItem","position":5,"name":"SSH キーの管理: ssh-id-copy で SSH の公開鍵をリモートホストに登録する","item":"https://maku.blog/p/2mzbmw8/"}]}</script>
 </body>
 </html>
