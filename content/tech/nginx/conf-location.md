@@ -1,6 +1,6 @@
 ---
-title: "Nginx の設定: Nginx の設定ファイル (nginx.conf) の場所"
-url: "/p/pms426x"
+title: "Nginx の設定: Nginx の設定ファイル (*.conf) の場所"
+url: "p/pms426x/"
 date: "2013-12-02"
 tags: ["nginx"]
 ---

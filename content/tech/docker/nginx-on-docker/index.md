@@ -2,7 +2,7 @@
 title: "Docker コンテナで Nginx サーバーを立ち上げる"
 url: "p/99qo8zf/"
 date: "2022-07-13"
-tags: ["Docker", "Nginx"]
+tags: ["Docker", "nginx"]
 ---
 
 何をするか？

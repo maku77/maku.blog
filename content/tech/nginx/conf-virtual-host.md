@@ -10,7 +10,7 @@ tags: ["nginx"]
 
 例えば、`http://test.example.com/` というアドレス（80番ポート）で nginx サーバにアクセスしてきたときに、`localhost:7000` で動作している Web サーバに処理を委譲するには、下記のように設定します。
 
-{{< code title="/etc/nginx/conf.d/example.com.conf" >}}
+{{< code lang="nginx" title="/etc/nginx/conf.d/test.example.com.conf" >}}
 server {
     listen 80;
     server_name test.example.com;
@@ -43,7 +43,7 @@ nginx や Apache などの Web サーバのバーチャルホスト機能は、�
 
 下記の設定例では、`aaa.example.com` でアクセスされた場合と、`bbb.example.com` でアクセスされた場合に使用するドキュメント（html ファイル）のルートディレクトリを切り替えています。
 
-{{< code title="/etc/nginx/conf.d/my.conf" >}}
+{{< code lang="nginx" title="/etc/nginx/conf.d/example.com.conf" >}}
 server {
     listen 80;
     server_name aaa.example.com;
@@ -63,6 +63,7 @@ server {
 }
 {{< /code >}}
 
+ここでは設定を 1 つの `example.com.conf` ファイルにまとめて記述していますが、`aaa.example.com.conf` と `bbb.example.com.conf` の 2 つに分けても大丈夫です（参考: [Nginx の設定ファイル (.conf) の場所](/p/pms426x/)）。
 この設定により、クライアントからのアクセス時に指定された　URL によって、下記のように参照するファイルが切り替わります。
 
 - http://**aaa**.example.com/ でアクセスされた場合 → /home/maku/**website/aaa**/public/index.html
