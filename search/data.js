@@ -1494,6 +1494,36 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/88gow5c/",
+title: "gRPC / Protocol Buffers 関連メモ",
+date: "2022-11-29T00:00:00Z",
+body: "gRPC / Protocol Buffers 関連メモ"
+},
+{
+url: "/p/ikw7gpz/",
+title: "Protocol Buffers の .proto ファイルから API ドキュメントを自動生成する (protoc-gen-doc)",
+date: "2022-11-29T00:00:00Z",
+body: "Protocol Buffers の .proto ファイルから API ドキュメントを自動生成する (protoc-gen-doc) protoc-gen-doc とは？ David Muto 氏が公開している protoc-gen-doc という protoc コマンドのプラグインを使用すると、.proto ファイルから、HTML 形式や Markdown 形式のドキュメントを自動生成することができます。 複数の .proto ファイルの内容をまとめて 1 つのページとして出力してくれるので、シンプルで見通しのよいドキュメントになります。 生成されたドキュメントの例: HTML 形式 / Markdown 形式 / JSON 形式 protoc-gen-doc は protoc コマンドのプラグインとして動作するのですが、実行環境が Docker イメージとして提供されているので、docker コマンド一発で、簡単に .proto ファイルからドキュメントを生成できます。 もちろん、protoc コマンドと protoc-gen-doc を両方インストールして実行することもできますが、Docker を使った方が断然お手軽です。 Protocol Buffers Compiler（protoc コマンド）に関しては、こちらを参考にしてください。 .proto ファイルからのドキュメント生成 protoc-gen-doc の Docker イメージを使って、.proto ファイルからドキュメントを生成してみます。 Docker の実行環境は、Docker Desktop などでインストールしてください。 .proto ファイルが手元になければ、とりあえず下記のファイルをダウンロードして試せます。 Vehicle.proto（サンプル .proto ファイル） proto/Vehicle.proto のように、proto ディレクトリに格納すれば準備完了です。 あとは次のように実行すると、docs ディレクトリに index.html ファイルが生成されます。 HTML 形式のドキュメント (docs/index.html) を生成 $ docker container run --rm \\ -v $(pwd)/docs:/out \\ -v $(pwd)/proto:/protos \\ pseudomuto/protoc-gen-doc --doc_opt=html,index.html protoc-gen-doc は、デフォルトでコンテナ内の /protos ディレクトリにある .proto ファイルを読み込んで、コンテナ内の /out ディレクトリに出力しようとします。 なので、docker container run コマンドに指定しているマウントオプション (-v) は、次のような意味になります。 -v $(pwd)/docs:/out \u0026hellip; ローカルの docs ディレクトリを出力先にする -v $(pwd)/proto:/protos \u0026hellip; ローカルの proto ディレクトリ内の *.proto を読み込む 出力形式を変えたい場合などは、--doc_opt オプションを変更します。 --doc_opt オプションの例 説明 --doc_opt=markdown,api.md 出力形式を Markdown (.md) にする --doc_opt=:google/*,somepath/* 対象外にする .proto 指定する（: の後ろに記述） GitHub で .proto ファイルを管理している場合は、GitHub Actions でドキュメントを自動生成 するように設定しておくと、開発メンバーが幸せになれます。"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2022-11-29T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/nd3cmt3/",
+title: "ネットワーク関連技術メモ",
+date: "2022-11-29T00:00:00Z",
+body: "ネットワーク関連技術メモ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-11-29T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/bm6n5k2/",
 title: "Nginx の設定: Nginx の設定内容を確認する (nginx -T)",
 date: "2022-11-27T00:00:00Z",
@@ -1504,18 +1534,6 @@ url: "/p/xdsom3a/",
 title: "Nginx（Web サーバー）のメモ",
 date: "2022-11-27T00:00:00Z",
 body: "Nginx（Web サーバー）のメモ"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2022-11-27T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-11-27T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/vt4bjry/",
@@ -1552,12 +1570,6 @@ url: "/p/m2k4j2h/",
 title: "SSH キーの管理: SSH キーの種類やフィンガープリントを確認する (ssh-keygen -l)",
 date: "2022-11-24T00:00:00Z",
 body: "SSH キーの管理: SSH キーの種類やフィンガープリントを確認する (ssh-keygen -l) 作成済みの SSH 鍵ファイルの種類（暗号アルゴリズム）やフィンガープリントを確認したいときは、ssh-keygen -l コマンドを使用します。 -f オプションで指定する鍵ファイルのパスは、秘密鍵でも公開鍵でも構いません。 次の例では、OpenSSH の ssh-keygen コマンドで作成したさまざまな種類の SSH キーの内容を表示しています。 $ ssh-keygen -l -f ~/.ssh/id_ed25519.pub 256 SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx yourname@example.com (ED25519) $ ssh-keygen -l -f ~/.ssh/id_ecdsa.pub 256 SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx yourname@example.com (ECDSA) $ ssh-keygen -l -f ~/.ssh/id_rsa.pub 2048 SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx yourname@example.com (RSA) $ ssh-keygen -l -f ~/.ssh/id_dsa.pub 1024 SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx yourname@example.com (DSA) 各フィールドは、「鍵のビット長」「フィンガープリント」「コメント」「暗号アルゴリズム」を示しています。 Windows PC の場合は、~/.ssh の部分は %USERPROFILE%\\.ssh と読みかえてください。"
-},
-{
-url: "/p/nd3cmt3/",
-title: "ネットワーク関連技術メモ",
-date: "2022-11-24T00:00:00Z",
-body: "ネットワーク関連技術メモ"
 },
 {
 url: "/p/uyw4qan/",
@@ -2032,12 +2044,6 @@ url: "/p/ij4jv9k/",
 title: "Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）",
 date: "2022-05-18T00:00:00Z",
 body: "Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント） 何をするか？ ここでは、Go 言語用の gRPC ライブラリである gRPC-Go (google.golang.org/grpc) を使って、簡単な gRPC サーバーとクライアントを作ってみます。 通信用のスタブコードなどは、protoc コマンド (Protocl Buffers Compiler) で .proto ファイルから自動生成するので、あらかじめ protoc コマンドをインストールしておいてください。 参考: protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler) protoc コマンドで Go 言語用のコードを生成するには、protoc-gen-go プラグインと protoc-gen-go-grpc プラグインをインストールしておく必要があります。 前者がシリアライズ用のコード、後者が gRPC 用のスタブコードを生成するための protoc プラグインです。 # バージョンを指定してインストールする方法（推奨） $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2 # 最新バージョンをインストールする方法 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest プロジェクトの作成と gRPC-Go のインストール まずは Go 言語用のプロジェクトを作成します。 モジュール名は com.example/grpc-sample としていますが、GitHub で管理する予定であれば、リポジトリ名に合わせて github.com/\u0026lt;USER\u0026gt;/grpc-sample のような名前にしてください。 これが、プロジェクト内で作成する Go パッケージをインポートするときのプレフィックスになります。 $ mkdir grpc-sample \u0026amp;\u0026amp; cd grpc-sample $ go mod init com.example/grpc-sample あとは、gRPC サーバーとクライアントの実装に使用する gRPC-Go パッケージの依存関係を追加しておきます。 $ go get google.golang.org/grpc .proto ファイルを作成する protos/echo/echo.proto ファイルを作成して、次のように記述します。 Go 言語用のオプション option go_package で、出力する .go ファイルを echo パッケージに配置するように指定しています。 protos/echo/echo.proto syntax = \u0026#34;proto3\u0026#34;;package echo;option go_package = \u0026#34;example.com/grpc-sample/echo\u0026#34;;// Echo メソッドを持つ EchoService の定義 service EchoService { rpc Echo (EchoRequest) returns (EchoResponse);}// Echo に送るリクエストメッセージの定義 message EchoRequest { string message = 1;}// Echo が返すレスポンスメッセージの定義 message EchoResponse { string message = 1;} ここでは、EchoService というサービスが、Echo というメソッドを提供するよう定義しています。 .proto ファイルをコンパイルする protoc コマンドを実行して、.proto ファイルからシリアライズ用のコードと、gRPC 関連のスタブコードを生成します。 $ protoc --go_out=. \\ --go_opt=paths=source_relative \\ --go-grpc_out=. \\ --go-grpc_opt=paths=source_relative \\ --proto_path=protos \\ protos/echo/*.proto それぞれのオプションは次のような意味があります。 --go_out \u0026hellip; protoc-gen-go プラグインによる生成コードの出力先ディレクトリ --go_opt \u0026hellip; protoc-gen-go プラグインに渡すオプション --go-grpc_out \u0026hellip; protoc-gen-go-grpc プラグインによる生成コードの出力先ディレクトリ --go-grpc_opt \u0026hellip; protoc-gen-go-grpc プラグインに渡すオプション --proto_path \u0026hellip; .proto ファイル内で別の .proto ファイルをインポートしようとする場合、ここで指定したディレクトリからの相対パスで指定することになります。また、出力ファイル (.pg.go) のディレクトリ構造を入力ファイル (.proto) のディレクトリ構造に合わせるとき（後述）、ここで指定したパスを取り除いた階層構造で出力されます。 --go_out オプションを指定することでシリアライズ用のコード (echo.pb.go) を生成、--go-grpc_out オプションを指定することで gRPC 用のスタブコード (echo_grpc.pb.go) を生成してくれます。 追加のオプションで、paths=source_relative を指定することにより、入力ファイル (.proto) と同じディレクトリ構成で .go ファイルを出力するようにしています。 さらに、--proto_path=protos というオプションを指定することで、出力先のディレクトリ階層には protos を含めないようにしています。 今回はカレントディレクトリ (.) を出力のルートに指定しているので、結果的に次のように .go ファイルが生成されることになります。 入力ファイル 使う protoc プラグイン 生成されるファイル protos/echo/echo.proto protoc-gen-go echo/echo.pb.go protos/echo/echo.proto protoc-gen-go-grpc echo/echo_grpc.pb.go 生成された echo.pb.go ファイルや echo_grpc.pb.go ファイルを覗いてみると、次のようなパッケージ名で定義されていることがわかります。 echo/echo.pb.go（抜粋） package echo このパッケージ名は、.proto ファイル内の options go_package で指定したパスに従って自動生成されています（パスの最後の /echo という部分が採用されています）。 また、今回はモジュール名を example.com/grpc-sample と定義したので（go.mod ファイルに書かれているので）、自動生成されたこれらのパッケージをインポートするときは、次のような感じで記述することになります。 import \u0026#34;example.com/grpc-sample/echo\u0026#34; 生成された echo/echo_grpc.pb.go ファイルを覗いてみると、次のようなクライアント実装用の EchoServiceClient インタフェースや、サーバー実装用の EchoServiceServer インタフェースが生成されていることが分かります。 echo/echo_grpc.pb.go type EchoServiceClient interface { Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error) // ... } type EchoServiceServer interface { Echo(context.Context, *EchoRequest) (*EchoResponse, error) // ... } // ...（省略）... クライアントスタブに関しては、実装も提供されているので、NewEchoServiceClient 関数でそのままインスタンス化して gRPC の API を呼び出すことができます。 サーバー側は各 API の実装を行う必要があります。 gRPC サーバーとクライアントの実装 gRPC を使って通信するサーバーとクライアントは、それぞれ独立したコマンドとして cmd/echo-server ディレクトリ、cmd/echo-client ディレクトリ以下に作成することにします（それぞれ main 関数を作成します）。 Go 言語のプロジェクトで生成する実行ファイルのコードを cmd ディレクトリ以下に配置するのはよくあるプラクティスです。 gRPC サーバーの実装 まずは、EchoServiceServer を実装します。 protoc によって自動生成された echo/echo_grpc.pb.go ファイルで定義されている EchoServiceServer インタフェースを実装していくわけですが、このとき、同じく自動生成されている次のようなモック実装を利用することができます。 このモック実装は空っぽの実装なので、名前に Unimplemented プレフィックスが付いています。 自動生成されたサーバーのモック実装（echo/echo_grpc.pb.go 内） // UnimplementedEchoServiceServer must be embedded to have forward compatible implementations. type UnimplementedEchoServiceServer struct { } func (UnimplementedEchoServiceServer) Echo(context.Context, *EchoRequest) (*EchoResponse, error) { return nil, status.Errorf(codes.Unimplemented, \u0026#34;method Echo not implemented\u0026#34;) } サーバー実装用の構造体（下記のコードでは type server struct）を定義するときに、上記のモック実装を Golang の構造体埋め込みの仕組み で埋め込むことで、各 API をとりあえず not implemented エラーを返すだけの実装として提供することができます。 こうすることで、すべての API を一度に実装せずに、1 つずつ実装して提供していくことができます。 cmd/echo-server/server.go package main import ( \u0026#34;context\u0026#34; \u0026#34;log\u0026#34; \u0026#34;example.com/grpc-sample/echo\u0026#34; ) // EchoService を実装するサーバーの構造体 type server struct { echo.UnimplementedEchoServiceServer // とりあえず Not implemented の実装を入れておく } // EchoServiceServer インタフェースの Echo メソッドの実装（本物の Echo 実装） func (s *server) Echo(ctx context.Context, in *echo.EchoRequest) (*echo.EchoResponse, error) { log.Printf(\u0026#34;Received from client: %v\u0026#34;, in.GetMessage()) return \u0026amp;echo.EchoResponse{Message: \u0026#34;*\u0026#34; + in.GetMessage()}, nil } 上記の例では、server 構造体に UnimplementedEchoServiceServer のモック実装を埋め込みつつ、Echo メソッドをオーバーライドしています。 結果として、モック実装側の Echo メソッドは使われないのですが、UnimplementedEchoServiceServer は server 構造体に埋め込んだままにしておいて大丈夫です。 上記の Echo メソッドは、クライアントから受信したテキストの先頭に * を付加したテキストをレスポンスとして返しています。 あとは、main 関数で gRPC サーバー (grpc.Server) のインスタンスを生成して、上記の実装を登録すれば OK です。 cmd/echo-server/main.go package main import ( \u0026#34;fmt\u0026#34; \u0026#34;log\u0026#34; \u0026#34;net\u0026#34; \u0026#34;google.golang.org/grpc\u0026#34; \u0026#34;example.com/grpc-sample/echo\u0026#34; ) const port = 52000 func main() { // TCP ポートをオープンできるか確認 \tlis, err := net.Listen(\u0026#34;tcp\u0026#34;, fmt.Sprintf(\u0026#34;:%d\u0026#34;, port)) if err != nil { log.Fatalf(\u0026#34;Failed to listen: %v\u0026#34;, err) } // gRPC サーバーを生成し、EchoService サーバーの実装を登録する \ts := grpc.NewServer() echo.RegisterEchoServiceServer(s, \u0026amp;server{}) // gRPC サーバーを稼働開始 \tlog.Printf(\u0026#34;Server listening at %v\u0026#34;, lis.Addr()) if err := s.Serve(lis); err != nil { log.Fatalf(\u0026#34;Failed to serve: %v\u0026#34;, err) } } gRPC クライアントの実装 gRPC サーバー側が実装できたら、次はクライアント側の実装です。 通信用のクライアントスタブは、protoc で自動生成された NewEchoServiceClient 関数を使って生成することができます。 下記の gRPC クライアント実装では、Echo メソッドを呼び出して AAAAA というメッセージを送り、その応答 (*AAAAA) を単純に出力しています。 cmd/echo-client/main.go package main import ( \u0026#34;context\u0026#34; \u0026#34;log\u0026#34; \u0026#34;time\u0026#34; \u0026#34;google.golang.org/grpc\u0026#34; \u0026#34;google.golang.org/grpc/credentials/insecure\u0026#34; \u0026#34;example.com/grpc-sample/echo\u0026#34; ) const addr = \u0026#34;localhost:52000\u0026#34; func main() { // EchoService サーバーへ接続する \tconn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials())) if err != nil { log.Fatalf(\u0026#34;Did not connect: %v\u0026#34;, err) } defer conn.Close() c := echo.NewEchoServiceClient(conn) // Echo メソッドを呼び出す \tctx, cancel := context.WithTimeout(context.Background(), time.Second) defer cancel() r, err := c.Echo(ctx, \u0026amp;echo.EchoRequest{Message: \u0026#34;AAAAA\u0026#34;}) if err != nil { log.Fatalf(\u0026#34;Could not echo: %v\u0026#34;, err) } log.Printf(\u0026#34;Received from server: %s\u0026#34;, r.GetMessage()) } 実行してみる まず、gRPC のサーバー側を起動します。 $ go run ./cmd/echo-server 2022/05/17 22:00:47 Server listening at [::]:52000 次に、gRPC のクライアント側を起動すると、サーバーと通信してメッセージを受信できていることを確認できます。 $ go run ./cmd/echo-client 2022/05/17 22:01:32 Received from server: *AAAAA やったー！"
-},
-{
-url: "/p/88gow5c/",
-title: "gRPC 関連メモ",
-date: "2022-05-18T00:00:00Z",
-body: "gRPC 関連メモ"
 },
 {
 url: "/p/saku4ck/",
