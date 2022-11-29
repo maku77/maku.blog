@@ -1494,16 +1494,34 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
-url: "/p/vt4bjry/",
-title: "読書メモ『アルテミス』アンディ・ウィアー",
-date: "2022-11-26T00:00:00Z",
-body: "読書メモ『アルテミス』アンディ・ウィアー アルテミス アンディ・ウィアー 早川書房 『火星の人』 の著者、アンディ・ウィアーの SF 小説です。 前作は、マット・デイモン主演の映画版『オデッセイ』の方が有名かもしれません。 今回は 月が舞台 で現実味があります。 上下巻構成ですが、一人称で軽い調子で話が進んでいくのでサクッと読めてしまいます。 アルテミスは、月面に作られた居住区の名前で、5 つのドーム（バブル）から構成されています。 それぞれのバブルの名前は、アポロ計画の宇宙飛行士の名にちなんで、「アームストロング」「コンラッド」「オルドリン」「ビーン」「シェパード」という名前になっていてシャレオツ。 子供のころから月で暮らしている女性、ジャズ・バシャラは、地球から送られてくる品物を運ぶポーターをして生活していますが、決して裕福ではなく、非合法な仕事にも手を出しています。 あるとき、大物実業家から引き受けた依頼で一攫千金を狙うのですが、それは、月での酸素供給に関わる仕事でした。 その時点でヤバイでしょ。 酸素の供給施設は、すなわち 2000 人の住民全員の命を握っています。 そんな任務を受けてしまったジャズは、大きな陰謀に巻き込まれていきます。 地球の 1/6 の重力下での命懸けのアクションや、監視だらけの月面での無謀なミッションは、読んでいてハラハラします。 そんな中でもジャズは、一人で微妙なギャグを飛ばしながら任務を進めていきます。 頭のネジがぶっ飛んでいるのでしょう。 月での暮らしはこんな感じになるのかぁ・・・"
+url: "/p/bm6n5k2/",
+title: "Nginx の設定: Nginx の設定内容を確認する (nginx -T)",
+date: "2022-11-27T00:00:00Z",
+body: "Nginx の設定: Nginx の設定内容を確認する (nginx -T) nginx サーバーが読み込む設定情報を確認するには、nginx -T コマンドを使用します。 正確には、このコマンドは設定ファイルの検証 (nginx -t) と、内容の出力を同時に行うコマンドです。 下記は、nginx -T コマンドを実行したときの出力例です。 最初の 2 行が設定ファイルの検証結果で、3 行目以降が具体的な設定内容です。 nginx -T コマンドの出力例 nginx: the configuration file /etc/nginx/nginx.conf syntax is ok nginx: configuration file /etc/nginx/nginx.conf test is successful # configuration file /etc/nginx/nginx.conf: user nginx; worker_processes auto; error_log /var/log/nginx/error.log notice; pid /var/run/nginx.pid; events { worker_connections 1024; } http { include /etc/nginx/mime.types; default_type application/octet-stream; log_format main \u0026#39;$remote_addr - $remote_user [$time_local] \u0026#34;$request\u0026#34; \u0026#39; \u0026#39;$status $body_bytes_sent \u0026#34;$http_referer\u0026#34; \u0026#39; \u0026#39;\u0026#34;$http_user_agent\u0026#34; \u0026#34;$http_x_forwarded_for\u0026#34;\u0026#39;; access_log /var/log/nginx/access.log main; sendfile on; #tcp_nopush on; keepalive_timeout 65; #gzip on; include /etc/nginx/conf.d/*.conf; } # configuration file /etc/nginx/mime.types: types { text/html html htm shtml; text/css css; text/xml xml; image/gif gif; image/jpeg jpeg jpg; application/javascript js; application/atom+xml atom; application/rss+xml rss; text/mathml mml; text/plain txt; text/vnd.sun.j2me.app-descriptor jad; text/vnd.wap.wml wml; text/x-component htc; image/avif avif; image/png png; image/svg+xml svg svgz; image/tiff tif tiff; image/vnd.wap.wbmp wbmp; image/webp webp; image/x-icon ico; image/x-jng jng; image/x-ms-bmp bmp; font/woff woff; font/woff2 woff2; application/java-archive jar war ear; application/json json; application/mac-binhex40 hqx; application/msword doc; application/pdf pdf; application/postscript ps eps ai; application/rtf rtf; application/vnd.apple.mpegurl m3u8; application/vnd.google-earth.kml+xml kml; application/vnd.google-earth.kmz kmz; application/vnd.ms-excel xls; application/vnd.ms-fontobject eot; application/vnd.ms-powerpoint ppt; application/vnd.oasis.opendocument.graphics odg; application/vnd.oasis.opendocument.presentation odp; application/vnd.oasis.opendocument.spreadsheet ods; application/vnd.oasis.opendocument.text odt; application/vnd.openxmlformats-officedocument.presentationml.presentation pptx; application/vnd.openxmlformats-officedocument.spreadsheetml.sheet xlsx; application/vnd.openxmlformats-officedocument.wordprocessingml.document docx; application/vnd.wap.wmlc wmlc; application/wasm wasm; application/x-7z-compressed 7z; application/x-cocoa cco; application/x-java-archive-diff jardiff; application/x-java-jnlp-file jnlp; application/x-makeself run; application/x-perl pl pm; application/x-pilot prc pdb; application/x-rar-compressed rar; application/x-redhat-package-manager rpm; application/x-sea sea; application/x-shockwave-flash swf; application/x-stuffit sit; application/x-tcl tcl tk; application/x-x509-ca-cert der pem crt; application/x-xpinstall xpi; application/xhtml+xml xhtml; application/xspf+xml xspf; application/zip zip; application/octet-stream bin exe dll; application/octet-stream deb; application/octet-stream dmg; application/octet-stream iso img; application/octet-stream msi msp msm; audio/midi mid midi kar; audio/mpeg mp3; audio/ogg ogg; audio/x-m4a m4a; audio/x-realaudio ra; video/3gpp 3gpp 3gp; video/mp2t ts; video/mp4 mp4; video/mpeg mpeg mpg; video/quicktime mov; video/webm webm; video/x-flv flv; video/x-m4v m4v; video/x-mng mng; video/x-ms-asf asx asf; video/x-ms-wmv wmv; video/x-msvideo avi; } # configuration file /etc/nginx/conf.d/default.conf: server { listen 80; server_name localhost; #access_log /var/log/nginx/host.access.log main; location / { root /usr/share/nginx/html; index index.html index.htm; } #error_page 404 /404.html; # redirect server error pages to the static page /50x.html # error_page 500 502 503 504 /50x.html; location = /50x.html { root /usr/share/nginx/html; } # proxy the PHP scripts to Apache listening on 127.0.0.1:80 # #location ~ \\.php$ { # proxy_pass http://127.0.0.1; #} # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000 # #location ~ \\.php$ { # root html; # fastcgi_pass 127.0.0.1:9000; # fastcgi_index index.php; # fastcgi_param SCRIPT_FILENAME /scripts$fastcgi_script_name; # include fastcgi_params; #} # deny access to .htaccess files, if Apache\u0026#39;s document root # concurs with nginx\u0026#39;s one # #location ~ /\\.ht { # deny all; #} } Docker がインストールされている環境では、上記の出力は次のような感じで確認できます。 nginx:alpine コンテナで nginx -T を実行する $ docker container run --rm nginx:alpine sh -c \u0026#34;nginx -T\u0026#34;"
+},
+{
+url: "/p/xdsom3a/",
+title: "Nginx（Web サーバー）のメモ",
+date: "2022-11-27T00:00:00Z",
+body: "Nginx（Web サーバー）のメモ"
 },
 {
 url: "/",
 title: "まくろぐ",
-date: "2022-11-26T00:00:00Z",
+date: "2022-11-27T00:00:00Z",
 body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-11-27T00:00:00Z",
+body: "技術系のメモ"
+},
+{
+url: "/p/vt4bjry/",
+title: "読書メモ『アルテミス』アンディ・ウィアー",
+date: "2022-11-26T00:00:00Z",
+body: "読書メモ『アルテミス』アンディ・ウィアー アルテミス アンディ・ウィアー 早川書房 『火星の人』 の著者、アンディ・ウィアーの SF 小説です。 前作は、マット・デイモン主演の映画版『オデッセイ』の方が有名かもしれません。 今回は 月が舞台 で現実味があります。 上下巻構成ですが、一人称で軽い調子で話が進んでいくのでサクッと読めてしまいます。 アルテミスは、月面に作られた居住区の名前で、5 つのドーム（バブル）から構成されています。 それぞれのバブルの名前は、アポロ計画の宇宙飛行士の名にちなんで、「アームストロング」「コンラッド」「オルドリン」「ビーン」「シェパード」という名前になっていてシャレオツ。 子供のころから月で暮らしている女性、ジャズ・バシャラは、地球から送られてくる品物を運ぶポーターをして生活していますが、決して裕福ではなく、非合法な仕事にも手を出しています。 あるとき、大物実業家から引き受けた依頼で一攫千金を狙うのですが、それは、月での酸素供給に関わる仕事でした。 その時点でヤバイでしょ。 酸素の供給施設は、すなわち 2000 人の住民全員の命を握っています。 そんな任務を受けてしまったジャズは、大きな陰謀に巻き込まれていきます。 地球の 1/6 の重力下での命懸けのアクションや、監視だらけの月面での無謀なミッションは、読んでいてハラハラします。 そんな中でもジャズは、一人で微妙なギャグを飛ばしながら任務を進めていきます。 頭のネジがぶっ飛んでいるのでしょう。 月での暮らしはこんな感じになるのかぁ・・・"
 },
 {
 url: "/p/35odek9/",
@@ -1540,12 +1558,6 @@ url: "/p/nd3cmt3/",
 title: "ネットワーク関連技術メモ",
 date: "2022-11-24T00:00:00Z",
 body: "ネットワーク関連技術メモ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-11-24T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/uyw4qan/",
@@ -3714,12 +3726,6 @@ date: "2019-01-10T00:00:00Z",
 body: "Nginx の設定: http でアクセスされた場合に https にリダイレクトする nginx サーバの SSL 対応（https 有効化）が終わった後は、http プロトコルによるアクセスは避けてもらいたいですね。 そのような場合は、下記のように設定しておけば、http でアクセスされた場合に、https で再度アクセスしてもらうようにクライアントに応答することができます（301 という値は、Moved Permanently を示す HTTP レスポンスコードです）。 /etc/nginx/conf.d/xxx.conf server { listen 80; server_name example.com; return 301 https://$host$request_uri; } server { listen 443 ssl http2; server_name example.com; # ... } 結果として、Web ブラウザから http://example.com/ にアクセスすると、Web ブラウザは自動的に https://example.com/ という URL でアクセスし直すことになります。"
 },
 {
-url: "/p/xdsom3a/",
-title: "Nginx（Web サーバー）のメモ",
-date: "2019-01-10T00:00:00Z",
-body: "Nginx（Web サーバー）のメモ"
-},
-{
 url: "/p/xkpjfcf/",
 title: "Sakura VPS レンタルサーバーを Let's Encrypt で SSL 対応",
 date: "2019-01-10T00:00:00Z",
@@ -4273,9 +4279,9 @@ body: "読書メモ『レバレッジ・シンキング 無限大の成果を生
 },
 {
 url: "/p/3q8uzoo/",
-title: "Nginx の設定: Nginx の設定ファイルの書き方が正しいか確認する (configtest)",
+title: "Nginx の設定: Nginx の設定ファイルの書き方が正しいか確認する (configtest, nginx -t)",
 date: "2015-09-21T00:00:00Z",
-body: "Nginx の設定: Nginx の設定ファイルの書き方が正しいか確認する (configtest) nginx の configtest コマンドを使用すると、nginx のコンフィグファイルの記述方法が正しいかを確認することができます。 このコマンドは管理者権限で実行する必要があります。 $ sudo /etc/init.d/nginx configtest nginx: the configuration file /etc/nginx/nginx.conf syntax is ok nginx: configuration file /etc/nginx/nginx.conf test is successful"
+body: "Nginx の設定: Nginx の設定ファイルの書き方が正しいか確認する (configtest, nginx -t) nginx の configtest コマンドを使用すると、nginx のコンフィグファイルの記述方法が正しいかを確認することができます。 このコマンドは管理者権限で実行する必要があります。 $ sudo /etc/init.d/nginx configtest nginx: the configuration file /etc/nginx/nginx.conf syntax is ok nginx: configuration file /etc/nginx/nginx.conf test is successful nginx コマンド (/usr/sbin/nginx) を認識している環境であれば、このコマンドの -t オプションで確認することもできます。 $ nginx -t nginx: the configuration file /etc/nginx/nginx.conf syntax is ok nginx: configuration file /etc/nginx/nginx.conf test is successful"
 },
 {
 url: "/p/6aazmy3/",
@@ -4395,13 +4401,13 @@ body: "Jade テンプレートエンジンのメモ"
 url: "/p/q8tw6c4/",
 title: "Nginx の設定: Nginx でバーチャルホストを設定する（リバースプロキシ）",
 date: "2013-12-03T00:00:00Z",
-body: "Nginx の設定: Nginx でバーチャルホストを設定する（リバースプロキシ） アクセス時のドメイン名により別の Web サーバに処理をフォワードする 例えば、http://test.example.com/ というアドレス（80番ポート）で nginx サーバにアクセスしてきたときに、localhost:7000 で動作している Web サーバに処理を委譲するには、下記のように設定します。 /etc/nginx/conf.d/example.com.conf server { listen 80; server_name test.example.com; location / { proxy_pass http://localhost:7000/; } } この機能を利用することで、一つの PC 内に複数の Web サーバを（異なるポート）で立ち上げておき、アクセスしてきた URL（のドメイン名）によって処理を振り分けることができます。 例えば、次のように Web サーバへのアクセスをフォワードできます。 http://aaa.example.com/ でアクセスされた場合 → localhost:7000 で処理 http://bbb.example.com/ でアクセスされた場合 → localhost:7100 で処理 http://ccc.example.com/ でアクセスされた場合 → localhost:7200 で処理 それぞれのドメインは同じ IP アドレスにマッピングされており、物理的には 1 つのマシンに対してアクセスが発生するのですが、クライアント（Web ブラウザのユーザ）から見ると、あたかも異なるホストにアクセスしているかのように見えます（ドメイン名が異なるので）。 バーチャルなホストが存在しているような動作をするということで、このような Web サーバの機能をバーチャルホストと呼びます。 また、このように、サーバ環境側（ここでは 80 ポートのサーバ）でいったんアクセスを受けておいて、アドレス等を見て別の内部サーバ（ここでは 7000 ポートで待ち受けているサーバなど）に処理をフォーワードする仕組みのことを、リバースプロキシと呼びます。 リバースプロキシというのは Web サーバのためだけの仕組みではなく、より一般的なサーバの仕組みを指す名前です。 nginx や Apache などの Web サーバのバーチャルホスト機能は、リバースプロキシの仕組み（概念）を利用して実現されているということです。 アクセス時のドメイン名によりドキュメントルートを切り替える 上記の例では、クライアントからのアクセスを、別々の Web サーバ（例えば同じ PC 内の別のポートで待ち受けている Web サーバ）に振り分ける例でしたが、Web サーバは 1 つだけで、使用するコンテンツファイルのルートだけを切り替えるという方法もあります。 下記の設定例では、aaa.example.com でアクセスされた場合と、bbb.example.com でアクセスされた場合に使用するドキュメント（html ファイル）のルートディレクトリを切り替えています。 /etc/nginx/conf.d/my.conf server { listen 80; server_name aaa.example.com; location / { root /home/maku/website/aaa/public; index index.html index.htm; } } server { listen 80; server_name bbb.example.com; location / { root /home/maku/website/bbb/public; index index.html index.htm; } } この設定により、クライアントからのアクセス時に指定された　URL によって、下記のように参照するファイルが切り替わります。 http://aaa.example.com/ でアクセスされた場合 → /home/maku/website/aaa/public/index.html http://bbb.example.com/ でアクセスされた場合 → /home/maku/website/bbb/public/index.html"
+body: "Nginx の設定: Nginx でバーチャルホストを設定する（リバースプロキシ） アクセス時のドメイン名により別の Web サーバに処理をフォワードする 例えば、http://test.example.com/ というアドレス（80番ポート）で nginx サーバにアクセスしてきたときに、localhost:7000 で動作している Web サーバに処理を委譲するには、下記のように設定します。 /etc/nginx/conf.d/test.example.com.conf server { listen 80; server_name test.example.com; location / { proxy_pass http://localhost:7000/; } } この機能を利用することで、一つの PC 内に複数の Web サーバを（異なるポート）で立ち上げておき、アクセスしてきた URL（のドメイン名）によって処理を振り分けることができます。 例えば、次のように Web サーバへのアクセスをフォワードできます。 http://aaa.example.com/ でアクセスされた場合 → localhost:7000 で処理 http://bbb.example.com/ でアクセスされた場合 → localhost:7100 で処理 http://ccc.example.com/ でアクセスされた場合 → localhost:7200 で処理 それぞれのドメインは同じ IP アドレスにマッピングされており、物理的には 1 つのマシンに対してアクセスが発生するのですが、クライアント（Web ブラウザのユーザ）から見ると、あたかも異なるホストにアクセスしているかのように見えます（ドメイン名が異なるので）。 バーチャルなホストが存在しているような動作をするということで、このような Web サーバの機能をバーチャルホストと呼びます。 また、このように、サーバ環境側（ここでは 80 ポートのサーバ）でいったんアクセスを受けておいて、アドレス等を見て別の内部サーバ（ここでは 7000 ポートで待ち受けているサーバなど）に処理をフォーワードする仕組みのことを、リバースプロキシと呼びます。 リバースプロキシというのは Web サーバのためだけの仕組みではなく、より一般的なサーバの仕組みを指す名前です。 nginx や Apache などの Web サーバのバーチャルホスト機能は、リバースプロキシの仕組み（概念）を利用して実現されているということです。 アクセス時のドメイン名によりドキュメントルートを切り替える 上記の例では、クライアントからのアクセスを、別々の Web サーバ（例えば同じ PC 内の別のポートで待ち受けている Web サーバ）に振り分ける例でしたが、Web サーバは 1 つだけで、使用するコンテンツファイルのルートだけを切り替えるという方法もあります。 下記の設定例では、aaa.example.com でアクセスされた場合と、bbb.example.com でアクセスされた場合に使用するドキュメント（html ファイル）のルートディレクトリを切り替えています。 /etc/nginx/conf.d/example.com.conf server { listen 80; server_name aaa.example.com; location / { root /home/maku/website/aaa/public; index index.html index.htm; } } server { listen 80; server_name bbb.example.com; location / { root /home/maku/website/bbb/public; index index.html index.htm; } } ここでは設定を 1 つの example.com.conf ファイルにまとめて記述していますが、aaa.example.com.conf と bbb.example.com.conf の 2 つに分けても大丈夫です（参考: Nginx の設定ファイル (.conf) の場所）。 この設定により、クライアントからのアクセス時に指定された　URL によって、下記のように参照するファイルが切り替わります。 http://aaa.example.com/ でアクセスされた場合 → /home/maku/website/aaa/public/index.html http://bbb.example.com/ でアクセスされた場合 → /home/maku/website/bbb/public/index.html"
 },
 {
 url: "/p/pms426x/",
-title: "Nginx の設定: Nginx の設定ファイル (nginx.conf) の場所",
+title: "Nginx の設定: Nginx の設定ファイル (*.conf) の場所",
 date: "2013-12-02T00:00:00Z",
-body: "Nginx の設定: Nginx の設定ファイル (nginx.conf) の場所 nginx の設定ファイルは、/etc/nginx/nginx.conf です。 ソースからビルドする場合は、./configure の実行時にパスを指定できます。 この設定ファイルの中で、以下のように include ディレクティブが指定されているため、/etc/nginx/conf.d/ ディレクトリ内にある個別の設定ファイル (*.conf) も読み込まれるようになっています。 http { ... include /etc/nginx/conf.d/*.conf; } バーチャルホスト機能を利用して複数ドメインのサーバを運用するようなケースでは、ドメインごとに設定ファイルを分けておくと管理しやすいでしょう。 例えば、example.com ドメインのサーバ用には /etc/nginx/conf.d/example.com.conf を作成します。"
+body: "Nginx の設定: Nginx の設定ファイル (*.conf) の場所 nginx の設定ファイルは、/etc/nginx/nginx.conf です。 ソースからビルドする場合は、./configure の実行時にパスを指定できます。 この設定ファイルの中で、以下のように include ディレクティブが指定されているため、/etc/nginx/conf.d/ ディレクトリ内にある個別の設定ファイル (*.conf) も読み込まれるようになっています。 http { ... include /etc/nginx/conf.d/*.conf; } バーチャルホスト機能を利用して複数ドメインのサーバを運用するようなケースでは、ドメインごとに設定ファイルを分けておくと管理しやすいでしょう。 例えば、example.com ドメインのサーバ用には /etc/nginx/conf.d/example.com.conf を作成します。"
 },
 {
 url: "/p/c3s7wyx/",
