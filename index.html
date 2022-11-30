@@ -500,6 +500,7 @@ Nginx の設定: Nginx の設定内容を確認する (nginx -T)<span class=xRec
 <ul>
 <li><a href=#protoc-gen-doc-とは>protoc-gen-doc とは？</a></li>
 <li><a href=#proto-ファイルからのドキュメント生成>.proto ファイルからのドキュメント生成</a></li>
+<li><a href=#おまけgithub-actions-で-api-ドキュメントを自動生成する>（おまけ）GitHub Actions で API ドキュメントを自動生成する</a></li>
 </ul>
 </nav><h2 id=protoc-gen-doc-とは>protoc-gen-doc とは？</h2>
 <p>David Muto 氏が公開している <a href=https://github.com/pseudomuto/protoc-gen-doc>protoc-gen-doc</a> という <code>protoc</code> コマンドのプラグインを使用すると、<code>.proto</code> ファイルから、HTML 形式や Markdown 形式のドキュメントを自動生成することができます。
@@ -551,7 +552,33 @@ Docker の実行環境は、<a href=https://www.docker.com/products/docker-deskt
 </tr>
 </tbody>
 </table>
-<p>GitHub で <code>.proto</code> ファイルを管理している場合は、<a href=https://maku77.github.io/p/f2eggno/>GitHub Actions でドキュメントを自動生成</a> するように設定しておくと、開発メンバーが幸せになれます。</p>
+<h2 id=おまけgithub-actions-で-api-ドキュメントを自動生成する>（おまけ）GitHub Actions で API ドキュメントを自動生成する</h2>
+<p>GitHub で <code>.proto</code> ファイルを管理している場合は、<a href=https://maku77.github.io/p/f2eggno/>GitHub Actions でドキュメントを自動生成</a> するように設定しておくと便利です。
+ワークフローの中で、<code>protoc-gen-doc</code> を呼び出して Markdown ファイルを自動生成し、GitHub wiki か GitHub pages にデプロイするようにしておけば、開発メンバーがいつでも最新の API ドキュメントを参照できるようになります。</p>
+<p>例えば、メインリポジトリの <code>tools</code> ディレクトリなどに次のようなスクリプトを配置しておいて、</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>tools/gendoc.sh</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=cp>#!/bin/bash
+</span><span class=cp></span>
+<span class=c1># 第 1 引数で出力先ディレクトリ名を指定（デフォルトはカレントディレクトリ）</span>
+<span class=nv>out_dir</span><span class=o>=</span><span class=nv>$1</span>
+
+<span class=c1># API ドキュメントを生成</span>
+docker run --rm -v <span class=k>$(</span><span class=nb>pwd</span><span class=k>)</span>/<span class=nv>$out_dir</span>:/out -v <span class=k>$(</span><span class=nb>pwd</span><span class=k>)</span>/proto:/protos pseudomuto/protoc-gen-doc --doc_opt<span class=o>=</span>markdown,docs.md</code></pre></div></div>
+</figure>
+<p>GitHub Actions のワークフローの中で次のような感じで呼び出してやれば OK です。
+GitHub Actions の Ubuntu イメージは標準で <code>docker</code> コマンドを実行できるようになっているので、<code>protoc-gen-doc</code> のように Docker イメージが提供されているコマンドはとても簡単に呼び出せます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>.github/workflows/gendoc.yml（抜粋）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Generate API documents</span><span class=w>
+</span><span class=w>  </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>./tools/gendoc.sh .wiki</span></code></pre></div></div>
+</figure>
+<p>上記のように API ドキュメントの生成コマンドをシェルスクリプト化しておけば、ローカルでの開発中も簡単にドキュメント生成できます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>開発中はこうやってドキュメント生成結果を確認</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>./tools/gendoc.sh
+</code></pre></div></div>
+</figure>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">
