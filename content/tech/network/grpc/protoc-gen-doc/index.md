@@ -22,6 +22,8 @@ Protocol Buffers Compiler（`protoc` コマンド）に関しては、[こちら
 .proto ファイルからのドキュメント生成
 ----
 
+### protoc-gen-doc コマンドの基本
+
 `protoc-gen-doc` の Docker イメージを使って、`.proto` ファイルからドキュメントを生成してみます。
 Docker の実行環境は、[Docker Desktop](https://www.docker.com/products/docker-desktop/) などでインストールしてください。
 `.proto` ファイルが手元になければ、とりあえず下記のファイルをダウンロードして試せます。
@@ -50,6 +52,58 @@ $ docker container run --rm \
 | ---- | ---- |
 | `--doc_opt=markdown,api.md` | 出力形式を Markdown (`.md`) にする |
 | `--doc_opt=:google/*,somepath/*` | 対象外にする `.proto` 指定する（`:` の後ろに記述） |
+
+### .proto ファイルが深い階層にあるとき
+
+`protoc-gen-doc` はデフォルトで、Docker コンテナ内の __`/protos/*.proto`__ というパスで検索されるファイルを入力ファイルとして扱います。
+これ以外のパスに配置される `.proto` ファイルを扱いたいときは、ちょっと工夫が必要です。
+例えば、次のようなケースです。
+
+- 深い階層にある `.proto` ファイルを入力ファイルとして使いたい
+- 複数の階層に `.proto` ファイルが配置されている
+- 特定のディレクトリの `.proto` ファイルは無視したい
+
+このようなケースでは、基本的に次のように末尾に `.proto` ファイルを列挙することになります。
+
+```console
+$ docker container run --rm ...(省略)... dir1/foo.proto dir2/bar.proto
+```
+
+これらのパスは、proto のルートディレクトリからの相対パスで指定するのですが、__Docker コンテナ側の `/protos` からの相対パス__ を指定すれば OK です （暗黙的に __`--proto_path=/protos`__ が指定されたものとして扱われるからです）。
+例えば、マウントオプションで`-v $(pwd)/proto:protos` と指定しているなら、`$(pwd)/proto` ディレクトリからの相対パスで指定します。
+ファイル数が多いと、OS の glob パターン（ワイルドカード）を使用したくなりますが、パターンがコンテナ側で処理されないので使えません。
+[公式サイト](https://github.com/pseudomuto/protoc-gen-doc) にも、このことが注意事項として記述されています。
+
+> Remember: Paths should be from within the container, not the host!
+>
+> NOTE: Due to the way wildcard expansion works with docker you cannot use a wildcard path (e.g. protos/*.proto) in the file list. To get around this, if no files are passed, the container will generate docs for protos/*.proto, which can be changed by mounting different volumes.
+
+なかなか厳しい制約ですね。
+この問題に対処するには、例えば、次のようにシェルスクリプトで入力対象としたい `.proto` ファイルを列挙してしまうのが手っ取り早いです。
+
+```bash
+#!/bin/bash
+
+# このスクリプトが置かれているディレクトリ（絶対パス）
+SELF_DIR=$(cd $(dirname $0); pwd)
+
+# .proto ファイルのルートディレクトリ（絶対パス）
+PROTO_DIR=$SELF_DIR/proto
+
+# 出力先ディレクトリ（絶対パス）
+OUT_DIR=$SELF_DIR/docs
+
+# 入力対象の .proto ファイルを列挙する（PROTO_DIR からの相対パス）
+PROTO_FILES=$(find $PROTO_DIR -name '*.proto' -printf '%P ')
+
+# ドキュメントを生成する
+docker run --rm -v $PROTO_DIR:/protos -v $OUT_DIR:/out \
+    pseudomuto/protoc-gen-doc --doc_opt=html,index.html $PROTO_FILES
+```
+
+入力する `.proto` ファイルをもっと細かく制御したいとき（特定のディレクトリを対象外とするなど）は、`find` コマンド部分を調整してやれば OK です。
+
+- 参考: [ファイルやディレクトリを検索する (find, grep) - まくまく Linux/Shell ノート](https://maku77.github.io/p/hudubr8/)
 
 
 （おまけ）GitHub Actions で API ドキュメントを自動生成する
