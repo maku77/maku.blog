@@ -15,7 +15,7 @@
 生成されたドキュメントの例: HTML 形式 / Markdown 形式 / JSON 形式
 protoc-gen-doc は protoc コマンドのプラグインとして動作するのですが、実行環境が Docker イメージとして提供されているので、docker コマンド一発で、簡単に .proto ファイルからドキュメントを生成できます。 もちろん、protoc コマンドと protoc-gen-doc を両方インストールして実行することもできますが、Docker を使った方が断然お手軽です。
 Protocol Buffers Compiler（protoc コマンド）に関しては、こちらを参考にしてください。
-.proto ファイルからのドキュメント生成 protoc-gen-doc の Docker イメージを使って、.proto ファイルからドキュメントを生成してみます。 Docker の実行環境は、Docker Desktop などでインストールしてください。 .proto ファイルが手元になければ、とりあえず下記のファイルをダウンロードして試せます。
+.proto ファイルからのドキュメント生成 protoc-gen-doc コマンドの基本 protoc-gen-doc の Docker イメージを使って、.proto ファイルからドキュメントを生成してみます。 Docker の実行環境は、Docker Desktop などでインストールしてください。 .proto ファイルが手元になければ、とりあえず下記のファイルをダウンロードして試せます。
   Vehicle.proto（サンプル .proto ファイル）   proto/Vehicle.proto のように、proto ディレクトリに格納すれば準備完了です。 あとは次のように実行すると、docs ディレクトリに index.">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
@@ -538,7 +538,12 @@ SSH キーの管理: SSH キーのパスワードを変更する (ssh-keygen -p)
 <nav id=TableOfContents>
 <ul>
 <li><a href=#protoc-gen-doc-とは>protoc-gen-doc とは？</a></li>
-<li><a href=#proto-ファイルからのドキュメント生成>.proto ファイルからのドキュメント生成</a></li>
+<li><a href=#proto-ファイルからのドキュメント生成>.proto ファイルからのドキュメント生成</a>
+<ul>
+<li><a href=#protoc-gen-doc-コマンドの基本>protoc-gen-doc コマンドの基本</a></li>
+<li><a href=#proto-ファイルが深い階層にあるとき>.proto ファイルが深い階層にあるとき</a></li>
+</ul>
+</li>
 <li><a href=#おまけgithub-actions-で-api-ドキュメントを自動生成する>（おまけ）GitHub Actions で API ドキュメントを自動生成する</a></li>
 </ul>
 </nav><h2 id=protoc-gen-doc-とは>protoc-gen-doc とは？</h2>
@@ -549,6 +554,7 @@ SSH キーの管理: SSH キーのパスワードを変更する (ssh-keygen -p)
 もちろん、<code>protoc</code> コマンドと <code>protoc-gen-doc</code> を両方インストールして実行することもできますが、Docker を使った方が断然お手軽です。</p>
 <p>Protocol Buffers Compiler（<code>protoc</code> コマンド）に関しては、<a href=../../p/37e6uck/>こちらを参考にしてください</a>。</p>
 <h2 id=proto-ファイルからのドキュメント生成>.proto ファイルからのドキュメント生成</h2>
+<h3 id=protoc-gen-doc-コマンドの基本>protoc-gen-doc コマンドの基本</h3>
 <p><code>protoc-gen-doc</code> の Docker イメージを使って、<code>.proto</code> ファイルからドキュメントを生成してみます。
 Docker の実行環境は、<a href=https://www.docker.com/products/docker-desktop/>Docker Desktop</a> などでインストールしてください。
 <code>.proto</code> ファイルが手元になければ、とりあえず下記のファイルをダウンロードして試せます。</p>
@@ -591,6 +597,48 @@ Docker の実行環境は、<a href=https://www.docker.com/products/docker-deskt
 </tr>
 </tbody>
 </table>
+<h3 id=proto-ファイルが深い階層にあるとき>.proto ファイルが深い階層にあるとき</h3>
+<p><code>protoc-gen-doc</code> はデフォルトで、Docker コンテナ内の <strong><code>/protos/*.proto</code></strong> というパスで検索されるファイルを入力ファイルとして扱います。
+これ以外のパスに配置される <code>.proto</code> ファイルを扱いたいときは、ちょっと工夫が必要です。
+例えば、次のようなケースです。</p>
+<ul>
+<li>深い階層にある <code>.proto</code> ファイルを入力ファイルとして使いたい</li>
+<li>複数の階層に <code>.proto</code> ファイルが配置されている</li>
+<li>特定のディレクトリの <code>.proto</code> ファイルは無視したい</li>
+</ul>
+<p>このようなケースでは、基本的に次のように末尾に <code>.proto</code> ファイルを列挙することになります。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker container run --rm ...<span class=o>(</span>省略<span class=o>)</span>... dir1/foo.proto dir2/bar.proto
+</code></pre></div><p>これらのパスは、proto のルートディレクトリからの相対パスで指定するのですが、<strong>Docker コンテナ側の <code>/protos</code> からの相対パス</strong> を指定すれば OK です （暗黙的に <strong><code>--proto_path=/protos</code></strong> が指定されたものとして扱われるからです）。
+例えば、マウントオプションで<code>-v $(pwd)/proto:protos</code> と指定しているなら、<code>$(pwd)/proto</code> ディレクトリからの相対パスで指定します。
+ファイル数が多いと、OS の glob パターン（ワイルドカード）を使用したくなりますが、パターンがコンテナ側で処理されないので使えません。
+<a href=https://github.com/pseudomuto/protoc-gen-doc>公式サイト</a> にも、このことが注意事項として記述されています。</p>
+<blockquote>
+<p>Remember: Paths should be from within the container, not the host!</p>
+<p>NOTE: Due to the way wildcard expansion works with docker you cannot use a wildcard path (e.g. protos/<em>.proto) in the file list. To get around this, if no files are passed, the container will generate docs for protos/</em>.proto, which can be changed by mounting different volumes.</p>
+</blockquote>
+<p>なかなか厳しい制約ですね。
+この問題に対処するには、例えば、次のようにシェルスクリプトで入力対象としたい <code>.proto</code> ファイルを列挙してしまうのが手っ取り早いです。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=cp>#!/bin/bash
+</span><span class=cp></span>
+<span class=c1># このスクリプトが置かれているディレクトリ（絶対パス）</span>
+<span class=nv>SELF_DIR</span><span class=o>=</span><span class=k>$(</span><span class=nb>cd</span> <span class=k>$(</span>dirname <span class=nv>$0</span><span class=k>)</span><span class=p>;</span> <span class=nb>pwd</span><span class=k>)</span>
+
+<span class=c1># .proto ファイルのルートディレクトリ（絶対パス）</span>
+<span class=nv>PROTO_DIR</span><span class=o>=</span><span class=nv>$SELF_DIR</span>/proto
+
+<span class=c1># 出力先ディレクトリ（絶対パス）</span>
+<span class=nv>OUT_DIR</span><span class=o>=</span><span class=nv>$SELF_DIR</span>/docs
+
+<span class=c1># 入力対象の .proto ファイルを列挙する（PROTO_DIR からの相対パス）</span>
+<span class=nv>PROTO_FILES</span><span class=o>=</span><span class=k>$(</span>find <span class=nv>$PROTO_DIR</span> -name <span class=s1>&#39;*.proto&#39;</span> -printf <span class=s1>&#39;%P &#39;</span><span class=k>)</span>
+
+<span class=c1># ドキュメントを生成する</span>
+docker run --rm -v <span class=nv>$PROTO_DIR</span>:/protos -v <span class=nv>$OUT_DIR</span>:/out <span class=se>\
+</span><span class=se></span>    pseudomuto/protoc-gen-doc --doc_opt<span class=o>=</span>html,index.html <span class=nv>$PROTO_FILES</span>
+</code></pre></div><p>入力する <code>.proto</code> ファイルをもっと細かく制御したいとき（特定のディレクトリを対象外とするなど）は、<code>find</code> コマンド部分を調整してやれば OK です。</p>
+<ul>
+<li>参考: <a href=https://maku77.github.io/p/hudubr8/>ファイルやディレクトリを検索する (find, grep) - まくまく Linux/Shell ノート</a></li>
+</ul>
 <h2 id=おまけgithub-actions-で-api-ドキュメントを自動生成する>（おまけ）GitHub Actions で API ドキュメントを自動生成する</h2>
 <p>GitHub で <code>.proto</code> ファイルを管理している場合は、<a href=https://maku77.github.io/p/f2eggno/>GitHub Actions でドキュメントを自動生成</a> するように設定しておくと便利です。
 ワークフローの中で、<code>protoc-gen-doc</code> を呼び出して Markdown ファイルを自動生成し、GitHub wiki か GitHub pages にデプロイするようにしておけば、開発メンバーがいつでも最新の API ドキュメントを参照できるようになります。</p>
