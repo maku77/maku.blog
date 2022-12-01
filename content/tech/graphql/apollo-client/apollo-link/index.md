@@ -161,7 +161,7 @@ ApolloLink の実装サンプル
 
 よくありそうな独自 `ApolloLink` の実装例を載せておきます。
 
-### GraphQL クエリの内容を出力する
+### 例: GraphQL クエリの内容を出力する
 
 GraphQL クエリを実行するたびに、クエリの内容をコンソールに出力します。
 操作名や要求しているフィールド、変数などの情報を確認できます。
@@ -176,7 +176,7 @@ const dumpQueryLink = new ApolloLink((operation, forward) => {
 
 ただ、こういった情報は、Web ブラウザーの開発コンソール (`F12`) で見たほうが早いですね (^^;
 
-### GraphQL クエリの呼び出し回数をカウントする
+### 例: GraphQL クエリの呼び出し回数をカウントする
 
 Link オブジェクトにインスタンス変数を持たせることで、複数の GraphQL クエリにまたがって状態を保持することができます。
 このような Link オブジェクトを __stateful link__ と呼びます。
@@ -220,7 +220,7 @@ class OperationCounterLink extends ApolloLink {
 }
 {{< /code >}}
 
-### GraphQL サーバーの応答時間を計測する
+### 例: GraphQL サーバーの応答時間を計測する
 
 ハンドラー関数に渡される `operation` オブジェクトの __`setContext`__ を使って、コンテキスト情報を設定することができます。
 コンテキスト情報というのは、Link チェーンの中で共有されるグローバル変数のようなもので、設定されたコンテキスト情報は __`getContext`__ で参照することができます。
@@ -250,7 +250,7 @@ Operation QueryBooks took 7 ms to complete
 {{< /code >}}
 
 
-### 認証用のリクエストヘッダーを付加する
+### 例: 認証用のリクエストヘッダーを付加する
 
 `operation` オブジェクトのコンテキスト情報の __`headers`__ プロパティには、HTTP リクエストとして送られる（予定の）ヘッダー情報が含まれています。
 Link オブジェクトの実装でこのプロパティを書き換えることで、任意の HTTP リクエストヘッダーを付加できます。
@@ -315,4 +315,40 @@ const authLink = setContext(async (_, prevContext) => {
 ```
 
 ただし、このような実装にすると、リクエスト毎に非同期関数が呼び出されることに注意してください。
+
+### 例: 接続先の GraphQL API エンドポイントを動的に切り替える
+
+`HttpLink` に設定する `HttpOptions` オブジェクト（あるいは `ApolloClient` に設定する `ApolloClientOptions` オブジェクト）の __`uri`__ プロパティには、GraphQL API エンドポイントの URL を指定するのですが、ここには単純な文字列 (`string`) の代わりに、クエリ実行時に呼び出される __`UrlFunction`__ を設定できるようになっています。
+
+```js
+// エンドポイントの URI を動的に構築するための関数（のインタフェース）
+export interface UriFunction {
+    (operation: Operation): string;
+}
+
+export interface Operation {
+    query: DocumentNode;
+    variables: Record<string, any>;
+    operationName: string;
+    extensions: Record<string, any>;
+    setContext: (context: Record<string, any>) => Record<string, any>;
+    getContext: () => Record<string, any>;
+}
+```
+
+この仕組みを利用すると、例えば、GraphQL API エンドポイントをユーザー設定（Web ブラウザーの localStorage）の値によって切り替えたり、GraphQL クエリの内容（`Operation` パラメーター）によって切り替えたりすることができます。
+
+```ts
+// 動的に GraphQL API エンドポイントを決定する関数
+// （ここでは 1/2 の確率で URL を切り替えている）
+const getEndpointUrl: UriFunction = () => {
+    return Math.random() > 0.5 ? 'http://localhost:3000/graphql' : 'https://example.com/graphql'
+}
+
+// 上記の UriFunction 実装の参照を、ApolloClient か HttpLink の uri プロパティで指定すれば OK
+const apolloClient = new ApolloClient({
+  uri: getEndPointUri,  // 関数の参照を設定することに注意（関数を呼び出さないこと）
+  cache: new InMemoryCache(),
+})
+```
 
