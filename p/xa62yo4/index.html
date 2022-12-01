@@ -544,10 +544,11 @@ SSH キーの管理: SSH キーのパスワードを変更する (ssh-keygen -p)
 </li>
 <li><a href=#apollolink-の実装サンプル>ApolloLink の実装サンプル</a>
 <ul>
-<li><a href=#graphql-クエリの内容を出力する>GraphQL クエリの内容を出力する</a></li>
-<li><a href=#graphql-クエリの呼び出し回数をカウントする>GraphQL クエリの呼び出し回数をカウントする</a></li>
-<li><a href=#graphql-サーバーの応答時間を計測する>GraphQL サーバーの応答時間を計測する</a></li>
-<li><a href=#認証用のリクエストヘッダーを付加する>認証用のリクエストヘッダーを付加する</a></li>
+<li><a href=#例-graphql-クエリの内容を出力する>例: GraphQL クエリの内容を出力する</a></li>
+<li><a href=#例-graphql-クエリの呼び出し回数をカウントする>例: GraphQL クエリの呼び出し回数をカウントする</a></li>
+<li><a href=#例-graphql-サーバーの応答時間を計測する>例: GraphQL サーバーの応答時間を計測する</a></li>
+<li><a href=#例-認証用のリクエストヘッダーを付加する>例: 認証用のリクエストヘッダーを付加する</a></li>
+<li><a href=#例-接続先の-graphql-api-エンドポイントを動的に切り替える>例: 接続先の GraphQL API エンドポイントを動的に切り替える</a></li>
 </ul>
 </li>
 </ul>
@@ -678,7 +679,7 @@ Link オブジェクトの用途としては、次のようなものがありま
 </span><span class=c1></span><span class=kr>const</span> <span class=nx>linkChain</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>DumpOperationNameLink</span><span class=p>().</span><span class=nx>concat</span><span class=p>(</span><span class=nx>httpLink</span><span class=p>)</span>
 </code></pre></div><h2 id=apollolink-の実装サンプル>ApolloLink の実装サンプル</h2>
 <p>よくありそうな独自 <code>ApolloLink</code> の実装例を載せておきます。</p>
-<h3 id=graphql-クエリの内容を出力する>GraphQL クエリの内容を出力する</h3>
+<h3 id=例-graphql-クエリの内容を出力する>例: GraphQL クエリの内容を出力する</h3>
 <p>GraphQL クエリを実行するたびに、クエリの内容をコンソールに出力します。
 操作名や要求しているフィールド、変数などの情報を確認できます。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>dumpQueryLink</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>ApolloLink</span><span class=p>((</span><span class=nx>operation</span><span class=p>,</span> <span class=nx>forward</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
@@ -687,7 +688,7 @@ Link オブジェクトの用途としては、次のようなものがありま
   <span class=k>return</span> <span class=nx>forward</span><span class=p>(</span><span class=nx>operation</span><span class=p>)</span>
 <span class=p>})</span>
 </code></pre></div><p>ただ、こういった情報は、Web ブラウザーの開発コンソール (<code>F12</code>) で見たほうが早いですね (^^;</p>
-<h3 id=graphql-クエリの呼び出し回数をカウントする>GraphQL クエリの呼び出し回数をカウントする</h3>
+<h3 id=例-graphql-クエリの呼び出し回数をカウントする>例: GraphQL クエリの呼び出し回数をカウントする</h3>
 <p>Link オブジェクトにインスタンス変数を持たせることで、複数の GraphQL クエリにまたがって状態を保持することができます。
 このような Link オブジェクトを <strong>stateful link</strong> と呼びます。
 次の <code>OperationCounterLink</code> クラスは、GraphQL API の呼び出し回数を操作名ごとにカウントします。
@@ -725,7 +726,7 @@ GraphQL クエリで操作名が指定されていないときは、<code>ANONYM
   <span class=nt>&#34;QueryBooks&#34;</span><span class=p>:</span> <span class=mi>17</span>
 <span class=p>}</span></code></pre></div></div>
 </figure>
-<h3 id=graphql-サーバーの応答時間を計測する>GraphQL サーバーの応答時間を計測する</h3>
+<h3 id=例-graphql-サーバーの応答時間を計測する>例: GraphQL サーバーの応答時間を計測する</h3>
 <p>ハンドラー関数に渡される <code>operation</code> オブジェクトの <strong><code>setContext</code></strong> を使って、コンテキスト情報を設定することができます。
 コンテキスト情報というのは、Link チェーンの中で共有されるグローバル変数のようなもので、設定されたコンテキスト情報は <strong><code>getContext</code></strong> で参照することができます。
 次の例では、リクエスト時に <code>start</code> という名前のプロパティで現在時刻を保存し、レスポンス時に現在時刻との差分を取ることで、GraphQL サーバーの応答時間（ラウンドトリップタイム）を計算しています。</p>
@@ -748,7 +749,7 @@ GraphQL クエリで操作名が指定されていないときは、<code>ANONYM
 <figcaption class=xCodeBlock_title>出力例</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>Operation QueryBooks took 7 ms to complete</code></pre></div></div>
 </figure>
-<h3 id=認証用のリクエストヘッダーを付加する>認証用のリクエストヘッダーを付加する</h3>
+<h3 id=例-認証用のリクエストヘッダーを付加する>例: 認証用のリクエストヘッダーを付加する</h3>
 <p><code>operation</code> オブジェクトのコンテキスト情報の <strong><code>headers</code></strong> プロパティには、HTTP リクエストとして送られる（予定の）ヘッダー情報が含まれています。
 Link オブジェクトの実装でこのプロパティを書き換えることで、任意の HTTP リクエストヘッダーを付加できます。
 通常のコンテキスト情報は Link チェーン内で使われるものなので、GraphQL サーバーに送られることはありませんが、この <code>headers</code> プロパティの値は <code>HttpLink</code> によって GraphQL サーバーに送られます。</p>
@@ -799,6 +800,34 @@ Link チェーン内で設定されたヘッダー情報が上書きされない
   <span class=p>}</span>
 <span class=p>})</span>
 </code></pre></div><p>ただし、このような実装にすると、リクエスト毎に非同期関数が呼び出されることに注意してください。</p>
+<h3 id=例-接続先の-graphql-api-エンドポイントを動的に切り替える>例: 接続先の GraphQL API エンドポイントを動的に切り替える</h3>
+<p><code>HttpLink</code> に設定する <code>HttpOptions</code> オブジェクト（あるいは <code>ApolloClient</code> に設定する <code>ApolloClientOptions</code> オブジェクト）の <strong><code>uri</code></strong> プロパティには、GraphQL API エンドポイントの URL を指定するのですが、ここには単純な文字列 (<code>string</code>) の代わりに、クエリ実行時に呼び出される <strong><code>UrlFunction</code></strong> を設定できるようになっています。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=c1>// エンドポイントの URI を動的に構築するための関数（のインタフェース）
+</span><span class=c1></span><span class=kr>export</span> <span class=kr>interface</span> <span class=nx>UriFunction</span> <span class=p>{</span>
+    <span class=p>(</span><span class=nx>operation</span><span class=o>:</span> <span class=nx>Operation</span><span class=p>)</span><span class=o>:</span> <span class=nx>string</span><span class=p>;</span>
+<span class=p>}</span>
+
+<span class=kr>export</span> <span class=kr>interface</span> <span class=nx>Operation</span> <span class=p>{</span>
+    <span class=nx>query</span><span class=o>:</span> <span class=nx>DocumentNode</span><span class=p>;</span>
+    <span class=nx>variables</span><span class=o>:</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>;</span>
+    <span class=nx>operationName</span><span class=o>:</span> <span class=nx>string</span><span class=p>;</span>
+    <span class=nx>extensions</span><span class=o>:</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>;</span>
+    <span class=nx>setContext</span><span class=o>:</span> <span class=p>(</span><span class=nx>context</span><span class=o>:</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>;</span>
+    <span class=nx>getContext</span><span class=o>:</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><p>この仕組みを利用すると、例えば、GraphQL API エンドポイントをユーザー設定（Web ブラウザーの localStorage）の値によって切り替えたり、GraphQL クエリの内容（<code>Operation</code> パラメーター）によって切り替えたりすることができます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// 動的に GraphQL API エンドポイントを決定する関数
+</span><span class=c1>// （ここでは 1/2 の確率で URL を切り替えている）
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>getEndpointUrl</span>: <span class=kt>UriFunction</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+    <span class=k>return</span> <span class=nb>Math</span><span class=p>.</span><span class=nx>random</span><span class=p>()</span> <span class=o>&gt;</span> <span class=mf>0.5</span> <span class=o>?</span> <span class=s1>&#39;http://localhost:3000/graphql&#39;</span> <span class=o>:</span> <span class=s1>&#39;https://example.com/graphql&#39;</span>
+<span class=p>}</span>
+
+<span class=c1>// 上記の UriFunction 実装の参照を、ApolloClient か HttpLink の uri プロパティで指定すれば OK
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>apolloClient</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>ApolloClient</span><span class=p>({</span>
+  <span class=nx>uri</span>: <span class=kt>getEndPointUri</span><span class=p>,</span>  <span class=c1>// 関数の参照を設定することに注意（関数を呼び出さないこと）
+</span><span class=c1></span>  <span class=nx>cache</span>: <span class=kt>new</span> <span class=nx>InMemoryCache</span><span class=p>(),</span>
+<span class=p>})</span>
+</code></pre></div>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">
