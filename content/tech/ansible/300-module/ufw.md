@@ -10,7 +10,7 @@ Ubuntu のファイアウォール（パケットフィルタ）設定には、U
 
 - 参考: [Linux コマンド: ufw による Ubuntu のファイアウォール設定](/p/drar8o4/)
 
-Ansible の [community.general.ufw](https://docs.ansible.com/ansible/latest/collections/community/general/ufw_module.html) モジュールを使用して [UFW (Uncomplicated Firewall)[https://help.ubuntu.com/community/UFW] の設定を行うことができます。
+Ansible の [community.general.ufw](https://docs.ansible.com/ansible/latest/collections/community/general/ufw_module.html) モジュールを使用して [UFW (Uncomplicated Firewall)](https://help.ubuntu.com/community/UFW) の設定を行うことができます。
 `community.general` コレクションは、Ansible のコミュニティパッケージをインストールした場合は標準でインストールされています。
 
 
@@ -45,7 +45,7 @@ UFW をインストールしたら、有効化する必要があります。
 特定ポートへのアクセスを許可する
 ----
 
-次の例では、22 番ポート (SSH) と、80 番ポート (Web) へのアクセスを許可しています。
+次の例では、22 番ポート (SSH) と、80 番ポート (HTTP)、443 番ポート (HTTPS) へのアクセスを許可しています。
 
 ```yaml
 - name: UFW - Allow all access to tcp port 22 (SSH)
@@ -54,10 +54,16 @@ UFW をインストールしたら、有効化する必要があります。
     port: '22'
     proto: tcp
 
-- name: UFW - Allow all access to tcp port 80 (Web)
+- name: UFW - Allow all access to tcp port 80 (HTTP)
   community.general.ufw:
     rule: allow
     port: '80'
+    proto: tcp
+
+- name: UFW - Allow all access to tcp port 443 (HTTPS)
+  community.general.ufw:
+    rule: allow
+    port: '443'
     proto: tcp
 ```
 
