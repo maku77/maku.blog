@@ -12,11 +12,11 @@
 <meta property="og:image:width" content="1436">
 <meta property="og:image:height" content="746">
 <meta property="og:description" content="Ubuntu のファイアウォール（パケットフィルタ）設定には、UFW というツールが使用されています。
- 参考: Linux コマンド: ufw による Ubuntu のファイアウォール設定  Ansible の community.general.ufw モジュールを使用して [UFW (Uncomplicated Firewall)[https://help.ubuntu.com/community/UFW] の設定を行うことができます。 community.general コレクションは、Ansible のコミュニティパッケージをインストールした場合は標準でインストールされています。
+ 参考: Linux コマンド: ufw による Ubuntu のファイアウォール設定  Ansible の community.general.ufw モジュールを使用して UFW (Uncomplicated Firewall) の設定を行うことができます。 community.general コレクションは、Ansible のコミュニティパッケージをインストールした場合は標準でインストールされています。
 UFW をインストールする UFW の設定は community.general.ufw モジュールで行うのですが、UFW の本体（ufw コマンド）はあらかじめ APT でインストールしておく必要があります。
 - name:Install UFWansible.builtin.apt:name:ufwstate:presentupdate_cache:yesUFW を有効化する UFW をインストールしたら、有効化する必要があります。 次の例では、デフォルトポリシーを接続拒否 (deny) にして UFW を有効化しています。
-- name:Enable UFWcommunity.general.ufw:state:enabledpolicy:deny特定ポートへのアクセスを許可する 次の例では、22 番ポート (SSH) と、80 番ポート (Web) へのアクセスを許可しています。
-- name:UFW - Allow all access to tcp port 22 (SSH)community.general.ufw:rule:allowport:'22'proto:tcp- name:UFW - Allow all access to tcp port 80 (Web)community.">
+- name:Enable UFWcommunity.general.ufw:state:enabledpolicy:deny特定ポートへのアクセスを許可する 次の例では、22 番ポート (SSH) と、80 番ポート (HTTP)、443 番ポート (HTTPS) へのアクセスを許可しています。
+- name:UFW - Allow all access to tcp port 22 (SSH)community.general.ufw:rule:allowport:'22'proto:tcp- name:UFW - Allow all access to tcp port 80 (HTTP)community.">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -63,6 +63,11 @@ UFW をインストールする UFW の設定は community.general.ufw モジュ
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/io4gs6h/>
+Certbot で Let's Encrypt の SSL 証明書を取得する（Web サーバーの HTTPS 対応）
+<time>2022-12-03</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/ikw7gpz/>
 Protocol Buffers の .proto ファイルから API ドキュメントを自動生成する (protoc-gen-doc)
 <time>2022-11-29</time></a>
@@ -80,11 +85,6 @@ Nginx の設定: Nginx の設定内容を確認する (nginx -T)
 <div class=xBoxLink>
 <a href=../../p/m2k4j2h/>
 SSH キーの管理: SSH キーの種類やフィンガープリントを確認する (ssh-keygen -l)
-<time>2022-11-24</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/as2ahpw/>
-SSH キーの管理: SSH キーのパスワードを変更する (ssh-keygen -p)
 <time>2022-11-24</time></a>
 </div>
 </div>
@@ -287,6 +287,8 @@ SSH キーの管理: SSH キーのパスワードを変更する (ssh-keygen -p)
 </div><div class=xMenu_tag>
 <a href=../../tags/jekyll>jekyll (4)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/lets-encrypt>lets-encrypt (4)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/sql>sql (4)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/windows>windows (4)</a>
@@ -302,8 +304,6 @@ SSH キーの管理: SSH キーのパスワードを変更する (ssh-keygen -p)
 <a href=../../tags/hugo>hugo (3)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/kotlin>kotlin (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/lets-encrypt>lets-encrypt (3)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/mac>mac (3)</a>
 </div><div class=xMenu_tag>
@@ -418,6 +418,8 @@ SSH キーの管理: SSH キーのパスワードを変更する (ssh-keygen -p)
 <a href=../../tags/bot-framework>bot-framework (1)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/boto3>boto3 (1)</a>
+</div><div class=xMenu_tag>
+<a href=../../tags/certbot>certbot (1)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/css>css (1)</a>
 </div><div class=xMenu_tag>
@@ -548,7 +550,7 @@ SSH キーの管理: SSH キーのパスワードを変更する (ssh-keygen -p)
 <ul>
 <li>参考: <a href=../../p/drar8o4/>Linux コマンド: ufw による Ubuntu のファイアウォール設定</a></li>
 </ul>
-<p>Ansible の <a href=https://docs.ansible.com/ansible/latest/collections/community/general/ufw_module.html>community.general.ufw</a> モジュールを使用して [UFW (Uncomplicated Firewall)[https://help.ubuntu.com/community/UFW] の設定を行うことができます。
+<p>Ansible の <a href=https://docs.ansible.com/ansible/latest/collections/community/general/ufw_module.html>community.general.ufw</a> モジュールを使用して <a href=https://help.ubuntu.com/community/UFW>UFW (Uncomplicated Firewall)</a> の設定を行うことができます。
 <code>community.general</code> コレクションは、Ansible のコミュニティパッケージをインストールした場合は標準でインストールされています。</p>
 <h2 id=ufw-をインストールする>UFW をインストールする</h2>
 <p>UFW の設定は <code>community.general.ufw</code> モジュールで行うのですが、UFW の本体（<code>ufw</code> コマンド）はあらかじめ APT でインストールしておく必要があります。</p>
@@ -565,17 +567,23 @@ SSH キーの管理: SSH キーのパスワードを変更する (ssh-keygen -p)
 </span><span class=w>    </span><span class=nt>state</span><span class=p>:</span><span class=w> </span><span class=l>enabled</span><span class=w>
 </span><span class=w>    </span><span class=nt>policy</span><span class=p>:</span><span class=w> </span><span class=l>deny</span><span class=w>
 </span></code></pre></div><h2 id=特定ポートへのアクセスを許可する>特定ポートへのアクセスを許可する</h2>
-<p>次の例では、22 番ポート (SSH) と、80 番ポート (Web) へのアクセスを許可しています。</p>
+<p>次の例では、22 番ポート (SSH) と、80 番ポート (HTTP)、443 番ポート (HTTPS) へのアクセスを許可しています。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>UFW - Allow all access to tcp port 22 (SSH)</span><span class=w>
 </span><span class=w>  </span><span class=nt>community.general.ufw</span><span class=p>:</span><span class=w>
 </span><span class=w>    </span><span class=nt>rule</span><span class=p>:</span><span class=w> </span><span class=l>allow</span><span class=w>
 </span><span class=w>    </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;22&#39;</span><span class=w>
 </span><span class=w>    </span><span class=nt>proto</span><span class=p>:</span><span class=w> </span><span class=l>tcp</span><span class=w>
 </span><span class=w>
-</span><span class=w></span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>UFW - Allow all access to tcp port 80 (Web)</span><span class=w>
+</span><span class=w></span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>UFW - Allow all access to tcp port 80 (HTTP)</span><span class=w>
 </span><span class=w>  </span><span class=nt>community.general.ufw</span><span class=p>:</span><span class=w>
 </span><span class=w>    </span><span class=nt>rule</span><span class=p>:</span><span class=w> </span><span class=l>allow</span><span class=w>
 </span><span class=w>    </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;80&#39;</span><span class=w>
+</span><span class=w>    </span><span class=nt>proto</span><span class=p>:</span><span class=w> </span><span class=l>tcp</span><span class=w>
+</span><span class=w>
+</span><span class=w></span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>UFW - Allow all access to tcp port 443 (HTTPS)</span><span class=w>
+</span><span class=w>  </span><span class=nt>community.general.ufw</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=nt>rule</span><span class=p>:</span><span class=w> </span><span class=l>allow</span><span class=w>
+</span><span class=w>    </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;443&#39;</span><span class=w>
 </span><span class=w>    </span><span class=nt>proto</span><span class=p>:</span><span class=w> </span><span class=l>tcp</span><span class=w>
 </span></code></pre></div><h2 id=特定ポートへの連続アクセスを制限する>特定ポートへの連続アクセスを制限する</h2>
 <p>特定ポートに対して、30 秒以内に 6 回以上のアクセスがあった場合に、一定時間接続を拒否します。
