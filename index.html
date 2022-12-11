@@ -44,6 +44,11 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/rn7p7n5/>
+Cloudflare Workers をはじめる (wrangler)
+<time>2022-12-11</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/io4gs6h/>
 Certbot で Let's Encrypt の SSL 証明書を取得する（Web サーバーの HTTPS 対応）
 <time>2022-12-03</time></a>
@@ -62,11 +67,6 @@ Nginx の設定: Nginx の設定内容を確認する (nginx -T)
 <a href=./p/vt4bjry/>
 読書メモ『アルテミス』アンディ・ウィアー
 <time>2022-11-26</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/m2k4j2h/>
-SSH キーの管理: SSH キーの種類やフィンガープリントを確認する (ssh-keygen -l)
-<time>2022-11-24</time></a>
 </div>
 </div>
 </div>
@@ -372,6 +372,8 @@ SSH キーの管理: SSH キーの種類やフィンガープリントを確認�
 </div><div class=xMenu_tag>
 <a href=./tags/certbot>certbot (1)</a>
 </div><div class=xMenu_tag>
+<a href=./tags/cloudflare>cloudflare (1)</a>
+</div><div class=xMenu_tag>
 <a href=./tags/css>css (1)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/dns>dns (1)</a>
@@ -459,14 +461,14 @@ SSH キーの管理: SSH キーの種類やフィンガープリントを確認�
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/rn7p7n5/>
+Cloudflare Workers をはじめる (wrangler)<span class=xRecents_item_tag>Cloudflare</span><time>2022-12-11</time></a>
+</div><div class=xRecents_item>
 <a href=./p/io4gs6h/>
 Certbot で Let's Encrypt の SSL 証明書を取得する（Web サーバーの HTTPS 対応）<span class=xRecents_item_tag>Let's Encrypt</span><span class=xRecents_item_tag>Certbot</span><time>2022-12-03</time></a>
 </div><div class=xRecents_item>
 <a href=./p/ikw7gpz/>
 Protocol Buffers の .proto ファイルから API ドキュメントを自動生成する (protoc-gen-doc)<span class=xRecents_item_tag>gRPC</span><span class=xRecents_item_tag>Protocol Buffers</span><time>2022-11-29</time></a>
-</div><div class=xRecents_item>
-<a href=./p/bm6n5k2/>
-Nginx の設定: Nginx の設定内容を確認する (nginx -T)<span class=xRecents_item_tag>nginx</span><time>2022-11-27</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -474,6 +476,220 @@ Nginx の設定: Nginx の設定内容を確認する (nginx -T)<span class=xRec
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/c9sar9p/>Cloudflare</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=width:80px;margin-right:.5em>
+<img src=./p/c9sar9p/_index.svg style=width:80px;height:80px>
+</div>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/rn7p7n5/>Cloudflare Workers をはじめる (wrangler)</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/cloudflare>Cloudflare</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-12-11>2022-12-11</time><br>
+作成: <time itemprop=datePublished datetime=2022-12-11>2022-12-11</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#workers-とは>Workers とは？</a></li>
+<li><a href=#wrangler-をインストールする>Wrangler をインストールする</a></li>
+<li><a href=#cloudflont-へのアクセスを許可する-wrangler-login>Cloudflont へのアクセスを許可する (wrangler login)</a></li>
+<li><a href=#worker-プロジェクトを作成する-wrangler-init>Worker プロジェクトを作成する (wrangler init)</a></li>
+<li><a href=#開発用のローカルサーバーを起動する-wrangler-dev>開発用のローカルサーバーを起動する (wrangler dev)</a></li>
+<li><a href=#cloudflare-workers-へのデプロイ-wrangler-publish>Cloudflare Workers へのデプロイ (wrangler publish)</a></li>
+<li><a href=#あとかたづけ-wrangler-delete>あとかたづけ (wrangler delete)</a></li>
+</ul>
+</nav><h2 id=workers-とは>Workers とは？</h2>
+<p><a href=https://workers.cloudflare.com/>Cloudflare Workers</a> は、Cloudflare 社が提供しているサーバレスプラットフォームで、Web リクエストに応じたレスポンスを返すサービスを簡単に構築することができます。
+Workers は世界中に配置されたエッジサーバーで実行されるため、クライアントからの要求に高速に応答することができます。
+Azure Functions や AWS Lambda と同じようなサービスですが、それらに比べて Workers は、より高速かつ安価という特徴を持っています。
+<strong>毎日 10 万リクエストまで無料</strong> で使えるので、趣味用途であれば、無料枠だけでいろいろ試せます。</p>
+<p>本記事の作業を進めるには、あらかじめ Cloudflare のアカウントを作成しておく必要があります。
+下記から無料で作成できます。</p>
+<ul>
+<li><a href=https://dash.cloudflare.com/sign-up/workers>Cloudflare Workers を開始する - Sign Up</a></li>
+</ul>
+<h2 id=wrangler-をインストールする>Wrangler をインストールする</h2>
+<p>Worker の開発やデプロイには、<strong><code>wrangler</code></strong> という公式のコマンドラインツールを使用します。
+<a href=https://nodejs.org/ja/>Node.js</a> の <code>npm</code> コマンドを使って、次のようにインストールできます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>wrangler コマンドのインストール</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>npm install wrangler -g
+</code></pre></div></div>
+</figure>
+<h2 id=cloudflont-へのアクセスを許可する-wrangler-login>Cloudflont へのアクセスを許可する (wrangler login)</h2>
+<p><code>wrangler</code> コマンドを実行できるようになったら、<strong><code>wrangler login</code></strong> を実行して、Cloudflare のアカウントと関連づけます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Cloudflare へのサインイン</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>wrangler login
+<span class=go> ⛅️ wrangler 2.6.2
+</span><span class=go>-------------------
+</span><span class=go>Attempting to login via OAuth...
+</span></code></pre></div></div>
+</figure>
+<p>Web ブラウザーが自動的に開いて、Wrangler から Cloudflare のデータにアクセスしてよいか尋ねられるので <strong><code>Allow</code></strong> ボタンを押して許可します。
+これで、<code>wrangler</code> の各種コマンドを実行できるようになります。
+サインインした状態で <strong><code>wrangler whoami</code></strong> コマンドを実行すると、どの Cloudflare ユーザーでサインインしているかを確認できます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>現在のサインイン状態を確認</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>wrangler whoami
+<span class=go> ⛅️ wrangler 2.6.2
+</span><span class=go>-------------------
+</span><span class=go>Getting User settings...
+</span><span class=go>👋 You are logged in with an OAuth Token, associated with the email &#39;XXXX@gmail.com&#39;!
+</span><span class=go>┌──────────────────────────┬──────────────────────────────────┐
+</span><span class=go>│ Account Name             │ Account ID                       │
+</span><span class=go>├──────────────────────────┼──────────────────────────────────┤
+</span><span class=go>│ XXXX@gmail.com&#39;s Account │ a79fd54644844825ded71b264152dc7c │
+</span><span class=go>└──────────────────────────┴──────────────────────────────────┘
+</span><span class=go>🔓 Token Permissions: If scopes are missing, you may need to logout and re-login.
+</span><span class=go>Scope (Access)
+</span><span class=go>- account (read)
+</span><span class=go>- user (read)
+</span><span class=go>- workers (write)
+</span><span class=go>- workers_kv (write)
+</span><span class=go>- workers_routes (write)
+</span><span class=go>- workers_scripts (write)
+</span><span class=go>- workers_tail (read)
+</span><span class=go>- d1 (write)
+</span><span class=go>- pages (write)
+</span><span class=go>- zone (read)
+</span><span class=go>- offline_access
+</span></code></pre></div></div>
+</figure>
+<h2 id=worker-プロジェクトを作成する-wrangler-init>Worker プロジェクトを作成する (wrangler init)</h2>
+<p><strong>wranger init &lt;プロジェクト名></strong> を実行すると、Worker プロジェクトのテンプレートコードを生成できます（いわゆる scaffold 処理です）。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Worker プロジェクト (hello) を新規作成</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>wrangler init hello
+<span class=go> ⛅️ wrangler 2.6.2
+</span><span class=go>-------------------
+</span><span class=go>Using npm as package manager.
+</span><span class=go>✨ Created hello/wrangler.toml
+</span><span class=go>Would you like to use git to manage this Worker? (y/n)
+</span><span class=go>✨ Initialized git repository at hello
+</span><span class=go>No package.json found. Would you like to create one? (y/n)
+</span><span class=go>✨ Created hello/package.json
+</span><span class=go>Would you like to use TypeScript? (y/n)
+</span><span class=go>✨ Created hello/tsconfig.json
+</span><span class=go>Would you like to create a Worker at hello/src/index.ts?
+</span><span class=go>  None
+</span><span class=go>❯ Fetch handler
+</span><span class=go>  Scheduled handler
+</span></code></pre></div></div>
+</figure>
+<p>次のような質問をされますが、基本はすべて <kbd>Enter</kbd> でデフォルトのまま進めていけば OK です。</p>
+<ul>
+<li>Git リポジトリとして初期化するか？（デフォルト: Yes）</li>
+<li>package.json ファイルを作成するか？（デフォルト: Yes）</li>
+<li>TypeScript を使用するか？（デフォルト: Yes）</li>
+<li>どのタイプのハンドラーコードを生成するか？（デフォルト: Fetch handler）</li>
+</ul>
+<p>プロジェクトの初期化が終了すると次のようなファイルが配置されます。</p>
+<pre tabindex=0><code>hello/
+  +-- .git/
+  +-- .gitignore
+  +-- node_modules/
+  +-- package-lock.json
+  +-- package.json
+  +-- src/index.tsx
+  +-- tsconfig.json
+  +-- wrangler.toml
+</code></pre><h2 id=開発用のローカルサーバーを起動する-wrangler-dev>開発用のローカルサーバーを起動する (wrangler dev)</h2>
+<p><code>wrangler init</code> によって生成される <code>src/index.ts</code> ファイルは次のような感じの実装になっています。
+HTTP リクエストを受けて <code>Hello World!</code> というレスポンスを返すだけですね。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>src/index.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>export</span> <span class=k>default</span> <span class=p>{</span>
+  <span class=kr>async</span> <span class=nx>fetch</span><span class=p>(</span><span class=nx>request</span>: <span class=kt>Request</span><span class=p>,</span> <span class=nx>env</span>: <span class=kt>Env</span><span class=p>,</span> <span class=nx>ctx</span>: <span class=kt>ExecutionContext</span><span class=p>)</span><span class=o>:</span> <span class=nx>Promise</span><span class=p>&lt;</span><span class=nt>Response</span><span class=p>&gt;</span> <span class=p>{</span>
+    <span class=k>return</span> <span class=k>new</span> <span class=nx>Response</span><span class=p>(</span><span class=s2>&#34;Hello World!&#34;</span><span class=p>)</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>この Worker 実装をローカルサーバーでテストするには、<strong><code>wrangler dev</code></strong> コマンドを実行します。
+<code>package.json</code> で NPM スクリプトが定義されているので <code>npm start</code> でも OK です（<code>wrangler</code> コマンドをローカルインストールした場合は <code>npm start</code> を使います）。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>ローカルサーバーを起動</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>wrangler dev
+<span class=go> ⛅️ wrangler 2.6.2
+</span><span class=go>-------------------
+</span><span class=go>⬣ Listening at http://0.0.0.0:8787
+</span><span class=go>- http://127.0.0.1:8787
+</span><span class=go>- http://192.168.1.7:8787
+</span><span class=go>Total Upload: 0.19 KiB / gzip: 0.16 KiB
+</span><span class=go>╭────────────────────────────────────────────────────────────────────────────────────────────────╮
+</span><span class=go>│ [b] open a browser, [d] open Devtools, [l] turn on local mode, [c] clear console, [x] to exit  │
+</span><span class=go>╰────────────────────────────────────────────────────────────────────────────────────────────────╯
+</span></code></pre></div></div>
+</figure>
+<p>デフォルトでは <code>http://localhost:8787</code> でアクセス可能なローカルサーバーが起動します。
+コンソール上で <kbd>B</kbd> キーを入力すると、Web ブラウザでページを開くことができます。
+次のように表示されれば成功です。</p>
+<figure class=xImage>
+<a href=./p/rn7p7n5/img-001.png target=_blank>
+<img style="border:solid #ccc 2px" width=400 height=101 src=./p/rn7p7n5/img-001_hu703edc311c6efa4b455950ef80ee34bd_9128_400x0_resize_box_3.png alt=/p/rn7p7n5/img-001.png>
+</a>
+<figcaption>図: ローカルサーバーでの Worker のテスト</figcaption>
+</figure>
+<h2 id=cloudflare-workers-へのデプロイ-wrangler-publish>Cloudflare Workers へのデプロイ (wrangler publish)</h2>
+<p>ローカルサーバーでの動作確認が済んだら、<strong><code>wrangler publish</code></strong> コマンドで Cloudflare Workers へデプロイできます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Worker のデプロイ</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>$</span> <span class=nx>wrangler</span> <span class=nx>publish</span>
+ <span class=err>⛅️</span> <span class=nx>wrangler</span> <span class=mf>2.6</span><span class=p>.</span><span class=mi>2</span>
+<span class=o>-------------------</span>
+<span class=nx>Total</span> <span class=nx>Upload</span>: <span class=kt>0.19</span> <span class=nx>KiB</span> <span class=o>/</span> <span class=nx>gzip</span>: <span class=kt>0.16</span> <span class=nx>KiB</span>
+<span class=nx>Uploaded</span> <span class=nx>hello</span> <span class=p>(</span><span class=mf>0.61</span> <span class=nx>sec</span><span class=p>)</span>
+<span class=nx>Published</span> <span class=nx>hello</span> <span class=p>(</span><span class=mf>3.81</span> <span class=nx>sec</span><span class=p>)</span>
+  <span class=nx>https</span><span class=o>:</span><span class=c1>//hello.&lt;ユーザー名&gt;.workers.dev
+</span><span class=c1></span><span class=nx>Current</span> <span class=nx>Deployment</span> <span class=nx>ID</span>: <span class=kt>b7e28af5</span><span class=o>-</span><span class=nx>f244</span><span class=o>-</span><span class=mi>422</span><span class=nx>b</span><span class=o>-</span><span class=nx>ae64</span><span class=o>-</span><span class=mi>00</span><span class=nx>bd796e536e</span></code></pre></div></div>
+</figure>
+<p>デプロイは一瞬で完了して、自動的に <strong><code>https://&lt;プロジェクト名>.&lt;ユーザー名>.workers.dev</code></strong> という URL が割り当てられます。
+デフォルトで公開状態になるので、Web ブラウザや <code>curl</code> コマンドでアクセスすれば、<code>Hello World!</code> というレスポンスが返ってきます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>curl https://hello.XXXX.workers.dev
+<span class=go>Hello World!
+</span></code></pre></div><p>デプロイまでとても簡単にできました！
+٩(๑❛ᴗ❛๑)۶ わーぃ</p>
+<p>ちなみに、デプロイ先の Worker 名は <strong><code>--name</code></strong> オプションで変更できます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>wrangler publish --name hello-stg
+</code></pre></div><h2 id=あとかたづけ-wrangler-delete>あとかたづけ (wrangler delete)</h2>
+<p>Cloudflare Workers は呼び出しごとの従量課金なので、Worker をたくさん作って放置しておいても特にお金はかかりませんが、不要な Worker は削除しておいた方がよいでしょう。
+Worker の削除には、<strong><code>wrangler delete</code></strong> コマンドを使用します。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Worker (hello) の削除</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>wrangler delete
+<span class=go> ⛅️ wrangler 2.6.2
+</span><span class=go>-------------------
+</span><span class=go>Are you sure you want to delete hello? This action cannot be undone. (y/n)
+</span><span class=go></span><span class=err>
+</span><span class=err></span><span class=go>Successfully deleted hello
+</span></code></pre></div></div>
+</figure>
+<p>スッキリスッキリ ( ⁎ᵕᴗᵕ⁎ )</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/cloudflare>Cloudflare</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/c9sar9p/><span class=xArticle_up_label>Cloudflare 関連メモ</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -672,8 +888,8 @@ Let&rsquo;s Encrypt はサーバーの存在確認のために、Web サーバ�
 </code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-573921468 type=checkbox>
-<label class=xAccordion_title for=id-573921468>出力例</label>
+<input id=id-318597642 type=checkbox>
+<label class=xAccordion_title for=id-318597642>出力例</label>
 <div class=xAccordion_body>
 <pre tabindex=0><code>Saving debug log to /var/log/letsencrypt/letsencrypt.log
 Plugins selected: Authenticator standalone, Installer None
@@ -730,8 +946,8 @@ Certbot の <code>webroot</code> プラグインで証明書を取得するに�
 </code></pre></div></div>
 </figure>
 <div class=xAccordion>
-<input id=id-718543269 type=checkbox>
-<label class=xAccordion_title for=id-718543269>出力例</label>
+<input id=id-728196354 type=checkbox>
+<label class=xAccordion_title for=id-728196354>出力例</label>
 <div class=xAccordion_body>
 <pre tabindex=0><code>Saving debug log to /var/log/letsencrypt/letsencrypt.log
 Requesting a certificate for example.com
@@ -1010,244 +1226,6 @@ GitHub Actions の Ubuntu イメージは標準で <code>docker</code> コマン
 </div>
 <div class=xArticle_up>
 <a href=./p/88gow5c/><span class=xArticle_up_label>gRPC / Protocol Buffers 関連メモ</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/xdsom3a/>Nginx（Web サーバー）</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/bm6n5k2/>Nginx の設定: Nginx の設定内容を確認する (nginx -T)</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/nginx>nginx</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-11-27>2022-11-27</time><br>
-作成: <time itemprop=datePublished datetime=2022-11-27>2022-11-27</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents></nav><p>nginx サーバーが読み込む設定情報を確認するには、<strong><code>nginx -T</code></strong> コマンドを使用します。
-正確には、このコマンドは設定ファイルの検証 (<code>nginx -t</code>) と、内容の出力を同時に行うコマンドです。</p>
-<p>下記は、<code>nginx -T</code> コマンドを実行したときの出力例です。
-最初の 2 行が設定ファイルの検証結果で、3 行目以降が具体的な設定内容です。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>nginx -T コマンドの出力例</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell>nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
-nginx: configuration file /etc/nginx/nginx.conf <span class=nb>test</span> is successful
-<span class=c1># configuration file /etc/nginx/nginx.conf:</span>
-
-user  nginx<span class=p>;</span>
-worker_processes  auto<span class=p>;</span>
-
-error_log  /var/log/nginx/error.log notice<span class=p>;</span>
-pid        /var/run/nginx.pid<span class=p>;</span>
-
-
-events <span class=o>{</span>
-    worker_connections  1024<span class=p>;</span>
-<span class=o>}</span>
-
-
-http <span class=o>{</span>
-    include       /etc/nginx/mime.types<span class=p>;</span>
-    default_type  application/octet-stream<span class=p>;</span>
-
-    log_format  main  <span class=s1>&#39;$remote_addr - $remote_user [$time_local] &#34;$request&#34; &#39;</span>
-                      <span class=s1>&#39;$status $body_bytes_sent &#34;$http_referer&#34; &#39;</span>
-                      <span class=s1>&#39;&#34;$http_user_agent&#34; &#34;$http_x_forwarded_for&#34;&#39;</span><span class=p>;</span>
-
-    access_log  /var/log/nginx/access.log  main<span class=p>;</span>
-
-    sendfile        on<span class=p>;</span>
-    <span class=c1>#tcp_nopush     on;</span>
-
-    keepalive_timeout  65<span class=p>;</span>
-
-    <span class=c1>#gzip  on;</span>
-
-    include /etc/nginx/conf.d/*.conf<span class=p>;</span>
-<span class=o>}</span>
-
-<span class=c1># configuration file /etc/nginx/mime.types:</span>
-
-types <span class=o>{</span>
-    text/html                                        html htm shtml<span class=p>;</span>
-    text/css                                         css<span class=p>;</span>
-    text/xml                                         xml<span class=p>;</span>
-    image/gif                                        gif<span class=p>;</span>
-    image/jpeg                                       jpeg jpg<span class=p>;</span>
-    application/javascript                           js<span class=p>;</span>
-    application/atom+xml                             atom<span class=p>;</span>
-    application/rss+xml                              rss<span class=p>;</span>
-
-    text/mathml                                      mml<span class=p>;</span>
-    text/plain                                       txt<span class=p>;</span>
-    text/vnd.sun.j2me.app-descriptor                 jad<span class=p>;</span>
-    text/vnd.wap.wml                                 wml<span class=p>;</span>
-    text/x-component                                 htc<span class=p>;</span>
-
-    image/avif                                       avif<span class=p>;</span>
-    image/png                                        png<span class=p>;</span>
-    image/svg+xml                                    svg svgz<span class=p>;</span>
-    image/tiff                                       tif tiff<span class=p>;</span>
-    image/vnd.wap.wbmp                               wbmp<span class=p>;</span>
-    image/webp                                       webp<span class=p>;</span>
-    image/x-icon                                     ico<span class=p>;</span>
-    image/x-jng                                      jng<span class=p>;</span>
-    image/x-ms-bmp                                   bmp<span class=p>;</span>
-
-    font/woff                                        woff<span class=p>;</span>
-    font/woff2                                       woff2<span class=p>;</span>
-
-    application/java-archive                         jar war ear<span class=p>;</span>
-    application/json                                 json<span class=p>;</span>
-    application/mac-binhex40                         hqx<span class=p>;</span>
-    application/msword                               doc<span class=p>;</span>
-    application/pdf                                  pdf<span class=p>;</span>
-    application/postscript                           ps eps ai<span class=p>;</span>
-    application/rtf                                  rtf<span class=p>;</span>
-    application/vnd.apple.mpegurl                    m3u8<span class=p>;</span>
-    application/vnd.google-earth.kml+xml             kml<span class=p>;</span>
-    application/vnd.google-earth.kmz                 kmz<span class=p>;</span>
-    application/vnd.ms-excel                         xls<span class=p>;</span>
-    application/vnd.ms-fontobject                    eot<span class=p>;</span>
-    application/vnd.ms-powerpoint                    ppt<span class=p>;</span>
-    application/vnd.oasis.opendocument.graphics      odg<span class=p>;</span>
-    application/vnd.oasis.opendocument.presentation  odp<span class=p>;</span>
-    application/vnd.oasis.opendocument.spreadsheet   ods<span class=p>;</span>
-    application/vnd.oasis.opendocument.text          odt<span class=p>;</span>
-    application/vnd.openxmlformats-officedocument.presentationml.presentation
-                                                     pptx<span class=p>;</span>
-    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-                                                     xlsx<span class=p>;</span>
-    application/vnd.openxmlformats-officedocument.wordprocessingml.document
-                                                     docx<span class=p>;</span>
-    application/vnd.wap.wmlc                         wmlc<span class=p>;</span>
-    application/wasm                                 wasm<span class=p>;</span>
-    application/x-7z-compressed                      7z<span class=p>;</span>
-    application/x-cocoa                              cco<span class=p>;</span>
-    application/x-java-archive-diff                  jardiff<span class=p>;</span>
-    application/x-java-jnlp-file                     jnlp<span class=p>;</span>
-    application/x-makeself                           run<span class=p>;</span>
-    application/x-perl                               pl pm<span class=p>;</span>
-    application/x-pilot                              prc pdb<span class=p>;</span>
-    application/x-rar-compressed                     rar<span class=p>;</span>
-    application/x-redhat-package-manager             rpm<span class=p>;</span>
-    application/x-sea                                sea<span class=p>;</span>
-    application/x-shockwave-flash                    swf<span class=p>;</span>
-    application/x-stuffit                            sit<span class=p>;</span>
-    application/x-tcl                                tcl tk<span class=p>;</span>
-    application/x-x509-ca-cert                       der pem crt<span class=p>;</span>
-    application/x-xpinstall                          xpi<span class=p>;</span>
-    application/xhtml+xml                            xhtml<span class=p>;</span>
-    application/xspf+xml                             xspf<span class=p>;</span>
-    application/zip                                  zip<span class=p>;</span>
-
-    application/octet-stream                         bin exe dll<span class=p>;</span>
-    application/octet-stream                         deb<span class=p>;</span>
-    application/octet-stream                         dmg<span class=p>;</span>
-    application/octet-stream                         iso img<span class=p>;</span>
-    application/octet-stream                         msi msp msm<span class=p>;</span>
-
-    audio/midi                                       mid midi kar<span class=p>;</span>
-    audio/mpeg                                       mp3<span class=p>;</span>
-    audio/ogg                                        ogg<span class=p>;</span>
-    audio/x-m4a                                      m4a<span class=p>;</span>
-    audio/x-realaudio                                ra<span class=p>;</span>
-
-    video/3gpp                                       3gpp 3gp<span class=p>;</span>
-    video/mp2t                                       ts<span class=p>;</span>
-    video/mp4                                        mp4<span class=p>;</span>
-    video/mpeg                                       mpeg mpg<span class=p>;</span>
-    video/quicktime                                  mov<span class=p>;</span>
-    video/webm                                       webm<span class=p>;</span>
-    video/x-flv                                      flv<span class=p>;</span>
-    video/x-m4v                                      m4v<span class=p>;</span>
-    video/x-mng                                      mng<span class=p>;</span>
-    video/x-ms-asf                                   asx asf<span class=p>;</span>
-    video/x-ms-wmv                                   wmv<span class=p>;</span>
-    video/x-msvideo                                  avi<span class=p>;</span>
-<span class=o>}</span>
-
-<span class=c1># configuration file /etc/nginx/conf.d/default.conf:</span>
-server <span class=o>{</span>
-    listen       80<span class=p>;</span>
-    server_name  localhost<span class=p>;</span>
-
-    <span class=c1>#access_log  /var/log/nginx/host.access.log  main;</span>
-
-    location / <span class=o>{</span>
-        root   /usr/share/nginx/html<span class=p>;</span>
-        index  index.html index.htm<span class=p>;</span>
-    <span class=o>}</span>
-
-    <span class=c1>#error_page  404              /404.html;</span>
-
-    <span class=c1># redirect server error pages to the static page /50x.html</span>
-    <span class=c1>#</span>
-    error_page   <span class=m>500</span> <span class=m>502</span> <span class=m>503</span> <span class=m>504</span>  /50x.html<span class=p>;</span>
-    <span class=nv>location</span> <span class=o>=</span> /50x.html <span class=o>{</span>
-        root   /usr/share/nginx/html<span class=p>;</span>
-    <span class=o>}</span>
-
-    <span class=c1># proxy the PHP scripts to Apache listening on 127.0.0.1:80</span>
-    <span class=c1>#</span>
-    <span class=c1>#location ~ \.php$ {</span>
-    <span class=c1>#    proxy_pass   http://127.0.0.1;</span>
-    <span class=c1>#}</span>
-
-    <span class=c1># pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</span>
-    <span class=c1>#</span>
-    <span class=c1>#location ~ \.php$ {</span>
-    <span class=c1>#    root           html;</span>
-    <span class=c1>#    fastcgi_pass   127.0.0.1:9000;</span>
-    <span class=c1>#    fastcgi_index  index.php;</span>
-    <span class=c1>#    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;</span>
-    <span class=c1>#    include        fastcgi_params;</span>
-    <span class=c1>#}</span>
-
-    <span class=c1># deny access to .htaccess files, if Apache&#39;s document root</span>
-    <span class=c1># concurs with nginx&#39;s one</span>
-    <span class=c1>#</span>
-    <span class=c1>#location ~ /\.ht {</span>
-    <span class=c1>#    deny  all;</span>
-    <span class=c1>#}</span>
-<span class=o>}</span></code></pre></div></div>
-</figure>
-<p>Docker がインストールされている環境では、上記の出力は次のような感じで確認できます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>nginx:alpine コンテナで nginx -T を実行する</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker container run --rm nginx:alpine sh -c <span class=s2>&#34;nginx -T&#34;</span>
-</code></pre></div></div>
-</figure>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/99qo8zf/>Docker コンテナで Nginx サーバーを立ち上げる</a></li>
-<li><a href=./p/cniq5vr/>Let's Encrypt certificate expiration notice が来たら</a></li>
-<li><a href=./p/ew5zmmw/>Nginx で 403 Forbidden エラーが出るときのチェック項目</a></li>
-<li><a href=./p/jowgstm/>Nginx の設定: http でアクセスされた場合に https にリダイレクトする</a></li>
-<li><a href=./p/xkpjfcf/>Sakura VPS レンタルサーバーを Let's Encrypt で SSL 対応</a></li>
-<li><a href=./p/3q8uzoo/>Nginx の設定: Nginx の設定ファイルの書き方が正しいか確認する (configtest, nginx -t)</a></li>
-<li><a href=./p/6aazmy3/>Nginx の設定: Nginx の設定ファイルの変更を反映する（再読み込み）</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/nginx>nginx</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/xdsom3a/><span class=xArticle_up_label>Nginx（Web サーバー）のメモ</span><br>へ戻る</a>
 </div>
 </article><h2>メニュー</h2>
 <div class=xTopMenu>
