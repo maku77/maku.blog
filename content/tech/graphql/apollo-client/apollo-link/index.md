@@ -323,16 +323,16 @@ const authLink = setContext(async (_, prevContext) => {
 ```js
 // エンドポイントの URI を動的に構築するための関数（のインタフェース）
 export interface UriFunction {
-    (operation: Operation): string;
+  (operation: Operation): string;
 }
 
 export interface Operation {
-    query: DocumentNode;
-    variables: Record<string, any>;
-    operationName: string;
-    extensions: Record<string, any>;
-    setContext: (context: Record<string, any>) => Record<string, any>;
-    getContext: () => Record<string, any>;
+  query: DocumentNode;
+  variables: Record<string, any>;
+  operationName: string;
+  extensions: Record<string, any>;
+  setContext: (context: Record<string, any>) => Record<string, any>;
+  getContext: () => Record<string, any>;
 }
 ```
 
@@ -340,9 +340,9 @@ export interface Operation {
 
 ```ts
 // 動的に GraphQL API エンドポイントを決定する関数
-// （ここでは 1/2 の確率で URL を切り替えている）
 const getEndpointUrl: UriFunction = () => {
-    return Math.random() > 0.5 ? 'http://localhost:3000/graphql' : 'https://example.com/graphql'
+  // 通常、エンドポイント情報は localStorage などで管理するが、ここではランダムに切り替え
+  return Math.random() > 0.5 ? 'http://localhost:3000/graphql' : 'https://example.com/graphql'
 }
 
 // 上記の UriFunction 実装の参照を、ApolloClient か HttpLink の uri プロパティで指定すれば OK
@@ -350,5 +350,19 @@ const apolloClient = new ApolloClient({
   uri: getEndPointUri,  // 関数の参照を設定することに注意（関数を呼び出さないこと）
   cache: new InMemoryCache(),
 })
+```
+
+GraphQL API で取得したデータは、Apollo Client がキャッシュしています（`InMemoryCache` など）。
+これは、コンポーネント再描画時の余計な再取得を防ぐための仕組みですが、GraphQL API のエンドポイントを切り替えた場合は、過去に保存したキャッシュはゴミになっている可能性が高いです。
+エンドポイントの切り替え後は、次のような感じで `ApolloClient` の参照を取得してキャッシュをクリアしてしまうのがよいでしょう。
+
+```ts
+import { useApolloClient } from '@apollo/client'
+
+// コンポーネントの中で ApolloClient インスタンスを取得
+const apolloClient = useApolloClient()
+
+// エンドポイント切り替えのタイミングでキャッシュをクリア
+apolloClient.cache.reset()
 ```
 
