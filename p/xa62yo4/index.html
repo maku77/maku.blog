@@ -809,22 +809,22 @@ Link チェーン内で設定されたヘッダー情報が上書きされない
 <p><code>HttpLink</code> に設定する <code>HttpOptions</code> オブジェクト（あるいは <code>ApolloClient</code> に設定する <code>ApolloClientOptions</code> オブジェクト）の <strong><code>uri</code></strong> プロパティには、GraphQL API エンドポイントの URL を指定するのですが、ここには単純な文字列 (<code>string</code>) の代わりに、クエリ実行時に呼び出される <strong><code>UrlFunction</code></strong> を設定できるようになっています。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=c1>// エンドポイントの URI を動的に構築するための関数（のインタフェース）
 </span><span class=c1></span><span class=kr>export</span> <span class=kr>interface</span> <span class=nx>UriFunction</span> <span class=p>{</span>
-    <span class=p>(</span><span class=nx>operation</span><span class=o>:</span> <span class=nx>Operation</span><span class=p>)</span><span class=o>:</span> <span class=nx>string</span><span class=p>;</span>
+  <span class=p>(</span><span class=nx>operation</span><span class=o>:</span> <span class=nx>Operation</span><span class=p>)</span><span class=o>:</span> <span class=nx>string</span><span class=p>;</span>
 <span class=p>}</span>
 
 <span class=kr>export</span> <span class=kr>interface</span> <span class=nx>Operation</span> <span class=p>{</span>
-    <span class=nx>query</span><span class=o>:</span> <span class=nx>DocumentNode</span><span class=p>;</span>
-    <span class=nx>variables</span><span class=o>:</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>;</span>
-    <span class=nx>operationName</span><span class=o>:</span> <span class=nx>string</span><span class=p>;</span>
-    <span class=nx>extensions</span><span class=o>:</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>;</span>
-    <span class=nx>setContext</span><span class=o>:</span> <span class=p>(</span><span class=nx>context</span><span class=o>:</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>;</span>
-    <span class=nx>getContext</span><span class=o>:</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>;</span>
+  <span class=nx>query</span><span class=o>:</span> <span class=nx>DocumentNode</span><span class=p>;</span>
+  <span class=nx>variables</span><span class=o>:</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>;</span>
+  <span class=nx>operationName</span><span class=o>:</span> <span class=nx>string</span><span class=p>;</span>
+  <span class=nx>extensions</span><span class=o>:</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>;</span>
+  <span class=nx>setContext</span><span class=o>:</span> <span class=p>(</span><span class=nx>context</span><span class=o>:</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>;</span>
+  <span class=nx>getContext</span><span class=o>:</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=nx>Record</span><span class=o>&lt;</span><span class=nx>string</span><span class=p>,</span> <span class=nx>any</span><span class=o>&gt;</span><span class=p>;</span>
 <span class=p>}</span>
 </code></pre></div><p>この仕組みを利用すると、例えば、GraphQL API エンドポイントをユーザー設定（Web ブラウザーの localStorage）の値によって切り替えたり、GraphQL クエリの内容（<code>Operation</code> パラメーター）によって切り替えたりすることができます。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// 動的に GraphQL API エンドポイントを決定する関数
-</span><span class=c1>// （ここでは 1/2 の確率で URL を切り替えている）
 </span><span class=c1></span><span class=kr>const</span> <span class=nx>getEndpointUrl</span>: <span class=kt>UriFunction</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
-    <span class=k>return</span> <span class=nb>Math</span><span class=p>.</span><span class=nx>random</span><span class=p>()</span> <span class=o>&gt;</span> <span class=mf>0.5</span> <span class=o>?</span> <span class=s1>&#39;http://localhost:3000/graphql&#39;</span> <span class=o>:</span> <span class=s1>&#39;https://example.com/graphql&#39;</span>
+  <span class=c1>// 通常、エンドポイント情報は localStorage などで管理するが、ここではランダムに切り替え
+</span><span class=c1></span>  <span class=k>return</span> <span class=nb>Math</span><span class=p>.</span><span class=nx>random</span><span class=p>()</span> <span class=o>&gt;</span> <span class=mf>0.5</span> <span class=o>?</span> <span class=s1>&#39;http://localhost:3000/graphql&#39;</span> <span class=o>:</span> <span class=s1>&#39;https://example.com/graphql&#39;</span>
 <span class=p>}</span>
 
 <span class=c1>// 上記の UriFunction 実装の参照を、ApolloClient か HttpLink の uri プロパティで指定すれば OK
@@ -832,6 +832,16 @@ Link チェーン内で設定されたヘッダー情報が上書きされない
   <span class=nx>uri</span>: <span class=kt>getEndPointUri</span><span class=p>,</span>  <span class=c1>// 関数の参照を設定することに注意（関数を呼び出さないこと）
 </span><span class=c1></span>  <span class=nx>cache</span>: <span class=kt>new</span> <span class=nx>InMemoryCache</span><span class=p>(),</span>
 <span class=p>})</span>
+</code></pre></div><p>GraphQL API で取得したデータは、Apollo Client がキャッシュしています（<code>InMemoryCache</code> など）。
+これは、コンポーネント再描画時の余計な再取得を防ぐための仕組みですが、GraphQL API のエンドポイントを切り替えた場合は、過去に保存したキャッシュはゴミになっている可能性が高いです。
+エンドポイントの切り替え後は、次のような感じで <code>ApolloClient</code> の参照を取得してキャッシュをクリアしてしまうのがよいでしょう。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>useApolloClient</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@apollo/client&#39;</span>
+
+<span class=c1>// コンポーネントの中で ApolloClient インスタンスを取得
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>apolloClient</span> <span class=o>=</span> <span class=nx>useApolloClient</span><span class=p>()</span>
+
+<span class=c1>// エンドポイント切り替えのタイミングでキャッシュをクリア
+</span><span class=c1></span><span class=nx>apolloClient</span><span class=p>.</span><span class=nx>cache</span><span class=p>.</span><span class=nx>reset</span><span class=p>()</span>
 </code></pre></div>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
