@@ -24,6 +24,12 @@ date: "2022-08-10T00:00:00Z",
 body: "プログラミング"
 },
 {
+url: "/p/esbs9o5/",
+title: "protobuf (.proto) ファイルのコーディングスタイル",
+date: "2022-05-17T00:00:00Z",
+body: "protobuf (.proto) ファイルのコーディングスタイル .proto ファイルでメッセージやサービスを定義するときのコーディング規約をまとめておきます。 Google が Style Guide として指針をまとめていますが、プロジェクト内に既に .proto ファイルがある場合は、一貫性を保つように記述するのがよいとされています。 .proto ファイルの例 syntax = \u0026#34;proto3\u0026#34;;package endpoints.examples.bookstore;option java_multiple_files = true;option java_outer_classname = \u0026#34;BookstoreProto\u0026#34;;option java_package = \u0026#34;com.google.endpoints.examples.bookstore\u0026#34;;import \u0026#34;google/protobuf/empty.proto\u0026#34;;service Bookstore { rpc ListShelves(google.protobuf.Empty) returns (ListShelvesResponse) {} rpc CreateShelf(CreateShelfRequest) returns (Shelf) {} rpc GetShelf(GetShelfRequest) returns (Shelf) {} rpc DeleteShelf(DeleteShelfRequest) returns (google.protobuf.Empty) {} rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {} rpc CreateBook(CreateBookRequest) returns (Book) {} rpc GetBook(GetBookRequest) returns (Book) {} rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {}}message Shelf { int64 id = 1; string theme = 2;}message Book { int64 id = 1; string author = 2; string title = 3;}enum FooBar { FOO_BAR_UNSPECIFIED = 0; FOO_BAR_FIRST_VALUE = 1; FOO_BAR_SECOND_VALUE = 2;} 全般 1 行は 80 文字 まで インデントはスペース 2 文字 文字列リテラルは ダブルクォート で囲む（例: \u0026quot;Hoge\u0026quot;） ファイル構造 .proto ファイル名はすべて小文字 + アンダースコア（例: lower_snake_case.proto） .proto ファイルの内容は次のような順番で記述する ライセンス / コピーライト（必要があれば） 概要 / Overview 構文バージョン（例: syntax = \u0026quot;proto3\u0026quot;;） これを省略すると、デフォルトで \u0026quot;proto2\u0026quot; とみなされてしまいます。 パッケージ定義（例: package example.echo;） インポート（ソートしておく） オプション (File options) 例: go_package = \u0026quot;example.com/hello\u0026quot;; 例: java_package = \u0026quot;com.example.hello\u0026quot;; その他（残り全部） パッケージ package example.echo; パッケージ名はすべて小文字 (lowercase)。できるだけ .proto ファイルのパスと対応させる メッセージ message SongServerRequest { optional string song_name = 1;} メッセージ名は CamelCase で、フィールド名は lower_snace_case の形にする。.proto ファイル内で song_name というフィールド名で定義しても、Java や Kotlin のコードを生成したときは、正しく getSongName() のような名前になるので心配しなくていい フィールド名のサフィックスに数値を付ける場合は、アンダースコアを挟まない string song_name_1; // NG string song_name1; // Good repeated 修飾子のついたフィールドの名前は複数形にする repeated string keys = 1; Enum Enum 名は CamelCase で、各値は CAPITALS_WITH_UNDERSCORES の形にする 各値の行末はセミコロン (;) で終わる 各値のプレフィックスとして Enum 名に対応する名前を付ける。下記の例では FOO_BAR_ 0 の値を持つものは、_UNSPECIFIED サフィックスを付ける enum FooBar { FOO_BAR_UNSPECIFIED = 0; FOO_BAR_FIRST_VALUE = 1; FOO_BAR_SECOND_VALUE = 2;} サービス サービス名は CamelCase で、RPC メソッド名も CamelCase の形にする service FooService { rpc GetSomething(GetSomethingRequest) returns (GetSomethingResponse); rpc ListSomething(ListSomethingRequest) returns (ListSomethingResponse);} その他 required は proto3 以降は使わない groups は proto3 以降は使わない"
+},
+{
 url: "/p/cenio8m/",
 title: "AWS 一般／環境／設定など",
 date: "2022-04-11T00:00:00Z",
@@ -426,6 +432,12 @@ date: "2019-02-08T00:00:00Z",
 body: "よいチャットボットとは？ボットを作成するときのベストプラクティス とある事情によりチャットボットを作ろうという話になっています。 まずは、チャットボットってどんなことに気を付けて作ればよいかを調べたので、ポイントになりそうなことをまとめておきます。 下記の Microsoft が提供している Bot Framework のドキュメントがとても参考になりました。 参考: Principles of bot design - Bot Service | Microsoft Docs チャットボットの知識は、今流行りのスマートスピーカー（Amazon Alexa や Google Home）などのスキルを作成する際にも応用がききそうです。 音声入力による会話は、チャットの特殊形態（キーボードやモニタがないときの手段）と考えることができるので、チャットボットの基本原則を押さえておくことはきっと参考になります。 チャットボットが目指すべきこと こだわるべき事 少ないステップで簡単に問題を解決できること 他の手段よりもチャットボットを使ったほうが速く、簡単で、よりよい結果を得られること ユーザが**使いたい環境（クライアント）**で動作すること ユーザがボットの存在に気付けること。それを使って何をすればよいのか気付けること 何より大切なのはユーザーエクスペリエンスです。 めっちゃ賢い AI を使っているかどうかではなく、ユーザがやりたいことを素早く、簡単に行えるかが重要です。 こだわらなくてよい事 機械学習は必須ではない。めっちゃ賢いボットは必須ではない。 完璧に自然言語を理解して会話できる必要はない。 ボイス対応により必ず UX が改善されるわけではない。ボイスを嫌うユーザはいるし、ノイズの多い環境では使えない。 大切なのは技術力とかクールさとかではなく、ユーザのやりたいことができることです。 最初の挨拶は「自然言語」か「メニュー選択」か？ どんな話しかけにも反応できるボットは存在しません（少なくとも現在は）。 ユーザは、ボットが何をできるのか知らないので、できることの選択肢を表示してあげるとよいです。 選択肢が少なければボタンを並べて、それを押すだけで会話を進められるようにすると、ユーザの入力の手間を大幅に削減することができます。 できることがたくさんあるのであれば、選択肢として「ヘルプ」ボタンを配置して、より詳しい使い方を提示してあげましょう。 図: 最初のメッセージの例 一般的に、自由回答形式の質問 (open-ended question) はユーザーの返答を予測できないので、選択回答形式の質問 (closed-ended question) を使用した方がボットの設計者にとっても望ましいといえます。 見栄を張ってどんな会話でもできる賢いボットを作ろうとするのではなく、できることを明確に示して上げたほうがユーザにとっても使いやすいボットができるでしょう。 プライバシーポリシーの表示 ユーザが「個人情報保護に関する方針と利用規約」(Privacy policy and terms of use) にアクセスできるようにしておくのが望ましいです。 特に、チャットボットサービスを介して個人情報を収集するのであれば、このような表示は必須になります。 会話 (Dialog) のスタック構造という罠 チャットボットのフレームワーク内部では、会話の流れは Dialog（会話）といった単位で管理されます。 一般的に、ユーザとの会話は、GUI アプリケーションのウィンドウと同様に、Dialog（会話）のスタック構造で管理されます。 つまり、ウィンドウを開いたり閉じたりするのと同様に、次の会話内容へ進んだり、前の会話内容へ戻ったりします。 ただし、、、ユーザにはこのようなスタック構造で会話しているという意識はありません。 ユーザは本当に気まぐれなので、こんなきれいに会話が進むことはありません。 チャットボットのアンチパターン (1) 頑固なボット (The stubborn bot) ユーザが別のことをしたいのに、ボットが現在のシナリオが完了するまで強引に会話を進めようとしてしまう。 ボット「どちらまで行きますか？」 ユーザ「やっぱりやめます」 ボット「分かりませんでした。どちらまで行きますか？」 ユーザ「キャンセル」 ボット「分かりませんでした。どちらまで行きますか？」 ユーザ「終了」 ボット「分かりませんでした。どちらまで行きますか？」 ユーザ「キャンセルしてください。会話を終了してください。もういいです。何もしないでください。」 教訓 ユーザがやりたいことを途中で変えられるようにしよう。 ユーザの発言を無視して、同じ質問を繰り返すのはやめよう。少なくともリトライ回数の上限を設定しよう。 (2) 無知なボット (The clueless bot) ユーザが別の意図で入力したキーワードを、現在の質問への回答だと判断して処理を進めてしまう。 ボット「好きな映画のジャンルを入力してください」 ユーザ「help」 ボット「好きなジャンルとして help を登録しました。それではお楽しみください」 ユーザ「ちょっと待って」 教訓 help（ヘルプ）、cancel（キャンセル）、start over（やり直し）といった入力に対して、割り込んで応答するミドルウェアを導入しよう。 各々の会話 (dialog) ごとに、認識しなければならないキーワードをリスト管理するのやめよう。いつでも使えるマジックワードは、共通のミドルウェアで処理すると楽。 (3) 謎めいたボット (The mysterious bot) 会話中に急にボットからの反応がなくなってしまう。 ボット「こんにちは。ご用件をどうぞ」 ユーザ「今週はどんな映画をやっていますか？」 ユーザ「こんにちは」 ユーザ「今週上映される映画は何がありますか？」 ユーザ「ボットさん、いますか？」 教訓 ボット側で時間がかかるかもしれない処理を開始する前には、ユーザに何らかの反応を返しておこう。 ボットフレームワークの提供する typing メッセージ機能 (typing indicator) を利用しよう。このメッセージ返すことで、ユーザのチャット UI 上に「入力中です」と表示される。 (4) わざわざ言うボット (The captain obvious bot) Captain obvious というのは、分かり切ったことをわざわざ言う人のことです。 ボット「また1万円も課金しちゃいましたね」 ユーザ「そうだね。。。」 ボット「いまオフィスに向かっていますね」 ユーザ「そのとおり。。。」 ボット「オフィスに着きましたね。これから一日仕事ですね」 ユーザ「もう！ほっといてくれ！」 教訓 ユーザにとって有益な情報を提供しよう（そのボットは何のためのもの？） (5) 忘れられないボット (The bot that can\u0026rsquo;t forget) 昔の会話で入力した内容を、今回の会話でも有効な情報として使おうとしてしまう。 ユーザ「旅行に行きたいんだ。イタリアへ。」 ボット「ラスベガスへの交通費は $200 かかります。よろしいですか？」 ユーザ「ラスベガス？？？」 ボット「あなたは1月5日にラスベガス行きのチケットを予約しました」 ユーザ「あぁ、半年前の話ね。。。」 教訓 ユーザが以前の話題を持ち出そうとしない限り、今回開始した話題に集中すること。 例外的な割り込みに対応するミドルウェア ユーザからの特殊な入力に対して「割り込んで」反応するミドルウェアを導入することで、ボットの強引さをいくらか軽減することができます。 具体的には、ユーザから下記のような入力があった場合に、現在の会話への応答として処理するのではなく、例外的な特殊コマンドとして処理するようにします。 cancel: 処理を中断する help: システムの使い方を表示する（処理は継続する） more info: 現在のコンテキストに沿って詳しい情報を表示する（料理メニューの一覧とか、電話番号でも予約できます、とか） これらの振る舞いは、特定の話題に結び付いたものではなく汎用的に使用できるものなので、ミドルウェアとしての実装は一種類だけで済みます。 これらの簡単なコマンドを実装するだけで、ユーザが路頭に迷ってしまうリスクを下げることができます。 ミドルウェアに認識できない入力が来た場合は、現在の会話への入力なのだと判断して、通常通りのコンテキストに応じた処理を行います。 それでも認識できないユーザ発言が繰り返されるようでしたら、最終的にはメインメニューの表示へフォールバックさせます。 具体的な質問 (specific question) で揺らぎのある回答を防ぐ ボットがユーザ発話を自然言語処理する際には、正規表現や LUIS などの文章解析サービスが利用されます。 しかし、高度な言語処理を実装するのはとても大変な作業です。 それよりも、ユーザがあいまいな返答をしないようにうまく質問で誘導することで、自然言語処理の手間を省くということを考慮すべきでしょう。 悪い例 ボット「あなたの名前は何ですか？」 ユーザ「私は山田です」 ボット「こんにちは、“私は 山田”さん」 よい例 ボット「名前を入力してください（入力例: 山田 太郎）」 ユーザ「山田 花子」 ボット「こんにちは、“山田 花子”さん」 このように、入力例を示すというのはとても効果的です。 他にも、次のように入力の例を複数示したり、受け付けるフォーマットを示すのもよいでしょう。 「どこが痛いですか？（入力例: 肩/頭/腕/ひざ）」 「誕生日はいつですか？ (yyyy/MM/dd)」 このような例示では完ぺきではないという人もいるかもしれませんが、何も示さずに自由回答形式で質問するよりは100倍マシです。 高度なサービスを制御するための入り口として使用する 専門的な用途に特化したボットであれば、コマンド入力専用の構文を用意しておくのもよい考えです。 DebOps ボットの例 ユーザ「/STOP VM XYZ」 ボット「仮想マシン \u0026quot;XYZ\u0026quot; を停止します」 ユーザ「/START VM ABC」 ボット「仮想マシン \u0026quot;ABC\u0026quot; を起動します」 このようなコマンドを用意することで、ネット上に構築された高度なサービスを利用するための、敷居の低い入口としてチャットクライアントを使用できるようになります。 ネット上のサービスは常に進化を続け、できることはどんどん増えていきます。 チャットボットをサービス操作のインターフェイスとして配置すれば、チャットボットが最初にユーザに挨拶をするときにサービスの最新情報を伝えることができます。 また、ユーザは help と入力するだけで、いつでも最新の機能を把握することができます。"
 },
 {
+url: "/p/7h3hu8k/",
+title: ".proto の文法: メッセージ型 (message)",
+date: "2022-12-13T00:00:00Z",
+body: ".proto の文法: メッセージ型 (message) メッセージ型とは Protocol Buffers の メッセージ型 は、基本的なデータ構造を表すもので、.proto ファイルの中で message キーワードを使って定義します。 メッセージ型は、プログラミング言語でいうところの構造体に相当するものです。 message SearchRequest { string query = 1; int32 page_number = 2; int32 result_per_page = 3;}Go 言語のコードに変換した場合の例 変換コマンド $ protoc --go_out=. --go_opt=Msample.proto=message sample.proto sample.pb.go（抜粋） type SearchRequest struct { // ... \tQuery string `protobuf:\u0026#34;bytes,1,opt,name=query,proto3\u0026#34; json:\u0026#34;query,omitempty\u0026#34;` PageNumber int32 `protobuf:\u0026#34;varint,2,opt,name=page_number,json=pageNumber,proto3\u0026#34; json:\u0026#34;page_number,omitempty\u0026#34;` ResultPerPage int32 `protobuf:\u0026#34;varint,3,opt,name=result_per_page,json=resultPerPage,proto3\u0026#34; json:\u0026#34;result_per_page,omitempty\u0026#34;` } 自動生成されたコードの型情報には、.proto で明示的に定義したフィールド以外の情報も含まれています。 それらの情報は、各種 protobuf ライブラリが内部的に使用します。 上記の SearchRequest というメッセージ型は 3 つのフィールド（文字列 1 つと数値 2 つ）を持っています。 ここでは、protobuf が標準で用意している スカラー型 の string と int32 を使っていますが、他のメッセージ型や列挙型、マップ型などのフィールドとして定義することもできます。 このあたりは、一般的なプログラミング言語と同様です。 各フィールドの末尾には、フィールドを一意に特定する整数である フィールド番号 を割り当てる必要があります。 配列を示す repeated ラベル repeated float prices = 2; // Golang なら []float32 になる repeated string snippets = 3; // Golang なら []string になる フィールドの定義に repeated ラベルを付けると、配列やリスト（Golang ではスライス）を表すフィールドとして扱われます。 省略可能を示す optional ラベル optional string name = 1;optional int32 id = 2;optional string email = 3;フィールドの定義に optional ラベルを付けると、省略可能なフィールドとして扱われます。 キー＆バリューのマップを示す map 型 map\u0026lt;int32, string\u0026gt; my_map = 2;map\u0026lt;string, Project\u0026gt; projects = 3;フィールドを定義するときに、map\u0026lt;キーの型, 値の型\u0026gt; という型を使うと、任意の整数あるいは文字列をキーとするマップを表現することができます（浮動小数点数をキーにすることはできません）。 ネストされた型の定義 (Nested Types) ネストされた形でメッセージ型を定義することができます。 次の例では、SearchResponse 型の中で Result 型を定義しており、results フィールドでその型の配列を持つように定義しています。 SearchResponse 型が持っているフィールドは、あくまで results の 1 つだけであることに注意してください。 message SearchResponse { message Result { string url = 1; string title = 2; repeated string snippets = 3; } // 上記の型の配列をフィールドとして持つ repeated Result results = 1;}ネスト定義された型を、別のメッセージ型から参照するときには、次のようにドット区切りで名前を指定します。 message SomeOtherMessage { SearchResponse.Result result = 1;}ネストの深さに制限はありません。 message Outer { // Level 0 message MiddleA { // Level 1 message Inner { // Level 2 int64 ival = 1; bool booly = 2; } } message MiddleB { // Level 1 message Inner { // Level 2 int32 ival = 1; bool booly = 2; } }}メッセージ型に限らず、列挙型 (enum) もネストして定義することができます。 次の例では、Person メッセージ型の下に PhoneType 列挙型を定義しています。 message Person { // ... enum PhoneType { MOBILE = 0; HOME = 1; WORK = 2; } message PhoneNumber { string number = 1; PhoneType type = 2; } repeated PhoneNumber phones = 4;}"
+},
+{
 url: "/p/ubmu3bj/",
 title: "Next.js で HelloWorld（プロジェクト作成からサーバー起動まで）",
 date: "2021-04-18T00:00:00Z",
@@ -534,6 +546,12 @@ date: "2002-08-28T00:00:00Z",
 body: "gnuplot: gnuplot の基本設定 初期化ファイル (~/.gnuplot or gnuplot.ini) 初期化ファイルは gnuplot を起動した時に、自動的に読み込まれるファイルです。 Unix の場合は ~/.gnuplot、Windows の場合は gnuplot.ini が読み込まれます。 gnuplot.ini は次に説明する「作業フォルダ」内に置きます。 例えば、作業フォルダを D:\\home\\gnuplot とした場合は、よく使う関数を D:\\home\\gnuplot\\lib\\func.gp などに書いておいて、gnuplot.ini で次のように起動時に読み込むようにしておくと便利です。 gnuplot.ini load \u0026#39;lib/func.gp\u0026#39; gnuplot のホームディレクトリの設定 gnuplot を起動した時にカレントとなるディレクトリを指定しておくと便利です。 デフォルトでは、gnuplot の実行ファイルのあるディレクトリがカレントディレクトリになっているので、出力したファイルがそのディレクトリにできてしまいます。 起動時のカレントディレクトリを変更するには次のようにします。 gnuplot.ini (~/.gnuplot) cd \u0026#39;D:\\home\\gnuplot\u0026#39; 初期化ファイルの中で、ディレクトリを移動しているだけです。 あるいは、Windows では wgnuplot.exe のショートカットを作成して、そのプロパティの作業フォルダで指定する方法もあります。 wgnuplot.exe のショートカット右クリック → プロパティ ショートカット タブの 作業フォルダ に D:\\home\\gnuplot などを設定 上のように設定してショートカットをダブルクリックすると、好きなディレクトリで作業を始められます。 この方法を使うと、ショートカットごとに作業ディレクトリを変更することができます。"
 },
 {
+url: "/p/w7xkvnb/",
+title: ".proto の文法: フィールド番号について",
+date: "2022-12-13T00:00:00Z",
+body: ".proto の文法: フィールド番号について Protocol Buffers の .proto ファイルの型定義では、各フィールドの末尾に フィールド番号 を割り当てておく必要があります。 フィールド番号の割り当て例 message SearchRequest { string query = 1; int32 page_number = 2; int32 result_per_page = 3;} = 記号が使われていますが、そのフィールドに値を代入しているわけではないので注意してください。 Protocol Buffers は、メッセージ送信用にデータをシリアライズ（バイナリ化）するとき、フィールド名の代わりにこのフィールド番号を使用します。 これにより、Protocol Buffers は効率的なデータ転送を実現しています。 フィールド番号は 1 以上の整数（最大値は 229-1 = 536,870,911）で、メッセージの定義内（同じ階層）で一意になっている必要があります。 必ずしも 1、2、3 のように連番で割り当てる必要はなく、ほぼ任意の数値を割り当てることができますが、19000 ～ 19999 の値は使えません。 これらは、Protocol Buffers ライブラリが内部実装用に予約している値です。 これらの不正な値を使用していると、protoc コマンドなどでコンパイルしようとしたときにエラーになります。 データをシリアライズするとき、フィールド番号 1～15 の数値は、わずか 1 バイトのデータに変換されるため、頻繁に使用するフィールドには 1～15 のフィールド番号を割り当てておくと効率的な通信を行えます。 とはいえ、フィールド番号が 16～2047 であっても、2 バイトのデータで表現できるので、シビアな通信速度が求められている環境でなければそれほど気にする必要はないでしょう。 一度割り当てたフィールド番号は、将来にわたって変更してはいけません。 なぜなら、過去のバージョンの .proto を使って実装されたアプリケーションは、古い .proto で割り当てられたフィールド番号で通信しようとするためです。 同じフィールド番号で異なるデータが送られてきたら、アプリケーションはうまく動作しなくなってしまいます。 .proto を更新して非推奨になったフィールドを削除するときは、フィールド番号やフィールド名を使いまわしてしまわないように、reserved キーワードを使って次のように定義しておきます。 フィールド番号の予約 enum Foo { reserved 2, 5 to 10, 40 to max; reserved \u0026#34;FOO_AAA\u0026#34;, \u0026#34;FOO_BBB\u0026#34; // ... } この例では、2、5～10、40～最大値 のフィールド番号の使用と、FOO_AAA と FOO_BBB というフィールド名（この例の場合は列挙値）の使用を制限しています。 1 つの reserved 行では、数値のリストあるいは文字列のリストのどちらかしか定義できないので、上記のように 2 行に分けて定義する必要があります。 reserved キーワードは、その名前が示しているように、将来的にこれらのフィールド番号を使うために「予約」しておく、という用途でも使用できます。"
+},
+{
 url: "/p/uhu7hs4/",
 title: "Ansible で Hello World",
 date: "2022-02-17T00:00:00Z",
@@ -610,6 +628,12 @@ url: "/p/ffyw55u/",
 title: "gnuplot: 2次元プロットの基本",
 date: "2004-01-03T00:00:00Z",
 body: "gnuplot: 2次元プロットの基本 関数をプロットする Syntax plot \u0026lt;expression\u0026gt; [with \u0026lt;line_style\u0026gt;] line_style 一覧 lines \u0026ndash; 線だけ (関数をプロットする時のデフォルト) points \u0026ndash; 記号だけ (ファイルのデータをプロット時のデフォルト) linespoints \u0026ndash; 線と点 例: y = 0.5x \u0026#43; 1 plot 0.5*x + 1 複数の関数をプロットする Syntax plot \u0026lt;expression\u0026gt; [, \u0026lt;expression\u0026gt;...] 複数のグラフを重ねたい場合は、 plot の後ろにカンマ (,) で区切って関数を並べます。 一行が長くなってしまう場合は \\ の次に改行すれば複数行に渡ってコマンドを書くことができます。 最後に実行した plot を再び実行する Syntax replot [\u0026lt;expression\u0026gt;] replot と入力すると、最後にプロットしたグラフを再表示します。 replot の引数に別の関数を指定すれと、 最後に実行した plot の出力に重ねてグラフを表示することができます。 連続して replot を実行すればどんどんグラフが重なっていきます。 replot は主に環境設定を変更した際に使用します。 例: sin(x) と cos(x) と tan(x) を重ねたグラフを描画 plot sin(x) replot cos(x) replot tan(x) 次のようにしても同じ plot sin(x), cos(x), tan(x) ファイルのデータをプロットする Syntax plot \u0026#39;\u0026lt;filename\u0026gt;\u0026#39; [with \u0026lt;line_style\u0026gt;] 例: ファイルからデータを読み込んで表示 plot \u0026#39;sample.dat\u0026#39; with linespoints # x y 10 412.4 20 234.2 40 301.3 1行に1つの点を表す座標を書きます。 データは空白かタブで区切ります。 # 以降その行はコメントと見なされます。 データの間に空行を入れると、空行で分けられた点と点はプロットした際に線で結ばれなくなります。 ファイル内の複数のデータをプロットする plot \u0026#34;test.dat\u0026#34; using 1:2 with lines,\\ \u0026#34;test.dat\u0026#34; using 1:3 with lines,\\ \u0026#34;test.dat\u0026#34; using 1:4 with lines test.dat # x y1 y2 y3 1 0 0 0 2 14 19 24 3 50 60 70 x 座標を共有する、複数のデータをまとめて上のようなフォーマットで記述することができます。 using 1:2 は 1 列目のデータ (x) と、 2 列目のデータ (y1) を使用することを示しています。 つまり、上の例では 3 本の線が引かれることになります。 プロットデータを直接入力する Syntax plot \u0026#39;-\u0026#39; [with line_style] [x1] y1 [x2] y2 [x3] y3 : e x 座標を省略すると、0, 1, 2 \u0026hellip; が指定されたと見なされます。 例 plot \u0026#39;-\u0026#39; with linespoints 0 0 1 12 2 34 3 20 e"
+},
+{
+url: "/p/bi5jyer/",
+title: ".proto の文法: スカラー型の一覧",
+date: "2022-12-13T00:00:00Z",
+body: ".proto の文法: スカラー型の一覧 Protocol Buffers の .proto ファイルの中で使用可能なスカラー型と、各言語の型の対応表です。 スカラー型は、メッセージ型 の各フィールドの型として使用できます。 protobuf C++ Java/Kotlin Go Dart double double double float64 double float float float float32 double int32 int32 int int32 int int64 int64 long int64 Int64 uint32 uint32 int uint32 int uint64 uint64 long uint64 Int64 sint32 int32 int int32 int sint64 int64 long int64 Int64 fixed32 uint32 int uint32 int fixed64 uint64 long uint64 Int64 sfixed32 int32 int int32 int sfixed64 int64 long int64 Int64 bool bool boolean bool bool string string String string String bytes string ByteString []byte List 次のような repeated フィールドは、配列やリスト（Golang ではスライス）に相当するコードに置き換えられます。 repeated float prices = 2; // Golang なら []float32 になる repeated string snippets = 3; // Golang なら []string になる"
 },
 {
 url: "/p/2yahqx6/",
@@ -1500,6 +1524,54 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/vxixbp3/",
+title: ".proto の文法: oneof 型",
+date: "2022-12-14T00:00:00Z",
+body: ".proto の文法: oneof 型 Protocol Buffers の oneof 型 は、定義したフィールドのうち、いずれか 1 つのフィールドのみに値が格納されていることを示す型です。 次の SampleMessage メッセージ型は、1 つの oneof 型フィールド test_oneof を持っています。 message SampleMessage { oneof test_oneof { string name = 4; SubMessage sub_message = 9; }}上記の oneof ブロックには name フィールドと sub_message フィールドが定義されていますが、これらのいずれかのフィールドに値が格納されることを示しています。 実際にどのフィールドに値が格納されているかを調べる方法は、各言語の protobuf ライブラリ実装によって異なります。 下記は C++ の例です。 SampleMessage message; message.set_name(\u0026#34;maku\u0026#34;); if (message.has_name()) { // ... } oneof のフィールドに値をセットすると、同じ oneof に含まれる他のフィールドの値はクリアされることに注意してください。"
+},
+{
+url: "/p/p5wjbwq/",
+title: ".proto の文法: 列挙型 (enum)",
+date: "2022-12-14T00:00:00Z",
+body: ".proto の文法: 列挙型 (enum) 列挙型とは Protocol Buffers の 列挙型 は、取り得る値が、あらかじめ定義された定数の中からのみ選択可能であることを示す型で、.proto ファイルの中で enum キーワードを使って定義します。 下記の例では、Corpus という列挙型を定義し、SearchRequest メッセージ型のフィールドとして使用しています。 sample.proto enum Corpus { CORPUS_UNSPECIFIED = 0; CORPUS_UNIVERSAL = 1; CORPUS_WEB = 2; CORPUS_IMAGES = 3; CORPUS_LOCAL = 4; CORPUS_NEWS = 5; CORPUS_PRODUCTS = 6; CORPUS_VIDEO = 7;}message SearchRequest { string query = 1; int32 page_number = 2; int32 result_per_page = 3; Corpus corpus = 4;} .proto のコーディングスタイル では、すべての列挙値の名前には、型名に相当するプレフィックス を付けるべしとされています（上記の CORPUS_ の部分）。 型名が 3 語以上で構成されていたりして長い場合は、略称のプレフィックスが使われることもあるようです。 0 という値にマップされるものには、サフィックスとして _UNSPECIFIED を付けるよう推奨されています（上記の CORPUS_UNSPECIFIED）。 これは、コーディングスタイルという観点だけではなく、proto2 との互換性確保の理由もあります。 列挙型の定数値には、32 ビット整数の範囲内で値を割り当てあることができますが、負の値は非効率 なので使うべきではないとされています。 エイリアス値の定義 (allow_alias) 列挙値はデフォルトでは同じ値を持つことはできませんが、allow_alias オプションを true に設定することでエイリアス（別名）を定義できるようになります。 エイリアスの定義 enum EnumAllowingAlias { option allow_alias = true; EAA_UNSPECIFIED = 0; EAA_STARTED = 1; EAA_RUNNING = 1; EAA_FINISHED = 2;} 上記の EAA_RUNNING は、EAA_STARTED のエイリアスとして使用することができます。"
+},
+{
+url: "/tech/network/grpc/syntax/import/",
+title: ".proto の文法: 別の .proto ファイルをインポートする (import)",
+date: "2022-12-14T00:00:00Z",
+body: ".proto の文法: 別の .proto ファイルをインポートする (import) .proto ファイルをインポートする (import) Protocol Buffers の .proto 内で import ステートメントを使用すると、他の .proto ファイルの内容を取り込むことができます。 次の例では、main.proto から other.proto の内容をインポートして、OtherMessage というメッセージ型を参照しています。 proto/message/main.proto（インポートする側） syntax = \u0026#34;proto3\u0026#34;;option go_package = \u0026#34;example.com/myapp/message\u0026#34;;import \u0026#34;message/other.proto\u0026#34;;message MainMessage { OtherMessage other = 1;} proto/message/other.proto（インポートされる側） syntax = \u0026#34;proto3\u0026#34;;option go_package = \u0026#34;example.com/myapp/message\u0026#34;;message OtherMessage { string content = 1;} インポートのパスは、デフォルトでは protoc コマンドを実行したディレクトリからの相対パスで指定します。 起点となるディレクトリを変更したい場合は、protoc コマンドの --proto_path オプションで、.proto ファイルを配置したルートディレクトリを指定します。 .proto ファイルが proto ディレクトリ以下にある場合 $ protoc --go_out=. --go_opt=paths=source_relative --proto_path=proto message/main.proto 上記のように実行すると、proto/message/main.proto ファイル（およびそこからインポートされているファイル）を入力情報として、message/main.pb.go が生成されます。 参考: protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler) 参考: Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント） インポートした内容を再公開する (import public) 別の .proto ファイルをインポートするときに、import public を使用すると、インポートした内容（メッセージ型の定義など）を自分自身が定義しているかのように公開することができます。 以下の例では、main.proto は other1.proto しかインポートしていませんが、間接的に other2.proto で定義している Other2Message メッセージ型を参照しています。 main.proto syntax = \u0026#34;proto3\u0026#34;;import \u0026#34;other1.proto\u0026#34;;message MainMessage { Other2Message other2 = 1;} other1.proto syntax = \u0026#34;proto3\u0026#34;;import public \u0026#34;other2.proto\u0026#34;; other2.proto syntax = \u0026#34;proto3\u0026#34;;message Other2Message { string content = 1;}"
+},
+{
+url: "/p/yakoi7q/",
+title: ".proto ファイルの書き方",
+date: "2022-12-14T00:00:00Z",
+body: ".proto ファイルの書き方"
+},
+{
+url: "/p/88gow5c/",
+title: "gRPC / Protocol Buffers 関連メモ",
+date: "2022-12-14T00:00:00Z",
+body: "gRPC / Protocol Buffers 関連メモ"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2022-12-14T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/nd3cmt3/",
+title: "ネットワーク関連技術メモ",
+date: "2022-12-14T00:00:00Z",
+body: "ネットワーク関連技術メモ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-12-14T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/c9sar9p/",
 title: "Cloudflare 関連メモ",
 date: "2022-12-11T00:00:00Z",
@@ -1510,30 +1582,6 @@ url: "/p/rn7p7n5/",
 title: "Cloudflare Workers をはじめる (wrangler)",
 date: "2022-12-11T00:00:00Z",
 body: "Cloudflare Workers をはじめる (wrangler) Workers とは？ Cloudflare Workers は、Cloudflare 社が提供しているサーバレスプラットフォームで、Web リクエストに応じたレスポンスを返すサービスを簡単に構築することができます。 Workers は世界中に配置されたエッジサーバーで実行されるため、クライアントからの要求に高速に応答することができます。 Azure Functions や AWS Lambda と同じようなサービスですが、それらに比べて Workers は、より高速かつ安価という特徴を持っています。 毎日 10 万リクエストまで無料 で使えるので、趣味用途であれば、無料枠だけでいろいろ試せます。 本記事の作業を進めるには、あらかじめ Cloudflare のアカウントを作成しておく必要があります。 下記から無料で作成できます。 Cloudflare Workers を開始する - Sign Up Wrangler をインストールする Worker の開発やデプロイには、wrangler という公式のコマンドラインツールを使用します。 Node.js の npm コマンドを使って、次のようにインストールできます。 wrangler コマンドのインストール $ npm install wrangler -g Cloudflont へのアクセスを許可する (wrangler login) wrangler コマンドを実行できるようになったら、wrangler login を実行して、Cloudflare のアカウントと関連づけます。 Cloudflare へのサインイン $ wrangler login ⛅️ wrangler 2.6.2 ------------------- Attempting to login via OAuth... Web ブラウザーが自動的に開いて、Wrangler から Cloudflare のデータにアクセスしてよいか尋ねられるので Allow ボタンを押して許可します。 これで、wrangler の各種コマンドを実行できるようになります。 サインインした状態で wrangler whoami コマンドを実行すると、どの Cloudflare ユーザーでサインインしているかを確認できます。 現在のサインイン状態を確認 $ wrangler whoami ⛅️ wrangler 2.6.2 ------------------- Getting User settings... 👋 You are logged in with an OAuth Token, associated with the email \u0026#39;XXXX@gmail.com\u0026#39;! ┌──────────────────────────┬──────────────────────────────────┐ │ Account Name │ Account ID │ ├──────────────────────────┼──────────────────────────────────┤ │ XXXX@gmail.com\u0026#39;s Account │ a79fd54644844825ded71b264152dc7c │ └──────────────────────────┴──────────────────────────────────┘ 🔓 Token Permissions: If scopes are missing, you may need to logout and re-login. Scope (Access) - account (read) - user (read) - workers (write) - workers_kv (write) - workers_routes (write) - workers_scripts (write) - workers_tail (read) - d1 (write) - pages (write) - zone (read) - offline_access Worker プロジェクトを作成する (wrangler init) wranger init \u0026lt;プロジェクト名\u0026gt; を実行すると、Worker プロジェクトのテンプレートコードを生成できます（いわゆる scaffold 処理です）。 Worker プロジェクト (hello) を新規作成 $ wrangler init hello ⛅️ wrangler 2.6.2 ------------------- Using npm as package manager. ✨ Created hello/wrangler.toml Would you like to use git to manage this Worker? (y/n) ✨ Initialized git repository at hello No package.json found. Would you like to create one? (y/n) ✨ Created hello/package.json Would you like to use TypeScript? (y/n) ✨ Created hello/tsconfig.json Would you like to create a Worker at hello/src/index.ts? None ❯ Fetch handler Scheduled handler 次のような質問をされますが、基本はすべて Enter でデフォルトのまま進めていけば OK です。 Git リポジトリとして初期化するか？（デフォルト: Yes） package.json ファイルを作成するか？（デフォルト: Yes） TypeScript を使用するか？（デフォルト: Yes） どのタイプのハンドラーコードを生成するか？（デフォルト: Fetch handler） プロジェクトの初期化が終了すると次のようなファイルが配置されます。 hello/ +-- .git/ +-- .gitignore +-- node_modules/ +-- package-lock.json +-- package.json +-- src/index.tsx +-- tsconfig.json +-- wrangler.toml 開発用のローカルサーバーを起動する (wrangler dev) wrangler init によって生成される src/index.ts ファイルは次のような感じの実装になっています。 HTTP リクエストを受けて Hello World! というレスポンスを返すだけですね。 src/index.ts export default { async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise\u0026lt;Response\u0026gt; { return new Response(\u0026#34;Hello World!\u0026#34;) } } この Worker 実装をローカルサーバーでテストするには、wrangler dev コマンドを実行します。 package.json で NPM スクリプトが定義されているので npm start でも OK です（wrangler コマンドをローカルインストールした場合は npm start を使います）。 ローカルサーバーを起動 $ wrangler dev ⛅️ wrangler 2.6.2 ------------------- ⬣ Listening at http://0.0.0.0:8787 - http://127.0.0.1:8787 - http://192.168.1.7:8787 Total Upload: 0.19 KiB / gzip: 0.16 KiB ╭────────────────────────────────────────────────────────────────────────────────────────────────╮ │ [b] open a browser, [d] open Devtools, [l] turn on local mode, [c] clear console, [x] to exit │ ╰────────────────────────────────────────────────────────────────────────────────────────────────╯ デフォルトでは http://localhost:8787 でアクセス可能なローカルサーバーが起動します。 コンソール上で B キーを入力すると、Web ブラウザでページを開くことができます。 次のように表示されれば成功です。 図: ローカルサーバーでの Worker のテスト Cloudflare Workers へのデプロイ (wrangler publish) ローカルサーバーでの動作確認が済んだら、wrangler publish コマンドで Cloudflare Workers へデプロイできます。 Worker のデプロイ $ wrangler publish ⛅️ wrangler 2.6.2 ------------------- Total Upload: 0.19 KiB / gzip: 0.16 KiB Uploaded hello (0.61 sec) Published hello (3.81 sec) https://hello.\u0026lt;ユーザー名\u0026gt;.workers.dev Current Deployment ID: b7e28af5-f244-422b-ae64-00bd796e536e デプロイは一瞬で完了して、自動的に https://\u0026lt;プロジェクト名\u0026gt;.\u0026lt;ユーザー名\u0026gt;.workers.dev という URL が割り当てられます。 デフォルトで公開状態になるので、Web ブラウザや curl コマンドでアクセスすれば、Hello World! というレスポンスが返ってきます。 $ curl https://hello.XXXX.workers.dev Hello World! デプロイまでとても簡単にできました！ ٩(๑❛ᴗ❛๑)۶ わーぃ ちなみに、デプロイ先の Worker 名は --name オプションで変更できます。 $ wrangler publish --name hello-stg あとかたづけ (wrangler delete) Cloudflare Workers は呼び出しごとの従量課金なので、Worker をたくさん作って放置しておいても特にお金はかかりませんが、不要な Worker は削除しておいた方がよいでしょう。 Worker の削除には、wrangler delete コマンドを使用します。 Worker (hello) の削除 $ wrangler delete ⛅️ wrangler 2.6.2 ------------------- Are you sure you want to delete hello? This action cannot be undone. (y/n) Successfully deleted hello スッキリスッキリ ( ⁎ᵕᴗᵕ⁎ )"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2022-12-11T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-12-11T00:00:00Z",
-body: "技術系のメモ"
-},
-{
-url: "/p/nd3cmt3/",
-title: "ネットワーク関連技術メモ",
-date: "2022-12-03T00:00:00Z",
-body: "ネットワーク関連技術メモ"
-},
-{
-url: "/p/88gow5c/",
-title: "gRPC / Protocol Buffers 関連メモ",
-date: "2022-11-29T00:00:00Z",
-body: "gRPC / Protocol Buffers 関連メモ"
 },
 {
 url: "/p/ikw7gpz/",
