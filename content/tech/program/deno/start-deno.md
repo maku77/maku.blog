@@ -26,7 +26,7 @@ Deno には次のような特徴があります。
 - npm モジュールのサポート（2022 年に追加）
 - 公式のサーバレス環境 Deno Deploy が提供されている
 
-Node.js の時代は、TypeScript 環境や ESLint の設定に四苦八苦することが多かったのですが、そこから解放されるだけでもうれしいです。
+Node.js の時代は、TypeScript 環境の準備や ESLint、Prettier の設定など、本質的ではないことに時間を取られがちでしたが、Deno であれば最初から全部入りなので、時間を有効活用できて幸せな人生を送ることができます。
 Golang や Rust の開発体験のよさに、TypeScript/JavaScript が追いついた感じですね。
 
 
@@ -38,7 +38,7 @@ Deno（`deno` コマンド）のインストールは、下記ページの説明
 - [Installation | Manual | Deno](https://deno.land/manual/getting_started/installation)
 
 例えば、macOS/Linux や Window 環境では次のようにコマンド実行すれば、数秒でインストールは完了します。
-`deno` はホームディレクトリ以下 (`~/.deno/bin`) にインストールされるので、管理者権限で実行する必要はありません（バイナリが 1 つ配置されるだけ）。
+`deno` はホームディレクトリ以下 (`~/.deno/bin`) にインストールされるので、管理者権限で実行する必要はありません（バイナリが 1 つ配置されるだけです）。
 
 {{< code lang="console" title="macOS/Linux の場合" >}}
 $ curl -fsSL https://deno.land/x/install/install.sh | sh
