@@ -1,6 +1,6 @@
 ---
 title: ".proto の文法: 別の .proto ファイルをインポートする (import)"
-permalink: "/p/e8yeofc/"
+url: "p/e8yeofc/"
 date: "2022-12-14"
 tags: ["Protocol Buffers"]
 ---
@@ -14,7 +14,7 @@ Protocol Buffers の `.proto` 内で __`import`__ ステートメントを使用
 {{< code lang="proto" title="proto/message/main.proto（インポートする側）" hl_lines="5" >}}
 syntax = "proto3";
 
-option go_package = "example.com/myapp/message";
+option go_package = "github.com/maku77/myapp/message";
 
 import "message/other.proto";
 
@@ -26,7 +26,7 @@ message MainMessage {
 {{< code lang="proto" title="proto/message/other.proto（インポートされる側）" >}}
 syntax = "proto3";
 
-option go_package = "example.com/myapp/message";
+option go_package = "github.com/maku77/myapp/message";
 
 message OtherMessage {
   string content = 1;
