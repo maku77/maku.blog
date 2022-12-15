@@ -11,11 +11,11 @@
 <meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
 <meta property="og:image:width" content="1436">
 <meta property="og:image:height" content="746">
-<meta property="og:description" content="Protocol Buffers の .proto ファイルの型定義では、各フィールドの末尾に フィールド番号 を割り当てておく必要があります。
+<meta property="og:description" content="フィールド番号の基本 Protocol Buffers の .proto ファイルの型定義では、各フィールドの末尾に フィールド番号 を割り当てておく必要があります。
 フィールド番号の割り当て例 message SearchRequest { string query = 1; int32 page_number = 2; int32 result_per_page = 3;}  = 記号が使われていますが、そのフィールドに値を代入しているわけではないので注意してください。 Protocol Buffers は、メッセージ送信用にデータをシリアライズ（バイナリ化）するとき、フィールド名の代わりにこのフィールド番号を使用します。 これにより、Protocol Buffers は効率的なデータ転送を実現しています。
 フィールド番号は 1 以上の整数（最大値は 229-1 = 536,870,911）で、メッセージの定義内（同じ階層）で一意になっている必要があります。 必ずしも 1、2、3 のように連番で割り当てる必要はなく、ほぼ任意の数値を割り当てることができますが、19000 ～ 19999 の値は使えません。 これらは、Protocol Buffers ライブラリが内部実装用に予約している値です。 これらの不正な値を使用していると、protoc コマンドなどでコンパイルしようとしたときにエラーになります。
 データをシリアライズするとき、フィールド番号 1～15 の数値は、わずか 1 バイトのデータに変換されるため、頻繁に使用するフィールドには 1～15 のフィールド番号を割り当てておくと効率的な通信を行えます。 とはいえ、フィールド番号が 16～2047 であっても、2 バイトのデータで表現できるので、シビアな通信速度が求められている環境でなければそれほど気にする必要はないでしょう。
-一度割り当てたフィールド番号は、将来にわたって変更してはいけません。 なぜなら、過去のバージョンの .proto を使って実装されたアプリケーションは、古い .proto で割り当てられたフィールド番号で通信しようとするためです。 同じフィールド番号で異なるデータが送られてきたら、アプリケーションはうまく動作しなくなってしまいます。 .proto を更新して非推奨になったフィールドを削除するときは、フィールド番号やフィールド名を使いまわしてしまわないように、reserved キーワードを使って次のように定義しておきます。">
+reserved と deprecated reserved 一度割り当てたフィールド番号は、将来にわたって変更してはいけません。 なぜなら、過去のバージョンの .proto を使って実装されたアプリケーションは、古い .proto で割り当てられたフィールド番号で通信しようとするためです。 同じフィールド番号で異なるデータが送られてきたら、アプリケーションはうまく動作しなくなってしまいます。 .">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -547,7 +547,18 @@
 </span>
 </header>
 <div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents></nav><p>Protocol Buffers の <code>.proto</code> ファイルの型定義では、各フィールドの末尾に <strong><code>フィールド番号</code></strong> を割り当てておく必要があります。</p>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#フィールド番号の基本>フィールド番号の基本</a></li>
+<li><a href=#reserved-と-deprecated>reserved と deprecated</a>
+<ul>
+<li><a href=#reserved>reserved</a></li>
+<li><a href=#deprecated>deprecated</a></li>
+</ul>
+</li>
+</ul>
+</nav><h2 id=フィールド番号の基本>フィールド番号の基本</h2>
+<p>Protocol Buffers の <code>.proto</code> ファイルの型定義では、各フィールドの末尾に <strong><code>フィールド番号</code></strong> を割り当てておく必要があります。</p>
 <figure class=xCodeBlock>
 <figcaption class=xCodeBlock_title>フィールド番号の割り当て例</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=kd>message</span> <span class=nc>SearchRequest</span> <span class=p>{</span><span class=err>
@@ -565,7 +576,9 @@ Protocol Buffers は、メッセージ送信用にデータをシリアライズ
 これらの不正な値を使用していると、<code>protoc</code> コマンドなどでコンパイルしようとしたときにエラーになります。</p>
 <p>データをシリアライズするとき、フィールド番号 1～15 の数値は、わずか 1 バイトのデータに変換されるため、頻繁に使用するフィールドには 1～15 のフィールド番号を割り当てておくと効率的な通信を行えます。
 とはいえ、フィールド番号が 16～2047 であっても、2 バイトのデータで表現できるので、シビアな通信速度が求められている環境でなければそれほど気にする必要はないでしょう。</p>
-<p><strong>一度割り当てたフィールド番号は、将来にわたって変更してはいけません</strong>。
+<h2 id=reserved-と-deprecated>reserved と deprecated</h2>
+<h3 id=reserved>reserved</h3>
+<p><strong>一度割り当てたフィールド番号は、将来にわたって変更してはいけません。</strong>
 なぜなら、過去のバージョンの <code>.proto</code> を使って実装されたアプリケーションは、古い <code>.proto</code> で割り当てられたフィールド番号で通信しようとするためです。
 同じフィールド番号で異なるデータが送られてきたら、アプリケーションはうまく動作しなくなってしまいます。
 <code>.proto</code> を更新して非推奨になったフィールドを削除するときは、フィールド番号やフィールド名を使いまわしてしまわないように、<strong><code>reserved</code></strong> キーワードを使って次のように定義しておきます。</p>
@@ -580,6 +593,11 @@ Protocol Buffers は、メッセージ送信用にデータをシリアライズ
 <p>この例では、<code>2</code>、<code>5～10</code>、<code>40～最大値</code> のフィールド番号の使用と、<code>FOO_AAA</code> と <code>FOO_BBB</code> というフィールド名（この例の場合は列挙値）の使用を制限しています。
 1 つの <code>reserved</code> 行では、数値のリストあるいは文字列のリストのどちらかしか定義できないので、上記のように 2 行に分けて定義する必要があります。
 <code>reserved</code> キーワードは、その名前が示しているように、将来的にこれらのフィールド番号を使うために「予約」しておく、という用途でも使用できます。</p>
+<h3 id=deprecated>deprecated</h3>
+<p><strong>フィールドオプション (field option)</strong> の機能を使って、既存のフィールドに <strong><code>deprecated</code></strong>（非推奨）の印を付けることができます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=kt>int32</span> <span class=n>old_field</span> <span class=o>=</span> <span class=mi>6</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span><span class=err>
+</span></code></pre></div><p>このオプションが付いたフィールドを、Java や Kotlin のコードとして出力すると、<code>@Deprecated</code> アノテーションとして出力されますが、言語によっては何も効果がないことがあります。
+ただ、ドキュメンテーションコメントとしては役に立つので活用するとよいです。</p>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">
