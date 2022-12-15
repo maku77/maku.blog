@@ -3,6 +3,7 @@ title: "Deno プログラミングをはじめる"
 url: "p/d8s6fpz/"
 date: "2022-12-12"
 tags: ["Deno"]
+weight: 1
 ---
 
 Deno とは
@@ -71,5 +72,26 @@ V8 エンジンと TypeScript 環境も同時に更新されるので、`deno` �
 Deno で Hello World
 ----
 
+{{< code lang="ts" title="hello.ts" >}}
+console.log("Hello World");
+{{< /code >}}
 
+Deno の Hello World プログラムです。
+TypeScript コードで書かれていますが、JavaScript へトランスパイルする必要はなく、__`deno run`__ コマンドで直接実行できます。
+
+```console
+$ deno run hello.ts
+Hello World
+```
+
+ここでは、ローカルの `.ts` ファイルを実行しましたが、次のように Web 上の `.ts` ファイルを実行することもできます。
+
+```console
+$ deno run https://deno.land/std@0.168.0/examples/welcome.ts
+Welcome to Deno!
+```
+
+これで、Deno プログラミングの準備が整いました！
+
+٩(๑❛ᴗ❛๑)۶ わーぃ
 
