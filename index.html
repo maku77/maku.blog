@@ -44,7 +44,12 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
-<a href=./tech/network/grpc/syntax/import/>
+<a href=./p/sp9q7o5/>
+.proto の文法: optional ラベル（フィールドを省略可能にする）
+<time>2022-12-15</time></a>
+</div>
+<div class=xBoxLink>
+<a href=./p/e8yeofc/>
 .proto の文法: 別の .proto ファイルをインポートする (import)
 <time>2022-12-14</time></a>
 </div>
@@ -54,19 +59,14 @@
 <time>2022-12-14</time></a>
 </div>
 <div class=xBoxLink>
-<a href=./p/vxixbp3/>
-.proto の文法: oneof 型
+<a href=./p/xpbnycm/>
+.proto の文法: マップ型 (map)
 <time>2022-12-14</time></a>
 </div>
 <div class=xBoxLink>
-<a href=./p/bi5jyer/>
-.proto の文法: スカラー型の一覧
-<time>2022-12-13</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/w7xkvnb/>
-.proto の文法: フィールド番号について
-<time>2022-12-13</time></a>
+<a href=./p/vxixbp3/>
+.proto の文法: oneof 型
+<time>2022-12-14</time></a>
 </div>
 </div>
 </div>
@@ -134,6 +134,8 @@
 </div><div class=xMenu_tag>
 <a href=./tags/mongodb>mongodb (13)</a>
 </div><div class=xMenu_tag>
+<a href=./tags/protocol-buffers>protocol-buffers (13)</a>
+</div><div class=xMenu_tag>
 <a href=./tags/aws/cognito>aws/cognito (12)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/nginx>nginx (11)</a>
@@ -143,8 +145,6 @@
 <a href=./tags/android>android (10)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/aws/lambda>aws/lambda (10)</a>
-</div><div class=xMenu_tag>
-<a href=./tags/protocol-buffers>protocol-buffers (10)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
 </div><div class=xMenu_tag>
@@ -461,14 +461,14 @@
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
-<a href=./tech/network/grpc/syntax/import/>
+<a href=./p/sp9q7o5/>
+.proto の文法: optional ラベル（フィールドを省略可能にする）<span class=xRecents_item_tag>Protocol Buffers</span><time>2022-12-15</time></a>
+</div><div class=xRecents_item>
+<a href=./p/e8yeofc/>
 .proto の文法: 別の .proto ファイルをインポートする (import)<span class=xRecents_item_tag>Protocol Buffers</span><time>2022-12-14</time></a>
 </div><div class=xRecents_item>
 <a href=./p/p5wjbwq/>
 .proto の文法: 列挙型 (enum)<span class=xRecents_item_tag>Protocol Buffers</span><time>2022-12-14</time></a>
-</div><div class=xRecents_item>
-<a href=./p/vxixbp3/>
-.proto の文法: oneof 型<span class=xRecents_item_tag>Protocol Buffers</span><time>2022-12-14</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -485,10 +485,129 @@
 <span class=xArticle_headerBox_breadcrumb><a href=./p/yakoi7q/>.proto ファイルの書き方</a></span></div>
 <div style=display:flex;margin-top:.8em>
 <div style=width:80px;margin-right:.5em>
-<img src=./p/nd3cmt3/_index.svg style=width:80px;height:80px>
+<img src=./p/88gow5c/_index.svg style=width:80px;height:80px>
 </div>
 <div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./tech/network/grpc/syntax/import/>.proto の文法: 別の .proto ファイルをインポートする (import)</a></h1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/sp9q7o5/>.proto の文法: optional ラベル（フィールドを省略可能にする）</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-12-15>2022-12-15</time><br>
+作成: <time itemprop=datePublished datetime=2022-12-15>2022-12-15</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#proto-のフィールドを省略可能にする-option>.proto のフィールドを省略可能にする (option)</a></li>
+<li><a href=#おまけデフォルト値と-field-presence>（おまけ）デフォルト値と Field presence</a></li>
+</ul>
+</nav><h2 id=proto-のフィールドを省略可能にする-option>.proto のフィールドを省略可能にする (option)</h2>
+<p>Protocol Buffers（<code>.proto</code> ファイル）のフィールド定義で <strong><code>optional</code></strong> というラベルを付けると、そのフィールドへの値のセットがオプショナルであることを示すことができます。
+<code>optional</code> ラベルは、<code>protoc</code> コンパイラの v3.15.0 以降で使用できます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>sample.proto</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=k>option</span> <span class=n>go_package</span> <span class=o>=</span> <span class=s>&#34;github.com/maku77/myapp/pb&#34;</span><span class=p>;</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=kd>message</span> <span class=nc>SampleMessage</span> <span class=p>{</span><span class=err>
+</span><span class=err></span>  <span class=kt>string</span> <span class=kd>message</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>  <span class=c1>// 通常のフィールド
+</span><span class=hl><span class=c1></span>  <span class=k>optional</span> <span class=kt>string</span> <span class=n>description</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span>  <span class=c1>// 省略可能なフィールド
+</span></span><span class=c1></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<p>例えば、上記のような <code>.proto</code> ファイルから、次のように Golang コードを生成すると、</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>protoc --go_out<span class=o>=</span>. --go_opt<span class=o>=</span><span class=nv>paths</span><span class=o>=</span>source_relative sample.proto
+</code></pre></div><p>次のような <code>SampleMessage</code> 型のコードが生成されます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>sample.pb.go</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>SampleMessage</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>state</span>         <span class=nx>protoimpl</span><span class=p>.</span><span class=nx>MessageState</span>
+	<span class=nx>sizeCache</span>     <span class=nx>protoimpl</span><span class=p>.</span><span class=nx>SizeCache</span>
+	<span class=nx>unknownFields</span> <span class=nx>protoimpl</span><span class=p>.</span><span class=nx>UnknownFields</span>
+
+	<span class=nx>Message</span>     <span class=kt>string</span>  <span class=s>`protobuf:&#34;bytes,1,opt,name=message,proto3&#34; json:&#34;message,omitempty&#34;`</span>               <span class=c1>// 通常のフィールド
+</span><span class=hl><span class=c1></span>	<span class=nx>Description</span> <span class=o>*</span><span class=kt>string</span> <span class=s>`protobuf:&#34;bytes,2,opt,name=description,proto3,oneof&#34; json:&#34;description,omitempty&#34;`</span> <span class=c1>// 省略可能なフィールド
+</span></span><span class=c1></span><span class=p>}</span></code></pre></div></div>
+</figure>
+<p>Golang の場合は、オプショナルな <code>string</code> フィールドは、<code>*string</code> として表現されるようですね。</p>
+<p>データの受信側で、実際にフィールドに値がセットされているかを調べる方法は、各言語の protobuf ライブラリによって異なります。
+例えば、C++ の場合は、<code>has_description()</code> というメソッドで <code>description</code> フィールドに値がセットされているかどうかを調べることができます。
+これは、<a href=./p/vxixbp3/>oneof フィールド</a> に値がセットされていることを調べる方法と同様です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>各言語での optional フィールドの存在確認</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>if (m.has_foo()) {...}  // C++ の場合
+if (m.HasFoo) {...}     // C# の場合
+if m.Foo != nil {...}   // Go の場合
+if (m.hasFoo()) {...}   // Java の場合
+if (m.hasFoo()) {...}   // Javascript の場合
+if m.HasField(&#39;foo&#39;):   // Python の場合
+if m.has_foo?           // Ruby の場合</code></pre></div></div>
+</figure>
+<h2 id=おまけデフォルト値と-field-presence>（おまけ）デフォルト値と Field presence</h2>
+<p>Protocol Buffers では、バイナリ化したデータ形式のこと <strong>wire 形式</strong> と読んでいます。
+例えば、ファイルへの保存時や、gRPC のリクエスト送信時に使われるときのデータ形式です。
+Protocol Buffers では、フィールドの型ごとに下記のようなデフォルト値が定義されており、データを wire 形式にシリアライズするときに、これらの <strong>デフォルト値を保存しない</strong> ようになっています（ネットワークなどで送信されません）。</p>
+<ul>
+<li>数値型: <code>0</code></li>
+<li>bool 型: <code>false</code></li>
+<li>enum 型: <code>0</code> を持つ enum 値（つまり、先頭の <code>XXXX_UNSPECIFIED</code>）</li>
+<li>string 型、bytes 型、repeated ラベルの付いた型: 長さが 0 のデータ</li>
+<li>message 型: 各言語の null に相当するデータ</li>
+</ul>
+<p>これは、データサイズを削減するための proto3 の仕様です。
+データの受信側では、フィールドに対応する値が入っていなければ、デフォルト値がセットされているものとして振る舞います。
+この仕様は、データの送信側がフィールドの値を明示的にセットしなかった場合に問題になります。
+例えば、送信側がある数値型のフィールドをセットしなかった場合、受信側はそのフィールドにデフォルト値の <code>0</code> が格納されていると判断しますが、意図的に <code>0</code> がセットされたのか、値がセットされなかったのかを区別できません。</p>
+<p>そこで、値がセットされない可能性があるフィールドには <code>optional</code> ラベルを付加することで、wire 形式のデータに、<strong>フィールドの値の有無を示す情報</strong> を付加できるようにしています。
+このようなフィールドのことを、<strong>Explicit Presence</strong> と呼んでいます。
+明示的に値の存在を示す、ということですね。
+逆に、通常のフィールドでは、このような値の存在を示す情報は付加されないので、<strong>No Presence</strong> と呼ばれています。</p>
+<p><code>options</code> ラベルの付いたフィールドと、通常のフィールドの本質的な違いは、このような Field presence 情報の扱いだけです。</p>
+<ul>
+<li>参考: <a href=https://github.com/protocolbuffers/protobuf/blob/main/docs/field_presence.md>Application note: Field presence</a></li>
+</ul>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/vxixbp3/>.proto の文法: oneof 型</a></li>
+<li><a href=./p/xpbnycm/>.proto の文法: マップ型 (map)</a></li>
+<li><a href=./p/p5wjbwq/>.proto の文法: 列挙型 (enum)</a></li>
+<li><a href=./p/e8yeofc/>.proto の文法: 別の .proto ファイルをインポートする (import)</a></li>
+<li><a href=./p/napwb4e/>.proto の文法: サービス型 (service)</a></li>
+<li><a href=./p/bi5jyer/>.proto の文法: スカラー型の一覧</a></li>
+<li><a href=./p/w7xkvnb/>.proto の文法: フィールド番号について</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/yakoi7q/><span class=xArticle_up_label>.proto ファイルの書き方</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/nd3cmt3/>ネットワーク</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/88gow5c/>gRPC / Protocol Buffers</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/yakoi7q/>.proto ファイルの書き方</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=width:80px;margin-right:.5em>
+<img src=./p/88gow5c/_index.svg style=width:80px;height:80px>
+</div>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/e8yeofc/>.proto の文法: 別の .proto ファイルをインポートする (import)</a></h1>
 <div class=xPageTags>
 <span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>
 </div>
@@ -512,7 +631,7 @@
 <figcaption class=xCodeBlock_title>proto/message/main.proto（インポートする側）</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
 </span><span class=err>
-</span><span class=err></span><span class=k>option</span> <span class=n>go_package</span> <span class=o>=</span> <span class=s>&#34;example.com/myapp/message&#34;</span><span class=p>;</span><span class=err>
+</span><span class=err></span><span class=k>option</span> <span class=n>go_package</span> <span class=o>=</span> <span class=s>&#34;github.com/maku77/myapp/message&#34;</span><span class=p>;</span><span class=err>
 </span><span class=err>
 </span><span class=hl><span class=err></span><span class=k>import</span> <span class=s>&#34;message/other.proto&#34;</span><span class=p>;</span><span class=err>
 </span></span><span class=err>
@@ -524,7 +643,7 @@
 <figcaption class=xCodeBlock_title>proto/message/other.proto（インポートされる側）</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
 </span><span class=err>
-</span><span class=err></span><span class=k>option</span> <span class=n>go_package</span> <span class=o>=</span> <span class=s>&#34;example.com/myapp/message&#34;</span><span class=p>;</span><span class=err>
+</span><span class=err></span><span class=k>option</span> <span class=n>go_package</span> <span class=o>=</span> <span class=s>&#34;github.com/maku77/myapp/message&#34;</span><span class=p>;</span><span class=err>
 </span><span class=err>
 </span><span class=err></span><span class=kd>message</span> <span class=nc>OtherMessage</span> <span class=p>{</span><span class=err>
 </span><span class=err></span>  <span class=kt>string</span> <span class=n>content</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
@@ -576,12 +695,12 @@
 <h3 style="border-bottom:1px solid gray">関連記事</h3>
 <ul>
 <li><a href=./p/vxixbp3/>.proto の文法: oneof 型</a></li>
+<li><a href=./p/xpbnycm/>.proto の文法: マップ型 (map)</a></li>
 <li><a href=./p/p5wjbwq/>.proto の文法: 列挙型 (enum)</a></li>
+<li><a href=./p/napwb4e/>.proto の文法: サービス型 (service)</a></li>
 <li><a href=./p/bi5jyer/>.proto の文法: スカラー型の一覧</a></li>
 <li><a href=./p/w7xkvnb/>.proto の文法: フィールド番号について</a></li>
 <li><a href=./p/7h3hu8k/>.proto の文法: メッセージ型 (message)</a></li>
-<li><a href=./p/ikw7gpz/>Protocol Buffers の .proto ファイルから API ドキュメントを自動生成する (protoc-gen-doc)</a></li>
-<li><a href=./p/ij4jv9k/>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）</a></li>
 </ul>
 <div class=xPageTags>
 <span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>
@@ -603,7 +722,7 @@
 <span class=xArticle_headerBox_breadcrumb><a href=./p/yakoi7q/>.proto ファイルの書き方</a></span></div>
 <div style=display:flex;margin-top:.8em>
 <div style=width:80px;margin-right:.5em>
-<img src=./p/nd3cmt3/_index.svg style=width:80px;height:80px>
+<img src=./p/88gow5c/_index.svg style=width:80px;height:80px>
 </div>
 <div style=flex:1>
 <h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/p5wjbwq/>.proto の文法: 列挙型 (enum)</a></h1>
@@ -671,79 +790,12 @@
 <h3 style="border-bottom:1px solid gray">関連記事</h3>
 <ul>
 <li><a href=./p/vxixbp3/>.proto の文法: oneof 型</a></li>
-<li><a href=./tech/network/grpc/syntax/import/>.proto の文法: 別の .proto ファイルをインポートする (import)</a></li>
+<li><a href=./p/xpbnycm/>.proto の文法: マップ型 (map)</a></li>
+<li><a href=./p/e8yeofc/>.proto の文法: 別の .proto ファイルをインポートする (import)</a></li>
+<li><a href=./p/napwb4e/>.proto の文法: サービス型 (service)</a></li>
 <li><a href=./p/bi5jyer/>.proto の文法: スカラー型の一覧</a></li>
 <li><a href=./p/w7xkvnb/>.proto の文法: フィールド番号について</a></li>
 <li><a href=./p/7h3hu8k/>.proto の文法: メッセージ型 (message)</a></li>
-<li><a href=./p/ikw7gpz/>Protocol Buffers の .proto ファイルから API ドキュメントを自動生成する (protoc-gen-doc)</a></li>
-<li><a href=./p/ij4jv9k/>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/yakoi7q/><span class=xArticle_up_label>.proto ファイルの書き方</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/nd3cmt3/>ネットワーク</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/88gow5c/>gRPC / Protocol Buffers</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/yakoi7q/>.proto ファイルの書き方</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=./p/nd3cmt3/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/vxixbp3/>.proto の文法: oneof 型</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-12-14>2022-12-14</time><br>
-作成: <time itemprop=datePublished datetime=2022-12-14>2022-12-14</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents></nav><p>Protocol Buffers の <strong>oneof 型</strong> は、定義したフィールドのうち、いずれか 1 つのフィールドのみに値が格納されていることを示す型です。
-次の <code>SampleMessage</code> メッセージ型は、1 つの <code>oneof</code> 型フィールド <code>test_oneof</code> を持っています。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=kd>message</span> <span class=nc>SampleMessage</span> <span class=p>{</span><span class=err>
-</span><span class=err></span>  <span class=k>oneof</span> <span class=n>test_oneof</span> <span class=p>{</span><span class=err>
-</span><span class=err></span>    <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span><span class=err>
-</span><span class=err></span>    <span class=n>SubMessage</span> <span class=n>sub_message</span> <span class=o>=</span> <span class=mi>9</span><span class=p>;</span><span class=err>
-</span><span class=err></span>  <span class=p>}</span><span class=err>
-</span><span class=err></span><span class=p>}</span><span class=err>
-</span></code></pre></div><p>上記の <code>oneof</code> ブロックには <code>name</code> フィールドと <code>sub_message</code> フィールドが定義されていますが、これらのいずれかのフィールドに値が格納されることを示しています。
-実際にどのフィールドに値が格納されているかを調べる方法は、各言語の protobuf ライブラリ実装によって異なります。
-下記は C++ の例です。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=n>SampleMessage</span> <span class=n>message</span><span class=p>;</span>
-
-<span class=n>message</span><span class=p>.</span><span class=n>set_name</span><span class=p>(</span><span class=s>&#34;maku&#34;</span><span class=p>);</span>
-<span class=k>if</span> <span class=p>(</span><span class=n>message</span><span class=p>.</span><span class=n>has_name</span><span class=p>())</span> <span class=p>{</span>
-    <span class=c1>// ...
-</span><span class=c1></span><span class=p>}</span>
-</code></pre></div><p><code>oneof</code> のフィールドに値をセットすると、同じ <code>oneof</code> に含まれる他のフィールドの値はクリアされることに注意してください。</p>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/p5wjbwq/>.proto の文法: 列挙型 (enum)</a></li>
-<li><a href=./tech/network/grpc/syntax/import/>.proto の文法: 別の .proto ファイルをインポートする (import)</a></li>
-<li><a href=./p/bi5jyer/>.proto の文法: スカラー型の一覧</a></li>
-<li><a href=./p/w7xkvnb/>.proto の文法: フィールド番号について</a></li>
-<li><a href=./p/7h3hu8k/>.proto の文法: メッセージ型 (message)</a></li>
-<li><a href=./p/ikw7gpz/>Protocol Buffers の .proto ファイルから API ドキュメントを自動生成する (protoc-gen-doc)</a></li>
-<li><a href=./p/ij4jv9k/>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）</a></li>
 </ul>
 <div class=xPageTags>
 <span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>

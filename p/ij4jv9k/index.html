@@ -60,7 +60,12 @@
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
-<a href=../../tech/network/grpc/syntax/import/>
+<a href=../../p/sp9q7o5/>
+.proto の文法: optional ラベル（フィールドを省略可能にする）
+<time>2022-12-15</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/e8yeofc/>
 .proto の文法: 別の .proto ファイルをインポートする (import)
 <time>2022-12-14</time></a>
 </div>
@@ -70,19 +75,14 @@
 <time>2022-12-14</time></a>
 </div>
 <div class=xBoxLink>
-<a href=../../p/vxixbp3/>
-.proto の文法: oneof 型
+<a href=../../p/xpbnycm/>
+.proto の文法: マップ型 (map)
 <time>2022-12-14</time></a>
 </div>
 <div class=xBoxLink>
-<a href=../../p/bi5jyer/>
-.proto の文法: スカラー型の一覧
-<time>2022-12-13</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/w7xkvnb/>
-.proto の文法: フィールド番号について
-<time>2022-12-13</time></a>
+<a href=../../p/vxixbp3/>
+.proto の文法: oneof 型
+<time>2022-12-14</time></a>
 </div>
 </div>
 </div>
@@ -182,6 +182,8 @@
 </div><div class=xMenu_tag>
 <a href=../../tags/mongodb>mongodb (13)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/protocol-buffers>protocol-buffers (13)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/aws/cognito>aws/cognito (12)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/nginx>nginx (11)</a>
@@ -191,8 +193,6 @@
 <a href=../../tags/android>android (10)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/aws/lambda>aws/lambda (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/protocol-buffers>protocol-buffers (10)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
 </div><div class=xMenu_tag>
@@ -525,7 +525,7 @@
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/88gow5c/>gRPC / Protocol Buffers</a></span></div>
 <div style=display:flex;margin-top:.8em>
 <div style=width:80px;margin-right:.5em>
-<img src=../../p/nd3cmt3/_index.svg style=width:80px;height:80px>
+<img src=../../p/88gow5c/_index.svg style=width:80px;height:80px>
 </div>
 <div style=flex:1>
 <h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/ij4jv9k/>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）</a></h1>
@@ -580,10 +580,10 @@
 </code></pre></div><p>あとは、gRPC サーバーとクライアントの実装に使用する gRPC-Go パッケージの依存関係を追加しておきます。</p>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>go get google.golang.org/grpc
 </code></pre></div><h2 id=proto-ファイルを作成する>.proto ファイルを作成する</h2>
-<p><code>protos/echo/echo.proto</code> ファイルを作成して、次のように記述します。
+<p><code>proto/echo/echo.proto</code> ファイルを作成して、次のように記述します。
 Go 言語用のオプション <code>option go_package</code> で、出力する <code>.go</code> ファイルを <code>echo</code> パッケージに配置するように指定しています。</p>
 <figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>protos/echo/echo.proto</figcaption>
+<figcaption class=xCodeBlock_title>proto/echo/echo.proto</figcaption>
 <div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
 </span><span class=err>
 </span><span class=err></span><span class=kn>package</span> <span class=nn>echo</span><span class=p>;</span><span class=err>
@@ -612,8 +612,8 @@ Go 言語用のオプション <code>option go_package</code> で、出力する
          --go_opt=paths=source_relative \
          --go-grpc_out=. \
          --go-grpc_opt=paths=source_relative \
-         --proto_path=protos \
-         protos/echo/*.proto
+         --proto_path=proto \
+         proto/echo/*.proto
 </code></pre><p>それぞれのオプションは次のような意味があります。</p>
 <ul>
 <li><strong><code>--go_out</code></strong> &mldr; <code>protoc-gen-go</code> プラグインによる生成コードの出力先ディレクトリ</li>
@@ -624,7 +624,7 @@ Go 言語用のオプション <code>option go_package</code> で、出力する
 </ul>
 <p><strong><code>--go_out</code></strong> オプションを指定することでシリアライズ用のコード (<code>echo.pb.go</code>) を生成、<strong><code>--go-grpc_out</code></strong> オプションを指定することで gRPC 用のスタブコード (<code>echo_grpc.pb.go</code>) を生成してくれます。
 追加のオプションで、<strong><code>paths=source_relative</code></strong> を指定することにより、入力ファイル (<code>.proto</code>) と同じディレクトリ構成で <code>.go</code> ファイルを出力するようにしています。
-さらに、<strong><code>--proto_path=protos</code></strong> というオプションを指定することで、出力先のディレクトリ階層には <code>protos</code> を含めないようにしています。</p>
+さらに、<strong><code>--proto_path=proto</code></strong> というオプションを指定することで、出力先のディレクトリ階層には <code>proto</code> を含めないようにしています。</p>
 <p>今回はカレントディレクトリ (<code>.</code>) を出力のルートに指定しているので、結果的に次のように <code>.go</code> ファイルが生成されることになります。</p>
 <table>
 <thead>
@@ -636,12 +636,12 @@ Go 言語用のオプション <code>option go_package</code> で、出力する
 </thead>
 <tbody>
 <tr>
-<td><code>protos/echo/echo.proto</code></td>
+<td><code>proto/echo/echo.proto</code></td>
 <td><code>protoc-gen-go</code></td>
 <td><strong><code>echo/echo.pb.go</code></strong></td>
 </tr>
 <tr>
-<td><code>protos/echo/echo.proto</code></td>
+<td><code>proto/echo/echo.proto</code></td>
 <td><code>protoc-gen-go-grpc</code></td>
 <td><strong><code>echo/echo_grpc.pb.go</code></strong></td>
 </tr>
