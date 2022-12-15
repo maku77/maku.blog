@@ -70,7 +70,7 @@ libprotoc 3.20.0
 
 次のような簡単な `.proto` ファイルを入力ファイルとして用意します。
 
-{{< code lang="proto" title="protos/person.proto" >}}
+{{< code lang="proto" title="proto/person.proto" >}}
 syntax = "proto3";
 
 message Person {
@@ -87,7 +87,7 @@ __`--csharp_out=<OUT_DIR>`__ というオプションで、C# ソースコード
 
 ```console
 $ mkdir gen
-$ protoc --csharp_out=gen protos/person.proto
+$ protoc --csharp_out=gen proto/person.proto
 $ ls gen
 Person.cs
 ```
@@ -98,7 +98,7 @@ Python 用のソースコードを生成したければ、同様に次のよう�
 出力ディレクトリは __`--python_out=<OUT_DIR>`__ オプションで指定します。
 
 ```console
-$ protoc --python_out=gen protos/person.proto
+$ protoc --python_out=gen proto/person.proto
 ```
 
 ### その他の言語のコードを生成
@@ -147,7 +147,7 @@ protoc-gen-go v1.28.0
 
 Go 言語用のコードを出力する場合は、`.proto` ファイル内の __`option go_package`__ でパッケージ名を設定しておく必要があります。
 
-{{< code lang="proto" title="protos/person.proto" >}}
+{{< code lang="proto" title="proto/person.proto" >}}
 syntax = "proto3";
 
 option go_package = "example.com/myapp";
@@ -162,7 +162,7 @@ message Person {
 次のようにすると、`gen` ディレクトリ以下に Go コードが生成されます。
 
 ```console
-$ protoc --go_out=gen protos/person.proto
+$ protoc --go_out=gen proto/person.proto
 ```
 
 `.proto` ファイルで指定したパッケージ名に従ってディレクトリ階層ができます。
@@ -175,11 +175,11 @@ gen/example.com/myapp/person.pb.go
 
 ```
 $ protoc --go_out=gen \
-         --go_opt=Mprotos/person.proto=example.com/myapp \
-         protos/person.proto
+         --go_opt=Mproto/person.proto=example.com/myapp \
+         proto/person.proto
 ```
 
-`=` が 2 回出てくるのでちょっと分かりにくいですが、`protos/person.proto` ファイルのパッケージ名を `example.com/myapp` に設定しています。
+`=` が 2 回出てくるのでちょっと分かりにくいですが、`proto/person.proto` ファイルのパッケージ名を `example.com/myapp` に設定しています。
 
 {{% reference %}}
 - [Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）](/p/ij4jv9k/)
