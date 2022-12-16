@@ -52,6 +52,8 @@ repeated string snippets = 3;  // Golang なら []string になる
 
 フィールドの定義に __`repeated`__ ラベルを付けると、配列やリスト（Golang ではスライス）を表すフィールドとして扱われます。
 
+- [repeated ラベル（フィールドを配列にする）](/p/b2q2jmh/)
+
 ### 省略可能を示す optional ラベル
 
 ```proto

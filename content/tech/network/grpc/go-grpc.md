@@ -77,6 +77,8 @@ message EchoResponse {
 
 ここでは、`EchoService` というサービスが、`Echo` というメソッドを提供するよう定義しています。
 
+- 参考: [.proto の文法: サービス型 (service)](/p/napwb4e/)
+
 
 .proto ファイルをコンパイルする
 ----
@@ -102,7 +104,9 @@ $ protoc --go_out=. \
 
 __`--go_out`__ オプションを指定することでシリアライズ用のコード (`echo.pb.go`) を生成、__`--go-grpc_out`__ オプションを指定することで gRPC 用のスタブコード (`echo_grpc.pb.go`) を生成してくれます。
 追加のオプションで、__`paths=source_relative`__ を指定することにより、入力ファイル (`.proto`) と同じディレクトリ構成で `.go` ファイルを出力するようにしています。
-さらに、__`--proto_path=proto`__ というオプションを指定することで、出力先のディレクトリ階層には `proto` を含めないようにしています。
+
+さらに、__`--proto_path=proto`__ というオプションで、`.proto` ファイル群のルートディレクトリを指定しています。
+これにより、出力先のディレクトリには `proto` ではなく `echo` ディレクトリが生成されるようになります。
 
 今回はカレントディレクトリ (`.`) を出力のルートに指定しているので、結果的に次のように `.go` ファイルが生成されることになります。
 
@@ -216,7 +220,7 @@ func main() {
 	// TCP ポートをオープンできるか確認
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
+		log.Fatalf("Failed to listen: %v\n", err)
 	}
 
 	// gRPC サーバーを生成し、EchoService サーバーの実装を登録する
@@ -224,9 +228,9 @@ func main() {
 	echo.RegisterEchoServiceServer(s, &server{})
 
 	// gRPC サーバーを稼働開始
-	log.Printf("Server listening at %v", lis.Addr())
+	log.Printf("Server listening at %v\n", lis.Addr())
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("Failed to serve: %v", err)
+		log.Fatalf("Failed to serve: %v\n", err)
 	}
 }
 {{< /code >}}
@@ -257,19 +261,19 @@ func main() {
 	// EchoService サーバーへ接続する
 	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("Did not connect: %v", err)
+		log.Fatalf("Did not connect: %v\n", err)
 	}
 	defer conn.Close()
-	c := echo.NewEchoServiceClient(conn)
+	client := echo.NewEchoServiceClient(conn)
 
 	// Echo メソッドを呼び出す
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	r, err := c.Echo(ctx, &echo.EchoRequest{Message: "AAAAA"})
+	r, err := client.Echo(ctx, &echo.EchoRequest{Message: "AAAAA"})
 	if err != nil {
-		log.Fatalf("Could not echo: %v", err)
+		log.Fatalf("Could not echo: %v\n", err)
 	}
-	log.Printf("Received from server: %s", r.GetMessage())
+	log.Printf("Received from server: %s\n", r.GetMessage())
 }
 {{< /code >}}
 
