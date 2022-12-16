@@ -60,6 +60,11 @@
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/b2q2jmh/>
+.proto の文法: repeated ラベル（フィールドを配列にする）
+<time>2022-12-16</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/sp9q7o5/>
 .proto の文法: optional ラベル（フィールドを省略可能にする）
 <time>2022-12-15</time></a>
@@ -77,11 +82,6 @@
 <div class=xBoxLink>
 <a href=../../p/xpbnycm/>
 .proto の文法: マップ型 (map)
-<time>2022-12-14</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/vxixbp3/>
-.proto の文法: oneof 型
 <time>2022-12-14</time></a>
 </div>
 </div>
@@ -176,13 +176,13 @@
 </div><div class=xMenu_tag>
 <a href=../../tags/electron>electron (15)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/protocol-buffers>protocol-buffers (14)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/vs-code>vs-code (14)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/javascript>javascript (13)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/mongodb>mongodb (13)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/protocol-buffers>protocol-buffers (13)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/aws/cognito>aws/cognito (12)</a>
 </div><div class=xMenu_tag>
@@ -608,6 +608,9 @@ Go 言語用のオプション <code>option go_package</code> で、出力する
 </span><span class=err></span><span class=p>}</span></code></pre></div></div>
 </figure>
 <p>ここでは、<code>EchoService</code> というサービスが、<code>Echo</code> というメソッドを提供するよう定義しています。</p>
+<ul>
+<li>参考: <a href=../../p/napwb4e/>.proto の文法: サービス型 (service)</a></li>
+</ul>
 <h2 id=proto-ファイルをコンパイルする>.proto ファイルをコンパイルする</h2>
 <p><code>protoc</code> コマンドを実行して、<code>.proto</code> ファイルからシリアライズ用のコードと、gRPC 関連のスタブコードを生成します。</p>
 <pre tabindex=0><code>$ protoc --go_out=. \
@@ -625,8 +628,9 @@ Go 言語用のオプション <code>option go_package</code> で、出力する
 <li><strong><code>--proto_path</code></strong> &mldr; <code>.proto</code> ファイル内で別の <code>.proto</code> ファイルをインポートしようとする場合、ここで指定したディレクトリからの相対パスで指定することになります。また、出力ファイル (<code>.pg.go</code>) のディレクトリ構造を入力ファイル (<code>.proto</code>) のディレクトリ構造に合わせるとき（後述）、ここで指定したパスを取り除いた階層構造で出力されます。</li>
 </ul>
 <p><strong><code>--go_out</code></strong> オプションを指定することでシリアライズ用のコード (<code>echo.pb.go</code>) を生成、<strong><code>--go-grpc_out</code></strong> オプションを指定することで gRPC 用のスタブコード (<code>echo_grpc.pb.go</code>) を生成してくれます。
-追加のオプションで、<strong><code>paths=source_relative</code></strong> を指定することにより、入力ファイル (<code>.proto</code>) と同じディレクトリ構成で <code>.go</code> ファイルを出力するようにしています。
-さらに、<strong><code>--proto_path=proto</code></strong> というオプションを指定することで、出力先のディレクトリ階層には <code>proto</code> を含めないようにしています。</p>
+追加のオプションで、<strong><code>paths=source_relative</code></strong> を指定することにより、入力ファイル (<code>.proto</code>) と同じディレクトリ構成で <code>.go</code> ファイルを出力するようにしています。</p>
+<p>さらに、<strong><code>--proto_path=proto</code></strong> というオプションで、<code>.proto</code> ファイル群のルートディレクトリを指定しています。
+これにより、出力先のディレクトリには <code>proto</code> ではなく <code>echo</code> ディレクトリが生成されるようになります。</p>
 <p>今回はカレントディレクトリ (<code>.</code>) を出力のルートに指定しているので、結果的に次のように <code>.go</code> ファイルが生成されることになります。</p>
 <table>
 <thead>
@@ -740,7 +744,7 @@ Go 言語のプロジェクトで生成する実行ファイルのコードを <
 	<span class=c1>// TCP ポートをオープンできるか確認
 </span><span class=c1></span>	<span class=nx>lis</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>net</span><span class=p>.</span><span class=nf>Listen</span><span class=p>(</span><span class=s>&#34;tcp&#34;</span><span class=p>,</span> <span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;:%d&#34;</span><span class=p>,</span> <span class=nx>port</span><span class=p>))</span>
 	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
-		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;Failed to listen: %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;Failed to listen: %v\n&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
 	<span class=p>}</span>
 
 	<span class=c1>// gRPC サーバーを生成し、EchoService サーバーの実装を登録する
@@ -748,9 +752,9 @@ Go 言語のプロジェクトで生成する実行ファイルのコードを <
 	<span class=nx>echo</span><span class=p>.</span><span class=nf>RegisterEchoServiceServer</span><span class=p>(</span><span class=nx>s</span><span class=p>,</span> <span class=o>&amp;</span><span class=nx>server</span><span class=p>{})</span>
 
 	<span class=c1>// gRPC サーバーを稼働開始
-</span><span class=c1></span>	<span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;Server listening at %v&#34;</span><span class=p>,</span> <span class=nx>lis</span><span class=p>.</span><span class=nf>Addr</span><span class=p>())</span>
+</span><span class=c1></span>	<span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;Server listening at %v\n&#34;</span><span class=p>,</span> <span class=nx>lis</span><span class=p>.</span><span class=nf>Addr</span><span class=p>())</span>
 	<span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>s</span><span class=p>.</span><span class=nf>Serve</span><span class=p>(</span><span class=nx>lis</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
-		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;Failed to serve: %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;Failed to serve: %v\n&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
 	<span class=p>}</span>
 <span class=p>}</span></code></pre></div></div>
 </figure>
@@ -779,19 +783,19 @@ Go 言語のプロジェクトで生成する実行ファイルのコードを <
 	<span class=c1>// EchoService サーバーへ接続する
 </span><span class=c1></span>	<span class=nx>conn</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>grpc</span><span class=p>.</span><span class=nf>Dial</span><span class=p>(</span><span class=nx>addr</span><span class=p>,</span> <span class=nx>grpc</span><span class=p>.</span><span class=nf>WithTransportCredentials</span><span class=p>(</span><span class=nx>insecure</span><span class=p>.</span><span class=nf>NewCredentials</span><span class=p>()))</span>
 	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
-		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;Did not connect: %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;Did not connect: %v\n&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
 	<span class=p>}</span>
 	<span class=k>defer</span> <span class=nx>conn</span><span class=p>.</span><span class=nf>Close</span><span class=p>()</span>
-	<span class=nx>c</span> <span class=o>:=</span> <span class=nx>echo</span><span class=p>.</span><span class=nf>NewEchoServiceClient</span><span class=p>(</span><span class=nx>conn</span><span class=p>)</span>
+	<span class=nx>client</span> <span class=o>:=</span> <span class=nx>echo</span><span class=p>.</span><span class=nf>NewEchoServiceClient</span><span class=p>(</span><span class=nx>conn</span><span class=p>)</span>
 
 	<span class=c1>// Echo メソッドを呼び出す
 </span><span class=c1></span>	<span class=nx>ctx</span><span class=p>,</span> <span class=nx>cancel</span> <span class=o>:=</span> <span class=nx>context</span><span class=p>.</span><span class=nf>WithTimeout</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>Background</span><span class=p>(),</span> <span class=nx>time</span><span class=p>.</span><span class=nx>Second</span><span class=p>)</span>
 	<span class=k>defer</span> <span class=nf>cancel</span><span class=p>()</span>
-	<span class=nx>r</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>c</span><span class=p>.</span><span class=nf>Echo</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span> <span class=o>&amp;</span><span class=nx>echo</span><span class=p>.</span><span class=nx>EchoRequest</span><span class=p>{</span><span class=nx>Message</span><span class=p>:</span> <span class=s>&#34;AAAAA&#34;</span><span class=p>})</span>
+	<span class=nx>r</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>client</span><span class=p>.</span><span class=nf>Echo</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span> <span class=o>&amp;</span><span class=nx>echo</span><span class=p>.</span><span class=nx>EchoRequest</span><span class=p>{</span><span class=nx>Message</span><span class=p>:</span> <span class=s>&#34;AAAAA&#34;</span><span class=p>})</span>
 	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
-		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;Could not echo: %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;Could not echo: %v\n&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
 	<span class=p>}</span>
-	<span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;Received from server: %s&#34;</span><span class=p>,</span> <span class=nx>r</span><span class=p>.</span><span class=nf>GetMessage</span><span class=p>())</span>
+	<span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;Received from server: %s\n&#34;</span><span class=p>,</span> <span class=nx>r</span><span class=p>.</span><span class=nf>GetMessage</span><span class=p>())</span>
 <span class=p>}</span></code></pre></div></div>
 </figure>
 <h2 id=実行してみる>実行してみる</h2>
