@@ -10,10 +10,12 @@ changes:
 GraphQL Code Generator とは
 ----
 
-__GraphQL Code Generator__ は、GraphQL スキーマ (`schema.graphqls`) とクエリ用のドキュメント (`query {...}`) を入力として与えることで、さまざまな言語とライブラリに対応した型情報を生成するツールです。
+__GraphQL Code Generator (graphql-codegen)__ は、GraphQL スキーマ (`schema.graphqls`) とクエリ用のドキュメント (`query {...}`) を入力として与えることで、さまざまな言語とライブラリに対応した型情報を生成するツールです。
 
 - [公式 Web サイト - GraphQL Code Generator](https://www.the-guild.dev/graphql/codegen)
 - [GitHub リポジトリ - dotansimha/graphql-code-generator](https://github.com/dotansimha/graphql-code-generator)
+
+{{< image src="img-001.drawio.svg" title="graphql-codegen の動作概要" >}}
 
 C# や Dart 用のコードも生成できるようですが、ツール自体が NPM パッケージとして提供されているので、やはり TypeScript がメインターゲットですね。
 クライアント側で、React + Apollo Client のフレームワークを使用している場合は、Apollo Client のフック API (`useQuery`) に渡すためのオブジェクトを生成してくれます。
