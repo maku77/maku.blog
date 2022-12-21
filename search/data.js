@@ -1,15 +1,15 @@
 var data = [
 {
+url: "/p/ujqinda/",
+title: "プログラミング",
+date: "2022-12-21T00:00:00Z",
+body: "プログラミング"
+},
+{
 url: "/p/d8s6fpz/",
 title: "Deno プログラミングをはじめる",
 date: "2022-12-12T00:00:00Z",
 body: "Deno プログラミングをはじめる Deno とは Deno（発音: ディーノ）は、Node.js の作者であるライアン・ダール (Ryan Dahl) 氏が作成した JavaScript/TypeScript の実行環境です。 Deno という名前は、Node を逆にしたネーミングになっています。 Node.js での反省を活かした改善が行われており、今後は Node.js ではなく Deno で作成されるアプリケーションが増えていくと思われます。 Deno には次のような特徴があります。 シンプルな 1 つの実行ファイル（deno コマンド）で提供 ネイティブに TypeScript 実行をサポート（tsc コマンドのインストールが不要） 各種開発ツールを deno コマンドに標準搭載 deno fmt \u0026hellip; フォーマッター deno lint \u0026hellip; Lint ツール deno test \u0026hellip; テストランナー deno bundle \u0026hellip; バンドラー（1 つの JS や実行ファイルにまとめる） package.json で依存モジュールを管理する必要がない Promise ベースの API 実装 Rust 実装による高速動作（当初は Golang 実装だった） npm モジュールのサポート（2022 年に追加） 公式のサーバレス環境 Deno Deploy が提供されている Node.js の時代は、TypeScript 環境の準備や ESLint、Prettier の設定など、本質的ではないことに時間を取られがちでしたが、Deno であれば最初から全部入りなので、時間を有効活用できて幸せな人生を送ることができます。 Golang や Rust の開発体験のよさに、TypeScript/JavaScript が追いついた感じですね。 Deno のインストール Deno（deno コマンド）のインストールは、下記ページの説明に従えば簡単に終わります。 Installation | Manual | Deno 例えば、macOS/Linux や Window 環境では次のようにコマンド実行すれば、数秒でインストールは完了します。 deno はホームディレクトリ以下 (~/.deno/bin) にインストールされるので、管理者権限で実行する必要はありません（バイナリが 1 つ配置されるだけです）。 macOS/Linux の場合 $ curl -fsSL https://deno.land/x/install/install.sh | sh Windows の場合 (PowerShell) $ irm https://deno.land/install.ps1 | iex deno コマンドが実行できるようになっていれば OK です。 $ deno --version deno 1.28.3 (release, x86_64-pc-windows-msvc) v8 10.9.194.5 typescript 4.8.3 一度 deno コマンドをインストールしてしまえば、その後のバージョンアップは deno コマンド自身のサブコマンドで行えます。 deno のバージョンを更新する場合 $ deno upgrade # 最新バージョンへ更新 $ deno upgrade --version 1.28.3 # バージョンを指定（バージョンダウンも簡単） V8 エンジンと TypeScript 環境も同時に更新されるので、deno のバージョンだけ気にしていれば済みます。 とっても楽です。 Deno で Hello World hello.ts console.log(\u0026#34;Hello World\u0026#34;); Deno の Hello World プログラムです。 TypeScript コードで書かれていますが、JavaScript へトランスパイルする必要はなく、deno run コマンドで直接実行できます。 $ deno run hello.ts Hello World ここでは、ローカルの .ts ファイルを実行しましたが、次のように Web 上の .ts ファイルを実行することもできます。 $ deno run https://deno.land/std@0.168.0/examples/welcome.ts Welcome to Deno! これで、Deno プログラミングの準備が整いました！ ٩(๑❛ᴗ❛๑)۶ わーぃ"
-},
-{
-url: "/p/ujqinda/",
-title: "プログラミング",
-date: "2022-12-12T00:00:00Z",
-body: "プログラミング"
 },
 {
 url: "/p/io4gs6h/",
@@ -1530,6 +1530,12 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/dp4r2wz/",
+title: "Deno プログラミング関連メモ",
+date: "2022-12-21T00:00:00Z",
+body: "Deno プログラミング関連メモ"
+},
+{
 url: "/p/cm9nyco/",
 title: "GraphQL 関連記事",
 date: "2022-12-21T00:00:00Z",
@@ -1540,6 +1546,12 @@ url: "/p/adxcp3g/",
 title: "GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する",
 date: "2022-12-21T00:00:00Z",
 body: "GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する graphql-schema-linter とは？ graphql-schema-linter は、GraphQL スキーマファイル (*.graphqls) の記述の不備を指摘してくれる Linter です。 スキーマファーストなアプローチで GraphQL サーバー／クライアントを実装している場合は、Linter は早い段階で導入しておくことをお勧めします。 graphql-schema-linter のインストール graphql-schema-linter コマンドは、yarn あるいは npm でインストールできます。 依存パッケージである graphql も一緒にインストールする必要があります（package.json ファイルがない場合は、先に npm init で作成しておいてください）。 graphql-schema-linter のインストール # yarn の場合 $ yarn add --dev graphql graphql-schema-linter # npm の場合 $ npm install --save-dev graphql graphql-schema-linter 次のように実行できるようになっていれば OK です。 コマンドを実行できるか確認 $ npx graphql-schema-linter --help ...（ヘルプ表示）... コマンド名が長いので、npm スクリプトを定義して、yarn lint だけで実行できるようにしておくと便利です。 最低限の package.json ファイルは次のような感じになります。 package.json { \u0026#34;license\u0026#34;: \u0026#34;UNLICENSED\u0026#34;, \u0026#34;scripts\u0026#34;: { \u0026#34;lint\u0026#34;: \u0026#34;graphql-schema-linter graph/*.graphqls\u0026#34; }, \u0026#34;devDependencies\u0026#34;: { \u0026#34;graphql\u0026#34;: \u0026#34;^16.6.0\u0026#34;, \u0026#34;graphql-schema-linter\u0026#34;: \u0026#34;^3.0.1\u0026#34; } } graphql-schema-linter の実行 前述のような package.json を定義していれば、yarn lint でスキーマの lint チェックを実行できます。 lint 実行例 $ yarn lint yarn run v1.22.17 $ graphql-schema-linter graph/*.graphqls D:\\gitwork\\maku77\\myapp\\graph\\schema.graphqls 1:1 The object type `Query` is missing a description. types-have-descriptions 1:1 A `PageInfo` object type is required as per the Relay spec. relay-page-info-spec 3:9 The `hardId` argument of `games` is missing a description. arguments-have-descriptions 7:1 The scalar type `Hardware` is missing a description. types-have-descriptions 31:3 The field `Game.serial` is missing a description. fields-have-descriptions 38:1 The fields of object type `Maker` should be sorted in alphabetical order. type-fields-sorted-alphabetically × 6 errors detected error Command failed with exit code 1. info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. オブジェクト型のフィールドがアルファベット順にソートされていないとか、コメント (description) が抜けている、といった指摘を行ってくれます。 もちろん、これに従うだけでよいスキーマ設計ができるわけではありませんが、一定の品質を保つためには導入しておくのがよさそうです。 スキーマ定義のベストプラクティスは下記を参考にしてください。 参考: GraphQL ベストプラクティス"
+},
+{
+url: "/p/zbaga2z/",
+title: "Node.js と Deno のコーディング方法の違いまとめ",
+date: "2022-12-21T00:00:00Z",
+body: "Node.js と Deno のコーディング方法の違いまとめ Deno でのコーディングは、Node.js とほぼ同様の書き方で行えますが、いくつか押さえておきたいポイントがあるのでまとめておきます。 Web ブラウザーで使える JavaScript の標準 API、例えば fetch API や、それに付随する Request や Response インタフェースをデフォルトで使用することができます。 JavaScript 標準ではない API は、Deno.xxx という形の静的メソッド／プロパティで提供されています。Deno が提供している API ということが分かりやすいです。下記は、コマンドライン引数を参照するときの例です。 Deno の場合: Deno.argv[0] Node の場合: process.argv[0] npm モジュールは、npm specifier というフォーマット (npm:xxx) でインポート可能です。さらに、型定義が DefinitelyTyped で提供されている場合は、コメントで @deno-types ディレクティブを使って指定できます。 // @deno-types=\u0026#34;npm:@types/express@^4.17\u0026#34;; import express from \u0026#34;npm:express@^4.17\u0026#34;; const app = express(); npm モジュールのインポート方法として、esm.sh や Skypack CDN といった CDN を利用する方法もあります。 import React from \u0026#34;https://esm.sh/react@~16.13.0\u0026#34;; import React from \u0026#34;https://cdn.skypack.dev/react@~16.13.0\u0026#34;; Deno 用のモジュールは deno.land レジストリで管理されています。 deno.land/std/ \u0026hellip; Deno の標準ライブラリが提供されています。 import { copy } from \u0026#34;https://deno.land/std@0.168.0/fs/copy.ts\u0026#34;; deno.land/std/node \u0026hellip; 従来の Node API をエミュレートするためのレイヤーです。例えば、std/node/global.ts は、Node のグローバル変数 process を提供します。 deno.land/x/ \u0026hellip; 3rd パーティモジュールが提供されています。実際には、コードがある場所にリダイレクトしているだけです。"
 },
 {
 url: "/",
@@ -1612,12 +1624,6 @@ url: "/p/napwb4e/",
 title: ".proto の文法: サービス型 (service)",
 date: "2022-12-13T00:00:00Z",
 body: ".proto の文法: サービス型 (service) Protoco Buffers の サービス型 は、クライアントとサーバー間の通信方法 (RPC メソッド群) を定義するための型で、.proto ファイルの中で service キーワードを使って定義します。 次の例では、Echo メソッドを持つ EchoService サービス型を定義しています。 // Echo メソッドを持つ EchoService の定義 service EchoService { rpc Echo (EchoRequest) returns (EchoResponse);}// Echo に送るリクエストメッセージの定義 message EchoRequest { string message = 1; optional string payload = 2;}// Echo が返すレスポンスメッセージの定義 message EchoResponse { string message = 1;}引数と戻り値の方には、上記のように単一のメッセージ型を指定します。 スカラー型を指定することはできないので、単一の値を渡したいときも、独自のメッセージ型を用意する必要があります。 慣例として、引数の型には Request、戻り値の型には Response というサフィックスを付けます。 引数や戻り値が存在しない場合は、Google が用意している google.protobuf.Empty 型を使用することができます。 import \u0026#34;google/protobuf/empty.proto\u0026#34;;service HelloService { rpc Hello(google.protobuf.Empty) returns (google.protobuf.Empty);}ただ、将来的に何らかの値を渡す可能性がある場合は、独自の空っぽのメッセージ型を定義しておくのがよいでしょう。 service HelloService { rpc Hello(HelloRequest) returns (HelloResponse);}message HelloRequest {}message HelloResponse {}RPC の通信プロトコルは、独自で実装してしまうことも可能ですが、多くの場合は Google が作った gRPC というプロトコルを使います。 というより、gRPC による通信を実現するために、Protocol Buffers (protobuf) によるシリアライズを使用することになるというケースが多いと思います。 protoc コマンド本体には、gRPC 用のスタブコードを生成する機能は入っていないので、protoc のプラグイン（protoc-gen-go-grpc など）を入れてコード生成することになります。 参考: Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）"
-},
-{
-url: "/p/dp4r2wz/",
-title: "Deno プログラミング関連メモ",
-date: "2022-12-12T00:00:00Z",
-body: "Deno プログラミング関連メモ"
 },
 {
 url: "/p/c9sar9p/",
