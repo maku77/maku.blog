@@ -6,7 +6,7 @@ tags: ["Deno"]
 weight: 1
 ---
 
-Deno とは
+Deno とは？
 ----
 
 [Deno](https://deno.land/)（発音: ディーノ）は、Node.js の作者であるライアン・ダール (Ryan Dahl) 氏が作成した JavaScript/TypeScript の実行環境です。
@@ -16,12 +16,14 @@ Deno には次のような特徴があります。
 
 - シンプルな 1 つの実行ファイル（`deno` コマンド）で提供
 - ネイティブに TypeScript 実行をサポート（`tsc` コマンドのインストールが不要）
-- 各種開発ツールを `deno` コマンドに標準搭載
+- ゼロコンフィグで開発を始められる（必要に応じて `deno.json` を用意することも可能）
+- `package.json` で依存モジュールを管理する必要がない
+- 各種開発ツールを `deno` サブコマンドで標準搭載
   - `deno fmt` ... フォーマッター
   - `deno lint` ... Lint ツール
   - `deno test` ... テストランナー
   - `deno bundle` ... バンドラー（1 つの JS や実行ファイルにまとめる）
-- `package.json` で依存モジュールを管理する必要がない
+- クロスプラットフォームな `deno task`（Node の `npm run` に相当）
 - Promise ベースの API 実装
 - Rust 実装による高速動作（当初は Golang 実装だった）
 - npm モジュールのサポート（2022 年に追加）
