@@ -12,7 +12,8 @@
 <meta property="og:image:width" content="1436">
 <meta property="og:image:height" content="746">
 <meta property="og:description" content="Deno でのコーディングは、Node.js とほぼ同様の書き方で行えますが、いくつか押さえておきたいポイントがあるのでまとめておきます。
- Web ブラウザーで使える JavaScript の標準 API、例えば fetch API や、それに付随する Request や Response インタフェースをデフォルトで使用することができます。 JavaScript 標準ではない API は、Deno.xxx という形の静的メソッド／プロパティで提供されています。Deno が提供している API ということが分かりやすいです。下記は、コマンドライン引数を参照するときの例です。  Deno の場合: Deno.argv[0] Node の場合: process.argv[0]   npm モジュールは、npm specifier というフォーマット (npm:xxx) でインポート可能です。さらに、型定義が DefinitelyTyped で提供されている場合は、コメントで @deno-types ディレクティブを使って指定できます。 // @deno-types=&#34;npm:@types/express@^4.17&#34;; import express from &#34;npm:express@^4.17&#34;; const app = express();  npm モジュールのインポート方法として、esm.sh や Skypack CDN といった CDN を利用する方法もあります。 import React from &#34;https://esm.sh/react@~16.13.0&#34;; import React from &#34;https://cdn.skypack.dev/react@~16.13.0&#34;;  Deno 用のモジュールは deno.">
+Web Platform APIs  Web ブラウザーで使える JavaScript の標準 API、例えば fetch API や、それに付随する Request や Response インタフェースをデフォルトで使用することができます。 これは、Chrome や Firefox などのブラウザ上で動作する JavaScript で使える API と同様の API を使えるということです。もちろん、Deno の実行環境はブラウザではないので、セキュリティモデルなどに微妙に違いがありますが、インタフェースが統一されているので学習コストが低いです。  Web Platform API の一覧は、こちらを参照してください。
+Deno APIs / Built-in APIs  JavaScript 標準ではない、組み込みの API (Deno API) は、Deno という namespace 以下のメソッド／プロパティとして提供されています。Deno が提供している API ということが一目でわかります。下記は、コマンドライン引数を参照するときの例です。 Deno.argv[0] // Deno の場合 process.argv[0] // Node の場合  Deno API 呼び出し時に発生するエラーは、Deno.errors namespace に定義されています。 Deno API には、まだ安定版 (stable) になっていないものがあり、それらを使う場合は、deno run 実行時に --unstable オプションを指定します。  Deno namespace の API の一覧は、こちらを参照してください。">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -552,15 +553,40 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 </span>
 </header>
 <div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents></nav><p>Deno でのコーディングは、Node.js とほぼ同様の書き方で行えますが、いくつか押さえておきたいポイントがあるのでまとめておきます。</p>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#web-platform-apis>Web Platform APIs</a></li>
+<li><a href=#deno-apis--built-in-apis>Deno APIs / Built-in APIs</a></li>
+<li><a href=#standard-library-standard-modules>Standard Library (standard modules)</a></li>
+<li><a href=#npm-モジュール>npm モジュール</a></li>
+<li><a href=#denoland-レジストリ>deno.land レジストリ</a></li>
+</ul>
+</nav><p>Deno でのコーディングは、Node.js とほぼ同様の書き方で行えますが、いくつか押さえておきたいポイントがあるのでまとめておきます。</p>
+<h2 id=web-platform-apis>Web Platform APIs</h2>
 <ul>
 <li>Web ブラウザーで使える JavaScript の標準 API、例えば <a href=https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API>fetch API</a> や、それに付随する <a href=https://developer.mozilla.org/en-US/docs/Web/API/Request>Request</a> や <a href=https://developer.mozilla.org/en-US/docs/Web/API/Response>Response</a> インタフェースをデフォルトで使用することができます。</li>
-<li>JavaScript 標準ではない API は、<strong><code>Deno.xxx</code></strong> という形の静的メソッド／プロパティで提供されています。Deno が提供している API ということが分かりやすいです。下記は、コマンドライン引数を参照するときの例です。
-<ul>
-<li>Deno の場合: <code>Deno.argv[0]</code></li>
-<li>Node の場合: <code>process.argv[0]</code></li>
+<li>これは、Chrome や Firefox などのブラウザ上で動作する JavaScript で使える API と同様の API を使えるということです。もちろん、Deno の実行環境はブラウザではないので、セキュリティモデルなどに微妙に違いがありますが、インタフェースが統一されているので学習コストが低いです。</li>
 </ul>
-</li>
+<p>Web Platform API の一覧は、<a href=https://deno.land/manual/runtime/web_platform_apis>こちらを参照</a>してください。</p>
+<h2 id=deno-apis--built-in-apis>Deno APIs / Built-in APIs</h2>
+<ul>
+<li>JavaScript 標準ではない、組み込みの API (Deno API) は、<strong><code>Deno</code></strong> という namespace 以下のメソッド／プロパティとして提供されています。Deno が提供している API ということが一目でわかります。下記は、コマンドライン引数を参照するときの例です。
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>Deno</span><span class=p>.</span><span class=nx>argv</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span>     <span class=c1>// Deno の場合
+</span><span class=c1></span><span class=nx>process</span><span class=p>.</span><span class=nx>argv</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span>  <span class=c1>// Node の場合
+</span></code></pre></div></li>
+<li>Deno API 呼び出し時に発生するエラーは、<a href="https://deno.land/api?s=Deno.errors">Deno.errors</a> namespace に定義されています。</li>
+<li>Deno API には、まだ安定版 (stable) になっていないものがあり、それらを使う場合は、<code>deno run</code> 実行時に <strong><code>--unstable</code></strong> オプションを指定します。</li>
+</ul>
+<p>Deno namespace の API の一覧は、<a href="https://deno.land/api?s=Deno">こちらを参照</a>してください。</p>
+<h2 id=standard-library-standard-modules>Standard Library (standard modules)</h2>
+<ul>
+<li>Deno は <code>Deno</code> namespace 以下のグローバルな Deno API 以外にも、様々な標準ライブラリ（std モジュール）を提供しています。</li>
+<li>std モジュールは、使用時に明示的なインポートが必要です（一方で、Deno API は何もインポートせずに呼び出せます）。</li>
+<li>Deno の std モジュールは、<a href=https://pkg.go.dev/std>Golang の std ライブラリ</a> を参考に実装されています。</li>
+</ul>
+<p>Deno の標準モジュールの一覧は、<a href=https://deno.land/std>こちらを参照</a> してください。</p>
+<h2 id=npm-モジュール>npm モジュール</h2>
+<ul>
 <li>npm モジュールは、<strong>npm specifier</strong> というフォーマット (<code>npm:xxx</code>) でインポート可能です。さらに、型定義が DefinitelyTyped で提供されている場合は、コメントで <strong><code>@deno-types</code></strong> ディレクティブを使って指定できます。
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// @deno-types=&#34;npm:@types/express@^4.17&#34;;
 </span><span class=c1></span><span class=kr>import</span> <span class=nx>express</span> <span class=kr>from</span> <span class=s2>&#34;npm:express@^4.17&#34;</span><span class=p>;</span>
@@ -570,13 +596,29 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=nx>React</span> <span class=kr>from</span> <span class=s2>&#34;https://esm.sh/react@~16.13.0&#34;</span><span class=p>;</span>
 <span class=kr>import</span> <span class=nx>React</span> <span class=kr>from</span> <span class=s2>&#34;https://cdn.skypack.dev/react@~16.13.0&#34;</span><span class=p>;</span>
 </code></pre></div></li>
-<li>Deno 用のモジュールは deno.land レジストリで管理されています。
+</ul>
+<h2 id=denoland-レジストリ>deno.land レジストリ</h2>
+<p>Deno ランタイムに組み込まれていないモジュールは、deno.land レジストリで管理されています。
+下記モジュールが重要です。</p>
 <ul>
-<li><strong><code>deno.land/std/</code></strong> &mldr; Deno の標準ライブラリが提供されています。
+<li><a href=https://deno.land/std>deno.land/std</a>
+<ul>
+<li>Deno の標準ライブラリ (Deno standard library) です。</li>
+<li>使用例:
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>copy</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;https://deno.land/std@0.168.0/fs/copy.ts&#34;</span><span class=p>;</span>
 </code></pre></div></li>
-<li><strong><code>deno.land/std/node</code></strong> &mldr; 従来の Node API をエミュレートするためのレイヤーです。例えば、<a href=https://deno.land/std/node/global.ts>std/node/global.ts</a> は、Node のグローバル変数 <code>process</code> を提供します。</li>
-<li><strong><code>deno.land/x/</code></strong> &mldr; 3rd パーティモジュールが提供されています。実際には、コードがある場所にリダイレクトしているだけです。</li>
+</ul>
+</li>
+<li><a href=https://deno.land/std/node>deno.land/std/node</a>
+<ul>
+<li>従来の Node API をエミュレートするためのモジュールが、標準ライブラリとして提供されています。</li>
+<li>例えば、<a href=https://deno.land/std/node/global.ts>std/node/global.ts</a> は、Node のグローバル変数 <code>process</code> を提供します。</li>
+</ul>
+</li>
+<li><a href=https://deno.land/x>deno.land/x</a>
+<ul>
+<li>3rd パーティモジュールはここで管理されています。</li>
+<li>実際には、コードがある場所にリダイレクトしているだけです。</li>
 </ul>
 </li>
 </ul>
