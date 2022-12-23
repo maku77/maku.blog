@@ -24,6 +24,7 @@ Deno には次のような特徴があります。
   - `deno test` ... テストランナー
   - `deno bundle` ... バンドラー（1 つの JS や実行ファイルにまとめる）
 - クロスプラットフォームな `deno task`（Node の `npm run` に相当）
+- Web ブラウザ上の JavaScript と互換性のある API 定義 (Web Platform APIs)
 - Promise ベースの API 実装
 - Rust 実装による高速動作（当初は Golang 実装だった）
 - npm モジュールのサポート（2022 年に追加）
