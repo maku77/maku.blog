@@ -3,6 +3,7 @@ title: "Deno Deploy で Deno のサーバープログラムを公開する"
 url: "p/phz7fo3/"
 date: "2022-12-24"
 tags: ["Deno"]
+weight: 100
 ---
 
 Deno Deploy とは？

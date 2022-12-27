@@ -3,6 +3,7 @@ title: "Node.js と Deno のコーディング方法の違いまとめ"
 url: "p/zbaga2z/"
 date: "2022-12-21"
 tags: ["Deno"]
+weight: 2
 ---
 
 Deno でのコーディングは、Node.js とほぼ同様の書き方で行えますが、いくつか押さえておきたいポイントがあるのでまとめておきます。
@@ -103,5 +104,7 @@ export {
 import { add, multiply } from "./deps.ts";
 {{< /code >}}
 
-- 参考: [Manage Dependencies | Manual | Deno](https://deno.land/manual/examples/manage_dependencies#example)）
+同様に、開発中のみ使用する依存関係は、__`dev_deps.ts`__ という名前のファイルにまとめるのが慣例です。
+
+- 参考: [Manage Dependencies | Manual | Deno](https://deno.land/manual/examples/manage_dependencies)）
 
