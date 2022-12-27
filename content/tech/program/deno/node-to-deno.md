@@ -75,3 +75,33 @@ Deno ランタイムに組み込まれていないモジュールは、deno.land
   - 3rd パーティモジュールはここで管理されています。
   - 実際には、コードがある場所にリダイレクトしているだけです。
 
+
+mod.ts と deps.ts
+----
+
+### mod.ts
+
+モジュールのエントリポイントとなるファイル名には、慣例として __`mod.ts`__ が使用されます。これは Rust にインスパイアされたものです。
+逆に、`index.ts` のような名前は避けるべきだとされています。
+
+- 参考: [Style Guide | Manual | Deno](https://deno.land/manual/references/contributing/style_guide)
+
+### deps.ts
+
+アプリケーションがインポートするモジュールを一箇所でまとめて定義しておきたい場合は、__`deps.ts`__ という名前のファイルが使われます。
+このファイルで、アプリケーションが使用するメソッドを re-export しておき、他のファイルからはそれをインポートして使用します。
+こうすることで、アプリケーション内で使用するモジュールのバージョンを揃えることができます。
+
+{{< code lang="ts" title="deps.ts" >}}
+export {
+  add,
+  multiply,
+} from "https://x.nest.land/ramda@0.27.0/source/index.js";
+{{< /code >}}
+
+{{< code lang="ts" title="example.ts" >}}
+import { add, multiply } from "./deps.ts";
+{{< /code >}}
+
+- 参考: [Manage Dependencies | Manual | Deno](https://deno.land/manual/examples/manage_dependencies#example)）
+

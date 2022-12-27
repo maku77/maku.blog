@@ -22,7 +22,8 @@ Deno には次のような特徴があります。
   - `deno fmt` ... フォーマッター
   - `deno lint` ... Lint ツール
   - `deno test` ... テストランナー
-  - `deno bundle` ... バンドラー（1 つの JS や実行ファイルにまとめる）
+  - `deno bundle` ... バンドラー（1 つの JavaScript ファイルにまとめる）
+  - `deno compile` ... コンパイラー（OS ごとの実行ファイルを生成する）
 - クロスプラットフォームな `deno task`（Node の `npm run` に相当）
 - Web ブラウザ上の JavaScript と互換性のある API 定義 (Web Platform APIs)
 - Promise ベースの API 実装
