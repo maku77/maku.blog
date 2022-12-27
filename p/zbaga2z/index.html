@@ -60,6 +60,11 @@ Deno APIs / Built-in APIs  JavaScript 標準ではない、組み込みの API (
 <h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=../../p/phz7fo3/>
+Deno Deploy で Deno のサーバープログラムを公開する
+<time>2022-12-24</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/zbaga2z/>
 Node.js と Deno のコーディング方法の違いまとめ
 <time>2022-12-21</time></a>
@@ -78,11 +83,6 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 <a href=../../p/sp9q7o5/>
 .proto の文法: optional ラベル（フィールドを省略可能にする）
 <time>2022-12-15</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/e8yeofc/>
-.proto の文法: 別の .proto ファイルをインポートする (import)
-<time>2022-12-14</time></a>
 </div>
 </div>
 </div>
@@ -314,6 +314,8 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 </div><div class=xMenu_tag>
 <a href=../../tags/cosmos-db>cosmos-db (3)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/deno>deno (3)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/grpc>grpc (3)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/hugo>hugo (3)</a>
@@ -369,8 +371,6 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 <a href=../../tags/aws/sdk>aws/sdk (2)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/azure-app-service>azure-app-service (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/deno>deno (2)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/excel>excel (2)</a>
 </div><div class=xMenu_tag>
@@ -526,7 +526,7 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 <aside>
 <div class=xPrevNextLink>
 <div class=xPrevNextLink_prev>
-<a href=../../p/d8s6fpz/>Deno プログラミングをはじめる</a>
+<a href=../../p/phz7fo3/>Deno Deploy で Deno のサーバープログラムを公開する</a>
 </div>
 </div>
 </aside>
@@ -560,6 +560,12 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 <li><a href=#standard-library-standard-modules>Standard Library (standard modules)</a></li>
 <li><a href=#npm-モジュール>npm モジュール</a></li>
 <li><a href=#denoland-レジストリ>deno.land レジストリ</a></li>
+<li><a href=#modts-と-depsts>mod.ts と deps.ts</a>
+<ul>
+<li><a href=#modts>mod.ts</a></li>
+<li><a href=#depsts>deps.ts</a></li>
+</ul>
+</li>
 </ul>
 </nav><p>Deno でのコーディングは、Node.js とほぼ同様の書き方で行えますが、いくつか押さえておきたいポイントがあるのでまとめておきます。</p>
 <h2 id=web-platform-apis>Web Platform APIs</h2>
@@ -622,6 +628,31 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 </ul>
 </li>
 </ul>
+<h2 id=modts-と-depsts>mod.ts と deps.ts</h2>
+<h3 id=modts>mod.ts</h3>
+<p>モジュールのエントリポイントとなるファイル名には、慣例として <strong><code>mod.ts</code></strong> が使用されます。これは Rust にインスパイアされたものです。
+逆に、<code>index.ts</code> のような名前は避けるべきだとされています。</p>
+<ul>
+<li>参考: <a href=https://deno.land/manual/references/contributing/style_guide>Style Guide | Manual | Deno</a></li>
+</ul>
+<h3 id=depsts>deps.ts</h3>
+<p>アプリケーションがインポートするモジュールを一箇所でまとめて定義しておきたい場合は、<strong><code>deps.ts</code></strong> という名前のファイルが使われます。
+このファイルで、アプリケーションが使用するメソッドを re-export しておき、他のファイルからはそれをインポートして使用します。
+こうすることで、アプリケーション内で使用するモジュールのバージョンを揃えることができます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>deps.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>export</span> <span class=p>{</span>
+  <span class=nx>add</span><span class=p>,</span>
+  <span class=nx>multiply</span><span class=p>,</span>
+<span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;https://x.nest.land/ramda@0.27.0/source/index.js&#34;</span><span class=p>;</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>example.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>add</span><span class=p>,</span> <span class=nx>multiply</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;./deps.ts&#34;</span><span class=p>;</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://deno.land/manual/examples/manage_dependencies#example>Manage Dependencies | Manual | Deno</a>）</li>
+</ul>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">
@@ -643,7 +674,7 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 <aside>
 <div class=xPrevNextLink>
 <div class=xPrevNextLink_prev>
-<a href=../../p/d8s6fpz/>Deno プログラミングをはじめる</a>
+<a href=../../p/phz7fo3/>Deno Deploy で Deno のサーバープログラムを公開する</a>
 </div>
 <div class=xPrevNextLink_next>
 <a href=../../p/d8s6fpz/>Deno プログラミングをはじめる</a>

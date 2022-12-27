@@ -2,14 +2,14 @@ var data = [
 {
 url: "/p/ujqinda/",
 title: "プログラミング",
-date: "2022-12-21T00:00:00Z",
+date: "2022-12-24T00:00:00Z",
 body: "プログラミング"
 },
 {
 url: "/p/d8s6fpz/",
 title: "Deno プログラミングをはじめる",
 date: "2022-12-12T00:00:00Z",
-body: "Deno プログラミングをはじめる Deno とは？ Deno（発音: ディーノ）は、Node.js の作者であるライアン・ダール (Ryan Dahl) 氏が作成した JavaScript/TypeScript の実行環境です。 Deno という名前は、Node を逆にしたネーミングになっています。 Node.js での反省を活かした改善が行われており、今後は Node.js ではなく Deno で作成されるアプリケーションが増えていくと思われます。 Deno には次のような特徴があります。 シンプルな 1 つの実行ファイル（deno コマンド）で提供 ネイティブに TypeScript 実行をサポート（tsc コマンドのインストールが不要） ゼロコンフィグで開発を始められる（必要に応じて deno.json を用意することも可能） package.json で依存モジュールを管理する必要がない 各種開発ツールを deno サブコマンドで標準搭載 deno fmt \u0026hellip; フォーマッター deno lint \u0026hellip; Lint ツール deno test \u0026hellip; テストランナー deno bundle \u0026hellip; バンドラー（1 つの JS や実行ファイルにまとめる） クロスプラットフォームな deno task（Node の npm run に相当） Web ブラウザ上の JavaScript と互換性のある API 定義 (Web Platform APIs) Promise ベースの API 実装 Rust 実装による高速動作（当初は Golang 実装だった） npm モジュールのサポート（2022 年に追加） 公式のサーバレス環境 Deno Deploy が提供されている Node.js の時代は、TypeScript 環境の準備や ESLint、Prettier の設定など、本質的ではないことに時間を取られがちでしたが、Deno であれば最初から全部入りなので、時間を有効活用できて幸せな人生を送ることができます。 Golang や Rust の開発体験のよさに、TypeScript/JavaScript が追いついた感じですね。 Deno のインストール Deno（deno コマンド）のインストールは、下記ページの説明に従えば簡単に終わります。 Installation | Manual | Deno 例えば、macOS/Linux や Window 環境では次のようにコマンド実行すれば、数秒でインストールは完了します。 deno はホームディレクトリ以下 (~/.deno/bin) にインストールされるので、管理者権限で実行する必要はありません（バイナリが 1 つ配置されるだけです）。 macOS/Linux の場合 $ curl -fsSL https://deno.land/x/install/install.sh | sh Windows の場合 (PowerShell) $ irm https://deno.land/install.ps1 | iex deno コマンドが実行できるようになっていれば OK です。 $ deno --version deno 1.28.3 (release, x86_64-pc-windows-msvc) v8 10.9.194.5 typescript 4.8.3 一度 deno コマンドをインストールしてしまえば、その後のバージョンアップは deno コマンド自身のサブコマンドで行えます。 deno のバージョンを更新する場合 $ deno upgrade # 最新バージョンへ更新 $ deno upgrade --version 1.28.3 # バージョンを指定（バージョンダウンも簡単） V8 エンジンと TypeScript 環境も同時に更新されるので、deno のバージョンだけ気にしていれば済みます。 とっても楽です。 Deno で Hello World hello.ts console.log(\u0026#34;Hello World\u0026#34;); Deno の Hello World プログラムです。 TypeScript コードで書かれていますが、JavaScript へトランスパイルする必要はなく、deno run コマンドで直接実行できます。 $ deno run hello.ts Hello World ここでは、ローカルの .ts ファイルを実行しましたが、次のように Web 上の .ts ファイルを実行することもできます。 $ deno run https://deno.land/std@0.168.0/examples/welcome.ts Welcome to Deno! これで、Deno プログラミングの準備が整いました！ ٩(๑❛ᴗ❛๑)۶ わーぃ"
+body: "Deno プログラミングをはじめる Deno とは？ Deno（発音: ディーノ）は、Node.js の作者であるライアン・ダール (Ryan Dahl) 氏が作成した JavaScript/TypeScript の実行環境です。 Deno という名前は、Node を逆にしたネーミングになっています。 Node.js での反省を活かした改善が行われており、今後は Node.js ではなく Deno で作成されるアプリケーションが増えていくと思われます。 Deno には次のような特徴があります。 シンプルな 1 つの実行ファイル（deno コマンド）で提供 ネイティブに TypeScript 実行をサポート（tsc コマンドのインストールが不要） ゼロコンフィグで開発を始められる（必要に応じて deno.json を用意することも可能） package.json で依存モジュールを管理する必要がない 各種開発ツールを deno サブコマンドで標準搭載 deno fmt \u0026hellip; フォーマッター deno lint \u0026hellip; Lint ツール deno test \u0026hellip; テストランナー deno bundle \u0026hellip; バンドラー（1 つの JavaScript ファイルにまとめる） deno compile \u0026hellip; コンパイラー（OS ごとの実行ファイルを生成する） クロスプラットフォームな deno task（Node の npm run に相当） Web ブラウザ上の JavaScript と互換性のある API 定義 (Web Platform APIs) Promise ベースの API 実装 Rust 実装による高速動作（当初は Golang 実装だった） npm モジュールのサポート（2022 年に追加） 公式のサーバレス環境 Deno Deploy が提供されている Node.js の時代は、TypeScript 環境の準備や ESLint、Prettier の設定など、本質的ではないことに時間を取られがちでしたが、Deno であれば最初から全部入りなので、時間を有効活用できて幸せな人生を送ることができます。 Golang や Rust の開発体験のよさに、TypeScript/JavaScript が追いついた感じですね。 Deno のインストール Deno（deno コマンド）のインストールは、下記ページの説明に従えば簡単に終わります。 Installation | Manual | Deno 例えば、macOS/Linux や Window 環境では次のようにコマンド実行すれば、数秒でインストールは完了します。 deno はホームディレクトリ以下 (~/.deno/bin) にインストールされるので、管理者権限で実行する必要はありません（バイナリが 1 つ配置されるだけです）。 macOS/Linux の場合 $ curl -fsSL https://deno.land/x/install/install.sh | sh Windows の場合 (PowerShell) $ irm https://deno.land/install.ps1 | iex deno コマンドが実行できるようになっていれば OK です。 $ deno --version deno 1.28.3 (release, x86_64-pc-windows-msvc) v8 10.9.194.5 typescript 4.8.3 一度 deno コマンドをインストールしてしまえば、その後のバージョンアップは deno コマンド自身のサブコマンドで行えます。 deno のバージョンを更新する場合 $ deno upgrade # 最新バージョンへ更新 $ deno upgrade --version 1.28.3 # バージョンを指定（バージョンダウンも簡単） V8 エンジンと TypeScript 環境も同時に更新されるので、deno のバージョンだけ気にしていれば済みます。 とっても楽です。 Deno で Hello World hello.ts console.log(\u0026#34;Hello World\u0026#34;); Deno の Hello World プログラムです。 TypeScript コードで書かれていますが、JavaScript へトランスパイルする必要はなく、deno run コマンドで直接実行できます。 $ deno run hello.ts Hello World ここでは、ローカルの .ts ファイルを実行しましたが、次のように Web 上の .ts ファイルを実行することもできます。 $ deno run https://deno.land/std@0.168.0/examples/welcome.ts Welcome to Deno! これで、Deno プログラミングの準備が整いました！ ٩(๑❛ᴗ❛๑)۶ わーぃ"
 },
 {
 url: "/p/io4gs6h/",
@@ -1532,8 +1532,26 @@ body: "TypeScriptのサンプルコード"
 {
 url: "/p/dp4r2wz/",
 title: "Deno プログラミング関連メモ",
-date: "2022-12-21T00:00:00Z",
+date: "2022-12-24T00:00:00Z",
 body: "Deno プログラミング関連メモ"
+},
+{
+url: "/p/phz7fo3/",
+title: "Deno Deploy で Deno のサーバープログラムを公開する",
+date: "2022-12-24T00:00:00Z",
+body: "Deno Deploy で Deno のサーバープログラムを公開する Deno Deploy とは？ Deno Deploy を使うと、Deno で作成したサーバープログラムを簡単に公開することができます。 Deno Deploy はエッジサーバーで動作する Deno 実行環境を提供しており、ゼロコンフィグでデプロイすることができます。 TypeScript コードで記述したプログラムがそのまま動きます（Deno なので） CLI ツール (deployctl) や GitHub 統合、GitHub Actions で簡単にデプロイできます デプロイは数秒で終わります（GitHub 連携による Deno Deploy へのデプロイは、Vercel や Cloudflare へのデプロイより 10 倍以上速い） サーバー上で公開されている .ts ファイルを直接デプロイすることができます プレビューサイト用の URL が自動生成されます（もちろん SSL 対応） 1 日に 10 万回までの呼び出しであれば無料で利用できます（それ以上は$10/月からの有料プラン） deployctl のインストール ローカルにある .ts ファイルを Deno Deploy へデプロイするには、CLI コマンドの deployctl を使用します。 このコマンドは、deno コマンドでインストールできます。 deployctl のインストール $ deno install \\ --allow-read --allow-write --allow-env --allow-net --allow-run \\ --no-check -r -f https://deno.land/x/deploy/deployctl.ts ~/.deno/bin/ に deployctl コマンドが配置されれば成功です。 $ deployctl --version deployctl 1.4.0 簡単なサーバープログラムを用意する Deno Deploy にデプロイするための、簡単なサーバープログラムを用意しておきます。 Deno の標準ライブラリ std/http を使うと、簡単に Web サーバーをプログラムを作成できます。 mod.ts import { serve } from \u0026#34;https://deno.land/std@0.170.0/http/server.ts\u0026#34;; function handler(_req: Request): Response { return new Response(\u0026#34;Hello, World!\u0026#34;, { headers: { \u0026#34;content-type\u0026#34;: \u0026#34;text/plain\u0026#34; }, }); } serve(handler); 動作確認 $ deno run --allow-net mod.ts Listening on http://localhost:8000/ serve 関数はデフォルトで 8000 番ポートで待ち受けを行いますが、Deno Deploy を使う場合は、このポートを調整する必要はありません。 Deno Deploy は自動的に 80 番ポートで Web サーバーを公開してくれます。 これで、デプロイ用のファイルの準備ができました。 Deno Deploy にデプロイしてみる Sign Up Deno Deploy を使用するには、GitHub アカウントで Sign Up する必要があります。 Deno Deploy のサイト から Sign Up ボタンを押して、GitHub アカウントと Deno Deploy を連携すると、新しいプロジェクトを作成できるようになります。 アクセストークンの発行 deployctl コマンドでデプロイするときに、アクセストークンが必要になるので、Deno Deploy の設定ページから アクセストークンを発行 しておきます。 発行したアクセストークンは、環境変数 DENO_DEPLOY_TOKEN に設定しておきます。 export ddp_3MkWxJK9NLRkbOZjObTDO1VWotofhR3xbGPz デプロイする ローカルにある .ts ファイルをデプロイするには、deployctl deploy コマンドを使用します。 プロジェクト名は、Deno Deploy 上で作成したプロジェクト名に合わせてください。 $ deployctl deploy --project=hello mod.ts ✔ Project: maku-temp ℹ Uploading all files from the current dir (/Users/maku/hello-server) ✔ Found 2 assets. ✔ Uploaded 2 new assets. ✔ Deployment complete. View at: - https://hello-sgm5da8zw56g.deno.dev 上記のように、自動的にプレビュー URL が割り当てられるので、Web ブラウザーなどでアクセスして Hello, World! と表示されれば成功です。 ٩(๑❛ᴗ❛๑)۶ わーぃ Preview Deployment と Production Deployment Preview Deployment deployctl deploy コマンドでのデプロイは、デフォルトでは Preview Deployment が生成されるようになっており、次のような形式のプレビュー URL が割り当てられます。 {project_name}-{deployment_id}.deno.dev 例えば、https://hello-sgm5da8zw56g.deno.dev のような、ランダムな {deployment_id} の混ざった URL になっています。 {deployment_id} には、デプロイごとに新しい ID が割り当てられ、Deno Deploy の中でそれぞれ異なる Deployment として管理されます。 これらの Deployment は、いわゆるステージング環境であり、サービス公開前のテストに使用できます（URL がバレると自由にアクセスされてしまいますが）。 Production Deployment 本番環境用のデプロイ (Production Deployment) を行いたい場合は、--prod オプションを付けてデプロイを実行します。 $ deployctl deploy --project=hello --prod mod.ts Production Deployment を実行すると、アクセス用の URL は、https://hello.deno.dev のようなシンプルなものになります（独自ドメインを割り当てることもできます）。 すでにデプロイ済みの Preview Deployment を、Production Deployment に格上げすることもできます。 Deno Deploy のサイトの Deployments パネルから対象の Deployment を選択し、Promoto to Production を選択すれば OK です。"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2022-12-24T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2022-12-24T00:00:00Z",
+body: "技術系のメモ"
 },
 {
 url: "/p/cm9nyco/",
@@ -1551,19 +1569,7 @@ body: "GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入�
 url: "/p/zbaga2z/",
 title: "Node.js と Deno のコーディング方法の違いまとめ",
 date: "2022-12-21T00:00:00Z",
-body: "Node.js と Deno のコーディング方法の違いまとめ Deno でのコーディングは、Node.js とほぼ同様の書き方で行えますが、いくつか押さえておきたいポイントがあるのでまとめておきます。 Web Platform APIs Web ブラウザーで使える JavaScript の標準 API、例えば fetch API や、それに付随する Request や Response インタフェースをデフォルトで使用することができます。 これは、Chrome や Firefox などのブラウザ上で動作する JavaScript で使える API と同様の API を使えるということです。もちろん、Deno の実行環境はブラウザではないので、セキュリティモデルなどに微妙に違いがありますが、インタフェースが統一されているので学習コストが低いです。 Web Platform API の一覧は、こちらを参照してください。 Deno APIs / Built-in APIs JavaScript 標準ではない、組み込みの API (Deno API) は、Deno という namespace 以下のメソッド／プロパティとして提供されています。Deno が提供している API ということが一目でわかります。下記は、コマンドライン引数を参照するときの例です。 Deno.argv[0] // Deno の場合 process.argv[0] // Node の場合 Deno API 呼び出し時に発生するエラーは、Deno.errors namespace に定義されています。 Deno API には、まだ安定版 (stable) になっていないものがあり、それらを使う場合は、deno run 実行時に --unstable オプションを指定します。 Deno namespace の API の一覧は、こちらを参照してください。 Standard Library (standard modules) Deno は Deno namespace 以下のグローバルな Deno API 以外にも、様々な標準ライブラリ（std モジュール）を提供しています。 std モジュールは、使用時に明示的なインポートが必要です（一方で、Deno API は何もインポートせずに呼び出せます）。 Deno の std モジュールは、Golang の std ライブラリ を参考に実装されています。 Deno の標準モジュールの一覧は、こちらを参照 してください。 npm モジュール npm モジュールは、npm specifier というフォーマット (npm:xxx) でインポート可能です。さらに、型定義が DefinitelyTyped で提供されている場合は、コメントで @deno-types ディレクティブを使って指定できます。 // @deno-types=\u0026#34;npm:@types/express@^4.17\u0026#34;; import express from \u0026#34;npm:express@^4.17\u0026#34;; const app = express(); npm モジュールのインポート方法として、esm.sh や Skypack CDN といった CDN を利用する方法もあります。 import React from \u0026#34;https://esm.sh/react@~16.13.0\u0026#34;; import React from \u0026#34;https://cdn.skypack.dev/react@~16.13.0\u0026#34;; deno.land レジストリ Deno ランタイムに組み込まれていないモジュールは、deno.land レジストリで管理されています。 下記モジュールが重要です。 deno.land/std Deno の標準ライブラリ (Deno standard library) です。 使用例: import { copy } from \u0026#34;https://deno.land/std@0.168.0/fs/copy.ts\u0026#34;; deno.land/std/node 従来の Node API をエミュレートするためのモジュールが、標準ライブラリとして提供されています。 例えば、std/node/global.ts は、Node のグローバル変数 process を提供します。 deno.land/x 3rd パーティモジュールはここで管理されています。 実際には、コードがある場所にリダイレクトしているだけです。"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2022-12-21T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-12-21T00:00:00Z",
-body: "技術系のメモ"
+body: "Node.js と Deno のコーディング方法の違いまとめ Deno でのコーディングは、Node.js とほぼ同様の書き方で行えますが、いくつか押さえておきたいポイントがあるのでまとめておきます。 Web Platform APIs Web ブラウザーで使える JavaScript の標準 API、例えば fetch API や、それに付随する Request や Response インタフェースをデフォルトで使用することができます。 これは、Chrome や Firefox などのブラウザ上で動作する JavaScript で使える API と同様の API を使えるということです。もちろん、Deno の実行環境はブラウザではないので、セキュリティモデルなどに微妙に違いがありますが、インタフェースが統一されているので学習コストが低いです。 Web Platform API の一覧は、こちらを参照してください。 Deno APIs / Built-in APIs JavaScript 標準ではない、組み込みの API (Deno API) は、Deno という namespace 以下のメソッド／プロパティとして提供されています。Deno が提供している API ということが一目でわかります。下記は、コマンドライン引数を参照するときの例です。 Deno.argv[0] // Deno の場合 process.argv[0] // Node の場合 Deno API 呼び出し時に発生するエラーは、Deno.errors namespace に定義されています。 Deno API には、まだ安定版 (stable) になっていないものがあり、それらを使う場合は、deno run 実行時に --unstable オプションを指定します。 Deno namespace の API の一覧は、こちらを参照してください。 Standard Library (standard modules) Deno は Deno namespace 以下のグローバルな Deno API 以外にも、様々な標準ライブラリ（std モジュール）を提供しています。 std モジュールは、使用時に明示的なインポートが必要です（一方で、Deno API は何もインポートせずに呼び出せます）。 Deno の std モジュールは、Golang の std ライブラリ を参考に実装されています。 Deno の標準モジュールの一覧は、こちらを参照 してください。 npm モジュール npm モジュールは、npm specifier というフォーマット (npm:xxx) でインポート可能です。さらに、型定義が DefinitelyTyped で提供されている場合は、コメントで @deno-types ディレクティブを使って指定できます。 // @deno-types=\u0026#34;npm:@types/express@^4.17\u0026#34;; import express from \u0026#34;npm:express@^4.17\u0026#34;; const app = express(); npm モジュールのインポート方法として、esm.sh や Skypack CDN といった CDN を利用する方法もあります。 import React from \u0026#34;https://esm.sh/react@~16.13.0\u0026#34;; import React from \u0026#34;https://cdn.skypack.dev/react@~16.13.0\u0026#34;; deno.land レジストリ Deno ランタイムに組み込まれていないモジュールは、deno.land レジストリで管理されています。 下記モジュールが重要です。 deno.land/std Deno の標準ライブラリ (Deno standard library) です。 使用例: import { copy } from \u0026#34;https://deno.land/std@0.168.0/fs/copy.ts\u0026#34;; deno.land/std/node 従来の Node API をエミュレートするためのモジュールが、標準ライブラリとして提供されています。 例えば、std/node/global.ts は、Node のグローバル変数 process を提供します。 deno.land/x 3rd パーティモジュールはここで管理されています。 実際には、コードがある場所にリダイレクトしているだけです。 mod.ts と deps.ts mod.ts モジュールのエントリポイントとなるファイル名には、慣例として mod.ts が使用されます。これは Rust にインスパイアされたものです。 逆に、index.ts のような名前は避けるべきだとされています。 参考: Style Guide | Manual | Deno deps.ts アプリケーションがインポートするモジュールを一箇所でまとめて定義しておきたい場合は、deps.ts という名前のファイルが使われます。 このファイルで、アプリケーションが使用するメソッドを re-export しておき、他のファイルからはそれをインポートして使用します。 こうすることで、アプリケーション内で使用するモジュールのバージョンを揃えることができます。 deps.ts export { add, multiply, } from \u0026#34;https://x.nest.land/ramda@0.27.0/source/index.js\u0026#34;; example.ts import { add, multiply } from \u0026#34;./deps.ts\u0026#34;; 参考: Manage Dependencies | Manual | Deno）"
 },
 {
 url: "/p/b2q2jmh/",

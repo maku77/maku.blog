@@ -44,6 +44,11 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/phz7fo3/>
+Deno Deploy で Deno のサーバープログラムを公開する
+<time>2022-12-24</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/zbaga2z/>
 Node.js と Deno のコーディング方法の違いまとめ
 <time>2022-12-21</time></a>
@@ -62,11 +67,6 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 <a href=./p/sp9q7o5/>
 .proto の文法: optional ラベル（フィールドを省略可能にする）
 <time>2022-12-15</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/e8yeofc/>
-.proto の文法: 別の .proto ファイルをインポートする (import)
-<time>2022-12-14</time></a>
 </div>
 </div>
 </div>
@@ -252,6 +252,8 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 </div><div class=xMenu_tag>
 <a href=./tags/cosmos-db>cosmos-db (3)</a>
 </div><div class=xMenu_tag>
+<a href=./tags/deno>deno (3)</a>
+</div><div class=xMenu_tag>
 <a href=./tags/grpc>grpc (3)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/hugo>hugo (3)</a>
@@ -307,8 +309,6 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 <a href=./tags/aws/sdk>aws/sdk (2)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/azure-app-service>azure-app-service (2)</a>
-</div><div class=xMenu_tag>
-<a href=./tags/deno>deno (2)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/excel>excel (2)</a>
 </div><div class=xMenu_tag>
@@ -463,14 +463,14 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/phz7fo3/>
+Deno Deploy で Deno のサーバープログラムを公開する<span class=xRecents_item_tag>Deno</span><time>2022-12-24</time></a>
+</div><div class=xRecents_item>
 <a href=./p/zbaga2z/>
 Node.js と Deno のコーディング方法の違いまとめ<span class=xRecents_item_tag>Deno</span><time>2022-12-21</time></a>
 </div><div class=xRecents_item>
 <a href=./p/adxcp3g/>
 GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する<span class=xRecents_item_tag>GraphQL</span><time>2022-12-21</time></a>
-</div><div class=xRecents_item>
-<a href=./p/b2q2jmh/>
-.proto の文法: repeated ラベル（フィールドを配列にする）<span class=xRecents_item_tag>Protocol Buffers</span><time>2022-12-16</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -478,6 +478,150 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する<s
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/ujqinda/>プログラミング</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/dp4r2wz/>Deno</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=width:80px;margin-right:.5em>
+<img src=./p/dp4r2wz/_index.svg style=width:80px;height:80px>
+</div>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/phz7fo3/>Deno Deploy で Deno のサーバープログラムを公開する</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/deno>Deno</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2022-12-24>2022-12-24</time><br>
+作成: <time itemprop=datePublished datetime=2022-12-24>2022-12-24</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#deno-deploy-とは>Deno Deploy とは？</a></li>
+<li><a href=#deployctl-のインストール>deployctl のインストール</a></li>
+<li><a href=#簡単なサーバープログラムを用意する>簡単なサーバープログラムを用意する</a></li>
+<li><a href=#deno-deploy-にデプロイしてみる>Deno Deploy にデプロイしてみる</a>
+<ul>
+<li><a href=#sign-up>Sign Up</a></li>
+<li><a href=#アクセストークンの発行>アクセストークンの発行</a></li>
+<li><a href=#デプロイする>デプロイする</a></li>
+</ul>
+</li>
+<li><a href=#preview-deployment-と-production-deployment>Preview Deployment と Production Deployment</a>
+<ul>
+<li><a href=#preview-deployment>Preview Deployment</a></li>
+<li><a href=#production-deployment>Production Deployment</a></li>
+</ul>
+</li>
+</ul>
+</nav><h2 id=deno-deploy-とは>Deno Deploy とは？</h2>
+<p><a href=https://deno.com/deploy>Deno Deploy</a> を使うと、Deno で作成したサーバープログラムを簡単に公開することができます。
+Deno Deploy はエッジサーバーで動作する Deno 実行環境を提供しており、ゼロコンフィグでデプロイすることができます。</p>
+<ul>
+<li>TypeScript コードで記述したプログラムがそのまま動きます（Deno なので）</li>
+<li>CLI ツール (<a href=https://github.com/denoland/deployctl>deployctl</a>) や GitHub 統合、GitHub Actions で簡単にデプロイできます</li>
+<li>デプロイは数秒で終わります（GitHub 連携による Deno Deploy へのデプロイは、<a href=https://deno.com/blog/fastest-git-deploys-to-the-edge>Vercel や Cloudflare へのデプロイより 10 倍以上速い</a>）</li>
+<li>サーバー上で公開されている <code>.ts</code> ファイルを直接デプロイすることができます</li>
+<li>プレビューサイト用の URL が自動生成されます（もちろん SSL 対応）</li>
+<li>1 日に 10 万回までの呼び出しであれば無料で利用できます（それ以上は$10/月からの有料プラン）</li>
+</ul>
+<h2 id=deployctl-のインストール>deployctl のインストール</h2>
+<p>ローカルにある <code>.ts</code> ファイルを Deno Deploy へデプロイするには、CLI コマンドの <a href=https://github.com/denoland/deployctl>deployctl</a> を使用します。
+このコマンドは、<code>deno</code> コマンドでインストールできます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>deployctl のインストール</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ deno install \
+    --allow-read --allow-write --allow-env --allow-net --allow-run \
+    --no-check -r -f https://deno.land/x/deploy/deployctl.ts</code></pre></div></div>
+</figure>
+<p><code>~/.deno/bin/</code> に <code>deployctl</code> コマンドが配置されれば成功です。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>deployctl --version
+<span class=go>deployctl 1.4.0
+</span></code></pre></div><h2 id=簡単なサーバープログラムを用意する>簡単なサーバープログラムを用意する</h2>
+<p>Deno Deploy にデプロイするための、簡単なサーバープログラムを用意しておきます。
+Deno の標準ライブラリ <a href=https://deno.land/std/http>std/http</a> を使うと、簡単に Web サーバーをプログラムを作成できます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>mod.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>serve</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;https://deno.land/std@0.170.0/http/server.ts&#34;</span><span class=p>;</span>
+
+<span class=kd>function</span> <span class=nx>handler</span><span class=p>(</span><span class=nx>_req</span>: <span class=kt>Request</span><span class=p>)</span><span class=o>:</span> <span class=nx>Response</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=k>new</span> <span class=nx>Response</span><span class=p>(</span><span class=s2>&#34;Hello, World!&#34;</span><span class=p>,</span> <span class=p>{</span>
+    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span> <span class=s2>&#34;content-type&#34;</span><span class=o>:</span> <span class=s2>&#34;text/plain&#34;</span> <span class=p>},</span>
+  <span class=p>});</span>
+<span class=p>}</span>
+
+<span class=nx>serve</span><span class=p>(</span><span class=nx>handler</span><span class=p>);</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>動作確認</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>deno run --allow-net mod.ts
+<span class=go>Listening on http://localhost:8000/
+</span></code></pre></div></div>
+</figure>
+<p><code>serve</code> 関数はデフォルトで 8000 番ポートで待ち受けを行いますが、Deno Deploy を使う場合は、このポートを調整する必要はありません。
+Deno Deploy は自動的に 80 番ポートで Web サーバーを公開してくれます。</p>
+<p>これで、デプロイ用のファイルの準備ができました。</p>
+<h2 id=deno-deploy-にデプロイしてみる>Deno Deploy にデプロイしてみる</h2>
+<h3 id=sign-up>Sign Up</h3>
+<p>Deno Deploy を使用するには、GitHub アカウントで Sign Up する必要があります。
+<a href=https://dash.deno.com/signin>Deno Deploy のサイト</a> から Sign Up ボタンを押して、GitHub アカウントと Deno Deploy を連携すると、新しいプロジェクトを作成できるようになります。</p>
+<h3 id=アクセストークンの発行>アクセストークンの発行</h3>
+<p><code>deployctl</code> コマンドでデプロイするときに、アクセストークンが必要になるので、Deno Deploy の設定ページから <a href=https://dash.deno.com/account#access-tokens>アクセストークンを発行</a> しておきます。
+発行したアクセストークンは、環境変数 <strong><code>DENO_DEPLOY_TOKEN</code></strong> に設定しておきます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=nb>export</span> ddp_3MkWxJK9NLRkbOZjObTDO1VWotofhR3xbGPz
+</code></pre></div><h3 id=デプロイする>デプロイする</h3>
+<p>ローカルにある <code>.ts</code> ファイルをデプロイするには、<strong><code>deployctl deploy</code></strong> コマンドを使用します。
+プロジェクト名は、Deno Deploy 上で作成したプロジェクト名に合わせてください。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>deployctl deploy --project<span class=o>=</span>hello mod.ts
+<span class=go> ✔ Project: maku-temp
+</span><span class=go> ℹ Uploading all files from the current dir (/Users/maku/hello-server)
+</span><span class=go> ✔ Found 2 assets.
+</span><span class=go> ✔ Uploaded 2 new assets.
+</span><span class=go> ✔ Deployment complete.
+</span><span class=go></span><span class=err>
+</span><span class=err></span><span class=go>View at:
+</span><span class=go> - https://hello-sgm5da8zw56g.deno.dev
+</span></code></pre></div><p>上記のように、自動的にプレビュー URL が割り当てられるので、Web ブラウザーなどでアクセスして <code>Hello, World!</code> と表示されれば成功です。</p>
+<p>٩(๑❛ᴗ❛๑)۶ わーぃ</p>
+<h2 id=preview-deployment-と-production-deployment>Preview Deployment と Production Deployment</h2>
+<h3 id=preview-deployment>Preview Deployment</h3>
+<p><code>deployctl deploy</code> コマンドでのデプロイは、デフォルトでは <strong>Preview Deployment</strong> が生成されるようになっており、次のような形式のプレビュー URL が割り当てられます。</p>
+<pre tabindex=0><code>{project_name}-{deployment_id}.deno.dev
+</code></pre><p>例えば、<code>https://hello-sgm5da8zw56g.deno.dev</code> のような、ランダムな <code>{deployment_id}</code> の混ざった URL になっています。
+<code>{deployment_id}</code> には、デプロイごとに新しい ID が割り当てられ、Deno Deploy の中でそれぞれ異なる Deployment として管理されます。
+これらの Deployment は、いわゆるステージング環境であり、サービス公開前のテストに使用できます（URL がバレると自由にアクセスされてしまいますが）。</p>
+<h3 id=production-deployment>Production Deployment</h3>
+<p>本番環境用のデプロイ (<strong>Production Deployment</strong>) を行いたい場合は、<strong><code>--prod</code></strong> オプションを付けてデプロイを実行します。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>deployctl deploy --project<span class=o>=</span>hello --prod mod.ts
+</code></pre></div><p>Production Deployment を実行すると、アクセス用の URL は、<code>https://hello.deno.dev</code> のようなシンプルなものになります（独自ドメインを割り当てることもできます）。</p>
+<p>すでにデプロイ済みの Preview Deployment を、Production Deployment に格上げすることもできます。
+Deno Deploy のサイトの <code>Deployments</code> パネルから対象の Deployment を選択し、<strong><code>Promoto to Production</code></strong> を選択すれば OK です。</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/zbaga2z/>Node.js と Deno のコーディング方法の違いまとめ</a></li>
+<li><a href=./p/d8s6fpz/>Deno プログラミングをはじめる</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/deno>Deno</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/dp4r2wz/><span class=xArticle_up_label>Deno プログラミング関連メモ</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -508,6 +652,12 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する<s
 <li><a href=#standard-library-standard-modules>Standard Library (standard modules)</a></li>
 <li><a href=#npm-モジュール>npm モジュール</a></li>
 <li><a href=#denoland-レジストリ>deno.land レジストリ</a></li>
+<li><a href=#modts-と-depsts>mod.ts と deps.ts</a>
+<ul>
+<li><a href=#modts>mod.ts</a></li>
+<li><a href=#depsts>deps.ts</a></li>
+</ul>
+</li>
 </ul>
 </nav><p>Deno でのコーディングは、Node.js とほぼ同様の書き方で行えますが、いくつか押さえておきたいポイントがあるのでまとめておきます。</p>
 <h2 id=web-platform-apis>Web Platform APIs</h2>
@@ -569,6 +719,31 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する<s
 <li>実際には、コードがある場所にリダイレクトしているだけです。</li>
 </ul>
 </li>
+</ul>
+<h2 id=modts-と-depsts>mod.ts と deps.ts</h2>
+<h3 id=modts>mod.ts</h3>
+<p>モジュールのエントリポイントとなるファイル名には、慣例として <strong><code>mod.ts</code></strong> が使用されます。これは Rust にインスパイアされたものです。
+逆に、<code>index.ts</code> のような名前は避けるべきだとされています。</p>
+<ul>
+<li>参考: <a href=https://deno.land/manual/references/contributing/style_guide>Style Guide | Manual | Deno</a></li>
+</ul>
+<h3 id=depsts>deps.ts</h3>
+<p>アプリケーションがインポートするモジュールを一箇所でまとめて定義しておきたい場合は、<strong><code>deps.ts</code></strong> という名前のファイルが使われます。
+このファイルで、アプリケーションが使用するメソッドを re-export しておき、他のファイルからはそれをインポートして使用します。
+こうすることで、アプリケーション内で使用するモジュールのバージョンを揃えることができます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>deps.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>export</span> <span class=p>{</span>
+  <span class=nx>add</span><span class=p>,</span>
+  <span class=nx>multiply</span><span class=p>,</span>
+<span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;https://x.nest.land/ramda@0.27.0/source/index.js&#34;</span><span class=p>;</span></code></pre></div></div>
+</figure>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>example.ts</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>add</span><span class=p>,</span> <span class=nx>multiply</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;./deps.ts&#34;</span><span class=p>;</span></code></pre></div></div>
+</figure>
+<ul>
+<li>参考: <a href=https://deno.land/manual/examples/manage_dependencies#example>Manage Dependencies | Manual | Deno</a>）</li>
 </ul>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
@@ -703,73 +878,6 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する<s
 </div>
 <div class=xArticle_up>
 <a href=./p/cm9nyco/><span class=xArticle_up_label>GraphQL 関連記事</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/nd3cmt3/>ネットワーク</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/88gow5c/>gRPC / Protocol Buffers</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/yakoi7q/>.proto ファイルの書き方</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=./p/88gow5c/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/b2q2jmh/>.proto の文法: repeated ラベル（フィールドを配列にする）</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-12-16>2022-12-16</time><br>
-作成: <time itemprop=datePublished datetime=2022-12-16>2022-12-16</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents></nav><p>Protocol Buffers (protobuf) のフィールドを配列／リスト扱いにするには、<code>.proto</code> ファイルのフィールド定義の先頭に <strong><code>repeated</code></strong> ラベルを付加します。
-次の <code>FindBookResponse</code> メッセージ型は、<code>Book</code> 配列のフィールドを持っています。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>books.proto（抜粋）</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=kd>message</span> <span class=nc>FindBookResponse</span> <span class=p>{</span><span class=err>
-</span><span class=err></span>  <span class=k>repeated</span> <span class=n>Book</span> <span class=n>books</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span><span class=err></span><span class=p>}</span><span class=err>
-</span><span class=err>
-</span><span class=err></span><span class=kd>message</span> <span class=nc>Book</span> <span class=p>{</span><span class=err>
-</span><span class=err></span>  <span class=kt>string</span> <span class=n>title</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span><span class=err></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p><code>repeated</code> ラベルを付けたフィールドの名前は複数形にしましょう（上記例の場合は <code>books</code>）。</p>
-<p>Protocol Buffers では <code>repeated</code> を連続させた多次元配列は定義できませんが、任意のメッセージ型に <code>repeated</code> を付けることはできるので、そのメッセージ型の中に <code>repeated</code> フィールドを配置すれば、多次元配列と同様のデータを表現することができます。</p>
-<p><code>repeated</code> ラベルは、<code>oneof</code> フィールドに付加することはできません。</p>
-<ul>
-<li>参考: <a href=./p/vxixbp3/>.proto の文法: oneof 型</a></li>
-</ul>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/sp9q7o5/>.proto の文法: optional ラベル（フィールドを省略可能にする）</a></li>
-<li><a href=./p/vxixbp3/>.proto の文法: oneof 型</a></li>
-<li><a href=./p/xpbnycm/>.proto の文法: マップ型 (map)</a></li>
-<li><a href=./p/p5wjbwq/>.proto の文法: 列挙型 (enum)</a></li>
-<li><a href=./p/e8yeofc/>.proto の文法: 別の .proto ファイルをインポートする (import)</a></li>
-<li><a href=./p/napwb4e/>.proto の文法: サービス型 (service)</a></li>
-<li><a href=./p/bi5jyer/>.proto の文法: スカラー型の一覧</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/protocol-buffers>Protocol Buffers</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/yakoi7q/><span class=xArticle_up_label>.proto ファイルの書き方</span><br>へ戻る</a>
 </div>
 </article><h2>メニュー</h2>
 <div class=xTopMenu>
