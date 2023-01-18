@@ -5,6 +5,7 @@ url: "/p/yhs2bjs"
 weight: 900
 links:
   - /tech/azure/azure-cosmosdb/cosmos-account
+  - /tech/program/deno/mongo
 ---
 
 {{% reference %}}
