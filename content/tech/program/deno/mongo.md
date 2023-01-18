@@ -33,7 +33,7 @@ await client.connect("mongodb://127.0.0.1:27017");
 mongodb+srv://<user>:<password>@cluster-name.abcde.mongodb.net/?retryWrites=true&w=majority
 ```
 
-次のモジュールは、`MongoClient` インスタンスを `MONGO_URI` 環境変数が示す MongoDB サーバーに接続し、`export` しています。
+次の `client.ts` モジュールは、`MongoClient` インスタンスを `MONGO_URI` 環境変数が示す MongoDB サーバーに接続し、`export` しています。
 `MONGO_URI` 環境変数がセットされていない場合は、代わりに `127.0.0.1:27017` へ接続するようにしています。
 
 {{< code lang="ts" title="client.ts" >}}
@@ -44,7 +44,7 @@ export const client = new MongoClient();
 await client.connect(uri);
 {{< /code >}}
 
-このモジュールを使えば、メインモジュールから次のように簡単に `MongoClient` インスタンスを使用できます。
+メインモジュールから次のようにインポートすることで、簡単に `MongoClient` インスタンスを使用できます。
 
 {{< code lang="ts" title="main.ts" >}}
 import { client } from "./client.ts";
@@ -53,7 +53,7 @@ import { client } from "./client.ts";
 console.log(await client.listDatabases());
 {{< /code >}}
 
-__`deno run`__ でプログラムを実行するときは、`--allow-env` による環境変数へのアクセス、`--allow-net` によるネットワークへのアクセスの許可が必要です。
+__`deno run`__ でプログラムを実行するときは、`--allow-env` による環境変数へのアクセスと、`--allow-net` によるネットワークへのアクセスの許可が必要です。
 
 ```console
 $ deno run --allow-env --allow-net main.ts
