@@ -136,3 +136,38 @@ Production Deployment を実行すると、アクセス用の URL は、`https:/
 すでにデプロイ済みの Preview Deployment を、Production Deployment に格上げすることもできます。
 Deno Deploy のサイトの `Deployments` パネルから対象の Deployment を選択し、__`Promoto to Production`__ を選択すれば OK です。
 
+
+deno task 用にタスク定義しておく
+----
+
+Deno のタスクランナー (`deno task`) で、デプロイ用のタスクを定義しておくと便利です。
+タイプ数はそんなに変わらないかもしれませんが、プロジェクトで実行可能なタスクを `deno task` で一覧表示できるようにしておくのはよいプラクティスです。
+
+{{< code lang="js" title="deno.jsonc" >}}
+{
+  "tasks": {
+    "dev": "deno run -A --watch main.ts",
+    "lint": "deno lint",
+    "fmt": "deno fmt",
+
+    // Preview deployment
+    "deploy": "deployctl deploy --project=hello main.ts",
+
+    // Production deployment
+    "deploy:prod": "deno task deploy --prod",
+
+    // Deploy by dry-run
+    "deploy:dry": "deno task deploy --dry-run"
+  }
+}
+{{< /code >}}
+
+これで、次のようにデプロイできるようになります。
+
+```console
+$ deno task deploy       # Preview 環境へのデプロイ
+$ deno task deploy:prod  # Production 環境へのデプロイ
+```
+
+参考: [Deno のタスクランナーの使い方 (deno task)](/p/ho4gs5h/)
+
