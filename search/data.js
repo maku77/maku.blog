@@ -2,7 +2,7 @@ var data = [
 {
 url: "/p/ujqinda/",
 title: "プログラミング",
-date: "2022-12-27T00:00:00Z",
+date: "2023-01-18T00:00:00Z",
 body: "プログラミング"
 },
 {
@@ -750,6 +750,12 @@ date: "2019-09-05T00:00:00Z",
 body: "Azure: Cosmos DB の SQL API をプロキシ経由で使用する 参照するサンプルコード Azure の Cosmos DB を SQL API で操作するための最初の手順は下記のドキュメントに記載されています。 クイック スタート:Azure Cosmos DB SQL API アカウントを使用して Node.js アプリを構築する ここに Node.js 用のサンプルコードがあり、@azure/cosmos パッケージが提供する CosmosClient クラスを使用したコードになっています（昔のサンプルコードでは documentdb というライブラリを使用していたりしますが、今は Microsoft が提供する @azure/cosmos を使用すると完結なコードを記述できます）。 const CosmosClient = require(\u0026#39;@azure/cosmos\u0026#39;).CosmosClient; 基本的には、config.js ファイルに記述されたエンドポイントとキーを下記のような感じで設定すれば実行できるようになるのですが、 config.js var config = {}; config.endpoint = \u0026#39;https://your-cosmosdb.documents.azure.com:443/\u0026#39;; config.key = \u0026#39;9Hp4WSwgvggexAuGy4dKdl...snipped...lV9Nm44Pg8WVkH==\u0026#39;; 会社などのプロキシ環境内からだとうまく接続できず、次のような感じのエラーが発生すると思います。 $ node app.js Completed with error {\u0026#34;message\u0026#34;:\u0026#34;request to https://your-cosmosdb.documents.azure.com:443/dbs/FamilyDatabase failed, reason: connect ETIMEDOUT 123.34.56.78:443\u0026#34;,\u0026#34;type\u0026#34;:\u0026#34;system\u0026#34;,\u0026#34;errno\u0026#34;:\u0026#34;ETIMEDOUT\u0026#34;, \u0026#34;code\u0026#34;:\u0026#34;ETIMEDOUT\u0026#34;,\u0026#34;headers\u0026#34;:{\u0026#34;x-ms-throttle-retry-count\u0026#34;:0,\u0026#34;x-ms-throttle-retry-wait-time-ms\u0026#34;:0}} HTTPS_PROXY 環境変数を設定しても同様で効果がありません。 プロキシ経由で CosmosClient を使用する CosmosClient クラスでの Cosmos DB へのアクセスをプロキシ経由で行うには、コンストラクタのパラメータとして渡せる CosmosClientOptions の agent プロパティを設定します。 ここでは、エージェントとして proxy-agent モジュールを使用します。 proxy-agent のインストール $ npm install --save proxy-agent sample.js const { CosmosClient } = require(\u0026#39;@azure/cosmos\u0026#39;); const ProxyAgent = require(\u0026#39;proxy-agent\u0026#39;); // HTTP, HTTPS, or SOCKS proxy to use const PROXY_URI = \u0026#39;http://proxy.example.com:3128/\u0026#39;; const client = new CosmosClient({ endpoint: config.endpoint, key: config.key, agent: new ProxyAgent(PROXY_URI) }); プロキシを使用するかどうかを簡単に切り替えられるようにするには、例えば、AZURE_PROXY 環境変数に URI がセットされていたら、それをプロキシアドレスとして使用する、というように処理を分けるとよいでしょう。 sample.js const { CosmosClient } = require(\u0026#39;@azure/cosmos\u0026#39;); const options = { endpoint: config.endpoint, key: config.key }; // AZURE_PROXY 環境変数がセットされていたらプロキシ経由のアクセスにする if (process.env.AZURE_PROXY) { const ProxyAgent = require(\u0026#39;proxy-agent\u0026#39;); options.agent = new ProxyAgent(process.env.AZURE_PROXY); } const client = new CosmosClient(options); あとは、普通に CosmosClient インスタンスを使用して API を呼び出すだけです。 my-db データベースの my-collection コレクションに、適当な JSON データを格納してみます。 async function createItem(item) { // Create the database if it does not exist const { database } = await client.databases.createIfNotExists({ id: \u0026#39;my-db\u0026#39; }); // Create the container if it does not exist const { container } = await database.containers.createIfNotExists({ id: \u0026#39;my-collection\u0026#39; }); // Create the item if it does not exist const { resource } = await container.items.upsert(item); } // コレクションに追加してみる const item = { id: \u0026#39;id1\u0026#39;, key1: \u0026#39;value1\u0026#39;, key2: \u0026#39;value2\u0026#39; }; createItem(item).catch(err =\u0026gt; { console.error(err); }); Azure ポータル から Cosmos DB の データエクスプローラー を開くと、my-db データベースの my-collection コレクションにアイテムが追加されていることを確認できます。 図: Cosmos DB データエクスプローラー"
 },
 {
+url: "/p/q8hry9h/",
+title: "MongoDB サーバー (mongod デーモン)",
+date: "2023-01-18T00:00:00Z",
+body: "MongoDB サーバー (mongod デーモン)"
+},
+{
 url: "/p/u6p6n4i/",
 title: "Ansible の操作／設定",
 date: "2022-07-18T00:00:00Z",
@@ -844,12 +850,6 @@ url: "/p/fdjk4hh/",
 title: "TypeScriptの型: 列挙型を定義する (enum)",
 date: "2019-09-26T00:00:00Z",
 body: "TypeScriptの型: 列挙型を定義する (enum) 列挙型 (enum) の基本 TypeScript で列挙型を定義するには、enum キーワードを使用します。 enum Fruits { Apple, //= 0 Banana, //= 1 Orange //= 2 } console.log(Fruits.Apple); //=\u0026gt; 0 console.log(Fruits[Fruits.Apple]); //=\u0026gt; Apple デフォルトでは、各要素の値として先頭から順番に 0、1、2 という連番の 整数値 が内部的に割り当てられます（C 言語や Java と同様です）。 この値は任意の数値に変更することができます。 次の例は、ビットフラグとして使用することを想定した enum の定義例です。 各値が 2 のべき乗の値になっていることに注意してください。 enum OpenModes { Read = 1, Write = 2, Append = 4 } const mode = OpenModes.Read | OpenModes.Write; if ((mode \u0026amp; OpenModes.Write) == OpenModes.Write) { console.log(\u0026#39;Write フラグが指定されています\u0026#39;); } enum 値をインライン展開する (Constant enumeration) enum 定義を行うときに const キーワードを付加すると、その enum 値を使用した場所に値がハードコードされる形で展開されます（JavaScript のコードに変換するときに、0 や 1 といった値をインライン展開する）。 TypeScript のコード enum NormalEnum { A, B, C } const enum ConstEnum { A, B, C } console.log(NormalEnum.A) console.log(ConstEnum.A) 上記の TypeScript が JavaScript にトランスパイルされると、enum 値の参照箇所はそれぞれ下記のように出力されます。 JavaScript に変換されたコード // ...省略... console.log(NormalEnum.A); console.log(0 /* A */); ConstEnum.A という部分は、0 という値でハードコードされているのが分かります。 参考リンク TypeScript: リテラル型を定義する (Literal types)"
-},
-{
-url: "/p/q8hry9h/",
-title: "MongoDB サーバー (mongod デーモン)",
-date: "2015-04-13T00:00:00Z",
-body: "MongoDB サーバー (mongod デーモン)"
 },
 {
 url: "/p/vm2ft83/",
@@ -1544,26 +1544,44 @@ body: "TypeScriptのサンプルコード"
 {
 url: "/p/dp4r2wz/",
 title: "Deno プログラミング関連メモ",
-date: "2022-12-27T00:00:00Z",
+date: "2023-01-18T00:00:00Z",
 body: "Deno プログラミング関連メモ"
+},
+{
+url: "/p/3pwojuj/",
+title: "Deno で MongoDB にアクセスする",
+date: "2023-01-18T00:00:00Z",
+body: "Deno で MongoDB にアクセスする Deno 用の MongoDB ドライバーとして、deno_mongo が公開されています。 Deno Deploy 上でも使えるので、Deno Deploy で公開する Web API から MongoDB Atlas に接続する、といったことが簡単に行えます。 mongo | Deno GitHub - denodrivers/mongo: MongoDB driver for Deno MongoDB サーバーへ接続する ローカルホスト上で起動した MongoDB サーバーへ接続するには次のようにします。 import { MongoClient } from \u0026#34;https://deno.land/x/mongo@v0.31.1/mod.ts\u0026#34;; const client = new MongoClient(); await client.connect(\u0026#34;mongodb://127.0.0.1:27017\u0026#34;); // 後は client インスタンスを使って MongoDB を操作する 実運用を考えると、MONGO_URI のような環境変数で接続先の MongoDB サーバーを指定できるようにしておいた方がよいでしょう。 例えば、MongoDB Atlas サービスを使用している場合は、次のような接続文字列 (SRV URI) が発行されますが、ここには接続パスワードなどが含まれるので、この URI をハードコーディングすることはできません。 mongodb+srv://\u0026lt;user\u0026gt;:\u0026lt;password\u0026gt;@cluster-name.abcde.mongodb.net/?retryWrites=true\u0026amp;w=majority 次のモジュールは、MongoClient インスタンスを MONGO_URI 環境変数が示す MongoDB サーバーに接続し、export しています。 MONGO_URI 環境変数がセットされていない場合は、代わりに 127.0.0.1:27017 へ接続するようにしています。 client.ts import { MongoClient } from \u0026#34;https://deno.land/x/mongo@v0.31.1/mod.ts\u0026#34;; const uri = Deno.env.get(\u0026#34;MONGO_URI\u0026#34;) ?? \u0026#34;mongodb://127.0.0.1:27017\u0026#34;; export const client = new MongoClient(); await client.connect(uri); このモジュールを使えば、メインモジュールから次のように簡単に MongoClient インスタンスを使用できます。 main.ts import { client } from \u0026#34;./client.ts\u0026#34;; // あとは client を使っていろいろな DB 操作 console.log(await client.listDatabases()); deno run でプログラムを実行するときは、--allow-env による環境変数へのアクセス、--allow-net によるネットワークへのアクセスの許可が必要です。 $ deno run --allow-env --allow-net main.ts [ { name: \u0026#34;admin\u0026#34;, sizeOnDisk: 40960, empty: false }, { name: \u0026#34;config\u0026#34;, sizeOnDisk: 61440, empty: false }, { name: \u0026#34;local\u0026#34;, sizeOnDisk: 40960, empty: false } ] コレクションを参照する MongoDB データベース内のコレクションを参照するときは、そこに含まれるドキュメントの型をあらかじめ定義しておくことができます。 次の例では、書籍データ（books コレクション）のスキーマ定義を行っています。 main.ts import { ObjectId } from \u0026#34;https://deno.land/x/mongo@v0.31.1/mod.ts\u0026#34;; import { client } from \u0026#34;./client.ts\u0026#34;; // books コレクションのスキーマ定義（含まれるドキュメントの型） interface BookSchema { _id: ObjectId; title: string; author: string; } // mydb データベースの books コレクションを参照する const db = client.database(\u0026#34;mydb\u0026#34;); const booksCollection = db.collection\u0026lt;BookSchema\u0026gt;(\u0026#34;books\u0026#34;); このようにして Collection インスタンスを取得したら、あとは自由にドキュメントの追加や検索を行えます。 コレクション内のドキュメントを操作する ドキュメントを追加する (insertOne, insertMany) ドキュメントを追加するには、Collection クラスの insertOne や insertMany メソッドを使用します。 booksCollection.insertMany([ { title: \u0026#34;Title-1\u0026#34;, author: \u0026#34;Author-1\u0026#34; }, { title: \u0026#34;Title-2\u0026#34;, author: \u0026#34;Author-2\u0026#34; }, { title: \u0026#34;Title-3\u0026#34;, author: \u0026#34;Author-3\u0026#34; }, ]); ドキュメントを検索する (find, findOne) ドキュメントを取得するには、Collection クラスの find メソッドや findOne メソッドを使用します。 すべてのドキュメントを取得 const books: BookSchema[] = await booksCollection.find({}).toArray(); title フィールドに特定の文字列が含まれているものを検索 const books: BookSchema[] = await booksCollection .find({ title: { $regex: \u0026#34;itle-3\u0026#34; } }) .toArray(); その他のメソッドは、公式サイト を参考にしてください。"
+},
+{
+url: "/p/y6zgrg2/",
+title: "Docker で MongoDB サーバーを立ち上げる",
+date: "2023-01-18T00:00:00Z",
+body: "Docker で MongoDB サーバーを立ち上げる Docker のオフィシャルイメージとして、mongo イメージが公開されています。 mongo - Official Image | Docker Hub このイメージには、MongoDB サーバー (mongod) や、MongoDB クライアント (mongosh) が含まれており、コマンドを省略してコンテナーを起動すると、デフォルトで MongoDB サーバーが立ち上がります。 MongoDB サーバーのコンテナを起動する 次のように mongo コンテナーを起動すると、ローカルホスト上で MongoDB サーバーを立ち上げたのと同様に振舞います。 $ docker container run --rm -d -p 27017:27017 --name mongo mongo オプションの意味: --rm \u0026hellip; コンテナーを停止したときにコンテナーを削除します。コンテナーを削除したくなければ、このオプションは外してください。 -d \u0026hellip; デーモンをバックグラウンドで動作させます。 -p 27107:27017 \u0026hellip; ローカルホストの 27107 ポートへのアクセスを、コンテナー内の MongoDB サーバーの 27107 ポートへ転送します。 --name mongo \u0026hellip; 起動するコンテナーに mongo という名前を付けます。 mongo \u0026hellip; Docker イメージとして mongo:latest を使用します（デフォルトで :latest が使われます)。 次のようにして、mongo コンテナーが起動していることを確認できます。 $ docker container ls CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES e5a2aeba6bf4 mongo \u0026#34;docker-entrypoint.s…\u0026#34; 16 seconds ago Up 14 seconds 0.0.0.0:27017-\u0026gt;27017/tcp, :::27017-\u0026gt;27017/tcp mongo コンテナーを停止したいときは次のようにします。 $ docker container stop mongo 次のような docker-compose.yml を作成しておけば、docker compose up -d とするだけで起動できます（停止は docker compose down で）。 docker-compose.yml version:\u0026#34;3\u0026#34;services:mongo:image:mongoports:- \u0026#34;27017:27017\u0026#34;restart:always MongoDB サーバーに接続する ローカルホスト上の MongoDB クライアント (mongosh) を使って、上記のように起動した Docker コンテナーの MongoDB サーバーに接続できます。 デフォルトで、localhost:27017 に接続しに行くので、接続先アドレスを指定する必要はありません。 $ mongosh mydb ... mydb\u0026gt; 接続できました。 ٩(๑❛ᴗ❛๑)۶ わーぃ （おまけ）コンテナー間で通信させる コンテナー内の MongoDB サーバーに、別のコンテナーから接続したい場合は、それぞれのコンテナーを同一のネットワークに接続しておくことで、コンテナー名でアクセスできるようになります。 ここでは、mongo-net というブリッジネットワークを作って、そこに各コンテナーを接続してみます。 docker コマンドを使う場合 docker network create コマンドで、接続先のネットワーク mongo-net を作成しておきます。 ネットワークの作成 $ docker network create mongo-net MongoDB サーバー用のコンテナーを起動するときに、--net mongo-net オプションを付けて、上記で作成したネットワークに接続します。 このとき、-p オプションによるポートフォワードの指定は必要ありません（ローカルホストへのアクセスをフォワードするわけではないので）。 MongoDB サーバー用のコンテナーを起動 $ docker container run --rm -d --net mongo-net --name mongo mongo 次に、別のコンテナーから MongoDB クライアント (mongosh) で接続します。 接続先コンテナーの IP アドレスの代わりに、コンテナー名を使って mongo:27017 というアドレスで接続します。 Docker イメージとしては、サーバーと同じ mongo イメージを使用できます。 別のコンテナーの mongosh で接続 $ docker container run --rm -it --net mongo-net mongo mongosh mongo:27017/mydb ... mydb\u0026gt; docker compose コマンドを使う場合 Docker Compose (docker compose up -d) を使う場合は、次のような Compose ファイルを使用します。 前述の通り、ports プロパティの指定は必要ありません。 Docker Compose はネットワークの作成まで同時にやってくれるので便利です。 docker-compose.yml version:\u0026#34;3\u0026#34;services:mongo:image:mongorestart:alwaysnetworks:- mongo-netnetworks:mongo-net: MongoDB サーバー用コンテナーの起動 $ docker compose up -d MongoDB クライアントからの接続方法はほぼ同様ですが、ネットワーク名には、Docker Compose のプロジェクト名（親ディレクトリ名）がプレフィックスとして付けられているので注意してください。 例えば、親ディレクトリ名が mongo であれば、実際に生成されるネットワーク名は mongo_mongo-net になるので、次のように接続することになります。 別コンテナーの mongosh コマンドで接続 $ docker container run --rm -it --net mongo_mongo-net mongo mongosh mongo:27017/mydb ... mydb\u0026gt;"
+},
+{
+url: "/p/qikq9o8/",
+title: "MongoDB 関連記事",
+date: "2023-01-18T00:00:00Z",
+body: "MongoDB 関連記事"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2023-01-18T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2023-01-18T00:00:00Z",
+body: "技術系のメモ"
 },
 {
 url: "/p/zt3birz/",
 title: "Deno Deploy の例: JSON ファイルを読み込んで返す REST API を作る (oak)",
 date: "2022-12-27T00:00:00Z",
 body: "Deno Deploy の例: JSON ファイルを読み込んで返す REST API を作る (oak) 何をするか？ Deno Deploy を使うと、Web API を簡単にデプロイすることができます。 ここでは、よくある例として、サーバー側で JSON ファイルを読み込んで、その内容をレスポンスとして返す REST API を作ってみます。 ここでは、次のような関数やモジュールを使用します。 Deno.readTextFile テキストファイルを読み込むために使用する Deno の標準 API です。 x/oak モジュール HTTP サーバーを作るときに使えるミドルウェアフレームワークです。リクエストのパスに応じて、処理を簡単に振り分けることができます。Node の express と同じように使えます。 前提条件 Deno Deploy の基本的な使い方は下記ページを参考にしてください。 参考: Deno Deploy で Deno のサーバープログラムを公開する 後述の記事では、デプロイ用の deployctl コマンドを使用するので、上記ページに従って先にインストールしておいてください。 JSON ファイル サーバー側で読み込む、サンプルの JSON ファイルを用意しておきます。 data/books.json [ { \u0026#34;id\u0026#34;: \u0026#34;1\u0026#34;, \u0026#34;title\u0026#34;: \u0026#34;Title 1\u0026#34; }, { \u0026#34;id\u0026#34;: \u0026#34;2\u0026#34;, \u0026#34;title\u0026#34;: \u0026#34;Title 2\u0026#34; }, { \u0026#34;id\u0026#34;: \u0026#34;3\u0026#34;, \u0026#34;title\u0026#34;: \u0026#34;Title 3\u0026#34; } ] 3 冊の書籍データが格納されているという想定です。 実際のアプリケーションでは、RDB や mongoDB などのデータベースから情報取得することになると思います。 サーバーの実装 先に、data/books.json ファイルの情報を読み込んで返す getAllBooks 関数と getBook 関数を作成しておきます。 テキストファイルは、Deno.readTextFile 関数で読み込むことができます。 booksDb.ts // 読み込むデータの型情報 type Book = { id: string; title: string; }; // サンプルの JSON ファイルを読み込んでおく const booksJson = await Deno.readTextFile(\u0026#34;./data/books.json\u0026#34;); const books = JSON.parse(booksJson) as Book[]; /** 全ての書籍データを取得します */ export function getAllBooks() { return books; } /** 指定した ID の書籍データを取得します */ export function getBook(id: string | undefined): Book | undefined { return books.find((b) =\u0026gt; b.id === id); } 下記は、サーバーのエントリポイントとなるファイルで、oak の Router クラスを使って、次のようにリクエストを振り分けています。 /books \u0026hellip; すべての書籍情報を返す。 /books/1 \u0026hellip; 指定された ID (=1) に対応する書籍情報を返す。 import { Application, Router } from \u0026#34;https://deno.land/x/oak@v11.1.0/mod.ts\u0026#34;; import { getAllBooks, getBook } from \u0026#34;./booksDb.ts\u0026#34;; // Router を作成して、リクエストに応じて処理を振り分ける const router = new Router(); router .use((ctx, next) =\u0026gt; { // レスポンスのデフォルトの content-type を application/json にする ctx.response.type = \u0026#34;json\u0026#34;; next(); }) .get(\u0026#34;/books\u0026#34;, (ctx) =\u0026gt; { ctx.response.body = getAllBooks(); }) .get(\u0026#34;/books/:id\u0026#34;, (ctx) =\u0026gt; { const book = getBook(ctx?.params?.id); ctx.response.body = book ?? { error: \u0026#34;Not Found\u0026#34; }; }); // Create Application and register middlewares const app = new Application(); app.use(router.routes()); app.use(router.allowedMethods()); // Start the server await app.listen({ port: 8000 }); ローカルでのテストとデプロイ サーバーの実装が終わったら、deno run でローカル実行して動作確認します。 ネットワークアクセスと、ファイルアクセスがあるので、--allow-net と --allow-read を指定して起動する必要があります（面倒であれば -A であらゆるアクセスを許可しても OK）。 $ deno run --allow-net --allow-read main.ts Web ブラウザや curl コマンドでアクセスして、正しく JSON データが返ってくるか確認します。 $ curl localhost:8000/books [{\u0026#34;id\u0026#34;:\u0026#34;1\u0026#34;,\u0026#34;title\u0026#34;:\u0026#34;Title 1\u0026#34;},{\u0026#34;id\u0026#34;:\u0026#34;2\u0026#34;,\u0026#34;title\u0026#34;:\u0026#34;Title 2\u0026#34;},{\u0026#34;id\u0026#34;:\u0026#34;3\u0026#34;,\u0026#34;title\u0026#34;:\u0026#34;Title 3\u0026#34;}] $ curl localhost:8000/books/1 {\u0026#34;id\u0026#34;:\u0026#34;1\u0026#34;,\u0026#34;title\u0026#34;:\u0026#34;Title 1\u0026#34;} うまく動いているようなので、deployctl deploy コマンドで、Deno Deploy にデプロイします。 $ deployctl deploy --project your-project main.ts デプロイ時に、カレントディレクトリにある data/books.json ファイルも同時に転送してくれるので、Deno Deploy サービス上でも正しく JSON ファイルを読み込むことができます。 デプロイが完了したら、発行された URL でアクセスしてみます。 $ curl https://your-project-a93nne0yv79j.deno.dev/books [{\u0026#34;id\u0026#34;:\u0026#34;1\u0026#34;,\u0026#34;title\u0026#34;:\u0026#34;Title 1\u0026#34;},{\u0026#34;id\u0026#34;:\u0026#34;2\u0026#34;,\u0026#34;title\u0026#34;:\u0026#34;Title 2\u0026#34;},{\u0026#34;id\u0026#34;:\u0026#34;3\u0026#34;,\u0026#34;title\u0026#34;:\u0026#34;Title 3\u0026#34;}] $ curl https://your-project-a93nne0yv79j.deno.dev/books/1 {\u0026#34;id\u0026#34;:\u0026#34;1\u0026#34;,\u0026#34;title\u0026#34;:\u0026#34;Title 1\u0026#34;} バッチシ動きました！ ٩(๑❛ᴗ❛๑)۶ わーぃ"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2022-12-27T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2022-12-27T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/cm9nyco/",
@@ -3718,12 +3736,6 @@ url: "/p/k6m6tdm/",
 title: "2019-05-26 ゲームマーケット2019春に行ってきた",
 date: "2019-05-26T00:00:00Z",
 body: "2019-05-26 ゲームマーケット2019春に行ってきた 今日はアナログゲームの祭典、ゲームマーケット。 会場には東京テレポート駅から徒歩10秒で到着です。 日曜日の午後からぶらりと行ってきたんですが、思ったより空いてました。 初日はたぶん混んでたんでしょうね。 ほとんどのお店（サークル）には試遊台があるので、いろいろ遊んでいたらたぶん一日あっても足りないですが、ざーっと見て回るだけなら2、3時間あれば大丈夫。 参加者は年々うなぎのぼりみたいですが、このブームいつまで続くんでしょうか。 ゲームつくろーっと。"
-},
-{
-url: "/p/qikq9o8/",
-title: "MongoDB 関連記事",
-date: "2019-05-20T00:00:00Z",
-body: "MongoDB 関連記事"
 },
 {
 url: "/p/x2zrq7f/",
