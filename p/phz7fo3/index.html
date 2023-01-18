@@ -70,19 +70,19 @@ Deno で MongoDB にアクセスする
 <time>2023-01-18</time></a>
 </div>
 <div class=xBoxLink>
+<a href=../../p/ho4gs5h/>
+Deno のタスクランナーの使い方 (deno task)
+<time>2023-01-14</time></a>
+</div>
+<div class=xBoxLink>
+<a href=../../p/a83hr2b/>
+Deno で JSON ファイルを読み込む方法いろいろ
+<time>2022-12-28</time></a>
+</div>
+<div class=xBoxLink>
 <a href=../../p/zt3birz/>
 Deno Deploy の例: JSON ファイルを読み込んで返す REST API を作る (oak)
 <time>2022-12-27</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/phz7fo3/>
-Deno Deploy で Deno のサーバープログラムを公開する
-<time>2022-12-24</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/adxcp3g/>
-GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
-<time>2022-12-21</time></a>
 </div>
 </div>
 </div>
@@ -248,6 +248,8 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 </div><div class=xMenu_tag>
 <a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/deno>deno (7)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/jade>jade (7)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/material-ui>material-ui (7)</a>
@@ -275,8 +277,6 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 <a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/c/c++>c/c++ (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/deno>deno (5)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/github-actions>github-actions (5)</a>
 </div><div class=xMenu_tag>
@@ -380,6 +380,8 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 </div><div class=xMenu_tag>
 <a href=../../tags/http>http (2)</a>
 </div><div class=xMenu_tag>
+<a href=../../tags/json>json (2)</a>
+</div><div class=xMenu_tag>
 <a href=../../tags/mui>mui (2)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/npm>npm (2)</a>
@@ -461,8 +463,6 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 <a href=../../tags/iso>iso (1)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/jest>jest (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/json>json (1)</a>
 </div><div class=xMenu_tag>
 <a href=../../tags/macos>macos (1)</a>
 </div><div class=xMenu_tag>
@@ -574,6 +574,7 @@ GraphQL スキーマの Lint ツール (graphql-schema-linter) を導入する
 <li><a href=#production-deployment>Production Deployment</a></li>
 </ul>
 </li>
+<li><a href=#deno-task-用にタスク定義しておく>deno task 用にタスク定義しておく</a></li>
 </ul>
 </nav><h2 id=deno-deploy-とは>Deno Deploy とは？</h2>
 <p><a href=https://deno.com/deploy>Deno Deploy</a> を使うと、Deno で作成したサーバープログラムを簡単に公開することができます。
@@ -657,6 +658,32 @@ Deno Deploy は自動的に 80 番ポートで Web サーバーを公開して�
 </code></pre></div><p>Production Deployment を実行すると、アクセス用の URL は、<code>https://hello.deno.dev</code> のようなシンプルなものになります（独自ドメインを割り当てることもできます）。</p>
 <p>すでにデプロイ済みの Preview Deployment を、Production Deployment に格上げすることもできます。
 Deno Deploy のサイトの <code>Deployments</code> パネルから対象の Deployment を選択し、<strong><code>Promoto to Production</code></strong> を選択すれば OK です。</p>
+<h2 id=deno-task-用にタスク定義しておく>deno task 用にタスク定義しておく</h2>
+<p>Deno のタスクランナー (<code>deno task</code>) で、デプロイ用のタスクを定義しておくと便利です。
+タイプ数はそんなに変わらないかもしれませんが、プロジェクトで実行可能なタスクを <code>deno task</code> で一覧表示できるようにしておくのはよいプラクティスです。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>deno.jsonc</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
+  <span class=s2>&#34;tasks&#34;</span><span class=o>:</span> <span class=p>{</span>
+    <span class=s2>&#34;dev&#34;</span><span class=o>:</span> <span class=s2>&#34;deno run -A --watch main.ts&#34;</span><span class=p>,</span>
+    <span class=s2>&#34;lint&#34;</span><span class=o>:</span> <span class=s2>&#34;deno lint&#34;</span><span class=p>,</span>
+    <span class=s2>&#34;fmt&#34;</span><span class=o>:</span> <span class=s2>&#34;deno fmt&#34;</span><span class=p>,</span>
+
+    <span class=c1>// Preview deployment
+</span><span class=c1></span>    <span class=s2>&#34;deploy&#34;</span><span class=o>:</span> <span class=s2>&#34;deployctl deploy --project=hello main.ts&#34;</span><span class=p>,</span>
+
+    <span class=c1>// Production deployment
+</span><span class=c1></span>    <span class=s2>&#34;deploy:prod&#34;</span><span class=o>:</span> <span class=s2>&#34;deno task deploy --prod&#34;</span><span class=p>,</span>
+
+    <span class=c1>// Deploy by dry-run
+</span><span class=c1></span>    <span class=s2>&#34;deploy:dry&#34;</span><span class=o>:</span> <span class=s2>&#34;deno task deploy --dry-run&#34;</span>
+  <span class=p>}</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>これで、次のようにデプロイできるようになります。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>deno task deploy       <span class=c1># Preview 環境へのデプロイ</span>
+<span class=gp>$ </span>deno task deploy:prod  <span class=c1># Production 環境へのデプロイ</span>
+</code></pre></div><p>参考: <a href=../../p/ho4gs5h/>Deno のタスクランナーの使い方 (deno task)</a></p>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">
@@ -665,6 +692,7 @@ Deno Deploy のサイトの <code>Deployments</code> パネルから対象の De
 <ul>
 <li><a href=../../p/zbaga2z/>Node.js と Deno のコーディング方法の違いまとめ</a></li>
 <li><a href=../../p/d8s6fpz/>Deno プログラミングをはじめる</a></li>
+<li><a href=../../p/ho4gs5h/>Deno のタスクランナーの使い方 (deno task)</a></li>
 </ul>
 <div class=xPageTags>
 <span class=xPageTags_item><a href=../../tags/deno>Deno</a></span>
