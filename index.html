@@ -44,6 +44,11 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/bo8q8p7/>
+Meilisearch サーチエンジンを使ってみる
+<time>2023-01-24</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/y6zgrg2/>
 Docker で MongoDB サーバーを立ち上げる
 <time>2023-01-18</time></a>
@@ -62,11 +67,6 @@ Deno のタスクランナーの使い方 (deno task)
 <a href=./p/a83hr2b/>
 Deno で JSON ファイルを読み込む方法いろいろ
 <time>2022-12-28</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/zt3birz/>
-Deno Deploy の例: JSON ファイルを読み込んで返す REST API を作る (oak)
-<time>2022-12-27</time></a>
 </div>
 </div>
 </div>
@@ -404,6 +404,8 @@ Deno Deploy の例: JSON ファイルを読み込んで返す REST API を作る
 </div><div class=xMenu_tag>
 <a href=./tags/macos>macos (1)</a>
 </div><div class=xMenu_tag>
+<a href=./tags/meilisearch>meilisearch (1)</a>
+</div><div class=xMenu_tag>
 <a href=./tags/parcel>parcel (1)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/raspberrypi>raspberrypi (1)</a>
@@ -463,14 +465,14 @@ Deno Deploy の例: JSON ファイルを読み込んで返す REST API を作る
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/bo8q8p7/>
+Meilisearch サーチエンジンを使ってみる<span class=xRecents_item_tag>Meilisearch</span><time>2023-01-24</time></a>
+</div><div class=xRecents_item>
 <a href=./p/y6zgrg2/>
 Docker で MongoDB サーバーを立ち上げる<span class=xRecents_item_tag>Docker</span><span class=xRecents_item_tag>MongoDB</span><time>2023-01-18</time></a>
 </div><div class=xRecents_item>
 <a href=./p/3pwojuj/>
 Deno で MongoDB にアクセスする<span class=xRecents_item_tag>Deno</span><span class=xRecents_item_tag>MongoDB</span><time>2023-01-18</time></a>
-</div><div class=xRecents_item>
-<a href=./p/ho4gs5h/>
-Deno のタスクランナーの使い方 (deno task)<span class=xRecents_item_tag>Deno</span><time>2023-01-14</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -478,6 +480,229 @@ Deno のタスクランナーの使い方 (deno task)<span class=xRecents_item_t
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/ndbcxgb/>Meilisearch</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/bo8q8p7/>Meilisearch サーチエンジンを使ってみる</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/meilisearch>Meilisearch</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2023-01-24>2023-01-24</time><br>
+作成: <time itemprop=datePublished datetime=2023-01-24>2023-01-24</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#meilisearch-とは>Meilisearch とは？</a></li>
+<li><a href=#meilisearch-サーバーを起動する>Meilisearch サーバーを起動する</a></li>
+<li><a href=#プライマリーフィールド>プライマリーフィールド</a></li>
+<li><a href=#インデックスの作成とドキュメントの追加>インデックスの作成とドキュメントの追加</a></li>
+<li><a href=#ドキュメントを取得する>ドキュメントを取得する</a>
+<ul>
+<li><a href=#すべてのドキュメントを取得する>すべてのドキュメントを取得する</a></li>
+<li><a href=#ドキュメントを検索する>ドキュメントを検索する</a></li>
+</ul>
+</li>
+<li><a href=#ダッシュボードで確認する>ダッシュボードで確認する</a></li>
+</ul>
+</nav><h2 id=meilisearch-とは>Meilisearch とは？</h2>
+<p><a href=https://www.meilisearch.com/>Meilisearch</a> は、簡単に使えることをポリシーとして作られた OSS のサーチエンジンで、これを利用すると、アプリの <strong>フロントエンドに高速な検索機能</strong> を組み込むことができます。
+個人や中小企業でも手軽に導入でき、柔軟な設定により様々な用途に対応できます。
+Meilisearch には次のような特徴があります。</p>
+<ul>
+<li><strong>高速な応答</strong>（検索結果は 50 ミリ秒以内に得られる。ただし、1,000 万件以上の大規模なデータは想定していない）</li>
+<li><strong>インクリメンタルサーチ</strong>（入力するたびにプレフィックスで絞り込んで結果を返す）</li>
+<li><strong>タイポ入力補正</strong>（検索語句を多少間違えて入力してもそれっぽい単語で検索してくれる）</li>
+<li><strong>プレースホルダー検索</strong>（キーワードを入力せずにカテゴリーなどで結果を絞り込む）</li>
+<li><strong>カスタムランキング処理</strong>（ranking rules による検索結果のソート）</li>
+<li><strong>検索結果のハイライト表示</strong>（入力キーワードに一致した位置がわかる）</li>
+<li><strong>日本語を含む各種言語に対応</strong>（形態素解析エンジンに Lindera を採用）</li>
+<li><strong>同義語の定義</strong></li>
+</ul>
+<p>Meilisearch は <strong>簡単であること</strong> を哲学としているので、類似の検索フレームワークに比べて全体的にシンプルな構成になっています。
+Elasticsearch などでは大袈裟すぎるというニーズにマッチするかもしれません。
+JSON 形式のドキュメントを REST API で登録してインデックスを作成するだけで、REST API による検索が可能になります。
+最終的にはフロントエンドから直接 REST API を呼び出すように UI を作り込んでいく必要がありますが、プレビュー用の Web サーバー（ダッシュボード UI）が内蔵されているので、コーディングなしでインクリメンタルサーチを試すことができます。</p>
+<figure class=xImage>
+<a href=https://docs.meilisearch.com/search_preview/no_documents.png target=_blank>
+<img style="border:solid #ccc 2px" width height=auto src=https://docs.meilisearch.com/search_preview/no_documents.png alt=https://docs.meilisearch.com/search_preview/no_documents.png>
+</a>
+<figcaption>図: Meilisearch ダッシュボード</figcaption>
+</figure>
+<p>似たような検索エンジンとしては、Algolia という SaaS があります。
+Meilisearch は Algolia にインスパイアされて作られているので、アルゴリズム等は似ていますが、<strong>オープンソース</strong> であるという大きな違いがあります（Algolia は個人で使うには高すぎるというのもあります&mldr;）。</p>
+<h2 id=meilisearch-サーバーを起動する>Meilisearch サーバーを起動する</h2>
+<p>Docker Hub に <a href=https://hub.docker.com/r/getmeili/meilisearch/>getmeili/meilisearch</a> というイメージが公開されているので、これを使えば簡単に Meilisearch のサーバーを立ち上げることができます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>meilisearch サーバーの起動</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>docker run --rm -it -p 7700:7700 \
+    -v $(pwd)/meili_data:/meili_data \
+    getmeili/meilisearch:v0.30</code></pre></div></div>
+</figure>
+<ul>
+<li><code>docker run</code> のオプションの意味:
+<ul>
+<li><strong><code>--rm</code></strong> &mldr; コンテナを停止したときに、コンテナを自動で削除します。</li>
+<li><strong><code>-it</code></strong> &mldr; ターミナルとコンテナの標準入出力を連動させます。</li>
+<li><strong><code>-p 7700:7700</code></strong> &mldr; <code>localhost:7700</code> へのアクセスをコンテナの 7700 番ポート（Meilisearch サービス）へ転送します。</li>
+<li><strong><code>-v $(pwd)/meili_data:/meili_data</code></strong> &mldr; カレントディレクトリの <code>meili_data</code> ディレクトリを、Meilisearch のデータ格納先として使用します。ディレクトリが存在しない場合は、自動で作成されます。</li>
+</ul>
+</li>
+</ul>
+<p>Meilisearch はデフォルトで development モード (<code>--env=development</code>) で起動し、プレビュー用の UI を提供します。
+コンテナが起動したら、ブラウザで <strong><code>http://localhost:7700/</code></strong> にアクセスすると、Meilisearch のダッシュボードを表示できます。</p>
+<h2 id=プライマリーフィールド>プライマリーフィールド</h2>
+<p>Meilisearch を使い始めるときは、最初に <strong>プライマリーフィールド</strong> の概念を理解しておく必要があります。</p>
+<p>Meilisearch に登録するデータのことを <strong>ドキュメント</strong> と呼びますが、各ドキュメントには必ず、プライマリーフィールドと呼ばれる一意の ID フィールドが必要です。
+逆に言うと、これ以外のフィールドの値は、どれだけ重複していても大丈夫です。
+同一のドキュメント ID を持つドキュメントを登録しようとすると、古いドキュメントは上書きされます。</p>
+<figure class=xImage>
+<a href=./p/bo8q8p7/img-001.drawio.svg target=_blank>
+<img width=300 height=auto src=./p/bo8q8p7/img-001.drawio.svg alt=/p/bo8q8p7/img-001.drawio.svg>
+</a>
+<figcaption>図: Meilisearch のプライマリフィールド関連用語</figcaption>
+</figure>
+<p>多くの場合、プライマリーフィールドのキー名（プライマリーキー）は、<code>id</code> といった名前ですが、インデックスを作成するときに任意のキー名を指定することができます。
+キー名を省略すると、1 つ目のドキュメントから <code>id</code> を含む名前のキーが自動的に選択されます（例: <code>id</code>、<code>bookId</code>、<code>todo-id</code>）。</p>
+<p>インデックスにドキュメントを登録するとき、そのフィールドにプライマリーキーが見つからない場合は登録に失敗します。
+ドキュメント ID が不正な形式の場合も登録に失敗します。
+ドキュメント ID は、整数値、あるいは、英数字 (<code>a-zA-Z0-9</code>)、ハイフン (<code>-</code>)、アンダースコア (<code>_</code>) のみで構成された文字列である必要があります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>ドキュメント ID の形式</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>&#34;id&#34;: 12345      // Good
+&#34;id&#34;: &#34;a39NfE2&#34;  // Good
+&#34;id&#34;: &#34;x-12_34&#34;  // Good
+
+&#34;id&#34;: 0.12345    // NG（浮動小数点数はダメ）
+&#34;id&#34;: &#34;df/3 #@&#34;  // NG（不正な記号やスペース）</code></pre></div></div>
+</figure>
+<h2 id=インデックスの作成とドキュメントの追加>インデックスの作成とドキュメントの追加</h2>
+<p>Meilisearch で検索を行えるようにするには、インデックスを作成して、そこに JSON 形式のドキュメントを投入していく必要があります。
+それぞれの作業を独立して行うこともできますし、ドキュメントを追加するときに同時にインデックスを作成してしまうこともできます。
+Meilisearch の操作方法としては、各種言語用のライブラリが提供する API を使う方法と、REST API を直接呼び出す方法があります。
+ここでは <code>curl</code> コマンドで直接 REST API を呼び出して、インデックスの作成とドキュメントの追加をしてみます。</p>
+<p>あるインデックスに対してドキュメントを追加するには、<strong><code>/indexes/&lt;インデックス名>/documents</code></strong> というエンドポイントに POST メソッドで JSON 形式のデータを送ります。
+次の例では、<code>books</code> という名前のインデックスを作成し、そこに 3 つの書籍情報（ドキュメント）を登録しています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>ドキュメントの登録（同時に books インデックスを生成）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>curl -X POST &#39;http://localhost:7700/indexes/books/documents?primaryKey=id&#39; \
+    -H &#39;Content-Type: application/json&#39; \
+    --data-binary &#39;[
+        { &#34;id&#34;: 1, &#34;title&#34;: &#34;みんなの Meili&#34;, &#34;author&#34;: &#34;名無し&#34; },
+        { &#34;id&#34;: 2, &#34;title&#34;: &#34;Meili かわいい&#34;, &#34;author&#34;: &#34;John Doe&#34; },
+        { &#34;id&#34;: 3, &#34;title&#34;: &#34;Best of Meili&#34;, &#34;author&#34;: &#34;Maku&#34; }
+    ]&#39;</code></pre></div></div>
+</figure>
+<p>前述の通り、<code>id</code> というキーを自動的にプライマリーキーとして採用してくれますが、上記のように <code>primaryKey=id</code> でキー名を明示することもできます。
+次のように処理内容が出力されれば成功です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>実行結果（の出力）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span><span class=nt>&#34;taskUid&#34;</span><span class=p>:</span><span class=mi>3</span><span class=p>,</span><span class=nt>&#34;indexUid&#34;</span><span class=p>:</span><span class=s2>&#34;books&#34;</span><span class=p>,</span><span class=nt>&#34;status&#34;</span><span class=p>:</span><span class=s2>&#34;enqueued&#34;</span><span class=p>,</span><span class=nt>&#34;type&#34;</span><span class=p>:</span><span class=s2>&#34;documentAdditionOrUpdate&#34;</span><span class=p>,</span><span class=nt>&#34;enqueuedAt&#34;</span><span class=p>:</span><span class=s2>&#34;2023-01-24T07:02:22.4346468Z&#34;</span><span class=p>}</span></code></pre></div></div>
+</figure>
+<p>多数のドキュメントを登録したいときは、次のような JSON ファイルとしてデータを用意しておき、</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>books.json</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>[</span>
+  <span class=p>{</span> <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=mi>1</span><span class=p>,</span> <span class=nt>&#34;title&#34;</span><span class=p>:</span> <span class=s2>&#34;みんなの Meili&#34;</span><span class=p>,</span> <span class=nt>&#34;author&#34;</span><span class=p>:</span> <span class=s2>&#34;名無し&#34;</span> <span class=p>},</span>
+  <span class=p>{</span> <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=mi>2</span><span class=p>,</span> <span class=nt>&#34;title&#34;</span><span class=p>:</span> <span class=s2>&#34;Meili かわいい&#34;</span><span class=p>,</span> <span class=nt>&#34;author&#34;</span><span class=p>:</span> <span class=s2>&#34;John Doe&#34;</span> <span class=p>},</span>
+  <span class=p>{</span> <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=mi>3</span><span class=p>,</span> <span class=nt>&#34;title&#34;</span><span class=p>:</span> <span class=s2>&#34;Best of Meili&#34;</span><span class=p>,</span> <span class=nt>&#34;author&#34;</span><span class=p>:</span> <span class=s2>&#34;Maku&#34;</span> <span class=p>}</span>
+<span class=p>]</span></code></pre></div></div>
+</figure>
+<p>次のように Meilisearch のインデックスに登録します（ファイル名の前に <strong><code>@</code></strong> プレフィックスを付けます）。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>books インデックスに JSON ファイルのドキュメントを登録</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>curl -X POST &#39;http://localhost:7700/indexes/books/documents?primaryKey=id&#39; \
+    -H &#39;Content-Type: application/json&#39; --data-binary @books.json</code></pre></div></div>
+</figure>
+<p>Meilisearch サービスに現在登録されているインデックスの一覧を確認するには、<strong><code>/indexes</code></strong> というエンドポイントに GET リクエストを投げます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>インデックスの一覧を取得（出力は整形してます）</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>curl -X GET http://localhost:7700/indexes?limit<span class=o>=</span><span class=m>3</span>
+<span class=go>{
+</span><span class=go>  &#34;results&#34;: [
+</span><span class=go>    {
+</span><span class=go>      &#34;uid&#34;: &#34;books&#34;,
+</span><span class=go>      &#34;createdAt&#34;: &#34;2023-01-24T06:47:13.0555429Z&#34;,
+</span><span class=go>      &#34;updatedAt&#34;: &#34;2023-01-24T07:10:13.2373666Z&#34;,
+</span><span class=go>      &#34;primaryKey&#34;: &#34;id&#34;
+</span><span class=go>    }
+</span><span class=go>  ],
+</span><span class=go>  &#34;offset&#34;: 0,
+</span><span class=go>  &#34;limit&#34;: 3,
+</span><span class=go>  &#34;total&#34;: 1
+</span><span class=go>}
+</span></code></pre></div></div>
+</figure>
+<p>正しく、<code>books</code> というインデックスが作成されているようです。
+まだインデックスは 1 つしか作成していないので、<code>total</code> フィールドの値は 1 になっています。</p>
+<h2 id=ドキュメントを取得する>ドキュメントを取得する</h2>
+<h3 id=すべてのドキュメントを取得する>すべてのドキュメントを取得する</h3>
+<p><strong><code>/indexes/{index_uid}/documents</code></strong> に GET 要求を送ると、すべてのドキュメントを取得できます。
+ただし、<code>limit</code> パラメーターのデフォルト値は <code>20</code> です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>最大 3 つのドキュメントを取得</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>curl http://localhost:7700/indexes/books/documents?limit<span class=o>=</span><span class=m>3</span>
+</code></pre></div></div>
+</figure>
+<p><strong><code>/indexes/{index_uid}/documents/{document_id}</code></strong> に GET 要求を送ると、指定したドキュメント ID に一致するドキュメントを取得できます。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>ドキュメント ID = 1 のドキュメントを取得</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>curl http://localhost:7700/indexes/books/documents/1
+</code></pre></div></div>
+</figure>
+<h3 id=ドキュメントを検索する>ドキュメントを検索する</h3>
+<p><strong><code>/indexes/{index_uid}/search</code></strong> に GET あるいは POST 要求を送ると、任意の検索文字列（<code>q</code> パラメーター）でドキュメントを検索できます。
+この API が Meilisearch による検索のキモとなる API です。
+API キーを使用したアクセス制御を行う場合は、POST メソッドの方を使う必要があります。
+なので、実運用では POST を使うことになりますが、ここではお試しのため GET メソッドを使っています。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>「Meili」で検索</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>curl http://localhost:7700/indexes/books/search?q<span class=o>=</span>Meili
+</code></pre></div></div>
+</figure>
+<p>ちょっと綴りを間違えて、「Meilli」と入力してもうまく検索してくれます。
+(*>ω&lt;)bグッ</p>
+<p>日本語で検索する場合は、検索文字列を URL エンコードしておく必要があるかもしれません。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>「かわいい」で検索</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>curl http://localhost:7700/indexes/books/search?q<span class=o>=</span>%E3%81%8B%E3%82%8F%E3%81%84%E3%81%84
+</code></pre></div></div>
+</figure>
+<p>他にも様々なクエリパラメーターが用意されていて、ページングやソート方法などを指定できるようになっています。
+詳細は <a href=https://docs.meilisearch.com/reference/api/search.html>Search API のドキュメント</a> を参照してください。</p>
+<h2 id=ダッシュボードで確認する>ダッシュボードで確認する</h2>
+<p>インデックスに登録されたドキュメントは、<code>http://localhost:7700</code> で表示されるダッシュボード (Mini Dashboard) からも検索できるようになっています。</p>
+<figure class=xImage>
+<a href=./p/bo8q8p7/img-002.png target=_blank>
+<img style="border:solid #ccc 2px" width=1064 height=635 src=./p/bo8q8p7/img-002.png alt=/p/bo8q8p7/img-002.png>
+</a>
+<figcaption>図: Mini Dashboard で books インデックスを検索</figcaption>
+</figure>
+<p>うまくいきました！
+٩(๑❛ᴗ❛๑)۶ わーぃ</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/meilisearch>Meilisearch</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/ndbcxgb/><span class=xArticle_up_label>Meilisearch のメモ</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -775,127 +1000,6 @@ Docker Compose はネットワークの作成まで同時にやってくれる�
 <div class=xPageTags>
 <span class=xPageTags_item><a href=./tags/deno>Deno</a></span>
 <span class=xPageTags_item><a href=./tags/mongodb>MongoDB</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/dp4r2wz/><span class=xArticle_up_label>Deno プログラミング関連メモ</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/ujqinda/>プログラミング</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/dp4r2wz/>Deno</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=./p/dp4r2wz/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/ho4gs5h/>Deno のタスクランナーの使い方 (deno task)</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/deno>Deno</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2023-01-14>2023-01-14</time><br>
-作成: <time itemprop=datePublished datetime=2023-01-14>2023-01-14</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#deno-のタスクランナーとは-npm-スクリプトとの違いは>Deno のタスクランナーとは？ npm スクリプトとの違いは？</a></li>
-<li><a href=#jsonc-フォーマットがおすすめ-json-with-comments>jsonc フォーマットがおすすめ (JSON with Comments)</a></li>
-<li><a href=#タスクの一覧を表示する>タスクの一覧を表示する</a></li>
-<li><a href=#タスク実行時にコマンドライン引数を渡す>タスク実行時にコマンドライン引数を渡す</a></li>
-</ul>
-</nav><h2 id=deno-のタスクランナーとは-npm-スクリプトとの違いは>Deno のタスクランナーとは？ npm スクリプトとの違いは？</h2>
-<p>Deno は標準で <a href=https://deno.land/manual/tools/task_runner>deno task コマンド</a> を提供しており、<strong><code>deno.json</code></strong>（あるいは <strong><code>deno.jsonc</code></strong>）の <strong><code>tasks</code></strong> プロパティで定義したタスクを実行できるようになっています。
-これは、Node.js で言うところの npm スクリプト (<code>npm run</code>) に相当するものですが、<code>deno task</code> の場合は、<strong>クロスプラットフォームなタスクを定義できる</strong> ところが大きな特徴になっています。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>deno.json でのタスク定義</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
-  <span class=nt>&#34;tasks&#34;</span><span class=p>:</span> <span class=p>{</span>
-    <span class=nt>&#34;hello&#34;</span><span class=p>:</span> <span class=s2>&#34;echo Hello, Deno Task Runner!&#34;</span>
-  <span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>タスクの実行方法</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>deno task hello
-</code></pre></div></div>
-</figure>
-<p>npm スクリプトの場合は、定義したタスクが OS のシェル上で実行されることが前提だったので、シェルの機能をうかつに使ってしまうと、Linux では動くけど Windows では動かないというタスクなってしまいがちでした。
-例えば、ファイルをまとめて削除するタスクを作りたい場合、Linux に依存した <code>rm -rf</code> コマンドは使えず、いちいち <code>rimraf</code> モジュールをインストールするといったことが必要でした。
-一方、Deno 場合は、クロスプラットフォームで動作する <strong>組み込みコマンドとして <code>rm</code> コマンドを備えています</strong>。
-他にも、<code>cp</code>、<code>mv</code>、<code>mkdir</code>、<code>echo</code>、<code>cat</code> といったよく使うコマンドが、Linux や Windows、macOS などで共通で使えるようになっています。</p>
-<p>また、Linux と Windows では、パイプやリダイレクトの記述方法も微妙に異なっていますが、Deno のタスクランナーでは、<strong>組み込みでパイプやリダイレクトの構文を処理する</strong> ようになっており、連続したコマンド実行も OS のシェルに依存せずに定義できます。</p>
-<h2 id=jsonc-フォーマットがおすすめ-json-with-comments>jsonc フォーマットがおすすめ (JSON with Comments)</h2>
-<p><code>deno.json</code> の代わりに、<strong><code>deno.jsonc</code></strong> という名前で Deno の設定ファイルを作成すると、ファイル内にコメントを記述することができます。
-JSONC は JSON with Comments の略です。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>deno.jsonc</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
-  <span class=s2>&#34;tasks&#34;</span><span class=o>:</span> <span class=p>{</span>
-    <span class=c1>// データ収集と分析を実行します
-</span><span class=c1></span>    <span class=s2>&#34;data&#34;</span><span class=o>:</span> <span class=s2>&#34;deno task collect &amp;&amp; deno task analyze&#34;</span><span class=p>,</span>
-    <span class=c1>// データ収集を実行します
-</span><span class=c1></span>    <span class=s2>&#34;collect&#34;</span><span class=o>:</span> <span class=s2>&#34;deno run --allow-read=. --allow-write=. scripts/collect.js&#34;</span><span class=p>,</span>
-    <span class=c1>// データ分析を実行します
-</span><span class=c1></span>    <span class=s2>&#34;analyze&#34;</span><span class=o>:</span> <span class=s2>&#34;deno run --allow-read=. scripts/analyze.js&#34;</span>
-  <span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<h2 id=タスクの一覧を表示する>タスクの一覧を表示する</h2>
-<p><code>deno task</code> コマンドを <strong>引数なしで実行</strong> すると、定義されているタスクの一覧を表示できます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>deno task
-<span class=go>Available tasks:
-</span><span class=go>- analyze
-</span><span class=go>    deno run --allow-read=. scripts/analyze.js
-</span><span class=go>- collect
-</span><span class=go>    deno run --allow-read=. --allow-write=. scripts/collect.js
-</span><span class=go>- data
-</span><span class=go>    deno task collect &amp;&amp; deno task analyze
-</span></code></pre></div><p>Deno プロジェクトを <code>git clone</code> してきたときに、<code>deno task</code> でできることがざっと分かるようになっていると親切ですね。</p>
-<h2 id=タスク実行時にコマンドライン引数を渡す>タスク実行時にコマンドライン引数を渡す</h2>
-<p><code>deno task &lt;タスク名> &lt;引数...></code> のように渡した引数は、タスクで定義されているコマンドに渡されます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>deno.json</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
-  <span class=nt>&#34;tasks&#34;</span><span class=p>:</span> <span class=p>{</span>
-    <span class=nt>&#34;my-echo&#34;</span><span class=p>:</span> <span class=s2>&#34;echo&#34;</span>
-  <span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>例えば、上記のように定義した <code>my-echo</code> タスクを、次のように引数 <code>A B C</code> 付きで実行すると、それらは <code>echo</code> に対して渡されます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>deno task my-echo A B C
-<span class=go>Task my-echo echo &#34;A&#34; &#34;B&#34; &#34;C&#34;
-</span><span class=go>A B C
-</span></code></pre></div><p>コマンドライン引数がどのようにタスクに渡されたかは、出力の 1 行目を見るとわかります。
-この 1 行目の出力を抑制するには、<code>deno task</code> コマンドに <strong><code>-q (--quiet)</code></strong> オプションを指定します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>deno task -q my-echo A B C
-<span class=go>A B C
-</span></code></pre></div>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/3pwojuj/>Deno で MongoDB にアクセスする</a></li>
-<li><a href=./p/a83hr2b/>Deno で JSON ファイルを読み込む方法いろいろ</a></li>
-<li><a href=./p/zt3birz/>Deno Deploy の例: JSON ファイルを読み込んで返す REST API を作る (oak)</a></li>
-<li><a href=./p/phz7fo3/>Deno Deploy で Deno のサーバープログラムを公開する</a></li>
-<li><a href=./p/zbaga2z/>Node.js と Deno のコーディング方法の違いまとめ</a></li>
-<li><a href=./p/d8s6fpz/>Deno プログラミングをはじめる</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/deno>Deno</a></span>
 </div>
 </div>
 <div style=text-align:right>
