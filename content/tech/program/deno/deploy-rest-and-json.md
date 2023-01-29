@@ -156,3 +156,23 @@ $ curl https://your-project-a93nne0yv79j.deno.dev/books/1
 
 バッチシ動きました！ ٩(๑❛ᴗ❛๑)۶ わーぃ
 
+
+CORS 対応
+----
+
+クライアントサイド JavaScript から REST API を呼び出す場合は、クロスドメインでの呼び出しを許可するための CORS 対応が必要です。
+
+{{< code title="CORS エラーの例" >}}
+Origin http://localhost:3000 is not allowed by Access-Control-Allow-Origin.
+{{< /code >}}
+
+Deno の [cors モジュール](https://deno.land/x/cors) をインポートして、`oak` のミドルウェアとして設定すれば、ブラウザ上の JavaScript からアクセスできるようになります。
+
+{{< code lang="ts" hl_lines="4" >}}
+import { oakCors } from "https://deno.land/x/cors@v1.2.2/mod.ts";
+
+const app = new Application();
+app.use(oakCors()); // Enable CORS for All Routes
+app.use(router.routes());
+{{< /code >}}
+
