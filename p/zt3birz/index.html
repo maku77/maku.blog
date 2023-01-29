@@ -565,6 +565,7 @@ Deno で JSON ファイルを読み込む方法いろいろ
 <li><a href=#json-ファイル>JSON ファイル</a></li>
 <li><a href=#サーバーの実装>サーバーの実装</a></li>
 <li><a href=#ローカルでのテストとデプロイ>ローカルでのテストとデプロイ</a></li>
+<li><a href=#cors-対応>CORS 対応</a></li>
 </ul>
 </nav><h2 id=何をするか>何をするか？</h2>
 <p>Deno Deploy を使うと、Web API を簡単にデプロイすることができます。
@@ -687,6 +688,20 @@ Deno で JSON ファイルを読み込む方法いろいろ
 </span><span class=err></span><span class=gp>$ </span>curl https://your-project-a93nne0yv79j.deno.dev/books/1
 <span class=go>{&#34;id&#34;:&#34;1&#34;,&#34;title&#34;:&#34;Title 1&#34;}
 </span></code></pre></div><p>バッチシ動きました！ ٩(๑❛ᴗ❛๑)۶ わーぃ</p>
+<h2 id=cors-対応>CORS 対応</h2>
+<p>クライアントサイド JavaScript から REST API を呼び出す場合は、クロスドメインでの呼び出しを許可するための CORS 対応が必要です。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>CORS エラーの例</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>Origin http://localhost:3000 is not allowed by Access-Control-Allow-Origin.</code></pre></div></div>
+</figure>
+<p>Deno の <a href=https://deno.land/x/cors>cors モジュール</a> をインポートして、<code>oak</code> のミドルウェアとして設定すれば、ブラウザ上の JavaScript からアクセスできるようになります。</p>
+<figure class=xCodeBlock>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>oakCors</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;https://deno.land/x/cors@v1.2.2/mod.ts&#34;</span><span class=p>;</span>
+
+<span class=kr>const</span> <span class=nx>app</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Application</span><span class=p>();</span>
+<span class=hl><span class=nx>app</span><span class=p>.</span><span class=nx>use</span><span class=p>(</span><span class=nx>oakCors</span><span class=p>());</span> <span class=c1>// Enable CORS for All Routes
+</span></span><span class=c1></span><span class=nx>app</span><span class=p>.</span><span class=nx>use</span><span class=p>(</span><span class=nx>router</span><span class=p>.</span><span class=nx>routes</span><span class=p>());</span></code></pre></div></div>
+</figure>
 <meta itemprop=author content="まく">
 <span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
 <meta itemprop=name content="まく">
