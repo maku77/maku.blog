@@ -95,3 +95,43 @@ export default TodoPage
 クエリパラメーターは、あくまで実際にユーザーが Web サイトにアクセスするときに指定されるものという扱いであり、ビルド時にはクエリパラメーターまで含んだページを出力できないからです。
 もっと具体的にいうと、`001?sortby=title&order=asc.html` のようなクエリまで含んだファイルを事前生成することはできないということです。
 
+
+クエリ文字列を変更する
+----
+
+コンポーネントの中から URL のクエリ文字列部分を変更するには、`NextRouter` オブジェクトの `replace` メソッドの引数に渡すオブジェクトの __`query`__ プロパティを指定します。
+元の URL をブラウザの履歴に積みたいときは、`replace` の代わりに `push` メソッドを使用します。
+
+```ts
+// import NextRouter from 'next/router'
+
+const updateQuery = (value: string) => {
+  NextRouter.replace({
+    // 既存のクエリパラメーターとマージする形で keyName の値を書き換える
+    query: { ...NextRouter.query, keyName: value },
+  })
+}
+```
+
+上記の例では、`useRouter` フックの代わりに、`next/router` モジュールがデフォルト export するオブジェクトを参照しています。
+ユーザー操作によるトリガーでしか呼ばれない関数など、コンポーネントのライフサイクルから切り離された場所であれば、このデフォルトオブジェクトを使用できます。
+
+複数のクエリパラメーターを一度に変更したい場合は、次のような `updateQuery` 関数を作っておくと便利かもしれません。
+この関数は、複数のキー＆バリューを受け取ることができます。
+
+```ts
+// import { ParsedUrlQueryInput } from 'querystring'
+// import NextRouter from 'next/router'
+
+/**
+ * URL のクエリパラメーター部分を更新します。
+ *
+ * 使用例: updateQuery({ key1: "value1", key2: "value2" })
+ */
+function updateQuery(query: { [key: string]: string | number }) {
+  // 既存のクエリパラメーターとマージ
+  const newQuery: ParsedUrlQueryInput = { ...NextRouter.query, ...query }
+  NextRouter.replace({ query: newQuery })
+}
+```
+
