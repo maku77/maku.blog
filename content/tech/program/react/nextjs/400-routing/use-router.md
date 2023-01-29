@@ -106,7 +106,7 @@ export default TodoPage
 // import NextRouter from 'next/router'
 
 const updateQuery = (value: string) => {
-  NextRouter.replace({
+  void NextRouter.replace({
     // 既存のクエリパラメーターとマージする形で keyName の値を書き換える
     query: { ...NextRouter.query, keyName: value },
   })
@@ -131,7 +131,7 @@ const updateQuery = (value: string) => {
 function updateQuery(query: { [key: string]: string | number }) {
   // 既存のクエリパラメーターとマージ
   const newQuery: ParsedUrlQueryInput = { ...NextRouter.query, ...query }
-  NextRouter.replace({ query: newQuery })
+  void NextRouter.replace({ query: newQuery })
 }
 ```
 
