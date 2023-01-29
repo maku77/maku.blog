@@ -44,6 +44,11 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/cv6fpx7/>
+React で入力フォームの onChange イベントを IME ON のときに無視する
+<time>2023-01-29</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/bo8q8p7/>
 Meilisearch サーチエンジンを使ってみる
 <time>2023-01-24</time></a>
@@ -62,11 +67,6 @@ Deno で MongoDB にアクセスする
 <a href=./p/ho4gs5h/>
 Deno のタスクランナーの使い方 (deno task)
 <time>2023-01-14</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/a83hr2b/>
-Deno で JSON ファイルを読み込む方法いろいろ
-<time>2022-12-28</time></a>
 </div>
 </div>
 </div>
@@ -104,9 +104,9 @@ Deno で JSON ファイルを読み込む方法いろいろ
 </div><div class=xMenu_tag>
 <a href=./tags/graphql>graphql (35)</a>
 </div><div class=xMenu_tag>
-<a href=./tags/chatbot>chatbot (28)</a>
+<a href=./tags/react>react (29)</a>
 </div><div class=xMenu_tag>
-<a href=./tags/react>react (28)</a>
+<a href=./tags/chatbot>chatbot (28)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/gnuplot>gnuplot (27)</a>
 </div><div class=xMenu_tag>
@@ -465,14 +465,14 @@ Deno で JSON ファイルを読み込む方法いろいろ
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/cv6fpx7/>
+React で入力フォームの onChange イベントを IME ON のときに無視する<span class=xRecents_item_tag>React</span><time>2023-01-29</time></a>
+</div><div class=xRecents_item>
 <a href=./p/bo8q8p7/>
 Meilisearch サーチエンジンを使ってみる<span class=xRecents_item_tag>Meilisearch</span><time>2023-01-24</time></a>
 </div><div class=xRecents_item>
 <a href=./p/y6zgrg2/>
 Docker で MongoDB サーバーを立ち上げる<span class=xRecents_item_tag>Docker</span><span class=xRecents_item_tag>MongoDB</span><time>2023-01-18</time></a>
-</div><div class=xRecents_item>
-<a href=./p/3pwojuj/>
-Deno で MongoDB にアクセスする<span class=xRecents_item_tag>Deno</span><span class=xRecents_item_tag>MongoDB</span><time>2023-01-18</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -480,6 +480,200 @@ Deno で MongoDB にアクセスする<span class=xRecents_item_tag>Deno</span><
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/ujqinda/>プログラミング</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/d7p5jye/>React</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/m7it4do/>React 雑多記事</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=width:80px;margin-right:.5em>
+<img src=./p/ujqinda/_index.svg style=width:80px;height:80px>
+</div>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/cv6fpx7/>React で入力フォームの onChange イベントを IME ON のときに無視する</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/react>React</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2023-01-29>2023-01-29</time><br>
+作成: <time itemprop=datePublished datetime=2023-01-29>2023-01-29</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#何をするか>何をするか？</a></li>
+<li><a href=#実装してみる>実装してみる</a></li>
+<li><a href=#コンポーネント化する>コンポーネント化する</a></li>
+</ul>
+</nav><h2 id=何をするか>何をするか？</h2>
+<p>React のテキスト入力フォーム（<code>input</code> コンポーネントや mui の <code>TextField</code> など）で <code>onChange</code> イベントハンドラーを設定すると、入力テキストが変化したときに任意の処理を行うことができます。
+ただ、<strong><code>onChange</code> イベントは IME での日本語変換中にも呼び出されてしまう</strong> ので、おそらく、想定しているよりも多く呼び出されてしまいます。
+インクリメンタルサーチなどで、入力のたびに API 呼び出しをしているようなケースでは、この振る舞いは抑制しなければいけません。</p>
+<p>ここでは、IME が ON になっているとき（つまり日本語変換中）に、<code>onChange</code> イベントを無視する実装例を紹介します。
+このあたりの実装は、ブラウザごとの微妙な振る舞いの差（特に <code>Esc</code> キーで IME 入力をキャンセルした場合など）を考えると、結構複雑だったりします。</p>
+<h2 id=実装してみる>実装してみる</h2>
+<p>React の <code>input</code> コンポーネントの <strong><code>onCompositionStart</code></strong> と <strong><code>onCompositionEnd</code></strong> イベントハンドラーを設定すると、IME を ON/OFF したタイミングを知ることができます。
+そのタイミングで、<code>isImeOn</code> のようなフラグを制御すれば、必要に応じて <code>onChange</code> イベントを無視できるようになります。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=c1>// import { FC, useRef, useState } from &#39;react&#39;
+</span><span class=c1></span>
+<span class=kr>const</span> <span class=nx>SearchBox</span>: <span class=kt>FC</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=c1>// 現在 IME ON（変換中）かどうかのフラグ
+</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>isImeOn</span> <span class=o>=</span> <span class=nx>useRef</span><span class=p>(</span><span class=kc>false</span><span class=p>)</span>
+
+  <span class=c1>// 以前の入力テキスト（ブラウザごとの onChange の振る舞いの差異への対策）
+</span><span class=c1></span>  <span class=kr>const</span> <span class=p>[</span><span class=nx>prevText</span><span class=p>,</span> <span class=nx>setPrevText</span><span class=p>]</span> <span class=o>=</span> <span class=nx>useState</span><span class=p>(</span><span class=s1>&#39;&#39;</span><span class=p>)</span>
+
+  <span class=c1>// 入力テキストを処理する
+</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>handleChange</span> <span class=o>=</span> <span class=p>(</span><span class=nx>text</span>: <span class=kt>string</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+    <span class=k>if</span> <span class=p>(</span><span class=nx>prevText</span> <span class=o>===</span> <span class=nx>text</span><span class=p>)</span> <span class=k>return</span>
+    <span class=k>if</span> <span class=p>(</span><span class=nx>text</span> <span class=o>===</span> <span class=s1>&#39;&#39;</span><span class=p>)</span> <span class=p>{</span>
+      <span class=c1>// Chrome ではテキストクリア時に onCompositionEnd が呼ばれないことがある
+</span><span class=c1></span>      <span class=nx>isImeOn</span><span class=p>.</span><span class=nx>current</span> <span class=o>=</span> <span class=kc>false</span>
+    <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=nx>isImeOn</span><span class=p>.</span><span class=nx>current</span><span class=p>)</span> <span class=p>{</span>
+      <span class=k>return</span> <span class=c1>// IME 変換中は何もしない
+</span><span class=c1></span>    <span class=p>}</span>
+    <span class=nx>setPrevText</span><span class=p>(</span><span class=nx>text</span><span class=p>)</span>
+
+    <span class=c1>// ここで最新の入力値にもとづいて検索処理などを行う
+</span><span class=c1></span>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>text</span><span class=p>)</span>
+  <span class=p>}</span>
+
+  <span class=k>return</span> <span class=p>(</span>
+    <span class=p>&lt;</span><span class=nt>input</span>
+      <span class=na>id</span><span class=o>=</span><span class=s>&#34;search&#34;</span>
+      <span class=na>type</span><span class=o>=</span><span class=s>&#34;search&#34;</span>
+      <span class=na>onChange</span><span class=o>=</span><span class=p>{(</span><span class=nx>e</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>handleChange</span><span class=p>(</span><span class=nx>e</span><span class=p>.</span><span class=nx>target</span><span class=p>.</span><span class=nx>value</span><span class=p>)}</span>
+      <span class=na>onCompositionStart</span><span class=o>=</span><span class=p>{()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+        <span class=nx>isImeOn</span><span class=p>.</span><span class=nx>current</span> <span class=o>=</span> <span class=kc>true</span> <span class=c1>// IME 入力中フラグを ON
+</span><span class=c1></span>      <span class=p>}}</span>
+      <span class=na>onCompositionEnd</span><span class=o>=</span><span class=p>{(</span><span class=nx>e</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+        <span class=nx>isImeOn</span><span class=p>.</span><span class=nx>current</span> <span class=o>=</span> <span class=kc>false</span> <span class=c1>// IME 入力中フラグを OFF
+</span><span class=c1></span>        <span class=nx>handleChange</span><span class=p>((</span><span class=nx>e</span><span class=p>.</span><span class=nx>target</span> <span class=kr>as</span> <span class=nx>HTMLInputElement</span><span class=p>).</span><span class=nx>value</span><span class=p>)</span> <span class=c1>// 入力確定したとき
+</span><span class=c1></span>      <span class=p>}}</span>
+    <span class=p>/&gt;</span>
+  <span class=p>)</span>
+<span class=p>}</span>
+</code></pre></div><p>ポイントは、<code>onCompositionEnd</code> ハンドラーの中で <code>handleChange</code> を明示的に呼び出しているところでしょうか。
+これを入れておかないと、IME での変換を確定したときに、入力されたテキストを処理することができません（<code>onChange</code> は呼び出されるけど、IME 変換中とみなして処理をスキップしてしまうため）。</p>
+<p><code>input</code> コンポーネントの代わりに、mui の <code>TextField</code> コンポーネントを使う場合も、同様の props 設定で OK です。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=p>&lt;</span><span class=nt>TextField</span>
+  <span class=na>id</span><span class=o>=</span><span class=s>&#34;search&#34;</span>
+  <span class=na>type</span><span class=o>=</span><span class=s>&#34;search&#34;</span>
+  <span class=na>fullWidth</span>
+  <span class=na>label</span><span class=o>=</span><span class=s>&#34;Search&#34;</span>
+  <span class=na>variant</span><span class=o>=</span><span class=s>&#34;filled&#34;</span>
+  <span class=na>onChange</span><span class=o>=</span><span class=p>{(</span><span class=nx>e</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>handleChange</span><span class=p>(</span><span class=nx>e</span><span class=p>.</span><span class=nx>target</span><span class=p>.</span><span class=nx>value</span><span class=p>)}</span>
+  <span class=na>onCompositionStart</span><span class=o>=</span><span class=p>{()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+    <span class=nx>isImeOn</span><span class=p>.</span><span class=nx>current</span> <span class=o>=</span> <span class=kc>true</span> <span class=c1>// IME 入力中フラグを ON
+</span><span class=c1></span>  <span class=p>}}</span>
+  <span class=na>onCompositionEnd</span><span class=o>=</span><span class=p>{(</span><span class=nx>e</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+    <span class=nx>isImeOn</span><span class=p>.</span><span class=nx>current</span> <span class=o>=</span> <span class=kc>false</span> <span class=c1>// IME 入力中フラグを OFF
+</span><span class=c1></span>    <span class=nx>handleChange</span><span class=p>((</span><span class=nx>e</span><span class=p>.</span><span class=nx>target</span> <span class=kr>as</span> <span class=nx>HTMLInputElement</span><span class=p>).</span><span class=nx>value</span><span class=p>)</span> <span class=c1>// 入力確定したとき
+</span><span class=c1></span>  <span class=p>}}</span>
+<span class=p>/&gt;</span>
+</code></pre></div><h2 id=コンポーネント化する>コンポーネント化する</h2>
+<p>実際に上記のようなコードを導入する場合は、IME まわりの処理を隠蔽する形でコンポーネント化してしまった方がよいでしょう。
+次の <code>SearchTextField</code> コンポーネントは、<code>props</code> として <code>onSearch</code> ハンドラーを受け取ります。
+このハンドラーは、適切なタイミングで呼び出される <code>onChange</code> ハンドラーとして使用することができます。</p>
+<div class=xAccordion>
+<input id=id-264538197 type=checkbox>
+<label class=xAccordion_title for=id-264538197>components/SearchTextField.tsx</label>
+<div class=xAccordion_body>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>FC</span><span class=p>,</span> <span class=nx>useRef</span><span class=p>,</span> <span class=nx>useState</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;react&#39;</span>
+<span class=kr>import</span> <span class=p>{</span> <span class=nx>TextField</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@mui/material&#39;</span>
+
+<span class=kr>interface</span> <span class=nx>Props</span> <span class=p>{</span>
+  <span class=nx>onSearch</span><span class=o>?:</span> <span class=p>(</span><span class=nx>text</span>: <span class=kt>string</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=k>void</span>
+<span class=p>}</span>
+
+<span class=cm>/**
+</span><span class=cm> * インクリメンタルサーチ用に `TextField` を拡張したコンポーネントです。
+</span><span class=cm> *
+</span><span class=cm> * ユーザーの入力に応じて検索 API を呼び出す場合は、`onSearch` ハンドラーを使用します。
+</span><span class=cm> * `onSearch` は、`TextField` の `onChange` よりも適切なタイミングで呼び出されます。
+</span><span class=cm> * 例えば、`onChange` は IME 変換中にも呼び出されてしまいますが、
+</span><span class=cm> * `onSearch` はユーザーが入力を確定したときにしか呼び出されないようになっています。
+</span><span class=cm> */</span>
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>SearchTextField</span>: <span class=kt>FC</span><span class=p>&lt;</span><span class=nt>Props</span><span class=p>&gt;</span> <span class=o>=</span> <span class=p>({</span> <span class=nx>onSearch</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=c1>// 現在 IME ON（変換中）かどうかのフラグ
+</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>isImeOn</span> <span class=o>=</span> <span class=nx>useRef</span><span class=p>(</span><span class=kc>false</span><span class=p>)</span>
+
+  <span class=c1>// 以前の入力テキスト（ブラウザによって onChange の振る舞いが微妙に異なるための対策）
+</span><span class=c1></span>  <span class=kr>const</span> <span class=p>[</span><span class=nx>prevText</span><span class=p>,</span> <span class=nx>setPrevText</span><span class=p>]</span> <span class=o>=</span> <span class=nx>useState</span><span class=p>(</span><span class=s1>&#39;&#39;</span><span class=p>)</span>
+
+  <span class=c1>// 入力テキストを処理する
+</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>handleChange</span> <span class=o>=</span> <span class=p>(</span><span class=nx>text</span>: <span class=kt>string</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+    <span class=k>if</span> <span class=p>(</span><span class=nx>prevText</span> <span class=o>===</span> <span class=nx>text</span><span class=p>)</span> <span class=k>return</span>
+    <span class=k>if</span> <span class=p>(</span><span class=nx>text</span> <span class=o>===</span> <span class=s1>&#39;&#39;</span><span class=p>)</span> <span class=p>{</span>
+      <span class=c1>// Chrome ではテキストクリア時に onCompositionEnd が呼ばれないことがある
+</span><span class=c1></span>      <span class=nx>isImeOn</span><span class=p>.</span><span class=nx>current</span> <span class=o>=</span> <span class=kc>false</span>
+    <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=nx>isImeOn</span><span class=p>.</span><span class=nx>current</span><span class=p>)</span> <span class=p>{</span>
+      <span class=k>return</span> <span class=c1>// IME 変換中は何もしない
+</span><span class=c1></span>    <span class=p>}</span>
+    <span class=nx>setPrevText</span><span class=p>(</span><span class=nx>text</span><span class=p>)</span>
+
+    <span class=c1>// ここで任意のコールバック関数を呼び出す
+</span><span class=c1></span>    <span class=nx>onSearch</span><span class=o>?</span><span class=p>.(</span><span class=nx>text</span><span class=p>)</span>
+  <span class=p>}</span>
+
+  <span class=k>return</span> <span class=p>(</span>
+    <span class=p>&lt;</span><span class=nt>TextField</span>
+      <span class=na>id</span><span class=o>=</span><span class=s>&#34;search&#34;</span>
+      <span class=na>type</span><span class=o>=</span><span class=s>&#34;search&#34;</span>
+      <span class=na>fullWidth</span>
+      <span class=na>label</span><span class=o>=</span><span class=s>&#34;Search&#34;</span>
+      <span class=na>variant</span><span class=o>=</span><span class=s>&#34;filled&#34;</span>
+      <span class=na>onChange</span><span class=o>=</span><span class=p>{(</span><span class=nx>e</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>handleChange</span><span class=p>(</span><span class=nx>e</span><span class=p>.</span><span class=nx>target</span><span class=p>.</span><span class=nx>value</span><span class=p>)}</span>
+      <span class=na>onCompositionStart</span><span class=o>=</span><span class=p>{()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+        <span class=nx>isImeOn</span><span class=p>.</span><span class=nx>current</span> <span class=o>=</span> <span class=kc>true</span> <span class=c1>// IME 入力中フラグを ON
+</span><span class=c1></span>      <span class=p>}}</span>
+      <span class=na>onCompositionEnd</span><span class=o>=</span><span class=p>{(</span><span class=nx>e</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+        <span class=nx>isImeOn</span><span class=p>.</span><span class=nx>current</span> <span class=o>=</span> <span class=kc>false</span> <span class=c1>// IME 入力中フラグを OFF
+</span><span class=c1></span>        <span class=nx>handleChange</span><span class=p>((</span><span class=nx>e</span><span class=p>.</span><span class=nx>target</span> <span class=kr>as</span> <span class=nx>HTMLInputElement</span><span class=p>).</span><span class=nx>value</span><span class=p>)</span> <span class=c1>// 入力確定したとき
+</span><span class=c1></span>      <span class=p>}}</span>
+    <span class=p>/&gt;</span>
+  <span class=p>)</span>
+<span class=p>}</span>
+</code></pre></div> </div>
+</div>
+<p>このコンポーネントを使用すると、前述の実装を次のように簡潔に記述できます。</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=c1>// import { FC } from &#39;react&#39;
+</span><span class=c1>// import { SearchTextField } from &#39;../components/SearchTextField&#39;
+</span><span class=c1></span>
+<span class=kr>const</span> <span class=nx>SearchBox</span>: <span class=kt>FC</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=p>&lt;</span><span class=nt>SearchTextField</span> <span class=na>onSearch</span><span class=o>=</span><span class=p>{(</span><span class=nx>text</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>text</span><span class=p>)}</span> <span class=p>/&gt;</span>
+<span class=p>}</span>
+</code></pre></div>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/k7it5fp/>React コンポーネントで入力フォームを作成する (2) react-hook-form 編</a></li>
+<li><a href=./p/w7igunc/>Apollo Client の fetchMore を自動で呼び出して GitHub GraphQL の100件制限を乗り越える (useAutoFetchMore)</a></li>
+<li><a href=./p/xenv4bh/>React の props.children の型定義には ReactNode を使う</a></li>
+<li><a href=./p/vm2ft83/>React フック: useSWR でデータフェッチ</a></li>
+<li><a href=./p/xjv6gqy/>React の JSX 記述のコツ</a></li>
+<li><a href=./p/ny9fmty/>Next.js のプロジェクトを TypeScript 化する</a></li>
+<li><a href=./p/xjw8it5/>Next.js アプリのソースコードを GitHub で管理する</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/react>React</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/m7it4do/><span class=xArticle_up_label>React 雑多記事</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -863,150 +1057,6 @@ Docker Compose はネットワークの作成まで同時にやってくれる�
 </div>
 <div class=xArticle_up>
 <a href=./p/q8hry9h/><span class=xArticle_up_label>MongoDB サーバー (mongod デーモン)</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/ujqinda/>プログラミング</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/dp4r2wz/>Deno</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=./p/dp4r2wz/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/3pwojuj/>Deno で MongoDB にアクセスする</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/deno>Deno</a></span>
-<span class=xPageTags_item><a href=./tags/mongodb>MongoDB</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2023-01-18>2023-01-18</time><br>
-作成: <time itemprop=datePublished datetime=2023-01-18>2023-01-18</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#mongodb-サーバーへ接続する>MongoDB サーバーへ接続する</a></li>
-<li><a href=#コレクションを参照する>コレクションを参照する</a></li>
-<li><a href=#コレクション内のドキュメントを操作する>コレクション内のドキュメントを操作する</a>
-<ul>
-<li><a href=#ドキュメントを追加する-insertone-insertmany>ドキュメントを追加する (insertOne, insertMany)</a></li>
-<li><a href=#ドキュメントを検索する-find-findone>ドキュメントを検索する (find, findOne)</a></li>
-</ul>
-</li>
-</ul>
-</nav><p>Deno 用の MongoDB ドライバーとして、<strong>deno_mongo</strong> が公開されています。
-<a href=./p/phz7fo3/>Deno Deploy</a> 上でも使えるので、Deno Deploy で公開する Web API から MongoDB Atlas に接続する、といったことが簡単に行えます。</p>
-<ul>
-<li><a href=https://deno.land/x/mongo>mongo | Deno</a></li>
-<li><a href=https://github.com/denodrivers/mongo>GitHub - denodrivers/mongo: MongoDB driver for Deno</a></li>
-</ul>
-<h2 id=mongodb-サーバーへ接続する>MongoDB サーバーへ接続する</h2>
-<p>ローカルホスト上で起動した MongoDB サーバーへ接続するには次のようにします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>MongoClient</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;https://deno.land/x/mongo@v0.31.1/mod.ts&#34;</span><span class=p>;</span>
-
-<span class=kr>const</span> <span class=nx>client</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>MongoClient</span><span class=p>();</span>
-<span class=k>await</span> <span class=nx>client</span><span class=p>.</span><span class=nx>connect</span><span class=p>(</span><span class=s2>&#34;mongodb://127.0.0.1:27017&#34;</span><span class=p>);</span>
-
-<span class=c1>// 後は client インスタンスを使って MongoDB を操作する
-</span></code></pre></div><p>実運用を考えると、<strong><code>MONGO_URI</code></strong> のような環境変数で接続先の MongoDB サーバーを指定できるようにしておいた方がよいでしょう。
-例えば、MongoDB Atlas サービスを使用している場合は、次のような接続文字列 (SRV URI) が発行されますが、ここには接続パスワードなどが含まれるので、この URI をハードコーディングすることはできません。</p>
-<pre tabindex=0><code>mongodb+srv://&lt;user&gt;:&lt;password&gt;@cluster-name.abcde.mongodb.net/?retryWrites=true&amp;w=majority
-</code></pre><p>次の <code>client.ts</code> モジュールは、<code>MongoClient</code> インスタンスを <code>MONGO_URI</code> 環境変数が示す MongoDB サーバーに接続し、<code>export</code> しています。
-<code>MONGO_URI</code> 環境変数がセットされていない場合は、代わりに <code>127.0.0.1:27017</code> へ接続するようにしています。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>client.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>MongoClient</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;https://deno.land/x/mongo@v0.31.1/mod.ts&#34;</span><span class=p>;</span>
-
-<span class=kr>const</span> <span class=nx>uri</span> <span class=o>=</span> <span class=nx>Deno</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=kr>get</span><span class=p>(</span><span class=s2>&#34;MONGO_URI&#34;</span><span class=p>)</span> <span class=o>??</span> <span class=s2>&#34;mongodb://127.0.0.1:27017&#34;</span><span class=p>;</span>
-<span class=kr>export</span> <span class=kr>const</span> <span class=nx>client</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>MongoClient</span><span class=p>();</span>
-<span class=k>await</span> <span class=nx>client</span><span class=p>.</span><span class=nx>connect</span><span class=p>(</span><span class=nx>uri</span><span class=p>);</span></code></pre></div></div>
-</figure>
-<p>メインモジュールから次のようにインポートすることで、簡単に <code>MongoClient</code> インスタンスを使用できます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>main.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>client</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;./client.ts&#34;</span><span class=p>;</span>
-
-<span class=c1>// あとは client を使っていろいろな DB 操作
-</span><span class=c1></span><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=k>await</span> <span class=nx>client</span><span class=p>.</span><span class=nx>listDatabases</span><span class=p>());</span></code></pre></div></div>
-</figure>
-<p><strong><code>deno run</code></strong> でプログラムを実行するときは、<code>--allow-env</code> による環境変数へのアクセスと、<code>--allow-net</code> によるネットワークへのアクセスの許可が必要です。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>deno run --allow-env --allow-net main.ts
-<span class=go>[
-</span><span class=go>  { name: &#34;admin&#34;, sizeOnDisk: 40960, empty: false },
-</span><span class=go>  { name: &#34;config&#34;, sizeOnDisk: 61440, empty: false },
-</span><span class=go>  { name: &#34;local&#34;, sizeOnDisk: 40960, empty: false }
-</span><span class=go>]
-</span></code></pre></div><h2 id=コレクションを参照する>コレクションを参照する</h2>
-<p>MongoDB データベース内のコレクションを参照するときは、そこに含まれるドキュメントの型をあらかじめ定義しておくことができます。
-次の例では、書籍データ（<code>books</code> コレクション）のスキーマ定義を行っています。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>main.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>ObjectId</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;https://deno.land/x/mongo@v0.31.1/mod.ts&#34;</span><span class=p>;</span>
-<span class=kr>import</span> <span class=p>{</span> <span class=nx>client</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;./client.ts&#34;</span><span class=p>;</span>
-
-<span class=c1>// books コレクションのスキーマ定義（含まれるドキュメントの型）
-</span><span class=c1></span><span class=kr>interface</span> <span class=nx>BookSchema</span> <span class=p>{</span>
-  <span class=nx>_id</span>: <span class=kt>ObjectId</span><span class=p>;</span>
-  <span class=nx>title</span>: <span class=kt>string</span><span class=p>;</span>
-  <span class=nx>author</span>: <span class=kt>string</span><span class=p>;</span>
-<span class=p>}</span>
-
-<span class=c1>// mydb データベースの books コレクションを参照する
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>db</span> <span class=o>=</span> <span class=nx>client</span><span class=p>.</span><span class=nx>database</span><span class=p>(</span><span class=s2>&#34;mydb&#34;</span><span class=p>);</span>
-<span class=kr>const</span> <span class=nx>booksCollection</span> <span class=o>=</span> <span class=nx>db</span><span class=p>.</span><span class=nx>collection</span><span class=p>&lt;</span><span class=nt>BookSchema</span><span class=p>&gt;(</span><span class=s2>&#34;books&#34;</span><span class=p>);</span></code></pre></div></div>
-</figure>
-<p>このようにして <code>Collection</code> インスタンスを取得したら、あとは自由にドキュメントの追加や検索を行えます。</p>
-<h2 id=コレクション内のドキュメントを操作する>コレクション内のドキュメントを操作する</h2>
-<h3 id=ドキュメントを追加する-insertone-insertmany>ドキュメントを追加する (insertOne, insertMany)</h3>
-<p>ドキュメントを追加するには、<code>Collection</code> クラスの <strong><code>insertOne</code></strong> や <strong><code>insertMany</code></strong> メソッドを使用します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>booksCollection</span><span class=p>.</span><span class=nx>insertMany</span><span class=p>([</span>
-  <span class=p>{</span> <span class=nx>title</span><span class=o>:</span> <span class=s2>&#34;Title-1&#34;</span><span class=p>,</span> <span class=nx>author</span><span class=o>:</span> <span class=s2>&#34;Author-1&#34;</span> <span class=p>},</span>
-  <span class=p>{</span> <span class=nx>title</span><span class=o>:</span> <span class=s2>&#34;Title-2&#34;</span><span class=p>,</span> <span class=nx>author</span><span class=o>:</span> <span class=s2>&#34;Author-2&#34;</span> <span class=p>},</span>
-  <span class=p>{</span> <span class=nx>title</span><span class=o>:</span> <span class=s2>&#34;Title-3&#34;</span><span class=p>,</span> <span class=nx>author</span><span class=o>:</span> <span class=s2>&#34;Author-3&#34;</span> <span class=p>},</span>
-<span class=p>]);</span>
-</code></pre></div><h3 id=ドキュメントを検索する-find-findone>ドキュメントを検索する (find, findOne)</h3>
-<p>ドキュメントを取得するには、<code>Collection</code> クラスの <strong><code>find</code></strong> メソッドや <strong><code>findOne</code></strong> メソッドを使用します。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>すべてのドキュメントを取得</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>books</span>: <span class=kt>BookSchema</span><span class=p>[]</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>booksCollection</span><span class=p>.</span><span class=nx>find</span><span class=p>({}).</span><span class=nx>toArray</span><span class=p>();</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>title フィールドに特定の文字列が含まれているものを検索</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>books</span>: <span class=kt>BookSchema</span><span class=p>[]</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>booksCollection</span>
-  <span class=p>.</span><span class=nx>find</span><span class=p>({</span> <span class=nx>title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>$regex</span><span class=o>:</span> <span class=s2>&#34;itle-3&#34;</span> <span class=p>}</span> <span class=p>})</span>
-  <span class=p>.</span><span class=nx>toArray</span><span class=p>();</span></code></pre></div></div>
-</figure>
-<p>その他のメソッドは、<a href=https://deno.land/x/mongo>公式サイト</a> を参考にしてください。</p>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/y6zgrg2/>Docker で MongoDB サーバーを立ち上げる</a></li>
-<li><a href=./p/ho4gs5h/>Deno のタスクランナーの使い方 (deno task)</a></li>
-<li><a href=./p/a83hr2b/>Deno で JSON ファイルを読み込む方法いろいろ</a></li>
-<li><a href=./p/zt3birz/>Deno Deploy の例: JSON ファイルを読み込んで返す REST API を作る (oak)</a></li>
-<li><a href=./p/phz7fo3/>Deno Deploy で Deno のサーバープログラムを公開する</a></li>
-<li><a href=./p/zbaga2z/>Node.js と Deno のコーディング方法の違いまとめ</a></li>
-<li><a href=./p/d8s6fpz/>Deno プログラミングをはじめる</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/deno>Deno</a></span>
-<span class=xPageTags_item><a href=./tags/mongodb>MongoDB</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/dp4r2wz/><span class=xArticle_up_label>Deno プログラミング関連メモ</span><br>へ戻る</a>
 </div>
 </article><h2>メニュー</h2>
 <div class=xTopMenu>
