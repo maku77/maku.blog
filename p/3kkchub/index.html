@@ -11,10 +11,11 @@
 <meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
 <meta property="og:image:width" content="1436">
 <meta property="og:image:height" content="746">
-<meta property="og:description" content="プロキシ経由時の「リクエスト行」の URI について プロキシサーバを介する場合は、リクエスト行に絶対アドレス指定で URI を指定する必要があります。 これは、リクエストを受け取ったプロキシサーバが、リクエストの転送先サーバを判断するためです。
-Client ｜ ｜ GET http://target.example.com/index.html HTTP/1.1 ▽ Proxy server ｜ ｜ GET /index.html HTTP/1.1 ▽ target.example.com HTTP1.1 の Host 指定 HTTP1.1 では、メッセージヘッダに Host: の指定が必須です。これはバーチャルホストの機能を実現するためです。 HTTP1.0 を使う場合は、Host: の指定は必要ありません。
-HTTP のメッセージヘッダの種類 HTTP のメッセージヘッダには、大きく分けて、
- End-to-End Hop-by-Hop  の 2 種類があります。">
+<meta property="og:description" content="HTTP1.1 Host 指定 HTTP1.1 では、メッセージヘッダーに Host: <ドメイン> の指定が必須です（これが唯一の必須ヘッダーです）。 これは、1 台の Web サーバーで複数のドメインを運用する、バーチャルホストの機能を実現するために必要とされています。 Web サーバーは、Host ヘッダーで示されたドメイン名と、相対 URI (/index.html など）を組み合わせて、実際のどのリソースを返すかを判断します。 HTTP1.0 を使う場合は、Host: の指定は必要ありません。
+HTTP キープアライブ HTTP1.1 では、最初にスリーウェイハンドシェイクしたら、そのコネクションを一定時間使い続けることで、複数のリソースファイルの取得を効率化しています。 これを HTTP キープアライブ (KeepAlive) といい、HTTP1.1 では標準の振る舞いになっています（HTTP ヘッダーに Connection: keep-alive が付いていると考えるが規定の動作)。 例えば、ブラウザで Web ページを開くと、HTML ファイルだけではなく、CSS ファイルや画像ファイルなどのリソースを取得するために複数のリクエストが発行されますが、そこでは同じコネクションが使用されます。
+コネクションの切断は、サーバーが設定しているタイムアウト時間を過ぎたときに行われますが、クライアントあるいはサーバーが Connection: close ヘッダーを含めることで、切断する意志を伝えることができます。
+プロキシ経由時の「リクエスト行」の URI について プロキシサーバを介する場合は、リクエスト行に 絶対アドレス指定 で URI を指定する必要があります。 これは、リクエストを受け取ったプロキシサーバが、リクエストの転送先サーバを判断するためです。 逆に、プロキシを使わない場合は、リクエスト URI は相対パスで指定します。
+Client ｜ ｜ GET http://target.example.com/index.html HTTP/1.1 ▽ Proxy server ｜ ｜ GET /index.html HTTP/1.1 ▽ target.">
 <meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
 <link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
 <link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
@@ -543,13 +544,30 @@ Deno のタスクランナーの使い方 (deno task)
 <div itemprop=articleBody class=xArticle_content>
 <nav id=TableOfContents>
 <ul>
+<li><a href=#http11>HTTP1.1</a>
+<ul>
+<li><a href=#host-指定>Host 指定</a></li>
+<li><a href=#http-キープアライブ>HTTP キープアライブ</a></li>
+</ul>
+</li>
 <li><a href=#プロキシ経由時のリクエスト行の-uri-について>プロキシ経由時の「リクエスト行」の URI について</a></li>
-<li><a href=#http11-の-host-指定>HTTP1.1 の Host 指定</a></li>
 <li><a href=#http-のメッセージヘッダの種類>HTTP のメッセージヘッダの種類</a></li>
 </ul>
-</nav><h2 id=プロキシ経由時のリクエスト行の-uri-について>プロキシ経由時の「リクエスト行」の URI について</h2>
-<p>プロキシサーバを介する場合は、リクエスト行に絶対アドレス指定で URI を指定する必要があります。
-これは、リクエストを受け取ったプロキシサーバが、リクエストの転送先サーバを判断するためです。</p>
+</nav><h2 id=http11>HTTP1.1</h2>
+<h3 id=host-指定>Host 指定</h3>
+<p>HTTP1.1 では、メッセージヘッダーに <strong><code>Host: &lt;ドメイン></code></strong> の指定が必須です（これが唯一の必須ヘッダーです）。
+これは、1 台の Web サーバーで複数のドメインを運用する、バーチャルホストの機能を実現するために必要とされています。
+Web サーバーは、<code>Host</code> ヘッダーで示されたドメイン名と、相対 URI (<code>/index.html</code> など）を組み合わせて、実際のどのリソースを返すかを判断します。
+HTTP1.0 を使う場合は、<code>Host:</code> の指定は必要ありません。</p>
+<h3 id=http-キープアライブ>HTTP キープアライブ</h3>
+<p>HTTP1.1 では、最初にスリーウェイハンドシェイクしたら、そのコネクションを一定時間使い続けることで、複数のリソースファイルの取得を効率化しています。
+これを HTTP キープアライブ (KeepAlive) といい、HTTP1.1 では標準の振る舞いになっています（HTTP ヘッダーに <strong><code>Connection: keep-alive</code></strong> が付いていると考えるが規定の動作)。
+例えば、ブラウザで Web ページを開くと、HTML ファイルだけではなく、CSS ファイルや画像ファイルなどのリソースを取得するために複数のリクエストが発行されますが、そこでは同じコネクションが使用されます。</p>
+<p>コネクションの切断は、サーバーが設定しているタイムアウト時間を過ぎたときに行われますが、クライアントあるいはサーバーが <strong><code>Connection: close</code></strong> ヘッダーを含めることで、切断する意志を伝えることができます。</p>
+<h2 id=プロキシ経由時のリクエスト行の-uri-について>プロキシ経由時の「リクエスト行」の URI について</h2>
+<p>プロキシサーバを介する場合は、リクエスト行に <strong>絶対アドレス指定</strong> で URI を指定する必要があります。
+これは、リクエストを受け取ったプロキシサーバが、リクエストの転送先サーバを判断するためです。
+逆に、プロキシを使わない場合は、リクエスト URI は相対パスで指定します。</p>
 <pre tabindex=0><code>Client
   ｜
   ｜ GET http://target.example.com/index.html HTTP/1.1
@@ -559,10 +577,7 @@ Proxy server
   ｜ GET /index.html HTTP/1.1
   ▽
 target.example.com
-</code></pre><h2 id=http11-の-host-指定>HTTP1.1 の Host 指定</h2>
-<p>HTTP1.1 では、メッセージヘッダに <code>Host:</code> の指定が必須です。これはバーチャルホストの機能を実現するためです。
-HTTP1.0 を使う場合は、<code>Host:</code> の指定は必要ありません。</p>
-<h2 id=http-のメッセージヘッダの種類>HTTP のメッセージヘッダの種類</h2>
+</code></pre><h2 id=http-のメッセージヘッダの種類>HTTP のメッセージヘッダの種類</h2>
 <p>HTTP のメッセージヘッダには、大きく分けて、</p>
 <ul>
 <li>End-to-End</li>
