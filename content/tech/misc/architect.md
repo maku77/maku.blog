@@ -96,19 +96,21 @@ tags: ["技術"]
 パフォーマンス解析／チューニング
 ----
 
+パフォーマンスを改善するときは、必ず、プロファイリング（解析）→ チューニングの順番で行うこと。
+
 - Profiling (computer programming)（日本語: 性能解析）
     - [Performance analysis - Wikipedia](https://en.wikipedia.org/wiki/Performance_analysis)
     - [性能解析 - Wikipedia](https://ja.wikipedia.org/wiki/%E6%80%A7%E8%83%BD%E8%A7%A3%E6%9E%90)
         - ページの最後にプロファイラのリストがあります。
 - [Performance tuning - Wikipedia](https://en.wikipedia.org/wiki/Performance_tuning)
-- Performance counter
-    - [Hardware performance counter - Wikipedia](https://en.wikipedia.org/wiki/Hardware_performance_counter)
-    - [Working with Performance Counters - Microsoft TechNet Archive](https://docs.microsoft.com/en-us/previous-versions/tn-archive/bb734903(v=technet.10))
 
 
-並列処理に関する制御モデル
+その他
 ----
 
+### 並列処理に関する制御モデル
+
+並列処理の設計は、システムが大きくなってから変更するのは大変なので、初期段階から方針を決めておいた方がよいです。
 並列性を利用するコードは、一般的に 3 種類のモデルに基いて構築されます。
 
 - <b>ワーククルーモデル</b>: 類似した一連のタスクを並列的に実行。
@@ -117,4 +119,12 @@ tags: ["技術"]
 
 出展:『Code Reading』
 
+### 関連リンク
+
+- [読書メモ『ソフトウェアアーキテクトが知るべき97のこと』鈴木雄介 監修](/p/ejm5wd2/)
+- [読書メモ『レガシーコード改善ガイド』マイケル・C・フェザーズ](/p/p6awy3z/)
+  - テストのないコードはレガシーコードだ
+- [『アジャイルソフトウェア開発の奥義』ロバート・C・マーチン（輪講メモ）](/p/fn9ris5/)
+- [1 時間で分かる GoF デザインパターン](/p/7gmjvza/)
+- [ソフトウェア開発手法のまとめ](/p/herfwex/)
 
