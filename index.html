@@ -44,6 +44,11 @@
 <h3 class=xMenu_box_title><a href=./latest/>新着</a></h3>
 <div class=xMenu_box_body>
 <div class=xBoxLink>
+<a href=./p/zycmw6f/>
+Next.js アプリに Google Analytics を設定する (next/script)
+<time>2023-03-21</time></a>
+</div>
+<div class=xBoxLink>
 <a href=./p/cv6fpx7/>
 React で入力フォームの onChange イベントを IME ON のときに無視する
 <time>2023-01-29</time></a>
@@ -62,11 +67,6 @@ Docker で MongoDB サーバーを立ち上げる
 <a href=./p/3pwojuj/>
 Deno で MongoDB にアクセスする
 <time>2023-01-18</time></a>
-</div>
-<div class=xBoxLink>
-<a href=./p/ho4gs5h/>
-Deno のタスクランナーの使い方 (deno task)
-<time>2023-01-14</time></a>
 </div>
 </div>
 </div>
@@ -100,7 +100,7 @@ Deno のタスクランナーの使い方 (deno task)
 </div><div class=xMenu_tag>
 <a href=./tags/%E6%97%A5%E8%A8%98>日記 (54)</a>
 </div><div class=xMenu_tag>
-<a href=./tags/next.js>next.js (37)</a>
+<a href=./tags/next.js>next.js (38)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/graphql>graphql (35)</a>
 </div><div class=xMenu_tag>
@@ -392,6 +392,8 @@ Deno のタスクランナーの使い方 (deno task)
 </div><div class=xMenu_tag>
 <a href=./tags/golang>golang (1)</a>
 </div><div class=xMenu_tag>
+<a href=./tags/google-analytics>google-analytics (1)</a>
+</div><div class=xMenu_tag>
 <a href=./tags/groovy>groovy (1)</a>
 </div><div class=xMenu_tag>
 <a href=./tags/html>html (1)</a>
@@ -465,14 +467,14 @@ Deno のタスクランナーの使い方 (deno task)
 <aside>
 <div class=xRecents>
 <h4>新着記事</h4><div class=xRecents_item>
+<a href=./p/zycmw6f/>
+Next.js アプリに Google Analytics を設定する (next/script)<span class=xRecents_item_tag>Google Analytics</span><span class=xRecents_item_tag>Next.js</span><time>2023-03-21</time></a>
+</div><div class=xRecents_item>
 <a href=./p/cv6fpx7/>
 React で入力フォームの onChange イベントを IME ON のときに無視する<span class=xRecents_item_tag>React</span><time>2023-01-29</time></a>
 </div><div class=xRecents_item>
 <a href=./p/bo8q8p7/>
 Meilisearch サーチエンジンを使ってみる<span class=xRecents_item_tag>Meilisearch</span><time>2023-01-24</time></a>
-</div><div class=xRecents_item>
-<a href=./p/y6zgrg2/>
-Docker で MongoDB サーバーを立ち上げる<span class=xRecents_item_tag>Docker</span><span class=xRecents_item_tag>MongoDB</span><time>2023-01-18</time></a>
 </div></div>
 </aside>
 <article class=xArticle>
@@ -480,6 +482,171 @@ Docker で MongoDB サーバーを立ち上げる<span class=xRecents_item_tag>D
 </div>
 </article>
 <article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
+<header class=xArticle_headerBox>
+<div>
+<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/ujqinda/>プログラミング</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/d7p5jye/>React</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/saku4ck/>Next.js</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=./p/s5m7cbh/>その他</a></span></div>
+<div style=display:flex;margin-top:.8em>
+<div style=width:80px;margin-right:.5em>
+<img src=./p/saku4ck/_index.svg style=width:80px;height:80px>
+</div>
+<div style=flex:1>
+<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/zycmw6f/>Next.js アプリに Google Analytics を設定する (next/script)</a></h1>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/google-analytics>Google Analytics</a></span>
+<span class=xPageTags_item><a href=./tags/next.js>Next.js</a></span>
+</div>
+</div>
+</div>
+<span class=xPageDate>
+更新: <time itemprop=dateModified datetime=2023-03-21>2023-03-21</time><br>
+作成: <time itemprop=datePublished datetime=2023-03-21>2023-03-21</time>
+</span>
+</header>
+<div itemprop=articleBody class=xArticle_content>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#何をするか>何をするか？</a></li>
+<li><a href=#事前準備google-analitics-でプロパティとデータストリームを追加する>事前準備（Google Analitics でプロパティとデータストリームを追加する）</a></li>
+<li><a href=#nextjs-用の-analytics-コンポーネントを作成する>Next.js 用の Analytics コンポーネントを作成する</a></li>
+<li><a href=#analytics-コンポーネントを設置する>Analytics コンポーネントを設置する</a></li>
+</ul>
+</nav><h2 id=何をするか>何をするか？</h2>
+<p>Google Analytics で Web サイトのアクセス解析を行うには、次のような感じのコードを各ページに埋め込む必要があります。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>Google Analytics 用の埋め込みコード</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=c>&lt;!-- Google tag (gtag.js) --&gt;</span>
+<span class=p>&lt;</span><span class=nt>script</span> <span class=na>async</span> <span class=na>src</span><span class=o>=</span><span class=s>&#34;https://www.googletagmanager.com/gtag/js?id=G-ABCDE12345&#34;</span><span class=p>&gt;&lt;/</span><span class=nt>script</span><span class=p>&gt;</span>
+<span class=p>&lt;</span><span class=nt>script</span><span class=p>&gt;</span>
+  <span class=nb>window</span><span class=p>.</span><span class=nx>dataLayer</span> <span class=o>=</span> <span class=nb>window</span><span class=p>.</span><span class=nx>dataLayer</span> <span class=o>||</span> <span class=p>[];</span>
+  <span class=kd>function</span> <span class=nx>gtag</span><span class=p>(){</span><span class=nx>dataLayer</span><span class=p>.</span><span class=nx>push</span><span class=p>(</span><span class=nx>arguments</span><span class=p>);}</span>
+  <span class=nx>gtag</span><span class=p>(</span><span class=s1>&#39;js&#39;</span><span class=p>,</span> <span class=k>new</span> <span class=nb>Date</span><span class=p>());</span>
+  <span class=nx>gtag</span><span class=p>(</span><span class=s1>&#39;config&#39;</span><span class=p>,</span> <span class=s1>&#39;G-ABCDE12345&#39;</span><span class=p>);</span>
+<span class=p>&lt;/</span><span class=nt>script</span><span class=p>&gt;</span></code></pre></div></div>
+</figure>
+<p>ここでは、Next.js が提供する <strong><code>Script</code></strong> コンポーネント (<strong><code>next/script</code></strong>) を使用して、Next.js アプリに同等のコードを埋め込む方法を説明します。
+HTML 標準の <code>script</code> ではなく、Next.js の <code>Script</code> コンポーネントを使用することで、Next.js アプリのレンダリング処理に合わせて実行タイミングを最適化できます。</p>
+<h2 id=事前準備google-analitics-でプロパティとデータストリームを追加する>事前準備（Google Analitics でプロパティとデータストリームを追加する）</h2>
+<p>事前準備として、<a href=https://analytics.google.com/>Google Analytics</a> のサイトで、サイドバーの <strong>管理</strong> メニューから対象アプリ用に <strong>プロパティ</strong> を追加しておいてください。
+さらに、そのプロパティに対して <strong>データストリーム</strong> を追加すると、Web サイトや Android アプリの利用状況を監視できるようになります。</p>
+<figure class=xImage>
+<a href=./p/zycmw6f/img-001.png target=_blank>
+<img style="border:solid #ccc 2px" width=1830 height=718 src=./p/zycmw6f/img-001.png alt=/p/zycmw6f/img-001.png>
+</a>
+<figcaption>図: プロパティにデータストリームを追加する</figcaption>
+</figure>
+<p>データストリームを追加すると、次のように <strong>測定 ID</strong> が発行されます。
+これが、前述の JavaScript コードで指定する ID になります。</p>
+<figure class=xImage>
+<a href=./p/zycmw6f/img-002.png target=_blank>
+<img style="border:solid #ccc 2px" width=1952 height=634 src=./p/zycmw6f/img-002.png alt=/p/zycmw6f/img-002.png>
+</a>
+<figcaption>図: 測定 ID が発行された</figcaption>
+</figure>
+<h2 id=nextjs-用の-analytics-コンポーネントを作成する>Next.js 用の Analytics コンポーネントを作成する</h2>
+<p>下記の <code>Analytics.tsx</code> は、Google Analytics 用のコードを埋め込むためのコンポーネントの実装例です。
+Google Analytics の測定 ID は、ホスティングサーバー（例えば Vercel）の環境変数 <strong><code>NEXT_PUBLIC_ANALYTICS_ID</code></strong> で設定することを想定しています（自サイト専用のコンポーネントにするなら、ハードコーディングしちゃっても大丈夫です）。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>components/common/Analytics.tsx</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>FC</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;react&#39;</span>
+<span class=kr>import</span> <span class=nx>Script</span> <span class=kr>from</span> <span class=s1>&#39;next/script&#39;</span>
+
+<span class=c1>// サーバーの環境変数で Google Analytics の測定 ID を指定します
+</span><span class=c1></span><span class=kr>const</span> <span class=nx>ANALYTICS_ID</span> <span class=o>=</span> <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>NEXT_PUBLIC_ANALYTICS_ID</span>
+<span class=c1>// あるいはハードコーディングでも可
+</span><span class=c1>// const ANALYTICS_ID = &#39;G-ABCDE12345&#39;
+</span><span class=c1></span>
+<span class=cm>/** Google Analytics によるアクセス解析を行うためのコンポーネント */</span>
+<span class=kr>export</span> <span class=kr>const</span> <span class=nx>Analytics</span>: <span class=kt>FC</span> <span class=o>=</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>{</span>
+  <span class=k>if</span> <span class=p>(</span><span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>NODE_ENV</span> <span class=o>!==</span> <span class=s1>&#39;production&#39;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=c1>// 開発サーバー上での実行 (next dev) では何も出力しない
+</span><span class=c1></span>    <span class=k>return</span> <span class=p>&lt;&gt;&lt;/&gt;</span>
+  <span class=p>}</span>
+
+  <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=nx>ANALYTICS_ID</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>warn</span><span class=p>(</span><span class=s1>&#39;NEXT_PUBLIC_ANALYTICS_ID not defined&#39;</span><span class=p>)</span>
+    <span class=k>return</span> <span class=p>&lt;&gt;&lt;/&gt;</span>
+  <span class=p>}</span>
+
+  <span class=k>return</span> <span class=p>(</span>
+    <span class=p>&lt;&gt;</span>
+      <span class=p>&lt;</span><span class=nt>Script</span>
+        <span class=na>src</span><span class=o>=</span><span class=s>&#34;https://www.googletagmanager.com/gtag/js?id=${ANALYTICS_ID}&#34;</span>
+        <span class=na>strategy</span><span class=o>=</span><span class=s>&#34;afterInteractive&#34;</span>
+      <span class=p>/&gt;</span>
+      <span class=p>&lt;</span><span class=nt>Script</span> <span class=na>id</span><span class=o>=</span><span class=s>&#34;google-analytics&#34;</span> <span class=na>strategy</span><span class=o>=</span><span class=s>&#34;afterInteractive&#34;</span><span class=p>&gt;</span>
+        <span class=p>{</span><span class=sb>`
+</span><span class=sb>          window.dataLayer = window.dataLayer || [];
+</span><span class=sb>          function gtag(){dataLayer.push(arguments);}
+</span><span class=sb>          gtag(&#39;js&#39;, new Date());
+</span><span class=sb>          gtag(&#39;config&#39;, &#39;</span><span class=si>${</span><span class=nx>ANALYTICS_ID</span><span class=si>}</span><span class=sb>&#39;);
+</span><span class=sb>        `</span><span class=p>}</span>
+      <span class=p>&lt;/</span><span class=nt>Script</span><span class=p>&gt;</span>
+    <span class=p>&lt;/&gt;</span>
+  <span class=p>)</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p><code>Script</code> コンポーネントの <code>strategy</code> プロパティでは、読み込みタイミングを細かく制御できます（参考: <a href=https://nextjs.org/docs/basic-features/script#strategy>Handling Scripts | Next.js</a>）。
+<code>afterInteractive</code> を指定すると、ページのハイドレーション処理が行われたタイミング（つまりユーザー操作が可能になったタイミング）で実行されます。
+デフォルト値は <code>afterInteractive</code> なので、実はサンプルコード内の <code>strategy</code> プロパティの指定は省略することができます。</p>
+<p>JavaScript コードをインラインで埋め込んでいる方の <code>Script</code> タグには、<code>id</code> プロパティを指定しておく必要があります。
+この <code>id</code> は、Next.js が内部での最適化に使用します。
+サンプルコードでは <code>google-analytics</code> と指定していますが、一意の文字列であれば何でも構いません。</p>
+<h2 id=analytics-コンポーネントを設置する>Analytics コンポーネントを設置する</h2>
+<p><code>Analytics</code> コンポーネントは、各ページで実行されるように <strong><code>pages/_app.tsx</code></strong> から呼び出すようにします。</p>
+<figure class=xCodeBlock>
+<figcaption class=xCodeBlock_title>pages/_app.tsx</figcaption>
+<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=kr>type</span> <span class=p>{</span> <span class=nx>AppProps</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;next/app&#39;</span>
+<span class=kr>import</span> <span class=nx>Head</span> <span class=kr>from</span> <span class=s1>&#39;next/head&#39;</span>
+<span class=hl><span class=kr>import</span> <span class=p>{</span> <span class=nx>Analytics</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;../components/common/Analytics&#39;</span>
+</span>
+<span class=kr>export</span> <span class=k>default</span> <span class=kd>function</span> <span class=nx>MyApp</span><span class=p>({</span> <span class=nx>Component</span><span class=p>,</span> <span class=nx>pageProps</span> <span class=p>}</span><span class=o>:</span> <span class=nx>AppProps</span><span class=p>)</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=p>(</span>
+    <span class=p>&lt;&gt;</span>
+      <span class=p>&lt;</span><span class=nt>Head</span><span class=p>&gt;</span>
+        <span class=p>&lt;</span><span class=nt>meta</span> <span class=na>charSet</span><span class=o>=</span><span class=s>&#34;utf-8&#34;</span> <span class=p>/&gt;</span>
+        <span class=p>&lt;</span><span class=nt>meta</span> <span class=na>name</span><span class=o>=</span><span class=s>&#34;viewport&#34;</span> <span class=na>content</span><span class=o>=</span><span class=s>&#34;initial-scale=1, width=device-width&#34;</span> <span class=p>/&gt;</span>
+        <span class=p>&lt;</span><span class=nt>title</span><span class=p>&gt;</span><span class=nx>Awesome</span> <span class=nx>website</span><span class=p>&lt;/</span><span class=nt>title</span><span class=p>&gt;</span>
+      <span class=p>&lt;/</span><span class=nt>Head</span><span class=p>&gt;</span>
+<span class=hl>      <span class=p>&lt;</span><span class=nt>Analytics</span> <span class=p>/&gt;</span>
+</span>      <span class=p>&lt;</span><span class=nt>Component</span> <span class=p>{</span><span class=na>...pageProps</span><span class=p>}</span> <span class=p>/&gt;</span>
+    <span class=p>&lt;/&gt;</span>
+  <span class=p>)</span>
+<span class=p>}</span></code></pre></div></div>
+</figure>
+<p>Next.js の <code>Script</code> 要素は <code>Head</code> 要素の外に記述しないと動作しないようなので注意してください。
+これで、Web サイトのアクセス情報を Google Analytics のページで確認できるようになります。</p>
+<p>٩(๑❛ᴗ❛๑)۶ わーぃ</p>
+<meta itemprop=author content="まく">
+<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
+<meta itemprop=name content="まく">
+</span>
+<h3 style="border-bottom:1px solid gray">関連記事</h3>
+<ul>
+<li><a href=./p/3vbr2bm/>Next.js でローカル開発時 (next dev) のみ有効なデバッグページを作成する (getStaticProps)</a></li>
+<li><a href=./p/m4dmu4c/>Next.js でブラウザ履歴で戻るボタンを表示する (router.back)</a></li>
+<li><a href=./p/m3bjrz7/>Next.js で Firebase: Cloud Firestore データベースを使う</a></li>
+<li><a href=./p/8t6gq2b/>Next.js で Firebase: Authentication 機能でユーザー認証できるようにする</a></li>
+<li><a href=./p/73eq2cm/>Next.js で Firebase: プロジェクトの作成と接続準備</a></li>
+<li><a href=./p/cwdyhec/>Next.js で useState とローカルストレージ (localStorage) を連動させる</a></li>
+<li><a href=./p/xp8o5k2/>Next.js から AWS DynamoDB にアクセスする</a></li>
+</ul>
+<div class=xPageTags>
+<span class=xPageTags_item><a href=./tags/google-analytics>Google Analytics</a></span>
+<span class=xPageTags_item><a href=./tags/next.js>Next.js</a></span>
+</div>
+</div>
+<div style=text-align:right>
+<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
+</div>
+<div class=xArticle_up>
+<a href=./p/s5m7cbh/><span class=xArticle_up_label>Next.js のその他の記事</span><br>へ戻る</a>
+</div>
+</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
 <header class=xArticle_headerBox>
 <div>
 <span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
@@ -581,8 +748,8 @@ Docker で MongoDB サーバーを立ち上げる<span class=xRecents_item_tag>D
 次の <code>SearchTextField</code> コンポーネントは、<code>props</code> として <code>onSearch</code> ハンドラーを受け取ります。
 このハンドラーは、適切なタイミングで呼び出される <code>onChange</code> ハンドラーとして使用することができます。</p>
 <div class=xAccordion>
-<input id=id-852691347 type=checkbox>
-<label class=xAccordion_title for=id-852691347>components/SearchTextField.tsx</label>
+<input id=id-324897165 type=checkbox>
+<label class=xAccordion_title for=id-324897165>components/SearchTextField.tsx</label>
 <div class=xAccordion_body>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=kr>import</span> <span class=p>{</span> <span class=nx>FC</span><span class=p>,</span> <span class=nx>useRef</span><span class=p>,</span> <span class=nx>useState</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;react&#39;</span>
 <span class=kr>import</span> <span class=p>{</span> <span class=nx>TextField</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;@mui/material&#39;</span>
@@ -895,168 +1062,6 @@ API キーを使用したアクセス制御を行う場合は、POST メソッ�
 </div>
 <div class=xArticle_up>
 <a href=./p/ndbcxgb/><span class=xArticle_up_label>Meilisearch のメモ</span><br>へ戻る</a>
-</div>
-</article><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=./>&#x1F3E0;</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/ujqinda/>プログラミング</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/qikq9o8/>MongoDB</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=./p/q8hry9h/>サーバー</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=./p/qikq9o8/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=./p/y6zgrg2/>Docker で MongoDB サーバーを立ち上げる</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/docker>Docker</a></span>
-<span class=xPageTags_item><a href=./tags/mongodb>MongoDB</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2023-01-18>2023-01-18</time><br>
-作成: <time itemprop=datePublished datetime=2023-01-18>2023-01-18</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#mongodb-サーバーのコンテナを起動する>MongoDB サーバーのコンテナを起動する</a></li>
-<li><a href=#mongodb-サーバーに接続する>MongoDB サーバーに接続する</a></li>
-<li><a href=#おまけコンテナ間で通信させる>（おまけ）コンテナ間で通信させる</a>
-<ul>
-<li><a href=#docker-コマンドを使う場合>docker コマンドを使う場合</a></li>
-<li><a href=#docker-compose-コマンドを使う場合>docker compose コマンドを使う場合</a></li>
-</ul>
-</li>
-</ul>
-</nav><p>Docker のオフィシャルイメージとして、<strong><code>mongo</code></strong> イメージが公開されています。</p>
-<ul>
-<li><a href=https://hub.docker.com/_/mongo>mongo - Official Image | Docker Hub</a></li>
-</ul>
-<p>このイメージには、MongoDB サーバー (<code>mongod</code>) や、MongoDB クライアント (<code>mongosh</code>) が含まれており、コマンドを省略してコンテナを起動すると、デフォルトで MongoDB サーバーが立ち上がります。</p>
-<h2 id=mongodb-サーバーのコンテナを起動する>MongoDB サーバーのコンテナを起動する</h2>
-<p>次のように <code>mongo</code> コンテナを起動すると、ローカルホスト上で MongoDB サーバーを立ち上げたのと同様に振舞います。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker container run --rm -d -p 27017:27017 --name mongo mongo
-</code></pre></div><p>オプションの意味:</p>
-<ul>
-<li><strong><code>--rm</code></strong> &mldr; コンテナを停止したときにコンテナを削除します。コンテナを削除したくなければ、このオプションは外してください。</li>
-<li><strong><code>-d</code></strong> &mldr; デーモンをバックグラウンドで動作させます。</li>
-<li><strong><code>-p 27107:27017</code></strong> &mldr; ローカルホストの <code>27107</code> ポートへのアクセスを、コンテナ内の MongoDB サーバーの <code>27107</code> ポートへ転送します。</li>
-<li><strong><code>--name mongo</code></strong> &mldr; 起動するコンテナに <code>mongo</code> という名前を付けます。</li>
-<li><strong><code>mongo</code></strong> &mldr; Docker イメージとして <code>mongo:latest</code> を使用します（デフォルトで <code>:latest</code> が使われます)。</li>
-</ul>
-<p>次のようにして、<code>mongo</code> コンテナが起動していることを確認できます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker container ls
-<span class=go>CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                                           NAMES
-</span><span class=go>e5a2aeba6bf4   mongo     &#34;docker-entrypoint.s…&#34;   16 seconds ago   Up 14 seconds   0.0.0.0:27017-&gt;27017/tcp, :::27017-&gt;27017/tcp   mongo
-</span></code></pre></div><p>コンテナを停止したいときは次のようにします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker container stop mongo
-</code></pre></div><p>次のような <code>docker-compose.yml</code> を作成しておけば、<strong><code>docker compose up -d</code></strong> とするだけで起動できます（停止は <strong><code>docker compose down</code></strong> で）。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>docker-compose.yml</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;3&#34;</span><span class=w>
-</span><span class=w></span><span class=nt>services</span><span class=p>:</span><span class=w>
-</span><span class=w>  </span><span class=nt>mongo</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>mongo</span><span class=w>
-</span><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span>- <span class=s2>&#34;27017:27017&#34;</span><span class=w>
-</span><span class=w>    </span><span class=nt>restart</span><span class=p>:</span><span class=w> </span><span class=l>always</span></code></pre></div></div>
-</figure>
-<h2 id=mongodb-サーバーに接続する>MongoDB サーバーに接続する</h2>
-<p>ローカルホスト上の MongoDB クライアント (<strong><code>mongosh</code></strong>) を使って、上記のように起動した Docker コンテナの MongoDB サーバーに接続できます。
-デフォルトで、<code>localhost:27017</code> に接続しに行くので、接続先アドレスを指定する必要はありません。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mongosh mydb
-<span class=go>...
-</span><span class=go>mydb&gt;
-</span></code></pre></div><p>接続できました。
-٩(๑❛ᴗ❛๑)۶ わーぃ</p>
-<h2 id=おまけコンテナ間で通信させる>（おまけ）コンテナ間で通信させる</h2>
-<p>コンテナ内の MongoDB サーバーに、別のコンテナから接続したい場合は、それぞれのコンテナを同一のネットワークに接続しておくことで、コンテナ名でアクセスできるようになります。
-ここでは、<code>mongo-net</code> というブリッジネットワークを作って、そこに各コンテナを接続してみます。</p>
-<h3 id=docker-コマンドを使う場合>docker コマンドを使う場合</h3>
-<p><strong><code>docker network create</code></strong> コマンドで、接続先のネットワーク <code>mongo-net</code> を作成しておきます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>ネットワークの作成</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker network create mongo-net
-</code></pre></div></div>
-</figure>
-<p>MongoDB サーバー用のコンテナを起動するときに、<strong><code>--net mongo-net</code></strong> オプションを付けて、上記で作成したネットワークに接続します。
-このとき、<code>-p</code> オプションによるポートフォワードの指定は必要ありません（ローカルホストへのアクセスをフォワードするわけではないので）。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>MongoDB サーバー用のコンテナを起動</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker container run --rm -d --net mongo-net --name mongo mongo
-</code></pre></div></div>
-</figure>
-<p>次に、別のコンテナから MongoDB クライアント (<code>mongosh</code>) で接続します。
-接続先コンテナの IP アドレスの代わりに、コンテナ名を使って <code>mongo:27017</code> というアドレスで接続します。
-Docker イメージとしては、サーバーと同じ <code>mongo</code> イメージを使用できます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>別のコンテナの mongosh で接続</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker container run --rm -it --net mongo-net mongo mongosh mongo:27017/mydb
-<span class=go>...
-</span><span class=go>mydb&gt;
-</span></code></pre></div></div>
-</figure>
-<h3 id=docker-compose-コマンドを使う場合>docker compose コマンドを使う場合</h3>
-<p>Docker Compose (<code>docker compose up -d</code>) を使う場合は、次のような Compose ファイルを使用します。
-前述の通り、<code>ports</code> プロパティの指定は必要ありません。
-Docker Compose はネットワークの作成まで同時にやってくれるので便利です。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>docker-compose.yml</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;3&#34;</span><span class=w>
-</span><span class=w>
-</span><span class=w></span><span class=nt>services</span><span class=p>:</span><span class=w>
-</span><span class=w>  </span><span class=nt>mongo</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>mongo</span><span class=w>
-</span><span class=w>    </span><span class=nt>restart</span><span class=p>:</span><span class=w> </span><span class=l>always</span><span class=w>
-</span><span class=w>    </span><span class=nt>networks</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span>- <span class=l>mongo-net</span><span class=w>
-</span><span class=w>
-</span><span class=w></span><span class=nt>networks</span><span class=p>:</span><span class=w>
-</span><span class=w>  </span><span class=l>mongo-net:</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>MongoDB サーバー用コンテナの起動</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker compose up -d
-</code></pre></div></div>
-</figure>
-<p>MongoDB クライアントからの接続方法はほぼ同様ですが、ネットワーク名には、Docker Compose のプロジェクト名（親ディレクトリ名）がプレフィックスとして付けられているので注意してください。
-例えば、親ディレクトリ名が <code>mongo</code> であれば、実際に生成されるネットワーク名は <code>mongo_mongo-net</code> になるので、次のように接続することになります。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>別コンテナの mongosh コマンドで接続</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>docker container run --rm -it --net mongo_mongo-net mongo mongosh mongo:27017/mydb
-<span class=go>...
-</span><span class=go>mydb&gt;
-</span></code></pre></div></div>
-</figure>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=./p/3pwojuj/>Deno で MongoDB にアクセスする</a></li>
-<li><a href=./p/wbtbr8o/>Go アプリを実行する軽量な Docker コンテナイメージを作成する</a></li>
-<li><a href=./p/8k4j2gw/>Ansible タスク例: Docker と Docker Compose をインストールする</a></li>
-<li><a href=./p/v9r8o5k/>GitHub Actions でコンテナイメージをビルドして Docker Hub へ push する</a></li>
-<li><a href=./p/ehxgwt4/>TypeScript を使った Node.js アプリを Docker コンテナ化する</a></li>
-<li><a href=./p/csctaq7/>Docker コンテナで Ansible のテストベッド環境を用意する</a></li>
-<li><a href=./p/99qo8zf/>Docker コンテナで Nginx サーバーを立ち上げる</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=./tags/docker>Docker</a></span>
-<span class=xPageTags_item><a href=./tags/mongodb>MongoDB</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=./p/q8hry9h/><span class=xArticle_up_label>MongoDB サーバー (mongod デーモン)</span><br>へ戻る</a>
 </div>
 </article><h2>メニュー</h2>
 <div class=xTopMenu>
