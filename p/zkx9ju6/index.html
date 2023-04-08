@@ -1,1006 +1,293 @@
-<!doctype html><html lang=ja-jp>
-<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<title>Amazon EC2 をコマンドライン (CLI) で操作する｜まくろぐ</title>
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
-<meta property="og:title" content="Amazon EC2 をコマンドライン (CLI) で操作する">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://maku.blog/p/zkx9ju6/">
-<meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
-<meta property="og:image:width" content="1436">
-<meta property="og:image:height" content="746">
-<meta property="og:description" content="EC2 で使用可能なリージョンの一覧を取得する (ec2 describe-regions) $ aws ec2 describe-regions  実行結果 (YAML形式） Regions:- Endpoint:ec2.eu-north-1.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:eu-north-1- Endpoint:ec2.ap-south-1.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:ap-south-1- Endpoint:ec2.eu-west-3.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:eu-west-3- Endpoint:ec2.eu-west-2.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:eu-west-2- Endpoint:ec2.eu-west-1.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:eu-west-1- Endpoint:ec2.ap-northeast-3.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:ap-northeast-3- Endpoint:ec2.ap-northeast-2.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:ap-northeast-2- Endpoint:ec2.ap-northeast-1.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:ap-northeast-1- Endpoint:ec2.sa-east-1.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:sa-east-1- Endpoint:ec2.ca-central-1.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:ca-central-1- Endpoint:ec2.ap-southeast-1.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:ap-southeast-1- Endpoint:ec2.ap-southeast-2.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:ap-southeast-2- Endpoint:ec2.eu-central-1.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:eu-central-1- Endpoint:ec2.us-east-1.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:us-east-1- Endpoint:ec2.us-east-2.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:us-east-2- Endpoint:ec2.us-west-1.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:us-west-1- Endpoint:ec2.us-west-2.amazonaws.comOptInStatus:opt-in-not-requiredRegionName:us-west-2    EC2 インスタンスの情報を取得する (ec2 describe-instances) 作成済みの EC2 インスタンスの一覧、あるいは指定した EC2 インスタンスの情報を取得します。
-$ aws ec2 describe-instances  実行結果（YAML形式） Reservations:- Groups:[]Instances:- AmiLaunchIndex:0Architecture:x86_64BlockDeviceMappings:- DeviceName:/dev/xvdaEbs:AttachTime:'2021-03-02T14:26:39+00:00'DeleteOnTermination:trueStatus:attachedVolumeId:vol-3b75f0f9090990420CapacityReservationSpecification:CapacityReservationPreference:openClientToken:''CpuOptions:CoreCount:1ThreadsPerCore:1EbsOptimized:falseEnaSupport:trueEnclaveOptions:Enabled:falseHibernationOptions:Configured:falseHypervisor:xenImageId:ami-e2e9e713809d28faaInstanceId:i-757968a71071691b7InstanceType:t2.nanoKeyName:ec2keyLaunchTime:'2021-03-02T15:32:17+00:00'MetadataOptions:HttpEndpoint:enabledHttpPutResponseHopLimit:1HttpTokens:optionalState:appliedMonitoring:State:disabledNetworkInterfaces:- Attachment:AttachTime:'2021-03-02T14:26:38+00:00'AttachmentId:eni-attach-c1c18b4c61083b1eaDeleteOnTermination:trueDeviceIndex:0NetworkCardIndex:0Status:attachedDescription:''Groups:- GroupId:sg-650f7192f60271eb7GroupName:launch-wizard-1InterfaceType:interfaceIpv6Addresses:[]MacAddress:0a:a0:bf:37:7f:c1NetworkInterfaceId:eni-c8aea6d54ac8cc0d0OwnerId:'049344049957'PrivateDnsName:ip-172-31-0-95.ap-northeast-1.compute.internalPrivateIpAddress:172.31.0.95PrivateIpAddresses:- Primary:truePrivateDnsName:ip-172-31-0-95.ap-northeast-1.compute.internalPrivateIpAddress:172.31.0.95SourceDestCheck:trueStatus:in-useSubnetId:subnet-13e65081VpcId:vpc-af6e084dPlacement:AvailabilityZone:ap-northeast-1cGroupName:''Tenancy:defaultPrivateDnsName:ip-172-31-0-95.ap-northeast-1.compute.internalPrivateIpAddress:172.31.0.95ProductCodes:[]PublicDnsName:''RootDeviceName:/dev/xvdaRootDeviceType:ebsSecurityGroups:- GroupId:sg-650f7192f60271eb7GroupName:launch-wizard-1SourceDestCheck:trueState:Code:80Name:stoppedStateReason:Code:Client.UserInitiatedShutdownMessage: 'Client.UserInitiatedShutdown:User initiated shutdown'StateTransitionReason:User initiated (2021-03-03 16:24:03 GMT)SubnetId:subnet-6508113eTags:- Key:NameValue:maku-test-ec2VirtualizationType:hvmVpcId:vpc-af6e084dOwnerId:'493440499570'ReservationId:r-09d469440a8ee4861    AMI の情報を取得する (ec2 describe-images) $ aws ec2 describe-images  作成した Amazon マシンイメージ (AMI) の一覧を表示することができます。">
-<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
-<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
-<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
-<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
-<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
-<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
-<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
-</head>
-<body>
-<div id=xRoot>
-<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/7s7hs4e/>AWS</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/cxcozak/>EC2</a>
-</span>
-<span class=xBreadcrumb_item>Amazon EC2 をコマンドライン (CLI) で操作する
-</span>
-</div>
-</aside>
-<div id=xContainer>
-<nav id=xMenu aria-label=メニュー>
-<div id=sidebar style=height:100%>
-<div id=sidebar_notFixed>
-<a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a>
-<div class=xMenu_box data-sticky>
-<form action=https://cse.google.com/cse target=_blank>
-<div class=xSearchBox>
-<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<!doctype html><html lang=ja-jp><head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#"><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Amazon EC2 をコマンドライン (CLI) で操作する｜まくろぐ</title><script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-63069513-4")</script><meta property="og:site_name" content="まくろぐ"><meta property="og:title" content="Amazon EC2 をコマンドライン (CLI) で操作する"><meta property="og:type" content="website"><meta property="og:url" content="https://maku.blog/p/zkx9ju6/"><meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png"><meta property="og:image:width" content="1436"><meta property="og:image:height" content="746"><meta property="og:description" content="EC2 で使用可能なリージョンの一覧を取得する (ec2 describe-regions) $ aws ec2 describe-regions 実行結果 (YAML形式） Regions: - Endpoint: ec2.eu-north-1.amazonaws.com OptInStatus: opt-in-not-required RegionName: eu-north-1 - Endpoint: ec2.ap-south-1.amazonaws.com OptInStatus: opt-in-not-required RegionName: ap-south-1 - Endpoint: ec2.eu-west-3.amazonaws.com OptInStatus: opt-in-not-required RegionName: eu-west-3 - Endpoint: ec2.eu-west-2.amazonaws.com OptInStatus: opt-in-not-required RegionName: eu-west-2 - Endpoint: ec2.eu-west-1.amazonaws.com OptInStatus: opt-in-not-required RegionName: eu-west-1 - Endpoint: ec2.ap-northeast-3.amazonaws.com OptInStatus: opt-in-not-required RegionName: ap-northeast-3 - Endpoint: ec2.ap-northeast-2.amazonaws.com OptInStatus: opt-in-not-required RegionName: ap-northeast-2 - Endpoint: ec2.ap-northeast-1.amazonaws.com OptInStatus: opt-in-not-required RegionName: ap-northeast-1 - Endpoint: ec2."><meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css><link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico><link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png><link rel=apple-touch-icon href=../../assets/favicon/180x180.png><script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script><style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style><script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script></head><body><div id=xRoot><div id=xSiteHeader><a href=../../>まくろぐ</a></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/7s7hs4e/>AWS</a></span>
+<span class=xBreadcrumb_item><a href=../../p/cxcozak/>EC2</a></span>
+<span class=xBreadcrumb_item>Amazon EC2 をコマンドライン (CLI) で操作する</span></div></aside><div id=xContainer><nav id=xMenu aria-label=メニュー><div id=sidebar style=height:100%><div id=sidebar_notFixed><a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a><div class=xMenu_box data-sticky><form action=https://cse.google.com/cse target=_blank><div class=xSearchBox><input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
 <input type=hidden name=ie value=UTF-8>
 <input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
-<input type=submit value=検索></input>
-</div>
-</form>
-<div class=xMenu_box_body>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
-<div class=xMenu_box_body>
-<div class=xBoxLink>
-<a href=../../p/zycmw6f/>
-Next.js アプリに Google Analytics を設定する (next/script)
-<time>2023-03-21</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/cv6fpx7/>
-React で入力フォームの onChange イベントを IME ON のときに無視する
-<time>2023-01-29</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/bo8q8p7/>
-Meilisearch サーチエンジンを使ってみる
-<time>2023-01-24</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/y6zgrg2/>
-Docker で MongoDB サーバーを立ち上げる
-<time>2023-01-18</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/3pwojuj/>
-Deno で MongoDB にアクセスする
-<time>2023-01-18</time></a>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3>
-<div class=xMenu_box_body>
-<div class=xNavTree>
-<ul>
-<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
-<ul>
-<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
-<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
-<li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a>
-<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
-<li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a>
-<li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a>
-<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
-<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
-<li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a>
-<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
-<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
-<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
-<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
-<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
-<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
-<ul>
-<li><a class=xNavTree-dir href=../../p/cenio8m/>AWS 一般／環境／設定など</a>
-<li><a class=xNavTree-dir href=../../p/vigdnzf/>CLI</a>
-<li><a class=xNavTree-dir href=../../p/q7fov5c/>S3</a>
-<li><a class=xNavTree-dir href=../../p/wn52kog/>IAM</a>
-<li><a class=xNavTree-dir href=../../p/eyeq2do/>Lambda</a>
-<li><a class=xNavTree-dir href=../../p/cxcozak/>EC2</a>
-<ul>
-</ul>
-<li><a class=xNavTree-dir href=../../p/au8is4e/>CodeBuild</a>
-<li><a class=xNavTree-dir href=../../p/sdq2cnx/>CloudFormation/SAM/CDK</a>
-<li><a class=xNavTree-dir href=../../p/wqamv5d/>API Gateway</a>
-<li><a class=xNavTree-dir href=../../p/yz2h95y/>Cognito</a>
-<li><a class=xNavTree-dir href=../../p/3jt3bjr/>DynamoDB</a>
-<li><a class=xNavTree-dir href=../../p/5o2cnw8/>SSM</a>
-<li><a class=xNavTree-dir href=../../p/3nybkv6/>AWS KMS</a>
-<li><a class=xNavTree-dir href=../../p/dxhs2bk/>AppSync</a>
-<li><a class=xNavTree-dir href=../../p/szcbzgt/>AWS のトラブルシューティング</a>
-</ul>
-<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
-<li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a>
-<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
-<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
-<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
-<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
-<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
-<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
-<li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a>
-</ul>
-<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
-<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
-<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
-<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
-<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
-<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
-<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
-</ul>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
-<div class=xMenu_box_body><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws>aws (61)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure>azure (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/typescript>typescript (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/next.js>next.js (38)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/graphql>graphql (35)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/react>react (29)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/chatbot>chatbot (28)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/gnuplot>gnuplot (27)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cdk>aws/cdk (26)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/linux>linux (25)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github>github (24)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ansible>ansible (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/node.js>node.js (19)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/electron>electron (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mongodb>mongodb (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/protocol-buffers>protocol-buffers (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vs-code>vs-code (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/javascript>javascript (13)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cognito>aws/cognito (12)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/nginx>nginx (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/android>android (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/lambda>aws/lambda (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/java>java (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/python>python (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ssh>ssh (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/uml>uml (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/3d>3d (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sam>aws/sam (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/docker>docker (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/firestore>firebase/firestore (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unity>unity (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webgl>webgl (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo>apollo (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-cli>azure-cli (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/deno>deno (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jade>jade (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/material-ui>material-ui (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cli>aws/cli (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-storage>azure-storage (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/doxygen>doxygen (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/c/c++>c/c++ (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-actions>github-actions (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/luis>luis (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/qna-maker>qna-maker (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/ssm>aws/ssm (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/eslint>eslint (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase>firebase (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-pages>github-pages (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html/css>html/css (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jekyll>jekyll (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/lets-encrypt>lets-encrypt (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sql>sql (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/windows>windows (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-functions>azure-functions (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cosmos-db>cosmos-db (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/grpc>grpc (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/hugo>hugo (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/kotlin>kotlin (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mac>mac (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/powershell>powershell (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/prettier>prettier (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sqlite>sqlite (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/textlint>textlint (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tv>tv (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apache>apache (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/arib>arib (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/amplify>aws/amplify (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/appsync>aws/appsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/iam>aws/iam (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/kms>aws/kms (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/s3>aws/s3 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sdk>aws/sdk (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-app-service>azure-app-service (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/excel>excel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/go>go (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/http>http (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/json>json (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mui>mui (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/npm>npm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/oauth>oauth (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/opengl>opengl (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/rsync>rsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/scp>scp (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/slack>slack (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teraterm>teraterm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unicode>unicode (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vercel>vercel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/zip>zip (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/.net>.net (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/androidstudio>androidstudio (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo-server>apollo-server (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/atomic-design>atomic-design (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/blender>blender (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bluetooth>bluetooth (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bootstrap>bootstrap (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-framework>bot-framework (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/boto3>boto3 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/certbot>certbot (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cloudflare>cloudflare (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/css>css (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dns>dns (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dvb>dvb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/editorconfig>editorconfig (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/evernote>evernote (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/git>git (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/golang>golang (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/google-analytics>google-analytics (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/groovy>groovy (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html>html (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/igdb>igdb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/iso>iso (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jest>jest (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/macos>macos (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/meilisearch>meilisearch (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/parcel>parcel (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/raspberrypi>raspberrypi (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teams>teams (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tex>tex (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ubuntu>ubuntu (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/url>url (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vim>vim (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vps>vps (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/web>web (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webpack>webpack (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/wsl>wsl (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
-</div></div>
-</div>
-<div class=xMenu_box data-sticky><br></div>
-</div>
-<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
-</div>
-</div>
-</nav>
-<main id=xMain>
-<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/whu7hr3/>Amazon EC2 で Hello World (2) EC2 インスタンスの起動と接続</a>
-</div>
-</div>
-</aside>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<input type=submit value=検索></input></div></form><div class=xMenu_box_body></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3><div class=xMenu_box_body><div class=xBoxLink><a href=../../p/zycmw6f/>Next.js アプリに Google Analytics を設定する (next/script)
+<time>2023-03-21</time></a></div><div class=xBoxLink><a href=../../p/cv6fpx7/>React で入力フォームの onChange イベントを IME ON のときに無視する
+<time>2023-01-29</time></a></div><div class=xBoxLink><a href=../../p/bo8q8p7/>Meilisearch サーチエンジンを使ってみる
+<time>2023-01-24</time></a></div><div class=xBoxLink><a href=../../p/y6zgrg2/>Docker で MongoDB サーバーを立ち上げる
+<time>2023-01-18</time></a></div><div class=xBoxLink><a href=../../p/3pwojuj/>Deno で MongoDB にアクセスする
+<time>2023-01-18</time></a></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3><div class=xMenu_box_body><div class=xNavTree><ul><li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a><ul><li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a><li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a><li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a><li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a><li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a><li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a><li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a><li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a><li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a><li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a><li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a><li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a><li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a><li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a><li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a><ul><li><a class=xNavTree-dir href=../../p/cenio8m/>AWS 一般／環境／設定など</a><li><a class=xNavTree-dir href=../../p/vigdnzf/>CLI</a><li><a class=xNavTree-dir href=../../p/q7fov5c/>S3</a><li><a class=xNavTree-dir href=../../p/wn52kog/>IAM</a><li><a class=xNavTree-dir href=../../p/eyeq2do/>Lambda</a><li><a class=xNavTree-dir href=../../p/cxcozak/>EC2</a><ul></ul><li><a class=xNavTree-dir href=../../p/au8is4e/>CodeBuild</a><li><a class=xNavTree-dir href=../../p/sdq2cnx/>CloudFormation/SAM/CDK</a><li><a class=xNavTree-dir href=../../p/wqamv5d/>API Gateway</a><li><a class=xNavTree-dir href=../../p/yz2h95y/>Cognito</a><li><a class=xNavTree-dir href=../../p/3jt3bjr/>DynamoDB</a><li><a class=xNavTree-dir href=../../p/5o2cnw8/>SSM</a><li><a class=xNavTree-dir href=../../p/3nybkv6/>AWS KMS</a><li><a class=xNavTree-dir href=../../p/dxhs2bk/>AppSync</a><li><a class=xNavTree-dir href=../../p/szcbzgt/>AWS のトラブルシューティング</a></ul><li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a><li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a><li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a><li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a><li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a><li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a><li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a><li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a><li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a></ul><li><a class=xNavTree-dir href=../../p/35odek9/>読書</a><li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a><li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a><li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a><li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a><li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a><li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a></ul></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3><div class=xMenu_box_body><div class=xMenu_tag><a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a></div><div class=xMenu_tag><a href=../../tags/aws>aws (61)</a></div><div class=xMenu_tag><a href=../../tags/azure>azure (58)</a></div><div class=xMenu_tag><a href=../../tags/typescript>typescript (58)</a></div><div class=xMenu_tag><a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a></div><div class=xMenu_tag><a href=../../tags/next.js>next.js (38)</a></div><div class=xMenu_tag><a href=../../tags/graphql>graphql (35)</a></div><div class=xMenu_tag><a href=../../tags/react>react (29)</a></div><div class=xMenu_tag><a href=../../tags/chatbot>chatbot (28)</a></div><div class=xMenu_tag><a href=../../tags/gnuplot>gnuplot (27)</a></div><div class=xMenu_tag><a href=../../tags/aws/cdk>aws/cdk (26)</a></div><div class=xMenu_tag><a href=../../tags/linux>linux (25)</a></div><div class=xMenu_tag><a href=../../tags/github>github (24)</a></div><div class=xMenu_tag><a href=../../tags/ansible>ansible (21)</a></div><div class=xMenu_tag><a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a></div><div class=xMenu_tag><a href=../../tags/node.js>node.js (19)</a></div><div class=xMenu_tag><a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a></div><div class=xMenu_tag><a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a></div><div class=xMenu_tag><a href=../../tags/electron>electron (15)</a></div><div class=xMenu_tag><a href=../../tags/mongodb>mongodb (15)</a></div><div class=xMenu_tag><a href=../../tags/protocol-buffers>protocol-buffers (14)</a></div><div class=xMenu_tag><a href=../../tags/vs-code>vs-code (14)</a></div><div class=xMenu_tag><a href=../../tags/javascript>javascript (13)</a></div><div class=xMenu_tag><a href=../../tags/aws/cognito>aws/cognito (12)</a></div><div class=xMenu_tag><a href=../../tags/nginx>nginx (11)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a></div><div class=xMenu_tag><a href=../../tags/android>android (10)</a></div><div class=xMenu_tag><a href=../../tags/aws/lambda>aws/lambda (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a></div><div class=xMenu_tag><a href=../../tags/java>java (9)</a></div><div class=xMenu_tag><a href=../../tags/python>python (9)</a></div><div class=xMenu_tag><a href=../../tags/ssh>ssh (9)</a></div><div class=xMenu_tag><a href=../../tags/uml>uml (9)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a></div><div class=xMenu_tag><a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a></div><div class=xMenu_tag><a href=../../tags/3d>3d (8)</a></div><div class=xMenu_tag><a href=../../tags/aws/sam>aws/sam (8)</a></div><div class=xMenu_tag><a href=../../tags/docker>docker (8)</a></div><div class=xMenu_tag><a href=../../tags/firebase/firestore>firebase/firestore (8)</a></div><div class=xMenu_tag><a href=../../tags/unity>unity (8)</a></div><div class=xMenu_tag><a href=../../tags/webgl>webgl (8)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a></div><div class=xMenu_tag><a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a></div><div class=xMenu_tag><a href=../../tags/apollo>apollo (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-cli>azure-cli (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-pipelines>azure-pipelines (7)</a></div><div class=xMenu_tag><a href=../../tags/deno>deno (7)</a></div><div class=xMenu_tag><a href=../../tags/jade>jade (7)</a></div><div class=xMenu_tag><a href=../../tags/material-ui>material-ui (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a></div><div class=xMenu_tag><a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a></div><div class=xMenu_tag><a href=../../tags/aws/cli>aws/cli (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-storage>azure-storage (6)</a></div><div class=xMenu_tag><a href=../../tags/doxygen>doxygen (6)</a></div><div class=xMenu_tag><a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-table-storage>azure-table-storage (5)</a></div><div class=xMenu_tag><a href=../../tags/c/c++>c/c++ (5)</a></div><div class=xMenu_tag><a href=../../tags/github-actions>github-actions (5)</a></div><div class=xMenu_tag><a href=../../tags/luis>luis (5)</a></div><div class=xMenu_tag><a href=../../tags/qna-maker>qna-maker (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a></div><div class=xMenu_tag><a href=../../tags/aws/ssm>aws/ssm (4)</a></div><div class=xMenu_tag><a href=../../tags/eslint>eslint (4)</a></div><div class=xMenu_tag><a href=../../tags/firebase>firebase (4)</a></div><div class=xMenu_tag><a href=../../tags/github-pages>github-pages (4)</a></div><div class=xMenu_tag><a href=../../tags/html/css>html/css (4)</a></div><div class=xMenu_tag><a href=../../tags/jekyll>jekyll (4)</a></div><div class=xMenu_tag><a href=../../tags/lets-encrypt>lets-encrypt (4)</a></div><div class=xMenu_tag><a href=../../tags/sql>sql (4)</a></div><div class=xMenu_tag><a href=../../tags/windows>windows (4)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a></div><div class=xMenu_tag><a href=../../tags/azure-functions>azure-functions (3)</a></div><div class=xMenu_tag><a href=../../tags/cosmos-db>cosmos-db (3)</a></div><div class=xMenu_tag><a href=../../tags/grpc>grpc (3)</a></div><div class=xMenu_tag><a href=../../tags/hugo>hugo (3)</a></div><div class=xMenu_tag><a href=../../tags/kotlin>kotlin (3)</a></div><div class=xMenu_tag><a href=../../tags/mac>mac (3)</a></div><div class=xMenu_tag><a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a></div><div class=xMenu_tag><a href=../../tags/powershell>powershell (3)</a></div><div class=xMenu_tag><a href=../../tags/prettier>prettier (3)</a></div><div class=xMenu_tag><a href=../../tags/sqlite>sqlite (3)</a></div><div class=xMenu_tag><a href=../../tags/textlint>textlint (3)</a></div><div class=xMenu_tag><a href=../../tags/tv>tv (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a></div><div class=xMenu_tag><a href=../../tags/apache>apache (2)</a></div><div class=xMenu_tag><a href=../../tags/arib>arib (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/amplify>aws/amplify (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/appsync>aws/appsync (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/codebuild>aws/codebuild (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/iam>aws/iam (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/kms>aws/kms (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/s3>aws/s3 (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/sdk>aws/sdk (2)</a></div><div class=xMenu_tag><a href=../../tags/azure-app-service>azure-app-service (2)</a></div><div class=xMenu_tag><a href=../../tags/excel>excel (2)</a></div><div class=xMenu_tag><a href=../../tags/firebase/authentication>firebase/authentication (2)</a></div><div class=xMenu_tag><a href=../../tags/go>go (2)</a></div><div class=xMenu_tag><a href=../../tags/http>http (2)</a></div><div class=xMenu_tag><a href=../../tags/json>json (2)</a></div><div class=xMenu_tag><a href=../../tags/mui>mui (2)</a></div><div class=xMenu_tag><a href=../../tags/npm>npm (2)</a></div><div class=xMenu_tag><a href=../../tags/oauth>oauth (2)</a></div><div class=xMenu_tag><a href=../../tags/opengl>opengl (2)</a></div><div class=xMenu_tag><a href=../../tags/rsync>rsync (2)</a></div><div class=xMenu_tag><a href=../../tags/scp>scp (2)</a></div><div class=xMenu_tag><a href=../../tags/slack>slack (2)</a></div><div class=xMenu_tag><a href=../../tags/teraterm>teraterm (2)</a></div><div class=xMenu_tag><a href=../../tags/unicode>unicode (2)</a></div><div class=xMenu_tag><a href=../../tags/vercel>vercel (2)</a></div><div class=xMenu_tag><a href=../../tags/zip>zip (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a></div><div class=xMenu_tag><a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a></div><div class=xMenu_tag><a href=../../tags/.net>.net (1)</a></div><div class=xMenu_tag><a href=../../tags/androidstudio>androidstudio (1)</a></div><div class=xMenu_tag><a href=../../tags/apollo-server>apollo-server (1)</a></div><div class=xMenu_tag><a href=../../tags/atomic-design>atomic-design (1)</a></div><div class=xMenu_tag><a href=../../tags/blender>blender (1)</a></div><div class=xMenu_tag><a href=../../tags/bluetooth>bluetooth (1)</a></div><div class=xMenu_tag><a href=../../tags/bootstrap>bootstrap (1)</a></div><div class=xMenu_tag><a href=../../tags/bot-framework>bot-framework (1)</a></div><div class=xMenu_tag><a href=../../tags/boto3>boto3 (1)</a></div><div class=xMenu_tag><a href=../../tags/certbot>certbot (1)</a></div><div class=xMenu_tag><a href=../../tags/cloudflare>cloudflare (1)</a></div><div class=xMenu_tag><a href=../../tags/css>css (1)</a></div><div class=xMenu_tag><a href=../../tags/dns>dns (1)</a></div><div class=xMenu_tag><a href=../../tags/dvb>dvb (1)</a></div><div class=xMenu_tag><a href=../../tags/editorconfig>editorconfig (1)</a></div><div class=xMenu_tag><a href=../../tags/evernote>evernote (1)</a></div><div class=xMenu_tag><a href=../../tags/git>git (1)</a></div><div class=xMenu_tag><a href=../../tags/golang>golang (1)</a></div><div class=xMenu_tag><a href=../../tags/google-analytics>google-analytics (1)</a></div><div class=xMenu_tag><a href=../../tags/groovy>groovy (1)</a></div><div class=xMenu_tag><a href=../../tags/html>html (1)</a></div><div class=xMenu_tag><a href=../../tags/igdb>igdb (1)</a></div><div class=xMenu_tag><a href=../../tags/iso>iso (1)</a></div><div class=xMenu_tag><a href=../../tags/jest>jest (1)</a></div><div class=xMenu_tag><a href=../../tags/macos>macos (1)</a></div><div class=xMenu_tag><a href=../../tags/meilisearch>meilisearch (1)</a></div><div class=xMenu_tag><a href=../../tags/parcel>parcel (1)</a></div><div class=xMenu_tag><a href=../../tags/raspberrypi>raspberrypi (1)</a></div><div class=xMenu_tag><a href=../../tags/teams>teams (1)</a></div><div class=xMenu_tag><a href=../../tags/tex>tex (1)</a></div><div class=xMenu_tag><a href=../../tags/ubuntu>ubuntu (1)</a></div><div class=xMenu_tag><a href=../../tags/url>url (1)</a></div><div class=xMenu_tag><a href=../../tags/vim>vim (1)</a></div><div class=xMenu_tag><a href=../../tags/vps>vps (1)</a></div><div class=xMenu_tag><a href=../../tags/web>web (1)</a></div><div class=xMenu_tag><a href=../../tags/webpack>webpack (1)</a></div><div class=xMenu_tag><a href=../../tags/wsl>wsl (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a></div></div></div><div class=xMenu_box data-sticky><br></div></div><div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem></div></div></nav><main id=xMain><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting><aside><div class=xPrevNextLink><div class=xPrevNextLink_prev><a href=../../p/whu7hr3/>Amazon EC2 で Hello World (2) EC2 インスタンスの起動と接続</a></div></div></aside><header class=xArticle_headerBox><div><span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/7s7hs4e/>AWS</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=../../p/cxcozak/>EC2</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=../../p/7s7hs4e/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/zkx9ju6/>Amazon EC2 をコマンドライン (CLI) で操作する</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/aws>AWS</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2021-02-22>2021-02-22</time><br>
-作成: <time itemprop=datePublished datetime=2021-02-22>2021-02-22</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#ec2-で使用可能なリージョンの一覧を取得する-ec2-describe-regions>EC2 で使用可能なリージョンの一覧を取得する (ec2 describe-regions)</a></li>
-<li><a href=#ec2-インスタンスの情報を取得する-ec2-describe-instances>EC2 インスタンスの情報を取得する (ec2 describe-instances)</a></li>
-<li><a href=#ami-の情報を取得する-ec2-describe-images>AMI の情報を取得する (ec2 describe-images)</a></li>
-<li><a href=#アタッチされた-ebs-ボリュームの情報を取得する-ec2-describe-volumes>アタッチされた EBS ボリュームの情報を取得する (ec2 describe-volumes)</a></li>
-<li><a href=#仮想マシンを終了する-ec2-terminate-instances>仮想マシンを終了する (ec2 terminate-instances)</a></li>
-<li><a href=#仮想マシンが起動終了するまで待機-ec2-wait>仮想マシンが起動・終了するまで待機 (ec2 wait)</a>
-<ul>
-<li><a href=#起動するまで待機>起動するまで待機</a></li>
-<li><a href=#終了するまで待機>終了するまで待機</a></li>
-</ul>
-</li>
-<li><a href=#vpc-の情報を取得する-ec2-describe-vpcs>VPC の情報を取得する (ec2 describe-vpcs)</a></li>
-<li><a href=#サブネットの情報を取得する-ec2-describe-subnets>サブネットの情報を取得する (ec2 describe-subnets)</a></li>
-</ul>
-</nav>
-<h2 id=ec2-で使用可能なリージョンの一覧を取得する-ec2-describe-regions>EC2 で使用可能なリージョンの一覧を取得する (ec2 describe-regions)</h2>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ aws ec2 describe-regions</code></pre></div></div>
-</figure>
-<div class=xAccordion>
-<input id=id-849263157 type=checkbox>
-<label class=xAccordion_title for=id-849263157>実行結果 (YAML形式）</label>
-<div class=xAccordion_body>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>Regions</span><span class=p>:</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.eu-north-1.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>eu-north-1</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ap-south-1.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ap-south-1</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.eu-west-3.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>eu-west-3</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.eu-west-2.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>eu-west-2</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.eu-west-1.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>eu-west-1</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ap-northeast-3.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-3</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ap-northeast-2.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-2</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ap-northeast-1.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-1</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.sa-east-1.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>sa-east-1</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ca-central-1.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ca-central-1</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ap-southeast-1.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ap-southeast-1</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ap-southeast-2.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ap-southeast-2</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.eu-central-1.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>eu-central-1</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.us-east-1.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>us-east-1</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.us-east-2.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>us-east-2</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.us-west-1.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>us-west-1</span><span class=w>
-</span><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.us-west-2.amazonaws.com</span><span class=w>
-</span><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
-</span><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>us-west-2</span></code></pre></div></div>
-</figure>
-</div>
-</div>
-<h2 id=ec2-インスタンスの情報を取得する-ec2-describe-instances>EC2 インスタンスの情報を取得する (ec2 describe-instances)</h2>
-<p>作成済みの EC2 インスタンスの一覧、あるいは指定した EC2 インスタンスの情報を取得します。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ aws ec2 describe-instances</code></pre></div></div>
-</figure>
-<div class=xAccordion>
-<input id=id-321768459 type=checkbox>
-<label class=xAccordion_title for=id-321768459>実行結果（YAML形式）</label>
-<div class=xAccordion_body>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>Reservations</span><span class=p>:</span><span class=w>
-</span><span class=w></span>- <span class=nt>Groups</span><span class=p>:</span><span class=w> </span><span class=p>[]</span><span class=w>
-</span><span class=w>  </span><span class=nt>Instances</span><span class=p>:</span><span class=w>
-</span><span class=w>  </span>- <span class=nt>AmiLaunchIndex</span><span class=p>:</span><span class=w> </span><span class=m>0</span><span class=w>
-</span><span class=w>    </span><span class=nt>Architecture</span><span class=p>:</span><span class=w> </span><span class=l>x86_64</span><span class=w>
-</span><span class=w>    </span><span class=nt>BlockDeviceMappings</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span>- <span class=nt>DeviceName</span><span class=p>:</span><span class=w> </span><span class=l>/dev/xvda</span><span class=w>
-</span><span class=w>      </span><span class=nt>Ebs</span><span class=p>:</span><span class=w>
-</span><span class=w>        </span><span class=nt>AttachTime</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2021-03-02T14:26:39+00:00&#39;</span><span class=w>
-</span><span class=w>        </span><span class=nt>DeleteOnTermination</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>        </span><span class=nt>Status</span><span class=p>:</span><span class=w> </span><span class=l>attached</span><span class=w>
-</span><span class=w>        </span><span class=nt>VolumeId</span><span class=p>:</span><span class=w> </span><span class=l>vol-3b75f0f9090990420</span><span class=w>
-</span><span class=w>    </span><span class=nt>CapacityReservationSpecification</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span><span class=nt>CapacityReservationPreference</span><span class=p>:</span><span class=w> </span><span class=l>open</span><span class=w>
-</span><span class=w>    </span><span class=nt>ClientToken</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;&#39;</span><span class=w>
-</span><span class=w>    </span><span class=nt>CpuOptions</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span><span class=nt>CoreCount</span><span class=p>:</span><span class=w> </span><span class=m>1</span><span class=w>
-</span><span class=w>      </span><span class=nt>ThreadsPerCore</span><span class=p>:</span><span class=w> </span><span class=m>1</span><span class=w>
-</span><span class=w>    </span><span class=nt>EbsOptimized</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
-</span><span class=w>    </span><span class=nt>EnaSupport</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>    </span><span class=nt>EnclaveOptions</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span><span class=nt>Enabled</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
-</span><span class=w>    </span><span class=nt>HibernationOptions</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span><span class=nt>Configured</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
-</span><span class=w>    </span><span class=nt>Hypervisor</span><span class=p>:</span><span class=w> </span><span class=l>xen</span><span class=w>
-</span><span class=w>    </span><span class=nt>ImageId</span><span class=p>:</span><span class=w> </span><span class=l>ami-e2e9e713809d28faa</span><span class=w>
-</span><span class=w>    </span><span class=nt>InstanceId</span><span class=p>:</span><span class=w> </span><span class=l>i-757968a71071691b7</span><span class=w>
-</span><span class=w>    </span><span class=nt>InstanceType</span><span class=p>:</span><span class=w> </span><span class=l>t2.nano</span><span class=w>
-</span><span class=w>    </span><span class=nt>KeyName</span><span class=p>:</span><span class=w> </span><span class=l>ec2key</span><span class=w>
-</span><span class=w>    </span><span class=nt>LaunchTime</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2021-03-02T15:32:17+00:00&#39;</span><span class=w>
-</span><span class=w>    </span><span class=nt>MetadataOptions</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span><span class=nt>HttpEndpoint</span><span class=p>:</span><span class=w> </span><span class=l>enabled</span><span class=w>
-</span><span class=w>      </span><span class=nt>HttpPutResponseHopLimit</span><span class=p>:</span><span class=w> </span><span class=m>1</span><span class=w>
-</span><span class=w>      </span><span class=nt>HttpTokens</span><span class=p>:</span><span class=w> </span><span class=l>optional</span><span class=w>
-</span><span class=w>      </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>applied</span><span class=w>
-</span><span class=w>    </span><span class=nt>Monitoring</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>disabled</span><span class=w>
-</span><span class=w>    </span><span class=nt>NetworkInterfaces</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span>- <span class=nt>Attachment</span><span class=p>:</span><span class=w>
-</span><span class=w>        </span><span class=nt>AttachTime</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2021-03-02T14:26:38+00:00&#39;</span><span class=w>
-</span><span class=w>        </span><span class=nt>AttachmentId</span><span class=p>:</span><span class=w> </span><span class=l>eni-attach-c1c18b4c61083b1ea</span><span class=w>
-</span><span class=w>        </span><span class=nt>DeleteOnTermination</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>        </span><span class=nt>DeviceIndex</span><span class=p>:</span><span class=w> </span><span class=m>0</span><span class=w>
-</span><span class=w>        </span><span class=nt>NetworkCardIndex</span><span class=p>:</span><span class=w> </span><span class=m>0</span><span class=w>
-</span><span class=w>        </span><span class=nt>Status</span><span class=p>:</span><span class=w> </span><span class=l>attached</span><span class=w>
-</span><span class=w>      </span><span class=nt>Description</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;&#39;</span><span class=w>
-</span><span class=w>      </span><span class=nt>Groups</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span>- <span class=nt>GroupId</span><span class=p>:</span><span class=w> </span><span class=l>sg-650f7192f60271eb7</span><span class=w>
-</span><span class=w>        </span><span class=nt>GroupName</span><span class=p>:</span><span class=w> </span><span class=l>launch-wizard-1</span><span class=w>
-</span><span class=w>      </span><span class=nt>InterfaceType</span><span class=p>:</span><span class=w> </span><span class=l>interface</span><span class=w>
-</span><span class=w>      </span><span class=nt>Ipv6Addresses</span><span class=p>:</span><span class=w> </span><span class=p>[]</span><span class=w>
-</span><span class=w>      </span><span class=nt>MacAddress</span><span class=p>:</span><span class=w> </span><span class=l>0a:a0:bf:37:7f:c1</span><span class=w>
-</span><span class=w>      </span><span class=nt>NetworkInterfaceId</span><span class=p>:</span><span class=w> </span><span class=l>eni-c8aea6d54ac8cc0d0</span><span class=w>
-</span><span class=w>      </span><span class=nt>OwnerId</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;049344049957&#39;</span><span class=w>
-</span><span class=w>      </span><span class=nt>PrivateDnsName</span><span class=p>:</span><span class=w> </span><span class=l>ip-172-31-0-95.ap-northeast-1.compute.internal</span><span class=w>
-</span><span class=w>      </span><span class=nt>PrivateIpAddress</span><span class=p>:</span><span class=w> </span><span class=m>172.31.0.95</span><span class=w>
-</span><span class=w>      </span><span class=nt>PrivateIpAddresses</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span>- <span class=nt>Primary</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>        </span><span class=nt>PrivateDnsName</span><span class=p>:</span><span class=w> </span><span class=l>ip-172-31-0-95.ap-northeast-1.compute.internal</span><span class=w>
-</span><span class=w>        </span><span class=nt>PrivateIpAddress</span><span class=p>:</span><span class=w> </span><span class=m>172.31.0.95</span><span class=w>
-</span><span class=w>      </span><span class=nt>SourceDestCheck</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>      </span><span class=nt>Status</span><span class=p>:</span><span class=w> </span><span class=l>in-use</span><span class=w>
-</span><span class=w>      </span><span class=nt>SubnetId</span><span class=p>:</span><span class=w> </span><span class=l>subnet-13e65081</span><span class=w>
-</span><span class=w>      </span><span class=nt>VpcId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-af6e084d</span><span class=w>
-</span><span class=w>    </span><span class=nt>Placement</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span><span class=nt>AvailabilityZone</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-1c</span><span class=w>
-</span><span class=w>      </span><span class=nt>GroupName</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;&#39;</span><span class=w>
-</span><span class=w>      </span><span class=nt>Tenancy</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
-</span><span class=w>    </span><span class=nt>PrivateDnsName</span><span class=p>:</span><span class=w> </span><span class=l>ip-172-31-0-95.ap-northeast-1.compute.internal</span><span class=w>
-</span><span class=w>    </span><span class=nt>PrivateIpAddress</span><span class=p>:</span><span class=w> </span><span class=m>172.31.0.95</span><span class=w>
-</span><span class=w>    </span><span class=nt>ProductCodes</span><span class=p>:</span><span class=w> </span><span class=p>[]</span><span class=w>
-</span><span class=w>    </span><span class=nt>PublicDnsName</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;&#39;</span><span class=w>
-</span><span class=w>    </span><span class=nt>RootDeviceName</span><span class=p>:</span><span class=w> </span><span class=l>/dev/xvda</span><span class=w>
-</span><span class=w>    </span><span class=nt>RootDeviceType</span><span class=p>:</span><span class=w> </span><span class=l>ebs</span><span class=w>
-</span><span class=w>    </span><span class=nt>SecurityGroups</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span>- <span class=nt>GroupId</span><span class=p>:</span><span class=w> </span><span class=l>sg-650f7192f60271eb7</span><span class=w>
-</span><span class=w>      </span><span class=nt>GroupName</span><span class=p>:</span><span class=w> </span><span class=l>launch-wizard-1</span><span class=w>
-</span><span class=w>    </span><span class=nt>SourceDestCheck</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>    </span><span class=nt>State</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span><span class=nt>Code</span><span class=p>:</span><span class=w> </span><span class=m>80</span><span class=w>
-</span><span class=w>      </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>stopped</span><span class=w>
-</span><span class=w>    </span><span class=nt>StateReason</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span><span class=nt>Code</span><span class=p>:</span><span class=w> </span><span class=l>Client.UserInitiatedShutdown</span><span class=w>
-</span><span class=w>      </span><span class=nt>Message: &#39;Client.UserInitiatedShutdown</span><span class=p>:</span><span class=w> </span><span class=l>User initiated shutdown&#39;</span><span class=w>
-</span><span class=w>    </span><span class=nt>StateTransitionReason</span><span class=p>:</span><span class=w> </span><span class=l>User initiated (2021-03-03 16:24:03 GMT)</span><span class=w>
-</span><span class=w>    </span><span class=nt>SubnetId</span><span class=p>:</span><span class=w> </span><span class=l>subnet-6508113e</span><span class=w>
-</span><span class=w>    </span><span class=nt>Tags</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span>- <span class=nt>Key</span><span class=p>:</span><span class=w> </span><span class=l>Name</span><span class=w>
-</span><span class=w>      </span><span class=nt>Value</span><span class=p>:</span><span class=w> </span><span class=l>maku-test-ec2</span><span class=w>
-</span><span class=w>    </span><span class=nt>VirtualizationType</span><span class=p>:</span><span class=w> </span><span class=l>hvm</span><span class=w>
-</span><span class=w>    </span><span class=nt>VpcId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-af6e084d</span><span class=w>
-</span><span class=w>  </span><span class=nt>OwnerId</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;493440499570&#39;</span><span class=w>
-</span><span class=w>  </span><span class=nt>ReservationId</span><span class=p>:</span><span class=w> </span><span class=l>r-09d469440a8ee4861</span></code></pre></div></div>
-</figure>
-</div>
-</div>
-<h2 id=ami-の情報を取得する-ec2-describe-images>AMI の情報を取得する (ec2 describe-images)</h2>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ aws ec2 describe-images</code></pre></div></div>
-</figure>
-<p>作成した Amazon マシンイメージ (AMI) の一覧を表示することができます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>例: 最新の 5 つの AMI を新しい順に表示</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ aws ec2 describe-images \
-  --owners self \
-  --query &#39;reverse(sort_by(Images,&amp;CreationDate))[:5].{id:ImageId,date:CreationDate}&#39;</code></pre></div></div>
-</figure>
-<div class=xAccordion>
-<input id=id-649378215 type=checkbox>
-<label class=xAccordion_title for=id-649378215>実行結果（JSON形式）</label>
-<div class=xAccordion_body>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>[</span>
-    <span class=p>{</span>
-        <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=s2>&#34;ami-0a1b2c3d4e5f60001&#34;</span><span class=p>,</span>
-        <span class=nt>&#34;date&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-11-28T17:16:38.000Z&#34;</span>
-    <span class=p>},</span>
-    <span class=p>{</span>
-        <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=s2>&#34;ami-0a1b2c3d4e5f60002&#34;</span><span class=p>,</span>
-        <span class=nt>&#34;date&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-09-15T13:51:22.000Z&#34;</span>
-    <span class=p>},</span>
-    <span class=p>{</span>
-        <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=s2>&#34;ami-0a1b2c3d4e5f60003&#34;</span><span class=p>,</span>
-        <span class=nt>&#34;date&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-08-19T10:22:45.000Z&#34;</span>
-    <span class=p>},</span>
-    <span class=p>{</span>
-        <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=s2>&#34;ami-0a1b2c3d4e5f60004&#34;</span><span class=p>,</span>
-        <span class=nt>&#34;date&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-05-03T12:04:02.000Z&#34;</span>
-    <span class=p>},</span>
-    <span class=p>{</span>
-        <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=s2>&#34;ami-0a1b2c3d4e5f60005&#34;</span><span class=p>,</span>
-        <span class=nt>&#34;date&#34;</span><span class=p>:</span> <span class=s2>&#34;2017-12-13T17:16:38.000Z&#34;</span>
-    <span class=p>}</span>
-<span class=p>]</span></code></pre></div></div>
-</figure>
-</div>
-</div>
-<h2 id=アタッチされた-ebs-ボリュームの情報を取得する-ec2-describe-volumes>アタッチされた EBS ボリュームの情報を取得する (ec2 describe-volumes)</h2>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ aws ec2 describe-volumes</code></pre></div></div>
-</figure>
-<p>EC2 インスタンスにアタッチされた Elastic Block Store (EBS) ボリュームの情報を調べることができます。</p>
-<div class=xAccordion>
-<input id=id-378215694 type=checkbox>
-<label class=xAccordion_title for=id-378215694>実行結果</label>
-<div class=xAccordion_body>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
-    <span class=nt>&#34;Volumes&#34;</span><span class=p>:</span> <span class=p>[</span>
-        <span class=p>{</span>
-            <span class=nt>&#34;AvailabilityZone&#34;</span><span class=p>:</span> <span class=s2>&#34;us-west-2a&#34;</span><span class=p>,</span>
-            <span class=nt>&#34;Attachments&#34;</span><span class=p>:</span> <span class=p>[</span>
-                <span class=p>{</span>
-                    <span class=nt>&#34;AttachTime&#34;</span><span class=p>:</span> <span class=s2>&#34;2013-09-17T00:55:03.000Z&#34;</span><span class=p>,</span>
-                    <span class=nt>&#34;InstanceId&#34;</span><span class=p>:</span> <span class=s2>&#34;i-a071c394&#34;</span><span class=p>,</span>
-                    <span class=nt>&#34;VolumeId&#34;</span><span class=p>:</span> <span class=s2>&#34;vol-e11a5288&#34;</span><span class=p>,</span>
-                    <span class=nt>&#34;State&#34;</span><span class=p>:</span> <span class=s2>&#34;attached&#34;</span><span class=p>,</span>
-                    <span class=nt>&#34;DeleteOnTermination&#34;</span><span class=p>:</span> <span class=kc>true</span><span class=p>,</span>
-                    <span class=nt>&#34;Device&#34;</span><span class=p>:</span> <span class=s2>&#34;/dev/sda1&#34;</span>
-                <span class=p>}</span>
-            <span class=p>],</span>
-            <span class=nt>&#34;VolumeType&#34;</span><span class=p>:</span> <span class=s2>&#34;standard&#34;</span><span class=p>,</span>
-            <span class=nt>&#34;VolumeId&#34;</span><span class=p>:</span> <span class=s2>&#34;vol-e11a5288&#34;</span><span class=p>,</span>
-            <span class=nt>&#34;State&#34;</span><span class=p>:</span> <span class=s2>&#34;in-use&#34;</span><span class=p>,</span>
-            <span class=nt>&#34;SnapshotId&#34;</span><span class=p>:</span> <span class=s2>&#34;snap-f23ec1c8&#34;</span><span class=p>,</span>
-            <span class=nt>&#34;CreateTime&#34;</span><span class=p>:</span> <span class=s2>&#34;2013-09-17T00:55:03.000Z&#34;</span><span class=p>,</span>
-            <span class=nt>&#34;Size&#34;</span><span class=p>:</span> <span class=mi>30</span>
-        <span class=p>},</span>
-        <span class=p>{</span>
-            <span class=nt>&#34;AvailabilityZone&#34;</span><span class=p>:</span> <span class=s2>&#34;us-west-2a&#34;</span><span class=p>,</span>
-            <span class=nt>&#34;Attachments&#34;</span><span class=p>:</span> <span class=p>[</span>
-                <span class=p>{</span>
-                    <span class=nt>&#34;AttachTime&#34;</span><span class=p>:</span> <span class=s2>&#34;2013-09-18T20:26:16.000Z&#34;</span><span class=p>,</span>
-                    <span class=nt>&#34;InstanceId&#34;</span><span class=p>:</span> <span class=s2>&#34;i-4b41a37c&#34;</span><span class=p>,</span>
-                    <span class=nt>&#34;VolumeId&#34;</span><span class=p>:</span> <span class=s2>&#34;vol-2e410a47&#34;</span><span class=p>,</span>
-                    <span class=nt>&#34;State&#34;</span><span class=p>:</span> <span class=s2>&#34;attached&#34;</span><span class=p>,</span>
-                    <span class=nt>&#34;DeleteOnTermination&#34;</span><span class=p>:</span> <span class=kc>true</span><span class=p>,</span>
-                    <span class=nt>&#34;Device&#34;</span><span class=p>:</span> <span class=s2>&#34;/dev/sda1&#34;</span>
-                <span class=p>}</span>
-            <span class=p>],</span>
-            <span class=nt>&#34;VolumeType&#34;</span><span class=p>:</span> <span class=s2>&#34;standard&#34;</span><span class=p>,</span>
-            <span class=nt>&#34;VolumeId&#34;</span><span class=p>:</span> <span class=s2>&#34;vol-2e410a47&#34;</span><span class=p>,</span>
-            <span class=nt>&#34;State&#34;</span><span class=p>:</span> <span class=s2>&#34;in-use&#34;</span><span class=p>,</span>
-            <span class=nt>&#34;SnapshotId&#34;</span><span class=p>:</span> <span class=s2>&#34;snap-708e8348&#34;</span><span class=p>,</span>
-            <span class=nt>&#34;CreateTime&#34;</span><span class=p>:</span> <span class=s2>&#34;2013-09-18T20:26:15.000Z&#34;</span><span class=p>,</span>
-            <span class=nt>&#34;Size&#34;</span><span class=p>:</span> <span class=mi>8</span>
-        <span class=p>}</span>
-    <span class=p>]</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-</div>
-</div>
-<h2 id=仮想マシンを終了する-ec2-terminate-instances>仮想マシンを終了する (ec2 terminate-instances)</h2>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ aws ec2 terminate-instances --instance-ids &#34;$INSTANCE_ID&#34;</code></pre></div></div>
-</figure>
-<h2 id=仮想マシンが起動終了するまで待機-ec2-wait>仮想マシンが起動・終了するまで待機 (ec2 wait)</h2>
-<h3 id=起動するまで待機>起動するまで待機</h3>
-<p><code>ec2 run-instances</code> で仮想マシンを起動したあと、起動完了まで待機したいときは次のようにします。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ aws ec2 wait instance-running --instance-ids &#34;$INSTANCE_ID&#34;</code></pre></div></div>
-</figure>
-<h3 id=終了するまで待機>終了するまで待機</h3>
-<p><code>ec2 terminate-instances</code> で仮想マシンを終了したあと、終了完了まで待機したいときは次のようにします。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ aws ec2 wait instance-terminated --instance-ids &#34;$INSTANCE_ID&#34;</code></pre></div></div>
-</figure>
-<h2 id=vpc-の情報を取得する-ec2-describe-vpcs>VPC の情報を取得する (ec2 describe-vpcs)</h2>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>全 VPC の情報を取得する</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ aws ec2 describe-vpcs</code></pre></div></div>
-</figure>
-<div class=xAccordion>
-<input id=id-642178953 type=checkbox>
-<label class=xAccordion_title for=id-642178953>実行結果（YAML形式）</label>
-<div class=xAccordion_body>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>Vpcs</span><span class=p>:</span><span class=w>
-</span><span class=w></span>- <span class=nt>CidrBlock</span><span class=p>:</span><span class=w> </span><span class=m>172.31.0.0</span><span class=l>/16</span><span class=w>
-</span><span class=w>  </span><span class=nt>CidrBlockAssociationSet</span><span class=p>:</span><span class=w>
-</span><span class=w>  </span>- <span class=nt>AssociationId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-cidr-assoc-3d305bd3</span><span class=w>
-</span><span class=w>    </span><span class=nt>CidrBlock</span><span class=p>:</span><span class=w> </span><span class=m>172.31.0.0</span><span class=l>/16</span><span class=w>
-</span><span class=w>    </span><span class=nt>CidrBlockState</span><span class=p>:</span><span class=w>
-</span><span class=w>      </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>associated</span><span class=w>
-</span><span class=w>  </span><span class=nt>DhcpOptionsId</span><span class=p>:</span><span class=w> </span><span class=l>dopt-6fa8cf64</span><span class=w>
-</span><span class=w>  </span><span class=nt>InstanceTenancy</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
-</span><span class=w>  </span><span class=nt>IsDefault</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>  </span><span class=nt>OwnerId</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;049344049957&#39;</span><span class=w>
-</span><span class=w>  </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>available</span><span class=w>
-</span><span class=w>  </span><span class=nt>VpcId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-af6e084d</span></code></pre></div></div>
-</figure>
-</div>
-</div>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>VPC の ID だけ取得する</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ aws ec2 describe-vpcs --query &#34;Vpcs[0].VpcId&#34; --output text
-vpc-af6e084d</code></pre></div></div>
-</figure>
-<h2 id=サブネットの情報を取得する-ec2-describe-subnets>サブネットの情報を取得する (ec2 describe-subnets)</h2>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ aws ec2 describe-subnets</code></pre></div></div>
-</figure>
-<div class=xAccordion>
-<input id=id-156743982 type=checkbox>
-<label class=xAccordion_title for=id-156743982>実行結果（YAML形式）</label>
-<div class=xAccordion_body>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=nt>Subnets</span><span class=p>:</span><span class=w>
-</span><span class=w></span>- <span class=nt>AssignIpv6AddressOnCreation</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
-</span><span class=w>  </span><span class=nt>AvailabilityZone</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-1a</span><span class=w>
-</span><span class=w>  </span><span class=nt>AvailabilityZoneId</span><span class=p>:</span><span class=w> </span><span class=l>apne1-az4</span><span class=w>
-</span><span class=w>  </span><span class=nt>AvailableIpAddressCount</span><span class=p>:</span><span class=w> </span><span class=m>4091</span><span class=w>
-</span><span class=w>  </span><span class=nt>CidrBlock</span><span class=p>:</span><span class=w> </span><span class=m>172.31.32.0</span><span class=l>/20</span><span class=w>
-</span><span class=w>  </span><span class=nt>DefaultForAz</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>  </span><span class=nt>Ipv6CidrBlockAssociationSet</span><span class=p>:</span><span class=w> </span><span class=p>[]</span><span class=w>
-</span><span class=w>  </span><span class=nt>MapCustomerOwnedIpOnLaunch</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
-</span><span class=w>  </span><span class=nt>MapPublicIpOnLaunch</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>  </span><span class=nt>OwnerId</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;049344049957&#39;</span><span class=w>
-</span><span class=w>  </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>available</span><span class=w>
-</span><span class=w>  </span><span class=nt>SubnetArn</span><span class=p>:</span><span class=w> </span><span class=l>arn:aws:ec2:ap-northeast-1:049344049957:subnet/subnet-cd6e2662</span><span class=w>
-</span><span class=w>  </span><span class=nt>SubnetId</span><span class=p>:</span><span class=w> </span><span class=l>subnet-cd6e2662</span><span class=w>
-</span><span class=w>  </span><span class=nt>VpcId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-af6e084d</span><span class=w>
-</span><span class=w></span>- <span class=nt>AssignIpv6AddressOnCreation</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
-</span><span class=w>  </span><span class=nt>AvailabilityZone</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-1d</span><span class=w>
-</span><span class=w>  </span><span class=nt>AvailabilityZoneId</span><span class=p>:</span><span class=w> </span><span class=l>apne1-az2</span><span class=w>
-</span><span class=w>  </span><span class=nt>AvailableIpAddressCount</span><span class=p>:</span><span class=w> </span><span class=m>4091</span><span class=w>
-</span><span class=w>  </span><span class=nt>CidrBlock</span><span class=p>:</span><span class=w> </span><span class=m>172.31.16.0</span><span class=l>/20</span><span class=w>
-</span><span class=w>  </span><span class=nt>DefaultForAz</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>  </span><span class=nt>Ipv6CidrBlockAssociationSet</span><span class=p>:</span><span class=w> </span><span class=p>[]</span><span class=w>
-</span><span class=w>  </span><span class=nt>MapCustomerOwnedIpOnLaunch</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
-</span><span class=w>  </span><span class=nt>MapPublicIpOnLaunch</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>  </span><span class=nt>OwnerId</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;049344049957&#39;</span><span class=w>
-</span><span class=w>  </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>available</span><span class=w>
-</span><span class=w>  </span><span class=nt>SubnetArn</span><span class=p>:</span><span class=w> </span><span class=l>arn:aws:ec2:ap-northeast-1:049344049957:subnet/subnet-3d7d568b</span><span class=w>
-</span><span class=w>  </span><span class=nt>SubnetId</span><span class=p>:</span><span class=w> </span><span class=l>subnet-3d7d568b</span><span class=w>
-</span><span class=w>  </span><span class=nt>VpcId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-af6e084d</span><span class=w>
-</span><span class=w></span>- <span class=nt>AssignIpv6AddressOnCreation</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
-</span><span class=w>  </span><span class=nt>AvailabilityZone</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-1c</span><span class=w>
-</span><span class=w>  </span><span class=nt>AvailabilityZoneId</span><span class=p>:</span><span class=w> </span><span class=l>apne1-az1</span><span class=w>
-</span><span class=w>  </span><span class=nt>AvailableIpAddressCount</span><span class=p>:</span><span class=w> </span><span class=m>4090</span><span class=w>
-</span><span class=w>  </span><span class=nt>CidrBlock</span><span class=p>:</span><span class=w> </span><span class=m>172.31.0.0</span><span class=l>/20</span><span class=w>
-</span><span class=w>  </span><span class=nt>DefaultForAz</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>  </span><span class=nt>Ipv6CidrBlockAssociationSet</span><span class=p>:</span><span class=w> </span><span class=p>[]</span><span class=w>
-</span><span class=w>  </span><span class=nt>MapCustomerOwnedIpOnLaunch</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
-</span><span class=w>  </span><span class=nt>MapPublicIpOnLaunch</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
-</span><span class=w>  </span><span class=nt>OwnerId</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;049344049957&#39;</span><span class=w>
-</span><span class=w>  </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>available</span><span class=w>
-</span><span class=w>  </span><span class=nt>SubnetArn</span><span class=p>:</span><span class=w> </span><span class=l>arn:aws:ec2:ap-northeast-1:049344049957:subnet/subnet-113e6508</span><span class=w>
-</span><span class=w>  </span><span class=nt>SubnetId</span><span class=p>:</span><span class=w> </span><span class=l>subnet-113e6508</span><span class=w>
-</span><span class=w>  </span><span class=nt>VpcId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-af6e084d</span></code></pre></div></div>
-</figure>
-</div>
-</div>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=../../p/bwamw8i/>AWS CodeBuild をコマンドライン (CLI) から操作する</a></li>
-<li><a href=../../p/zkzamw8/>DynamoDB をコマンドライン (CLI) で操作する</a></li>
-<li><a href=../../p/4ju5eow/>AWS S3 をコマンドライン (CLI) で操作する</a></li>
-<li><a href=../../p/aov4bho/>AWS IAM の設定をコマンドライン (CLI) で行う</a></li>
-<li><a href=../../p/j5iu7it/>AWS の初期設定: AWS CLI と認証情報の設定</a></li>
-<li><a href=../../p/xbipv39/>AWS の初期設定: 管理者用の IAM ユーザーを作成する</a></li>
-<li><a href=../../p/4c7sdwg/>AWS アカウント、IAM ユーザー、グループ、ポリシーの違い</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/aws>AWS</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=../../p/cxcozak/><span class=xArticle_up_label>Amazon EC2 関連記事</span><br>へ戻る</a>
-</div>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/whu7hr3/>Amazon EC2 で Hello World (2) EC2 インスタンスの起動と接続</a>
-</div>
-<div class=xPrevNextLink_next>
-<a href=../../p/pcp3doy/>Amazon EC2 で Hello World (1) キーペアの作成</a>
-</div>
-</div>
-</aside>
-</article>
-<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/cxcozak/>EC2</a></span></div><div style=display:flex;margin-top:.8em><div style=width:80px;margin-right:.5em><img src=../../p/7s7hs4e/_index.svg style=width:80px;height:80px></div><div style=flex:1><h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/zkx9ju6/>Amazon EC2 をコマンドライン (CLI) で操作する</a></h1><div class=xPageTags><span class=xPageTags_item><a href=../../tags/aws>AWS</a></span></div></div></div><span class=xPageDate>更新: <time itemprop=dateModified datetime=2021-02-22>2021-02-22</time><br>作成: <time itemprop=datePublished datetime=2021-02-22>2021-02-22</time></span></header><div itemprop=articleBody class=xArticle_content><nav id=TableOfContents><ul><li><a href=#ec2-で使用可能なリージョンの一覧を取得する-ec2-describe-regions>EC2 で使用可能なリージョンの一覧を取得する (ec2 describe-regions)</a></li><li><a href=#ec2-インスタンスの情報を取得する-ec2-describe-instances>EC2 インスタンスの情報を取得する (ec2 describe-instances)</a></li><li><a href=#ami-の情報を取得する-ec2-describe-images>AMI の情報を取得する (ec2 describe-images)</a></li><li><a href=#アタッチされた-ebs-ボリュームの情報を取得する-ec2-describe-volumes>アタッチされた EBS ボリュームの情報を取得する (ec2 describe-volumes)</a></li><li><a href=#仮想マシンを終了する-ec2-terminate-instances>仮想マシンを終了する (ec2 terminate-instances)</a></li><li><a href=#仮想マシンが起動終了するまで待機-ec2-wait>仮想マシンが起動・終了するまで待機 (ec2 wait)</a><ul><li><a href=#起動するまで待機>起動するまで待機</a></li><li><a href=#終了するまで待機>終了するまで待機</a></li></ul></li><li><a href=#vpc-の情報を取得する-ec2-describe-vpcs>VPC の情報を取得する (ec2 describe-vpcs)</a></li><li><a href=#サブネットの情報を取得する-ec2-describe-subnets>サブネットの情報を取得する (ec2 describe-subnets)</a></li></ul></nav><h2 id=ec2-で使用可能なリージョンの一覧を取得する-ec2-describe-regions>EC2 で使用可能なリージョンの一覧を取得する (ec2 describe-regions)</h2><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ aws ec2 describe-regions</span></span></code></pre></div></div></figure><div class=xAccordion><input id=id-547631928 type=checkbox>
+<label class=xAccordion_title for=id-547631928>実行結果 (YAML形式）</label><div class=xAccordion_body><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Regions</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.eu-north-1.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>eu-north-1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ap-south-1.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ap-south-1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.eu-west-3.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>eu-west-3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.eu-west-2.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>eu-west-2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.eu-west-1.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>eu-west-1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ap-northeast-3.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ap-northeast-2.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ap-northeast-1.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.sa-east-1.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>sa-east-1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ca-central-1.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ca-central-1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ap-southeast-1.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ap-southeast-1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.ap-southeast-2.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>ap-southeast-2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.eu-central-1.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>eu-central-1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.us-east-1.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>us-east-1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.us-east-2.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>us-east-2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.us-west-1.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>us-west-1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Endpoint</span><span class=p>:</span><span class=w> </span><span class=l>ec2.us-west-2.amazonaws.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OptInStatus</span><span class=p>:</span><span class=w> </span><span class=l>opt-in-not-required</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>RegionName</span><span class=p>:</span><span class=w> </span><span class=l>us-west-2</span></span></span></code></pre></div></div></figure></div></div><h2 id=ec2-インスタンスの情報を取得する-ec2-describe-instances>EC2 インスタンスの情報を取得する (ec2 describe-instances)</h2><p>作成済みの EC2 インスタンスの一覧、あるいは指定した EC2 インスタンスの情報を取得します。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ aws ec2 describe-instances</span></span></code></pre></div></div></figure><div class=xAccordion><input id=id-256931478 type=checkbox>
+<label class=xAccordion_title for=id-256931478>実行結果（YAML形式）</label><div class=xAccordion_body><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Reservations</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>Groups</span><span class=p>:</span><span class=w> </span><span class=p>[]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Instances</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>AmiLaunchIndex</span><span class=p>:</span><span class=w> </span><span class=m>0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Architecture</span><span class=p>:</span><span class=w> </span><span class=l>x86_64</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>BlockDeviceMappings</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>DeviceName</span><span class=p>:</span><span class=w> </span><span class=l>/dev/xvda</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Ebs</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>AttachTime</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2021-03-02T14:26:39+00:00&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>DeleteOnTermination</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>Status</span><span class=p>:</span><span class=w> </span><span class=l>attached</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>VolumeId</span><span class=p>:</span><span class=w> </span><span class=l>vol-3b75f0f9090990420</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>CapacityReservationSpecification</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>CapacityReservationPreference</span><span class=p>:</span><span class=w> </span><span class=l>open</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ClientToken</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>CpuOptions</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>CoreCount</span><span class=p>:</span><span class=w> </span><span class=m>1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>ThreadsPerCore</span><span class=p>:</span><span class=w> </span><span class=m>1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>EbsOptimized</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>EnaSupport</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>EnclaveOptions</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Enabled</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>HibernationOptions</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Configured</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Hypervisor</span><span class=p>:</span><span class=w> </span><span class=l>xen</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ImageId</span><span class=p>:</span><span class=w> </span><span class=l>ami-e2e9e713809d28faa</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>InstanceId</span><span class=p>:</span><span class=w> </span><span class=l>i-757968a71071691b7</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>InstanceType</span><span class=p>:</span><span class=w> </span><span class=l>t2.nano</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>KeyName</span><span class=p>:</span><span class=w> </span><span class=l>ec2key</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>LaunchTime</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2021-03-02T15:32:17+00:00&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>MetadataOptions</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>HttpEndpoint</span><span class=p>:</span><span class=w> </span><span class=l>enabled</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>HttpPutResponseHopLimit</span><span class=p>:</span><span class=w> </span><span class=m>1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>HttpTokens</span><span class=p>:</span><span class=w> </span><span class=l>optional</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>applied</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Monitoring</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>disabled</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>NetworkInterfaces</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>Attachment</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>AttachTime</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2021-03-02T14:26:38+00:00&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>AttachmentId</span><span class=p>:</span><span class=w> </span><span class=l>eni-attach-c1c18b4c61083b1ea</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>DeleteOnTermination</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>DeviceIndex</span><span class=p>:</span><span class=w> </span><span class=m>0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>NetworkCardIndex</span><span class=p>:</span><span class=w> </span><span class=m>0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>Status</span><span class=p>:</span><span class=w> </span><span class=l>attached</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Description</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Groups</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>GroupId</span><span class=p>:</span><span class=w> </span><span class=l>sg-650f7192f60271eb7</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>GroupName</span><span class=p>:</span><span class=w> </span><span class=l>launch-wizard-1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>InterfaceType</span><span class=p>:</span><span class=w> </span><span class=l>interface</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Ipv6Addresses</span><span class=p>:</span><span class=w> </span><span class=p>[]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>MacAddress</span><span class=p>:</span><span class=w> </span><span class=l>0a:a0:bf:37:7f:c1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>NetworkInterfaceId</span><span class=p>:</span><span class=w> </span><span class=l>eni-c8aea6d54ac8cc0d0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>OwnerId</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;049344049957&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>PrivateDnsName</span><span class=p>:</span><span class=w> </span><span class=l>ip-172-31-0-95.ap-northeast-1.compute.internal</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>PrivateIpAddress</span><span class=p>:</span><span class=w> </span><span class=m>172.31.0.95</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>PrivateIpAddresses</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>Primary</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>PrivateDnsName</span><span class=p>:</span><span class=w> </span><span class=l>ip-172-31-0-95.ap-northeast-1.compute.internal</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>PrivateIpAddress</span><span class=p>:</span><span class=w> </span><span class=m>172.31.0.95</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>SourceDestCheck</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Status</span><span class=p>:</span><span class=w> </span><span class=l>in-use</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>SubnetId</span><span class=p>:</span><span class=w> </span><span class=l>subnet-13e65081</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>VpcId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-af6e084d</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Placement</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>AvailabilityZone</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-1c</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>GroupName</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Tenancy</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>PrivateDnsName</span><span class=p>:</span><span class=w> </span><span class=l>ip-172-31-0-95.ap-northeast-1.compute.internal</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>PrivateIpAddress</span><span class=p>:</span><span class=w> </span><span class=m>172.31.0.95</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ProductCodes</span><span class=p>:</span><span class=w> </span><span class=p>[]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>PublicDnsName</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>RootDeviceName</span><span class=p>:</span><span class=w> </span><span class=l>/dev/xvda</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>RootDeviceType</span><span class=p>:</span><span class=w> </span><span class=l>ebs</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>SecurityGroups</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>GroupId</span><span class=p>:</span><span class=w> </span><span class=l>sg-650f7192f60271eb7</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>GroupName</span><span class=p>:</span><span class=w> </span><span class=l>launch-wizard-1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>SourceDestCheck</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>State</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Code</span><span class=p>:</span><span class=w> </span><span class=m>80</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Name</span><span class=p>:</span><span class=w> </span><span class=l>stopped</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>StateReason</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Code</span><span class=p>:</span><span class=w> </span><span class=l>Client.UserInitiatedShutdown</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Message: &#39;Client.UserInitiatedShutdown</span><span class=p>:</span><span class=w> </span><span class=l>User initiated shutdown&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>StateTransitionReason</span><span class=p>:</span><span class=w> </span><span class=l>User initiated (2021-03-03 16:24:03 GMT)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>SubnetId</span><span class=p>:</span><span class=w> </span><span class=l>subnet-6508113e</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Tags</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>Key</span><span class=p>:</span><span class=w> </span><span class=l>Name</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Value</span><span class=p>:</span><span class=w> </span><span class=l>maku-test-ec2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>VirtualizationType</span><span class=p>:</span><span class=w> </span><span class=l>hvm</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>VpcId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-af6e084d</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OwnerId</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;493440499570&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>ReservationId</span><span class=p>:</span><span class=w> </span><span class=l>r-09d469440a8ee4861</span></span></span></code></pre></div></div></figure></div></div><h2 id=ami-の情報を取得する-ec2-describe-images>AMI の情報を取得する (ec2 describe-images)</h2><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ aws ec2 describe-images</span></span></code></pre></div></div></figure><p>作成した Amazon マシンイメージ (AMI) の一覧を表示することができます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>例: 最新の 5 つの AMI を新しい順に表示</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ aws ec2 describe-images \
+</span></span><span class=line><span class=cl>  --owners self \
+</span></span><span class=line><span class=cl>  --query &#39;reverse(sort_by(Images,&amp;CreationDate))[:5].{id:ImageId,date:CreationDate}&#39;</span></span></code></pre></div></div></figure><div class=xAccordion><input id=id-937561284 type=checkbox>
+<label class=xAccordion_title for=id-937561284>実行結果（JSON形式）</label><div class=xAccordion_body><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=s2>&#34;ami-0a1b2c3d4e5f60001&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;date&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-11-28T17:16:38.000Z&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=s2>&#34;ami-0a1b2c3d4e5f60002&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;date&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-09-15T13:51:22.000Z&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=s2>&#34;ami-0a1b2c3d4e5f60003&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;date&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-08-19T10:22:45.000Z&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=s2>&#34;ami-0a1b2c3d4e5f60004&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;date&#34;</span><span class=p>:</span> <span class=s2>&#34;2018-05-03T12:04:02.000Z&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=s2>&#34;ami-0a1b2c3d4e5f60005&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;date&#34;</span><span class=p>:</span> <span class=s2>&#34;2017-12-13T17:16:38.000Z&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>]</span></span></span></code></pre></div></div></figure></div></div><h2 id=アタッチされた-ebs-ボリュームの情報を取得する-ec2-describe-volumes>アタッチされた EBS ボリュームの情報を取得する (ec2 describe-volumes)</h2><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ aws ec2 describe-volumes</span></span></code></pre></div></div></figure><p>EC2 インスタンスにアタッチされた Elastic Block Store (EBS) ボリュームの情報を調べることができます。</p><div class=xAccordion><input id=id-361925487 type=checkbox>
+<label class=xAccordion_title for=id-361925487>実行結果</label><div class=xAccordion_body><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Volumes&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;AvailabilityZone&#34;</span><span class=p>:</span> <span class=s2>&#34;us-west-2a&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Attachments&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>                <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=nt>&#34;AttachTime&#34;</span><span class=p>:</span> <span class=s2>&#34;2013-09-17T00:55:03.000Z&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nt>&#34;InstanceId&#34;</span><span class=p>:</span> <span class=s2>&#34;i-a071c394&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nt>&#34;VolumeId&#34;</span><span class=p>:</span> <span class=s2>&#34;vol-e11a5288&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nt>&#34;State&#34;</span><span class=p>:</span> <span class=s2>&#34;attached&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nt>&#34;DeleteOnTermination&#34;</span><span class=p>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nt>&#34;Device&#34;</span><span class=p>:</span> <span class=s2>&#34;/dev/sda1&#34;</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>],</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;VolumeType&#34;</span><span class=p>:</span> <span class=s2>&#34;standard&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;VolumeId&#34;</span><span class=p>:</span> <span class=s2>&#34;vol-e11a5288&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;State&#34;</span><span class=p>:</span> <span class=s2>&#34;in-use&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;SnapshotId&#34;</span><span class=p>:</span> <span class=s2>&#34;snap-f23ec1c8&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;CreateTime&#34;</span><span class=p>:</span> <span class=s2>&#34;2013-09-17T00:55:03.000Z&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Size&#34;</span><span class=p>:</span> <span class=mi>30</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;AvailabilityZone&#34;</span><span class=p>:</span> <span class=s2>&#34;us-west-2a&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Attachments&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>                <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=nt>&#34;AttachTime&#34;</span><span class=p>:</span> <span class=s2>&#34;2013-09-18T20:26:16.000Z&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nt>&#34;InstanceId&#34;</span><span class=p>:</span> <span class=s2>&#34;i-4b41a37c&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nt>&#34;VolumeId&#34;</span><span class=p>:</span> <span class=s2>&#34;vol-2e410a47&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nt>&#34;State&#34;</span><span class=p>:</span> <span class=s2>&#34;attached&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nt>&#34;DeleteOnTermination&#34;</span><span class=p>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nt>&#34;Device&#34;</span><span class=p>:</span> <span class=s2>&#34;/dev/sda1&#34;</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>],</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;VolumeType&#34;</span><span class=p>:</span> <span class=s2>&#34;standard&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;VolumeId&#34;</span><span class=p>:</span> <span class=s2>&#34;vol-2e410a47&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;State&#34;</span><span class=p>:</span> <span class=s2>&#34;in-use&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;SnapshotId&#34;</span><span class=p>:</span> <span class=s2>&#34;snap-708e8348&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;CreateTime&#34;</span><span class=p>:</span> <span class=s2>&#34;2013-09-18T20:26:15.000Z&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Size&#34;</span><span class=p>:</span> <span class=mi>8</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span></span></span></code></pre></div></div></figure></div></div><h2 id=仮想マシンを終了する-ec2-terminate-instances>仮想マシンを終了する (ec2 terminate-instances)</h2><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ aws ec2 terminate-instances --instance-ids &#34;$INSTANCE_ID&#34;</span></span></code></pre></div></div></figure><h2 id=仮想マシンが起動終了するまで待機-ec2-wait>仮想マシンが起動・終了するまで待機 (ec2 wait)</h2><h3 id=起動するまで待機>起動するまで待機</h3><p><code>ec2 run-instances</code> で仮想マシンを起動したあと、起動完了まで待機したいときは次のようにします。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ aws ec2 wait instance-running --instance-ids &#34;$INSTANCE_ID&#34;</span></span></code></pre></div></div></figure><h3 id=終了するまで待機>終了するまで待機</h3><p><code>ec2 terminate-instances</code> で仮想マシンを終了したあと、終了完了まで待機したいときは次のようにします。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ aws ec2 wait instance-terminated --instance-ids &#34;$INSTANCE_ID&#34;</span></span></code></pre></div></div></figure><h2 id=vpc-の情報を取得する-ec2-describe-vpcs>VPC の情報を取得する (ec2 describe-vpcs)</h2><figure class=xCodeBlock><figcaption class=xCodeBlock_title>全 VPC の情報を取得する</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ aws ec2 describe-vpcs</span></span></code></pre></div></div></figure><div class=xAccordion><input id=id-846123579 type=checkbox>
+<label class=xAccordion_title for=id-846123579>実行結果（YAML形式）</label><div class=xAccordion_body><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Vpcs</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>CidrBlock</span><span class=p>:</span><span class=w> </span><span class=m>172.31.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>CidrBlockAssociationSet</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>AssociationId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-cidr-assoc-3d305bd3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>CidrBlock</span><span class=p>:</span><span class=w> </span><span class=m>172.31.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>CidrBlockState</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>associated</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>DhcpOptionsId</span><span class=p>:</span><span class=w> </span><span class=l>dopt-6fa8cf64</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>InstanceTenancy</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>IsDefault</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OwnerId</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;049344049957&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>available</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>VpcId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-af6e084d</span></span></span></code></pre></div></div></figure></div></div><figure class=xCodeBlock><figcaption class=xCodeBlock_title>VPC の ID だけ取得する</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ aws ec2 describe-vpcs --query &#34;Vpcs[0].VpcId&#34; --output text
+</span></span><span class=line><span class=cl>vpc-af6e084d</span></span></code></pre></div></div></figure><h2 id=サブネットの情報を取得する-ec2-describe-subnets>サブネットの情報を取得する (ec2 describe-subnets)</h2><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ aws ec2 describe-subnets</span></span></code></pre></div></div></figure><div class=xAccordion><input id=id-731825694 type=checkbox>
+<label class=xAccordion_title for=id-731825694>実行結果（YAML形式）</label><div class=xAccordion_body><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Subnets</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>AssignIpv6AddressOnCreation</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>AvailabilityZone</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-1a</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>AvailabilityZoneId</span><span class=p>:</span><span class=w> </span><span class=l>apne1-az4</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>AvailableIpAddressCount</span><span class=p>:</span><span class=w> </span><span class=m>4091</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>CidrBlock</span><span class=p>:</span><span class=w> </span><span class=m>172.31.32.0</span><span class=l>/20</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>DefaultForAz</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Ipv6CidrBlockAssociationSet</span><span class=p>:</span><span class=w> </span><span class=p>[]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>MapCustomerOwnedIpOnLaunch</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>MapPublicIpOnLaunch</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OwnerId</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;049344049957&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>available</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>SubnetArn</span><span class=p>:</span><span class=w> </span><span class=l>arn:aws:ec2:ap-northeast-1:049344049957:subnet/subnet-cd6e2662</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>SubnetId</span><span class=p>:</span><span class=w> </span><span class=l>subnet-cd6e2662</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>VpcId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-af6e084d</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>AssignIpv6AddressOnCreation</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>AvailabilityZone</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-1d</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>AvailabilityZoneId</span><span class=p>:</span><span class=w> </span><span class=l>apne1-az2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>AvailableIpAddressCount</span><span class=p>:</span><span class=w> </span><span class=m>4091</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>CidrBlock</span><span class=p>:</span><span class=w> </span><span class=m>172.31.16.0</span><span class=l>/20</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>DefaultForAz</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Ipv6CidrBlockAssociationSet</span><span class=p>:</span><span class=w> </span><span class=p>[]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>MapCustomerOwnedIpOnLaunch</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>MapPublicIpOnLaunch</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OwnerId</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;049344049957&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>available</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>SubnetArn</span><span class=p>:</span><span class=w> </span><span class=l>arn:aws:ec2:ap-northeast-1:049344049957:subnet/subnet-3d7d568b</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>SubnetId</span><span class=p>:</span><span class=w> </span><span class=l>subnet-3d7d568b</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>VpcId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-af6e084d</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>AssignIpv6AddressOnCreation</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>AvailabilityZone</span><span class=p>:</span><span class=w> </span><span class=l>ap-northeast-1c</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>AvailabilityZoneId</span><span class=p>:</span><span class=w> </span><span class=l>apne1-az1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>AvailableIpAddressCount</span><span class=p>:</span><span class=w> </span><span class=m>4090</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>CidrBlock</span><span class=p>:</span><span class=w> </span><span class=m>172.31.0.0</span><span class=l>/20</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>DefaultForAz</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Ipv6CidrBlockAssociationSet</span><span class=p>:</span><span class=w> </span><span class=p>[]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>MapCustomerOwnedIpOnLaunch</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>MapPublicIpOnLaunch</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>OwnerId</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;049344049957&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>State</span><span class=p>:</span><span class=w> </span><span class=l>available</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>SubnetArn</span><span class=p>:</span><span class=w> </span><span class=l>arn:aws:ec2:ap-northeast-1:049344049957:subnet/subnet-113e6508</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>SubnetId</span><span class=p>:</span><span class=w> </span><span class=l>subnet-113e6508</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>VpcId</span><span class=p>:</span><span class=w> </span><span class=l>vpc-af6e084d</span></span></span></code></pre></div></div></figure></div></div><meta itemprop=author content="まく"><span itemprop=publisher itemscope itemtype=https://schema.org/Organization><meta itemprop=name content="まく"></span><h3 style="border-bottom:1px solid gray">関連記事</h3><ul><li><a href=../../p/bwamw8i/>AWS CodeBuild をコマンドライン (CLI) から操作する</a></li><li><a href=../../p/zkzamw8/>DynamoDB をコマンドライン (CLI) で操作する</a></li><li><a href=../../p/4ju5eow/>AWS S3 をコマンドライン (CLI) で操作する</a></li><li><a href=../../p/aov4bho/>AWS IAM の設定をコマンドライン (CLI) で行う</a></li><li><a href=../../p/j5iu7it/>AWS の初期設定: AWS CLI と認証情報の設定</a></li><li><a href=../../p/xbipv39/>AWS の初期設定: 管理者用の IAM ユーザーを作成する</a></li><li><a href=../../p/4c7sdwg/>AWS アカウント、IAM ユーザー、グループ、ポリシーの違い</a></li></ul><div class=xPageTags><span class=xPageTags_item><a href=../../tags/aws>AWS</a></span></div></div><div style=text-align:right><div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div></div><div class=xArticle_up><a href=../../p/cxcozak/><span class=xArticle_up_label>Amazon EC2 関連記事</span><br>へ戻る</a></div><aside><div class=xPrevNextLink><div class=xPrevNextLink_prev><a href=../../p/whu7hr3/>Amazon EC2 で Hello World (2) EC2 インスタンスの起動と接続</a></div><div class=xPrevNextLink_next><a href=../../p/pcp3doy/>Amazon EC2 で Hello World (1) キーペアの作成</a></div></div></aside></article><script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
 <ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
-<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
-</main>
-</div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/7s7hs4e/>AWS</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/cxcozak/>EC2</a>
-</span>
-<span class=xBreadcrumb_item>Amazon EC2 をコマンドライン (CLI) で操作する
-</span>
-</div>
-</aside>
-<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
-<div id=xSiteFooter2>
-<a href=../../sitemap/>サイトマップ</a> ｜
-<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
-</div>
-</div>
-<script src=../../assets/js/sidebar.js></script>
-<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c],d=b.getElementsByTagName('img');if(d.length>0)continue;const e=b.getElementsByTagName('svg');if(e.length>0)continue;b.classList.add('xExternalLinkIcon'),b.setAttribute('target','_blank'),b.setAttribute('rel','noopener')}})</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"AWS","item":"https://maku.blog/p/7s7hs4e/"},{"@type":"ListItem","position":4,"name":"EC2","item":"https://maku.blog/p/cxcozak/"},{"@type":"ListItem","position":5,"name":"Amazon EC2 をコマンドライン (CLI) で操作する","item":"https://maku.blog/p/zkx9ju6/"}]}</script>
-</body>
-</html>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/7s7hs4e/>AWS</a></span>
+<span class=xBreadcrumb_item><a href=../../p/cxcozak/>EC2</a></span>
+<span class=xBreadcrumb_item>Amazon EC2 をコマンドライン (CLI) で操作する</span></div></aside><div id=xSiteFooter><a href=../../>まくろぐ</a></div><div id=xSiteFooter2><a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a></div></div><script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener("DOMContentLoaded",function(){const e=document.querySelectorAll("a[href^=http]");for(let n=0;n<e.length;++n){const t=e[n],s=t.getElementsByTagName("img");if(s.length>0)continue;const o=t.getElementsByTagName("svg");if(o.length>0)continue;t.classList.add("xExternalLinkIcon"),t.setAttribute("target","_blank"),t.setAttribute("rel","noopener")}})</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"AWS","item":"https://maku.blog/p/7s7hs4e/"},{"@type":"ListItem","position":4,"name":"EC2","item":"https://maku.blog/p/cxcozak/"},{"@type":"ListItem","position":5,"name":"Amazon EC2 をコマンドライン (CLI) で操作する","item":"https://maku.blog/p/zkx9ju6/"}]}</script></body></html>

@@ -1,606 +1,44 @@
-<!doctype html><html lang=ja-jp>
-<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<title>Firebase Admin SDK で Firebase の各種サービスを操作する｜まくろぐ</title>
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
-<meta property="og:title" content="Firebase Admin SDK で Firebase の各種サービスを操作する">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://maku.blog/p/yfov4bi/">
-<meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
-<meta property="og:image:width" content="1436">
-<meta property="og:image:height" content="746">
-<meta property="og:description" content="Firebase Admin SDK とは Firebase Admin SDK を使うと、Firebase の管理者（おそらくあなた）用に提供された API キーを使って、Firebase 上のデータを管理することができます。 例えば、ローカル PC にある JSON データを解析して Firestore データベースのドキュメントとして登録するといったことができます。
+<!doctype html><html lang=ja-jp><head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#"><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Firebase Admin SDK で Firebase の各種サービスを操作する｜まくろぐ</title><script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-63069513-4")</script><meta property="og:site_name" content="まくろぐ"><meta property="og:title" content="Firebase Admin SDK で Firebase の各種サービスを操作する"><meta property="og:type" content="website"><meta property="og:url" content="https://maku.blog/p/yfov4bi/"><meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png"><meta property="og:image:width" content="1436"><meta property="og:image:height" content="746"><meta property="og:description" content="Firebase Admin SDK とは Firebase Admin SDK を使うと、Firebase の管理者（おそらくあなた）用に提供された API キーを使って、Firebase 上のデータを管理することができます。 例えば、ローカル PC にある JSON データを解析して Firestore データベースのドキュメントとして登録するといったことができます。
 Firebase Admin SDK がサポートしている言語としては、Node.js、Java、Python、Go、C# などがありますが、Node.js から順番に機能提供されていくようです。 ここでは Node.js (TypeScript) で Firestore の API を呼び出してみます。
-☝️ サーバーライブラリとクライアントライブラリ Firebase Admin SDK はしばしば サーバーライブラリ とも呼ばれます。 一方で、Web アプリやモバイルアプリなどで使う SDK は クライアントライブラリ と呼ばれ、Firebase が提供するセキュリティルールという仕組みでアクセス制御を行います。 具体的には、Firebase Auth などでユーザー認証を行うことで、各クライアントに対してアクセス権限を付与します。 これに対して、Firebase Admin SDK はあらかじめローカルに保持しているアクセスキーを使って API を呼び出すので、セキュリティルールを無視した特権アクセスが可能です。  秘密鍵のダウンロード Firebase Admin SDK を使って API 呼び出しを行うには、秘密鍵（API キー）を取得する必要があります。
-   Firebase コンソール にサインインして、対象のプロジェクトを選択する。 プロジェクトの設定 を開き、サービスアカウント タブを選択する。 新しい秘密鍵の生成 をクリックして、秘密鍵ファイル (.">
-<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
-<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
-<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
-<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
-<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
-<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
-<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
-</head>
-<body>
-<div id=xRoot>
-<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/6p3dox9/>Firebase</a>
-</span>
-<span class=xBreadcrumb_item>Firebase Admin SDK で Firebase の各種サービスを操作する
-</span>
-</div>
-</aside>
-<div id=xContainer>
-<nav id=xMenu aria-label=メニュー>
-<div id=sidebar style=height:100%>
-<div id=sidebar_notFixed>
-<a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a>
-<div class=xMenu_box data-sticky>
-<form action=https://cse.google.com/cse target=_blank>
-<div class=xSearchBox>
-<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+☝️ サーバーライブラリとクライアントライブラリ Firebase Admin SDK はしばしば サーバーライブラリ とも呼ばれます。 一方で、Web アプリやモバイルアプリなどで使う SDK は クライアントライブラリ と呼ばれ、Firebase が提供するセキュリティルールという仕組みでアクセス制御を行います。 具体的には、Firebase Auth などでユーザー認証を行うことで、各クライアントに対してアクセス権限を付与します。 これに対して、Firebase Admin SDK はあらかじめローカルに保持しているアクセスキーを使って API を呼び出すので、セキュリティルールを無視した特権アクセスが可能です。 秘密鍵のダウンロード Firebase Admin SDK を使って API 呼び出しを行うには、秘密鍵（API キー）を取得する必要があります。
+Firebase コンソール にサインインして、対象のプロジェクトを選択する。 プロジェクトの設定 を開き、サービスアカウント タブを選択する。 新しい秘密鍵の生成 をクリックして、秘密鍵ファイル (."><meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css><link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico><link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png><link rel=apple-touch-icon href=../../assets/favicon/180x180.png><script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script><style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style><script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script></head><body><div id=xRoot><div id=xSiteHeader><a href=../../>まくろぐ</a></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/6p3dox9/>Firebase</a></span>
+<span class=xBreadcrumb_item>Firebase Admin SDK で Firebase の各種サービスを操作する</span></div></aside><div id=xContainer><nav id=xMenu aria-label=メニュー><div id=sidebar style=height:100%><div id=sidebar_notFixed><a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a><div class=xMenu_box data-sticky><form action=https://cse.google.com/cse target=_blank><div class=xSearchBox><input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
 <input type=hidden name=ie value=UTF-8>
 <input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
-<input type=submit value=検索></input>
-</div>
-</form>
-<div class=xMenu_box_body>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
-<div class=xMenu_box_body>
-<div class=xBoxLink>
-<a href=../../p/zycmw6f/>
-Next.js アプリに Google Analytics を設定する (next/script)
-<time>2023-03-21</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/cv6fpx7/>
-React で入力フォームの onChange イベントを IME ON のときに無視する
-<time>2023-01-29</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/bo8q8p7/>
-Meilisearch サーチエンジンを使ってみる
-<time>2023-01-24</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/y6zgrg2/>
-Docker で MongoDB サーバーを立ち上げる
-<time>2023-01-18</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/3pwojuj/>
-Deno で MongoDB にアクセスする
-<time>2023-01-18</time></a>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3>
-<div class=xMenu_box_body>
-<div class=xNavTree>
-<ul>
-<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
-<ul>
-<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
-<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
-<li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a>
-<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
-<li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a>
-<li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a>
-<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
-<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
-<li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a>
-<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
-<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
-<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
-<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
-<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
-<ul>
-</ul>
-<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
-<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
-<li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a>
-<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
-<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
-<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
-<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
-<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
-<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
-<li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a>
-</ul>
-<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
-<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
-<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
-<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
-<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
-<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
-<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
-</ul>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
-<div class=xMenu_box_body><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws>aws (61)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure>azure (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/typescript>typescript (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/next.js>next.js (38)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/graphql>graphql (35)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/react>react (29)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/chatbot>chatbot (28)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/gnuplot>gnuplot (27)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cdk>aws/cdk (26)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/linux>linux (25)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github>github (24)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ansible>ansible (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/node.js>node.js (19)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/electron>electron (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mongodb>mongodb (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/protocol-buffers>protocol-buffers (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vs-code>vs-code (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/javascript>javascript (13)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cognito>aws/cognito (12)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/nginx>nginx (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/android>android (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/lambda>aws/lambda (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/java>java (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/python>python (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ssh>ssh (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/uml>uml (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/3d>3d (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sam>aws/sam (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/docker>docker (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/firestore>firebase/firestore (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unity>unity (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webgl>webgl (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo>apollo (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-cli>azure-cli (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/deno>deno (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jade>jade (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/material-ui>material-ui (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cli>aws/cli (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-storage>azure-storage (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/doxygen>doxygen (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/c/c++>c/c++ (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-actions>github-actions (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/luis>luis (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/qna-maker>qna-maker (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/ssm>aws/ssm (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/eslint>eslint (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase>firebase (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-pages>github-pages (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html/css>html/css (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jekyll>jekyll (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/lets-encrypt>lets-encrypt (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sql>sql (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/windows>windows (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-functions>azure-functions (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cosmos-db>cosmos-db (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/grpc>grpc (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/hugo>hugo (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/kotlin>kotlin (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mac>mac (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/powershell>powershell (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/prettier>prettier (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sqlite>sqlite (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/textlint>textlint (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tv>tv (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apache>apache (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/arib>arib (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/amplify>aws/amplify (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/appsync>aws/appsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/iam>aws/iam (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/kms>aws/kms (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/s3>aws/s3 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sdk>aws/sdk (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-app-service>azure-app-service (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/excel>excel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/go>go (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/http>http (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/json>json (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mui>mui (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/npm>npm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/oauth>oauth (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/opengl>opengl (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/rsync>rsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/scp>scp (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/slack>slack (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teraterm>teraterm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unicode>unicode (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vercel>vercel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/zip>zip (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/.net>.net (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/androidstudio>androidstudio (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo-server>apollo-server (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/atomic-design>atomic-design (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/blender>blender (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bluetooth>bluetooth (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bootstrap>bootstrap (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-framework>bot-framework (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/boto3>boto3 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/certbot>certbot (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cloudflare>cloudflare (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/css>css (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dns>dns (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dvb>dvb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/editorconfig>editorconfig (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/evernote>evernote (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/git>git (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/golang>golang (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/google-analytics>google-analytics (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/groovy>groovy (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html>html (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/igdb>igdb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/iso>iso (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jest>jest (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/macos>macos (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/meilisearch>meilisearch (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/parcel>parcel (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/raspberrypi>raspberrypi (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teams>teams (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tex>tex (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ubuntu>ubuntu (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/url>url (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vim>vim (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vps>vps (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/web>web (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webpack>webpack (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/wsl>wsl (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
-</div></div>
-</div>
-<div class=xMenu_box data-sticky><br></div>
-</div>
-<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
-</div>
-</div>
-</nav>
-<main id=xMain>
-<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/pamw7hr/>Firebase CLI でコマンドラインから Firebase を操作する</a>
-</div>
-<div class=xPrevNextLink_next>
-<a href=../../p/m3bjrz7/>Next.js で Firebase: Cloud Firestore データベースを使う</a>
-</div>
-</div>
-</aside>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<input type=submit value=検索></input></div></form><div class=xMenu_box_body></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3><div class=xMenu_box_body><div class=xBoxLink><a href=../../p/zycmw6f/>Next.js アプリに Google Analytics を設定する (next/script)
+<time>2023-03-21</time></a></div><div class=xBoxLink><a href=../../p/cv6fpx7/>React で入力フォームの onChange イベントを IME ON のときに無視する
+<time>2023-01-29</time></a></div><div class=xBoxLink><a href=../../p/bo8q8p7/>Meilisearch サーチエンジンを使ってみる
+<time>2023-01-24</time></a></div><div class=xBoxLink><a href=../../p/y6zgrg2/>Docker で MongoDB サーバーを立ち上げる
+<time>2023-01-18</time></a></div><div class=xBoxLink><a href=../../p/3pwojuj/>Deno で MongoDB にアクセスする
+<time>2023-01-18</time></a></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3><div class=xMenu_box_body><div class=xNavTree><ul><li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a><ul><li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a><li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a><li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a><li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a><li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a><li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a><li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a><li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a><li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a><li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a><li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a><li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a><li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a><li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a><ul></ul><li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a><li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a><li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a><li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a><li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a><li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a><li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a><li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a><li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a><li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a></ul><li><a class=xNavTree-dir href=../../p/35odek9/>読書</a><li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a><li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a><li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a><li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a><li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a><li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a></ul></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3><div class=xMenu_box_body><div class=xMenu_tag><a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a></div><div class=xMenu_tag><a href=../../tags/aws>aws (61)</a></div><div class=xMenu_tag><a href=../../tags/azure>azure (58)</a></div><div class=xMenu_tag><a href=../../tags/typescript>typescript (58)</a></div><div class=xMenu_tag><a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a></div><div class=xMenu_tag><a href=../../tags/next.js>next.js (38)</a></div><div class=xMenu_tag><a href=../../tags/graphql>graphql (35)</a></div><div class=xMenu_tag><a href=../../tags/react>react (29)</a></div><div class=xMenu_tag><a href=../../tags/chatbot>chatbot (28)</a></div><div class=xMenu_tag><a href=../../tags/gnuplot>gnuplot (27)</a></div><div class=xMenu_tag><a href=../../tags/aws/cdk>aws/cdk (26)</a></div><div class=xMenu_tag><a href=../../tags/linux>linux (25)</a></div><div class=xMenu_tag><a href=../../tags/github>github (24)</a></div><div class=xMenu_tag><a href=../../tags/ansible>ansible (21)</a></div><div class=xMenu_tag><a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a></div><div class=xMenu_tag><a href=../../tags/node.js>node.js (19)</a></div><div class=xMenu_tag><a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a></div><div class=xMenu_tag><a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a></div><div class=xMenu_tag><a href=../../tags/electron>electron (15)</a></div><div class=xMenu_tag><a href=../../tags/mongodb>mongodb (15)</a></div><div class=xMenu_tag><a href=../../tags/protocol-buffers>protocol-buffers (14)</a></div><div class=xMenu_tag><a href=../../tags/vs-code>vs-code (14)</a></div><div class=xMenu_tag><a href=../../tags/javascript>javascript (13)</a></div><div class=xMenu_tag><a href=../../tags/aws/cognito>aws/cognito (12)</a></div><div class=xMenu_tag><a href=../../tags/nginx>nginx (11)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a></div><div class=xMenu_tag><a href=../../tags/android>android (10)</a></div><div class=xMenu_tag><a href=../../tags/aws/lambda>aws/lambda (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a></div><div class=xMenu_tag><a href=../../tags/java>java (9)</a></div><div class=xMenu_tag><a href=../../tags/python>python (9)</a></div><div class=xMenu_tag><a href=../../tags/ssh>ssh (9)</a></div><div class=xMenu_tag><a href=../../tags/uml>uml (9)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a></div><div class=xMenu_tag><a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a></div><div class=xMenu_tag><a href=../../tags/3d>3d (8)</a></div><div class=xMenu_tag><a href=../../tags/aws/sam>aws/sam (8)</a></div><div class=xMenu_tag><a href=../../tags/docker>docker (8)</a></div><div class=xMenu_tag><a href=../../tags/firebase/firestore>firebase/firestore (8)</a></div><div class=xMenu_tag><a href=../../tags/unity>unity (8)</a></div><div class=xMenu_tag><a href=../../tags/webgl>webgl (8)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a></div><div class=xMenu_tag><a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a></div><div class=xMenu_tag><a href=../../tags/apollo>apollo (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-cli>azure-cli (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-pipelines>azure-pipelines (7)</a></div><div class=xMenu_tag><a href=../../tags/deno>deno (7)</a></div><div class=xMenu_tag><a href=../../tags/jade>jade (7)</a></div><div class=xMenu_tag><a href=../../tags/material-ui>material-ui (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a></div><div class=xMenu_tag><a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a></div><div class=xMenu_tag><a href=../../tags/aws/cli>aws/cli (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-storage>azure-storage (6)</a></div><div class=xMenu_tag><a href=../../tags/doxygen>doxygen (6)</a></div><div class=xMenu_tag><a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-table-storage>azure-table-storage (5)</a></div><div class=xMenu_tag><a href=../../tags/c/c++>c/c++ (5)</a></div><div class=xMenu_tag><a href=../../tags/github-actions>github-actions (5)</a></div><div class=xMenu_tag><a href=../../tags/luis>luis (5)</a></div><div class=xMenu_tag><a href=../../tags/qna-maker>qna-maker (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a></div><div class=xMenu_tag><a href=../../tags/aws/ssm>aws/ssm (4)</a></div><div class=xMenu_tag><a href=../../tags/eslint>eslint (4)</a></div><div class=xMenu_tag><a href=../../tags/firebase>firebase (4)</a></div><div class=xMenu_tag><a href=../../tags/github-pages>github-pages (4)</a></div><div class=xMenu_tag><a href=../../tags/html/css>html/css (4)</a></div><div class=xMenu_tag><a href=../../tags/jekyll>jekyll (4)</a></div><div class=xMenu_tag><a href=../../tags/lets-encrypt>lets-encrypt (4)</a></div><div class=xMenu_tag><a href=../../tags/sql>sql (4)</a></div><div class=xMenu_tag><a href=../../tags/windows>windows (4)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a></div><div class=xMenu_tag><a href=../../tags/azure-functions>azure-functions (3)</a></div><div class=xMenu_tag><a href=../../tags/cosmos-db>cosmos-db (3)</a></div><div class=xMenu_tag><a href=../../tags/grpc>grpc (3)</a></div><div class=xMenu_tag><a href=../../tags/hugo>hugo (3)</a></div><div class=xMenu_tag><a href=../../tags/kotlin>kotlin (3)</a></div><div class=xMenu_tag><a href=../../tags/mac>mac (3)</a></div><div class=xMenu_tag><a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a></div><div class=xMenu_tag><a href=../../tags/powershell>powershell (3)</a></div><div class=xMenu_tag><a href=../../tags/prettier>prettier (3)</a></div><div class=xMenu_tag><a href=../../tags/sqlite>sqlite (3)</a></div><div class=xMenu_tag><a href=../../tags/textlint>textlint (3)</a></div><div class=xMenu_tag><a href=../../tags/tv>tv (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a></div><div class=xMenu_tag><a href=../../tags/apache>apache (2)</a></div><div class=xMenu_tag><a href=../../tags/arib>arib (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/amplify>aws/amplify (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/appsync>aws/appsync (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/codebuild>aws/codebuild (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/iam>aws/iam (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/kms>aws/kms (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/s3>aws/s3 (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/sdk>aws/sdk (2)</a></div><div class=xMenu_tag><a href=../../tags/azure-app-service>azure-app-service (2)</a></div><div class=xMenu_tag><a href=../../tags/excel>excel (2)</a></div><div class=xMenu_tag><a href=../../tags/firebase/authentication>firebase/authentication (2)</a></div><div class=xMenu_tag><a href=../../tags/go>go (2)</a></div><div class=xMenu_tag><a href=../../tags/http>http (2)</a></div><div class=xMenu_tag><a href=../../tags/json>json (2)</a></div><div class=xMenu_tag><a href=../../tags/mui>mui (2)</a></div><div class=xMenu_tag><a href=../../tags/npm>npm (2)</a></div><div class=xMenu_tag><a href=../../tags/oauth>oauth (2)</a></div><div class=xMenu_tag><a href=../../tags/opengl>opengl (2)</a></div><div class=xMenu_tag><a href=../../tags/rsync>rsync (2)</a></div><div class=xMenu_tag><a href=../../tags/scp>scp (2)</a></div><div class=xMenu_tag><a href=../../tags/slack>slack (2)</a></div><div class=xMenu_tag><a href=../../tags/teraterm>teraterm (2)</a></div><div class=xMenu_tag><a href=../../tags/unicode>unicode (2)</a></div><div class=xMenu_tag><a href=../../tags/vercel>vercel (2)</a></div><div class=xMenu_tag><a href=../../tags/zip>zip (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a></div><div class=xMenu_tag><a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a></div><div class=xMenu_tag><a href=../../tags/.net>.net (1)</a></div><div class=xMenu_tag><a href=../../tags/androidstudio>androidstudio (1)</a></div><div class=xMenu_tag><a href=../../tags/apollo-server>apollo-server (1)</a></div><div class=xMenu_tag><a href=../../tags/atomic-design>atomic-design (1)</a></div><div class=xMenu_tag><a href=../../tags/blender>blender (1)</a></div><div class=xMenu_tag><a href=../../tags/bluetooth>bluetooth (1)</a></div><div class=xMenu_tag><a href=../../tags/bootstrap>bootstrap (1)</a></div><div class=xMenu_tag><a href=../../tags/bot-framework>bot-framework (1)</a></div><div class=xMenu_tag><a href=../../tags/boto3>boto3 (1)</a></div><div class=xMenu_tag><a href=../../tags/certbot>certbot (1)</a></div><div class=xMenu_tag><a href=../../tags/cloudflare>cloudflare (1)</a></div><div class=xMenu_tag><a href=../../tags/css>css (1)</a></div><div class=xMenu_tag><a href=../../tags/dns>dns (1)</a></div><div class=xMenu_tag><a href=../../tags/dvb>dvb (1)</a></div><div class=xMenu_tag><a href=../../tags/editorconfig>editorconfig (1)</a></div><div class=xMenu_tag><a href=../../tags/evernote>evernote (1)</a></div><div class=xMenu_tag><a href=../../tags/git>git (1)</a></div><div class=xMenu_tag><a href=../../tags/golang>golang (1)</a></div><div class=xMenu_tag><a href=../../tags/google-analytics>google-analytics (1)</a></div><div class=xMenu_tag><a href=../../tags/groovy>groovy (1)</a></div><div class=xMenu_tag><a href=../../tags/html>html (1)</a></div><div class=xMenu_tag><a href=../../tags/igdb>igdb (1)</a></div><div class=xMenu_tag><a href=../../tags/iso>iso (1)</a></div><div class=xMenu_tag><a href=../../tags/jest>jest (1)</a></div><div class=xMenu_tag><a href=../../tags/macos>macos (1)</a></div><div class=xMenu_tag><a href=../../tags/meilisearch>meilisearch (1)</a></div><div class=xMenu_tag><a href=../../tags/parcel>parcel (1)</a></div><div class=xMenu_tag><a href=../../tags/raspberrypi>raspberrypi (1)</a></div><div class=xMenu_tag><a href=../../tags/teams>teams (1)</a></div><div class=xMenu_tag><a href=../../tags/tex>tex (1)</a></div><div class=xMenu_tag><a href=../../tags/ubuntu>ubuntu (1)</a></div><div class=xMenu_tag><a href=../../tags/url>url (1)</a></div><div class=xMenu_tag><a href=../../tags/vim>vim (1)</a></div><div class=xMenu_tag><a href=../../tags/vps>vps (1)</a></div><div class=xMenu_tag><a href=../../tags/web>web (1)</a></div><div class=xMenu_tag><a href=../../tags/webpack>webpack (1)</a></div><div class=xMenu_tag><a href=../../tags/wsl>wsl (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a></div></div></div><div class=xMenu_box data-sticky><br></div></div><div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem></div></div></nav><main id=xMain><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting><aside><div class=xPrevNextLink><div class=xPrevNextLink_prev><a href=../../p/pamw7hr/>Firebase CLI でコマンドラインから Firebase を操作する</a></div><div class=xPrevNextLink_next><a href=../../p/m3bjrz7/>Next.js で Firebase: Cloud Firestore データベースを使う</a></div></div></aside><header class=xArticle_headerBox><div><span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=../../p/6p3dox9/>Firebase</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=../../p/6p3dox9/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/yfov4bi/>Firebase Admin SDK で Firebase の各種サービスを操作する</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/firebase>Firebase</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2021-12-31>2021-12-31</time><br>
-作成: <time itemprop=datePublished datetime=2021-12-31>2021-12-31</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#firebase-admin-sdk-とは>Firebase Admin SDK とは</a></li>
-<li><a href=#秘密鍵のダウンロード>秘密鍵のダウンロード</a></li>
-<li><a href=#nodejs-typescript-プロジェクトの作成>Node.js (TypeScript) プロジェクトの作成</a></li>
-<li><a href=#firebase-admin-sdk-の初期化>Firebase Admin SDK の初期化</a></li>
-<li><a href=#admin-sdk-で-firestore-データベースにアクセスしてみる>Admin SDK で Firestore データベースにアクセスしてみる</a></li>
-</ul>
-</nav><h2 id=firebase-admin-sdk-とは>Firebase Admin SDK とは</h2>
-<p><a href=https://firebase.google.com/docs/reference/admin>Firebase Admin SDK</a> を使うと、Firebase の管理者（おそらくあなた）用に提供された API キーを使って、Firebase 上のデータを管理することができます。
-例えば、ローカル PC にある JSON データを解析して Firestore データベースのドキュメントとして登録するといったことができます。</p>
-<p>Firebase Admin SDK がサポートしている言語としては、Node.js、Java、Python、Go、C# などがありますが、Node.js から順番に機能提供されていくようです。
-ここでは Node.js (TypeScript) で Firestore の API を呼び出してみます。</p>
-<div class=xNote>
-<span class=xNote_title>☝️ サーバーライブラリとクライアントライブラリ</span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/6p3dox9/>Firebase</a></span></div><div style=display:flex;margin-top:.8em><div style=width:80px;margin-right:.5em><img src=../../p/6p3dox9/_index.svg style=width:80px;height:80px></div><div style=flex:1><h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/yfov4bi/>Firebase Admin SDK で Firebase の各種サービスを操作する</a></h1><div class=xPageTags><span class=xPageTags_item><a href=../../tags/firebase>Firebase</a></span></div></div></div><span class=xPageDate>更新: <time itemprop=dateModified datetime=2021-12-31>2021-12-31</time><br>作成: <time itemprop=datePublished datetime=2021-12-31>2021-12-31</time></span></header><div itemprop=articleBody class=xArticle_content><nav id=TableOfContents><ul><li><a href=#firebase-admin-sdk-とは>Firebase Admin SDK とは</a></li><li><a href=#秘密鍵のダウンロード>秘密鍵のダウンロード</a></li><li><a href=#nodejs-typescript-プロジェクトの作成>Node.js (TypeScript) プロジェクトの作成</a></li><li><a href=#firebase-admin-sdk-の初期化>Firebase Admin SDK の初期化</a></li><li><a href=#admin-sdk-で-firestore-データベースにアクセスしてみる>Admin SDK で Firestore データベースにアクセスしてみる</a></li></ul></nav><h2 id=firebase-admin-sdk-とは>Firebase Admin SDK とは</h2><p><a href=https://firebase.google.com/docs/reference/admin>Firebase Admin SDK</a> を使うと、Firebase の管理者（おそらくあなた）用に提供された API キーを使って、Firebase 上のデータを管理することができます。
+例えば、ローカル PC にある JSON データを解析して Firestore データベースのドキュメントとして登録するといったことができます。</p><p>Firebase Admin SDK がサポートしている言語としては、Node.js、Java、Python、Go、C# などがありますが、Node.js から順番に機能提供されていくようです。
+ここでは Node.js (TypeScript) で Firestore の API を呼び出してみます。</p><div class=xNote><span class=xNote_title>☝️ サーバーライブラリとクライアントライブラリ</span>
 <span class=xNote_body>Firebase Admin SDK はしばしば <strong>サーバーライブラリ</strong> とも呼ばれます。
 一方で、Web アプリやモバイルアプリなどで使う SDK は <strong>クライアントライブラリ</strong> と呼ばれ、Firebase が提供するセキュリティルールという仕組みでアクセス制御を行います。
 具体的には、Firebase Auth などでユーザー認証を行うことで、各クライアントに対してアクセス権限を付与します。
-これに対して、Firebase Admin SDK はあらかじめローカルに保持しているアクセスキーを使って API を呼び出すので、セキュリティルールを無視した特権アクセスが可能です。</span>
-</div>
-<h2 id=秘密鍵のダウンロード>秘密鍵のダウンロード</h2>
-<p>Firebase Admin SDK を使って API 呼び出しを行うには、秘密鍵（API キー）を取得する必要があります。</p>
-<figure class=xImage>
-<a href=../../p/yfov4bi/img-001.png target=_blank>
-<img style="border:solid #ccc 2px" width=600 height=439 src=../../p/yfov4bi/img-001_hu950c252235f648d33b3ded097bb88c10_238644_600x0_resize_box_3.png alt=/p/yfov4bi/img-001.png>
-</a>
-</figure>
-<ol>
-<li><a href=https://console.firebase.google.com/>Firebase コンソール</a> にサインインして、対象のプロジェクトを選択する。</li>
-<li><strong>プロジェクトの設定</strong> を開き、<strong>サービスアカウント</strong> タブを選択する。</li>
-<li><strong>新しい秘密鍵の生成</strong> をクリックして、秘密鍵ファイル (.json) をダウンロード。</li>
-</ol>
-<p>ダウンロードされる .json ファイルは、次のような感じの内容になっています。
-このファイルは、<strong>Credential ファイル</strong> や <strong>Configuration ファイル</strong> と呼ばれます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>myapp-12345-firebase-adminsdk-xxxxx.json</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span>
-  <span class=nt>&#34;type&#34;</span><span class=p>:</span> <span class=s2>&#34;service_account&#34;</span><span class=p>,</span>
-  <span class=nt>&#34;project_id&#34;</span><span class=p>:</span> <span class=s2>&#34;myapp-12345&#34;</span><span class=p>,</span>
-  <span class=nt>&#34;private_key_id&#34;</span><span class=p>:</span> <span class=s2>&#34;14b01f11bc7f484d42fab494dd0bdb7818c93f3b&#34;</span><span class=p>,</span>
-  <span class=nt>&#34;private_key&#34;</span><span class=p>:</span> <span class=s2>&#34;-----BEGIN PRIVATE KEY-----\n ... \n-----END PRIVATE KEY-----\n&#34;</span><span class=p>,</span>
-  <span class=nt>&#34;client_email&#34;</span><span class=p>:</span> <span class=s2>&#34;firebase-adminsdk-xxxxx@myapp-12345.iam.gserviceaccount.com&#34;</span><span class=p>,</span>
-  <span class=nt>&#34;client_id&#34;</span><span class=p>:</span> <span class=s2>&#34;123456789012345678901&#34;</span><span class=p>,</span>
-  <span class=nt>&#34;auth_uri&#34;</span><span class=p>:</span> <span class=s2>&#34;https://accounts.google.com/o/oauth2/auth&#34;</span><span class=p>,</span>
-  <span class=nt>&#34;token_uri&#34;</span><span class=p>:</span> <span class=s2>&#34;https://oauth2.googleapis.com/token&#34;</span><span class=p>,</span>
-  <span class=nt>&#34;auth_provider_x509_cert_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://www.googleapis.com/oauth2/v1/certs&#34;</span><span class=p>,</span>
-  <span class=nt>&#34;client_x509_cert_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xxxxx%40myapp-12345.iam.gserviceaccount.com&#34;</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>このファイルには、管理者権限で Firebase を操作するための秘密鍵が含まれているので、外部に公開されないように保管してください。
+これに対して、Firebase Admin SDK はあらかじめローカルに保持しているアクセスキーを使って API を呼び出すので、セキュリティルールを無視した特権アクセスが可能です。</span></div><h2 id=秘密鍵のダウンロード>秘密鍵のダウンロード</h2><p>Firebase Admin SDK を使って API 呼び出しを行うには、秘密鍵（API キー）を取得する必要があります。</p><figure class=xImage><a href=../../p/yfov4bi/img-001.png target=_blank><img style="border:solid #ccc 2px" width=600 height=439 src=../../p/yfov4bi/img-001_hu950c252235f648d33b3ded097bb88c10_238644_600x0_resize_box_3.png alt=/p/yfov4bi/img-001.png></a></figure><ol><li><a href=https://console.firebase.google.com/>Firebase コンソール</a> にサインインして、対象のプロジェクトを選択する。</li><li><strong>プロジェクトの設定</strong> を開き、<strong>サービスアカウント</strong> タブを選択する。</li><li><strong>新しい秘密鍵の生成</strong> をクリックして、秘密鍵ファイル (.json) をダウンロード。</li></ol><p>ダウンロードされる .json ファイルは、次のような感じの内容になっています。
+このファイルは、<strong>Credential ファイル</strong> や <strong>Configuration ファイル</strong> と呼ばれます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>myapp-12345-firebase-adminsdk-xxxxx.json</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;type&#34;</span><span class=p>:</span> <span class=s2>&#34;service_account&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;project_id&#34;</span><span class=p>:</span> <span class=s2>&#34;myapp-12345&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;private_key_id&#34;</span><span class=p>:</span> <span class=s2>&#34;14b01f11bc7f484d42fab494dd0bdb7818c93f3b&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;private_key&#34;</span><span class=p>:</span> <span class=s2>&#34;-----BEGIN PRIVATE KEY-----\n ... \n-----END PRIVATE KEY-----\n&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;client_email&#34;</span><span class=p>:</span> <span class=s2>&#34;firebase-adminsdk-xxxxx@myapp-12345.iam.gserviceaccount.com&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;client_id&#34;</span><span class=p>:</span> <span class=s2>&#34;123456789012345678901&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;auth_uri&#34;</span><span class=p>:</span> <span class=s2>&#34;https://accounts.google.com/o/oauth2/auth&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;token_uri&#34;</span><span class=p>:</span> <span class=s2>&#34;https://oauth2.googleapis.com/token&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;auth_provider_x509_cert_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://www.googleapis.com/oauth2/v1/certs&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;client_x509_cert_url&#34;</span><span class=p>:</span> <span class=s2>&#34;https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xxxxx%40myapp-12345.iam.gserviceaccount.com&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span></span></span></code></pre></div></div></figure><p>このファイルには、管理者権限で Firebase を操作するための秘密鍵が含まれているので、外部に公開されないように保管してください。
 間違って Git コミットしないように、ホームディレクトリなどに配置しておくのがいいです。
-ここでは、次のように Dropbox に保存してみました。</p>
-<ul>
-<li><code>~/Dropbox/firebase/myapp-12345-firebase-adminsdk-xxxx-abcde12345.json</code></li>
-</ul>
-<h2 id=nodejs-typescript-プロジェクトの作成>Node.js (TypeScript) プロジェクトの作成</h2>
-<p>Firebase Admin SDK を使うための Node.js プロジェクトを作成していきます。
+ここでは、次のように Dropbox に保存してみました。</p><ul><li><code>~/Dropbox/firebase/myapp-12345-firebase-adminsdk-xxxx-abcde12345.json</code></li></ul><h2 id=nodejs-typescript-プロジェクトの作成>Node.js (TypeScript) プロジェクトの作成</h2><p>Firebase Admin SDK を使うための Node.js プロジェクトを作成していきます。
 まずは、プロジェクト用のディレクトリを作成して、必要な NPM パッケージをインストールします。
 ここでは、TypeScript コードをビルドなしで手軽に実行するために、<a href=https://www.npmjs.com/package/ts-node>ts-node</a> を使います。
-Firebase Admin SDK は、<a href=https://www.npmjs.com/package/firebase-admin>firebase-admin</a> という NPM パッケージとして提供されています。</p>
-<pre tabindex=0><code>$ mkdir myapp &amp;&amp; cd myapp
+Firebase Admin SDK は、<a href=https://www.npmjs.com/package/firebase-admin>firebase-admin</a> という NPM パッケージとして提供されています。</p><pre tabindex=0><code>$ mkdir myapp &amp;&amp; cd myapp
 
 ### npm の場合
 $ npm init -y
@@ -611,168 +49,85 @@ $ npm install firebase-admin
 $ yarn init -y
 $ yarn add -D typescript ts-node
 $ yarn add firebase-admin
-</code></pre><p>ついでに NPM スクリプトを追加して、<code>yarn start</code> (<code>npm start</code>) コマンドで <code>main.ts</code> を起動できるようにしておきます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>package.json</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
-  <span class=c1>// ...
-</span><span class=c1></span>  <span class=s2>&#34;scripts&#34;</span><span class=o>:</span> <span class=p>{</span>
-    <span class=s2>&#34;start&#34;</span><span class=o>:</span> <span class=s2>&#34;ts-node main&#34;</span>
-  <span class=p>},</span></code></pre></div></div>
-</figure>
-<h2 id=firebase-admin-sdk-の初期化>Firebase Admin SDK の初期化</h2>
-<p>Firebase Admin SDK の各種サービスにアクセスするには、最初に <strong><code>initializeApp</code></strong> 関数を呼び出して、Firebase の <code>App</code> インスタンスを初期化しておく必要があります。
-<code>initializeApp</code> 関数は、デフォルトで <strong><code>GOOGLE_APPLICATION_CREDENTIALS</code></strong> 環境変数に設定したパスから、Credential ファイルをロードしようとするので、先にこの環境変数を設定しておきます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=nb>export</span> <span class=nv>GOOGLE_APPLICATION_CREDENTIALS</span><span class=o>=</span>~/Dropbox/firebase/myapp-12345-firebase-adminsdk-xxxx-abcde12345.json
-</code></pre></div><p>次の TypeScript コードは、この Credential ファイルを使って Firebase の <code>App</code> インスタンスを初期化し、その設定内容を表示します。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>main.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>initializeApp</span><span class=p>,</span> <span class=nx>App</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;firebase-admin/app&#39;</span>
-
-<span class=kr>const</span> <span class=nx>app</span>: <span class=kt>App</span> <span class=o>=</span> <span class=nx>initializeApp</span><span class=p>()</span>
-<span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>app</span><span class=p>.</span><span class=nx>options</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<p>次のように実行して、秘密鍵の情報などが表示されればうまく設定できています。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>実行例</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ yarn -s start
-{
-  credential: ServiceAccountCredential {
-    httpAgent: undefined,
-    implicit: true,
-    projectId: &#39;myapp-12345&#39;,
-    privateKey: &#39;-----BEGIN PRIVATE KEY-----\n&#39; +
-      &#39;MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC4PB8Dwzy7J0tg\n&#39; +
-      &#39;................................................................\n&#39; +
-      &#39;I/cr9iy94UUMtXq5Y18aDe2aKg7//GDdtCGrQ4OicOojvv/BqujDZ3ZL0b3dD/yP\n&#39; +
-      &#39;AzWyaB/GnfIEPKIyWM7LOPl2\n&#39; +
-      &#39;-----END PRIVATE KEY-----\n&#39;,
-    clientEmail: &#39;firebase-adminsdk-xxxxx@myapp-12345.iam.gserviceaccount.com&#39;,
-    httpClient: HttpClient { retry: [Object] }
-  }
-}</code></pre></div></div>
-</figure>
-<p>複数の Firebase プロジェクトを運用している場合は、<code>GOOGLE_APPLICATION_CREDENTIALS</code> という 1 つの環境変数を使いまわすのは都合が悪いかもしれません。
+</code></pre><p>ついでに NPM スクリプトを追加して、<code>yarn start</code> (<code>npm start</code>) コマンドで <code>main.ts</code> を起動できるようにしておきます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>package.json</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=c1>// ...
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=s2>&#34;scripts&#34;</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;start&#34;</span><span class=o>:</span> <span class=s2>&#34;ts-node main&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=p>},</span></span></span></code></pre></div></div></figure><h2 id=firebase-admin-sdk-の初期化>Firebase Admin SDK の初期化</h2><p>Firebase Admin SDK の各種サービスにアクセスするには、最初に <strong><code>initializeApp</code></strong> 関数を呼び出して、Firebase の <code>App</code> インスタンスを初期化しておく必要があります。
+<code>initializeApp</code> 関数は、デフォルトで <strong><code>GOOGLE_APPLICATION_CREDENTIALS</code></strong> 環境変数に設定したパスから、Credential ファイルをロードしようとするので、先にこの環境変数を設定しておきます。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>export</span> <span class=nv>GOOGLE_APPLICATION_CREDENTIALS</span><span class=o>=</span>~/Dropbox/firebase/myapp-12345-firebase-adminsdk-xxxx-abcde12345.json
+</span></span></code></pre></div><p>次の TypeScript コードは、この Credential ファイルを使って Firebase の <code>App</code> インスタンスを初期化し、その設定内容を表示します。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>main.ts</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span> <span class=nx>initializeApp</span><span class=p>,</span> <span class=nx>App</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;firebase-admin/app&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>app</span>: <span class=kt>App</span> <span class=o>=</span> <span class=nx>initializeApp</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>app</span><span class=p>.</span><span class=nx>options</span><span class=p>)</span></span></span></code></pre></div></div></figure><p>次のように実行して、秘密鍵の情報などが表示されればうまく設定できています。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>実行例</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ yarn -s start
+</span></span><span class=line><span class=cl>{
+</span></span><span class=line><span class=cl>  credential: ServiceAccountCredential {
+</span></span><span class=line><span class=cl>    httpAgent: undefined,
+</span></span><span class=line><span class=cl>    implicit: true,
+</span></span><span class=line><span class=cl>    projectId: &#39;myapp-12345&#39;,
+</span></span><span class=line><span class=cl>    privateKey: &#39;-----BEGIN PRIVATE KEY-----\n&#39; +
+</span></span><span class=line><span class=cl>      &#39;MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC4PB8Dwzy7J0tg\n&#39; +
+</span></span><span class=line><span class=cl>      &#39;................................................................\n&#39; +
+</span></span><span class=line><span class=cl>      &#39;I/cr9iy94UUMtXq5Y18aDe2aKg7//GDdtCGrQ4OicOojvv/BqujDZ3ZL0b3dD/yP\n&#39; +
+</span></span><span class=line><span class=cl>      &#39;AzWyaB/GnfIEPKIyWM7LOPl2\n&#39; +
+</span></span><span class=line><span class=cl>      &#39;-----END PRIVATE KEY-----\n&#39;,
+</span></span><span class=line><span class=cl>    clientEmail: &#39;firebase-adminsdk-xxxxx@myapp-12345.iam.gserviceaccount.com&#39;,
+</span></span><span class=line><span class=cl>    httpClient: HttpClient { retry: [Object] }
+</span></span><span class=line><span class=cl>  }
+</span></span><span class=line><span class=cl>}</span></span></code></pre></div></div></figure><p>複数の Firebase プロジェクトを運用している場合は、<code>GOOGLE_APPLICATION_CREDENTIALS</code> という 1 つの環境変数を使いまわすのは都合が悪いかもしれません。
 そのような場合は、次のようにすれば、任意の環境変数に Credential ファイルのパスを設定しておくことができます。
-この例ではまず <strong><code>FIREBASE_MYAPP_CREDENTIALS</code></strong> 環境変数を参照し、見つからなかった場合はフォールバックとして <code>GOOGLE_APPLICATION_CREDENTIALS</code> 環境変数を参照するようにしています。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>initFirebase.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>cert</span><span class=p>,</span> <span class=nx>initializeApp</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;firebase-admin/app&#39;</span>
-
-<span class=kr>const</span> <span class=nx>credPath</span> <span class=o>=</span>
-  <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>[</span><span class=s1>&#39;FIREBASE_MYAPP_CREDENTIALS&#39;</span><span class=p>]</span> <span class=o>||</span>
-  <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>[</span><span class=s1>&#39;GOOGLE_APPLICATION_CREDENTIALS&#39;</span><span class=p>]</span>
-
-<span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=nx>credPath</span><span class=p>)</span> <span class=p>{</span>
-  <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=s1>&#39;Error: FIREBASE_MYAPP_CREDENTIALS env is not set&#39;</span><span class=p>)</span>
-  <span class=nx>process</span><span class=p>.</span><span class=nx>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
-<span class=p>}</span>
-
-<span class=nx>initializeApp</span><span class=p>({</span> <span class=nx>credential</span>: <span class=kt>cert</span><span class=p>(</span><span class=nx>credPath</span><span class=p>)</span> <span class=p>})</span></code></pre></div></div>
-</figure>
-<p>これで、Firebase の各種 API を呼び出す準備ができました。</p>
-<h2 id=admin-sdk-で-firestore-データベースにアクセスしてみる>Admin SDK で Firestore データベースにアクセスしてみる</h2>
-<p>上記で作成した <code>initFirebase.ts</code> モジュールを読み込めば、Firebase の各種サービスにアクセスできるようになります。
-例えば、<a href=https://firebase.google.com/docs/reference/admin/node/firebase-admin.firestore>firebase-admin/firestore モジュール</a> が提供する <strong><code>getFirestore</code></strong> 関数を使って、<code>Firestore</code> インスタンスを取得すれば、Firestore データベースを操作することができます。</p>
-<p>次の例では、<code>addSampleBooks</code> 関数で <code>books</code> コレクションにサンプルデータを登録し、<code>dumpSampleBooks</code> 関数でその情報を取得しています。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>main.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>getFirestore</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;firebase-admin/firestore&#39;</span>
-<span class=kr>import</span> <span class=s1>&#39;./initFirebase&#39;</span> <span class=c1>// Initialize Firebase App
-</span><span class=c1></span>
-<span class=kr>const</span> <span class=nx>db</span> <span class=o>=</span> <span class=nx>getFirestore</span><span class=p>()</span>
-<span class=kr>const</span> <span class=nx>booksCollection</span> <span class=o>=</span> <span class=nx>db</span><span class=p>.</span><span class=nx>collection</span><span class=p>(</span><span class=s1>&#39;/books&#39;</span><span class=p>)</span>
-
-<span class=cm>/** books コレクションに 1 つのドキュメントを追加 */</span>
-<span class=kr>async</span> <span class=kd>function</span> <span class=nx>addBook</span><span class=p>(</span><span class=nx>id</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>title</span>: <span class=kt>string</span><span class=p>)</span> <span class=p>{</span>
-  <span class=k>await</span> <span class=nx>booksCollection</span><span class=p>.</span><span class=nx>doc</span><span class=p>(</span><span class=nx>id</span><span class=p>).</span><span class=kr>set</span><span class=p>({</span> <span class=nx>title</span> <span class=p>})</span>
-<span class=p>}</span>
-
-<span class=cm>/** books コレクションにサンプルデータを追加 */</span>
-<span class=kr>async</span> <span class=kd>function</span> <span class=nx>addSampleBooks() {</span>
-  <span class=k>await</span> <span class=nx>Promise</span><span class=p>.</span><span class=nx>all</span><span class=p>([</span>
-    <span class=nx>addBook</span><span class=p>(</span><span class=s1>&#39;id-001&#39;</span><span class=p>,</span> <span class=s1>&#39;Title-001&#39;</span><span class=p>),</span>
-    <span class=nx>addBook</span><span class=p>(</span><span class=s1>&#39;id-002&#39;</span><span class=p>,</span> <span class=s1>&#39;Title-002&#39;</span><span class=p>),</span>
-    <span class=nx>addBook</span><span class=p>(</span><span class=s1>&#39;id-003&#39;</span><span class=p>,</span> <span class=s1>&#39;Title-003&#39;</span><span class=p>),</span>
-  <span class=p>])</span>
-<span class=p>}</span>
-
-<span class=cm>/** books コレクションの全てのドキュメントを取得して表示する */</span>
-<span class=kr>async</span> <span class=kd>function</span> <span class=nx>dumpSampleBooks() {</span>
-  <span class=kr>const</span> <span class=nx>snapshot</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>booksCollection</span><span class=p>.</span><span class=kr>get</span><span class=p>()</span>
-  <span class=nx>snapshot</span><span class=p>.</span><span class=nx>docs</span><span class=p>.</span><span class=nx>forEach</span><span class=p>((</span><span class=nx>doc</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-    <span class=kr>const</span> <span class=nx>book</span> <span class=o>=</span> <span class=nx>doc</span><span class=p>.</span><span class=nx>data</span><span class=p>()</span>
-    <span class=nx>console</span><span class=p>.</span><span class=nx>dir</span><span class=p>(</span><span class=nx>book</span><span class=p>)</span>
-  <span class=p>})</span>
-<span class=p>}</span>
-
-<span class=cm>/** エントリーポイント */</span>
-<span class=k>void</span> <span class=p>(</span><span class=kr>async</span> <span class=kd>function</span> <span class=nx>main() {</span>
-  <span class=k>await</span> <span class=nx>addSampleBooks</span><span class=p>()</span>
-  <span class=k>await</span> <span class=nx>dumpSampleBooks</span><span class=p>()</span>
-<span class=p>})()</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>実行結果</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ yarn -s start
-{ title: &#39;Title-001&#39; }
-{ title: &#39;Title-002&#39; }
-{ title: &#39;Title-003&#39; }</code></pre></div></div>
-</figure>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=../../p/73eq2cm/>Next.js で Firebase: プロジェクトの作成と接続準備</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/firebase>Firebase</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=../../p/6p3dox9/><span class=xArticle_up_label>Firebase 関連メモ</span><br>へ戻る</a>
-</div>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/pamw7hr/>Firebase CLI でコマンドラインから Firebase を操作する</a>
-</div>
-<div class=xPrevNextLink_next>
-<a href=../../p/m3bjrz7/>Next.js で Firebase: Cloud Firestore データベースを使う</a>
-</div>
-</div>
-</aside>
-</article>
-<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+この例ではまず <strong><code>FIREBASE_MYAPP_CREDENTIALS</code></strong> 環境変数を参照し、見つからなかった場合はフォールバックとして <code>GOOGLE_APPLICATION_CREDENTIALS</code> 環境変数を参照するようにしています。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>initFirebase.ts</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span> <span class=nx>cert</span><span class=p>,</span> <span class=nx>initializeApp</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;firebase-admin/app&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>credPath</span> <span class=o>=</span>
+</span></span><span class=line><span class=cl>  <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>[</span><span class=s1>&#39;FIREBASE_MYAPP_CREDENTIALS&#39;</span><span class=p>]</span> <span class=o>||</span>
+</span></span><span class=line><span class=cl>  <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>[</span><span class=s1>&#39;GOOGLE_APPLICATION_CREDENTIALS&#39;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=nx>credPath</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=s1>&#39;Error: FIREBASE_MYAPP_CREDENTIALS env is not set&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=nx>process</span><span class=p>.</span><span class=nx>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>initializeApp</span><span class=p>({</span> <span class=nx>credential</span>: <span class=kt>cert</span><span class=p>(</span><span class=nx>credPath</span><span class=p>)</span> <span class=p>})</span></span></span></code></pre></div></div></figure><p>これで、Firebase の各種 API を呼び出す準備ができました。</p><h2 id=admin-sdk-で-firestore-データベースにアクセスしてみる>Admin SDK で Firestore データベースにアクセスしてみる</h2><p>上記で作成した <code>initFirebase.ts</code> モジュールを読み込めば、Firebase の各種サービスにアクセスできるようになります。
+例えば、<a href=https://firebase.google.com/docs/reference/admin/node/firebase-admin.firestore>firebase-admin/firestore モジュール</a> が提供する <strong><code>getFirestore</code></strong> 関数を使って、<code>Firestore</code> インスタンスを取得すれば、Firestore データベースを操作することができます。</p><p>次の例では、<code>addSampleBooks</code> 関数で <code>books</code> コレクションにサンプルデータを登録し、<code>dumpSampleBooks</code> 関数でその情報を取得しています。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>main.ts</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span> <span class=nx>getFirestore</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;firebase-admin/firestore&#39;</span>
+</span></span><span class=line><span class=cl><span class=kr>import</span> <span class=s1>&#39;./initFirebase&#39;</span> <span class=c1>// Initialize Firebase App
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>db</span> <span class=o>=</span> <span class=nx>getFirestore</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>booksCollection</span> <span class=o>=</span> <span class=nx>db</span><span class=p>.</span><span class=nx>collection</span><span class=p>(</span><span class=s1>&#39;/books&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/** books コレクションに 1 つのドキュメントを追加 */</span>
+</span></span><span class=line><span class=cl><span class=kr>async</span> <span class=kd>function</span> <span class=nx>addBook</span><span class=p>(</span><span class=nx>id</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>title</span>: <span class=kt>string</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>await</span> <span class=nx>booksCollection</span><span class=p>.</span><span class=nx>doc</span><span class=p>(</span><span class=nx>id</span><span class=p>).</span><span class=kr>set</span><span class=p>({</span> <span class=nx>title</span> <span class=p>})</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/** books コレクションにサンプルデータを追加 */</span>
+</span></span><span class=line><span class=cl><span class=kr>async</span> <span class=kd>function</span> <span class=nx>addSampleBooks() {</span>
+</span></span><span class=line><span class=cl>  <span class=k>await</span> <span class=nx>Promise</span><span class=p>.</span><span class=nx>all</span><span class=p>([</span>
+</span></span><span class=line><span class=cl>    <span class=nx>addBook</span><span class=p>(</span><span class=s1>&#39;id-001&#39;</span><span class=p>,</span> <span class=s1>&#39;Title-001&#39;</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=nx>addBook</span><span class=p>(</span><span class=s1>&#39;id-002&#39;</span><span class=p>,</span> <span class=s1>&#39;Title-002&#39;</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=nx>addBook</span><span class=p>(</span><span class=s1>&#39;id-003&#39;</span><span class=p>,</span> <span class=s1>&#39;Title-003&#39;</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>  <span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/** books コレクションの全てのドキュメントを取得して表示する */</span>
+</span></span><span class=line><span class=cl><span class=kr>async</span> <span class=kd>function</span> <span class=nx>dumpSampleBooks() {</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>snapshot</span> <span class=o>=</span> <span class=k>await</span> <span class=nx>booksCollection</span><span class=p>.</span><span class=kr>get</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>  <span class=nx>snapshot</span><span class=p>.</span><span class=nx>docs</span><span class=p>.</span><span class=nx>forEach</span><span class=p>((</span><span class=nx>doc</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>book</span> <span class=o>=</span> <span class=nx>doc</span><span class=p>.</span><span class=nx>data</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>dir</span><span class=p>(</span><span class=nx>book</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=p>})</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/** エントリーポイント */</span>
+</span></span><span class=line><span class=cl><span class=k>void</span> <span class=p>(</span><span class=kr>async</span> <span class=kd>function</span> <span class=nx>main() {</span>
+</span></span><span class=line><span class=cl>  <span class=k>await</span> <span class=nx>addSampleBooks</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>  <span class=k>await</span> <span class=nx>dumpSampleBooks</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>})()</span></span></span></code></pre></div></div></figure><figure class=xCodeBlock><figcaption class=xCodeBlock_title>実行結果</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ yarn -s start
+</span></span><span class=line><span class=cl>{ title: &#39;Title-001&#39; }
+</span></span><span class=line><span class=cl>{ title: &#39;Title-002&#39; }
+</span></span><span class=line><span class=cl>{ title: &#39;Title-003&#39; }</span></span></code></pre></div></div></figure><meta itemprop=author content="まく"><span itemprop=publisher itemscope itemtype=https://schema.org/Organization><meta itemprop=name content="まく"></span><h3 style="border-bottom:1px solid gray">関連記事</h3><ul><li><a href=../../p/73eq2cm/>Next.js で Firebase: プロジェクトの作成と接続準備</a></li></ul><div class=xPageTags><span class=xPageTags_item><a href=../../tags/firebase>Firebase</a></span></div></div><div style=text-align:right><div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div></div><div class=xArticle_up><a href=../../p/6p3dox9/><span class=xArticle_up_label>Firebase 関連メモ</span><br>へ戻る</a></div><aside><div class=xPrevNextLink><div class=xPrevNextLink_prev><a href=../../p/pamw7hr/>Firebase CLI でコマンドラインから Firebase を操作する</a></div><div class=xPrevNextLink_next><a href=../../p/m3bjrz7/>Next.js で Firebase: Cloud Firestore データベースを使う</a></div></div></aside></article><script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
 <ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
-<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
-</main>
-</div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/6p3dox9/>Firebase</a>
-</span>
-<span class=xBreadcrumb_item>Firebase Admin SDK で Firebase の各種サービスを操作する
-</span>
-</div>
-</aside>
-<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
-<div id=xSiteFooter2>
-<a href=../../sitemap/>サイトマップ</a> ｜
-<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
-</div>
-</div>
-<script src=../../assets/js/sidebar.js></script>
-<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c],d=b.getElementsByTagName('img');if(d.length>0)continue;const e=b.getElementsByTagName('svg');if(e.length>0)continue;b.classList.add('xExternalLinkIcon'),b.setAttribute('target','_blank'),b.setAttribute('rel','noopener')}})</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"Firebase","item":"https://maku.blog/p/6p3dox9/"},{"@type":"ListItem","position":4,"name":"Firebase Admin SDK で Firebase の各種サービスを操作する","item":"https://maku.blog/p/yfov4bi/"}]}</script>
-</body>
-</html>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/6p3dox9/>Firebase</a></span>
+<span class=xBreadcrumb_item>Firebase Admin SDK で Firebase の各種サービスを操作する</span></div></aside><div id=xSiteFooter><a href=../../>まくろぐ</a></div><div id=xSiteFooter2><a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a></div></div><script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener("DOMContentLoaded",function(){const e=document.querySelectorAll("a[href^=http]");for(let n=0;n<e.length;++n){const t=e[n],s=t.getElementsByTagName("img");if(s.length>0)continue;const o=t.getElementsByTagName("svg");if(o.length>0)continue;t.classList.add("xExternalLinkIcon"),t.setAttribute("target","_blank"),t.setAttribute("rel","noopener")}})</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"Firebase","item":"https://maku.blog/p/6p3dox9/"},{"@type":"ListItem","position":4,"name":"Firebase Admin SDK で Firebase の各種サービスを操作する","item":"https://maku.blog/p/yfov4bi/"}]}</script></body></html>

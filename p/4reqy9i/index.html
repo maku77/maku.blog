@@ -1,1225 +1,317 @@
-<!doctype html><html lang=ja-jp>
-<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<title>GraphQL ベストプラクティス｜まくろぐ</title>
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
-<meta property="og:title" content="GraphQL ベストプラクティス">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://maku.blog/p/4reqy9i/">
-<meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
-<meta property="og:image:width" content="1436">
-<meta property="og:image:height" content="746">
-<meta property="og:description" content="GraphQL アプリ開発のノウハウ集です。 GraphQL のスキーマ設計から、サーバー実装、クライアント実装まで、GraphQL を使ったアプリ開発全般にわたるベストプラクティスをまとめています。 業務や趣味での GraphQL アプリ開発を通じて学んだことをまとめていますが、多くの項目は、主要な GraphQL ライブラリ (Apollo や gqlgen）の設計や、『Production Ready GraphQL』、『GraphQL in Action』 などの書籍を参考にしています。
+<!doctype html><html lang=ja-jp><head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#"><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>GraphQL ベストプラクティス｜まくろぐ</title><script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-63069513-4")</script><meta property="og:site_name" content="まくろぐ"><meta property="og:title" content="GraphQL ベストプラクティス"><meta property="og:type" content="website"><meta property="og:url" content="https://maku.blog/p/4reqy9i/"><meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png"><meta property="og:image:width" content="1436"><meta property="og:image:height" content="746"><meta property="og:description" content="GraphQL アプリ開発のノウハウ集です。 GraphQL のスキーマ設計から、サーバー実装、クライアント実装まで、GraphQL を使ったアプリ開発全般にわたるベストプラクティスをまとめています。 業務や趣味での GraphQL アプリ開発を通じて学んだことをまとめていますが、多くの項目は、主要な GraphQL ライブラリ (Apollo や gqlgen）の設計や、『Production Ready GraphQL』、『GraphQL in Action』 などの書籍を参考にしています。
 クライアントファースト、スキーマファースト クライアントファースト (Client First) で考える 何よりも、クライアントのユースケースを念頭において考えます。 これは、GraphQL を採用するそもそもの目的でもあります。 バックエンドで使うデータベースや言語などの、実装詳細に引っ張られた API 設計にならないように気を付けます。
- できるだけ早い段階でクライアントとのインテグレーションを始めるようにします。組織内での開発であれば、スキーマ定義が終わった段階で すぐにモックサーバーを用意する ことで、クライアント開発チームが実装を開始できます。 クライアントのユースケース以上の API は作らない ようにします。YAGNI (You Aren&rsquo;t Going to Need It) の原則に従いましょう。クライアント要求のない API を提供しようとすると、混沌とした設計になりがちで、パフォーマンスの悪化やセキュリティリスクを招きます。そして、deprecated な API の管理に苦しむことになります。 既存のデータベースから GraphQL API を生成するツールはいろいろありますが、クライアントファーストの考えからするとナンセンスであり、多くの場合は採用すべきではありません。クライアントのニーズを満たす API にはなりませんし、バックエンドの実装詳細に依存した API になってしまいます。必要のない情報まで公開してしまうことによるセキュリティリスクなど、総合的にデメリットが多いです。こういったツールは、本当にデータベースに依存した API がマッチするケースでのみ導入すべきです。REST API 定義から GraphQL スキーマを生成するツールもありますが、そもそも両者はデザインコンセプトから異なるものであり、それでよい API ができると考えてはいけません。  スキーマファーストで実装を進める 多くのケースでは、スキーマ定義を先に考える スキーマファースト で設計を進めると、サーバーとクライアントを並行して開発することができます。 どのような API を実装すればよいか、どのような情報を取得できるのかが、早い段階で全員に明らかになるからです。">
-<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
-<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
-<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
-<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
-<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
-<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
-<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
-</head>
-<body>
-<div id=xRoot>
-<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/cm9nyco/>GraphQL</a>
-</span>
-<span class=xBreadcrumb_item>GraphQL ベストプラクティス
-</span>
-</div>
-</aside>
-<div id=xContainer>
-<nav id=xMenu aria-label=メニュー>
-<div id=sidebar style=height:100%>
-<div id=sidebar_notFixed>
-<a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a>
-<div class=xMenu_box data-sticky>
-<form action=https://cse.google.com/cse target=_blank>
-<div class=xSearchBox>
-<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+できるだけ早い段階でクライアントとのインテグレーションを始めるようにします。組織内での開発であれば、スキーマ定義が終わった段階で すぐにモックサーバーを用意する ことで、クライアント開発チームが実装を開始できます。 クライアントのユースケース以上の API は作らない ようにします。YAGNI (You Aren&rsquo;t Going to Need It) の原則に従いましょう。クライアント要求のない API を提供しようとすると、混沌とした設計になりがちで、パフォーマンスの悪化やセキュリティリスクを招きます。そして、deprecated な API の管理に苦しむことになります。 既存のデータベースから GraphQL API を生成するツールはいろいろありますが、クライアントファーストの考えからするとナンセンスであり、多くの場合は採用すべきではありません。クライアントのニーズを満たす API にはなりませんし、バックエンドの実装詳細に依存した API になってしまいます。必要のない情報まで公開してしまうことによるセキュリティリスクなど、総合的にデメリットが多いです。こういったツールは、本当にデータベースに依存した API がマッチするケースでのみ導入すべきです。REST API 定義から GraphQL スキーマを生成するツールもありますが、そもそも両者はデザインコンセプトから異なるものであり、それでよい API ができると考えてはいけません。 スキーマファーストで実装を進める 多くのケースでは、スキーマ定義を先に考える スキーマファースト で設計を進めると、サーバーとクライアントを並行して開発することができます。 どのような API を実装すればよいか、どのような情報を取得できるのかが、早い段階で全員に明らかになるからです。"><meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css><link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico><link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png><link rel=apple-touch-icon href=../../assets/favicon/180x180.png><script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script><style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style><script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script></head><body><div id=xRoot><div id=xSiteHeader><a href=../../>まくろぐ</a></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/cm9nyco/>GraphQL</a></span>
+<span class=xBreadcrumb_item>GraphQL ベストプラクティス</span></div></aside><div id=xContainer><nav id=xMenu aria-label=メニュー><div id=sidebar style=height:100%><div id=sidebar_notFixed><a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a><div class=xMenu_box data-sticky><form action=https://cse.google.com/cse target=_blank><div class=xSearchBox><input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
 <input type=hidden name=ie value=UTF-8>
 <input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
-<input type=submit value=検索></input>
-</div>
-</form>
-<div class=xMenu_box_body>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
-<div class=xMenu_box_body>
-<div class=xBoxLink>
-<a href=../../p/zycmw6f/>
-Next.js アプリに Google Analytics を設定する (next/script)
-<time>2023-03-21</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/cv6fpx7/>
-React で入力フォームの onChange イベントを IME ON のときに無視する
-<time>2023-01-29</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/bo8q8p7/>
-Meilisearch サーチエンジンを使ってみる
-<time>2023-01-24</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/y6zgrg2/>
-Docker で MongoDB サーバーを立ち上げる
-<time>2023-01-18</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/3pwojuj/>
-Deno で MongoDB にアクセスする
-<time>2023-01-18</time></a>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3>
-<div class=xMenu_box_body>
-<div class=xNavTree>
-<ul>
-<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
-<ul>
-<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
-<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
-<li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a>
-<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
-<ul>
-<li><a class=xNavTree-dir href=../../p/mkc8gv2/>GraphQL 仕様</a>
-<li><a class=xNavTree-dir href=../../p/uyw4qan/>Apollo Client</a>
-<li><a class=xNavTree-dir href=../../p/aseqzau/>Apollo Server</a>
-</ul>
-<li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a>
-<li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a>
-<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
-<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
-<li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a>
-<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
-<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
-<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
-<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
-<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
-<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
-<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
-<li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a>
-<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
-<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
-<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
-<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
-<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
-<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
-<li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a>
-</ul>
-<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
-<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
-<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
-<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
-<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
-<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
-<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
-</ul>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
-<div class=xMenu_box_body><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws>aws (61)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure>azure (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/typescript>typescript (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/next.js>next.js (38)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/graphql>graphql (35)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/react>react (29)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/chatbot>chatbot (28)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/gnuplot>gnuplot (27)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cdk>aws/cdk (26)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/linux>linux (25)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github>github (24)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ansible>ansible (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/node.js>node.js (19)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/electron>electron (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mongodb>mongodb (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/protocol-buffers>protocol-buffers (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vs-code>vs-code (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/javascript>javascript (13)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cognito>aws/cognito (12)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/nginx>nginx (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/android>android (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/lambda>aws/lambda (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/java>java (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/python>python (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ssh>ssh (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/uml>uml (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/3d>3d (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sam>aws/sam (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/docker>docker (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/firestore>firebase/firestore (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unity>unity (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webgl>webgl (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo>apollo (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-cli>azure-cli (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/deno>deno (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jade>jade (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/material-ui>material-ui (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cli>aws/cli (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-storage>azure-storage (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/doxygen>doxygen (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/c/c++>c/c++ (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-actions>github-actions (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/luis>luis (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/qna-maker>qna-maker (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/ssm>aws/ssm (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/eslint>eslint (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase>firebase (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-pages>github-pages (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html/css>html/css (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jekyll>jekyll (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/lets-encrypt>lets-encrypt (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sql>sql (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/windows>windows (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-functions>azure-functions (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cosmos-db>cosmos-db (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/grpc>grpc (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/hugo>hugo (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/kotlin>kotlin (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mac>mac (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/powershell>powershell (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/prettier>prettier (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sqlite>sqlite (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/textlint>textlint (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tv>tv (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apache>apache (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/arib>arib (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/amplify>aws/amplify (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/appsync>aws/appsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/iam>aws/iam (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/kms>aws/kms (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/s3>aws/s3 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sdk>aws/sdk (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-app-service>azure-app-service (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/excel>excel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/go>go (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/http>http (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/json>json (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mui>mui (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/npm>npm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/oauth>oauth (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/opengl>opengl (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/rsync>rsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/scp>scp (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/slack>slack (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teraterm>teraterm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unicode>unicode (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vercel>vercel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/zip>zip (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/.net>.net (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/androidstudio>androidstudio (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo-server>apollo-server (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/atomic-design>atomic-design (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/blender>blender (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bluetooth>bluetooth (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bootstrap>bootstrap (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-framework>bot-framework (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/boto3>boto3 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/certbot>certbot (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cloudflare>cloudflare (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/css>css (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dns>dns (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dvb>dvb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/editorconfig>editorconfig (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/evernote>evernote (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/git>git (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/golang>golang (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/google-analytics>google-analytics (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/groovy>groovy (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html>html (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/igdb>igdb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/iso>iso (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jest>jest (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/macos>macos (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/meilisearch>meilisearch (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/parcel>parcel (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/raspberrypi>raspberrypi (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teams>teams (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tex>tex (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ubuntu>ubuntu (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/url>url (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vim>vim (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vps>vps (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/web>web (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webpack>webpack (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/wsl>wsl (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
-</div></div>
-</div>
-<div class=xMenu_box data-sticky><br></div>
-</div>
-<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
-</div>
-</div>
-</nav>
-<main id=xMain>
-<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_next>
-<a href=../../p/mkc8gv2/>GraphQL 仕様</a>
-</div>
-</div>
-</aside>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<input type=submit value=検索></input></div></form><div class=xMenu_box_body></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3><div class=xMenu_box_body><div class=xBoxLink><a href=../../p/zycmw6f/>Next.js アプリに Google Analytics を設定する (next/script)
+<time>2023-03-21</time></a></div><div class=xBoxLink><a href=../../p/cv6fpx7/>React で入力フォームの onChange イベントを IME ON のときに無視する
+<time>2023-01-29</time></a></div><div class=xBoxLink><a href=../../p/bo8q8p7/>Meilisearch サーチエンジンを使ってみる
+<time>2023-01-24</time></a></div><div class=xBoxLink><a href=../../p/y6zgrg2/>Docker で MongoDB サーバーを立ち上げる
+<time>2023-01-18</time></a></div><div class=xBoxLink><a href=../../p/3pwojuj/>Deno で MongoDB にアクセスする
+<time>2023-01-18</time></a></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3><div class=xMenu_box_body><div class=xNavTree><ul><li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a><ul><li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a><li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a><li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a><li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a><ul><li><a class=xNavTree-dir href=../../p/mkc8gv2/>GraphQL 仕様</a><li><a class=xNavTree-dir href=../../p/uyw4qan/>Apollo Client</a><li><a class=xNavTree-dir href=../../p/aseqzau/>Apollo Server</a></ul><li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a><li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a><li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a><li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a><li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a><li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a><li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a><li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a><li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a><li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a><li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a><li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a><li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a><li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a><li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a><li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a><li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a><li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a><li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a><li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a></ul><li><a class=xNavTree-dir href=../../p/35odek9/>読書</a><li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a><li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a><li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a><li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a><li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a><li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a></ul></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3><div class=xMenu_box_body><div class=xMenu_tag><a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a></div><div class=xMenu_tag><a href=../../tags/aws>aws (61)</a></div><div class=xMenu_tag><a href=../../tags/azure>azure (58)</a></div><div class=xMenu_tag><a href=../../tags/typescript>typescript (58)</a></div><div class=xMenu_tag><a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a></div><div class=xMenu_tag><a href=../../tags/next.js>next.js (38)</a></div><div class=xMenu_tag><a href=../../tags/graphql>graphql (35)</a></div><div class=xMenu_tag><a href=../../tags/react>react (29)</a></div><div class=xMenu_tag><a href=../../tags/chatbot>chatbot (28)</a></div><div class=xMenu_tag><a href=../../tags/gnuplot>gnuplot (27)</a></div><div class=xMenu_tag><a href=../../tags/aws/cdk>aws/cdk (26)</a></div><div class=xMenu_tag><a href=../../tags/linux>linux (25)</a></div><div class=xMenu_tag><a href=../../tags/github>github (24)</a></div><div class=xMenu_tag><a href=../../tags/ansible>ansible (21)</a></div><div class=xMenu_tag><a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a></div><div class=xMenu_tag><a href=../../tags/node.js>node.js (19)</a></div><div class=xMenu_tag><a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a></div><div class=xMenu_tag><a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a></div><div class=xMenu_tag><a href=../../tags/electron>electron (15)</a></div><div class=xMenu_tag><a href=../../tags/mongodb>mongodb (15)</a></div><div class=xMenu_tag><a href=../../tags/protocol-buffers>protocol-buffers (14)</a></div><div class=xMenu_tag><a href=../../tags/vs-code>vs-code (14)</a></div><div class=xMenu_tag><a href=../../tags/javascript>javascript (13)</a></div><div class=xMenu_tag><a href=../../tags/aws/cognito>aws/cognito (12)</a></div><div class=xMenu_tag><a href=../../tags/nginx>nginx (11)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a></div><div class=xMenu_tag><a href=../../tags/android>android (10)</a></div><div class=xMenu_tag><a href=../../tags/aws/lambda>aws/lambda (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a></div><div class=xMenu_tag><a href=../../tags/java>java (9)</a></div><div class=xMenu_tag><a href=../../tags/python>python (9)</a></div><div class=xMenu_tag><a href=../../tags/ssh>ssh (9)</a></div><div class=xMenu_tag><a href=../../tags/uml>uml (9)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a></div><div class=xMenu_tag><a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a></div><div class=xMenu_tag><a href=../../tags/3d>3d (8)</a></div><div class=xMenu_tag><a href=../../tags/aws/sam>aws/sam (8)</a></div><div class=xMenu_tag><a href=../../tags/docker>docker (8)</a></div><div class=xMenu_tag><a href=../../tags/firebase/firestore>firebase/firestore (8)</a></div><div class=xMenu_tag><a href=../../tags/unity>unity (8)</a></div><div class=xMenu_tag><a href=../../tags/webgl>webgl (8)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a></div><div class=xMenu_tag><a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a></div><div class=xMenu_tag><a href=../../tags/apollo>apollo (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-cli>azure-cli (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-pipelines>azure-pipelines (7)</a></div><div class=xMenu_tag><a href=../../tags/deno>deno (7)</a></div><div class=xMenu_tag><a href=../../tags/jade>jade (7)</a></div><div class=xMenu_tag><a href=../../tags/material-ui>material-ui (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a></div><div class=xMenu_tag><a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a></div><div class=xMenu_tag><a href=../../tags/aws/cli>aws/cli (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-storage>azure-storage (6)</a></div><div class=xMenu_tag><a href=../../tags/doxygen>doxygen (6)</a></div><div class=xMenu_tag><a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-table-storage>azure-table-storage (5)</a></div><div class=xMenu_tag><a href=../../tags/c/c++>c/c++ (5)</a></div><div class=xMenu_tag><a href=../../tags/github-actions>github-actions (5)</a></div><div class=xMenu_tag><a href=../../tags/luis>luis (5)</a></div><div class=xMenu_tag><a href=../../tags/qna-maker>qna-maker (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a></div><div class=xMenu_tag><a href=../../tags/aws/ssm>aws/ssm (4)</a></div><div class=xMenu_tag><a href=../../tags/eslint>eslint (4)</a></div><div class=xMenu_tag><a href=../../tags/firebase>firebase (4)</a></div><div class=xMenu_tag><a href=../../tags/github-pages>github-pages (4)</a></div><div class=xMenu_tag><a href=../../tags/html/css>html/css (4)</a></div><div class=xMenu_tag><a href=../../tags/jekyll>jekyll (4)</a></div><div class=xMenu_tag><a href=../../tags/lets-encrypt>lets-encrypt (4)</a></div><div class=xMenu_tag><a href=../../tags/sql>sql (4)</a></div><div class=xMenu_tag><a href=../../tags/windows>windows (4)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a></div><div class=xMenu_tag><a href=../../tags/azure-functions>azure-functions (3)</a></div><div class=xMenu_tag><a href=../../tags/cosmos-db>cosmos-db (3)</a></div><div class=xMenu_tag><a href=../../tags/grpc>grpc (3)</a></div><div class=xMenu_tag><a href=../../tags/hugo>hugo (3)</a></div><div class=xMenu_tag><a href=../../tags/kotlin>kotlin (3)</a></div><div class=xMenu_tag><a href=../../tags/mac>mac (3)</a></div><div class=xMenu_tag><a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a></div><div class=xMenu_tag><a href=../../tags/powershell>powershell (3)</a></div><div class=xMenu_tag><a href=../../tags/prettier>prettier (3)</a></div><div class=xMenu_tag><a href=../../tags/sqlite>sqlite (3)</a></div><div class=xMenu_tag><a href=../../tags/textlint>textlint (3)</a></div><div class=xMenu_tag><a href=../../tags/tv>tv (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a></div><div class=xMenu_tag><a href=../../tags/apache>apache (2)</a></div><div class=xMenu_tag><a href=../../tags/arib>arib (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/amplify>aws/amplify (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/appsync>aws/appsync (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/codebuild>aws/codebuild (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/iam>aws/iam (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/kms>aws/kms (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/s3>aws/s3 (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/sdk>aws/sdk (2)</a></div><div class=xMenu_tag><a href=../../tags/azure-app-service>azure-app-service (2)</a></div><div class=xMenu_tag><a href=../../tags/excel>excel (2)</a></div><div class=xMenu_tag><a href=../../tags/firebase/authentication>firebase/authentication (2)</a></div><div class=xMenu_tag><a href=../../tags/go>go (2)</a></div><div class=xMenu_tag><a href=../../tags/http>http (2)</a></div><div class=xMenu_tag><a href=../../tags/json>json (2)</a></div><div class=xMenu_tag><a href=../../tags/mui>mui (2)</a></div><div class=xMenu_tag><a href=../../tags/npm>npm (2)</a></div><div class=xMenu_tag><a href=../../tags/oauth>oauth (2)</a></div><div class=xMenu_tag><a href=../../tags/opengl>opengl (2)</a></div><div class=xMenu_tag><a href=../../tags/rsync>rsync (2)</a></div><div class=xMenu_tag><a href=../../tags/scp>scp (2)</a></div><div class=xMenu_tag><a href=../../tags/slack>slack (2)</a></div><div class=xMenu_tag><a href=../../tags/teraterm>teraterm (2)</a></div><div class=xMenu_tag><a href=../../tags/unicode>unicode (2)</a></div><div class=xMenu_tag><a href=../../tags/vercel>vercel (2)</a></div><div class=xMenu_tag><a href=../../tags/zip>zip (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a></div><div class=xMenu_tag><a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a></div><div class=xMenu_tag><a href=../../tags/.net>.net (1)</a></div><div class=xMenu_tag><a href=../../tags/androidstudio>androidstudio (1)</a></div><div class=xMenu_tag><a href=../../tags/apollo-server>apollo-server (1)</a></div><div class=xMenu_tag><a href=../../tags/atomic-design>atomic-design (1)</a></div><div class=xMenu_tag><a href=../../tags/blender>blender (1)</a></div><div class=xMenu_tag><a href=../../tags/bluetooth>bluetooth (1)</a></div><div class=xMenu_tag><a href=../../tags/bootstrap>bootstrap (1)</a></div><div class=xMenu_tag><a href=../../tags/bot-framework>bot-framework (1)</a></div><div class=xMenu_tag><a href=../../tags/boto3>boto3 (1)</a></div><div class=xMenu_tag><a href=../../tags/certbot>certbot (1)</a></div><div class=xMenu_tag><a href=../../tags/cloudflare>cloudflare (1)</a></div><div class=xMenu_tag><a href=../../tags/css>css (1)</a></div><div class=xMenu_tag><a href=../../tags/dns>dns (1)</a></div><div class=xMenu_tag><a href=../../tags/dvb>dvb (1)</a></div><div class=xMenu_tag><a href=../../tags/editorconfig>editorconfig (1)</a></div><div class=xMenu_tag><a href=../../tags/evernote>evernote (1)</a></div><div class=xMenu_tag><a href=../../tags/git>git (1)</a></div><div class=xMenu_tag><a href=../../tags/golang>golang (1)</a></div><div class=xMenu_tag><a href=../../tags/google-analytics>google-analytics (1)</a></div><div class=xMenu_tag><a href=../../tags/groovy>groovy (1)</a></div><div class=xMenu_tag><a href=../../tags/html>html (1)</a></div><div class=xMenu_tag><a href=../../tags/igdb>igdb (1)</a></div><div class=xMenu_tag><a href=../../tags/iso>iso (1)</a></div><div class=xMenu_tag><a href=../../tags/jest>jest (1)</a></div><div class=xMenu_tag><a href=../../tags/macos>macos (1)</a></div><div class=xMenu_tag><a href=../../tags/meilisearch>meilisearch (1)</a></div><div class=xMenu_tag><a href=../../tags/parcel>parcel (1)</a></div><div class=xMenu_tag><a href=../../tags/raspberrypi>raspberrypi (1)</a></div><div class=xMenu_tag><a href=../../tags/teams>teams (1)</a></div><div class=xMenu_tag><a href=../../tags/tex>tex (1)</a></div><div class=xMenu_tag><a href=../../tags/ubuntu>ubuntu (1)</a></div><div class=xMenu_tag><a href=../../tags/url>url (1)</a></div><div class=xMenu_tag><a href=../../tags/vim>vim (1)</a></div><div class=xMenu_tag><a href=../../tags/vps>vps (1)</a></div><div class=xMenu_tag><a href=../../tags/web>web (1)</a></div><div class=xMenu_tag><a href=../../tags/webpack>webpack (1)</a></div><div class=xMenu_tag><a href=../../tags/wsl>wsl (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a></div></div></div><div class=xMenu_box data-sticky><br></div></div><div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem></div></div></nav><main id=xMain><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting><aside><div class=xPrevNextLink><div class=xPrevNextLink_next><a href=../../p/mkc8gv2/>GraphQL 仕様</a></div></div></aside><header class=xArticle_headerBox><div><span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=../../p/cm9nyco/>GraphQL</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=../../p/cm9nyco/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/4reqy9i/>GraphQL ベストプラクティス</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/graphql>GraphQL</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-11-21>2022-11-21</time><br>
-作成: <time itemprop=datePublished datetime=2022-10-12>2022-10-12</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#クライアントファーストスキーマファースト>クライアントファースト、スキーマファースト</a>
-<ul>
-<li><a href=#クライアントファースト-client-first-で考える>クライアントファースト (Client First) で考える</a></li>
-<li><a href=#スキーマファーストで実装を進める>スキーマファーストで実装を進める</a></li>
-</ul>
-</li>
-<li><a href=#ドキュメンテーション>ドキュメンテーション</a>
-<ul>
-<li><a href=#description>スキーマの各要素に説明文 (description) を記載する</a></li>
-<li><a href=#スキーマとは独立したドキュメントを用意する>スキーマとは独立したドキュメントを用意する</a></li>
-</ul>
-</li>
-<li><a href=#命名-naming>命名 (Naming)</a>
-<ul>
-<li><a href=#一貫性のあるネーミング>一貫性のあるネーミング</a></li>
-<li><a href=#concrete-type>型名はある程度具体的に</a></li>
-<li><a href=#フィールド名で型名を繰り返さない>フィールド名で型名を繰り返さない</a></li>
-<li><a href=#入力型と出力型を分けて定義する>入力型と出力型を分けて定義する</a></li>
-<li><a href=#エンドポイント-url-の末尾は-graphql>エンドポイント URL の末尾は /graphql</a></li>
-</ul>
-</li>
-<li><a href=#フィールド-fields>フィールド (fields)</a>
-<ul>
-<li><a href=#string-型よりも具体的な型を使えないか考慮する>String 型よりも具体的な型を使えないか考慮する</a></li>
-<li><a href=#フィールドの役割を特化する>フィールドの役割を特化する</a></li>
-<li><a href=#暗黙的なデフォルト値をリゾルバー内部で定義しない>暗黙的なデフォルト値をリゾルバー内部で定義しない</a></li>
-</ul>
-</li>
-<li><a href=#nullable-と-non-null>Nullable と Non-null</a>
-<ul>
-<li><a href=#フィールドを-non-null-にする場合は慎重に>フィールドを Non-null にする場合は慎重に</a></li>
-<li><a href=#無意味な-null-フィールドの組み合わせが発生しないようにする>無意味な null フィールドの組み合わせが発生しないようにする</a></li>
-<li><a href=#nullable-と-non-null-のガイドライン>Nullable と Non-null のガイドライン</a></li>
-</ul>
-</li>
-<li><a href=#ミューテーション-mutation>ミューテーション (mutation)</a>
-<ul>
-<li><a href=#ミューテーション操作単位で一貫性を保つ>ミューテーション操作単位で一貫性を保つ</a></li>
-</ul>
-</li>
-<li><a href=#有名な実装パターン>有名な実装パターン</a>
-<ul>
-<li><a href=#サインイン済みユーザーを表す-me-フィールド>サインイン済みユーザーを表す me フィールド</a></li>
-<li><a href=#ページネーションconnection-パターン>ページネーション（Connection パターン）</a></li>
-<li><a href=#node-インタフェースと-global-object-identification>Node インタフェースと Global Object Identification</a></li>
-</ul>
-</li>
-<li><a href=#リゾルバー実装保守性パフォーマンスセキュリティ>リゾルバー実装（保守性、パフォーマンス、セキュリティ）</a>
-<ul>
-<li><a href=#ドメインロジックをリゾルバー関数から分離する>ドメインロジックをリゾルバー関数から分離する</a></li>
-<li><a href=#サブフィールド用のリゾルバー関数を実装して-dataloader-で-n1-問題に対応する>サブフィールド用のリゾルバー関数を実装して DataLoader で N+1 問題に対応する</a></li>
-<li><a href=#データソースや認証情報をコンテキストで共有する>データソースや認証情報をコンテキストで共有する</a></li>
-<li><a href=#エラーレスポンスに実装の詳細情報を含めない>エラーレスポンスに実装の詳細情報を含めない</a></li>
-<li><a href=#公開-api-には-rate-limit-やクエリのネスト制限を設ける>公開 API には Rate Limit やクエリのネスト制限を設ける</a></li>
-</ul>
-</li>
-<li><a href=#クエリクライアント側>クエリ（クライアント側）</a>
-<ul>
-<li><a href=#query-や-mutation-には操作名を付ける>query や mutation には操作名を付ける</a></li>
-<li><a href=#static-なクエリドキュメントを使用する>static なクエリドキュメントを使用する</a></li>
-</ul>
-</li>
-</ul>
-</nav><p>GraphQL アプリ開発のノウハウ集です。
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/cm9nyco/>GraphQL</a></span></div><div style=display:flex;margin-top:.8em><div style=width:80px;margin-right:.5em><img src=../../p/cm9nyco/_index.svg style=width:80px;height:80px></div><div style=flex:1><h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/4reqy9i/>GraphQL ベストプラクティス</a></h1><div class=xPageTags><span class=xPageTags_item><a href=../../tags/graphql>GraphQL</a></span></div></div></div><span class=xPageDate>更新: <time itemprop=dateModified datetime=2022-11-21>2022-11-21</time><br>作成: <time itemprop=datePublished datetime=2022-10-12>2022-10-12</time></span></header><div itemprop=articleBody class=xArticle_content><nav id=TableOfContents><ul><li><a href=#クライアントファーストスキーマファースト>クライアントファースト、スキーマファースト</a><ul><li><a href=#クライアントファースト-client-first-で考える>クライアントファースト (Client First) で考える</a></li><li><a href=#スキーマファーストで実装を進める>スキーマファーストで実装を進める</a></li></ul></li><li><a href=#ドキュメンテーション>ドキュメンテーション</a><ul><li><a href=#description>スキーマの各要素に説明文 (description) を記載する</a></li><li><a href=#スキーマとは独立したドキュメントを用意する>スキーマとは独立したドキュメントを用意する</a></li></ul></li><li><a href=#命名-naming>命名 (Naming)</a><ul><li><a href=#一貫性のあるネーミング>一貫性のあるネーミング</a></li><li><a href=#concrete-type>型名はある程度具体的に</a></li><li><a href=#フィールド名で型名を繰り返さない>フィールド名で型名を繰り返さない</a></li><li><a href=#入力型と出力型を分けて定義する>入力型と出力型を分けて定義する</a></li><li><a href=#エンドポイント-url-の末尾は-graphql>エンドポイント URL の末尾は /graphql</a></li></ul></li><li><a href=#フィールド-fields>フィールド (fields)</a><ul><li><a href=#string-型よりも具体的な型を使えないか考慮する>String 型よりも具体的な型を使えないか考慮する</a></li><li><a href=#フィールドの役割を特化する>フィールドの役割を特化する</a></li><li><a href=#暗黙的なデフォルト値をリゾルバー内部で定義しない>暗黙的なデフォルト値をリゾルバー内部で定義しない</a></li></ul></li><li><a href=#nullable-と-non-null>Nullable と Non-null</a><ul><li><a href=#フィールドを-non-null-にする場合は慎重に>フィールドを Non-null にする場合は慎重に</a></li><li><a href=#無意味な-null-フィールドの組み合わせが発生しないようにする>無意味な null フィールドの組み合わせが発生しないようにする</a></li><li><a href=#nullable-と-non-null-のガイドライン>Nullable と Non-null のガイドライン</a></li></ul></li><li><a href=#ミューテーション-mutation>ミューテーション (mutation)</a><ul><li><a href=#ミューテーション操作単位で一貫性を保つ>ミューテーション操作単位で一貫性を保つ</a></li></ul></li><li><a href=#有名な実装パターン>有名な実装パターン</a><ul><li><a href=#サインイン済みユーザーを表す-me-フィールド>サインイン済みユーザーを表す me フィールド</a></li><li><a href=#ページネーションconnection-パターン>ページネーション（Connection パターン）</a></li><li><a href=#node-インタフェースと-global-object-identification>Node インタフェースと Global Object Identification</a></li></ul></li><li><a href=#リゾルバー実装保守性パフォーマンスセキュリティ>リゾルバー実装（保守性、パフォーマンス、セキュリティ）</a><ul><li><a href=#ドメインロジックをリゾルバー関数から分離する>ドメインロジックをリゾルバー関数から分離する</a></li><li><a href=#サブフィールド用のリゾルバー関数を実装して-dataloader-で-n1-問題に対応する>サブフィールド用のリゾルバー関数を実装して DataLoader で N+1 問題に対応する</a></li><li><a href=#データソースや認証情報をコンテキストで共有する>データソースや認証情報をコンテキストで共有する</a></li><li><a href=#エラーレスポンスに実装の詳細情報を含めない>エラーレスポンスに実装の詳細情報を含めない</a></li><li><a href=#公開-api-には-rate-limit-やクエリのネスト制限を設ける>公開 API には Rate Limit やクエリのネスト制限を設ける</a></li></ul></li><li><a href=#クエリクライアント側>クエリ（クライアント側）</a><ul><li><a href=#query-や-mutation-には操作名を付ける>query や mutation には操作名を付ける</a></li><li><a href=#static-なクエリドキュメントを使用する>static なクエリドキュメントを使用する</a></li></ul></li></ul></nav><p>GraphQL アプリ開発のノウハウ集です。
 GraphQL のスキーマ設計から、サーバー実装、クライアント実装まで、GraphQL を使ったアプリ開発全般にわたるベストプラクティスをまとめています。
 業務や趣味での GraphQL アプリ開発を通じて学んだことをまとめていますが、多くの項目は、主要な GraphQL ライブラリ (Apollo や gqlgen）の設計や、『Production Ready GraphQL』、<a target=_blank href="https://www.amazon.co.jp/dp/161729568X?tag=maku04-22">『GraphQL in Action』</a>
-などの書籍を参考にしています。</p>
-<h2 id=クライアントファーストスキーマファースト>クライアントファースト、スキーマファースト</h2>
-<h3 id=クライアントファースト-client-first-で考える>クライアントファースト (Client First) で考える</h3>
-<p>何よりも、クライアントのユースケースを念頭において考えます。
+などの書籍を参考にしています。</p><h2 id=クライアントファーストスキーマファースト>クライアントファースト、スキーマファースト</h2><h3 id=クライアントファースト-client-first-で考える>クライアントファースト (Client First) で考える</h3><p>何よりも、クライアントのユースケースを念頭において考えます。
 これは、GraphQL を採用するそもそもの目的でもあります。
-バックエンドで使うデータベースや言語などの、実装詳細に引っ張られた API 設計にならないように気を付けます。</p>
-<ul>
-<li>できるだけ早い段階でクライアントとのインテグレーションを始めるようにします。組織内での開発であれば、スキーマ定義が終わった段階で <strong>すぐにモックサーバーを用意する</strong> ことで、クライアント開発チームが実装を開始できます。</li>
-<li><strong>クライアントのユースケース以上の API は作らない</strong> ようにします。<a href=https://ja.wikipedia.org/wiki/YAGNI>YAGNI (You Aren&rsquo;t Going to Need It)</a> の原則に従いましょう。クライアント要求のない API を提供しようとすると、混沌とした設計になりがちで、パフォーマンスの悪化やセキュリティリスクを招きます。そして、deprecated な API の管理に苦しむことになります。</li>
-<li>既存のデータベースから GraphQL API を生成するツールはいろいろありますが、クライアントファーストの考えからするとナンセンスであり、多くの場合は採用すべきではありません。クライアントのニーズを満たす API にはなりませんし、バックエンドの実装詳細に依存した API になってしまいます。必要のない情報まで公開してしまうことによるセキュリティリスクなど、総合的にデメリットが多いです。こういったツールは、本当にデータベースに依存した API がマッチするケースでのみ導入すべきです。REST API 定義から GraphQL スキーマを生成するツールもありますが、そもそも両者はデザインコンセプトから異なるものであり、それでよい API ができると考えてはいけません。</li>
-</ul>
-<h3 id=スキーマファーストで実装を進める>スキーマファーストで実装を進める</h3>
-<p>多くのケースでは、スキーマ定義を先に考える <strong>スキーマファースト</strong> で設計を進めると、サーバーとクライアントを並行して開発することができます。
-どのような API を実装すればよいか、どのような情報を取得できるのかが、早い段階で全員に明らかになるからです。</p>
-<figure class=xImage>
-<a href=../../p/4reqy9i/img-001.drawio.svg target=_blank>
-<img width=430 height=auto src=../../p/4reqy9i/img-001.drawio.svg alt=/p/4reqy9i/img-001.drawio.svg>
-</a>
-</figure>
-<p>型やフィールドの定義には <a href=#description>description を含める</a> ようにすることで、実装メンバーの認識を合わせます。
-サーバー開発チームに、<a href=https://github.com/graphql/graphiql>GraphiQL</a> などの内部サーバーを立ててもらえば、全員が常に最新のスキーマ定義（ドキュメント）を参照できます。</p>
-<h2 id=ドキュメンテーション>ドキュメンテーション</h2>
-<h3 id=description>スキーマの各要素に説明文 (description) を記載する</h3>
-<p>スキーマ定義ファイル (<code>.graphqls</code>) では、型やフィールドに description とよばれるドキュメントを記述することができます。
+バックエンドで使うデータベースや言語などの、実装詳細に引っ張られた API 設計にならないように気を付けます。</p><ul><li>できるだけ早い段階でクライアントとのインテグレーションを始めるようにします。組織内での開発であれば、スキーマ定義が終わった段階で <strong>すぐにモックサーバーを用意する</strong> ことで、クライアント開発チームが実装を開始できます。</li><li><strong>クライアントのユースケース以上の API は作らない</strong> ようにします。<a href=https://ja.wikipedia.org/wiki/YAGNI>YAGNI (You Aren&rsquo;t Going to Need It)</a> の原則に従いましょう。クライアント要求のない API を提供しようとすると、混沌とした設計になりがちで、パフォーマンスの悪化やセキュリティリスクを招きます。そして、deprecated な API の管理に苦しむことになります。</li><li>既存のデータベースから GraphQL API を生成するツールはいろいろありますが、クライアントファーストの考えからするとナンセンスであり、多くの場合は採用すべきではありません。クライアントのニーズを満たす API にはなりませんし、バックエンドの実装詳細に依存した API になってしまいます。必要のない情報まで公開してしまうことによるセキュリティリスクなど、総合的にデメリットが多いです。こういったツールは、本当にデータベースに依存した API がマッチするケースでのみ導入すべきです。REST API 定義から GraphQL スキーマを生成するツールもありますが、そもそも両者はデザインコンセプトから異なるものであり、それでよい API ができると考えてはいけません。</li></ul><h3 id=スキーマファーストで実装を進める>スキーマファーストで実装を進める</h3><p>多くのケースでは、スキーマ定義を先に考える <strong>スキーマファースト</strong> で設計を進めると、サーバーとクライアントを並行して開発することができます。
+どのような API を実装すればよいか、どのような情報を取得できるのかが、早い段階で全員に明らかになるからです。</p><figure class=xImage><a href=../../p/4reqy9i/img-001.drawio.svg target=_blank><img width=430 height=auto src=../../p/4reqy9i/img-001.drawio.svg alt=/p/4reqy9i/img-001.drawio.svg></a></figure><p>型やフィールドの定義には <a href=#description>description を含める</a> ようにすることで、実装メンバーの認識を合わせます。
+サーバー開発チームに、<a href=https://github.com/graphql/graphiql>GraphiQL</a> などの内部サーバーを立ててもらえば、全員が常に最新のスキーマ定義（ドキュメント）を参照できます。</p><h2 id=ドキュメンテーション>ドキュメンテーション</h2><h3 id=description>スキーマの各要素に説明文 (description) を記載する</h3><p>スキーマ定義ファイル (<code>.graphqls</code>) では、型やフィールドに description とよばれるドキュメントを記述することができます。
 すべての要素に description を記述することで、実装者間で認識の祖語が出ないようにします。
-フォーマットは Python のドキュメンテーションコメント同様で、説明文を 3 つのクォート (<code>"""</code>) で囲みます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=s>&#34;&#34;&#34;
-</span><span class=s>Images attached to the check run output displayed in the GitHub pull request UI.
-</span><span class=s>&#34;&#34;&#34;</span><span class=w>
-</span><span class=w></span><span class=kd>input</span><span class=w> </span><span class=nc>CheckRunOutputImage</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=s>&#34;&#34;&#34;
-</span><span class=s>  The alternative text for the image.
-</span><span class=s>  &#34;&#34;&#34;</span><span class=w>
-</span><span class=w>  </span><span class=py>alt</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!</span><span class=w>
-</span><span class=w>
-</span><span class=w>  </span><span class=s>&#34;&#34;&#34;
-</span><span class=s>  A short image description.
-</span><span class=s>  &#34;&#34;&#34;</span><span class=w>
-</span><span class=w>  </span><span class=py>caption</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
-</span><span class=w>
-</span><span class=w>  </span><span class=c># ...</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div><p>descrition は、その型が <strong>何を表現する</strong> ものなのか、その mutation が <strong>何を行う</strong> ものなのかが伝わるよう意識して記述します。
+フォーマットは Python のドキュメンテーションコメント同様で、説明文を 3 つのクォート (<code>"""</code>) で囲みます。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=s>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s>Images attached to the check run output displayed in the GitHub pull request UI.
+</span></span></span><span class=line><span class=cl><span class=s>&#34;&#34;&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>input</span><span class=w> </span><span class=nc>CheckRunOutputImage</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=s>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s>  The alternative text for the image.
+</span></span></span><span class=line><span class=cl><span class=s>  &#34;&#34;&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>alt</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=s>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s>  A short image description.
+</span></span></span><span class=line><span class=cl><span class=s>  &#34;&#34;&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>caption</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># ...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><p>descrition は、その型が <strong>何を表現する</strong> ものなのか、その mutation が <strong>何を行う</strong> ものなのかが伝わるよう意識して記述します。
 コードレビューでも description が簡潔かつ明確に記述できているかしっかりチェックします。
-開発を進めながら、description 記述は適宜更新していくのがよいです（仕様を変えてはいけませんが）。</p>
-<ul>
-<li>参考: <a href=../../p/c5pbs6p/>GraphQL スキーマ仕様: 型やフィールドに説明文 (description) を記述する</a></li>
-</ul>
-<h3 id=スキーマとは独立したドキュメントを用意する>スキーマとは独立したドキュメントを用意する</h3>
-<p>GraphQL スキーマの description 機能は、型やフィールドのドキュメンテーションには便利ですが、だからといって、他の API ドキュメントが必要ないというわけではありません。
+開発を進めながら、description 記述は適宜更新していくのがよいです（仕様を変えてはいけませんが）。</p><ul><li>参考: <a href=../../p/c5pbs6p/>GraphQL スキーマ仕様: 型やフィールドに説明文 (description) を記述する</a></li></ul><h3 id=スキーマとは独立したドキュメントを用意する>スキーマとは独立したドキュメントを用意する</h3><p>GraphQL スキーマの description 機能は、型やフィールドのドキュメンテーションには便利ですが、だからといって、他の API ドキュメントが必要ないというわけではありません。
 例えば、<strong>API 全体の概要説明</strong> は最初にあった方がよいですし、<strong>エンドポイントや認証などのアクセス情報</strong> はスキーマでは表現しきれないでしょう。
 <strong>Rate Limit やタイムアウトの扱い方</strong> など、全般的な API 呼び出しに関する注意事項も記述が必要かもしれません。
 そういった説明は、独立したドキュメントサイトで参照できるようにしておくべきです。
 一般公開する API であれば、<strong>チュートリアルサイト</strong> も用意しておいた方がよいでしょう。
-下記は GitHub の GraphQL API ドキュメントサイトの例です。</p>
-<ul>
-<li>参考: <a href=https://docs.github.com/ja/graphql>GitHub GraphQL API - GitHub Docs</a></li>
-</ul>
-<h2 id=命名-naming>命名 (Naming)</h2>
-<p>プログラムの関数名と同様、GraphQL API においても名前はとても重要なので、しっかり時間をかけて考えるようにします。
+下記は GitHub の GraphQL API ドキュメントサイトの例です。</p><ul><li>参考: <a href=https://docs.github.com/ja/graphql>GitHub GraphQL API - GitHub Docs</a></li></ul><h2 id=命名-naming>命名 (Naming)</h2><p>プログラムの関数名と同様、GraphQL API においても名前はとても重要なので、しっかり時間をかけて考えるようにします。
 よい名前は正しい使用方法を促すものであり、ドキュメントを読むことに時間を取られずに済みます。
-また、よい名前付けができると、API 自身の正しい設計につながります。</p>
-<h3 id=一貫性のあるネーミング>一貫性のあるネーミング</h3>
-<p>名前付けで重要なのは一貫性 (consistency) を持たせることです。
-API 名に一貫性がないと、間違った使用の危険性があるだけでなく、クライアント実装者が目的の API を見つけることすらできなくなってしまいます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>NG</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=c># 名詞と動詞が混ざってしまっている</span><span class=w>
-</span><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>products</span><span class=p>(</span><span class=py>ids</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>ID</span><span class=p>!]):</span><span class=w> </span><span class=p>[</span><span class=nc>Product</span><span class=p>!]</span><span class=w>
-</span><span class=w>  </span><span class=py>findPost</span><span class=p>(</span><span class=py>ids</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>ID</span><span class=p>!]):</span><span class=w> </span><span class=p>[</span><span class=nc>Post</span><span class=p>!]</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span><span class=w>
-</span><span class=w></span><span class=c># 使用する動詞に一貫性がない（add と create）</span><span class=w>
-</span><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>Mutation</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>addProduct</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>AddProductInput</span><span class=p>!):</span><span class=w> </span><span class=nc>AddProductPayload</span><span class=w>
-</span><span class=w>  </span><span class=nc>createPost</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>CreatePostInput</span><span class=p>!):</span><span class=w> </span><span class=nc>CreatePostPayload</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>動詞の対象性にも気を付けます。
-例えば、<code>publishPost</code> の反対の操作を行う mutation を定義するなら <code>unpublishPost</code> にします。</p>
-<p>ドメインオブジェクト（そのプロジェクトに特化した型）の名前の一貫性には特に注意します。
-ある場所で <code>BlogPost</code> という単語を使っているのに、同じ意味で <code>Post</code> という単語を使わないようにします。</p>
-<h3 id=concrete-type>型名はある程度具体的に</h3>
-<p>スキーマが小さいうちは、シンプルな型名で十分かもしれませんが、将来的にスキーマを拡張していくことを想定しているのであれば、型名はある程度具体的に付けておくべきです。
+また、よい名前付けができると、API 自身の正しい設計につながります。</p><h3 id=一貫性のあるネーミング>一貫性のあるネーミング</h3><p>名前付けで重要なのは一貫性 (consistency) を持たせることです。
+API 名に一貫性がないと、間違った使用の危険性があるだけでなく、クライアント実装者が目的の API を見つけることすらできなくなってしまいます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>NG</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=c># 名詞と動詞が混ざってしまっている</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>products</span><span class=p>(</span><span class=py>ids</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>ID</span><span class=p>!]):</span><span class=w> </span><span class=p>[</span><span class=nc>Product</span><span class=p>!]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>findPost</span><span class=p>(</span><span class=py>ids</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>ID</span><span class=p>!]):</span><span class=w> </span><span class=p>[</span><span class=nc>Post</span><span class=p>!]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># 使用する動詞に一貫性がない（add と create）</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>Mutation</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>addProduct</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>AddProductInput</span><span class=p>!):</span><span class=w> </span><span class=nc>AddProductPayload</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nc>createPost</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>CreatePostInput</span><span class=p>!):</span><span class=w> </span><span class=nc>CreatePostPayload</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><p>動詞の対象性にも気を付けます。
+例えば、<code>publishPost</code> の反対の操作を行う mutation を定義するなら <code>unpublishPost</code> にします。</p><p>ドメインオブジェクト（そのプロジェクトに特化した型）の名前の一貫性には特に注意します。
+ある場所で <code>BlogPost</code> という単語を使っているのに、同じ意味で <code>Post</code> という単語を使わないようにします。</p><h3 id=concrete-type>型名はある程度具体的に</h3><p>スキーマが小さいうちは、シンプルな型名で十分かもしれませんが、将来的にスキーマを拡張していくことを想定しているのであれば、型名はある程度具体的に付けておくべきです。
 例えば、<code>Lesson</code> よりも <code>CourseLesson</code> の方が望ましいかもしれません。
-型に抽象的すぎる名前を付けると、スキーマが成長していく段階で、deprecated（非推奨）マークの付いた型であふれかえることになります。</p>
-<p>型名に安易に <code>Event</code> や <code>User</code> という名前を使うと、より具体的な <code>Event</code> 型や <code>User</code> 型を使いたくなったときに困ります。
+型に抽象的すぎる名前を付けると、スキーマが成長していく段階で、deprecated（非推奨）マークの付いた型であふれかえることになります。</p><p>型名に安易に <code>Event</code> や <code>User</code> という名前を使うと、より具体的な <code>Event</code> 型や <code>User</code> 型を使いたくなったときに困ります。
 例えば、「カレントユーザー」と「チームメンバー」を同じ <code>User</code> 型で表現してしまうと、どちらか一方でしか使わないフィールドを追加したときに、API の破壊的な変更が必要になったりします。
 クライアントアプリの実装も煩雑になってしまうでしょう。
 「カレントユーザー」は <code>Viewer</code> 型、「チームメンバー」は <code>TeamMember</code> 型として定義しておけば、このような心配はなくなります。
-その上で、<code>User</code> インタフェースをくくり出して共通化するのは問題ありません。</p>
-<h3 id=フィールド名で型名を繰り返さない>フィールド名で型名を繰り返さない</h3>
-<p><a href=#concrete-type>型にはある程度具体的な名前</a> を付けるべきなのですが、フィールド名に関しては、必ずその上位の型（やフィールド名）で修飾される形になるので、冗長な名前を付けないようにします。
-例えば、次の <code>Book</code> 型に含まれている <code>bookDetails</code> フィールドの <code>book</code> というプレフィックスは冗長です。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>NG</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Book</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=c># ...</span><span class=w>
-</span><span class=w>  </span><span class=py>bookDetails</span><span class=p>:</span><span class=w> </span><span class=nc>BookDetails</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>次のようなシンプルなフィールド名でも、書籍の詳細情報であることは明らかです。
+その上で、<code>User</code> インタフェースをくくり出して共通化するのは問題ありません。</p><h3 id=フィールド名で型名を繰り返さない>フィールド名で型名を繰り返さない</h3><p><a href=#concrete-type>型にはある程度具体的な名前</a> を付けるべきなのですが、フィールド名に関しては、必ずその上位の型（やフィールド名）で修飾される形になるので、冗長な名前を付けないようにします。
+例えば、次の <code>Book</code> 型に含まれている <code>bookDetails</code> フィールドの <code>book</code> というプレフィックスは冗長です。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>NG</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Book</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># ...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>bookDetails</span><span class=p>:</span><span class=w> </span><span class=nc>BookDetails</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><p>次のようなシンプルなフィールド名でも、書籍の詳細情報であることは明らかです。
 もちろん、実際に返すデータの型は <code>BookDetails</code> のような具体的な名前で OK です。
-フィールド名と型名を 1 対 1 で合わせる必要はないということです。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>Good</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Book</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=c># ...</span><span class=w>
-</span><span class=w>  </span><span class=py>details</span><span class=p>:</span><span class=w> </span><span class=nc>BookDetails</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>上記のようなスキーマになっていれば、クライアントのクエリもシンプルに記述できます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=nc>QueryBooks</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>books</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>    </span><span class=c># ...</span><span class=w>
-</span><span class=w>    </span><span class=py>details</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>      </span><span class=c># ...</span><span class=w>
-</span><span class=w>    </span><span class=p>}</span><span class=w>
-</span><span class=w>  </span><span class=p>}</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div><h3 id=入力型と出力型を分けて定義する>入力型と出力型を分けて定義する</h3>
-<p>クエリあるいはミューテーション要求時のフィールド引数のための専用の型として、入力型 (input type) を定義することができます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>input</span><span class=w> </span><span class=nc>CreateBookInput</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>title</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!</span><span class=w>
-</span><span class=w>  </span><span class=py>author</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
-</span><span class=w>  </span><span class=py>year</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div><p>入力型の名前は、慣例的に上記のように <strong><code>〇〇Input</code></strong> という名前が付けられます。
+フィールド名と型名を 1 対 1 で合わせる必要はないということです。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>Good</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Book</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># ...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>details</span><span class=p>:</span><span class=w> </span><span class=nc>BookDetails</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><p>上記のようなスキーマになっていれば、クライアントのクエリもシンプルに記述できます。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>query</span><span class=w> </span><span class=nc>QueryBooks</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>books</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c># ...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=py>details</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=c># ...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><h3 id=入力型と出力型を分けて定義する>入力型と出力型を分けて定義する</h3><p>クエリあるいはミューテーション要求時のフィールド引数のための専用の型として、入力型 (input type) を定義することができます。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>input</span><span class=w> </span><span class=nc>CreateBookInput</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>title</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>author</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>year</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><p>入力型の名前は、慣例的に上記のように <strong><code>〇〇Input</code></strong> という名前が付けられます。
 フィールド自体の型は、入力型の反対の意味で出力型 (output type) と呼ばれたりします。
 入力型は、フィールド自体の型としては使えないようになっていますが、出力型（<code>type</code> で定義したもの）は、フィールド引数の型としても使えてしまいます。
-データ生成系の API では、入力と出力のフィールドに共通部分が多くなるため、次のように入力と出力の型を共通化してしまいがちです。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>NG</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Mutation</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>createBook</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>Book</span><span class=p>!):</span><span class=w> </span><span class=nc>Book</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>上記のように入力型と出力型を共通化してしまうと、将来的に出力型にのみ <code>createdAt</code> フィールドを追加しようとしたときに困ります。
-ミューテーション操作に必要な入力型が、現状は出力型でまかなえるとしても、最初から入力型は分けて定義しておくべきです。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>Good</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Mutation</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>createBook</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>CreateBookInput</span><span class=p>!):</span><span class=w> </span><span class=nc>Book</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<ul>
-<li>参考: <a href=../../p/nhhwqtu/>GraphQL スキーマ仕様: 入力型 (input type) を定義する</a></li>
-</ul>
-<h3 id=エンドポイント-url-の末尾は-graphql>エンドポイント URL の末尾は /graphql</h3>
-<p>GraphQL サーバーを作成するとき、エンドポイントする URL に特に決まりはないのですが、<a href=https://graphql.github.io/graphql-over-http/>GraphQL over HTTP specification</a> では、パスの最後の部分は <strong><code>/graphql</code></strong> で終わることが推奨されています。
+データ生成系の API では、入力と出力のフィールドに共通部分が多くなるため、次のように入力と出力の型を共通化してしまいがちです。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>NG</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Mutation</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>createBook</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>Book</span><span class=p>!):</span><span class=w> </span><span class=nc>Book</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><p>上記のように入力型と出力型を共通化してしまうと、将来的に出力型にのみ <code>createdAt</code> フィールドを追加しようとしたときに困ります。
+ミューテーション操作に必要な入力型が、現状は出力型でまかなえるとしても、最初から入力型は分けて定義しておくべきです。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>Good</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Mutation</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>createBook</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>CreateBookInput</span><span class=p>!):</span><span class=w> </span><span class=nc>Book</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><ul><li>参考: <a href=../../p/nhhwqtu/>GraphQL スキーマ仕様: 入力型 (input type) を定義する</a></li></ul><h3 id=エンドポイント-url-の末尾は-graphql>エンドポイント URL の末尾は /graphql</h3><p>GraphQL サーバーを作成するとき、エンドポイントする URL に特に決まりはないのですが、<a href=https://graphql.github.io/graphql-over-http/>GraphQL over HTTP specification</a> では、パスの最後の部分は <strong><code>/graphql</code></strong> で終わることが推奨されています。
 特に理由がなければ、このルールに従っておくと分かりやすいです。
-URL を見るだけで、REST API ではないことが一目瞭然です。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>推奨されているエンドポイント URL の例</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>http://example.com/graphql
-http://product.example.com/graphql
-http://example.com/product/graphql</code></pre></div></div>
-</figure>
-<p>ちなみに、上記のような GraphQL over HTTP の仕様は、<a href=http://spec.graphql.org/>GraphQL 本体の仕様</a> とは別で定義されています。
+URL を見るだけで、REST API ではないことが一目瞭然です。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>推奨されているエンドポイント URL の例</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>http://example.com/graphql
+</span></span><span class=line><span class=cl>http://product.example.com/graphql
+</span></span><span class=line><span class=cl>http://example.com/product/graphql</span></span></code></pre></div></div></figure><p>ちなみに、上記のような GraphQL over HTTP の仕様は、<a href=http://spec.graphql.org/>GraphQL 本体の仕様</a> とは別で定義されています。
 GraphQL はもともと HTTP 前提ではないのですが、実際には Web サーバーとして提供されることがほとんどなので、GraphQL over HTTP という仕様が後付けで定義されています。
-そこでは、HTTP ヘッダーの扱い方や、HTTP POST メソッドでどのようにクエリドキュメントを送るかなどが定義されています。</p>
-<h2 id=フィールド-fields>フィールド (fields)</h2>
-<h3 id=string-型よりも具体的な型を使えないか考慮する>String 型よりも具体的な型を使えないか考慮する</h3>
-<p><code>String</code> 型のフィールドは任意の文字列を格納できて便利ですが、指定できるフォーマットに制約があるのであれば、より具体的な型を割り当てられないかを考慮します。
-例えば、使える文字列が固定で数が限られているなら、<code>String</code> ではなく、<a href=../../p/isotm77/>enum 型を定義</a> して使用します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>enum</span><span class=w> </span><span class=nc>SortDirection</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>UNSPECIFIED</span><span class=w>
-</span><span class=w>  </span><span class=py>ASCENDING</span><span class=w>
-</span><span class=w>  </span><span class=py>DESCENDING</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div><p>キー＆バリューのリストが必要なら、JSON 形式の文字列などで表現するのではなく、キー＆バリューを保持する型を定義します。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>NG</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Book</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=c># JSON string of book attributes</span><span class=w>
-</span><span class=w>  </span><span class=py>attributes</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>Good</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Book</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>attributes</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>BookAttribute</span><span class=p>!]!</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span><span class=w>
-</span><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>BookAttribute</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>key</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!</span><span class=w>
-</span><span class=w>  </span><span class=py>value</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>それ以外のフォーマットが明確な文字列や数値は、カスタムスカラーを定義することで対応できます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>scalar</span><span class=w> </span><span class=nc>EmailAddress</span><span class=w>
-</span><span class=w></span><span class=kd>scalar</span><span class=w> </span><span class=nc>CreditCardNumber</span><span class=w>
-</span></code></pre></div><ul>
-<li>参考: <a href=https://gqlgen.com/reference/scalars/>Golang の gqlgen におけるカスタムスカラー</a></li>
-</ul>
-<h3 id=フィールドの役割を特化する>フィールドの役割を特化する</h3>
-<p>フィールドは多くのユースケースに対応できるように汎用化するよりも、あるユースケースに特化したものにした方が扱いが容易になります。
+そこでは、HTTP ヘッダーの扱い方や、HTTP POST メソッドでどのようにクエリドキュメントを送るかなどが定義されています。</p><h2 id=フィールド-fields>フィールド (fields)</h2><h3 id=string-型よりも具体的な型を使えないか考慮する>String 型よりも具体的な型を使えないか考慮する</h3><p><code>String</code> 型のフィールドは任意の文字列を格納できて便利ですが、指定できるフォーマットに制約があるのであれば、より具体的な型を割り当てられないかを考慮します。
+例えば、使える文字列が固定で数が限られているなら、<code>String</code> ではなく、<a href=../../p/isotm77/>enum 型を定義</a> して使用します。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>enum</span><span class=w> </span><span class=nc>SortDirection</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>UNSPECIFIED</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>ASCENDING</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>DESCENDING</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><p>キー＆バリューのリストが必要なら、JSON 形式の文字列などで表現するのではなく、キー＆バリューを保持する型を定義します。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>NG</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Book</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># JSON string of book attributes</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>attributes</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><figure class=xCodeBlock><figcaption class=xCodeBlock_title>Good</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Book</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>attributes</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>BookAttribute</span><span class=p>!]!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>BookAttribute</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>key</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>value</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><p>それ以外のフォーマットが明確な文字列や数値は、カスタムスカラーを定義することで対応できます。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>scalar</span><span class=w> </span><span class=nc>EmailAddress</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>scalar</span><span class=w> </span><span class=nc>CreditCardNumber</span><span class=w>
+</span></span></span></code></pre></div><ul><li>参考: <a href=https://gqlgen.com/reference/scalars/>Golang の gqlgen におけるカスタムスカラー</a></li></ul><h3 id=フィールドの役割を特化する>フィールドの役割を特化する</h3><p>フィールドは多くのユースケースに対応できるように汎用化するよりも、あるユースケースに特化したものにした方が扱いが容易になります。
 オプショナルなパラメーターを持つフィールド、つまり、汎用的なフィールドは、使い方が直感的でなく、キャッシュを導入するのも難しくなります。
 汎用的なフィールドは、リゾルバー実装内での分岐が増えるため、パフォーマンスが悪くなります。
-次のように、<code>Boolean</code> 型のオプショナルパラメーターが出てきたら不吉な兆候と捉えましょう。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>NG</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>posts</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=p>!,</span><span class=w> </span><span class=py>includeArchived</span><span class=p>:</span><span class=w> </span><span class=nc>Boolean</span><span class=p>):</span><span class=w> </span><span class=p>[</span><span class=nc>Post</span><span class=p>!]</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>上記の <code>posts</code> フィールドは、アーカイブ済みポストも返せるように汎用化が進んでいます。
-次のように、特化された <code>archivedPosts</code> フィールドを追加することで、同様のユースケースをサポートできます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>Good</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>posts</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=p>!):</span><span class=w> </span><span class=p>[</span><span class=nc>Post</span><span class=p>!]</span><span class=w>
-</span><span class=w>  </span><span class=py>archivedPosts</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=p>!)</span><span class=w> </span><span class=p>[</span><span class=py>Post</span><span class=p>!]</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>このように特化されたフィールドとして定義されていると、その API の使い方が明確になるため、クライアント実装の不具合が減ります。
+次のように、<code>Boolean</code> 型のオプショナルパラメーターが出てきたら不吉な兆候と捉えましょう。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>NG</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>posts</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=p>!,</span><span class=w> </span><span class=py>includeArchived</span><span class=p>:</span><span class=w> </span><span class=nc>Boolean</span><span class=p>):</span><span class=w> </span><span class=p>[</span><span class=nc>Post</span><span class=p>!]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><p>上記の <code>posts</code> フィールドは、アーカイブ済みポストも返せるように汎用化が進んでいます。
+次のように、特化された <code>archivedPosts</code> フィールドを追加することで、同様のユースケースをサポートできます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>Good</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>posts</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=p>!):</span><span class=w> </span><span class=p>[</span><span class=nc>Post</span><span class=p>!]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>archivedPosts</span><span class=p>(</span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=p>!)</span><span class=w> </span><span class=p>[</span><span class=py>Post</span><span class=p>!]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><p>このように特化されたフィールドとして定義されていると、その API の使い方が明確になるため、クライアント実装の不具合が減ります。
 オプショナルなパラメーターが複数になると、もっと顕著になります。
-例えば、書籍データを ID かタイトルで検索するための次のような <code>book</code> フィールドがあったとします。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>NG</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>book</span><span class=p>(</span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>,</span><span class=w> </span><span class=py>title</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>):</span><span class=w> </span><span class=nc>Book</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>これは一見便利そうな API ですが、<code>id</code> と <code>title</code> の両方を指定した場合の振る舞いが明確ではありません。
-次のようにフィールド自体が分かれていれば、スキーマ定義を見るだけで使い方がすぐに分かります。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>Good</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>bookById</span><span class=p>(</span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!):</span><span class=w> </span><span class=nc>Book</span><span class=w>
-</span><span class=w>  </span><span class=py>bookByTitle</span><span class=p>(</span><span class=py>title</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!):</span><span class=w> </span><span class=nc>Book</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>似たようなフィールドが増えるのは抵抗があるかもしれませんが、GraphQL においてそれがオーバーヘッドになることはありません。
+例えば、書籍データを ID かタイトルで検索するための次のような <code>book</code> フィールドがあったとします。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>NG</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>book</span><span class=p>(</span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>,</span><span class=w> </span><span class=py>title</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>):</span><span class=w> </span><span class=nc>Book</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><p>これは一見便利そうな API ですが、<code>id</code> と <code>title</code> の両方を指定した場合の振る舞いが明確ではありません。
+次のようにフィールド自体が分かれていれば、スキーマ定義を見るだけで使い方がすぐに分かります。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>Good</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>bookById</span><span class=p>(</span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!):</span><span class=w> </span><span class=nc>Book</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>bookByTitle</span><span class=p>(</span><span class=py>title</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!):</span><span class=w> </span><span class=nc>Book</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><p>似たようなフィールドが増えるのは抵抗があるかもしれませんが、GraphQL においてそれがオーバーヘッドになることはありません。
 むしろ、リゾルバー実装がシンプルになるため、パフォーマンスは向上します。
 また、フィールドを参照しているクライアントを絞り込むことが容易になるので、フィールドの再設計をしやすくなるという利点もあります。
 例外的に、SQL のような高度な検索機能を提供したい場合は、汎用的な検索クエリを扱うフィールドがあってよいかもしれません。
-ただし、やはりユースケースごとに特化した方が通常はうまくいきます。</p>
-<h3 id=暗黙的なデフォルト値をリゾルバー内部で定義しない>暗黙的なデフォルト値をリゾルバー内部で定義しない</h3>
-<p>フィールドパラメーターとして、ソート順序やフィルタ条件などのオプションを追加する場合、パラメーター省略時の振る舞いをスキーマから読み取れるようにすべきです。
-次の例では、パラメーターのデフォルト値を設定することで、API の振る舞いを明確にしています。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>games</span><span class=p>(</span><span class=py>sort</span><span class=p>:</span><span class=w> </span><span class=nc>SortOrder</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=py>DESC</span><span class=p>):</span><span class=w> </span><span class=p>[</span><span class=nc>Game</span><span class=p>!]</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div><ul>
-<li>参考: <a href=../../p/isotm77/>GraphQL スキーマ仕様: 列挙型 (enum type) を定義する</a></li>
-</ul>
-<h2 id=nullable-と-non-null>Nullable と Non-null</h2>
-<h3 id=フィールドを-non-null-にする場合は慎重に>フィールドを Non-null にする場合は慎重に</h3>
-<p>あるフィールドを一度 Non-null 型（末尾に <code>!</code>）で定義してしまうと、<strong>後から Nullable（Null 許容型）に戻すのは困難</strong> です。
+ただし、やはりユースケースごとに特化した方が通常はうまくいきます。</p><h3 id=暗黙的なデフォルト値をリゾルバー内部で定義しない>暗黙的なデフォルト値をリゾルバー内部で定義しない</h3><p>フィールドパラメーターとして、ソート順序やフィルタ条件などのオプションを追加する場合、パラメーター省略時の振る舞いをスキーマから読み取れるようにすべきです。
+次の例では、パラメーターのデフォルト値を設定することで、API の振る舞いを明確にしています。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>games</span><span class=p>(</span><span class=py>sort</span><span class=p>:</span><span class=w> </span><span class=nc>SortOrder</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=py>DESC</span><span class=p>):</span><span class=w> </span><span class=p>[</span><span class=nc>Game</span><span class=p>!]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><ul><li>参考: <a href=../../p/isotm77/>GraphQL スキーマ仕様: 列挙型 (enum type) を定義する</a></li></ul><h2 id=nullable-と-non-null>Nullable と Non-null</h2><h3 id=フィールドを-non-null-にする場合は慎重に>フィールドを Non-null にする場合は慎重に</h3><p>あるフィールドを一度 Non-null 型（末尾に <code>!</code>）で定義してしまうと、<strong>後から Nullable（Null 許容型）に戻すのは困難</strong> です。
 サーバー側の一方的な都合で Nullable 型に変更すると、Non-null 前提で実装しているクライアントが動作しなくなってしまいます（破壊的変更）。
 一般的なプログラミング言語内での関数実装では、Null 安全を考慮して、できるだけ Non-null 型を使用することが推奨されていたりしますが、GraphQL スキーマにおいてはこの考え方はあてはまらないので、Non-null 型を採用する場合は慎重になるべきです。
-GraphQL において、<code>null</code> 値は次のような状態を表現するために使用されます。</p>
-<ul>
-<li>そのフィールドの値が <code>null</code> だった（データベースに格納されている値自体が <code>null</code> であるなど）</li>
-<li>そのフィールドのアクセス権限がなかった</li>
-<li>指定された条件に一致するフィールドが見つからなかった</li>
-<li>その他、リゾルバー内部でエラーが発生した（外部要因、タイムアウトなど）</li>
-</ul>
-<p>特に、最後のエラー発生の可能性は軽視しがちです。
+GraphQL において、<code>null</code> 値は次のような状態を表現するために使用されます。</p><ul><li>そのフィールドの値が <code>null</code> だった（データベースに格納されている値自体が <code>null</code> であるなど）</li><li>そのフィールドのアクセス権限がなかった</li><li>指定された条件に一致するフィールドが見つからなかった</li><li>その他、リゾルバー内部でエラーが発生した（外部要因、タイムアウトなど）</li></ul><p>特に、最後のエラー発生の可能性は軽視しがちです。
 リゾルバー内でデータベースにアクセスする場合や、ネットワーク経由でデータ取得する場合は、様々な原因によるエラーが発生します。
 例えば、データベースサーバー側の不具合や、ネットワーク遅延によるタイムアウトなどです。
 こういったデータ取得を伴うフィールドは、デフォルトの Nullable 型として定義しておくべきです。
-ただし、リスト型の戻り値の場合、<code>null</code> の代わりに空リストを返すことができるので、Non-null 型で定義しても問題になることは少ないです。</p>
-<div class=xNote>
-<span class=xNote_title>☝️ Non-null フィールドで null を返すとどうなるか？</span>
+ただし、リスト型の戻り値の場合、<code>null</code> の代わりに空リストを返すことができるので、Non-null 型で定義しても問題になることは少ないです。</p><div class=xNote><span class=xNote_title>☝️ Non-null フィールドで null を返すとどうなるか？</span>
 <span class=xNote_body>仮に、GraphQL サーバー側の実装で、Non-null 定義されているフィールドなのに強引に null を返そうとすると、親フィールドを遡っていき、最初に見つかった Nullable なフィールドが null になるという挙動をします。
 これは、Non-null フィールドを null で返さないようにするためのフォールバック動作です。
-こうなると、本来部分的に取得できていたはずのデータも取得できなくなり、クライアント側に効率の悪い実装を強いることになります。</span>
-</div>
-<h3 id=無意味な-null-フィールドの組み合わせが発生しないようにする>無意味な null フィールドの組み合わせが発生しないようにする</h3>
-<p>Nullable なフィールドは「データなし」を表現するのに便利ですが、複数の Nullable フィールドがあると、不正な組み合わせが発生しやすくなります。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>NG</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Payment</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>creditCardNumber</span><span class=p>:</span><span class=w> </span><span class=nc>CreditCardNumber</span><span class=w>
-</span><span class=w>  </span><span class=py>creditCardExpiration</span><span class=p>:</span><span class=w> </span><span class=nc>CreditCardExpiration</span><span class=w>
-</span><span class=w>  </span><span class=py>giftCode</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>これは 3 つの Nullable なフィールドを持つ型の例ですが、最初の 2 つのフィールドは、どちらか一方だけ値がセットされても意味がありません。
-このようなフィールドは、1 つの型にまとめて次のように定義すれば、どちらか一方だけが null になるケースを考慮しなくて済みます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>Good</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Payment</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>creditCard</span><span class=p>:</span><span class=w> </span><span class=nc>CreaditCard</span><span class=w>
-</span><span class=w>  </span><span class=py>giftCode</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span><span class=w>
-</span><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>CreditCard</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>number</span><span class=p>:</span><span class=w> </span><span class=nc>CreditCardNumber</span><span class=p>!</span><span class=w>
-</span><span class=w>  </span><span class=py>expiration</span><span class=p>:</span><span class=w> </span><span class=nc>CreditCardExpiration</span><span class=p>!</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<h3 id=nullable-と-non-null-のガイドライン>Nullable と Non-null のガイドライン</h3>
-<ol>
-<li>何らかの原因で値を返せない可能性があるフィールドは、<strong>Nullable</strong> にしておきます。
-例えば、リゾルバーがデータソースとして、データベースやネットワークにアクセスする場合です。</li>
-<li>フィールドパラメーターはできるだけ <strong>Non-null</strong> にしておくと、その API の使い方が明確に伝わります（省略時の振る舞いを言及しなくてよい）。
+こうなると、本来部分的に取得できていたはずのデータも取得できなくなり、クライアント側に効率の悪い実装を強いることになります。</span></div><h3 id=無意味な-null-フィールドの組み合わせが発生しないようにする>無意味な null フィールドの組み合わせが発生しないようにする</h3><p>Nullable なフィールドは「データなし」を表現するのに便利ですが、複数の Nullable フィールドがあると、不正な組み合わせが発生しやすくなります。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>NG</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Payment</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>creditCardNumber</span><span class=p>:</span><span class=w> </span><span class=nc>CreditCardNumber</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>creditCardExpiration</span><span class=p>:</span><span class=w> </span><span class=nc>CreditCardExpiration</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>giftCode</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><p>これは 3 つの Nullable なフィールドを持つ型の例ですが、最初の 2 つのフィールドは、どちらか一方だけ値がセットされても意味がありません。
+このようなフィールドは、1 つの型にまとめて次のように定義すれば、どちらか一方だけが null になるケースを考慮しなくて済みます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>Good</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Payment</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>creditCard</span><span class=p>:</span><span class=w> </span><span class=nc>CreaditCard</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>giftCode</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>CreditCard</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>number</span><span class=p>:</span><span class=w> </span><span class=nc>CreditCardNumber</span><span class=p>!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>expiration</span><span class=p>:</span><span class=w> </span><span class=nc>CreditCardExpiration</span><span class=p>!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><h3 id=nullable-と-non-null-のガイドライン>Nullable と Non-null のガイドライン</h3><ol><li>何らかの原因で値を返せない可能性があるフィールドは、<strong>Nullable</strong> にしておきます。
+例えば、リゾルバーがデータソースとして、データベースやネットワークにアクセスする場合です。</li><li>フィールドパラメーターはできるだけ <strong>Non-null</strong> にしておくと、その API の使い方が明確に伝わります（省略時の振る舞いを言及しなくてよい）。
 ただし、パラメーターを後から追加する場合は、Nullable で（デフォルト値を付けて）追加することになります。
-フィールドパラメーターとして、オプショナルなフラグを追加したくなったときは、より具体的な別のフィールドを定義できないか考えてみるのがよいです。</li>
-<li>あるオブジェクト型のフィールドであり、そのオブジェクトが存在するときに必ず存在することが分かっているデータあれば、そのフィールドは <strong>Non-null</strong> で定義することができます（そのフィールドを含むオブジェクト自身は Nullable になり得ます）。</li>
-</ol>
-<h2 id=ミューテーション-mutation>ミューテーション (mutation)</h2>
-<h3 id=ミューテーション操作単位で一貫性を保つ>ミューテーション操作単位で一貫性を保つ</h3>
-<p>GraphQL クライアントがミューテーション要求を行う場合、<code>mutation</code> ドキュメントには複数のミューテーション操作を含めることができます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>NG（かもしれない）</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>mutation</span><span class=w> </span><span class=nc>ConfigServer</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>setAddress</span><span class=p>(</span><span class=py>address</span><span class=p>:</span><span class=w> </span><span class=s>&#34;192.168.0.100&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>     </span><span class=kd>...</span><span class=nc>serverConfig</span><span class=w>
-</span><span class=w>  </span><span class=p>}</span><span class=w>
-</span><span class=w>  </span><span class=py>setPort</span><span class=p>(</span><span class=py>port</span><span class=p>:</span><span class=w> </span><span class=nc>25052</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>     </span><span class=kd>...</span><span class=py>serverConfig</span><span class=w>
-</span><span class=w>  </span><span class=p>}</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>これらのミューテーション操作は上から順番に処理されていきますが、いずれかのミューテーション操作でエラーが発生すると、その後のミューテーション処理は実行されません。
+フィールドパラメーターとして、オプショナルなフラグを追加したくなったときは、より具体的な別のフィールドを定義できないか考えてみるのがよいです。</li><li>あるオブジェクト型のフィールドであり、そのオブジェクトが存在するときに必ず存在することが分かっているデータあれば、そのフィールドは <strong>Non-null</strong> で定義することができます（そのフィールドを含むオブジェクト自身は Nullable になり得ます）。</li></ol><h2 id=ミューテーション-mutation>ミューテーション (mutation)</h2><h3 id=ミューテーション操作単位で一貫性を保つ>ミューテーション操作単位で一貫性を保つ</h3><p>GraphQL クライアントがミューテーション要求を行う場合、<code>mutation</code> ドキュメントには複数のミューテーション操作を含めることができます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>NG（かもしれない）</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>mutation</span><span class=w> </span><span class=nc>ConfigServer</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>setAddress</span><span class=p>(</span><span class=py>address</span><span class=p>:</span><span class=w> </span><span class=s>&#34;192.168.0.100&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>     </span><span class=kd>...</span><span class=nc>serverConfig</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>setPort</span><span class=p>(</span><span class=py>port</span><span class=p>:</span><span class=w> </span><span class=mi>25052</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>     </span><span class=kd>...</span><span class=nc>serverConfig</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><p>これらのミューテーション操作は上から順番に処理されていきますが、いずれかのミューテーション操作でエラーが発生すると、その後のミューテーション処理は実行されません。
 GraphQL には、リレーショナルデータベース (RDB) のようなトランザクション処理の仕組みはないため、すでに実行されてしまったミューテーション操作をロールバックすることはできません。
-上記の <code>setAddress</code> 操作と <code>setPort</code> 操作が必ずセットで実行しなければいけない処理であるなら、そもそもミューテーション操作の定義を 1 つにまとめるべきです。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>Good</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>mutation</span><span class=w> </span><span class=nc>ConfigServer</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>changeServerConfig</span><span class=p>(</span><span class=py>address</span><span class=p>:</span><span class=w> </span><span class=s>&#34;192.168.0.100&#34;</span><span class=p>,</span><span class=w> </span><span class=nc>port</span><span class=p>:</span><span class=w> </span><span class=nc>25052</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>     </span><span class=kd>...</span><span class=py>serverConfig</span><span class=w>
-</span><span class=w>  </span><span class=p>}</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<p>このように、ミューテーション操作は整合性を保てる単位（RDB で言うところのトランザクション単位）で実行できるようにフィールド設計します。</p>
-<ul>
-<li>参考: <a href=../../p/pk9c9qs/>GraphQL スキーマ仕様: ミューテーションを定義する（データ更新 API）</a></li>
-</ul>
-<h2 id=有名な実装パターン>有名な実装パターン</h2>
-<h3 id=サインイン済みユーザーを表す-me-フィールド>サインイン済みユーザーを表す me フィールド</h3>
-<p>例えば、タスクの一覧を取得するための <code>taskList</code> ルートフィールドが次のように定義されているとします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>tasklist</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>Task</span><span class=p>!]!</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div><p>ここには、全ユーザーのタスクが含まれていますが、カレントユーザーのタスクのみを取得したいときはどうすればよいでしょうか？
-フィールドパラメーターとしてユーザー ID を指定できるようにするという方法もありますが、カレントユーザーの情報は頻繁に参照するため、専用の <strong><code>me</code></strong> フィールドを用意するということがよく行われます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>me</span><span class=p>:</span><span class=w> </span><span class=nc>User</span><span class=w>
-</span><span class=w>  </span><span class=c># ...</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span><span class=w>
-</span><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>User</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>taskList</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>Task</span><span class=p>!]!</span><span class=w>
-</span><span class=w>  </span><span class=c># ...</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div><p>ユーザーがサインインしていない場合は、<code>me</code> フィールドの値は <code>null</code> になるので、サインイン済みかどうかの判断にも利用できます。</p>
-<h3 id=ページネーションconnection-パターン>ページネーション（Connection パターン）</h3>
-<p>クエリのレスポンスとして多数のデータを返す可能性がある場合は、ページネーションに対応したフィールドとして定義することで、データを部分的に取得できるようにします。
+上記の <code>setAddress</code> 操作と <code>setPort</code> 操作が必ずセットで実行しなければいけない処理であるなら、そもそもミューテーション操作の定義を 1 つにまとめるべきです。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>Good</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>mutation</span><span class=w> </span><span class=nc>ConfigServer</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>changeServerConfig</span><span class=p>(</span><span class=py>address</span><span class=p>:</span><span class=w> </span><span class=s>&#34;192.168.0.100&#34;</span><span class=p>,</span><span class=w> </span><span class=nc>port</span><span class=p>:</span><span class=w> </span><span class=mi>25052</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>     </span><span class=kd>...</span><span class=nc>serverConfig</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><p>このように、ミューテーション操作は整合性を保てる単位（RDB で言うところのトランザクション単位）で実行できるようにフィールド設計します。</p><ul><li>参考: <a href=../../p/pk9c9qs/>GraphQL スキーマ仕様: ミューテーションを定義する（データ更新 API）</a></li></ul><h2 id=有名な実装パターン>有名な実装パターン</h2><h3 id=サインイン済みユーザーを表す-me-フィールド>サインイン済みユーザーを表す me フィールド</h3><p>例えば、タスクの一覧を取得するための <code>taskList</code> ルートフィールドが次のように定義されているとします。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>tasklist</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>Task</span><span class=p>!]!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><p>ここには、全ユーザーのタスクが含まれていますが、カレントユーザーのタスクのみを取得したいときはどうすればよいでしょうか？
+フィールドパラメーターとしてユーザー ID を指定できるようにするという方法もありますが、カレントユーザーの情報は頻繁に参照するため、専用の <strong><code>me</code></strong> フィールドを用意するということがよく行われます。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>me</span><span class=p>:</span><span class=w> </span><span class=nc>User</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># ...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>User</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>taskList</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>Task</span><span class=p>!]!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># ...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><p>ユーザーがサインインしていない場合は、<code>me</code> フィールドの値は <code>null</code> になるので、サインイン済みかどうかの判断にも利用できます。</p><h3 id=ページネーションconnection-パターン>ページネーション（Connection パターン）</h3><p>クエリのレスポンスとして多数のデータを返す可能性がある場合は、ページネーションに対応したフィールドとして定義することで、データを部分的に取得できるようにします。
 ページネーションの実装方法は自由ですが、Facebook の Relay ライブラリが提唱している <strong>Connection パターン（カーソルベースのページネーション）</strong> を採用するのが一般的です。
-Connection パターンでは、フィールドを定義するときに、値のリストの代わりに Connection 型のオブジェクトを返すようにし、統一された方法でページネーション処理を行えるようにします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>games</span><span class=p>(</span><span class=w>
-</span><span class=w>    </span><span class=py>after</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
-</span><span class=w>    </span><span class=py>before</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
-</span><span class=w>    </span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=w>
-</span><span class=w>    </span><span class=py>last</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=w>
-</span><span class=w>  </span><span class=p>):</span><span class=w> </span><span class=nc>GameConnection</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div><ul>
-<li>参考: <a href=../../p/vuo4px3/>GraphQL スキーマ仕様: ページネーション (pagination)</a></li>
-<li>参考: <a href=https://relay.dev/graphql/connections.htm>GraphQL Cursor Connections Specification - Relay</a></li>
-</ul>
-<p>Connection パターンに従ってスキーマ定義を行うことで、クライアントアプリの実装者は見慣れた方法でページネーション処理を実装できるようになります。
-また、GraphQL ライブラリによっては、Connection パターンでのスキーマ定義を前提としていることがあります。</p>
-<h3 id=node-インタフェースと-global-object-identification>Node インタフェースと Global Object Identification</h3>
-<p>GraphQL スキーマでは、<code>id: ID!</code> フィールドを持つ <strong><code>Node</code> インタフェース</strong> を定義し、すべてのオブジェクト型がこれを実装するようにします。
-この <code>id</code> フィールドにはシステム全体でユニークな ID を格納し、すべてのオブジェクトを ID で特定できるようにします (<strong>Global Object Identification</strong>)。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=c># An object with a Globally Unique ID</span><span class=w>
-</span><span class=w></span><span class=kd>interface</span><span class=w> </span><span class=nc>Node</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=c># The ID of the object.</span><span class=w>
-</span><span class=w>  </span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>ID</span><span class=p>!</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span><span class=w>
-</span><span class=w></span><span class=c># The query root of GitHub&#39;s GraphQL interface.</span><span class=w>
-</span><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=c># Fetches an object given its ID.</span><span class=w>
-</span><span class=w>  </span><span class=py>node</span><span class=p>(</span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>ID</span><span class=p>!):</span><span class=w> </span><span class=nc>Node</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span><span class=w>
-</span><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>User</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=nc>Node</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>ID</span><span class=p>!</span><span class=w>
-</span><span class=w>  </span><span class=py>login</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!</span><span class=w>
-</span><span class=w>  </span><span class=py>name</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
-</span><span class=w>  </span><span class=c># ...</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div><p><code>Node</code> インタフェースを備えるすべてのオブジェクトは、トップレベルの <strong><code>node</code></strong> クエリを使って参照できるようにします。
-下記は、GitHub の GraphQL API を使ってユーザー情報 (<code>User</code>) を取得するクエリの例です。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>node クエリの例</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=nc>QueryUser</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>node</span><span class=p>(</span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=s>&#34;MDQ6VXNlcjU1MTk1MDM=&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>    </span><span class=kd>...</span><span class=w> </span><span class=nc>on</span><span class=w> </span><span class=py>User</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>      </span><span class=py>id</span><span class=w>
-</span><span class=w>      </span><span class=py>login</span><span class=w>
-</span><span class=w>      </span><span class=py>name</span><span class=w>
-</span><span class=w>    </span><span class=p>}</span><span class=w>
-</span><span class=w>  </span><span class=p>}</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<div class=xNote>
-<span class=xNote_title>☝️ 一意な ID の作り方</span>
+Connection パターンでは、フィールドを定義するときに、値のリストの代わりに Connection 型のオブジェクトを返すようにし、統一された方法でページネーション処理を行えるようにします。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>games</span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=py>after</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=py>before</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=py>first</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=py>last</span><span class=p>:</span><span class=w> </span><span class=nc>Int</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>):</span><span class=w> </span><span class=nc>GameConnection</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><ul><li>参考: <a href=../../p/vuo4px3/>GraphQL スキーマ仕様: ページネーション (pagination)</a></li><li>参考: <a href=https://relay.dev/graphql/connections.htm>GraphQL Cursor Connections Specification - Relay</a></li></ul><p>Connection パターンに従ってスキーマ定義を行うことで、クライアントアプリの実装者は見慣れた方法でページネーション処理を実装できるようになります。
+また、GraphQL ライブラリによっては、Connection パターンでのスキーマ定義を前提としていることがあります。</p><h3 id=node-インタフェースと-global-object-identification>Node インタフェースと Global Object Identification</h3><p>GraphQL スキーマでは、<code>id: ID!</code> フィールドを持つ <strong><code>Node</code> インタフェース</strong> を定義し、すべてのオブジェクト型がこれを実装するようにします。
+この <code>id</code> フィールドにはシステム全体でユニークな ID を格納し、すべてのオブジェクトを ID で特定できるようにします (<strong>Global Object Identification</strong>)。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=c># An object with a Globally Unique ID</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>interface</span><span class=w> </span><span class=nc>Node</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># The ID of the object.</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>ID</span><span class=p>!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># The query root of GitHub&#39;s GraphQL interface.</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>Query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># Fetches an object given its ID.</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>node</span><span class=p>(</span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>ID</span><span class=p>!):</span><span class=w> </span><span class=nc>Node</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>type</span><span class=w> </span><span class=nc>User</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=nc>Node</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=nc>ID</span><span class=p>!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>login</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=p>!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>name</span><span class=p>:</span><span class=w> </span><span class=nc>String</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># ...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><p><code>Node</code> インタフェースを備えるすべてのオブジェクトは、トップレベルの <strong><code>node</code></strong> クエリを使って参照できるようにします。
+下記は、GitHub の GraphQL API を使ってユーザー情報 (<code>User</code>) を取得するクエリの例です。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>node クエリの例</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>query</span><span class=w> </span><span class=nc>QueryUser</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>node</span><span class=p>(</span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=s>&#34;MDQ6VXNlcjU1MTk1MDM=&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>...</span><span class=w> </span><span class=nc>on</span><span class=w> </span><span class=py>User</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=py>id</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=py>login</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=py>name</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><div class=xNote><span class=xNote_title>☝️ 一意な ID の作り方</span>
 <span class=xNote_body>上記のクエリ例で指定している <code>MDQ6VXNlcjU1MTk1MDM=</code> という ID は、ランダムな文字列のように見えますが、実は <code>04:User5519503</code> という文字列を Base64 エンコードしたものです。
 この文字列は <strong>APIバージョン + オブジェクトタイプ + オブジェクトID</strong> という構成になっており、GitHub 内部の API 実装で利用されています。
-このテクニックを使うと、GraphQL API のリゾルバーを実装する際に、ID のマッピングテーブルを作成する必要がなくなります。</span>
-</div>
-<p>すべてのオブジェクト型に <code>Node</code> インタフェースを実装し、一意の ID を割り当てることには様々なメリットがあります。</p>
-<ul>
-<li>GraphQL ライブラリは、ID 情報をキーにしてオブジェクトをキャッシュすることができます（実際に Apollo Client ライブラリなどは、オブジェクト型が <code>id</code> フィールドを備えていることを前提とした作りになっています）</li>
-<li>クライアントアプリがオブジェクトの更新情報を取得するときに、統一された方法でフェッチできます</li>
-<li>GraphQL API サーバーで、あるオブジェクトの情報を構築するときに、複雑に階層化されたノードを処理する必要がなくなります（ワンステップでデータソースから情報を取り出せます）</li>
-<li>インタフェースが統一されることで、様々なツールとの連携が可能になります。例えば、ページネーション用のクエリを自動生成できます（ページネーション実装に使われる Connection パターンも <code>Node</code> インタフェースを利用しています）</li>
-</ul>
-<p><code>Node</code> インタフェースは、Facebook の Relay フレームワークの実装から生まれたコンセプトですが、<a href=https://graphql.org/learn/global-object-identification/>GraphQL 公式のベストプラクティス</a> としても掲載されるようになりました。</p>
-<h2 id=リゾルバー実装保守性パフォーマンスセキュリティ>リゾルバー実装（保守性、パフォーマンス、セキュリティ）</h2>
-<h3 id=ドメインロジックをリゾルバー関数から分離する>ドメインロジックをリゾルバー関数から分離する</h3>
-<p><strong>リゾルバー関数の実装はできるだけ短く記述する</strong> ことがベストプラクティスとされています。</p>
-<blockquote>
-<p>By keeping resolvers thin as a best practice, you can safely refactor your backing logic while reducing the likelihood of breaking your API.
-&mdash; Apollo GraphQL Tutorial</p>
-</blockquote>
-<p>多くのケースでは、データの取得や加工処理といったドメインロジックを分離することで、リゾルバー関数の実装を 1 行～数行に抑えることができます。
+このテクニックを使うと、GraphQL API のリゾルバーを実装する際に、ID のマッピングテーブルを作成する必要がなくなります。</span></div><p>すべてのオブジェクト型に <code>Node</code> インタフェースを実装し、一意の ID を割り当てることには様々なメリットがあります。</p><ul><li>GraphQL ライブラリは、ID 情報をキーにしてオブジェクトをキャッシュすることができます（実際に Apollo Client ライブラリなどは、オブジェクト型が <code>id</code> フィールドを備えていることを前提とした作りになっています）</li><li>クライアントアプリがオブジェクトの更新情報を取得するときに、統一された方法でフェッチできます</li><li>GraphQL API サーバーで、あるオブジェクトの情報を構築するときに、複雑に階層化されたノードを処理する必要がなくなります（ワンステップでデータソースから情報を取り出せます）</li><li>インタフェースが統一されることで、様々なツールとの連携が可能になります。例えば、ページネーション用のクエリを自動生成できます（ページネーション実装に使われる Connection パターンも <code>Node</code> インタフェースを利用しています）</li></ul><p><code>Node</code> インタフェースは、Facebook の Relay フレームワークの実装から生まれたコンセプトですが、<a href=https://graphql.org/learn/global-object-identification/>GraphQL 公式のベストプラクティス</a> としても掲載されるようになりました。</p><h2 id=リゾルバー実装保守性パフォーマンスセキュリティ>リゾルバー実装（保守性、パフォーマンス、セキュリティ）</h2><h3 id=ドメインロジックをリゾルバー関数から分離する>ドメインロジックをリゾルバー関数から分離する</h3><p><strong>リゾルバー関数の実装はできるだけ短く記述する</strong> ことがベストプラクティスとされています。</p><blockquote><p>By keeping resolvers thin as a best practice, you can safely refactor your backing logic while reducing the likelihood of breaking your API.
+&mdash; Apollo GraphQL Tutorial</p></blockquote><p>多くのケースでは、データの取得や加工処理といったドメインロジックを分離することで、リゾルバー関数の実装を 1 行～数行に抑えることができます。
 ドメインロジックを分離することは、ユニットテストを記述できる設計にするということであり、安定した API をリリースし続けるためにも必要です。
-次の例では、3 つのルートクエリに対するリゾルバーをすべて 1 行で実装しています。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>Apollo Server でのリゾルバー実装例</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>module</span><span class=p>.</span><span class=nx>exports</span> <span class=o>=</span> <span class=p>{</span>
-  <span class=nx>Query</span><span class=o>:</span> <span class=p>{</span>
-    <span class=nx>launches</span><span class=o>:</span> <span class=p>(</span><span class=nx>_</span><span class=p>,</span> <span class=nx>__</span><span class=p>,</span> <span class=p>{</span> <span class=nx>dataSources</span> <span class=p>})</span> <span class=p>=&gt;</span> <span class=nx>dataSources</span><span class=p>.</span><span class=nx>launchAPI</span><span class=p>.</span><span class=nx>getAllLaunches</span><span class=p>(),</span>
-    <span class=nx>launch</span><span class=o>:</span> <span class=p>(</span><span class=nx>_</span><span class=p>,</span> <span class=p>{</span> <span class=nx>id</span> <span class=p>},</span> <span class=p>{</span> <span class=nx>dataSources</span> <span class=p>})</span> <span class=p>=&gt;</span> <span class=nx>dataSources</span><span class=p>.</span><span class=nx>launchAPI</span><span class=p>.</span><span class=nx>getLaunchById</span><span class=p>({</span> <span class=nx>launchId</span><span class=o>:</span> <span class=nx>id</span> <span class=p>}),</span>
-    <span class=nx>me</span><span class=o>:</span> <span class=p>(</span><span class=nx>_</span><span class=p>,</span> <span class=nx>__</span><span class=p>,</span> <span class=p>{</span> <span class=nx>dataSources</span> <span class=p>})</span> <span class=p>=&gt;</span> <span class=nx>dataSources</span><span class=p>.</span><span class=nx>userAPI</span><span class=p>.</span><span class=nx>findOrCreateUser</span><span class=p>(),</span>
-  <span class=p>},</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>ドメインロジック部分は、GraphQL サーバーがなくても単独で動作するように実装すべきです。
-リゾルバー関数は、ドメインロジックを呼び出すだけの橋渡しの役割になります。</p>
-<h3 id=サブフィールド用のリゾルバー関数を実装して-dataloader-で-n1-問題に対応する>サブフィールド用のリゾルバー関数を実装して DataLoader で N+1 問題に対応する</h3>
-<p>入れ子構造になったオブジェクトを返す必要があるときは、サブフィールドの処理をそれ専用のリゾルバー関数に委譲することで、リゾルバーの実装をシンプルに保つことができます。
-もちろん、すべてのオブジェクトフィールド用にリゾルバー関数を定義する必要はありません。</p>
-<ul>
-<li>参考: <a href=https://maku77.github.io/p/wdvdtap/>gqlgen で子フィールドの情報を返すリゾルバーを実装する</a></li>
-</ul>
-<p>サブフィールド用のリゾルバー関数を分けて定義すると、<strong>N+1 問題</strong> が発生することがあります。
+次の例では、3 つのルートクエリに対するリゾルバーをすべて 1 行で実装しています。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>Apollo Server でのリゾルバー実装例</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=nx>module</span><span class=p>.</span><span class=nx>exports</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>Query</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>launches</span><span class=o>:</span> <span class=p>(</span><span class=nx>_</span><span class=p>,</span> <span class=nx>__</span><span class=p>,</span> <span class=p>{</span> <span class=nx>dataSources</span> <span class=p>})</span> <span class=p>=&gt;</span> <span class=nx>dataSources</span><span class=p>.</span><span class=nx>launchAPI</span><span class=p>.</span><span class=nx>getAllLaunches</span><span class=p>(),</span>
+</span></span><span class=line><span class=cl>    <span class=nx>launch</span><span class=o>:</span> <span class=p>(</span><span class=nx>_</span><span class=p>,</span> <span class=p>{</span> <span class=nx>id</span> <span class=p>},</span> <span class=p>{</span> <span class=nx>dataSources</span> <span class=p>})</span> <span class=p>=&gt;</span> <span class=nx>dataSources</span><span class=p>.</span><span class=nx>launchAPI</span><span class=p>.</span><span class=nx>getLaunchById</span><span class=p>({</span> <span class=nx>launchId</span><span class=o>:</span> <span class=nx>id</span> <span class=p>}),</span>
+</span></span><span class=line><span class=cl>    <span class=nx>me</span><span class=o>:</span> <span class=p>(</span><span class=nx>_</span><span class=p>,</span> <span class=nx>__</span><span class=p>,</span> <span class=p>{</span> <span class=nx>dataSources</span> <span class=p>})</span> <span class=p>=&gt;</span> <span class=nx>dataSources</span><span class=p>.</span><span class=nx>userAPI</span><span class=p>.</span><span class=nx>findOrCreateUser</span><span class=p>(),</span>
+</span></span><span class=line><span class=cl>  <span class=p>},</span>
+</span></span><span class=line><span class=cl><span class=p>}</span></span></span></code></pre></div></div></figure><p>ドメインロジック部分は、GraphQL サーバーがなくても単独で動作するように実装すべきです。
+リゾルバー関数は、ドメインロジックを呼び出すだけの橋渡しの役割になります。</p><h3 id=サブフィールド用のリゾルバー関数を実装して-dataloader-で-n1-問題に対応する>サブフィールド用のリゾルバー関数を実装して DataLoader で N+1 問題に対応する</h3><p>入れ子構造になったオブジェクトを返す必要があるときは、サブフィールドの処理をそれ専用のリゾルバー関数に委譲することで、リゾルバーの実装をシンプルに保つことができます。
+もちろん、すべてのオブジェクトフィールド用にリゾルバー関数を定義する必要はありません。</p><ul><li>参考: <a href=https://maku77.github.io/p/wdvdtap/>gqlgen で子フィールドの情報を返すリゾルバーを実装する</a></li></ul><p>サブフィールド用のリゾルバー関数を分けて定義すると、<strong>N+1 問題</strong> が発生することがあります。
 これは、サブフィールドの処理ごとにリゾルバー関数が呼び出され（N 回）、その中で毎回同じデータソースへのフェッチが実行されてしまうというパフォーマンス問題です。
 これを解決する手法として、<strong>DataLoader</strong> という実装パターン（ライブラリ）があります。
 DataLoader は、連続したデータフェッチをバッチ処理化、キャッシュするためのユーティリティライブラリです。
-<a href=https://github.com/graphql/dataloader>DataLoader ライブラリ</a>は、もともと Facebook が作成したものですが、今では GraphQL コミュニティで管理されており、多数のプロジェクトが採用しています。</p>
-<h3 id=データソースや認証情報をコンテキストで共有する>データソースや認証情報をコンテキストで共有する</h3>
-<p>GraphQL API の <strong>コンテキスト</strong> は、すべてのリゾルバーで共有されるオブジェクトです。
+<a href=https://github.com/graphql/dataloader>DataLoader ライブラリ</a>は、もともと Facebook が作成したものですが、今では GraphQL コミュニティで管理されており、多数のプロジェクトが採用しています。</p><h3 id=データソースや認証情報をコンテキストで共有する>データソースや認証情報をコンテキストで共有する</h3><p>GraphQL API の <strong>コンテキスト</strong> は、すべてのリゾルバーで共有されるオブジェクトです。
 データベースのコネクションプールなどをコンテキストで共有すれば、複数のリゾルバー関数が呼び出されたときに、毎回データベースに接続し直すという無駄を省くことができます。
 リゾルバー間で共有するといっても、コンテキストはリクエストごとに生成されることに注意してください（異なるユーザーからのリクエストでデータが共有されるとおかしなことになるので）。
 あくまで、一つのリクエストで複数のリゾルバー関数が呼び出される場合に、そのリゾルバ間でコンテキストが共有されるということです。
-コンテキストは、データソースの保持以外にも、認証情報（ユーザー情報やアクセス権限）の保持にも利用されます。</p>
-<p>コンテキストを保持する方法は GraphQL のサーバーライブラリによって異なりますが、例えば、Apollo Server ライブラリであれば、<code>ApolloServer</code> インスタンスを生成するときに、<code>context</code> プロパティに任意のコンテキスト生成関数をセットすることができます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>コンテキストでデータベース接続を保持する例</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>context</span>: <span class=kt>async</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>({</span>
-  <span class=nx>db</span>: <span class=kt>await</span> <span class=nx>client</span><span class=p>.</span><span class=nx>connect</span><span class=p>(),</span>  <span class=c1>// 各リゾルバー関数内で context.db で参照できる
-</span><span class=c1></span><span class=p>}),</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>コンテキストでユーザー情報を保持する例</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>context</span>: <span class=kt>async</span> <span class=p>({</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>res</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>token</span> <span class=o>=</span> <span class=nx>req</span><span class=p>.</span><span class=nx>headers</span><span class=o>?</span><span class=p>.</span><span class=nx>authorization</span> <span class=o>||</span> <span class=s1>&#39;&#39;</span>
-  <span class=k>return</span> <span class=p>{</span>
-    <span class=nx>user</span>: <span class=kt>await</span> <span class=nx>getUser</span><span class=p>(</span><span class=nx>token</span><span class=p>),</span>  <span class=c1>// 各リゾルバー関数内で context.user で参照できる
-</span><span class=c1></span>  <span class=p>}</span>
-<span class=p>},</span></code></pre></div></div>
-</figure>
-<p>コンテキストオブジェクトをセットするのではなく、コンテキスト生成関数をセットしているのは、前述した通り、リクエスト時にコンテキストを生成する必要があるからです。</p>
-<h3 id=エラーレスポンスに実装の詳細情報を含めない>エラーレスポンスに実装の詳細情報を含めない</h3>
-<p>GraphQL API の呼び出しでエラーが発生したときに、エラー情報としてサーバー側の実装詳細（スタックトレースなど）を返してしまうと、悪意のあるユーザーに不正アクセスのヒントを与えてしまいます。
+コンテキストは、データソースの保持以外にも、認証情報（ユーザー情報やアクセス権限）の保持にも利用されます。</p><p>コンテキストを保持する方法は GraphQL のサーバーライブラリによって異なりますが、例えば、Apollo Server ライブラリであれば、<code>ApolloServer</code> インスタンスを生成するときに、<code>context</code> プロパティに任意のコンテキスト生成関数をセットすることができます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>コンテキストでデータベース接続を保持する例</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=line><span class=cl><span class=nx>context</span>: <span class=kt>async</span> <span class=p>()</span> <span class=o>=&gt;</span> <span class=p>({</span>
+</span></span><span class=line><span class=cl>  <span class=nx>db</span>: <span class=kt>await</span> <span class=nx>client</span><span class=p>.</span><span class=nx>connect</span><span class=p>(),</span>  <span class=c1>// 各リゾルバー関数内で context.db で参照できる
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}),</span></span></span></code></pre></div></div></figure><figure class=xCodeBlock><figcaption class=xCodeBlock_title>コンテキストでユーザー情報を保持する例</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=line><span class=cl><span class=nx>context</span>: <span class=kt>async</span> <span class=p>({</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>res</span> <span class=p>})</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>token</span> <span class=o>=</span> <span class=nx>req</span><span class=p>.</span><span class=nx>headers</span><span class=o>?</span><span class=p>.</span><span class=nx>authorization</span> <span class=o>||</span> <span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>user</span>: <span class=kt>await</span> <span class=nx>getUser</span><span class=p>(</span><span class=nx>token</span><span class=p>),</span>  <span class=c1>// 各リゾルバー関数内で context.user で参照できる
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>},</span></span></span></code></pre></div></div></figure><p>コンテキストオブジェクトをセットするのではなく、コンテキスト生成関数をセットしているのは、前述した通り、リクエスト時にコンテキストを生成する必要があるからです。</p><h3 id=エラーレスポンスに実装の詳細情報を含めない>エラーレスポンスに実装の詳細情報を含めない</h3><p>GraphQL API の呼び出しでエラーが発生したときに、エラー情報としてサーバー側の実装詳細（スタックトレースなど）を返してしまうと、悪意のあるユーザーに不正アクセスのヒントを与えてしまいます。
 とはいえ、API の実装中はサーバー側の詳細なエラー情報を返した方が都合がよかったりします。
-そのような場合は、次のように、開発中（dev 環境）でのみエラー詳細を返すようにしておくと便利です。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=k>return</span> <span class=nx>config</span><span class=p>.</span><span class=nx>isDev</span> <span class=o>?</span> <span class=nx>errorReport</span> <span class=o>:</span> <span class=p>{</span> <span class=nx>message</span><span class=o>:</span> <span class=s1>&#39;Oops! Something went wrong.&#39;</span> <span class=p>}</span>
-</code></pre></div><h3 id=公開-api-には-rate-limit-やクエリのネスト制限を設ける>公開 API には Rate Limit やクエリのネスト制限を設ける</h3>
-<p>GraphQL API を公開するときは、過剰なアクセスによりサーバーリソースを食いつぶされないように対策が必要です。
+そのような場合は、次のように、開発中（dev 環境）でのみエラー詳細を返すようにしておくと便利です。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=line><span class=cl><span class=k>return</span> <span class=nx>config</span><span class=p>.</span><span class=nx>isDev</span> <span class=o>?</span> <span class=nx>errorReport</span> <span class=o>:</span> <span class=p>{</span> <span class=nx>message</span><span class=o>:</span> <span class=s1>&#39;Oops! Something went wrong.&#39;</span> <span class=p>}</span>
+</span></span></code></pre></div><h3 id=公開-api-には-rate-limit-やクエリのネスト制限を設ける>公開 API には Rate Limit やクエリのネスト制限を設ける</h3><p>GraphQL API を公開するときは、過剰なアクセスによりサーバーリソースを食いつぶされないように対策が必要です。
 GraphQL はクエリドキュメントでフィールドをネストできるため、コストのかかるデータ取得処理を簡単に記述できてしまいます。
-クライアント実装者に悪意がなくても、クエリの記述ミス（あるいは実装者の知識不足）により DOS 攻撃のようなリクエストが飛んでくる可能性があります。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=nc>QueryPosts</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>posts</span><span class=p>(</span><span class=py>count</span><span class=p>:</span><span class=w> </span><span class=nc>100</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>    </span><span class=py>related</span><span class=p>(</span><span class=py>count</span><span class=p>:</span><span class=w> </span><span class=nc>100</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>      </span><span class=py>related</span><span class=p>(</span><span class=py>count</span><span class=p>:</span><span class=w> </span><span class=nc>100</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>        </span><span class=py>related</span><span class=p>(</span><span class=py>count</span><span class=p>:</span><span class=w> </span><span class=nc>100</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>          </span><span class=py>title</span><span class=w>
-</span><span class=w>        </span><span class=p>}</span><span class=w>
-</span><span class=w>      </span><span class=p>}</span><span class=w>
-</span><span class=w>    </span><span class=p>}</span><span class=w>
-</span><span class=w>  </span><span class=p>}</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div><p>コストのかかるリクエストを制限するためには、GraphQL サーバー側でクエリの <strong>ネスト数に制限</strong> をかけたり、<strong>Rate Limit</strong> を設けて実行可能なクエリ数を制限します。
-GitHub の GraphQL API にも Rate Limit が採用されています。</p>
-<ul>
-<li>参考: <a href=https://docs.github.com/en/graphql/overview/resource-limitations>Resource limitations - GitHub Docs</a></li>
-<li>参考: <a href=../../p/bqz7emt/>GitHub GraphQL API の呼び出し回数制限 (rate limit) の情報を取得する｜まくろぐ</a></li>
-</ul>
-<p>通常、フィールドごとにデータ取得のコストは異なるため、要求されたフィールドに応じてそのコストを計算するという実装になります。
+クライアント実装者に悪意がなくても、クエリの記述ミス（あるいは実装者の知識不足）により DOS 攻撃のようなリクエストが飛んでくる可能性があります。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>query</span><span class=w> </span><span class=nc>QueryPosts</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>posts</span><span class=p>(</span><span class=py>count</span><span class=p>:</span><span class=w> </span><span class=mi>100</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nc>related</span><span class=p>(</span><span class=py>count</span><span class=p>:</span><span class=w> </span><span class=mi>100</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nc>related</span><span class=p>(</span><span class=py>count</span><span class=p>:</span><span class=w> </span><span class=mi>100</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nc>related</span><span class=p>(</span><span class=py>count</span><span class=p>:</span><span class=w> </span><span class=mi>100</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nc>title</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><p>コストのかかるリクエストを制限するためには、GraphQL サーバー側でクエリの <strong>ネスト数に制限</strong> をかけたり、<strong>Rate Limit</strong> を設けて実行可能なクエリ数を制限します。
+GitHub の GraphQL API にも Rate Limit が採用されています。</p><ul><li>参考: <a href=https://docs.github.com/en/graphql/overview/resource-limitations>Resource limitations - GitHub Docs</a></li><li>参考: <a href=../../p/bqz7emt/>GitHub GraphQL API の呼び出し回数制限 (rate limit) の情報を取得する｜まくろぐ</a></li></ul><p>通常、フィールドごとにデータ取得のコストは異なるため、要求されたフィールドに応じてそのコストを計算するという実装になります。
 主要な GraphQL ライブラリには、クエリの複雑度（＝コスト）を計算するためのユーティリティが用意されています。
-下記は、Golang の gqlgen ライブラリにおけるクエリコスト計算の例です。</p>
-<ul>
-<li>参考: <a href=https://gqlgen.com/reference/complexity/>Preventing overly complex queries — gqlgen</a></li>
-</ul>
-<h2 id=クエリクライアント側>クエリ（クライアント側）</h2>
-<p>GraphQL API を使用するクライアント側で指定するドキュメント（クエリ）に関してのベストプラクティスです。</p>
-<h3 id=query-や-mutation-には操作名を付ける>query や mutation には操作名を付ける</h3>
-<p>操作名 (operation name) はマルチ操作ドキュメント (multi-operation document) 以外ではオプショナルとされていますが、サーバーサイドでのロギングに役立つので、なるべく記述するようにすべきです。
+下記は、Golang の gqlgen ライブラリにおけるクエリコスト計算の例です。</p><ul><li>参考: <a href=https://gqlgen.com/reference/complexity/>Preventing overly complex queries — gqlgen</a></li></ul><h2 id=クエリクライアント側>クエリ（クライアント側）</h2><p>GraphQL API を使用するクライアント側で指定するドキュメント（クエリ）に関してのベストプラクティスです。</p><h3 id=query-や-mutation-には操作名を付ける>query や mutation には操作名を付ける</h3><p>操作名 (operation name) はマルチ操作ドキュメント (multi-operation document) 以外ではオプショナルとされていますが、サーバーサイドでのロギングに役立つので、なるべく記述するようにすべきです。
 REST API の場合は、操作ごとにエンドポイントが変わるので、どのような API 呼び出しが行われたかトラックしやすいのですが、GraphQL の場合は単一のエンドポイントになるので、分かりやすい操作名を付けることがロギングのポイントになります。
-HTTP リクエストのペイロードに <code>operationName</code> が含まれるようになるので、Chrome のデベロッパーツールを使ったクライアントサイドでのデバッグにも役立ちます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>NG</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=nc>books</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=py>title</span><span class=w> </span><span class=py>author</span><span class=w> </span><span class=p>}</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>Good</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>query</span><span class=w> </span><span class=nc>QueryBooks</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>books</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=py>title</span><span class=w> </span><span class=py>author</span><span class=w> </span><span class=p>}</span><span class=w>
-</span><span class=w></span><span class=p>}</span></code></pre></div></div>
-</figure>
-<h3 id=static-なクエリドキュメントを使用する>static なクエリドキュメントを使用する</h3>
-<p>クエリドキュメント (<code>query {...}</code>) をプログラム実行時に動的に組み立てることは避け、静的な (static) クエリ文字列をそのまま扱うようにします（<code>StringBuilder</code> や <code>QueryBuilder</code> のようなものを使わない）。
+HTTP リクエストのペイロードに <code>operationName</code> が含まれるようになるので、Chrome のデベロッパーツールを使ったクライアントサイドでのデバッグにも役立ちます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>NG</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nc>books</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=py>title</span><span class=w> </span><span class=py>author</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><figure class=xCodeBlock><figcaption class=xCodeBlock_title>Good</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>query</span><span class=w> </span><span class=nc>QueryBooks</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>books</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=py>title</span><span class=w> </span><span class=py>author</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></div></div></figure><h3 id=static-なクエリドキュメントを使用する>static なクエリドキュメントを使用する</h3><p>クエリドキュメント (<code>query {...}</code>) をプログラム実行時に動的に組み立てることは避け、静的な (static) クエリ文字列をそのまま扱うようにします（<code>StringBuilder</code> や <code>QueryBuilder</code> のようなものを使わない）。
 通常は、クエリドキュメントを専用のファイル (<code>.graphql</code>) として作成するか、JavaScript のタグ付きテンプレート (<code>gql`...`</code>) などを使っていれば大丈夫です。
-static なクエリドキュメントには、様々な利点があります。</p>
-<dl>
-<dt>クエリ編集時のサポート機能</dt>
-<dd>VS Code や IntelliJ といった IDE には、GraphQL クエリ言語を扱うプラグインが用意されており、ほぼ実装言語を意識せずに使用できます。スキーマ定義を入力データとして設定しておけば、エディタ上での補完や検証ができるようになっています。</dd>
-<dt>各クエリ用の型ファイルの自動生成 (easier code generation)</dt>
-<dd>static なクエリドキュメント（とスキーマ定義）から、クエリレスポンスの型情報を自動生成することで、型安全かつ効率的なコーディングが可能になります。こういったツールとしては、<a href=../../p/n2k2hxd/>TypeScript の graphql-codegen</a> や、<a href=https://maku77.github.io/p/v48adgi/>Golang の gqlgen</a> などがあります。</dd>
-<dt>永続化クエリ (persisted queries)</dt>
-<dd>クライアントからの高コストなクエリを防ぐ方法として、永続化クエリという考え方があります。これは、アプリのリリース時に、必要なクエリに ID を割り当ててしまい、実際のクエリでは ID だけを送るという方法です。永続化クエリを取り入れるには、static なクエリ定義が必須になります。クエリ言語では変数を分離できるようになっているので、多少変化する部分があってもクエリの永続化が可能です。</dd>
-<dt>外部ツールとの連携 (better tooling)</dt>
-<dd>コード内で static なクエリドキュメントを使う設計になっていれば、GraphiQL などの開発ツールで試行錯誤して完成させたクエリをそのままコードに取り込むことができます。逆に、コード内のクエリを GraphiQL でテストするのも容易です。</dd>
-</dl>
-<p>要するに、共通言語としてクエリ言語があるのだから、それを最大限に活用せよということです。</p>
-<p>mutation 操作の場合は、可変なクエリになりやすいのではと思うかもしれません。
-例えば、次のようなスケジュール追加の mutation が定義されているとします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Mutation</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>addSchedule</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>AddScheduleInput</span><span class=p>!):</span><span class=w> </span><span class=nc>AddSchedulePayload</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div><p>クライアントが複数のスケジュールを同時に登録しようとした場合、複数の <code>addSchedule</code> 操作を呼び出すクエリを動的に生成することになってしまいます。
-このようなユースケースが存在する場合は、入力変数のフィールドとして複数の値を渡せるような API を用意します。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=kd>type</span><span class=w> </span><span class=nc>Mutation</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>addSchedule</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>AddScheduleInput</span><span class=p>!):</span><span class=w> </span><span class=nc>AddSchedulePayload</span><span class=w>
-</span><span class=w>  </span><span class=nc>addSchedules</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>AddSchedulesInput</span><span class=p>!):</span><span class=w> </span><span class=nc>AddSchedulesPayload</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span><span class=w>
-</span><span class=w></span><span class=nc>input</span><span class=w> </span><span class=py>AddSchedulesInput</span><span class=w> </span><span class=p>{</span><span class=w>
-</span><span class=w>  </span><span class=py>schedules</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>ScheduleInput</span><span class=p>!]!</span><span class=w>
-</span><span class=w>  </span><span class=c># ...</span><span class=w>
-</span><span class=w></span><span class=p>}</span><span class=w>
-</span></code></pre></div><p>こうすることで、可変部分は変数に切り出せるので、クエリ文字列を static に記述することができます。</p>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=../../p/vqsyz9j/>GraphQL スキーマ仕様: ユニオン型 (Union types) を定義する</a></li>
-<li><a href=../../p/n2k2hxd/>GraphQL Code Generator でスキーマから TypeScript の型情報を生成する (graphql-codegen)</a></li>
-<li><a href=../../p/dtwtpzj/>GraphQL クエリ仕様: クエリで変数を使用する</a></li>
-<li><a href=../../p/pk9c9qs/>GraphQL スキーマ仕様: ミューテーションを定義する（データ更新 API）</a></li>
-<li><a href=../../p/nhhwqtu/>GraphQL スキーマ仕様: 入力型 (input type) を定義する</a></li>
-<li><a href=../../p/isotm77/>GraphQL スキーマ仕様: 列挙型 (enum type) を定義する</a></li>
-<li><a href=../../p/tw75a7p/>GraphQL スキーマ仕様: 組み込みのスカラー型とカスタムスカラー型</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/graphql>GraphQL</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=../../p/cm9nyco/><span class=xArticle_up_label>GraphQL 関連記事</span><br>へ戻る</a>
-</div>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_next>
-<a href=../../p/mkc8gv2/>GraphQL 仕様</a>
-</div>
-</div>
-</aside>
-</article>
-<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+static なクエリドキュメントには、様々な利点があります。</p><dl><dt>クエリ編集時のサポート機能</dt><dd>VS Code や IntelliJ といった IDE には、GraphQL クエリ言語を扱うプラグインが用意されており、ほぼ実装言語を意識せずに使用できます。スキーマ定義を入力データとして設定しておけば、エディタ上での補完や検証ができるようになっています。</dd><dt>各クエリ用の型ファイルの自動生成 (easier code generation)</dt><dd>static なクエリドキュメント（とスキーマ定義）から、クエリレスポンスの型情報を自動生成することで、型安全かつ効率的なコーディングが可能になります。こういったツールとしては、<a href=../../p/n2k2hxd/>TypeScript の graphql-codegen</a> や、<a href=https://maku77.github.io/p/v48adgi/>Golang の gqlgen</a> などがあります。</dd><dt>永続化クエリ (persisted queries)</dt><dd>クライアントからの高コストなクエリを防ぐ方法として、永続化クエリという考え方があります。これは、アプリのリリース時に、必要なクエリに ID を割り当ててしまい、実際のクエリでは ID だけを送るという方法です。永続化クエリを取り入れるには、static なクエリ定義が必須になります。クエリ言語では変数を分離できるようになっているので、多少変化する部分があってもクエリの永続化が可能です。</dd><dt>外部ツールとの連携 (better tooling)</dt><dd>コード内で static なクエリドキュメントを使う設計になっていれば、GraphiQL などの開発ツールで試行錯誤して完成させたクエリをそのままコードに取り込むことができます。逆に、コード内のクエリを GraphiQL でテストするのも容易です。</dd></dl><p>要するに、共通言語としてクエリ言語があるのだから、それを最大限に活用せよということです。</p><p>mutation 操作の場合は、可変なクエリになりやすいのではと思うかもしれません。
+例えば、次のようなスケジュール追加の mutation が定義されているとします。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Mutation</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>addSchedule</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>AddScheduleInput</span><span class=p>!):</span><span class=w> </span><span class=nc>AddSchedulePayload</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><p>クライアントが複数のスケジュールを同時に登録しようとした場合、複数の <code>addSchedule</code> 操作を呼び出すクエリを動的に生成することになってしまいます。
+このようなユースケースが存在する場合は、入力変数のフィールドとして複数の値を渡せるような API を用意します。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>type</span><span class=w> </span><span class=nc>Mutation</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>addSchedule</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>AddScheduleInput</span><span class=p>!):</span><span class=w> </span><span class=nc>AddSchedulePayload</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nc>addSchedules</span><span class=p>(</span><span class=kd>input</span><span class=p>:</span><span class=w> </span><span class=nc>AddSchedulesInput</span><span class=p>!):</span><span class=w> </span><span class=nc>AddSchedulesPayload</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nc>input</span><span class=w> </span><span class=py>AddSchedulesInput</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=py>schedules</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=nc>ScheduleInput</span><span class=p>!]!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># ...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><p>こうすることで、可変部分は変数に切り出せるので、クエリ文字列を static に記述することができます。</p><meta itemprop=author content="まく"><span itemprop=publisher itemscope itemtype=https://schema.org/Organization><meta itemprop=name content="まく"></span><h3 style="border-bottom:1px solid gray">関連記事</h3><ul><li><a href=../../p/vqsyz9j/>GraphQL スキーマ仕様: ユニオン型 (Union types) を定義する</a></li><li><a href=../../p/n2k2hxd/>GraphQL Code Generator でスキーマから TypeScript の型情報を生成する (graphql-codegen)</a></li><li><a href=../../p/dtwtpzj/>GraphQL クエリ仕様: クエリで変数を使用する</a></li><li><a href=../../p/pk9c9qs/>GraphQL スキーマ仕様: ミューテーションを定義する（データ更新 API）</a></li><li><a href=../../p/nhhwqtu/>GraphQL スキーマ仕様: 入力型 (input type) を定義する</a></li><li><a href=../../p/isotm77/>GraphQL スキーマ仕様: 列挙型 (enum type) を定義する</a></li><li><a href=../../p/tw75a7p/>GraphQL スキーマ仕様: 組み込みのスカラー型とカスタムスカラー型</a></li></ul><div class=xPageTags><span class=xPageTags_item><a href=../../tags/graphql>GraphQL</a></span></div></div><div style=text-align:right><div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div></div><div class=xArticle_up><a href=../../p/cm9nyco/><span class=xArticle_up_label>GraphQL 関連記事</span><br>へ戻る</a></div><aside><div class=xPrevNextLink><div class=xPrevNextLink_next><a href=../../p/mkc8gv2/>GraphQL 仕様</a></div></div></aside></article><script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
 <ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
-<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
-</main>
-</div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/cm9nyco/>GraphQL</a>
-</span>
-<span class=xBreadcrumb_item>GraphQL ベストプラクティス
-</span>
-</div>
-</aside>
-<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
-<div id=xSiteFooter2>
-<a href=../../sitemap/>サイトマップ</a> ｜
-<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
-</div>
-</div>
-<script src=../../assets/js/sidebar.js></script>
-<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c],d=b.getElementsByTagName('img');if(d.length>0)continue;const e=b.getElementsByTagName('svg');if(e.length>0)continue;b.classList.add('xExternalLinkIcon'),b.setAttribute('target','_blank'),b.setAttribute('rel','noopener')}})</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"GraphQL","item":"https://maku.blog/p/cm9nyco/"},{"@type":"ListItem","position":4,"name":"GraphQL ベストプラクティス","item":"https://maku.blog/p/4reqy9i/"}]}</script>
-</body>
-</html>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/cm9nyco/>GraphQL</a></span>
+<span class=xBreadcrumb_item>GraphQL ベストプラクティス</span></div></aside><div id=xSiteFooter><a href=../../>まくろぐ</a></div><div id=xSiteFooter2><a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a></div></div><script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener("DOMContentLoaded",function(){const e=document.querySelectorAll("a[href^=http]");for(let n=0;n<e.length;++n){const t=e[n],s=t.getElementsByTagName("img");if(s.length>0)continue;const o=t.getElementsByTagName("svg");if(o.length>0)continue;t.classList.add("xExternalLinkIcon"),t.setAttribute("target","_blank"),t.setAttribute("rel","noopener")}})</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"GraphQL","item":"https://maku.blog/p/cm9nyco/"},{"@type":"ListItem","position":4,"name":"GraphQL ベストプラクティス","item":"https://maku.blog/p/4reqy9i/"}]}</script></body></html>

@@ -1,834 +1,131 @@
-<!doctype html><html lang=ja-jp>
-<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<title>Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる｜まくろぐ</title>
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
-<meta property="og:title" content="Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://maku.blog/p/ccoonon/">
-<meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/p/vrhjtds/azure-logo.jpg">
-<meta property="og:image:width" content="500">
-<meta property="og:image:height" content="281">
-<meta property="og:description" content="azure-storage パッケージのインストール Node.js から Azure Table Storage を操作するには、azure-storage というライブラリを使用します。 npm コマンドで簡単にインストールすることができます。
-azure-storage のインストール $ npm install --save azure-storage   参考: npm によるパッケージのインストール | Node.js ノート  TableService オブジェクトの生成 Azure Storage にアクセスするには、接続情報（ストレージアカウント名とキー）が必要になるので、Azure ポータル で確認しておいてください。
- 参考: Azure Storage の接続情報（キー）を確認する  接続情報としてデフォルトの環境変数を使用する Node.js から Table Storage を扱うには、azure-storage モジュールが提供する TableService クラス を使用します。 TableService のインスタンスは下記のように生成することができます。
-const azure = require('azure-storage'); const tableService = new azure.TableService();  上記のように、TableService のコンストラクのパラメータを何も指定しないと、接続のために下記のような環境変数が参照されます。
- AZURE_STORAGE_ACCOUNT &mldr; Azure Storage の「ストレージアカウント名」 AZURE_STORAGE_ACCESS_KEY &mldr; Azure Storage の「キー」 AZURE_STORAGE_CONNECTION_STRING &mldr; Azure Storage の「接続文字列」  1 と 2 を両方とも設定するか、3 を設定しておけば Azure Storage にアクセスできるようになります。">
-<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
-<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
-<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
-<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
-<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
-<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
-<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
-</head>
-<body>
-<div id=xRoot>
-<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/vrhjtds/>Azure</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/um2wi2o/>Azure Storage のメモ</a>
-</span>
-<span class=xBreadcrumb_item>Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる
-</span>
-</div>
-</aside>
-<div id=xContainer>
-<nav id=xMenu aria-label=メニュー>
-<div id=sidebar style=height:100%>
-<div id=sidebar_notFixed>
-<a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a>
-<div class=xMenu_box data-sticky>
-<form action=https://cse.google.com/cse target=_blank>
-<div class=xSearchBox>
-<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<!doctype html><html lang=ja-jp><head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#"><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる｜まくろぐ</title><script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-63069513-4")</script><meta property="og:site_name" content="まくろぐ"><meta property="og:title" content="Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる"><meta property="og:type" content="website"><meta property="og:url" content="https://maku.blog/p/ccoonon/"><meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/p/vrhjtds/azure-logo.jpg"><meta property="og:image:width" content="500"><meta property="og:image:height" content="281"><meta property="og:description" content="azure-storage パッケージのインストール Node.js から Azure Table Storage を操作するには、azure-storage というライブラリを使用します。 npm コマンドで簡単にインストールすることができます。
+azure-storage のインストール $ npm install --save azure-storage 参考: npm によるパッケージのインストール | Node.js ノート TableService オブジェクトの生成 Azure Storage にアクセスするには、接続情報（ストレージアカウント名とキー）が必要になるので、Azure ポータル で確認しておいてください。
+参考: Azure Storage の接続情報（キー）を確認する 接続情報としてデフォルトの環境変数を使用する Node.js から Table Storage を扱うには、azure-storage モジュールが提供する TableService クラス を使用します。 TableService のインスタンスは下記のように生成することができます。
+const azure = require('azure-storage'); const tableService = new azure.TableService(); 上記のように、TableService のコンストラクのパラメータを何も指定しないと、接続のために下記のような環境変数が参照されます。
+AZURE_STORAGE_ACCOUNT &mldr; Azure Storage の「ストレージアカウント名」 AZURE_STORAGE_ACCESS_KEY &mldr; Azure Storage の「キー」 AZURE_STORAGE_CONNECTION_STRING &mldr; Azure Storage の「接続文字列」 1 と 2 を両方とも設定するか、3 を設定しておけば Azure Storage にアクセスできるようになります。"><meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css><link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico><link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png><link rel=apple-touch-icon href=../../assets/favicon/180x180.png><script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script><style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style><script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script></head><body><div id=xRoot><div id=xSiteHeader><a href=../../>まくろぐ</a></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/vrhjtds/>Azure</a></span>
+<span class=xBreadcrumb_item><a href=../../p/um2wi2o/>Azure Storage のメモ</a></span>
+<span class=xBreadcrumb_item>Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる</span></div></aside><div id=xContainer><nav id=xMenu aria-label=メニュー><div id=sidebar style=height:100%><div id=sidebar_notFixed><a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a><div class=xMenu_box data-sticky><form action=https://cse.google.com/cse target=_blank><div class=xSearchBox><input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
 <input type=hidden name=ie value=UTF-8>
 <input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
-<input type=submit value=検索></input>
-</div>
-</form>
-<div class=xMenu_box_body>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
-<div class=xMenu_box_body>
-<div class=xBoxLink>
-<a href=../../p/zycmw6f/>
-Next.js アプリに Google Analytics を設定する (next/script)
-<time>2023-03-21</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/cv6fpx7/>
-React で入力フォームの onChange イベントを IME ON のときに無視する
-<time>2023-01-29</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/bo8q8p7/>
-Meilisearch サーチエンジンを使ってみる
-<time>2023-01-24</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/y6zgrg2/>
-Docker で MongoDB サーバーを立ち上げる
-<time>2023-01-18</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/3pwojuj/>
-Deno で MongoDB にアクセスする
-<time>2023-01-18</time></a>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3>
-<div class=xMenu_box_body>
-<div class=xNavTree>
-<ul>
-<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
-<ul>
-<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
-<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
-<ul>
-<li><a class=xNavTree-dir href=../../p/xjwakv8/>Cosmos DB</a>
-<li><a class=xNavTree-dir href=../../p/59jt4ck/>Azure Functions</a>
-<li><a class=xNavTree-dir href=../../p/fe7aiyp/>Azure DevOps</a>
-<li><a class=xNavTree-dir href=../../p/um2wi2o/>Azure Storage のメモ</a>
-<ul>
-</ul>
-<li><a class=xNavTree-dir href=../../p/3u2m6an/>Azure AppServices のメモ</a>
-<li><a class=xNavTree-dir href=../../p/d8apqgw/>LUIS のメモ</a>
-<li><a class=xNavTree-dir href=../../p/joexet9/>QnA Maker のメモ</a>
-<li><a class=xNavTree-dir href=../../p/yya9sbm/>逆引き Azure CLI</a>
-<li><a class=xNavTree-dir href=../../p/k43zbd8/>チャットボット</a>
-</ul>
-<li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a>
-<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
-<li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a>
-<li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a>
-<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
-<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
-<li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a>
-<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
-<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
-<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
-<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
-<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
-<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
-<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
-<li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a>
-<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
-<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
-<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
-<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
-<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
-<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
-<li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a>
-</ul>
-<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
-<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
-<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
-<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
-<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
-<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
-<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
-</ul>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
-<div class=xMenu_box_body><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws>aws (61)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure>azure (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/typescript>typescript (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/next.js>next.js (38)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/graphql>graphql (35)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/react>react (29)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/chatbot>chatbot (28)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/gnuplot>gnuplot (27)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cdk>aws/cdk (26)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/linux>linux (25)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github>github (24)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ansible>ansible (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/node.js>node.js (19)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/electron>electron (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mongodb>mongodb (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/protocol-buffers>protocol-buffers (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vs-code>vs-code (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/javascript>javascript (13)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cognito>aws/cognito (12)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/nginx>nginx (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/android>android (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/lambda>aws/lambda (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/java>java (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/python>python (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ssh>ssh (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/uml>uml (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/3d>3d (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sam>aws/sam (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/docker>docker (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/firestore>firebase/firestore (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unity>unity (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webgl>webgl (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo>apollo (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-cli>azure-cli (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/deno>deno (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jade>jade (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/material-ui>material-ui (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cli>aws/cli (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-storage>azure-storage (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/doxygen>doxygen (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/c/c++>c/c++ (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-actions>github-actions (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/luis>luis (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/qna-maker>qna-maker (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/ssm>aws/ssm (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/eslint>eslint (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase>firebase (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-pages>github-pages (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html/css>html/css (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jekyll>jekyll (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/lets-encrypt>lets-encrypt (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sql>sql (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/windows>windows (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-functions>azure-functions (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cosmos-db>cosmos-db (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/grpc>grpc (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/hugo>hugo (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/kotlin>kotlin (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mac>mac (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/powershell>powershell (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/prettier>prettier (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sqlite>sqlite (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/textlint>textlint (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tv>tv (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apache>apache (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/arib>arib (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/amplify>aws/amplify (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/appsync>aws/appsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/iam>aws/iam (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/kms>aws/kms (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/s3>aws/s3 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sdk>aws/sdk (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-app-service>azure-app-service (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/excel>excel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/go>go (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/http>http (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/json>json (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mui>mui (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/npm>npm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/oauth>oauth (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/opengl>opengl (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/rsync>rsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/scp>scp (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/slack>slack (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teraterm>teraterm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unicode>unicode (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vercel>vercel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/zip>zip (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/.net>.net (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/androidstudio>androidstudio (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo-server>apollo-server (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/atomic-design>atomic-design (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/blender>blender (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bluetooth>bluetooth (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bootstrap>bootstrap (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-framework>bot-framework (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/boto3>boto3 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/certbot>certbot (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cloudflare>cloudflare (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/css>css (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dns>dns (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dvb>dvb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/editorconfig>editorconfig (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/evernote>evernote (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/git>git (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/golang>golang (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/google-analytics>google-analytics (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/groovy>groovy (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html>html (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/igdb>igdb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/iso>iso (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jest>jest (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/macos>macos (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/meilisearch>meilisearch (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/parcel>parcel (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/raspberrypi>raspberrypi (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teams>teams (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tex>tex (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ubuntu>ubuntu (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/url>url (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vim>vim (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vps>vps (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/web>web (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webpack>webpack (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/wsl>wsl (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
-</div></div>
-</div>
-<div class=xMenu_box data-sticky><br></div>
-</div>
-<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
-</div>
-</div>
-</nav>
-<main id=xMain>
-<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/o8ufwct/>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる</a>
-</div>
-<div class=xPrevNextLink_next>
-<a href=../../p/gkardu9/>Azure Storage で静的 Web サイトをホスティングする</a>
-</div>
-</div>
-</aside>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<input type=submit value=検索></input></div></form><div class=xMenu_box_body></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3><div class=xMenu_box_body><div class=xBoxLink><a href=../../p/zycmw6f/>Next.js アプリに Google Analytics を設定する (next/script)
+<time>2023-03-21</time></a></div><div class=xBoxLink><a href=../../p/cv6fpx7/>React で入力フォームの onChange イベントを IME ON のときに無視する
+<time>2023-01-29</time></a></div><div class=xBoxLink><a href=../../p/bo8q8p7/>Meilisearch サーチエンジンを使ってみる
+<time>2023-01-24</time></a></div><div class=xBoxLink><a href=../../p/y6zgrg2/>Docker で MongoDB サーバーを立ち上げる
+<time>2023-01-18</time></a></div><div class=xBoxLink><a href=../../p/3pwojuj/>Deno で MongoDB にアクセスする
+<time>2023-01-18</time></a></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3><div class=xMenu_box_body><div class=xNavTree><ul><li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a><ul><li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a><li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a><ul><li><a class=xNavTree-dir href=../../p/xjwakv8/>Cosmos DB</a><li><a class=xNavTree-dir href=../../p/59jt4ck/>Azure Functions</a><li><a class=xNavTree-dir href=../../p/fe7aiyp/>Azure DevOps</a><li><a class=xNavTree-dir href=../../p/um2wi2o/>Azure Storage のメモ</a><ul></ul><li><a class=xNavTree-dir href=../../p/3u2m6an/>Azure AppServices のメモ</a><li><a class=xNavTree-dir href=../../p/d8apqgw/>LUIS のメモ</a><li><a class=xNavTree-dir href=../../p/joexet9/>QnA Maker のメモ</a><li><a class=xNavTree-dir href=../../p/yya9sbm/>逆引き Azure CLI</a><li><a class=xNavTree-dir href=../../p/k43zbd8/>チャットボット</a></ul><li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a><li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a><li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a><li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a><li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a><li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a><li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a><li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a><li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a><li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a><li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a><li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a><li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a><li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a><li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a><li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a><li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a><li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a><li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a><li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a><li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a><li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a></ul><li><a class=xNavTree-dir href=../../p/35odek9/>読書</a><li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a><li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a><li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a><li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a><li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a><li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a></ul></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3><div class=xMenu_box_body><div class=xMenu_tag><a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a></div><div class=xMenu_tag><a href=../../tags/aws>aws (61)</a></div><div class=xMenu_tag><a href=../../tags/azure>azure (58)</a></div><div class=xMenu_tag><a href=../../tags/typescript>typescript (58)</a></div><div class=xMenu_tag><a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a></div><div class=xMenu_tag><a href=../../tags/next.js>next.js (38)</a></div><div class=xMenu_tag><a href=../../tags/graphql>graphql (35)</a></div><div class=xMenu_tag><a href=../../tags/react>react (29)</a></div><div class=xMenu_tag><a href=../../tags/chatbot>chatbot (28)</a></div><div class=xMenu_tag><a href=../../tags/gnuplot>gnuplot (27)</a></div><div class=xMenu_tag><a href=../../tags/aws/cdk>aws/cdk (26)</a></div><div class=xMenu_tag><a href=../../tags/linux>linux (25)</a></div><div class=xMenu_tag><a href=../../tags/github>github (24)</a></div><div class=xMenu_tag><a href=../../tags/ansible>ansible (21)</a></div><div class=xMenu_tag><a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a></div><div class=xMenu_tag><a href=../../tags/node.js>node.js (19)</a></div><div class=xMenu_tag><a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a></div><div class=xMenu_tag><a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a></div><div class=xMenu_tag><a href=../../tags/electron>electron (15)</a></div><div class=xMenu_tag><a href=../../tags/mongodb>mongodb (15)</a></div><div class=xMenu_tag><a href=../../tags/protocol-buffers>protocol-buffers (14)</a></div><div class=xMenu_tag><a href=../../tags/vs-code>vs-code (14)</a></div><div class=xMenu_tag><a href=../../tags/javascript>javascript (13)</a></div><div class=xMenu_tag><a href=../../tags/aws/cognito>aws/cognito (12)</a></div><div class=xMenu_tag><a href=../../tags/nginx>nginx (11)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a></div><div class=xMenu_tag><a href=../../tags/android>android (10)</a></div><div class=xMenu_tag><a href=../../tags/aws/lambda>aws/lambda (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a></div><div class=xMenu_tag><a href=../../tags/java>java (9)</a></div><div class=xMenu_tag><a href=../../tags/python>python (9)</a></div><div class=xMenu_tag><a href=../../tags/ssh>ssh (9)</a></div><div class=xMenu_tag><a href=../../tags/uml>uml (9)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a></div><div class=xMenu_tag><a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a></div><div class=xMenu_tag><a href=../../tags/3d>3d (8)</a></div><div class=xMenu_tag><a href=../../tags/aws/sam>aws/sam (8)</a></div><div class=xMenu_tag><a href=../../tags/docker>docker (8)</a></div><div class=xMenu_tag><a href=../../tags/firebase/firestore>firebase/firestore (8)</a></div><div class=xMenu_tag><a href=../../tags/unity>unity (8)</a></div><div class=xMenu_tag><a href=../../tags/webgl>webgl (8)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a></div><div class=xMenu_tag><a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a></div><div class=xMenu_tag><a href=../../tags/apollo>apollo (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-cli>azure-cli (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-pipelines>azure-pipelines (7)</a></div><div class=xMenu_tag><a href=../../tags/deno>deno (7)</a></div><div class=xMenu_tag><a href=../../tags/jade>jade (7)</a></div><div class=xMenu_tag><a href=../../tags/material-ui>material-ui (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a></div><div class=xMenu_tag><a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a></div><div class=xMenu_tag><a href=../../tags/aws/cli>aws/cli (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-storage>azure-storage (6)</a></div><div class=xMenu_tag><a href=../../tags/doxygen>doxygen (6)</a></div><div class=xMenu_tag><a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-table-storage>azure-table-storage (5)</a></div><div class=xMenu_tag><a href=../../tags/c/c++>c/c++ (5)</a></div><div class=xMenu_tag><a href=../../tags/github-actions>github-actions (5)</a></div><div class=xMenu_tag><a href=../../tags/luis>luis (5)</a></div><div class=xMenu_tag><a href=../../tags/qna-maker>qna-maker (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a></div><div class=xMenu_tag><a href=../../tags/aws/ssm>aws/ssm (4)</a></div><div class=xMenu_tag><a href=../../tags/eslint>eslint (4)</a></div><div class=xMenu_tag><a href=../../tags/firebase>firebase (4)</a></div><div class=xMenu_tag><a href=../../tags/github-pages>github-pages (4)</a></div><div class=xMenu_tag><a href=../../tags/html/css>html/css (4)</a></div><div class=xMenu_tag><a href=../../tags/jekyll>jekyll (4)</a></div><div class=xMenu_tag><a href=../../tags/lets-encrypt>lets-encrypt (4)</a></div><div class=xMenu_tag><a href=../../tags/sql>sql (4)</a></div><div class=xMenu_tag><a href=../../tags/windows>windows (4)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a></div><div class=xMenu_tag><a href=../../tags/azure-functions>azure-functions (3)</a></div><div class=xMenu_tag><a href=../../tags/cosmos-db>cosmos-db (3)</a></div><div class=xMenu_tag><a href=../../tags/grpc>grpc (3)</a></div><div class=xMenu_tag><a href=../../tags/hugo>hugo (3)</a></div><div class=xMenu_tag><a href=../../tags/kotlin>kotlin (3)</a></div><div class=xMenu_tag><a href=../../tags/mac>mac (3)</a></div><div class=xMenu_tag><a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a></div><div class=xMenu_tag><a href=../../tags/powershell>powershell (3)</a></div><div class=xMenu_tag><a href=../../tags/prettier>prettier (3)</a></div><div class=xMenu_tag><a href=../../tags/sqlite>sqlite (3)</a></div><div class=xMenu_tag><a href=../../tags/textlint>textlint (3)</a></div><div class=xMenu_tag><a href=../../tags/tv>tv (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a></div><div class=xMenu_tag><a href=../../tags/apache>apache (2)</a></div><div class=xMenu_tag><a href=../../tags/arib>arib (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/amplify>aws/amplify (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/appsync>aws/appsync (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/codebuild>aws/codebuild (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/iam>aws/iam (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/kms>aws/kms (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/s3>aws/s3 (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/sdk>aws/sdk (2)</a></div><div class=xMenu_tag><a href=../../tags/azure-app-service>azure-app-service (2)</a></div><div class=xMenu_tag><a href=../../tags/excel>excel (2)</a></div><div class=xMenu_tag><a href=../../tags/firebase/authentication>firebase/authentication (2)</a></div><div class=xMenu_tag><a href=../../tags/go>go (2)</a></div><div class=xMenu_tag><a href=../../tags/http>http (2)</a></div><div class=xMenu_tag><a href=../../tags/json>json (2)</a></div><div class=xMenu_tag><a href=../../tags/mui>mui (2)</a></div><div class=xMenu_tag><a href=../../tags/npm>npm (2)</a></div><div class=xMenu_tag><a href=../../tags/oauth>oauth (2)</a></div><div class=xMenu_tag><a href=../../tags/opengl>opengl (2)</a></div><div class=xMenu_tag><a href=../../tags/rsync>rsync (2)</a></div><div class=xMenu_tag><a href=../../tags/scp>scp (2)</a></div><div class=xMenu_tag><a href=../../tags/slack>slack (2)</a></div><div class=xMenu_tag><a href=../../tags/teraterm>teraterm (2)</a></div><div class=xMenu_tag><a href=../../tags/unicode>unicode (2)</a></div><div class=xMenu_tag><a href=../../tags/vercel>vercel (2)</a></div><div class=xMenu_tag><a href=../../tags/zip>zip (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a></div><div class=xMenu_tag><a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a></div><div class=xMenu_tag><a href=../../tags/.net>.net (1)</a></div><div class=xMenu_tag><a href=../../tags/androidstudio>androidstudio (1)</a></div><div class=xMenu_tag><a href=../../tags/apollo-server>apollo-server (1)</a></div><div class=xMenu_tag><a href=../../tags/atomic-design>atomic-design (1)</a></div><div class=xMenu_tag><a href=../../tags/blender>blender (1)</a></div><div class=xMenu_tag><a href=../../tags/bluetooth>bluetooth (1)</a></div><div class=xMenu_tag><a href=../../tags/bootstrap>bootstrap (1)</a></div><div class=xMenu_tag><a href=../../tags/bot-framework>bot-framework (1)</a></div><div class=xMenu_tag><a href=../../tags/boto3>boto3 (1)</a></div><div class=xMenu_tag><a href=../../tags/certbot>certbot (1)</a></div><div class=xMenu_tag><a href=../../tags/cloudflare>cloudflare (1)</a></div><div class=xMenu_tag><a href=../../tags/css>css (1)</a></div><div class=xMenu_tag><a href=../../tags/dns>dns (1)</a></div><div class=xMenu_tag><a href=../../tags/dvb>dvb (1)</a></div><div class=xMenu_tag><a href=../../tags/editorconfig>editorconfig (1)</a></div><div class=xMenu_tag><a href=../../tags/evernote>evernote (1)</a></div><div class=xMenu_tag><a href=../../tags/git>git (1)</a></div><div class=xMenu_tag><a href=../../tags/golang>golang (1)</a></div><div class=xMenu_tag><a href=../../tags/google-analytics>google-analytics (1)</a></div><div class=xMenu_tag><a href=../../tags/groovy>groovy (1)</a></div><div class=xMenu_tag><a href=../../tags/html>html (1)</a></div><div class=xMenu_tag><a href=../../tags/igdb>igdb (1)</a></div><div class=xMenu_tag><a href=../../tags/iso>iso (1)</a></div><div class=xMenu_tag><a href=../../tags/jest>jest (1)</a></div><div class=xMenu_tag><a href=../../tags/macos>macos (1)</a></div><div class=xMenu_tag><a href=../../tags/meilisearch>meilisearch (1)</a></div><div class=xMenu_tag><a href=../../tags/parcel>parcel (1)</a></div><div class=xMenu_tag><a href=../../tags/raspberrypi>raspberrypi (1)</a></div><div class=xMenu_tag><a href=../../tags/teams>teams (1)</a></div><div class=xMenu_tag><a href=../../tags/tex>tex (1)</a></div><div class=xMenu_tag><a href=../../tags/ubuntu>ubuntu (1)</a></div><div class=xMenu_tag><a href=../../tags/url>url (1)</a></div><div class=xMenu_tag><a href=../../tags/vim>vim (1)</a></div><div class=xMenu_tag><a href=../../tags/vps>vps (1)</a></div><div class=xMenu_tag><a href=../../tags/web>web (1)</a></div><div class=xMenu_tag><a href=../../tags/webpack>webpack (1)</a></div><div class=xMenu_tag><a href=../../tags/wsl>wsl (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a></div></div></div><div class=xMenu_box data-sticky><br></div></div><div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem></div></div></nav><main id=xMain><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting><aside><div class=xPrevNextLink><div class=xPrevNextLink_prev><a href=../../p/o8ufwct/>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる</a></div><div class=xPrevNextLink_next><a href=../../p/gkardu9/>Azure Storage で静的 Web サイトをホスティングする</a></div></div></aside><header class=xArticle_headerBox><div><span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/vrhjtds/>Azure</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=../../p/um2wi2o/>Azure Storage のメモ</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=../../p/vrhjtds/azure-icon.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/ccoonon/>Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/azure-table-storage>Azure Table Storage</a></span>
-<span class=xPageTags_item><a href=../../tags/node.js>Node.js</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2020-01-31>2020-01-31</time><br>
-作成: <time itemprop=datePublished datetime=2020-01-31>2020-01-31</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#azure-storage-パッケージのインストール>azure-storage パッケージのインストール</a></li>
-<li><a href=#tableservice-オブジェクトの生成>TableService オブジェクトの生成</a>
-<ul>
-<li><a href=#接続情報としてデフォルトの環境変数を使用する>接続情報としてデフォルトの環境変数を使用する</a></li>
-<li><a href=#接続情報を明示的に指定する>接続情報を明示的に指定する</a></li>
-<li><a href=#プロキシ環境からアクセスする場合>プロキシ環境からアクセスする場合</a></li>
-</ul>
-</li>
-<li><a href=#テーブルの操作>テーブルの操作</a>
-<ul>
-<li><a href=#テーブルを作成する-createtable-createtableifnotexists>テーブルを作成する (createTable, createTableIfNotExists)</a></li>
-</ul>
-</li>
-<li><a href=#エンティティの操作>エンティティの操作</a>
-<ul>
-<li><a href=#エンティティを取得する-queryentities>エンティティを取得する (queryEntities)</a></li>
-</ul>
-</li>
-</ul>
-</nav><h2 id=azure-storage-パッケージのインストール>azure-storage パッケージのインストール</h2>
-<p>Node.js から Azure Table Storage を操作するには、<a href=https://www.npmjs.com/package/azure-storage><code>azure-storage</code></a> というライブラリを使用します。
-<code>npm</code> コマンドで簡単にインストールすることができます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>azure-storage のインストール</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ npm install --save azure-storage</code></pre></div></div>
-</figure>
-<ul>
-<li>参考: <a href=https://maku77.github.io/nodejs/npm/install-package.html>npm によるパッケージのインストール | Node.js ノート</a></li>
-</ul>
-<h2 id=tableservice-オブジェクトの生成>TableService オブジェクトの生成</h2>
-<p>Azure Storage にアクセスするには、接続情報（ストレージアカウント名とキー）が必要になるので、<a href=https://portal.azure.com/>Azure ポータル</a> で確認しておいてください。</p>
-<ul>
-<li>参考: <a href=../../p/dofzeua>Azure Storage の接続情報（キー）を確認する</a></li>
-</ul>
-<h3 id=接続情報としてデフォルトの環境変数を使用する>接続情報としてデフォルトの環境変数を使用する</h3>
-<p>Node.js から Table Storage を扱うには、<code>azure-storage</code> モジュールが提供する <a href=https://azure.github.io/azure-storage-node/TableService.html>TableService クラス</a> を使用します。
-<code>TableService</code> のインスタンスは下記のように生成することができます。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=kr>const</span> <span class=nx>azure</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;azure-storage&#39;</span><span class=p>);</span>
-
-<span class=kr>const</span> <span class=nx>tableService</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>azure</span><span class=p>.</span><span class=nx>TableService</span><span class=p>();</span></code></pre></div></div>
-</figure>
-<p>上記のように、<code>TableService</code> のコンストラクのパラメータを何も指定しないと、接続のために下記のような環境変数が参照されます。</p>
-<ol>
-<li><b>AZURE_STORAGE_ACCOUNT</b>
-&mldr; Azure Storage の「ストレージアカウント名」</li>
-<li><b>AZURE_STORAGE_ACCESS_KEY</b>
-&mldr; Azure Storage の「キー」</li>
-<li><b>AZURE_STORAGE_CONNECTION_STRING</b>
-&mldr; Azure Storage の「接続文字列」</li>
-</ol>
-<p>1 と 2 を両方とも設定するか、3 を設定しておけば Azure Storage にアクセスできるようになります。</p>
-<h3 id=接続情報を明示的に指定する>接続情報を明示的に指定する</h3>
-<p><code>TableService</code> のコンストラクタの引数で、明示的に接続情報を渡すこともできます。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=c1>// 接続文字列だけを渡す場合
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>tableService</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>azure</span><span class=p>.</span><span class=nx>TableService</span><span class=p>(</span><span class=nx>connectionString</span><span class=p>);</span>
-
-<span class=c1>// ストレージアカウント名とキーのペアを渡す場合
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>tableService</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>azure</span><span class=p>.</span><span class=nx>TableService</span><span class=p>(</span><span class=nx>storageAccount</span><span class=p>,</span> <span class=nx>storageAccessKey</span><span class=p>);</span></code></pre></div></div>
-</figure>
-<p>複数のストレージアカウントを使い分けたい場合は、<strong>独自の環境変数に「接続文字列」を設定しておく</strong>とよいでしょう。
-ここでは、<code>MAKU_AZURE_STORAGE_CONNECTION_STRING</code> という環境変数に「接続文字列」を設定してみます。</p>
-<figure class=xImage>
-<a href=../../p/ccoonon/img-env-var.png target=_blank>
-<img width=653 height=165 src=../../p/ccoonon/img-env-var.png alt=/p/ccoonon/img-env-var.png>
-</a>
-</figure>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=kr>const</span> <span class=nx>azure</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;azure-storage&#39;</span><span class=p>);</span>
-
-<span class=c1>// Azure Storage の接続文字列を環境変数から取得
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>connectionString</span> <span class=o>=</span> <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>MAKU_AZURE_STORAGE_CONNECTION_STRING</span><span class=p>;</span>
-<span class=k>if</span> <span class=p>(</span><span class=k>typeof</span> <span class=nx>connectionString</span> <span class=o>===</span> <span class=s1>&#39;undefined&#39;</span><span class=p>)</span> <span class=p>{</span>
-  <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=s1>&#39;MAKU_AZURE_STORAGE_CONNECTION_STRING is not set&#39;</span><span class=p>);</span>
-  <span class=nx>process</span><span class=p>.</span><span class=nx>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
-<span class=p>}</span>
-
-<span class=c1>// TableService オブジェクトを取得
-</span><span class=c1></span><span class=kr>const</span> <span class=nx>tableService</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>azure</span><span class=p>.</span><span class=nx>TableService</span><span class=p>(</span><span class=nx>connectionString</span><span class=p>);</span></code></pre></div></div>
-</figure>
-<h3 id=プロキシ環境からアクセスする場合>プロキシ環境からアクセスする場合</h3>
-<p><code>TableService</code> クラスをプロキシ環境内で使用する場合は、OS の <strong><code>https_proxy</code></strong> 環境変数で設定してしまうのが簡単です。
-OS の <code>https_proxy</code> 環境変数を設定するのを避けたいときは、<code>TableService</code> クラスの <code>setProxy()</code> メソッドを使ってプロキシを設定することもできます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>プロキシ情報をハードコードする</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>tableService</span><span class=p>.</span><span class=nx>setProxy</span><span class=p>(</span><span class=s1>&#39;http://proxy.example.com:12345&#39;</span><span class=p>);</span></code></pre></div></div>
-</figure>
-<p>プロキシ情報は環境変数で定義したいけど、OS の <code>https_proxy</code> 環境変数を設定するのは避けたいということであれば、例えば、独自の <code>MAKU_AZURE_PROXY</code> のような <strong>独自の環境変数</strong> を用意するとよいでしょう。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=c1>// MAKU_AZURE_PROXY 環境変数が設定されていたらプロキシ情報として使う
-</span><span class=c1></span><span class=k>if</span> <span class=p>(</span><span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>MAKU_AZURE_PROXY</span><span class=p>)</span> <span class=p>{</span>
-  <span class=nx>tableService</span><span class=p>.</span><span class=nx>setProxy</span><span class=p>(</span><span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>MAKU_AZURE_PROXY</span><span class=p>);</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<h2 id=テーブルの操作>テーブルの操作</h2>
-<p>ここから先のテーブル操作に関しては、前述の <code>TableService</code> オブジェクトの生成が終わっていることを想定しています。</p>
-<h3 id=テーブルを作成する-createtable-createtableifnotexists>テーブルを作成する (createTable, createTableIfNotExists)</h3>
-<p>Table Storage 上に、新しいテーブルを作成するには、<code>TableService</code> クラスの下記のメソッドを使用します。</p>
-<ul>
-<li><a href=https://azure.github.io/azure-storage-node/TableService.html#createTable__anchor>createTable() メソッド</a></li>
-<li><a href=https://azure.github.io/azure-storage-node/TableService.html#createTableIfNotExists__anchor>createTableIfNotExists() メソッド</a></li>
-</ul>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>mytable テーブルを作成する</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>tableService</span><span class=p>.</span><span class=nx>createTableIfNotExists</span><span class=p>(</span><span class=s1>&#39;mytable&#39;</span><span class=p>,</span> <span class=kd>function</span><span class=p>(</span><span class=nx>error</span><span class=p>,</span> <span class=nx>result</span><span class=p>,</span> <span class=nx>response</span><span class=p>)</span> <span class=p>{</span>
-  <span class=k>if</span> <span class=p>(</span><span class=nx>error</span><span class=p>)</span> <span class=p>{</span>
-    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>error</span><span class=p>);</span>
-    <span class=nx>process</span><span class=p>.</span><span class=nx>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
-  <span class=p>}</span>
-
-  <span class=c1>// result contains true if created; false if already exists
-</span><span class=c1></span>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
-<span class=p>});</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>実行結果（テーブルが作成された場合）</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
-  <span class=nx>isSuccessful</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
-  <span class=nx>statusCode</span><span class=o>:</span> <span class=mi>204</span><span class=p>,</span>
-  <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;mytable&#39;</span><span class=p>,</span>
-  <span class=nx>created</span><span class=o>:</span> <span class=kc>true</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>実行結果（テーブルが既に存在していた場合）</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>{</span>
-  <span class=nx>isSuccessful</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
-  <span class=nx>statusCode</span><span class=o>:</span> <span class=mi>200</span><span class=p>,</span>
-  <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;mytable&#39;</span><span class=p>,</span>
-  <span class=nx>created</span><span class=o>:</span> <span class=kc>false</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<h2 id=エンティティの操作>エンティティの操作</h2>
-<h3 id=エンティティを取得する-queryentities>エンティティを取得する (queryEntities)</h3>
-<p>条件を指定してエンティティのリストを取得するには、<code>TableService</code> クラスの <a href=https://azure.github.io/azure-storage-node/TableService.html#queryEntities__anchor>queryEntities() メソッド</a> を使用します。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>books テーブルのエンティティをすべて取得</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>tableService</span><span class=p>.</span><span class=nx>queryEntities</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>,</span> <span class=kc>null</span><span class=p>,</span> <span class=kc>null</span><span class=p>,</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>error</span><span class=p>,</span> <span class=nx>result</span><span class=p>)</span> <span class=p>{</span>
-  <span class=k>if</span> <span class=p>(</span><span class=nx>error</span><span class=p>)</span> <span class=p>{</span>
-    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>error</span><span class=p>);</span>
-    <span class=nx>process</span><span class=p>.</span><span class=nx>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
-  <span class=p>}</span>
-
-  <span class=kr>const</span> <span class=nx>entries</span> <span class=o>=</span> <span class=nx>result</span><span class=p>.</span><span class=nx>entries</span><span class=p>;</span>
-  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>entries</span><span class=p>);</span>
-<span class=p>});</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>実行結果</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>[</span>
-  <span class=p>{</span>
-    <span class=nx>PartitionKey</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.String&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;book&#39;</span> <span class=p>},</span>
-    <span class=nx>RowKey</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.String&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;001&#39;</span> <span class=p>},</span>
-    <span class=nx>Timestamp</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.DateTime&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=mi>2020</span><span class=o>-</span><span class=mi>01</span><span class=o>-</span><span class=mi>29</span><span class=nx>T02</span><span class=o>:</span><span class=mi>28</span><span class=o>:</span><span class=mf>15.137</span><span class=nx>Z</span> <span class=p>},</span>
-    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;まくの秘密&#39;</span> <span class=p>},</span>
-    <span class=nx>Author</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;まく&#39;</span> <span class=p>},</span>
-    <span class=s1>&#39;.metadata&#39;</span><span class=o>:</span> <span class=p>{</span> <span class=nx>etag</span><span class=o>:</span> <span class=sb>`W/&#34;datetime&#39;2020-01-29T02%3A28%3A15.1370872Z&#39;&#34;`</span> <span class=p>}</span>
-  <span class=p>},</span>
-  <span class=p>{</span>
-    <span class=nx>PartitionKey</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.String&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;book&#39;</span> <span class=p>},</span>
-    <span class=nx>RowKey</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.String&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;002&#39;</span> <span class=p>},</span>
-    <span class=nx>Timestamp</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.DateTime&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=mi>2020</span><span class=o>-</span><span class=mi>01</span><span class=o>-</span><span class=mi>29</span><span class=nx>T02</span><span class=o>:</span><span class=mi>29</span><span class=o>:</span><span class=mf>48.875</span><span class=nx>Z</span> <span class=p>},</span>
-    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;へむの秘密&#39;</span> <span class=p>},</span>
-    <span class=nx>Author</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;へむ&#39;</span> <span class=p>},</span>
-    <span class=s1>&#39;.metadata&#39;</span><span class=o>:</span> <span class=p>{</span> <span class=nx>etag</span><span class=o>:</span> <span class=sb>`W/&#34;datetime&#39;2020-01-29T02%3A29%3A48.8751116Z&#39;&#34;`</span> <span class=p>}</span>
-  <span class=p>},</span>
-  <span class=p>{</span>
-    <span class=nx>PartitionKey</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.String&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;book&#39;</span> <span class=p>},</span>
-    <span class=nx>RowKey</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.String&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;003&#39;</span> <span class=p>},</span>
-    <span class=nx>Timestamp</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.DateTime&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=mi>2020</span><span class=o>-</span><span class=mi>01</span><span class=o>-</span><span class=mi>29</span><span class=nx>T02</span><span class=o>:</span><span class=mi>30</span><span class=o>:</span><span class=mf>28.677</span><span class=nx>Z</span> <span class=p>},</span>
-    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;ちいの秘密&#39;</span> <span class=p>},</span>
-    <span class=nx>Author</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;ちい&#39;</span> <span class=p>},</span>
-    <span class=s1>&#39;.metadata&#39;</span><span class=o>:</span> <span class=p>{</span> <span class=nx>etag</span><span class=o>:</span> <span class=sb>`W/&#34;datetime&#39;2020-01-29T02%3A30%3A28.6771054Z&#39;&#34;`</span> <span class=p>}</span>
-  <span class=p>}</span>
-<span class=p>]</span></code></pre></div></div>
-</figure>
-<p><code>queryEntities()</code> メソッドの第2パラメータに <a href=https://azure.github.io/azure-storage-node/TableQuery.html>TableQuery オブジェクト</a> を渡すと、エンティティを検索するための条件を指定することができます。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=kr>const</span> <span class=nx>query</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>azure</span><span class=p>.</span><span class=nx>TableQuery</span><span class=p>()</span>
-  <span class=p>.</span><span class=nx>top</span><span class=p>(</span><span class=mi>3</span><span class=p>)</span>  <span class=c1>// 最大 3 件まで取得
-</span><span class=c1></span>  <span class=p>.</span><span class=nx>where</span><span class=p>(</span><span class=s1>&#39;PartitionKey eq ?&#39;</span><span class=p>,</span> <span class=s1>&#39;book&#39;</span><span class=p>)</span>  <span class=c1>// PartitionKey が book である
-</span><span class=c1></span>  <span class=p>.</span><span class=nx>and</span><span class=p>(</span><span class=s1>&#39;RowKey &gt;= ?&#39;</span><span class=p>,</span> <span class=s1>&#39;2&#39;</span><span class=p>)</span>  <span class=c1>// かつ RowKey が 002 以上である
-</span><span class=c1></span>  <span class=p>.</span><span class=nx>select</span><span class=p>(</span><span class=s1>&#39;Title&#39;</span><span class=p>)</span>  <span class=c1>// Title プロパティのみを取得
-</span><span class=c1></span>
-<span class=nx>tableService</span><span class=p>.</span><span class=nx>queryEntities</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>,</span> <span class=nx>query</span><span class=p>,</span> <span class=kc>null</span><span class=p>,</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>error</span><span class=p>,</span> <span class=nx>result</span><span class=p>)</span> <span class=p>{</span>
-  <span class=k>if</span> <span class=p>(</span><span class=nx>error</span><span class=p>)</span> <span class=p>{</span>
-    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>error</span><span class=p>);</span>
-    <span class=nx>process</span><span class=p>.</span><span class=nx>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
-  <span class=p>}</span>
-
-  <span class=kr>const</span> <span class=nx>entries</span> <span class=o>=</span> <span class=nx>result</span><span class=p>.</span><span class=nx>entries</span><span class=p>;</span>
-  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>entries</span><span class=p>);</span>
-<span class=p>});</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>実行結果</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=p>[</span>
-  <span class=p>{</span>
-    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;へむの秘密&#39;</span> <span class=p>},</span>
-    <span class=s1>&#39;.metadata&#39;</span><span class=o>:</span> <span class=p>{</span> <span class=nx>etag</span><span class=o>:</span> <span class=sb>`W/&#34;datetime&#39;2020-01-29T02%3A29%3A48.8751116Z&#39;&#34;`</span> <span class=p>}</span>
-  <span class=p>},</span>
-  <span class=p>{</span>
-    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;ちいの秘密&#39;</span> <span class=p>},</span>
-    <span class=s1>&#39;.metadata&#39;</span><span class=o>:</span> <span class=p>{</span> <span class=nx>etag</span><span class=o>:</span> <span class=sb>`W/&#34;datetime&#39;2020-01-29T02%3A30%3A28.6771054Z&#39;&#34;`</span> <span class=p>}</span>
-  <span class=p>}</span>
-<span class=p>]</span></code></pre></div></div>
-</figure>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=../../p/dofzeua/>Azure Table Strage を使ってみる (2) 接続情報（キー）を確認する</a></li>
-<li><a href=../../p/o8ufwct/>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる</a></li>
-<li><a href=../../p/xyzwod2/>Azure Table Strage を使ってみる (1) テーブルの作成</a></li>
-<li><a href=../../p/fn3amda/>チャットボット: 独自のミドルウェアを作成してログを記録する</a></li>
-<li><a href=../../p/gt9g2na/>チャットボット: 独自のミドルウェアを作成して禁止ワードを拒否するようにする</a></li>
-<li><a href=../../p/6arjar6/>チャットボット: Bot Builder SDK の Dialog で会話の流れをデザインする (2) スタック管理</a></li>
-<li><a href=../../p/q7vw95i/>チャットボット: Bot Builder SDK で画像やリストなどのリッチなメッセージを送る (MessageFactory)</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/azure-table-storage>Azure Table Storage</a></span>
-<span class=xPageTags_item><a href=../../tags/node.js>Node.js</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=../../p/um2wi2o/><span class=xArticle_up_label>Azure Storage のメモ</span><br>へ戻る</a>
-</div>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/o8ufwct/>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる</a>
-</div>
-<div class=xPrevNextLink_next>
-<a href=../../p/gkardu9/>Azure Storage で静的 Web サイトをホスティングする</a>
-</div>
-</div>
-</aside>
-</article>
-<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/um2wi2o/>Azure Storage のメモ</a></span></div><div style=display:flex;margin-top:.8em><div style=width:80px;margin-right:.5em><img src=../../p/vrhjtds/azure-icon.svg style=width:80px;height:80px></div><div style=flex:1><h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/ccoonon/>Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる</a></h1><div class=xPageTags><span class=xPageTags_item><a href=../../tags/azure-table-storage>Azure Table Storage</a></span>
+<span class=xPageTags_item><a href=../../tags/node.js>Node.js</a></span></div></div></div><span class=xPageDate>更新: <time itemprop=dateModified datetime=2020-01-31>2020-01-31</time><br>作成: <time itemprop=datePublished datetime=2020-01-31>2020-01-31</time></span></header><div itemprop=articleBody class=xArticle_content><nav id=TableOfContents><ul><li><a href=#azure-storage-パッケージのインストール>azure-storage パッケージのインストール</a></li><li><a href=#tableservice-オブジェクトの生成>TableService オブジェクトの生成</a><ul><li><a href=#接続情報としてデフォルトの環境変数を使用する>接続情報としてデフォルトの環境変数を使用する</a></li><li><a href=#接続情報を明示的に指定する>接続情報を明示的に指定する</a></li><li><a href=#プロキシ環境からアクセスする場合>プロキシ環境からアクセスする場合</a></li></ul></li><li><a href=#テーブルの操作>テーブルの操作</a><ul><li><a href=#テーブルを作成する-createtable-createtableifnotexists>テーブルを作成する (createTable, createTableIfNotExists)</a></li></ul></li><li><a href=#エンティティの操作>エンティティの操作</a><ul><li><a href=#エンティティを取得する-queryentities>エンティティを取得する (queryEntities)</a></li></ul></li></ul></nav><h2 id=azure-storage-パッケージのインストール>azure-storage パッケージのインストール</h2><p>Node.js から Azure Table Storage を操作するには、<a href=https://www.npmjs.com/package/azure-storage><code>azure-storage</code></a> というライブラリを使用します。
+<code>npm</code> コマンドで簡単にインストールすることができます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>azure-storage のインストール</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ npm install --save azure-storage</span></span></code></pre></div></div></figure><ul><li>参考: <a href=https://maku77.github.io/nodejs/npm/install-package.html>npm によるパッケージのインストール | Node.js ノート</a></li></ul><h2 id=tableservice-オブジェクトの生成>TableService オブジェクトの生成</h2><p>Azure Storage にアクセスするには、接続情報（ストレージアカウント名とキー）が必要になるので、<a href=https://portal.azure.com/>Azure ポータル</a> で確認しておいてください。</p><ul><li>参考: <a href=../../p/dofzeua>Azure Storage の接続情報（キー）を確認する</a></li></ul><h3 id=接続情報としてデフォルトの環境変数を使用する>接続情報としてデフォルトの環境変数を使用する</h3><p>Node.js から Table Storage を扱うには、<code>azure-storage</code> モジュールが提供する <a href=https://azure.github.io/azure-storage-node/TableService.html>TableService クラス</a> を使用します。
+<code>TableService</code> のインスタンスは下記のように生成することができます。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>azure</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;azure-storage&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>tableService</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>azure</span><span class=p>.</span><span class=nx>TableService</span><span class=p>();</span></span></span></code></pre></div></div></figure><p>上記のように、<code>TableService</code> のコンストラクのパラメータを何も指定しないと、接続のために下記のような環境変数が参照されます。</p><ol><li><b>AZURE_STORAGE_ACCOUNT</b>
+&mldr; Azure Storage の「ストレージアカウント名」</li><li><b>AZURE_STORAGE_ACCESS_KEY</b>
+&mldr; Azure Storage の「キー」</li><li><b>AZURE_STORAGE_CONNECTION_STRING</b>
+&mldr; Azure Storage の「接続文字列」</li></ol><p>1 と 2 を両方とも設定するか、3 を設定しておけば Azure Storage にアクセスできるようになります。</p><h3 id=接続情報を明示的に指定する>接続情報を明示的に指定する</h3><p><code>TableService</code> のコンストラクタの引数で、明示的に接続情報を渡すこともできます。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// 接続文字列だけを渡す場合
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>tableService</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>azure</span><span class=p>.</span><span class=nx>TableService</span><span class=p>(</span><span class=nx>connectionString</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// ストレージアカウント名とキーのペアを渡す場合
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>tableService</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>azure</span><span class=p>.</span><span class=nx>TableService</span><span class=p>(</span><span class=nx>storageAccount</span><span class=p>,</span> <span class=nx>storageAccessKey</span><span class=p>);</span></span></span></code></pre></div></div></figure><p>複数のストレージアカウントを使い分けたい場合は、<strong>独自の環境変数に「接続文字列」を設定しておく</strong>とよいでしょう。
+ここでは、<code>MAKU_AZURE_STORAGE_CONNECTION_STRING</code> という環境変数に「接続文字列」を設定してみます。</p><figure class=xImage><a href=../../p/ccoonon/img-env-var.png target=_blank><img width=653 height=165 src=../../p/ccoonon/img-env-var.png alt=/p/ccoonon/img-env-var.png></a></figure><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>azure</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;azure-storage&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Azure Storage の接続文字列を環境変数から取得
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>connectionString</span> <span class=o>=</span> <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>MAKU_AZURE_STORAGE_CONNECTION_STRING</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=k>typeof</span> <span class=nx>connectionString</span> <span class=o>===</span> <span class=s1>&#39;undefined&#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=s1>&#39;MAKU_AZURE_STORAGE_CONNECTION_STRING is not set&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>process</span><span class=p>.</span><span class=nx>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// TableService オブジェクトを取得
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>tableService</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>azure</span><span class=p>.</span><span class=nx>TableService</span><span class=p>(</span><span class=nx>connectionString</span><span class=p>);</span></span></span></code></pre></div></div></figure><h3 id=プロキシ環境からアクセスする場合>プロキシ環境からアクセスする場合</h3><p><code>TableService</code> クラスをプロキシ環境内で使用する場合は、OS の <strong><code>https_proxy</code></strong> 環境変数で設定してしまうのが簡単です。
+OS の <code>https_proxy</code> 環境変数を設定するのを避けたいときは、<code>TableService</code> クラスの <code>setProxy()</code> メソッドを使ってプロキシを設定することもできます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>プロキシ情報をハードコードする</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=nx>tableService</span><span class=p>.</span><span class=nx>setProxy</span><span class=p>(</span><span class=s1>&#39;http://proxy.example.com:12345&#39;</span><span class=p>);</span></span></span></code></pre></div></div></figure><p>プロキシ情報は環境変数で定義したいけど、OS の <code>https_proxy</code> 環境変数を設定するのは避けたいということであれば、例えば、独自の <code>MAKU_AZURE_PROXY</code> のような <strong>独自の環境変数</strong> を用意するとよいでしょう。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// MAKU_AZURE_PROXY 環境変数が設定されていたらプロキシ情報として使う
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>if</span> <span class=p>(</span><span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>MAKU_AZURE_PROXY</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>tableService</span><span class=p>.</span><span class=nx>setProxy</span><span class=p>(</span><span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>MAKU_AZURE_PROXY</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span></span></span></code></pre></div></div></figure><h2 id=テーブルの操作>テーブルの操作</h2><p>ここから先のテーブル操作に関しては、前述の <code>TableService</code> オブジェクトの生成が終わっていることを想定しています。</p><h3 id=テーブルを作成する-createtable-createtableifnotexists>テーブルを作成する (createTable, createTableIfNotExists)</h3><p>Table Storage 上に、新しいテーブルを作成するには、<code>TableService</code> クラスの下記のメソッドを使用します。</p><ul><li><a href=https://azure.github.io/azure-storage-node/TableService.html#createTable__anchor>createTable() メソッド</a></li><li><a href=https://azure.github.io/azure-storage-node/TableService.html#createTableIfNotExists__anchor>createTableIfNotExists() メソッド</a></li></ul><figure class=xCodeBlock><figcaption class=xCodeBlock_title>mytable テーブルを作成する</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=nx>tableService</span><span class=p>.</span><span class=nx>createTableIfNotExists</span><span class=p>(</span><span class=s1>&#39;mytable&#39;</span><span class=p>,</span> <span class=kd>function</span><span class=p>(</span><span class=nx>error</span><span class=p>,</span> <span class=nx>result</span><span class=p>,</span> <span class=nx>response</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>error</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>process</span><span class=p>.</span><span class=nx>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c1>// result contains true if created; false if already exists
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span></span></span></code></pre></div></div></figure><figure class=xCodeBlock><figcaption class=xCodeBlock_title>実行結果（テーブルが作成された場合）</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>isSuccessful</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>statusCode</span><span class=o>:</span> <span class=mi>204</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;mytable&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>created</span><span class=o>:</span> <span class=kc>true</span>
+</span></span><span class=line><span class=cl><span class=p>}</span></span></span></code></pre></div></div></figure><figure class=xCodeBlock><figcaption class=xCodeBlock_title>実行結果（テーブルが既に存在していた場合）</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>isSuccessful</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>statusCode</span><span class=o>:</span> <span class=mi>200</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>TableName</span><span class=o>:</span> <span class=s1>&#39;mytable&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>created</span><span class=o>:</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl><span class=p>}</span></span></span></code></pre></div></div></figure><h2 id=エンティティの操作>エンティティの操作</h2><h3 id=エンティティを取得する-queryentities>エンティティを取得する (queryEntities)</h3><p>条件を指定してエンティティのリストを取得するには、<code>TableService</code> クラスの <a href=https://azure.github.io/azure-storage-node/TableService.html#queryEntities__anchor>queryEntities() メソッド</a> を使用します。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>books テーブルのエンティティをすべて取得</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=nx>tableService</span><span class=p>.</span><span class=nx>queryEntities</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>,</span> <span class=kc>null</span><span class=p>,</span> <span class=kc>null</span><span class=p>,</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>error</span><span class=p>,</span> <span class=nx>result</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>error</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>process</span><span class=p>.</span><span class=nx>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>entries</span> <span class=o>=</span> <span class=nx>result</span><span class=p>.</span><span class=nx>entries</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>entries</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span></span></span></code></pre></div></div></figure><figure class=xCodeBlock><figcaption class=xCodeBlock_title>実行結果</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=p>[</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>PartitionKey</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.String&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;book&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>RowKey</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.String&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;001&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Timestamp</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.DateTime&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=mi>2020</span><span class=o>-</span><span class=mi>01</span><span class=o>-</span><span class=mi>29</span><span class=nx>T02</span><span class=o>:</span><span class=mi>28</span><span class=o>:</span><span class=mf>15.137</span><span class=nx>Z</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;まくの秘密&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Author</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;まく&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;.metadata&#39;</span><span class=o>:</span> <span class=p>{</span> <span class=nx>etag</span><span class=o>:</span> <span class=sb>`W/&#34;datetime&#39;2020-01-29T02%3A28%3A15.1370872Z&#39;&#34;`</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>PartitionKey</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.String&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;book&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>RowKey</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.String&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;002&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Timestamp</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.DateTime&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=mi>2020</span><span class=o>-</span><span class=mi>01</span><span class=o>-</span><span class=mi>29</span><span class=nx>T02</span><span class=o>:</span><span class=mi>29</span><span class=o>:</span><span class=mf>48.875</span><span class=nx>Z</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;へむの秘密&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Author</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;へむ&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;.metadata&#39;</span><span class=o>:</span> <span class=p>{</span> <span class=nx>etag</span><span class=o>:</span> <span class=sb>`W/&#34;datetime&#39;2020-01-29T02%3A29%3A48.8751116Z&#39;&#34;`</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>PartitionKey</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.String&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;book&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>RowKey</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.String&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;003&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Timestamp</span><span class=o>:</span> <span class=p>{</span> <span class=s1>&#39;$&#39;</span><span class=o>:</span> <span class=s1>&#39;Edm.DateTime&#39;</span><span class=p>,</span> <span class=nx>_</span><span class=o>:</span> <span class=mi>2020</span><span class=o>-</span><span class=mi>01</span><span class=o>-</span><span class=mi>29</span><span class=nx>T02</span><span class=o>:</span><span class=mi>30</span><span class=o>:</span><span class=mf>28.677</span><span class=nx>Z</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;ちいの秘密&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Author</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;ちい&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;.metadata&#39;</span><span class=o>:</span> <span class=p>{</span> <span class=nx>etag</span><span class=o>:</span> <span class=sb>`W/&#34;datetime&#39;2020-01-29T02%3A30%3A28.6771054Z&#39;&#34;`</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>]</span></span></span></code></pre></div></div></figure><p><code>queryEntities()</code> メソッドの第2パラメータに <a href=https://azure.github.io/azure-storage-node/TableQuery.html>TableQuery オブジェクト</a> を渡すと、エンティティを検索するための条件を指定することができます。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>query</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>azure</span><span class=p>.</span><span class=nx>TableQuery</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>  <span class=p>.</span><span class=nx>top</span><span class=p>(</span><span class=mi>3</span><span class=p>)</span>  <span class=c1>// 最大 3 件まで取得
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=p>.</span><span class=nx>where</span><span class=p>(</span><span class=s1>&#39;PartitionKey eq ?&#39;</span><span class=p>,</span> <span class=s1>&#39;book&#39;</span><span class=p>)</span>  <span class=c1>// PartitionKey が book である
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=p>.</span><span class=nx>and</span><span class=p>(</span><span class=s1>&#39;RowKey &gt;= ?&#39;</span><span class=p>,</span> <span class=s1>&#39;2&#39;</span><span class=p>)</span>  <span class=c1>// かつ RowKey が 002 以上である
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=p>.</span><span class=nx>select</span><span class=p>(</span><span class=s1>&#39;Title&#39;</span><span class=p>)</span>  <span class=c1>// Title プロパティのみを取得
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=nx>tableService</span><span class=p>.</span><span class=nx>queryEntities</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>,</span> <span class=nx>query</span><span class=p>,</span> <span class=kc>null</span><span class=p>,</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>error</span><span class=p>,</span> <span class=nx>result</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>error</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>process</span><span class=p>.</span><span class=nx>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>entries</span> <span class=o>=</span> <span class=nx>result</span><span class=p>.</span><span class=nx>entries</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>entries</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span></span></span></code></pre></div></div></figure><figure class=xCodeBlock><figcaption class=xCodeBlock_title>実行結果</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=p>[</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;へむの秘密&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;.metadata&#39;</span><span class=o>:</span> <span class=p>{</span> <span class=nx>etag</span><span class=o>:</span> <span class=sb>`W/&#34;datetime&#39;2020-01-29T02%3A29%3A48.8751116Z&#39;&#34;`</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Title</span><span class=o>:</span> <span class=p>{</span> <span class=nx>_</span><span class=o>:</span> <span class=s1>&#39;ちいの秘密&#39;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;.metadata&#39;</span><span class=o>:</span> <span class=p>{</span> <span class=nx>etag</span><span class=o>:</span> <span class=sb>`W/&#34;datetime&#39;2020-01-29T02%3A30%3A28.6771054Z&#39;&#34;`</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>]</span></span></span></code></pre></div></div></figure><meta itemprop=author content="まく"><span itemprop=publisher itemscope itemtype=https://schema.org/Organization><meta itemprop=name content="まく"></span><h3 style="border-bottom:1px solid gray">関連記事</h3><ul><li><a href=../../p/dofzeua/>Azure Table Strage を使ってみる (2) 接続情報（キー）を確認する</a></li><li><a href=../../p/o8ufwct/>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる</a></li><li><a href=../../p/xyzwod2/>Azure Table Strage を使ってみる (1) テーブルの作成</a></li><li><a href=../../p/fn3amda/>チャットボット: 独自のミドルウェアを作成してログを記録する</a></li><li><a href=../../p/gt9g2na/>チャットボット: 独自のミドルウェアを作成して禁止ワードを拒否するようにする</a></li><li><a href=../../p/6arjar6/>チャットボット: Bot Builder SDK の Dialog で会話の流れをデザインする (2) スタック管理</a></li><li><a href=../../p/q7vw95i/>チャットボット: Bot Builder SDK で画像やリストなどのリッチなメッセージを送る (MessageFactory)</a></li></ul><div class=xPageTags><span class=xPageTags_item><a href=../../tags/azure-table-storage>Azure Table Storage</a></span>
+<span class=xPageTags_item><a href=../../tags/node.js>Node.js</a></span></div></div><div style=text-align:right><div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div></div><div class=xArticle_up><a href=../../p/um2wi2o/><span class=xArticle_up_label>Azure Storage のメモ</span><br>へ戻る</a></div><aside><div class=xPrevNextLink><div class=xPrevNextLink_prev><a href=../../p/o8ufwct/>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる</a></div><div class=xPrevNextLink_next><a href=../../p/gkardu9/>Azure Storage で静的 Web サイトをホスティングする</a></div></div></aside></article><script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
 <ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
-<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
-</main>
-</div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/vrhjtds/>Azure</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/um2wi2o/>Azure Storage のメモ</a>
-</span>
-<span class=xBreadcrumb_item>Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる
-</span>
-</div>
-</aside>
-<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
-<div id=xSiteFooter2>
-<a href=../../sitemap/>サイトマップ</a> ｜
-<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
-</div>
-</div>
-<script src=../../assets/js/sidebar.js></script>
-<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c],d=b.getElementsByTagName('img');if(d.length>0)continue;const e=b.getElementsByTagName('svg');if(e.length>0)continue;b.classList.add('xExternalLinkIcon'),b.setAttribute('target','_blank'),b.setAttribute('rel','noopener')}})</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"Azure","item":"https://maku.blog/p/vrhjtds/"},{"@type":"ListItem","position":4,"name":"Azure Storage のメモ","item":"https://maku.blog/p/um2wi2o/"},{"@type":"ListItem","position":5,"name":"Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる","item":"https://maku.blog/p/ccoonon/"}]}</script>
-</body>
-</html>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/vrhjtds/>Azure</a></span>
+<span class=xBreadcrumb_item><a href=../../p/um2wi2o/>Azure Storage のメモ</a></span>
+<span class=xBreadcrumb_item>Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる</span></div></aside><div id=xSiteFooter><a href=../../>まくろぐ</a></div><div id=xSiteFooter2><a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a></div></div><script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener("DOMContentLoaded",function(){const e=document.querySelectorAll("a[href^=http]");for(let n=0;n<e.length;++n){const t=e[n],s=t.getElementsByTagName("img");if(s.length>0)continue;const o=t.getElementsByTagName("svg");if(o.length>0)continue;t.classList.add("xExternalLinkIcon"),t.setAttribute("target","_blank"),t.setAttribute("rel","noopener")}})</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"Azure","item":"https://maku.blog/p/vrhjtds/"},{"@type":"ListItem","position":4,"name":"Azure Storage のメモ","item":"https://maku.blog/p/um2wi2o/"},{"@type":"ListItem","position":5,"name":"Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる","item":"https://maku.blog/p/ccoonon/"}]}</script></body></html>

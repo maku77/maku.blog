@@ -1,944 +1,216 @@
-<!doctype html><html lang=ja-jp>
-<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<title>AWS CDK で API Gateway の REST API を作成する｜まくろぐ</title>
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
-<meta property="og:title" content="AWS CDK で API Gateway の REST API を作成する">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://maku.blog/p/k7eoer5/">
-<meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
-<meta property="og:image:width" content="1436">
-<meta property="og:image:height" content="746">
-<meta property="og:description" content="概要 API Gateway は HTTPS で Lambda 関数を呼び出す API Gateway で REST API のエンドポイントを定義すると、HTTPS リクエストで Lambda 関数を呼び出せるようになります。
+<!doctype html><html lang=ja-jp><head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#"><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>AWS CDK で API Gateway の REST API を作成する｜まくろぐ</title><script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-63069513-4")</script><meta property="og:site_name" content="まくろぐ"><meta property="og:title" content="AWS CDK で API Gateway の REST API を作成する"><meta property="og:type" content="website"><meta property="og:url" content="https://maku.blog/p/k7eoer5/"><meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png"><meta property="og:image:width" content="1436"><meta property="og:image:height" content="746"><meta property="og:description" content="概要 API Gateway は HTTPS で Lambda 関数を呼び出す API Gateway で REST API のエンドポイントを定義すると、HTTPS リクエストで Lambda 関数を呼び出せるようになります。
 クライアント ─(HTTPS)─> API Gateway ─(AWS API)─> Lambda 関数 API Gateway には Cognito のユーザープールと連携する機能を備えており、認証済みのユーザーにのみ API 呼び出しを許可するといったことが可能です（具体的に言うと、API Gateway が見えないところで ID トークンの正当性を確認してくれたりします）。
-☝️ 新しい Lambda 関数 URL 2022 年 4 月に公開された Lambda 関数 URL の仕組みを使うと、直接 Lambda 関数にエンドポイント URL を割り当てて呼び出すことができます。 Cognito 連携などを使わないシンプルな Web API であれば、Lambda 関数 URL の仕組みで作ってしまうのが手っ取り早いかもしれません。  Lambda プロキシ統合 Lambda 関数は様々な AWS サービスからのイベント通知によって起動する仕組みになっており、API Gateway からの HTTPS リクエストもそのうちのひとつです。 Lambda 関数のハンドラが呼び出されるとき、そのパラメーターとして「イベントオブジェクト」を受け取ることができるのですが、このイベントオブジェクトの中身は発生源によって異なります。">
-<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
-<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
-<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
-<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
-<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
-<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
-<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
-</head>
-<body>
-<div id=xRoot>
-<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/7s7hs4e/>AWS</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/wqamv5d/>API Gateway</a>
-</span>
-<span class=xBreadcrumb_item>AWS CDK で API Gateway の REST API を作成する
-</span>
-</div>
-</aside>
-<div id=xContainer>
-<nav id=xMenu aria-label=メニュー>
-<div id=sidebar style=height:100%>
-<div id=sidebar_notFixed>
-<a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a>
-<div class=xMenu_box data-sticky>
-<form action=https://cse.google.com/cse target=_blank>
-<div class=xSearchBox>
-<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+☝️ 新しい Lambda 関数 URL 2022 年 4 月に公開された Lambda 関数 URL の仕組みを使うと、直接 Lambda 関数にエンドポイント URL を割り当てて呼び出すことができます。 Cognito 連携などを使わないシンプルな Web API であれば、Lambda 関数 URL の仕組みで作ってしまうのが手っ取り早いかもしれません。 Lambda プロキシ統合 Lambda 関数は様々な AWS サービスからのイベント通知によって起動する仕組みになっており、API Gateway からの HTTPS リクエストもそのうちのひとつです。 Lambda 関数のハンドラが呼び出されるとき、そのパラメーターとして「イベントオブジェクト」を受け取ることができるのですが、このイベントオブジェクトの中身は発生源によって異なります。"><meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css><link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico><link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png><link rel=apple-touch-icon href=../../assets/favicon/180x180.png><script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script><style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style><script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script></head><body><div id=xRoot><div id=xSiteHeader><a href=../../>まくろぐ</a></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/7s7hs4e/>AWS</a></span>
+<span class=xBreadcrumb_item><a href=../../p/wqamv5d/>API Gateway</a></span>
+<span class=xBreadcrumb_item>AWS CDK で API Gateway の REST API を作成する</span></div></aside><div id=xContainer><nav id=xMenu aria-label=メニュー><div id=sidebar style=height:100%><div id=sidebar_notFixed><a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a><div class=xMenu_box data-sticky><form action=https://cse.google.com/cse target=_blank><div class=xSearchBox><input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
 <input type=hidden name=ie value=UTF-8>
 <input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
-<input type=submit value=検索></input>
-</div>
-</form>
-<div class=xMenu_box_body>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
-<div class=xMenu_box_body>
-<div class=xBoxLink>
-<a href=../../p/zycmw6f/>
-Next.js アプリに Google Analytics を設定する (next/script)
-<time>2023-03-21</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/cv6fpx7/>
-React で入力フォームの onChange イベントを IME ON のときに無視する
-<time>2023-01-29</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/bo8q8p7/>
-Meilisearch サーチエンジンを使ってみる
-<time>2023-01-24</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/y6zgrg2/>
-Docker で MongoDB サーバーを立ち上げる
-<time>2023-01-18</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/3pwojuj/>
-Deno で MongoDB にアクセスする
-<time>2023-01-18</time></a>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3>
-<div class=xMenu_box_body>
-<div class=xNavTree>
-<ul>
-<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
-<ul>
-<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
-<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
-<li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a>
-<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
-<li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a>
-<li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a>
-<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
-<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
-<li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a>
-<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
-<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
-<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
-<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
-<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
-<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
-<ul>
-<li><a class=xNavTree-dir href=../../p/cenio8m/>AWS 一般／環境／設定など</a>
-<li><a class=xNavTree-dir href=../../p/vigdnzf/>CLI</a>
-<li><a class=xNavTree-dir href=../../p/q7fov5c/>S3</a>
-<li><a class=xNavTree-dir href=../../p/wn52kog/>IAM</a>
-<li><a class=xNavTree-dir href=../../p/eyeq2do/>Lambda</a>
-<li><a class=xNavTree-dir href=../../p/cxcozak/>EC2</a>
-<li><a class=xNavTree-dir href=../../p/au8is4e/>CodeBuild</a>
-<li><a class=xNavTree-dir href=../../p/sdq2cnx/>CloudFormation/SAM/CDK</a>
-<li><a class=xNavTree-dir href=../../p/wqamv5d/>API Gateway</a>
-<ul>
-</ul>
-<li><a class=xNavTree-dir href=../../p/yz2h95y/>Cognito</a>
-<li><a class=xNavTree-dir href=../../p/3jt3bjr/>DynamoDB</a>
-<li><a class=xNavTree-dir href=../../p/5o2cnw8/>SSM</a>
-<li><a class=xNavTree-dir href=../../p/3nybkv6/>AWS KMS</a>
-<li><a class=xNavTree-dir href=../../p/dxhs2bk/>AppSync</a>
-<li><a class=xNavTree-dir href=../../p/szcbzgt/>AWS のトラブルシューティング</a>
-</ul>
-<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
-<li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a>
-<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
-<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
-<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
-<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
-<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
-<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
-<li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a>
-</ul>
-<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
-<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
-<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
-<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
-<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
-<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
-<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
-</ul>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
-<div class=xMenu_box_body><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws>aws (61)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure>azure (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/typescript>typescript (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/next.js>next.js (38)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/graphql>graphql (35)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/react>react (29)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/chatbot>chatbot (28)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/gnuplot>gnuplot (27)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cdk>aws/cdk (26)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/linux>linux (25)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github>github (24)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ansible>ansible (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/node.js>node.js (19)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/electron>electron (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mongodb>mongodb (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/protocol-buffers>protocol-buffers (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vs-code>vs-code (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/javascript>javascript (13)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cognito>aws/cognito (12)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/nginx>nginx (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/android>android (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/lambda>aws/lambda (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/java>java (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/python>python (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ssh>ssh (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/uml>uml (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/3d>3d (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sam>aws/sam (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/docker>docker (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/firestore>firebase/firestore (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unity>unity (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webgl>webgl (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo>apollo (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-cli>azure-cli (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/deno>deno (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jade>jade (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/material-ui>material-ui (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cli>aws/cli (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-storage>azure-storage (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/doxygen>doxygen (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/c/c++>c/c++ (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-actions>github-actions (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/luis>luis (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/qna-maker>qna-maker (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/ssm>aws/ssm (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/eslint>eslint (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase>firebase (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-pages>github-pages (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html/css>html/css (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jekyll>jekyll (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/lets-encrypt>lets-encrypt (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sql>sql (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/windows>windows (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-functions>azure-functions (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cosmos-db>cosmos-db (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/grpc>grpc (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/hugo>hugo (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/kotlin>kotlin (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mac>mac (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/powershell>powershell (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/prettier>prettier (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sqlite>sqlite (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/textlint>textlint (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tv>tv (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apache>apache (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/arib>arib (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/amplify>aws/amplify (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/appsync>aws/appsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/iam>aws/iam (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/kms>aws/kms (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/s3>aws/s3 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sdk>aws/sdk (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-app-service>azure-app-service (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/excel>excel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/go>go (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/http>http (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/json>json (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mui>mui (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/npm>npm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/oauth>oauth (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/opengl>opengl (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/rsync>rsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/scp>scp (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/slack>slack (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teraterm>teraterm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unicode>unicode (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vercel>vercel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/zip>zip (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/.net>.net (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/androidstudio>androidstudio (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo-server>apollo-server (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/atomic-design>atomic-design (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/blender>blender (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bluetooth>bluetooth (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bootstrap>bootstrap (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-framework>bot-framework (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/boto3>boto3 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/certbot>certbot (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cloudflare>cloudflare (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/css>css (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dns>dns (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dvb>dvb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/editorconfig>editorconfig (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/evernote>evernote (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/git>git (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/golang>golang (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/google-analytics>google-analytics (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/groovy>groovy (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html>html (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/igdb>igdb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/iso>iso (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jest>jest (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/macos>macos (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/meilisearch>meilisearch (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/parcel>parcel (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/raspberrypi>raspberrypi (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teams>teams (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tex>tex (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ubuntu>ubuntu (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/url>url (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vim>vim (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vps>vps (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/web>web (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webpack>webpack (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/wsl>wsl (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
-</div></div>
-</div>
-<div class=xMenu_box data-sticky><br></div>
-</div>
-<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
-</div>
-</div>
-</nav>
-<main id=xMain>
-<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/vujw9jv/>AWS CDK で API Gateway に Cognito 認証によるアクセス制御を追加する</a>
-</div>
-<div class=xPrevNextLink_next>
-<a href=../../p/qwb6v89/>Amazon API Gateway をコマンドライン (CLI) から操作する</a>
-</div>
-</div>
-</aside>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<input type=submit value=検索></input></div></form><div class=xMenu_box_body></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3><div class=xMenu_box_body><div class=xBoxLink><a href=../../p/zycmw6f/>Next.js アプリに Google Analytics を設定する (next/script)
+<time>2023-03-21</time></a></div><div class=xBoxLink><a href=../../p/cv6fpx7/>React で入力フォームの onChange イベントを IME ON のときに無視する
+<time>2023-01-29</time></a></div><div class=xBoxLink><a href=../../p/bo8q8p7/>Meilisearch サーチエンジンを使ってみる
+<time>2023-01-24</time></a></div><div class=xBoxLink><a href=../../p/y6zgrg2/>Docker で MongoDB サーバーを立ち上げる
+<time>2023-01-18</time></a></div><div class=xBoxLink><a href=../../p/3pwojuj/>Deno で MongoDB にアクセスする
+<time>2023-01-18</time></a></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3><div class=xMenu_box_body><div class=xNavTree><ul><li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a><ul><li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a><li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a><li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a><li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a><li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a><li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a><li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a><li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a><li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a><li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a><li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a><li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a><li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a><li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a><li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a><ul><li><a class=xNavTree-dir href=../../p/cenio8m/>AWS 一般／環境／設定など</a><li><a class=xNavTree-dir href=../../p/vigdnzf/>CLI</a><li><a class=xNavTree-dir href=../../p/q7fov5c/>S3</a><li><a class=xNavTree-dir href=../../p/wn52kog/>IAM</a><li><a class=xNavTree-dir href=../../p/eyeq2do/>Lambda</a><li><a class=xNavTree-dir href=../../p/cxcozak/>EC2</a><li><a class=xNavTree-dir href=../../p/au8is4e/>CodeBuild</a><li><a class=xNavTree-dir href=../../p/sdq2cnx/>CloudFormation/SAM/CDK</a><li><a class=xNavTree-dir href=../../p/wqamv5d/>API Gateway</a><ul></ul><li><a class=xNavTree-dir href=../../p/yz2h95y/>Cognito</a><li><a class=xNavTree-dir href=../../p/3jt3bjr/>DynamoDB</a><li><a class=xNavTree-dir href=../../p/5o2cnw8/>SSM</a><li><a class=xNavTree-dir href=../../p/3nybkv6/>AWS KMS</a><li><a class=xNavTree-dir href=../../p/dxhs2bk/>AppSync</a><li><a class=xNavTree-dir href=../../p/szcbzgt/>AWS のトラブルシューティング</a></ul><li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a><li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a><li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a><li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a><li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a><li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a><li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a><li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a><li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a></ul><li><a class=xNavTree-dir href=../../p/35odek9/>読書</a><li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a><li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a><li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a><li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a><li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a><li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a></ul></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3><div class=xMenu_box_body><div class=xMenu_tag><a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a></div><div class=xMenu_tag><a href=../../tags/aws>aws (61)</a></div><div class=xMenu_tag><a href=../../tags/azure>azure (58)</a></div><div class=xMenu_tag><a href=../../tags/typescript>typescript (58)</a></div><div class=xMenu_tag><a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a></div><div class=xMenu_tag><a href=../../tags/next.js>next.js (38)</a></div><div class=xMenu_tag><a href=../../tags/graphql>graphql (35)</a></div><div class=xMenu_tag><a href=../../tags/react>react (29)</a></div><div class=xMenu_tag><a href=../../tags/chatbot>chatbot (28)</a></div><div class=xMenu_tag><a href=../../tags/gnuplot>gnuplot (27)</a></div><div class=xMenu_tag><a href=../../tags/aws/cdk>aws/cdk (26)</a></div><div class=xMenu_tag><a href=../../tags/linux>linux (25)</a></div><div class=xMenu_tag><a href=../../tags/github>github (24)</a></div><div class=xMenu_tag><a href=../../tags/ansible>ansible (21)</a></div><div class=xMenu_tag><a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a></div><div class=xMenu_tag><a href=../../tags/node.js>node.js (19)</a></div><div class=xMenu_tag><a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a></div><div class=xMenu_tag><a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a></div><div class=xMenu_tag><a href=../../tags/electron>electron (15)</a></div><div class=xMenu_tag><a href=../../tags/mongodb>mongodb (15)</a></div><div class=xMenu_tag><a href=../../tags/protocol-buffers>protocol-buffers (14)</a></div><div class=xMenu_tag><a href=../../tags/vs-code>vs-code (14)</a></div><div class=xMenu_tag><a href=../../tags/javascript>javascript (13)</a></div><div class=xMenu_tag><a href=../../tags/aws/cognito>aws/cognito (12)</a></div><div class=xMenu_tag><a href=../../tags/nginx>nginx (11)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a></div><div class=xMenu_tag><a href=../../tags/android>android (10)</a></div><div class=xMenu_tag><a href=../../tags/aws/lambda>aws/lambda (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a></div><div class=xMenu_tag><a href=../../tags/java>java (9)</a></div><div class=xMenu_tag><a href=../../tags/python>python (9)</a></div><div class=xMenu_tag><a href=../../tags/ssh>ssh (9)</a></div><div class=xMenu_tag><a href=../../tags/uml>uml (9)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a></div><div class=xMenu_tag><a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a></div><div class=xMenu_tag><a href=../../tags/3d>3d (8)</a></div><div class=xMenu_tag><a href=../../tags/aws/sam>aws/sam (8)</a></div><div class=xMenu_tag><a href=../../tags/docker>docker (8)</a></div><div class=xMenu_tag><a href=../../tags/firebase/firestore>firebase/firestore (8)</a></div><div class=xMenu_tag><a href=../../tags/unity>unity (8)</a></div><div class=xMenu_tag><a href=../../tags/webgl>webgl (8)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a></div><div class=xMenu_tag><a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a></div><div class=xMenu_tag><a href=../../tags/apollo>apollo (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-cli>azure-cli (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-pipelines>azure-pipelines (7)</a></div><div class=xMenu_tag><a href=../../tags/deno>deno (7)</a></div><div class=xMenu_tag><a href=../../tags/jade>jade (7)</a></div><div class=xMenu_tag><a href=../../tags/material-ui>material-ui (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a></div><div class=xMenu_tag><a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a></div><div class=xMenu_tag><a href=../../tags/aws/cli>aws/cli (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-storage>azure-storage (6)</a></div><div class=xMenu_tag><a href=../../tags/doxygen>doxygen (6)</a></div><div class=xMenu_tag><a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-table-storage>azure-table-storage (5)</a></div><div class=xMenu_tag><a href=../../tags/c/c++>c/c++ (5)</a></div><div class=xMenu_tag><a href=../../tags/github-actions>github-actions (5)</a></div><div class=xMenu_tag><a href=../../tags/luis>luis (5)</a></div><div class=xMenu_tag><a href=../../tags/qna-maker>qna-maker (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a></div><div class=xMenu_tag><a href=../../tags/aws/ssm>aws/ssm (4)</a></div><div class=xMenu_tag><a href=../../tags/eslint>eslint (4)</a></div><div class=xMenu_tag><a href=../../tags/firebase>firebase (4)</a></div><div class=xMenu_tag><a href=../../tags/github-pages>github-pages (4)</a></div><div class=xMenu_tag><a href=../../tags/html/css>html/css (4)</a></div><div class=xMenu_tag><a href=../../tags/jekyll>jekyll (4)</a></div><div class=xMenu_tag><a href=../../tags/lets-encrypt>lets-encrypt (4)</a></div><div class=xMenu_tag><a href=../../tags/sql>sql (4)</a></div><div class=xMenu_tag><a href=../../tags/windows>windows (4)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a></div><div class=xMenu_tag><a href=../../tags/azure-functions>azure-functions (3)</a></div><div class=xMenu_tag><a href=../../tags/cosmos-db>cosmos-db (3)</a></div><div class=xMenu_tag><a href=../../tags/grpc>grpc (3)</a></div><div class=xMenu_tag><a href=../../tags/hugo>hugo (3)</a></div><div class=xMenu_tag><a href=../../tags/kotlin>kotlin (3)</a></div><div class=xMenu_tag><a href=../../tags/mac>mac (3)</a></div><div class=xMenu_tag><a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a></div><div class=xMenu_tag><a href=../../tags/powershell>powershell (3)</a></div><div class=xMenu_tag><a href=../../tags/prettier>prettier (3)</a></div><div class=xMenu_tag><a href=../../tags/sqlite>sqlite (3)</a></div><div class=xMenu_tag><a href=../../tags/textlint>textlint (3)</a></div><div class=xMenu_tag><a href=../../tags/tv>tv (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a></div><div class=xMenu_tag><a href=../../tags/apache>apache (2)</a></div><div class=xMenu_tag><a href=../../tags/arib>arib (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/amplify>aws/amplify (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/appsync>aws/appsync (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/codebuild>aws/codebuild (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/iam>aws/iam (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/kms>aws/kms (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/s3>aws/s3 (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/sdk>aws/sdk (2)</a></div><div class=xMenu_tag><a href=../../tags/azure-app-service>azure-app-service (2)</a></div><div class=xMenu_tag><a href=../../tags/excel>excel (2)</a></div><div class=xMenu_tag><a href=../../tags/firebase/authentication>firebase/authentication (2)</a></div><div class=xMenu_tag><a href=../../tags/go>go (2)</a></div><div class=xMenu_tag><a href=../../tags/http>http (2)</a></div><div class=xMenu_tag><a href=../../tags/json>json (2)</a></div><div class=xMenu_tag><a href=../../tags/mui>mui (2)</a></div><div class=xMenu_tag><a href=../../tags/npm>npm (2)</a></div><div class=xMenu_tag><a href=../../tags/oauth>oauth (2)</a></div><div class=xMenu_tag><a href=../../tags/opengl>opengl (2)</a></div><div class=xMenu_tag><a href=../../tags/rsync>rsync (2)</a></div><div class=xMenu_tag><a href=../../tags/scp>scp (2)</a></div><div class=xMenu_tag><a href=../../tags/slack>slack (2)</a></div><div class=xMenu_tag><a href=../../tags/teraterm>teraterm (2)</a></div><div class=xMenu_tag><a href=../../tags/unicode>unicode (2)</a></div><div class=xMenu_tag><a href=../../tags/vercel>vercel (2)</a></div><div class=xMenu_tag><a href=../../tags/zip>zip (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a></div><div class=xMenu_tag><a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a></div><div class=xMenu_tag><a href=../../tags/.net>.net (1)</a></div><div class=xMenu_tag><a href=../../tags/androidstudio>androidstudio (1)</a></div><div class=xMenu_tag><a href=../../tags/apollo-server>apollo-server (1)</a></div><div class=xMenu_tag><a href=../../tags/atomic-design>atomic-design (1)</a></div><div class=xMenu_tag><a href=../../tags/blender>blender (1)</a></div><div class=xMenu_tag><a href=../../tags/bluetooth>bluetooth (1)</a></div><div class=xMenu_tag><a href=../../tags/bootstrap>bootstrap (1)</a></div><div class=xMenu_tag><a href=../../tags/bot-framework>bot-framework (1)</a></div><div class=xMenu_tag><a href=../../tags/boto3>boto3 (1)</a></div><div class=xMenu_tag><a href=../../tags/certbot>certbot (1)</a></div><div class=xMenu_tag><a href=../../tags/cloudflare>cloudflare (1)</a></div><div class=xMenu_tag><a href=../../tags/css>css (1)</a></div><div class=xMenu_tag><a href=../../tags/dns>dns (1)</a></div><div class=xMenu_tag><a href=../../tags/dvb>dvb (1)</a></div><div class=xMenu_tag><a href=../../tags/editorconfig>editorconfig (1)</a></div><div class=xMenu_tag><a href=../../tags/evernote>evernote (1)</a></div><div class=xMenu_tag><a href=../../tags/git>git (1)</a></div><div class=xMenu_tag><a href=../../tags/golang>golang (1)</a></div><div class=xMenu_tag><a href=../../tags/google-analytics>google-analytics (1)</a></div><div class=xMenu_tag><a href=../../tags/groovy>groovy (1)</a></div><div class=xMenu_tag><a href=../../tags/html>html (1)</a></div><div class=xMenu_tag><a href=../../tags/igdb>igdb (1)</a></div><div class=xMenu_tag><a href=../../tags/iso>iso (1)</a></div><div class=xMenu_tag><a href=../../tags/jest>jest (1)</a></div><div class=xMenu_tag><a href=../../tags/macos>macos (1)</a></div><div class=xMenu_tag><a href=../../tags/meilisearch>meilisearch (1)</a></div><div class=xMenu_tag><a href=../../tags/parcel>parcel (1)</a></div><div class=xMenu_tag><a href=../../tags/raspberrypi>raspberrypi (1)</a></div><div class=xMenu_tag><a href=../../tags/teams>teams (1)</a></div><div class=xMenu_tag><a href=../../tags/tex>tex (1)</a></div><div class=xMenu_tag><a href=../../tags/ubuntu>ubuntu (1)</a></div><div class=xMenu_tag><a href=../../tags/url>url (1)</a></div><div class=xMenu_tag><a href=../../tags/vim>vim (1)</a></div><div class=xMenu_tag><a href=../../tags/vps>vps (1)</a></div><div class=xMenu_tag><a href=../../tags/web>web (1)</a></div><div class=xMenu_tag><a href=../../tags/webpack>webpack (1)</a></div><div class=xMenu_tag><a href=../../tags/wsl>wsl (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a></div></div></div><div class=xMenu_box data-sticky><br></div></div><div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem></div></div></nav><main id=xMain><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting><aside><div class=xPrevNextLink><div class=xPrevNextLink_prev><a href=../../p/vujw9jv/>AWS CDK で API Gateway に Cognito 認証によるアクセス制御を追加する</a></div><div class=xPrevNextLink_next><a href=../../p/qwb6v89/>Amazon API Gateway をコマンドライン (CLI) から操作する</a></div></div></aside><header class=xArticle_headerBox><div><span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/7s7hs4e/>AWS</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=../../p/wqamv5d/>API Gateway</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=../../p/7s7hs4e/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/k7eoer5/>AWS CDK で API Gateway の REST API を作成する</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/aws>AWS</a></span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/wqamv5d/>API Gateway</a></span></div><div style=display:flex;margin-top:.8em><div style=width:80px;margin-right:.5em><img src=../../p/7s7hs4e/_index.svg style=width:80px;height:80px></div><div style=flex:1><h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/k7eoer5/>AWS CDK で API Gateway の REST API を作成する</a></h1><div class=xPageTags><span class=xPageTags_item><a href=../../tags/aws>AWS</a></span>
 <span class=xPageTags_item><a href=../../tags/aws/api-gateway>AWS/API Gateway</a></span>
-<span class=xPageTags_item><a href=../../tags/aws/cdk>AWS/CDK</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2022-06-13>2022-06-13</time><br>
-作成: <time itemprop=datePublished datetime=2022-04-18>2022-04-18</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#概要>概要</a>
-<ul>
-<li><a href=#api-gateway-は-https-で-lambda-関数を呼び出す>API Gateway は HTTPS で Lambda 関数を呼び出す</a></li>
-<li><a href=#lambda-プロキシ統合>Lambda プロキシ統合</a></li>
-</ul>
-</li>
-<li><a href=#cdk-プロジェクトを作成する>CDK プロジェクトを作成する</a></li>
-<li><a href=#lambda-関数を実装する>Lambda 関数を実装する</a></li>
-<li><a href=#スタックを定義する>スタックを定義する</a></li>
-<li><a href=#デプロイ>デプロイ</a></li>
-<li><a href=#応用プロキシリソースで複数階層の-url-をまとめてハンドルする>（応用）プロキシリソースで複数階層の URL をまとめてハンドルする</a>
-<ul>
-<li><a href=#プロキシリソースとは>プロキシリソースとは</a></li>
-<li><a href=#cdk-でプロキシリソースを定義する>CDK でプロキシリソースを定義する</a></li>
-<li><a href=#プロキシリソース用のハンドラーlambda-関数を実装する>プロキシリソース用のハンドラー（Lambda 関数）を実装する</a></li>
-</ul>
-</li>
-</ul>
-</nav><h2 id=概要>概要</h2>
-<h3 id=api-gateway-は-https-で-lambda-関数を呼び出す>API Gateway は HTTPS で Lambda 関数を呼び出す</h3>
-<p>API Gateway で REST API のエンドポイントを定義すると、HTTPS リクエストで Lambda 関数を呼び出せるようになります。</p>
-<div style=text-align:center;font-weight:700>クライアント ─(HTTPS)─> API Gateway ─(AWS API)─> Lambda 関数</div>
-<p>API Gateway には Cognito のユーザープールと連携する機能を備えており、認証済みのユーザーにのみ API 呼び出しを許可するといったことが可能です（具体的に言うと、API Gateway が見えないところで ID トークンの正当性を確認してくれたりします）。</p>
-<div class=xNote>
-<span class=xNote_title>☝️ 新しい Lambda 関数 URL</span>
+<span class=xPageTags_item><a href=../../tags/aws/cdk>AWS/CDK</a></span></div></div></div><span class=xPageDate>更新: <time itemprop=dateModified datetime=2022-06-13>2022-06-13</time><br>作成: <time itemprop=datePublished datetime=2022-04-18>2022-04-18</time></span></header><div itemprop=articleBody class=xArticle_content><nav id=TableOfContents><ul><li><a href=#概要>概要</a><ul><li><a href=#api-gateway-は-https-で-lambda-関数を呼び出す>API Gateway は HTTPS で Lambda 関数を呼び出す</a></li><li><a href=#lambda-プロキシ統合>Lambda プロキシ統合</a></li></ul></li><li><a href=#cdk-プロジェクトを作成する>CDK プロジェクトを作成する</a></li><li><a href=#lambda-関数を実装する>Lambda 関数を実装する</a></li><li><a href=#スタックを定義する>スタックを定義する</a></li><li><a href=#デプロイ>デプロイ</a></li><li><a href=#応用プロキシリソースで複数階層の-url-をまとめてハンドルする>（応用）プロキシリソースで複数階層の URL をまとめてハンドルする</a><ul><li><a href=#プロキシリソースとは>プロキシリソースとは</a></li><li><a href=#cdk-でプロキシリソースを定義する>CDK でプロキシリソースを定義する</a></li><li><a href=#プロキシリソース用のハンドラーlambda-関数を実装する>プロキシリソース用のハンドラー（Lambda 関数）を実装する</a></li></ul></li></ul></nav><h2 id=概要>概要</h2><h3 id=api-gateway-は-https-で-lambda-関数を呼び出す>API Gateway は HTTPS で Lambda 関数を呼び出す</h3><p>API Gateway で REST API のエンドポイントを定義すると、HTTPS リクエストで Lambda 関数を呼び出せるようになります。</p><div style=text-align:center;font-weight:700>クライアント ─(HTTPS)─> API Gateway ─(AWS API)─> Lambda 関数</div><p>API Gateway には Cognito のユーザープールと連携する機能を備えており、認証済みのユーザーにのみ API 呼び出しを許可するといったことが可能です（具体的に言うと、API Gateway が見えないところで ID トークンの正当性を確認してくれたりします）。</p><div class=xNote><span class=xNote_title>☝️ 新しい Lambda 関数 URL</span>
 <span class=xNote_body>2022 年 4 月に公開された <a href=https://aws.amazon.com/jp/about-aws/whats-new/2022/04/aws-lambda-function-urls-built-in-https-endpoints/>Lambda 関数 URL</a> の仕組みを使うと、直接 Lambda 関数にエンドポイント URL を割り当てて呼び出すことができます。
-Cognito 連携などを使わないシンプルな Web API であれば、Lambda 関数 URL の仕組みで作ってしまうのが手っ取り早いかもしれません。</span>
-</div>
-<h3 id=lambda-プロキシ統合>Lambda プロキシ統合</h3>
-<p>Lambda 関数は様々な AWS サービスからのイベント通知によって起動する仕組みになっており、API Gateway からの HTTPS リクエストもそのうちのひとつです。
-Lambda 関数のハンドラが呼び出されるとき、そのパラメーターとして「イベントオブジェクト」を受け取ることができるのですが、このイベントオブジェクトの中身は発生源によって異なります。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=nx>exports</span><span class=p>.</span><span class=nx>handler</span> <span class=o>=</span> <span class=kr>async</span> <span class=kd>function</span><span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=p>{</span>
-  <span class=c1>// event の中身は呼び出し元によってバラバラ
-</span><span class=c1></span><span class=p>}</span>
-</code></pre></div><p>つまり、Lambda 関数は呼び出し側が想定しているリクエストとレスポンスの型を意識した実装をしなければいけません。
+Cognito 連携などを使わないシンプルな Web API であれば、Lambda 関数 URL の仕組みで作ってしまうのが手っ取り早いかもしれません。</span></div><h3 id=lambda-プロキシ統合>Lambda プロキシ統合</h3><p>Lambda 関数は様々な AWS サービスからのイベント通知によって起動する仕組みになっており、API Gateway からの HTTPS リクエストもそのうちのひとつです。
+Lambda 関数のハンドラが呼び出されるとき、そのパラメーターとして「イベントオブジェクト」を受け取ることができるのですが、このイベントオブジェクトの中身は発生源によって異なります。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=nx>exports</span><span class=p>.</span><span class=nx>handler</span> <span class=o>=</span> <span class=kr>async</span> <span class=kd>function</span><span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=c1>// event の中身は呼び出し元によってバラバラ
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span></code></pre></div><p>つまり、Lambda 関数は呼び出し側が想定しているリクエストとレスポンスの型を意識した実装をしなければいけません。
 とはいえ、REST API の呼び出し方は大体決まっており、Lambda 関数側が欲しい情報も、URL パスやクエリ文字列、HTTP メソッドなど決まっています。
 そこで、API Gateway はこういった REST API の実装に都合のよい情報をイベントオブジェクトに詰めてくれる「<strong>Lambda プロキシ統合</strong>」という仕組みを提供しています。
 Lambda プロキシ統合を有効にすると、ハンドラ関数に渡されたイベントオブジェクトから、クエリ文字列などを簡単に取り出すことができます。
-レスポンスも決まった型で返さないといけないことに注意してください（間違った形式で返すと、クライアントに 502 エラーが通知されます）。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>Lambda プロキシ統合を有効にしたハンドラ関数のシグネチャ (TypeScript)</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>export</span> <span class=kr>const</span> <span class=nx>handler</span>: <span class=kt>APIGatewayProxyHandler</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=c1>// event.pathParameters でアクセス時の URL パス情報を参照可能
-</span><span class=c1></span>  <span class=c1>// event.queryStringParameters でクエリ文字列を参照可能
-</span><span class=c1></span>
-  <span class=k>return</span> <span class=p>{</span>
-    <span class=nx>statusCode</span>: <span class=kt>200</span><span class=p>,</span>
-    <span class=nx>body</span>: <span class=kt>JSON.stringify</span><span class=p>(</span><span class=nx>data</span><span class=p>),</span>
-    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
-      <span class=s2>&#34;Access-Control-Allow-Origin&#34;</span><span class=o>:</span> <span class=s2>&#34;*&#34;</span><span class=p>,</span>
-    <span class=p>},</span>
-    <span class=c1>// isBase64Encoded: true,  // body が Base64 エンコードされている場合
-</span><span class=c1></span>  <span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>以下の説明では、この Lambda プロキシ統合を有効にして API Gateway (REST API) の実装を行っています。</p>
-<h2 id=cdk-プロジェクトを作成する>CDK プロジェクトを作成する</h2>
-<p><a href=../../p/nujyfsy>CDK プロジェクトの作成</a> は次のような感じで完了しているものとします。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>mkdir myapi-sample
-<span class=gp>$ </span><span class=nb>cd</span> myapi-sample
-<span class=gp>$ </span>cdk init app --language typescript
-</code></pre></div><p>ここでは、Lambda 関数の実装にも TypeScript を使います。</p>
-<h2 id=lambda-関数を実装する>Lambda 関数を実装する</h2>
-<p>API Gateway (REST API) 経由で呼び出される Lambda 関数を実装します。
-最初に Lambda 関数用の TypeScript 型情報をインストールしておきます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>npm install --save-dev @types/aws-lambda  <span class=c1># npm の場合</span>
-<span class=gp>$ </span>yarn add --dev @types/aws-lambda          <span class=c1># yarn の場合</span>
-</code></pre></div><p>Lambda 関数の実装ファイル (<code>.ts</code>) は、プロジェクトルートに <code>lambda</code> ディレクトリを作ってそこに入れることにします。
+レスポンスも決まった型で返さないといけないことに注意してください（間違った形式で返すと、クライアントに 502 エラーが通知されます）。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>Lambda プロキシ統合を有効にしたハンドラ関数のシグネチャ (TypeScript)</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=line><span class=cl><span class=kr>export</span> <span class=kr>const</span> <span class=nx>handler</span>: <span class=kt>APIGatewayProxyHandler</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=c1>// event.pathParameters でアクセス時の URL パス情報を参照可能
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=c1>// event.queryStringParameters でクエリ文字列を参照可能
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>statusCode</span>: <span class=kt>200</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>body</span>: <span class=kt>JSON.stringify</span><span class=p>(</span><span class=nx>data</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=s2>&#34;Access-Control-Allow-Origin&#34;</span><span class=o>:</span> <span class=s2>&#34;*&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// isBase64Encoded: true,  // body が Base64 エンコードされている場合
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span></span></span></code></pre></div></div></figure><p>以下の説明では、この Lambda プロキシ統合を有効にして API Gateway (REST API) の実装を行っています。</p><h2 id=cdk-プロジェクトを作成する>CDK プロジェクトを作成する</h2><p><a href=../../p/nujyfsy>CDK プロジェクトの作成</a> は次のような感じで完了しているものとします。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=line><span class=cl><span class=gp>$</span> mkdir myapi-sample
+</span></span><span class=line><span class=cl><span class=gp>$</span> <span class=nb>cd</span> myapi-sample
+</span></span><span class=line><span class=cl><span class=gp>$</span> cdk init app --language typescript
+</span></span></code></pre></div><p>ここでは、Lambda 関数の実装にも TypeScript を使います。</p><h2 id=lambda-関数を実装する>Lambda 関数を実装する</h2><p>API Gateway (REST API) 経由で呼び出される Lambda 関数を実装します。
+最初に Lambda 関数用の TypeScript 型情報をインストールしておきます。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=line><span class=cl><span class=gp>$</span> npm install --save-dev @types/aws-lambda  <span class=c1># npm の場合</span>
+</span></span><span class=line><span class=cl><span class=gp>$</span> yarn add --dev @types/aws-lambda          <span class=c1># yarn の場合</span>
+</span></span></code></pre></div><p>Lambda 関数の実装ファイル (<code>.ts</code>) は、プロジェクトルートに <code>lambda</code> ディレクトリを作ってそこに入れることにします。
 ここでは、REST API として書籍情報を返す <code>/books</code> と <code>/books/{id}</code> というエンドポイントを作成します。
-それぞれのハンドラとして <code>getBooksHandler</code> 関数と <code>getBookHandler</code> 関数を定義します。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>lambda/books.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>APIGatewayProxyHandler</span><span class=p>,</span> <span class=nx>APIGatewayProxyResult</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;aws-lambda&#34;</span>
-
-<span class=kr>const</span> <span class=nx>BOOKS</span> <span class=o>=</span> <span class=p>[</span>
-  <span class=p>{</span> <span class=nx>id</span><span class=o>:</span> <span class=s2>&#34;1&#34;</span><span class=p>,</span> <span class=nx>title</span><span class=o>:</span> <span class=s2>&#34;Title-1&#34;</span> <span class=p>},</span>
-  <span class=p>{</span> <span class=nx>id</span><span class=o>:</span> <span class=s2>&#34;2&#34;</span><span class=p>,</span> <span class=nx>title</span><span class=o>:</span> <span class=s2>&#34;Title-2&#34;</span> <span class=p>},</span>
-  <span class=p>{</span> <span class=nx>id</span><span class=o>:</span> <span class=s2>&#34;3&#34;</span><span class=p>,</span> <span class=nx>title</span><span class=o>:</span> <span class=s2>&#34;Title-3&#34;</span> <span class=p>},</span>
-<span class=p>]</span>
-
-<span class=cm>/** GET /books */</span>
-<span class=kr>export</span> <span class=kr>const</span> <span class=nx>getBooksHandler</span>: <span class=kt>APIGatewayProxyHandler</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span>
-    <span class=s2>&#34;pathParameters = &#34;</span> <span class=o>+</span> <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>(</span><span class=nx>event</span><span class=p>.</span><span class=nx>pathParameters</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=mi>2</span><span class=p>)</span>
-  <span class=p>)</span>
-  <span class=k>return</span> <span class=nx>createResponse</span><span class=p>(</span><span class=nx>BOOKS</span><span class=p>)</span>
-<span class=p>}</span>
-
-<span class=cm>/** GET /books/{id} */</span>
-<span class=kr>export</span> <span class=kr>const</span> <span class=nx>getBookHandler</span>: <span class=kt>APIGatewayProxyHandler</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span>
-    <span class=s2>&#34;pathParameters = &#34;</span> <span class=o>+</span> <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>(</span><span class=nx>event</span><span class=p>.</span><span class=nx>pathParameters</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=mi>2</span><span class=p>)</span>
-  <span class=p>)</span>
-  <span class=kr>const</span> <span class=nx>id</span> <span class=o>=</span> <span class=nx>event</span><span class=p>.</span><span class=nx>pathParameters</span><span class=o>?</span><span class=p>.[</span><span class=s2>&#34;id&#34;</span><span class=p>]</span>
-  <span class=k>return</span> <span class=nx>createResponse</span><span class=p>(</span><span class=nx>BOOKS</span><span class=p>.</span><span class=nx>find</span><span class=p>((</span><span class=nx>b</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>b</span><span class=p>.</span><span class=nx>id</span> <span class=o>===</span> <span class=nx>id</span><span class=p>))</span>
-<span class=p>}</span>
-
-<span class=cm>/** レスポンスデータを生成する */</span>
-<span class=kd>function</span> <span class=nx>createResponse</span><span class=p>(</span><span class=nx>body</span>: <span class=kt>any</span><span class=p>)</span><span class=o>:</span> <span class=nx>APIGatewayProxyResult</span> <span class=p>{</span>
-  <span class=k>return</span> <span class=p>{</span>
-    <span class=nx>statusCode</span>: <span class=kt>200</span><span class=p>,</span>
-    <span class=nx>body</span>: <span class=kt>JSON.stringify</span><span class=p>(</span><span class=nx>body</span><span class=p>),</span>
-    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
-      <span class=s2>&#34;Access-Control-Allow-Origin&#34;</span><span class=o>:</span> <span class=s2>&#34;*&#34;</span><span class=p>,</span>
-    <span class=p>},</span>
-  <span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>Lambda プロキシ統合を前提とする場合、Lambda 関数の型は、AWS SDK によってあらかじめ定義された型（<code>APIGatewayProxyHandler</code> や <code>APIGatewayProxyResult</code>）を使う必要があります。
-また、Web ブラウザ上の JavaScript からの CORS アクセスを許可するために、レスポンスオブジェクトの <code>headers</code> プロパティで、<strong><code>Access-Control-Allow-Origin</code></strong> を指定しています。</p>
-<ul>
-<li>参考: <a href=https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html>Enabling CORS for a REST API resource - Amazon API Gateway</a></li>
-</ul>
-<h2 id=スタックを定義する>スタックを定義する</h2>
-<p><code>cdk init app</code> による CDK プロジェクトの初期化時に、<code>lib/myapi-sample-stack.ts</code> といった感じの CloudFormation スタック定義用のコードが生成されているので、これを修正して、<strong>Lambda 関数と API Gateway の定義</strong> を行い、両者を Lambda プロキシ統合します。
-TypeScript で実装した Lambda 関数を CDK で扱う方法の詳細は下記を参考にしてください。</p>
-<ul>
-<li>参考: <a href=../../p/cj9i4m3>AWS CDK で TypeScript で実装した Lambda 関数をデプロイする (NodejsFunction)</a></li>
-</ul>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>lib/myapi-sample-stack.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// CDK V2 系のインポート（追加インストールの必要なし）
-</span><span class=c1></span><span class=kr>import</span> <span class=p>{</span>
-  <span class=nx>Stack</span><span class=p>,</span>
-  <span class=nx>StackProps</span><span class=p>,</span>
-  <span class=nx>aws_apigateway</span> <span class=kr>as</span> <span class=nx>apigateway</span><span class=p>,</span>
-  <span class=nx>aws_lambda_nodejs</span> <span class=kr>as</span> <span class=nx>lambda</span><span class=p>,</span>
-<span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;aws-cdk-lib&#34;</span>
-<span class=kr>import</span> <span class=p>{</span> <span class=nx>Construct</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;constructs&#34;</span>
-
-<span class=kr>export</span> <span class=kr>class</span> <span class=nx>MyapiSampleStack</span> <span class=kr>extends</span> <span class=nx>Stack</span> <span class=p>{</span>
-  <span class=kr>constructor</span><span class=p>(</span><span class=nx>scope</span>: <span class=kt>Construct</span><span class=p>,</span> <span class=nx>id</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>props?</span>: <span class=kt>StackProps</span><span class=p>)</span> <span class=p>{</span>
-    <span class=kr>super</span><span class=p>(</span><span class=nx>scope</span><span class=p>,</span> <span class=nx>id</span><span class=p>,</span> <span class=nx>props</span><span class=p>)</span>
-
-    <span class=c1>// Lambda 関数（GET books/ 用）
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>getBooksHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>lambda</span><span class=p>.</span><span class=nx>NodejsFunction</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;getBooksHandler&#34;</span><span class=p>,</span> <span class=p>{</span>
-      <span class=nx>entry</span><span class=o>:</span> <span class=s2>&#34;lambda/books.ts&#34;</span><span class=p>,</span>
-      <span class=nx>handler</span><span class=o>:</span> <span class=s2>&#34;getBooksHandler&#34;</span><span class=p>,</span>
-    <span class=p>})</span>
-
-    <span class=c1>// Lambda 関数（GET books/{id} 用）
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>getBookHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>lambda</span><span class=p>.</span><span class=nx>NodejsFunction</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;getBookHandler&#34;</span><span class=p>,</span> <span class=p>{</span>
-      <span class=nx>entry</span><span class=o>:</span> <span class=s2>&#34;lambda/books.ts&#34;</span><span class=p>,</span>
-      <span class=nx>handler</span><span class=o>:</span> <span class=s2>&#34;getBookHandler&#34;</span><span class=p>,</span>
-    <span class=p>})</span>
-
-    <span class=c1>// API Gateway (REST API) の作成
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>api</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>RestApi</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;BookApi&#34;</span><span class=p>)</span>
-
-    <span class=c1>// リソースを定義して Lambda プロキシ統合 (GET books/)
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>books</span> <span class=o>=</span> <span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s2>&#34;books&#34;</span><span class=p>)</span>
-    <span class=nx>books</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s2>&#34;GET&#34;</span><span class=p>,</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>getBooksHandler</span><span class=p>))</span>
-
-    <span class=c1>// リソースを定義して Lambda プロキシ統合 (GET book/)
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>singleBook</span> <span class=o>=</span> <span class=nx>books</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s2>&#34;{id}&#34;</span><span class=p>)</span>
-    <span class=nx>singleBook</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s2>&#34;GET&#34;</span><span class=p>,</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>getBookHandler</span><span class=p>))</span>
-  <span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>コードの末尾あたりの、<strong><code>apigateway.LambdaIntegration()</code></strong> の部分が、API Gateway の Lambda プロキシ統合を行っている部分になります。
+それぞれのハンドラとして <code>getBooksHandler</code> 関数と <code>getBookHandler</code> 関数を定義します。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>lambda/books.ts</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span> <span class=nx>APIGatewayProxyHandler</span><span class=p>,</span> <span class=nx>APIGatewayProxyResult</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;aws-lambda&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>BOOKS</span> <span class=o>=</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span> <span class=nx>id</span><span class=o>:</span> <span class=s2>&#34;1&#34;</span><span class=p>,</span> <span class=nx>title</span><span class=o>:</span> <span class=s2>&#34;Title-1&#34;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span> <span class=nx>id</span><span class=o>:</span> <span class=s2>&#34;2&#34;</span><span class=p>,</span> <span class=nx>title</span><span class=o>:</span> <span class=s2>&#34;Title-2&#34;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span> <span class=nx>id</span><span class=o>:</span> <span class=s2>&#34;3&#34;</span><span class=p>,</span> <span class=nx>title</span><span class=o>:</span> <span class=s2>&#34;Title-3&#34;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/** GET /books */</span>
+</span></span><span class=line><span class=cl><span class=kr>export</span> <span class=kr>const</span> <span class=nx>getBooksHandler</span>: <span class=kt>APIGatewayProxyHandler</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;pathParameters = &#34;</span> <span class=o>+</span> <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>(</span><span class=nx>event</span><span class=p>.</span><span class=nx>pathParameters</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=nx>createResponse</span><span class=p>(</span><span class=nx>BOOKS</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/** GET /books/{id} */</span>
+</span></span><span class=line><span class=cl><span class=kr>export</span> <span class=kr>const</span> <span class=nx>getBookHandler</span>: <span class=kt>APIGatewayProxyHandler</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;pathParameters = &#34;</span> <span class=o>+</span> <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>(</span><span class=nx>event</span><span class=p>.</span><span class=nx>pathParameters</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>id</span> <span class=o>=</span> <span class=nx>event</span><span class=p>.</span><span class=nx>pathParameters</span><span class=o>?</span><span class=p>.[</span><span class=s2>&#34;id&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=nx>createResponse</span><span class=p>(</span><span class=nx>BOOKS</span><span class=p>.</span><span class=nx>find</span><span class=p>((</span><span class=nx>b</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=nx>b</span><span class=p>.</span><span class=nx>id</span> <span class=o>===</span> <span class=nx>id</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/** レスポンスデータを生成する */</span>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>createResponse</span><span class=p>(</span><span class=nx>body</span>: <span class=kt>any</span><span class=p>)</span><span class=o>:</span> <span class=nx>APIGatewayProxyResult</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>statusCode</span>: <span class=kt>200</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>body</span>: <span class=kt>JSON.stringify</span><span class=p>(</span><span class=nx>body</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=s2>&#34;Access-Control-Allow-Origin&#34;</span><span class=o>:</span> <span class=s2>&#34;*&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span></span></span></code></pre></div></div></figure><p>Lambda プロキシ統合を前提とする場合、Lambda 関数の型は、AWS SDK によってあらかじめ定義された型（<code>APIGatewayProxyHandler</code> や <code>APIGatewayProxyResult</code>）を使う必要があります。
+また、Web ブラウザ上の JavaScript からの CORS アクセスを許可するために、レスポンスオブジェクトの <code>headers</code> プロパティで、<strong><code>Access-Control-Allow-Origin</code></strong> を指定しています。</p><ul><li>参考: <a href=https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html>Enabling CORS for a REST API resource - Amazon API Gateway</a></li></ul><h2 id=スタックを定義する>スタックを定義する</h2><p><code>cdk init app</code> による CDK プロジェクトの初期化時に、<code>lib/myapi-sample-stack.ts</code> といった感じの CloudFormation スタック定義用のコードが生成されているので、これを修正して、<strong>Lambda 関数と API Gateway の定義</strong> を行い、両者を Lambda プロキシ統合します。
+TypeScript で実装した Lambda 関数を CDK で扱う方法の詳細は下記を参考にしてください。</p><ul><li>参考: <a href=../../p/cj9i4m3>AWS CDK で TypeScript で実装した Lambda 関数をデプロイする (NodejsFunction)</a></li></ul><figure class=xCodeBlock><figcaption class=xCodeBlock_title>lib/myapi-sample-stack.ts</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=line><span class=cl><span class=c1>// CDK V2 系のインポート（追加インストールの必要なし）
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>import</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>Stack</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>StackProps</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>aws_apigateway</span> <span class=kr>as</span> <span class=nx>apigateway</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>aws_lambda_nodejs</span> <span class=kr>as</span> <span class=nx>lambda</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;aws-cdk-lib&#34;</span>
+</span></span><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span> <span class=nx>Construct</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;constructs&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>export</span> <span class=kr>class</span> <span class=nx>MyapiSampleStack</span> <span class=kr>extends</span> <span class=nx>Stack</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kr>constructor</span><span class=p>(</span><span class=nx>scope</span>: <span class=kt>Construct</span><span class=p>,</span> <span class=nx>id</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>props?</span>: <span class=kt>StackProps</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>super</span><span class=p>(</span><span class=nx>scope</span><span class=p>,</span> <span class=nx>id</span><span class=p>,</span> <span class=nx>props</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// Lambda 関数（GET books/ 用）
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kr>const</span> <span class=nx>getBooksHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>lambda</span><span class=p>.</span><span class=nx>NodejsFunction</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;getBooksHandler&#34;</span><span class=p>,</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>entry</span><span class=o>:</span> <span class=s2>&#34;lambda/books.ts&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nx>handler</span><span class=o>:</span> <span class=s2>&#34;getBooksHandler&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// Lambda 関数（GET books/{id} 用）
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kr>const</span> <span class=nx>getBookHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>lambda</span><span class=p>.</span><span class=nx>NodejsFunction</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;getBookHandler&#34;</span><span class=p>,</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>entry</span><span class=o>:</span> <span class=s2>&#34;lambda/books.ts&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nx>handler</span><span class=o>:</span> <span class=s2>&#34;getBookHandler&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// API Gateway (REST API) の作成
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kr>const</span> <span class=nx>api</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>RestApi</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;BookApi&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// リソースを定義して Lambda プロキシ統合 (GET books/)
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kr>const</span> <span class=nx>books</span> <span class=o>=</span> <span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s2>&#34;books&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>books</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s2>&#34;GET&#34;</span><span class=p>,</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>getBooksHandler</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// リソースを定義して Lambda プロキシ統合 (GET book/)
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kr>const</span> <span class=nx>singleBook</span> <span class=o>=</span> <span class=nx>books</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s2>&#34;{id}&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>singleBook</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s2>&#34;GET&#34;</span><span class=p>,</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>getBookHandler</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span></span></span></code></pre></div></div></figure><p>コードの末尾あたりの、<strong><code>apigateway.LambdaIntegration()</code></strong> の部分が、API Gateway の Lambda プロキシ統合を行っている部分になります。
 指定したリソース（URL パス）と HTTP メソッドを、特定のハンドラ関数に結びつけています。
-こうすることで、その URL (REST API) にアクセスしたときに、扱いやすいイベントオブジェクトをハンドラ関数に渡してくれるようになります。</p>
-<h2 id=デプロイ>デプロイ</h2>
-<p>Lambda 関数の実装とスタックの定義が完了したら、CDK でデプロイを行います。
-デプロイが完了すると、標準出力に API のエンドポイント (URL) を表示してくれます。</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=gp>$ </span>cdk deploy
-<span class=err>
-</span><span class=err></span><span class=go>...
-</span><span class=go></span><span class=err>
-</span><span class=err></span><span class=go>Outputs:
-</span><span class=go>MyapiSampleStack.BookApiEndpointCA1C03A3 =
-</span><span class=go>    https://a4chxhlkod.execute-api.ap-northeast-1.amazonaws.com/prod/
-</span></code></pre></div><p>上記 URL の末尾に <code>/books</code> を付けて Web ブラウザからアクセスすれば REST API を呼び出せます。
-次のような書籍一覧情報の JSON データが返ってくれば成功です。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>/books のレスポンス</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>[{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;1&#34;</span><span class=p>,</span><span class=nt>&#34;title&#34;</span><span class=p>:</span><span class=s2>&#34;Title-1&#34;</span><span class=p>},{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;2&#34;</span><span class=p>,</span><span class=nt>&#34;title&#34;</span><span class=p>:</span><span class=s2>&#34;Title-2&#34;</span><span class=p>},{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;3&#34;</span><span class=p>,</span><span class=nt>&#34;title&#34;</span><span class=p>:</span><span class=s2>&#34;Title-3&#34;</span><span class=p>}]</span></code></pre></div></div>
-</figure>
-<p>単一の書籍情報を取得する場合は、<code>/books/1</code> のように、書籍 ID まで指定してアクセスします。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>/books/1 のレスポンス</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;1&#34;</span><span class=p>,</span><span class=nt>&#34;title&#34;</span><span class=p>:</span><span class=s2>&#34;Title-1&#34;</span><span class=p>}</span></code></pre></div></div>
-</figure>
-<h2 id=応用プロキシリソースで複数階層の-url-をまとめてハンドルする>（応用）プロキシリソースで複数階層の URL をまとめてハンドルする</h2>
-<h3 id=プロキシリソースとは>プロキシリソースとは</h3>
-<p>前述の例では、ひとつの書籍情報を返す REST API のパスとして<code>/books/{id}</code> を設定し、パスパラメーター <code>{id}</code> で書籍 ID を受け取るようにしていました。
+こうすることで、その URL (REST API) にアクセスしたときに、扱いやすいイベントオブジェクトをハンドラ関数に渡してくれるようになります。</p><h2 id=デプロイ>デプロイ</h2><p>Lambda 関数の実装とスタックの定義が完了したら、CDK でデプロイを行います。
+デプロイが完了すると、標準出力に API のエンドポイント (URL) を表示してくれます。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-console data-lang=console><span class=line><span class=cl><span class=gp>$</span> cdk deploy
+</span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=go>...
+</span></span></span><span class=line><span class=cl><span class=go></span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=go>Outputs:
+</span></span></span><span class=line><span class=cl><span class=go>MyapiSampleStack.BookApiEndpointCA1C03A3 =
+</span></span></span><span class=line><span class=cl><span class=go>    https://a4chxhlkod.execute-api.ap-northeast-1.amazonaws.com/prod/
+</span></span></span></code></pre></div><p>上記 URL の末尾に <code>/books</code> を付けて Web ブラウザからアクセスすれば REST API を呼び出せます。
+次のような書籍一覧情報の JSON データが返ってくれば成功です。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>/books のレスポンス</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>[{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;1&#34;</span><span class=p>,</span><span class=nt>&#34;title&#34;</span><span class=p>:</span><span class=s2>&#34;Title-1&#34;</span><span class=p>},{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;2&#34;</span><span class=p>,</span><span class=nt>&#34;title&#34;</span><span class=p>:</span><span class=s2>&#34;Title-2&#34;</span><span class=p>},{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;3&#34;</span><span class=p>,</span><span class=nt>&#34;title&#34;</span><span class=p>:</span><span class=s2>&#34;Title-3&#34;</span><span class=p>}]</span></span></span></code></pre></div></div></figure><p>単一の書籍情報を取得する場合は、<code>/books/1</code> のように、書籍 ID まで指定してアクセスします。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>/books/1 のレスポンス</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span><span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=s2>&#34;1&#34;</span><span class=p>,</span><span class=nt>&#34;title&#34;</span><span class=p>:</span><span class=s2>&#34;Title-1&#34;</span><span class=p>}</span></span></span></code></pre></div></div></figure><h2 id=応用プロキシリソースで複数階層の-url-をまとめてハンドルする>（応用）プロキシリソースで複数階層の URL をまとめてハンドルする</h2><h3 id=プロキシリソースとは>プロキシリソースとは</h3><p>前述の例では、ひとつの書籍情報を返す REST API のパスとして<code>/books/{id}</code> を設定し、パスパラメーター <code>{id}</code> で書籍 ID を受け取るようにしていました。
 API Gateway の <strong>プロキシリソース</strong> の仕組みを利用すると、複数階層の URL（例: <code>/aaa/bbb/ccc</code>）を 1 つのパスパラメーター（<strong><code>{proxy+}</code></strong>）で受け取ることができます。
 <strong>プロキシリソースは、前述の Lambda プロキシ統合とは別物</strong> なので注意してください。
-Lambda プロキシ統合の方は、単に REST API 呼び出しを Lambda 関数の呼び出しに変換する機能です。</p>
-<p>プロキシリソースを使うと、1 つのハンドラー関数実装で様々な URL での API 呼び出しを処理することができます。
+Lambda プロキシ統合の方は、単に REST API 呼び出しを Lambda 関数の呼び出しに変換する機能です。</p><p>プロキシリソースを使うと、1 つのハンドラー関数実装で様々な URL での API 呼び出しを処理することができます。
 例えば、<code>/aaa</code> 、<code>/aaa/bbb/ccc</code> 、<code>/foo/bar</code> といった URL でのアクセスを、1 つのハンドラー関数でまとめて処理できます。
-さらに、ハンドルする HTTP メソッドとして <strong><code>ANY</code></strong> を指定することで、複数の HTTP メソッド（<code>GET</code> や <code>POST</code> など）もまとめて 1 つの関数で処理できます。</p>
-<p>プロキシリソースの <code>{proxy+}</code> の部分のことを <strong>greedy パスパラメーター (greedy path parameter)</strong> とか、<strong>greedy パス変数</strong> と呼びます。
+さらに、ハンドルする HTTP メソッドとして <strong><code>ANY</code></strong> を指定することで、複数の HTTP メソッド（<code>GET</code> や <code>POST</code> など）もまとめて 1 つの関数で処理できます。</p><p>プロキシリソースの <code>{proxy+}</code> の部分のことを <strong>greedy パスパラメーター (greedy path parameter)</strong> とか、<strong>greedy パス変数</strong> と呼びます。
 greedy とは「貪欲な」とか「食いしん坊な」という意味で、いろんな URL を飲み込んじゃうことを示しています。
-個人的には「食いしん坊パス」と呼びたいところです。</p>
-<h3 id=cdk-でプロキシリソースを定義する>CDK でプロキシリソースを定義する</h3>
-<p>先に CloudFormation のスタックを作る CDK コードを見ていきます。
-ここでは、API Gateway の REST API を作成し、プロキシリソース (<code>/greedy/{proxy+}</code>) を追加し、そこにハンドラー関数 (<code>greedyHandler</code>) を Lambda プロキシ統合します（ハンドラーは後ほど実装）。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>lib/myapi-sample-stack.ts（抜粋）</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=c1>// CDK V2 系のインポート
-</span><span class=c1></span><span class=kr>import</span> <span class=p>{</span>
-  <span class=nx>Stack</span><span class=p>,</span>
-  <span class=nx>StackProps</span><span class=p>,</span>
-  <span class=nx>aws_apigateway</span> <span class=kr>as</span> <span class=nx>apigateway</span><span class=p>,</span>
-  <span class=nx>aws_lambda_nodejs</span> <span class=kr>as</span> <span class=nx>lambda</span><span class=p>,</span>
-<span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;aws-cdk-lib&#34;</span>
-<span class=kr>import</span> <span class=p>{</span> <span class=nx>Construct</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;constructs&#34;</span>
-
-<span class=kr>export</span> <span class=kr>class</span> <span class=nx>MyapiSampleStack</span> <span class=kr>extends</span> <span class=nx>Stack</span> <span class=p>{</span>
-  <span class=kr>constructor</span><span class=p>(</span><span class=nx>scope</span>: <span class=kt>Construct</span><span class=p>,</span> <span class=nx>id</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>props?</span>: <span class=kt>StackProps</span><span class=p>)</span> <span class=p>{</span>
-    <span class=kr>super</span><span class=p>(</span><span class=nx>scope</span><span class=p>,</span> <span class=nx>id</span><span class=p>,</span> <span class=nx>props</span><span class=p>)</span>
-
-    <span class=c1>// API Gateway (REST API) を作成
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>api</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>RestApi</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;SampleApi&#34;</span><span class=p>)</span>
-
-    <span class=c1>// プロキシリソース (/greedy/{proxy+}) を扱うハンドラー関数を作成
-</span><span class=c1></span>    <span class=kr>const</span> <span class=nx>greedyHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>lambda</span><span class=p>.</span><span class=nx>NodejsFunction</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s1>&#39;GreedyHandler&#39;</span><span class=p>,</span> <span class=p>{</span>
-      <span class=nx>entry</span><span class=o>:</span> <span class=s1>&#39;lambda/api.ts&#39;</span><span class=p>,</span>
-      <span class=nx>handler</span><span class=o>:</span> <span class=s1>&#39;greedyHandler&#39;</span><span class=p>,</span>
-    <span class=p>})</span>
-
-    <span class=c1>// `/greedy/{proxy+}` というプロキシリソースを Lambda プロキシ統合して追加
-</span><span class=c1></span>    <span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s1>&#39;greedy&#39;</span><span class=p>).</span><span class=nx>addProxy</span><span class=p>({</span>
-      <span class=nx>anyMethod</span>: <span class=kt>true</span><span class=p>,</span> <span class=c1>// すべての HTTP メソッド (ANY) をハンドル
-</span><span class=c1></span>      <span class=nx>defaultIntegration</span>: <span class=kt>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>greedyHandler</span><span class=p>),</span>
-    <span class=p>})</span>
-  <span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>プロキシリソースを定義している部分は最後の <code>api.root.addResource('greedy').addProxy(...)</code> という部分ですが、greedy パス名としては <strong><code>{proxy+}</code></strong> が自動的に割り当てられるようです。</p>
-<p>ちなみに、API に Cognito ユーザープール認可などの Authorizer を設定するときは、OPTIONS メソッドに Authorizer が設定されないようにしなければいけません。
+個人的には「食いしん坊パス」と呼びたいところです。</p><h3 id=cdk-でプロキシリソースを定義する>CDK でプロキシリソースを定義する</h3><p>先に CloudFormation のスタックを作る CDK コードを見ていきます。
+ここでは、API Gateway の REST API を作成し、プロキシリソース (<code>/greedy/{proxy+}</code>) を追加し、そこにハンドラー関数 (<code>greedyHandler</code>) を Lambda プロキシ統合します（ハンドラーは後ほど実装）。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>lib/myapi-sample-stack.ts（抜粋）</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=line><span class=cl><span class=c1>// CDK V2 系のインポート
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>import</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>Stack</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>StackProps</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>aws_apigateway</span> <span class=kr>as</span> <span class=nx>apigateway</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>aws_lambda_nodejs</span> <span class=kr>as</span> <span class=nx>lambda</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;aws-cdk-lib&#34;</span>
+</span></span><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span> <span class=nx>Construct</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;constructs&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>export</span> <span class=kr>class</span> <span class=nx>MyapiSampleStack</span> <span class=kr>extends</span> <span class=nx>Stack</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kr>constructor</span><span class=p>(</span><span class=nx>scope</span>: <span class=kt>Construct</span><span class=p>,</span> <span class=nx>id</span>: <span class=kt>string</span><span class=p>,</span> <span class=nx>props?</span>: <span class=kt>StackProps</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>super</span><span class=p>(</span><span class=nx>scope</span><span class=p>,</span> <span class=nx>id</span><span class=p>,</span> <span class=nx>props</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// API Gateway (REST API) を作成
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kr>const</span> <span class=nx>api</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>RestApi</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s2>&#34;SampleApi&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// プロキシリソース (/greedy/{proxy+}) を扱うハンドラー関数を作成
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kr>const</span> <span class=nx>greedyHandler</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>lambda</span><span class=p>.</span><span class=nx>NodejsFunction</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s1>&#39;GreedyHandler&#39;</span><span class=p>,</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>entry</span><span class=o>:</span> <span class=s1>&#39;lambda/api.ts&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nx>handler</span><span class=o>:</span> <span class=s1>&#39;greedyHandler&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// `/greedy/{proxy+}` というプロキシリソースを Lambda プロキシ統合して追加
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s1>&#39;greedy&#39;</span><span class=p>).</span><span class=nx>addProxy</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>      <span class=nx>anyMethod</span>: <span class=kt>true</span><span class=p>,</span> <span class=c1>// すべての HTTP メソッド (ANY) をハンドル
+</span></span></span><span class=line><span class=cl><span class=c1></span>      <span class=nx>defaultIntegration</span>: <span class=kt>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>greedyHandler</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=p>})</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span></span></span></code></pre></div></div></figure><p>プロキシリソースを定義している部分は最後の <code>api.root.addResource('greedy').addProxy(...)</code> という部分ですが、greedy パス名としては <strong><code>{proxy+}</code></strong> が自動的に割り当てられるようです。</p><p>ちなみに、API に Cognito ユーザープール認可などの Authorizer を設定するときは、OPTIONS メソッドに Authorizer が設定されないようにしなければいけません。
 上記コードの <code>addProxy</code> 部分に単純に Authorizer を設定してしまうと、OPTIONS メソッドにまで Authorizer が設定されてしまい、HTTP のプリフライトリクエスト（OPTIONS リクエスト）が弾かれてしまいます。
-簡単に言うと、API Gateway で定義した API が Web ブラウザ上の JavaScript から呼び出せなくなります。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>ダメな Authorizer 設定方法</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s1>&#39;greedy&#39;</span><span class=p>).</span><span class=nx>addProxy</span><span class=p>({</span>
-  <span class=nx>anyMethod</span>: <span class=kt>true</span><span class=p>,</span> <span class=c1>// OPTIONS メソッドまで Authorizer が設定されてしまう
-</span><span class=c1></span>  <span class=nx>defaultIntegration</span>: <span class=kt>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>greedyHandler</span><span class=p>),</span>
-  <span class=nx>defaultMethodOptions</span><span class=o>:</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>},</span>
-<span class=p>})</span></code></pre></div></div>
-</figure>
-<p>なので、Authorizer は何とかして OPTIONS メソッド以外に設定してやる必要があります。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>例えばこうすれば動く</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>const</span> <span class=nx>greedyResource</span> <span class=o>=</span> <span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s1>&#39;greedy&#39;</span><span class=p>).</span><span class=nx>addProxy</span><span class=p>({</span>
-  <span class=nx>anyMethod</span>: <span class=kt>false</span><span class=p>,</span> <span class=c1>// ここでは HTTP メソッドを追加しない
-</span><span class=c1></span>  <span class=nx>defaultIntegration</span>: <span class=kt>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>greedyHandler</span><span class=p>),</span>
-<span class=p>})</span>
-
-<span class=c1>// OPTIONS 以外の各メソッドに個別に Authorizer を設定する
-</span><span class=c1></span><span class=nx>greedyResource</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;GET&#39;</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>})</span>
-<span class=nx>greedyResource</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;POST&#39;</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>})</span>
-<span class=nx>greedyResource</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;PUT&#39;</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>})</span>
-<span class=nx>greedyResource</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;DELETE&#39;</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>})</span></code></pre></div></div>
-</figure>
-<p>API Gateway に Cognito 認証をかける方法の詳細は <a href=../../p/vujw9jv/>こちらを参照</a> してください。</p>
-<h3 id=プロキシリソース用のハンドラーlambda-関数を実装する>プロキシリソース用のハンドラー（Lambda 関数）を実装する</h3>
-<p>上記で定義したプロキシリソース URL (<code>/greedy/{proxy+}</code>) にアクセスしたときに呼び出される Lambda 関数（ハンドラー）を実装します。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>lambda/api.ts</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=kr>import</span> <span class=p>{</span> <span class=nx>APIGatewayProxyHandler</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;aws-lambda&#39;</span>
-
-<span class=kr>export</span> <span class=kr>const</span> <span class=nx>greedyHandler</span>: <span class=kt>APIGatewayProxyHandler</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
-  <span class=c1>// レスポンス本文用の JSON テキストを作る
-</span><span class=c1></span>  <span class=kr>const</span> <span class=nx>responseBody</span> <span class=o>=</span> <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>({</span>
-    <span class=nx>message</span><span class=o>:</span> <span class=s1>&#39;I am greedyHandler!&#39;</span><span class=p>,</span>
-    <span class=nx>httpMethod</span>: <span class=kt>event.httpMethod</span><span class=p>,</span>
-    <span class=nx>path</span>: <span class=kt>event.path</span><span class=p>,</span>
-    <span class=nx>pathParameters</span>: <span class=kt>event.pathParameters</span><span class=p>,</span>
-    <span class=nx>queryStringParameters</span>: <span class=kt>event.queryStringParameters</span><span class=p>,</span>
-  <span class=p>})</span>
-
-  <span class=c1>// APIGatewayProxyResult 型のレスポンスを返す
-</span><span class=c1></span>  <span class=k>return</span> <span class=p>{</span>
-    <span class=nx>statusCode</span>: <span class=kt>200</span><span class=p>,</span>
-    <span class=nx>body</span>: <span class=kt>responseBody</span><span class=p>,</span>
-    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
-      <span class=s1>&#39;Access-Control-Allow-Origin&#39;</span><span class=o>:</span> <span class=s1>&#39;*&#39;</span><span class=p>,</span>
-    <span class=p>},</span>
-  <span class=p>}</span>
-<span class=p>}</span></code></pre></div></div>
-</figure>
-<p>実際にどのような URL で REST API が呼び出されたかは、ハンドラー関数に渡されるイベントオブジェクト (<a href=https://github.com/DefinitelyTyped/DefinitelyTyped/blob/48a5faec8eb951a173129e8dfe285a00ca0a426f/types/aws-lambda/trigger/api-gateway-proxy.d.ts#L109>APIGatewayProxyEvent</a>) を参照すると分かります。
-例えば、<code>/greedy/aaa/bbb/ccc/?foo=100&bar</code> という URL でアクセスした場合、イベントオブジェクトの値は次のようになります。</p>
-<table>
-<thead>
-<tr>
-<th>プロパティ</th>
-<th>値</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>event.httpMethod</code></td>
-<td><code>GET</code></td>
-</tr>
-<tr>
-<td><code>event.path</code></td>
-<td><code>/greedy/aaa/bbb/ccc/</code></td>
-</tr>
-<tr>
-<td><strong><code>event.pathParameters</code></strong></td>
-<td><strong><code>{ proxy: "aaa/bbb/ccc" }</code></strong></td>
-</tr>
-<tr>
-<td><code>event.queryStringParameters</code></td>
-<td><code>{ bar: "", foo: "100" }</code></td>
-</tr>
-</tbody>
-</table>
-<p>つまり、<strong><code>event.pathParameters.proxy</code></strong> の値を見ることで、パスに応じた処理を行えるということですね。</p>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=../../p/vujw9jv/>AWS CDK で API Gateway に Cognito 認証によるアクセス制御を追加する</a></li>
-<li><a href=../../p/38jt3cm/>AWS CDK で Go 言語で実装した Lambda 関数をデプロイする (GoFunction)</a></li>
-<li><a href=../../p/4h3jygw/>AWS CDK メモ: CDK アプリのパッケージ管理に Yarn を使う方法</a></li>
-<li><a href=../../p/q7q8p6m/>AWS CDK メモ: ブートストラップ処理を実行する (cdk bootstrap)</a></li>
-<li><a href=../../p/54s6es8/>Go 言語で AWS CDK V2 を使う (1) 導入編</a></li>
-<li><a href=../../p/qwb6v89/>Amazon API Gateway をコマンドライン (CLI) から操作する</a></li>
-<li><a href=../../p/vx5ta85/>AWS CDK で外部パラメーターを扱う（コンテキスト・バリューと環境変数）</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/aws>AWS</a></span>
+簡単に言うと、API Gateway で定義した API が Web ブラウザ上の JavaScript から呼び出せなくなります。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>ダメな Authorizer 設定方法</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=line><span class=cl><span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s1>&#39;greedy&#39;</span><span class=p>).</span><span class=nx>addProxy</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>  <span class=nx>anyMethod</span>: <span class=kt>true</span><span class=p>,</span> <span class=c1>// OPTIONS メソッドまで Authorizer が設定されてしまう
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=nx>defaultIntegration</span>: <span class=kt>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>greedyHandler</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>  <span class=nx>defaultMethodOptions</span><span class=o>:</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl><span class=p>})</span></span></span></code></pre></div></div></figure><p>なので、Authorizer は何とかして OPTIONS メソッド以外に設定してやる必要があります。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>例えばこうすれば動く</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=line><span class=cl><span class=kr>const</span> <span class=nx>greedyResource</span> <span class=o>=</span> <span class=nx>api</span><span class=p>.</span><span class=nx>root</span><span class=p>.</span><span class=nx>addResource</span><span class=p>(</span><span class=s1>&#39;greedy&#39;</span><span class=p>).</span><span class=nx>addProxy</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>  <span class=nx>anyMethod</span>: <span class=kt>false</span><span class=p>,</span> <span class=c1>// ここでは HTTP メソッドを追加しない
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=nx>defaultIntegration</span>: <span class=kt>new</span> <span class=nx>apigateway</span><span class=p>.</span><span class=nx>LambdaIntegration</span><span class=p>(</span><span class=nx>greedyHandler</span><span class=p>),</span>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// OPTIONS 以外の各メソッドに個別に Authorizer を設定する
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>greedyResource</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;GET&#39;</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>})</span>
+</span></span><span class=line><span class=cl><span class=nx>greedyResource</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;POST&#39;</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>})</span>
+</span></span><span class=line><span class=cl><span class=nx>greedyResource</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;PUT&#39;</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>})</span>
+</span></span><span class=line><span class=cl><span class=nx>greedyResource</span><span class=p>.</span><span class=nx>addMethod</span><span class=p>(</span><span class=s1>&#39;DELETE&#39;</span><span class=p>,</span> <span class=kc>undefined</span><span class=p>,</span> <span class=p>{</span> <span class=nx>authorizer</span> <span class=p>})</span></span></span></code></pre></div></div></figure><p>API Gateway に Cognito 認証をかける方法の詳細は <a href=../../p/vujw9jv/>こちらを参照</a> してください。</p><h3 id=プロキシリソース用のハンドラーlambda-関数を実装する>プロキシリソース用のハンドラー（Lambda 関数）を実装する</h3><p>上記で定義したプロキシリソース URL (<code>/greedy/{proxy+}</code>) にアクセスしたときに呼び出される Lambda 関数（ハンドラー）を実装します。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>lambda/api.ts</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-ts data-lang=ts><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span> <span class=nx>APIGatewayProxyHandler</span> <span class=p>}</span> <span class=kr>from</span> <span class=s1>&#39;aws-lambda&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>export</span> <span class=kr>const</span> <span class=nx>greedyHandler</span>: <span class=kt>APIGatewayProxyHandler</span> <span class=o>=</span> <span class=kr>async</span> <span class=p>(</span><span class=nx>event</span><span class=p>)</span> <span class=o>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=c1>// レスポンス本文用の JSON テキストを作る
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kr>const</span> <span class=nx>responseBody</span> <span class=o>=</span> <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>    <span class=nx>message</span><span class=o>:</span> <span class=s1>&#39;I am greedyHandler!&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>httpMethod</span>: <span class=kt>event.httpMethod</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>path</span>: <span class=kt>event.path</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>pathParameters</span>: <span class=kt>event.pathParameters</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>queryStringParameters</span>: <span class=kt>event.queryStringParameters</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c1>// APIGatewayProxyResult 型のレスポンスを返す
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=k>return</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>statusCode</span>: <span class=kt>200</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>body</span>: <span class=kt>responseBody</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=s1>&#39;Access-Control-Allow-Origin&#39;</span><span class=o>:</span> <span class=s1>&#39;*&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span></span></span></code></pre></div></div></figure><p>実際にどのような URL で REST API が呼び出されたかは、ハンドラー関数に渡されるイベントオブジェクト (<a href=https://github.com/DefinitelyTyped/DefinitelyTyped/blob/48a5faec8eb951a173129e8dfe285a00ca0a426f/types/aws-lambda/trigger/api-gateway-proxy.d.ts#L109>APIGatewayProxyEvent</a>) を参照すると分かります。
+例えば、<code>/greedy/aaa/bbb/ccc/?foo=100&amp;bar</code> という URL でアクセスした場合、イベントオブジェクトの値は次のようになります。</p><table><thead><tr><th>プロパティ</th><th>値</th></tr></thead><tbody><tr><td><code>event.httpMethod</code></td><td><code>GET</code></td></tr><tr><td><code>event.path</code></td><td><code>/greedy/aaa/bbb/ccc/</code></td></tr><tr><td><strong><code>event.pathParameters</code></strong></td><td><strong><code>{ proxy: "aaa/bbb/ccc" }</code></strong></td></tr><tr><td><code>event.queryStringParameters</code></td><td><code>{ bar: "", foo: "100" }</code></td></tr></tbody></table><p>つまり、<strong><code>event.pathParameters.proxy</code></strong> の値を見ることで、パスに応じた処理を行えるということですね。</p><meta itemprop=author content="まく"><span itemprop=publisher itemscope itemtype=https://schema.org/Organization><meta itemprop=name content="まく"></span><h3 style="border-bottom:1px solid gray">関連記事</h3><ul><li><a href=../../p/vujw9jv/>AWS CDK で API Gateway に Cognito 認証によるアクセス制御を追加する</a></li><li><a href=../../p/38jt3cm/>AWS CDK で Go 言語で実装した Lambda 関数をデプロイする (GoFunction)</a></li><li><a href=../../p/4h3jygw/>AWS CDK メモ: CDK アプリのパッケージ管理に Yarn を使う方法</a></li><li><a href=../../p/q7q8p6m/>AWS CDK メモ: ブートストラップ処理を実行する (cdk bootstrap)</a></li><li><a href=../../p/54s6es8/>Go 言語で AWS CDK V2 を使う (1) 導入編</a></li><li><a href=../../p/qwb6v89/>Amazon API Gateway をコマンドライン (CLI) から操作する</a></li><li><a href=../../p/vx5ta85/>AWS CDK で外部パラメーターを扱う（コンテキスト・バリューと環境変数）</a></li></ul><div class=xPageTags><span class=xPageTags_item><a href=../../tags/aws>AWS</a></span>
 <span class=xPageTags_item><a href=../../tags/aws/api-gateway>AWS/API Gateway</a></span>
-<span class=xPageTags_item><a href=../../tags/aws/cdk>AWS/CDK</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=../../p/wqamv5d/><span class=xArticle_up_label>Amazon API Gateway のメモ</span><br>へ戻る</a>
-</div>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/vujw9jv/>AWS CDK で API Gateway に Cognito 認証によるアクセス制御を追加する</a>
-</div>
-<div class=xPrevNextLink_next>
-<a href=../../p/qwb6v89/>Amazon API Gateway をコマンドライン (CLI) から操作する</a>
-</div>
-</div>
-</aside>
-</article>
-<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+<span class=xPageTags_item><a href=../../tags/aws/cdk>AWS/CDK</a></span></div></div><div style=text-align:right><div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div></div><div class=xArticle_up><a href=../../p/wqamv5d/><span class=xArticle_up_label>Amazon API Gateway のメモ</span><br>へ戻る</a></div><aside><div class=xPrevNextLink><div class=xPrevNextLink_prev><a href=../../p/vujw9jv/>AWS CDK で API Gateway に Cognito 認証によるアクセス制御を追加する</a></div><div class=xPrevNextLink_next><a href=../../p/qwb6v89/>Amazon API Gateway をコマンドライン (CLI) から操作する</a></div></div></aside></article><script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
 <ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
-<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
-</main>
-</div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/7s7hs4e/>AWS</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/wqamv5d/>API Gateway</a>
-</span>
-<span class=xBreadcrumb_item>AWS CDK で API Gateway の REST API を作成する
-</span>
-</div>
-</aside>
-<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
-<div id=xSiteFooter2>
-<a href=../../sitemap/>サイトマップ</a> ｜
-<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
-</div>
-</div>
-<script src=../../assets/js/sidebar.js></script>
-<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c],d=b.getElementsByTagName('img');if(d.length>0)continue;const e=b.getElementsByTagName('svg');if(e.length>0)continue;b.classList.add('xExternalLinkIcon'),b.setAttribute('target','_blank'),b.setAttribute('rel','noopener')}})</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"AWS","item":"https://maku.blog/p/7s7hs4e/"},{"@type":"ListItem","position":4,"name":"API Gateway","item":"https://maku.blog/p/wqamv5d/"},{"@type":"ListItem","position":5,"name":"AWS CDK で API Gateway の REST API を作成する","item":"https://maku.blog/p/k7eoer5/"}]}</script>
-</body>
-</html>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/7s7hs4e/>AWS</a></span>
+<span class=xBreadcrumb_item><a href=../../p/wqamv5d/>API Gateway</a></span>
+<span class=xBreadcrumb_item>AWS CDK で API Gateway の REST API を作成する</span></div></aside><div id=xSiteFooter><a href=../../>まくろぐ</a></div><div id=xSiteFooter2><a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a></div></div><script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener("DOMContentLoaded",function(){const e=document.querySelectorAll("a[href^=http]");for(let n=0;n<e.length;++n){const t=e[n],s=t.getElementsByTagName("img");if(s.length>0)continue;const o=t.getElementsByTagName("svg");if(o.length>0)continue;t.classList.add("xExternalLinkIcon"),t.setAttribute("target","_blank"),t.setAttribute("rel","noopener")}})</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"AWS","item":"https://maku.blog/p/7s7hs4e/"},{"@type":"ListItem","position":4,"name":"API Gateway","item":"https://maku.blog/p/wqamv5d/"},{"@type":"ListItem","position":5,"name":"AWS CDK で API Gateway の REST API を作成する","item":"https://maku.blog/p/k7eoer5/"}]}</script></body></html>

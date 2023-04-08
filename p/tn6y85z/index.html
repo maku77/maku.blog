@@ -1,1594 +1,428 @@
-<!doctype html><html lang=ja-jp>
-<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<title>PlantUML でクラス図を作成する｜まくろぐ</title>
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
-<meta property="og:title" content="PlantUML でクラス図を作成する">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://maku.blog/p/tn6y85z/">
-<meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png">
-<meta property="og:image:width" content="1436">
-<meta property="og:image:height" content="746">
-<meta property="og:description" content="クラスの箱を描く 基本 クラスの箱を描くには、class キーワードを使用します。 他にも、interface でインタフェース、abstract で抽象クラス、enum で列挙型を定義することができます。
- @startuml class クラス interface インタフェース abstract 抽象クラス enum 列挙型 @enduml  クラス名にスペースや記号を含んでいる場合 クラス名やインタフェース名にスペースや記号を含めたい場合は、その文字列全体をダブルクォート &#34;&#34; で囲みます。 さらに、as で別名を付けておくと、あとから参照しやすくなります。
- @startuml class &#34;This is a class A&#34; as A class &#34;This is a class B&#34; as B A -> B @enduml  ステレオタイプ クラス名の後ろに <<ステレオタイプ>> と記述することで、クラス名の上部に任意のステレオタイプを表示することができます。 独自のステレオタイプを表示することができますし、複数のステレオタイプを表示することもできます。
- @startuml interface インタフェース <<interface>> abstract 抽象クラス <<abstract>> class ほげほげ <<独自ステレオタイプ>> class へむへむ <<Serializable>> <<Model>> @enduml  クラス名の横の記号を非表示にする クラス名の左側に表示される C の記号などを非表示するには、hide circle コマンドを使用します。 下記のようにすると、クラスやインタフェースの記号がすべて非表示になります。 インタフェースに <<inteface>> というステレオタイプを表示するのであれば、記号は冗長なので消しておいた方がよいかもしれません。">
-<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
-<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
-<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
-<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
-<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
-<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
-<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
-</head>
-<body>
-<div id=xRoot>
-<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/zbgbb5u/>PlantUML</a>
-</span>
-<span class=xBreadcrumb_item>PlantUML でクラス図を作成する
-</span>
-</div>
-</aside>
-<div id=xContainer>
-<nav id=xMenu aria-label=メニュー>
-<div id=sidebar style=height:100%>
-<div id=sidebar_notFixed>
-<a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a>
-<div class=xMenu_box data-sticky>
-<form action=https://cse.google.com/cse target=_blank>
-<div class=xSearchBox>
-<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+<!doctype html><html lang=ja-jp><head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#"><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>PlantUML でクラス図を作成する｜まくろぐ</title><script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-63069513-4")</script><meta property="og:site_name" content="まくろぐ"><meta property="og:title" content="PlantUML でクラス図を作成する"><meta property="og:type" content="website"><meta property="og:url" content="https://maku.blog/p/tn6y85z/"><meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/img/site-logo.png"><meta property="og:image:width" content="1436"><meta property="og:image:height" content="746"><meta property="og:description" content="クラスの箱を描く 基本 クラスの箱を描くには、class キーワードを使用します。 他にも、interface でインタフェース、abstract で抽象クラス、enum で列挙型を定義することができます。
+@startuml class クラス interface インタフェース abstract 抽象クラス enum 列挙型 @enduml クラス名にスペースや記号を含んでいる場合 クラス名やインタフェース名にスペースや記号を含めたい場合は、その文字列全体をダブルクォート &#34;&#34; で囲みます。 さらに、as で別名を付けておくと、あとから参照しやすくなります。
+@startuml class &#34;This is a class A&#34; as A class &#34;This is a class B&#34; as B A -> B @enduml ステレオタイプ クラス名の後ろに <<ステレオタイプ>> と記述することで、クラス名の上部に任意のステレオタイプを表示することができます。 独自のステレオタイプを表示することができますし、複数のステレオタイプを表示することもできます。
+@startuml interface インタフェース <<interface>> abstract 抽象クラス <<abstract>> class ほげほげ <<独自ステレオタイプ>> class へむへむ <<Serializable>> <<Model>> @enduml クラス名の横の記号を非表示にする クラス名の左側に表示される C の記号などを非表示するには、hide circle コマンドを使用します。 下記のようにすると、クラスやインタフェースの記号がすべて非表示になります。 インタフェースに <<inteface>> というステレオタイプを表示するのであれば、記号は冗長なので消しておいた方がよいかもしれません。"><meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css><link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico><link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png><link rel=apple-touch-icon href=../../assets/favicon/180x180.png><script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script><style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style><script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script></head><body><div id=xRoot><div id=xSiteHeader><a href=../../>まくろぐ</a></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/zbgbb5u/>PlantUML</a></span>
+<span class=xBreadcrumb_item>PlantUML でクラス図を作成する</span></div></aside><div id=xContainer><nav id=xMenu aria-label=メニュー><div id=sidebar style=height:100%><div id=sidebar_notFixed><a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a><div class=xMenu_box data-sticky><form action=https://cse.google.com/cse target=_blank><div class=xSearchBox><input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
 <input type=hidden name=ie value=UTF-8>
 <input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
-<input type=submit value=検索></input>
-</div>
-</form>
-<div class=xMenu_box_body>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
-<div class=xMenu_box_body>
-<div class=xBoxLink>
-<a href=../../p/zycmw6f/>
-Next.js アプリに Google Analytics を設定する (next/script)
-<time>2023-03-21</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/cv6fpx7/>
-React で入力フォームの onChange イベントを IME ON のときに無視する
-<time>2023-01-29</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/bo8q8p7/>
-Meilisearch サーチエンジンを使ってみる
-<time>2023-01-24</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/y6zgrg2/>
-Docker で MongoDB サーバーを立ち上げる
-<time>2023-01-18</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/3pwojuj/>
-Deno で MongoDB にアクセスする
-<time>2023-01-18</time></a>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3>
-<div class=xMenu_box_body>
-<div class=xNavTree>
-<ul>
-<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
-<ul>
-<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
-<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
-<li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a>
-<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
-<li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a>
-<li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a>
-<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
-<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
-<li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a>
-<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
-<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
-<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
-<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
-<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
-<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
-<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
-<li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a>
-<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
-<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
-<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
-<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
-<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
-<ul>
-</ul>
-<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
-<li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a>
-</ul>
-<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
-<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
-<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
-<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
-<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
-<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
-<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
-</ul>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
-<div class=xMenu_box_body><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws>aws (61)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure>azure (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/typescript>typescript (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/next.js>next.js (38)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/graphql>graphql (35)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/react>react (29)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/chatbot>chatbot (28)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/gnuplot>gnuplot (27)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cdk>aws/cdk (26)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/linux>linux (25)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github>github (24)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ansible>ansible (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/node.js>node.js (19)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/electron>electron (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mongodb>mongodb (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/protocol-buffers>protocol-buffers (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vs-code>vs-code (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/javascript>javascript (13)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cognito>aws/cognito (12)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/nginx>nginx (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/android>android (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/lambda>aws/lambda (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/java>java (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/python>python (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ssh>ssh (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/uml>uml (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/3d>3d (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sam>aws/sam (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/docker>docker (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/firestore>firebase/firestore (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unity>unity (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webgl>webgl (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo>apollo (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-cli>azure-cli (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/deno>deno (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jade>jade (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/material-ui>material-ui (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cli>aws/cli (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-storage>azure-storage (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/doxygen>doxygen (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/c/c++>c/c++ (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-actions>github-actions (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/luis>luis (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/qna-maker>qna-maker (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/ssm>aws/ssm (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/eslint>eslint (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase>firebase (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-pages>github-pages (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html/css>html/css (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jekyll>jekyll (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/lets-encrypt>lets-encrypt (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sql>sql (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/windows>windows (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-functions>azure-functions (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cosmos-db>cosmos-db (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/grpc>grpc (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/hugo>hugo (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/kotlin>kotlin (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mac>mac (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/powershell>powershell (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/prettier>prettier (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sqlite>sqlite (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/textlint>textlint (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tv>tv (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apache>apache (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/arib>arib (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/amplify>aws/amplify (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/appsync>aws/appsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/iam>aws/iam (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/kms>aws/kms (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/s3>aws/s3 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sdk>aws/sdk (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-app-service>azure-app-service (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/excel>excel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/go>go (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/http>http (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/json>json (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mui>mui (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/npm>npm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/oauth>oauth (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/opengl>opengl (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/rsync>rsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/scp>scp (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/slack>slack (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teraterm>teraterm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unicode>unicode (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vercel>vercel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/zip>zip (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/.net>.net (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/androidstudio>androidstudio (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo-server>apollo-server (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/atomic-design>atomic-design (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/blender>blender (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bluetooth>bluetooth (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bootstrap>bootstrap (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-framework>bot-framework (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/boto3>boto3 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/certbot>certbot (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cloudflare>cloudflare (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/css>css (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dns>dns (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dvb>dvb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/editorconfig>editorconfig (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/evernote>evernote (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/git>git (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/golang>golang (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/google-analytics>google-analytics (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/groovy>groovy (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html>html (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/igdb>igdb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/iso>iso (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jest>jest (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/macos>macos (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/meilisearch>meilisearch (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/parcel>parcel (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/raspberrypi>raspberrypi (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teams>teams (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tex>tex (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ubuntu>ubuntu (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/url>url (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vim>vim (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vps>vps (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/web>web (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webpack>webpack (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/wsl>wsl (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
-</div></div>
-</div>
-<div class=xMenu_box data-sticky><br></div>
-</div>
-<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
-</div>
-</div>
-</nav>
-<main id=xMain>
-<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/opxhnho/>PlantUML の基本（インストール〜画像ファイルへの保存）</a>
-</div>
-<div class=xPrevNextLink_next>
-<a href=../../p/n8p7qmw/>PlantUML でシーケンス図を作成する</a>
-</div>
-</div>
-</aside>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<input type=submit value=検索></input></div></form><div class=xMenu_box_body></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3><div class=xMenu_box_body><div class=xBoxLink><a href=../../p/zycmw6f/>Next.js アプリに Google Analytics を設定する (next/script)
+<time>2023-03-21</time></a></div><div class=xBoxLink><a href=../../p/cv6fpx7/>React で入力フォームの onChange イベントを IME ON のときに無視する
+<time>2023-01-29</time></a></div><div class=xBoxLink><a href=../../p/bo8q8p7/>Meilisearch サーチエンジンを使ってみる
+<time>2023-01-24</time></a></div><div class=xBoxLink><a href=../../p/y6zgrg2/>Docker で MongoDB サーバーを立ち上げる
+<time>2023-01-18</time></a></div><div class=xBoxLink><a href=../../p/3pwojuj/>Deno で MongoDB にアクセスする
+<time>2023-01-18</time></a></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3><div class=xMenu_box_body><div class=xNavTree><ul><li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a><ul><li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a><li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a><li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a><li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a><li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a><li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a><li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a><li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a><li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a><li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a><li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a><li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a><li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a><li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a><li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a><li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a><li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a><li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a><li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a><li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a><li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a><li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a><ul></ul><li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a><li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a></ul><li><a class=xNavTree-dir href=../../p/35odek9/>読書</a><li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a><li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a><li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a><li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a><li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a><li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a></ul></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3><div class=xMenu_box_body><div class=xMenu_tag><a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a></div><div class=xMenu_tag><a href=../../tags/aws>aws (61)</a></div><div class=xMenu_tag><a href=../../tags/azure>azure (58)</a></div><div class=xMenu_tag><a href=../../tags/typescript>typescript (58)</a></div><div class=xMenu_tag><a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a></div><div class=xMenu_tag><a href=../../tags/next.js>next.js (38)</a></div><div class=xMenu_tag><a href=../../tags/graphql>graphql (35)</a></div><div class=xMenu_tag><a href=../../tags/react>react (29)</a></div><div class=xMenu_tag><a href=../../tags/chatbot>chatbot (28)</a></div><div class=xMenu_tag><a href=../../tags/gnuplot>gnuplot (27)</a></div><div class=xMenu_tag><a href=../../tags/aws/cdk>aws/cdk (26)</a></div><div class=xMenu_tag><a href=../../tags/linux>linux (25)</a></div><div class=xMenu_tag><a href=../../tags/github>github (24)</a></div><div class=xMenu_tag><a href=../../tags/ansible>ansible (21)</a></div><div class=xMenu_tag><a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a></div><div class=xMenu_tag><a href=../../tags/node.js>node.js (19)</a></div><div class=xMenu_tag><a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a></div><div class=xMenu_tag><a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a></div><div class=xMenu_tag><a href=../../tags/electron>electron (15)</a></div><div class=xMenu_tag><a href=../../tags/mongodb>mongodb (15)</a></div><div class=xMenu_tag><a href=../../tags/protocol-buffers>protocol-buffers (14)</a></div><div class=xMenu_tag><a href=../../tags/vs-code>vs-code (14)</a></div><div class=xMenu_tag><a href=../../tags/javascript>javascript (13)</a></div><div class=xMenu_tag><a href=../../tags/aws/cognito>aws/cognito (12)</a></div><div class=xMenu_tag><a href=../../tags/nginx>nginx (11)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a></div><div class=xMenu_tag><a href=../../tags/android>android (10)</a></div><div class=xMenu_tag><a href=../../tags/aws/lambda>aws/lambda (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a></div><div class=xMenu_tag><a href=../../tags/java>java (9)</a></div><div class=xMenu_tag><a href=../../tags/python>python (9)</a></div><div class=xMenu_tag><a href=../../tags/ssh>ssh (9)</a></div><div class=xMenu_tag><a href=../../tags/uml>uml (9)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a></div><div class=xMenu_tag><a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a></div><div class=xMenu_tag><a href=../../tags/3d>3d (8)</a></div><div class=xMenu_tag><a href=../../tags/aws/sam>aws/sam (8)</a></div><div class=xMenu_tag><a href=../../tags/docker>docker (8)</a></div><div class=xMenu_tag><a href=../../tags/firebase/firestore>firebase/firestore (8)</a></div><div class=xMenu_tag><a href=../../tags/unity>unity (8)</a></div><div class=xMenu_tag><a href=../../tags/webgl>webgl (8)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a></div><div class=xMenu_tag><a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a></div><div class=xMenu_tag><a href=../../tags/apollo>apollo (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-cli>azure-cli (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-pipelines>azure-pipelines (7)</a></div><div class=xMenu_tag><a href=../../tags/deno>deno (7)</a></div><div class=xMenu_tag><a href=../../tags/jade>jade (7)</a></div><div class=xMenu_tag><a href=../../tags/material-ui>material-ui (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a></div><div class=xMenu_tag><a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a></div><div class=xMenu_tag><a href=../../tags/aws/cli>aws/cli (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-storage>azure-storage (6)</a></div><div class=xMenu_tag><a href=../../tags/doxygen>doxygen (6)</a></div><div class=xMenu_tag><a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-table-storage>azure-table-storage (5)</a></div><div class=xMenu_tag><a href=../../tags/c/c++>c/c++ (5)</a></div><div class=xMenu_tag><a href=../../tags/github-actions>github-actions (5)</a></div><div class=xMenu_tag><a href=../../tags/luis>luis (5)</a></div><div class=xMenu_tag><a href=../../tags/qna-maker>qna-maker (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a></div><div class=xMenu_tag><a href=../../tags/aws/ssm>aws/ssm (4)</a></div><div class=xMenu_tag><a href=../../tags/eslint>eslint (4)</a></div><div class=xMenu_tag><a href=../../tags/firebase>firebase (4)</a></div><div class=xMenu_tag><a href=../../tags/github-pages>github-pages (4)</a></div><div class=xMenu_tag><a href=../../tags/html/css>html/css (4)</a></div><div class=xMenu_tag><a href=../../tags/jekyll>jekyll (4)</a></div><div class=xMenu_tag><a href=../../tags/lets-encrypt>lets-encrypt (4)</a></div><div class=xMenu_tag><a href=../../tags/sql>sql (4)</a></div><div class=xMenu_tag><a href=../../tags/windows>windows (4)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a></div><div class=xMenu_tag><a href=../../tags/azure-functions>azure-functions (3)</a></div><div class=xMenu_tag><a href=../../tags/cosmos-db>cosmos-db (3)</a></div><div class=xMenu_tag><a href=../../tags/grpc>grpc (3)</a></div><div class=xMenu_tag><a href=../../tags/hugo>hugo (3)</a></div><div class=xMenu_tag><a href=../../tags/kotlin>kotlin (3)</a></div><div class=xMenu_tag><a href=../../tags/mac>mac (3)</a></div><div class=xMenu_tag><a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a></div><div class=xMenu_tag><a href=../../tags/powershell>powershell (3)</a></div><div class=xMenu_tag><a href=../../tags/prettier>prettier (3)</a></div><div class=xMenu_tag><a href=../../tags/sqlite>sqlite (3)</a></div><div class=xMenu_tag><a href=../../tags/textlint>textlint (3)</a></div><div class=xMenu_tag><a href=../../tags/tv>tv (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a></div><div class=xMenu_tag><a href=../../tags/apache>apache (2)</a></div><div class=xMenu_tag><a href=../../tags/arib>arib (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/amplify>aws/amplify (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/appsync>aws/appsync (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/codebuild>aws/codebuild (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/iam>aws/iam (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/kms>aws/kms (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/s3>aws/s3 (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/sdk>aws/sdk (2)</a></div><div class=xMenu_tag><a href=../../tags/azure-app-service>azure-app-service (2)</a></div><div class=xMenu_tag><a href=../../tags/excel>excel (2)</a></div><div class=xMenu_tag><a href=../../tags/firebase/authentication>firebase/authentication (2)</a></div><div class=xMenu_tag><a href=../../tags/go>go (2)</a></div><div class=xMenu_tag><a href=../../tags/http>http (2)</a></div><div class=xMenu_tag><a href=../../tags/json>json (2)</a></div><div class=xMenu_tag><a href=../../tags/mui>mui (2)</a></div><div class=xMenu_tag><a href=../../tags/npm>npm (2)</a></div><div class=xMenu_tag><a href=../../tags/oauth>oauth (2)</a></div><div class=xMenu_tag><a href=../../tags/opengl>opengl (2)</a></div><div class=xMenu_tag><a href=../../tags/rsync>rsync (2)</a></div><div class=xMenu_tag><a href=../../tags/scp>scp (2)</a></div><div class=xMenu_tag><a href=../../tags/slack>slack (2)</a></div><div class=xMenu_tag><a href=../../tags/teraterm>teraterm (2)</a></div><div class=xMenu_tag><a href=../../tags/unicode>unicode (2)</a></div><div class=xMenu_tag><a href=../../tags/vercel>vercel (2)</a></div><div class=xMenu_tag><a href=../../tags/zip>zip (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a></div><div class=xMenu_tag><a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a></div><div class=xMenu_tag><a href=../../tags/.net>.net (1)</a></div><div class=xMenu_tag><a href=../../tags/androidstudio>androidstudio (1)</a></div><div class=xMenu_tag><a href=../../tags/apollo-server>apollo-server (1)</a></div><div class=xMenu_tag><a href=../../tags/atomic-design>atomic-design (1)</a></div><div class=xMenu_tag><a href=../../tags/blender>blender (1)</a></div><div class=xMenu_tag><a href=../../tags/bluetooth>bluetooth (1)</a></div><div class=xMenu_tag><a href=../../tags/bootstrap>bootstrap (1)</a></div><div class=xMenu_tag><a href=../../tags/bot-framework>bot-framework (1)</a></div><div class=xMenu_tag><a href=../../tags/boto3>boto3 (1)</a></div><div class=xMenu_tag><a href=../../tags/certbot>certbot (1)</a></div><div class=xMenu_tag><a href=../../tags/cloudflare>cloudflare (1)</a></div><div class=xMenu_tag><a href=../../tags/css>css (1)</a></div><div class=xMenu_tag><a href=../../tags/dns>dns (1)</a></div><div class=xMenu_tag><a href=../../tags/dvb>dvb (1)</a></div><div class=xMenu_tag><a href=../../tags/editorconfig>editorconfig (1)</a></div><div class=xMenu_tag><a href=../../tags/evernote>evernote (1)</a></div><div class=xMenu_tag><a href=../../tags/git>git (1)</a></div><div class=xMenu_tag><a href=../../tags/golang>golang (1)</a></div><div class=xMenu_tag><a href=../../tags/google-analytics>google-analytics (1)</a></div><div class=xMenu_tag><a href=../../tags/groovy>groovy (1)</a></div><div class=xMenu_tag><a href=../../tags/html>html (1)</a></div><div class=xMenu_tag><a href=../../tags/igdb>igdb (1)</a></div><div class=xMenu_tag><a href=../../tags/iso>iso (1)</a></div><div class=xMenu_tag><a href=../../tags/jest>jest (1)</a></div><div class=xMenu_tag><a href=../../tags/macos>macos (1)</a></div><div class=xMenu_tag><a href=../../tags/meilisearch>meilisearch (1)</a></div><div class=xMenu_tag><a href=../../tags/parcel>parcel (1)</a></div><div class=xMenu_tag><a href=../../tags/raspberrypi>raspberrypi (1)</a></div><div class=xMenu_tag><a href=../../tags/teams>teams (1)</a></div><div class=xMenu_tag><a href=../../tags/tex>tex (1)</a></div><div class=xMenu_tag><a href=../../tags/ubuntu>ubuntu (1)</a></div><div class=xMenu_tag><a href=../../tags/url>url (1)</a></div><div class=xMenu_tag><a href=../../tags/vim>vim (1)</a></div><div class=xMenu_tag><a href=../../tags/vps>vps (1)</a></div><div class=xMenu_tag><a href=../../tags/web>web (1)</a></div><div class=xMenu_tag><a href=../../tags/webpack>webpack (1)</a></div><div class=xMenu_tag><a href=../../tags/wsl>wsl (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a></div></div></div><div class=xMenu_box data-sticky><br></div></div><div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem></div></div></nav><main id=xMain><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting><aside><div class=xPrevNextLink><div class=xPrevNextLink_prev><a href=../../p/opxhnho/>PlantUML の基本（インストール〜画像ファイルへの保存）</a></div><div class=xPrevNextLink_next><a href=../../p/n8p7qmw/>PlantUML でシーケンス図を作成する</a></div></div></aside><header class=xArticle_headerBox><div><span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=../../p/zbgbb5u/>PlantUML</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=../../p/zbgbb5u/_index.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/tn6y85z/>PlantUML でクラス図を作成する</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/uml>UML</a></span>
-<span class=xPageTags_item><a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2019-03-07>2019-03-07</time><br>
-作成: <time itemprop=datePublished datetime=2019-03-07>2019-03-07</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#クラスの箱を描く>クラスの箱を描く</a>
-<ul>
-<li><a href=#基本>基本</a></li>
-<li><a href=#クラス名にスペースや記号を含んでいる場合>クラス名にスペースや記号を含んでいる場合</a></li>
-<li><a href=#ステレオタイプ>ステレオタイプ</a></li>
-<li><a href=#クラス名の横の記号を非表示にする>クラス名の横の記号を非表示にする</a></li>
-<li><a href=#クラス名の横に独自の記号を表示する>クラス名の横に独自の記号を表示する</a></li>
-</ul>
-</li>
-<li><a href=#関係を示す線を引く>関係を示す線を引く</a>
-<ul>
-<li><a href=#シンプルな関連の線>シンプルな関連の線</a></li>
-<li><a href=#矢印の種類>矢印の種類</a></li>
-<li><a href=#多重度と関連のラベル制約>多重度と関連のラベル（制約）</a></li>
-<li><a href=#関連間の制約>関連間の制約</a></li>
-</ul>
-</li>
-<li><a href=#属性を定義する>属性を定義する</a>
-<ul>
-<li><a href=#メソッドやフィールド属性を追加する>メソッドやフィールド（属性）を追加する</a></li>
-<li><a href=#メソッドやフィールドの可視性-visibility>メソッドやフィールドの可視性 (Visibility)</a></li>
-<li><a href=#static-メソッドと-abstract-メソッド>Static メソッドと Abstract メソッド</a></li>
-<li><a href=#セパレータで自由に区切る>セパレータで自由に区切る</a></li>
-<li><a href=#フィールドとメソッドのどちらに割り振るかを制御する>フィールドとメソッドのどちらに割り振るかを制御する</a></li>
-<li><a href=#メソッドがない場合にメソッドの領域を非表示にする>メソッドがない場合にメソッドの領域を非表示にする</a></li>
-</ul>
-</li>
-<li><a href=#パッケージ>パッケージ</a>
-<ul>
-<li><a href=#クラスをパッケージ囲む>クラスをパッケージ囲む</a></li>
-<li><a href=#パッケージ間の矢印>パッケージ間の矢印</a></li>
-<li><a href=#パッケージのスタイル>パッケージのスタイル</a></li>
-</ul>
-</li>
-<li><a href=#名前空間>名前空間</a>
-<ul>
-<li><a href=#名前空間にクラスを配置する>名前空間にクラスを配置する</a></li>
-<li><a href=#名前空間の機能を無効にする>名前空間の機能を無効にする</a></li>
-<li><a href=#名前空間のセパレータ文字を変更する>名前空間のセパレータ文字を変更する</a></li>
-</ul>
-</li>
-<li><a href=#注釈コメントを表示する>注釈（コメント）を表示する</a>
-<ul>
-<li><a href=#クラスに直接注釈-note-を付ける>クラスに直接注釈 (note) を付ける</a></li>
-<li><a href=#注釈-note-定義しておいて後からクラスに付加する>注釈 (note) 定義しておいて後からクラスに付加する</a></li>
-<li><a href=#フィールドやメソッドに注釈を付ける>フィールドやメソッドに注釈を付ける</a></li>
-<li><a href=#関連リンクに対して注釈をつける>関連（リンク）に対して注釈をつける</a></li>
-<li><a href=#注釈テキストを-html-タグで装飾する>注釈テキストを HTML タグで装飾する</a></li>
-</ul>
-</li>
-<li><a href=#レイアウト配置を調整する>レイアウト（配置）を調整する</a>
-<ul>
-<li><a href=#クラスの箱の配置順>クラスの箱の配置順</a></li>
-<li><a href=#矢印の方向>矢印の方向</a></li>
-<li><a href=#見えない関連の線を引いて配置>見えない関連の線を引いて配置</a></li>
-</ul>
-</li>
-<li><a href=#関連クラス>関連クラス</a></li>
-<li><a href=#全体のカラー配色を変更する>全体のカラー（配色）を変更する</a></li>
-</ul>
-</nav><h2 id=クラスの箱を描く>クラスの箱を描く</h2>
-<h3 id=基本>基本</h3>
-<p>クラスの箱を描くには、<strong><code>class</code></strong> キーワードを使用します。
-他にも、<strong><code>interface</code></strong> でインタフェース、<strong><code>abstract</code></strong> で抽象クラス、<strong><code>enum</code></strong> で列挙型を定義することができます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/box.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class クラス
-interface インタフェース
-abstract 抽象クラス
-enum 列挙型
-@enduml</code></pre></div></div>
-</div>
-<h3 id=クラス名にスペースや記号を含んでいる場合>クラス名にスペースや記号を含んでいる場合</h3>
-<p>クラス名やインタフェース名にスペースや記号を含めたい場合は、その文字列全体をダブルクォート <strong><code>""</code></strong> で囲みます。
-さらに、<strong><code>as</code></strong> で別名を付けておくと、あとから参照しやすくなります。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:350px;height:auto src=../../p/tn6y85z/quoted.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class &#34;This is a class A&#34; as A
-class &#34;This is a class B&#34; as B
-A -&gt; B
-@enduml</code></pre></div></div>
-</div>
-<h3 id=ステレオタイプ>ステレオタイプ</h3>
-<p>クラス名の後ろに <strong><code>&lt;&lt;ステレオタイプ>></code></strong> と記述することで、クラス名の上部に任意のステレオタイプを表示することができます。
-独自のステレオタイプを表示することができますし、複数のステレオタイプを表示することもできます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:300px;height:auto src=../../p/tn6y85z/stereotype.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-interface インタフェース &lt;&lt;interface&gt;&gt;
-abstract 抽象クラス &lt;&lt;abstract&gt;&gt;
-class ほげほげ &lt;&lt;独自ステレオタイプ&gt;&gt;
-class へむへむ &lt;&lt;Serializable&gt;&gt; &lt;&lt;Model&gt;&gt;
-@enduml</code></pre></div></div>
-</div>
-<h3 id=クラス名の横の記号を非表示にする>クラス名の横の記号を非表示にする</h3>
-<p>クラス名の左側に表示される C の記号などを非表示するには、<strong><code>hide circle</code></strong> コマンドを使用します。
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/zbgbb5u/>PlantUML</a></span></div><div style=display:flex;margin-top:.8em><div style=width:80px;margin-right:.5em><img src=../../p/zbgbb5u/_index.svg style=width:80px;height:80px></div><div style=flex:1><h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/tn6y85z/>PlantUML でクラス図を作成する</a></h1><div class=xPageTags><span class=xPageTags_item><a href=../../tags/uml>UML</a></span>
+<span class=xPageTags_item><a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール</a></span></div></div></div><span class=xPageDate>更新: <time itemprop=dateModified datetime=2019-03-07>2019-03-07</time><br>作成: <time itemprop=datePublished datetime=2019-03-07>2019-03-07</time></span></header><div itemprop=articleBody class=xArticle_content><nav id=TableOfContents><ul><li><a href=#クラスの箱を描く>クラスの箱を描く</a><ul><li><a href=#基本>基本</a></li><li><a href=#クラス名にスペースや記号を含んでいる場合>クラス名にスペースや記号を含んでいる場合</a></li><li><a href=#ステレオタイプ>ステレオタイプ</a></li><li><a href=#クラス名の横の記号を非表示にする>クラス名の横の記号を非表示にする</a></li><li><a href=#クラス名の横に独自の記号を表示する>クラス名の横に独自の記号を表示する</a></li></ul></li><li><a href=#関係を示す線を引く>関係を示す線を引く</a><ul><li><a href=#シンプルな関連の線>シンプルな関連の線</a></li><li><a href=#矢印の種類>矢印の種類</a></li><li><a href=#多重度と関連のラベル制約>多重度と関連のラベル（制約）</a></li><li><a href=#関連間の制約>関連間の制約</a></li></ul></li><li><a href=#属性を定義する>属性を定義する</a><ul><li><a href=#メソッドやフィールド属性を追加する>メソッドやフィールド（属性）を追加する</a></li><li><a href=#メソッドやフィールドの可視性-visibility>メソッドやフィールドの可視性 (Visibility)</a></li><li><a href=#static-メソッドと-abstract-メソッド>Static メソッドと Abstract メソッド</a></li><li><a href=#セパレータで自由に区切る>セパレータで自由に区切る</a></li><li><a href=#フィールドとメソッドのどちらに割り振るかを制御する>フィールドとメソッドのどちらに割り振るかを制御する</a></li><li><a href=#メソッドがない場合にメソッドの領域を非表示にする>メソッドがない場合にメソッドの領域を非表示にする</a></li></ul></li><li><a href=#パッケージ>パッケージ</a><ul><li><a href=#クラスをパッケージ囲む>クラスをパッケージ囲む</a></li><li><a href=#パッケージ間の矢印>パッケージ間の矢印</a></li><li><a href=#パッケージのスタイル>パッケージのスタイル</a></li></ul></li><li><a href=#名前空間>名前空間</a><ul><li><a href=#名前空間にクラスを配置する>名前空間にクラスを配置する</a></li><li><a href=#名前空間の機能を無効にする>名前空間の機能を無効にする</a></li><li><a href=#名前空間のセパレータ文字を変更する>名前空間のセパレータ文字を変更する</a></li></ul></li><li><a href=#注釈コメントを表示する>注釈（コメント）を表示する</a><ul><li><a href=#クラスに直接注釈-note-を付ける>クラスに直接注釈 (note) を付ける</a></li><li><a href=#注釈-note-定義しておいて後からクラスに付加する>注釈 (note) 定義しておいて後からクラスに付加する</a></li><li><a href=#フィールドやメソッドに注釈を付ける>フィールドやメソッドに注釈を付ける</a></li><li><a href=#関連リンクに対して注釈をつける>関連（リンク）に対して注釈をつける</a></li><li><a href=#注釈テキストを-html-タグで装飾する>注釈テキストを HTML タグで装飾する</a></li></ul></li><li><a href=#レイアウト配置を調整する>レイアウト（配置）を調整する</a><ul><li><a href=#クラスの箱の配置順>クラスの箱の配置順</a></li><li><a href=#矢印の方向>矢印の方向</a></li><li><a href=#見えない関連の線を引いて配置>見えない関連の線を引いて配置</a></li></ul></li><li><a href=#関連クラス>関連クラス</a></li><li><a href=#全体のカラー配色を変更する>全体のカラー（配色）を変更する</a></li></ul></nav><h2 id=クラスの箱を描く>クラスの箱を描く</h2><h3 id=基本>基本</h3><p>クラスの箱を描くには、<strong><code>class</code></strong> キーワードを使用します。
+他にも、<strong><code>interface</code></strong> でインタフェース、<strong><code>abstract</code></strong> で抽象クラス、<strong><code>enum</code></strong> で列挙型を定義することができます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/box.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class クラス
+</span></span><span class=line><span class=cl>interface インタフェース
+</span></span><span class=line><span class=cl>abstract 抽象クラス
+</span></span><span class=line><span class=cl>enum 列挙型
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=クラス名にスペースや記号を含んでいる場合>クラス名にスペースや記号を含んでいる場合</h3><p>クラス名やインタフェース名にスペースや記号を含めたい場合は、その文字列全体をダブルクォート <strong><code>""</code></strong> で囲みます。
+さらに、<strong><code>as</code></strong> で別名を付けておくと、あとから参照しやすくなります。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:350px;height:auto src=../../p/tn6y85z/quoted.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class &#34;This is a class A&#34; as A
+</span></span><span class=line><span class=cl>class &#34;This is a class B&#34; as B
+</span></span><span class=line><span class=cl>A -&gt; B
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=ステレオタイプ>ステレオタイプ</h3><p>クラス名の後ろに <strong><code>&lt;&lt;ステレオタイプ>></code></strong> と記述することで、クラス名の上部に任意のステレオタイプを表示することができます。
+独自のステレオタイプを表示することができますし、複数のステレオタイプを表示することもできます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:300px;height:auto src=../../p/tn6y85z/stereotype.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>interface インタフェース &lt;&lt;interface&gt;&gt;
+</span></span><span class=line><span class=cl>abstract 抽象クラス &lt;&lt;abstract&gt;&gt;
+</span></span><span class=line><span class=cl>class ほげほげ &lt;&lt;独自ステレオタイプ&gt;&gt;
+</span></span><span class=line><span class=cl>class へむへむ &lt;&lt;Serializable&gt;&gt; &lt;&lt;Model&gt;&gt;
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=クラス名の横の記号を非表示にする>クラス名の横の記号を非表示にする</h3><p>クラス名の左側に表示される C の記号などを非表示するには、<strong><code>hide circle</code></strong> コマンドを使用します。
 下記のようにすると、クラスやインタフェースの記号がすべて非表示になります。
-インタフェースに <code>&lt;&lt;inteface>></code> というステレオタイプを表示するのであれば、記号は冗長なので消しておいた方がよいかもしれません。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:300px;height:auto src=../../p/tn6y85z/hide-circle1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-hide circle
-
-class MyClass
-interface MyInterface &lt;&lt;interface&gt;&gt;
-abstract MyAbstract
-enum MyEnum
-@enduml</code></pre></div></div>
-</div>
-<p>記号を非表示にするクラスの種類を絞り込むこともできます。
+インタフェースに <code>&lt;&lt;inteface>></code> というステレオタイプを表示するのであれば、記号は冗長なので消しておいた方がよいかもしれません。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:300px;height:auto src=../../p/tn6y85z/hide-circle1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>hide circle
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>class MyClass
+</span></span><span class=line><span class=cl>interface MyInterface &lt;&lt;interface&gt;&gt;
+</span></span><span class=line><span class=cl>abstract MyAbstract
+</span></span><span class=line><span class=cl>enum MyEnum
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>記号を非表示にするクラスの種類を絞り込むこともできます。
 下記の例では、通常のクラス (<code>class</code>) の記号と、ステレオタイプ <code>&lt;&lt;interface>></code> のついたクラスの記号を非表示にしています。
-他にも、抽象クラス (<code>abstract</code>)、列挙型 (<code>enum</code>)、任意のクラス名の記号を非表示にすることもできます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:300px;height:auto src=../../p/tn6y85z/hide-circle2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-hide class circle
-hide &lt;&lt;interface&gt;&gt; circle
-
-class MyClass
-interface MyInterface &lt;&lt;interface&gt;&gt;
-abstract MyAbstract
-enum MyEnum
-@enduml</code></pre></div></div>
-</div>
-<h3 id=クラス名の横に独自の記号を表示する>クラス名の横に独自の記号を表示する</h3>
-<p>クラスを表す C 記号や、インタフェースを表す I 記号はデフォルトで表示されますが、任意の記号を任意の色で表示することもできます。
-独自の印を表示するには、クラスを定義するときに <strong><code>&lt;&lt; (記号, 色) >></code></strong> というフォーマットでステレオタイプを付加します。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:300px;height:auto src=../../p/tn6y85z/original-circle.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class DeprecatedClass &lt;&lt; (D, red) &gt;&gt;
-class PlayerView &lt;&lt; (V, #00FF00) View &gt;&gt;
-@enduml</code></pre></div></div>
-</div>
-<h2 id=関係を示す線を引く>関係を示す線を引く</h2>
-<h3 id=シンプルな関連の線>シンプルな関連の線</h3>
-<p>2 つのクラス名をハイフンで繋ぐことで、関連 (association) があることを示すことができます。
-ハイフン 1 つなら縦に、ハイフン 2 つなら横に並べて配置されます。</p>
-<ul>
-<li><code>-</code>: 横方向に並べる</li>
-<li><code>--</code>: 縦方向に並べる</li>
-</ul>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:300px;height:auto src=../../p/tn6y85z/relation1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-ClassA - ClassB
-ClassC -- ClassD
-@enduml</code></pre></div></div>
-</div>
-<p>ハイフン 2 つ以上は縦方向にクラスが並びますが、ハイフンが増えるごとに線の長さが伸びtていきます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:300px;height:auto src=../../p/tn6y85z/relation2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml relation2
-ClassA -- ClassB
-ClassC --- ClassD
-ClassE ---- ClassF
-ClassG ----- ClassH
-@enduml</code></pre></div></div>
-</div>
-<p>ただし、基本はハイフン 2 つを使っておいて、配置は PlantUML の最適化にまかせることが推奨されています。</p>
-<p>依存の方向を示す矢印を表示する方法は下記で説明しますが、上記のように単純な線でクラスを結んだ場合は、<strong>誘導可能性が未知、あるいは双方向の依存がある</strong>ということを意味します。
-簡単に言えば、とりあえずなんらかの関連がある、ということを示すということですね。</p>
-<h3 id=矢印の種類>矢印の種類</h3>
-<p>下記のように依存の方向を表す矢印（誘導可能性矢印: navigability arrows）を表示することができます。
+他にも、抽象クラス (<code>abstract</code>)、列挙型 (<code>enum</code>)、任意のクラス名の記号を非表示にすることもできます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:300px;height:auto src=../../p/tn6y85z/hide-circle2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>hide class circle
+</span></span><span class=line><span class=cl>hide &lt;&lt;interface&gt;&gt; circle
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>class MyClass
+</span></span><span class=line><span class=cl>interface MyInterface &lt;&lt;interface&gt;&gt;
+</span></span><span class=line><span class=cl>abstract MyAbstract
+</span></span><span class=line><span class=cl>enum MyEnum
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=クラス名の横に独自の記号を表示する>クラス名の横に独自の記号を表示する</h3><p>クラスを表す C 記号や、インタフェースを表す I 記号はデフォルトで表示されますが、任意の記号を任意の色で表示することもできます。
+独自の印を表示するには、クラスを定義するときに <strong><code>&lt;&lt; (記号, 色) >></code></strong> というフォーマットでステレオタイプを付加します。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:300px;height:auto src=../../p/tn6y85z/original-circle.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class DeprecatedClass &lt;&lt; (D, red) &gt;&gt;
+</span></span><span class=line><span class=cl>class PlayerView &lt;&lt; (V, #00FF00) View &gt;&gt;
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h2 id=関係を示す線を引く>関係を示す線を引く</h2><h3 id=シンプルな関連の線>シンプルな関連の線</h3><p>2 つのクラス名をハイフンで繋ぐことで、関連 (association) があることを示すことができます。
+ハイフン 1 つなら縦に、ハイフン 2 つなら横に並べて配置されます。</p><ul><li><code>-</code>: 横方向に並べる</li><li><code>--</code>: 縦方向に並べる</li></ul><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:300px;height:auto src=../../p/tn6y85z/relation1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>ClassA - ClassB
+</span></span><span class=line><span class=cl>ClassC -- ClassD
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>ハイフン 2 つ以上は縦方向にクラスが並びますが、ハイフンが増えるごとに線の長さが伸びtていきます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:300px;height:auto src=../../p/tn6y85z/relation2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml relation2
+</span></span><span class=line><span class=cl>ClassA -- ClassB
+</span></span><span class=line><span class=cl>ClassC --- ClassD
+</span></span><span class=line><span class=cl>ClassE ---- ClassF
+</span></span><span class=line><span class=cl>ClassG ----- ClassH
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>ただし、基本はハイフン 2 つを使っておいて、配置は PlantUML の最適化にまかせることが推奨されています。</p><p>依存の方向を示す矢印を表示する方法は下記で説明しますが、上記のように単純な線でクラスを結んだ場合は、<strong>誘導可能性が未知、あるいは双方向の依存がある</strong>ということを意味します。
+簡単に言えば、とりあえずなんらかの関連がある、ということを示すということですね。</p><h3 id=矢印の種類>矢印の種類</h3><p>下記のように依存の方向を表す矢印（誘導可能性矢印: navigability arrows）を表示することができます。
 両端に同様の記号を配置すれば、双方向の矢印として表示することができます。
-ハイフンやドットの数を 1 つにすれば、クラスを横方向に並べることができますが、ここでの紹介例ではすべて縦方向に並べています。</p>
-<ul>
-<li><code>--></code>: 関連 (Association) ※長期的な依存</li>
-<li><code>..></code>: 依存 (Dependency) ※短期的な依存</li>
-<li><code>o--</code>: 集約 (Aggregation)</li>
-<li><code>*--</code>: 合成、コンポジション (Composition)</li>
-<li><code>&lt;|--</code>: 汎化 (Extension)</li>
-<li><code>&lt;|..</code>: 実現 (Realization)</li>
-</ul>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/arrow1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-A --&gt; B
-C ..&gt; D
-E o-- F
-G *-- H
-@enduml</code></pre></div></div>
-</div>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/arrow2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-abstract Parent
-interface MyInterface
-Parent &lt;|-- ChildA
-Parent &lt;|-- ChildB
-MyInterface &lt;|.. ImplA
-MyInterface &lt;|.. ImplB
-@enduml</code></pre></div></div>
-</div>
-<h3 id=多重度と関連のラベル制約>多重度と関連のラベル（制約）</h3>
-<p>次のようにして、線の両端に多重度を表示したり、関連の意味や制約を示すラベルを表示したりすることができます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/arrow-label1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-BookShelf &#34;1&#34; o-- &#34;*&#34; Book : contains
-@enduml</code></pre></div></div>
-</div>
-<p>ラベルの先頭か末尾に <code>&lt;</code> や <code>></code> を付けることでラベルに方向を表示することができます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/arrow-label2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-Driver - Car : drives &gt;
-@enduml</code></pre></div></div>
-</div>
-<p>下記の例では、Customer が順序のある Purchase を保持していることを示しています。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/arrow-label3.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-Customer --&gt; &#34;1..* {ordered}&#34; Purchase
-@enduml</code></pre></div></div>
-</div>
-<h3 id=関連間の制約>関連間の制約</h3>
-<p>関連の線の間に <code>{ xor }</code> 制約などを表示することは PlantUML ではまだできないっぽいです。
-コメントなどで対応するしかなさそうです。</p>
-<h2 id=属性を定義する>属性を定義する</h2>
-<h3 id=メソッドやフィールド属性を追加する>メソッドやフィールド（属性）を追加する</h3>
-<p>クラスにメソッドやフィールドを追加していくには、クラス名の後ろに <code>{}</code> で囲んだブロックを作成します。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:150px;height:auto src=../../p/tn6y85z/attr.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class MyClass {
-  property1 : Int
-  property2 : String
-  func1() : String
-  func2(p1, p2) : Int
-}
-@enduml</code></pre></div></div>
-</div>
-<h3 id=メソッドやフィールドの可視性-visibility>メソッドやフィールドの可視性 (Visibility)</h3>
-<p>メソッドやフィールドの先頭に、<code>+</code>、<code>#</code>、<code>-</code>、<code>~</code> を付加することで、可視性を示すアイコンが表示されるようになります。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:230px;height:auto src=../../p/tn6y85z/visibility1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class MyClass {
-  +publicField
-  #protectedField
-  -privateField
-  ~packagePrivateField
-  +publicMethod()
-  #protectedMethod()
-  -privateMethod()
-  ~packagePrivateMethod()
-}
-@enduml</code></pre></div></div>
-</div>
-<p>可視性を示すアイコンが分かりにくい場合は、最初に <strong><code>skinparam classAttributeIconSize 0</code></strong> というコマンドを実行しておけば、<code>+</code> や <code>-</code> 記号がそのまま表示されるようになります。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:230px;height:auto src=../../p/tn6y85z/visibility2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-skinparam classAttributeIconSize 0
-
-class MyClass {
-  +publicField
-  #protectedField
-  -privateField
-  ~packagePrivateField
-  +publicMethod()
-  #protectedMethod()
-  -privateMethod()
-  ~packagePrivateMethod()
-}
-@enduml</code></pre></div></div>
-</div>
-<h3 id=static-メソッドと-abstract-メソッド>Static メソッドと Abstract メソッド</h3>
-<p>メソッドの前に、<strong><code>{static}</code></strong> モディファイアを付けることで静的メソッド (static method)、<strong><code>{abstract}</code></strong> モディファイアを付けることで抽象メソッド (abstract method) であることを示すことができます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:200px;height:auto src=../../p/tn6y85z/static-and-abstract.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml static-and-abstract
-class MyClass {
-  {static} staticField: String
-  {abstract} abstractField: String
-  {static} staticMethod(): void
-  {abstract} abstractMethod(): void
-}
-@enduml</code></pre></div></div>
-</div>
-<h3 id=セパレータで自由に区切る>セパレータで自由に区切る</h3>
-<p>デフォルトでは、括弧の有無によってメソッドとフィールドがグルーピングされて表示されます。
-下記のようなセパレータを使用することで、自由な位置に区切り線を入れて表示をグルーピングすることができます。</p>
-<table>
-<thead>
-<tr>
-<th>セパレータ</th>
-<th>線の種類</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>..</code></td>
-<td>破線</td>
-</tr>
-<tr>
-<td><code>--</code></td>
-<td>ノーマル</td>
-</tr>
-<tr>
-<td><code>__</code></td>
-<td>太線</td>
-</tr>
-<tr>
-<td><code>==</code></td>
-<td>二重線</td>
-</tr>
-</tbody>
-</table>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:130px;height:auto src=../../p/tn6y85z/separator1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class ClassA {
-  property1
-  ..
-  property2
-  --
-  property3
-  __
-  property4
-  ==
-  property5
-}
-@enduml</code></pre></div></div>
-</div>
-<p>セパレータの線の上にテキストを表示することもできます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:130px;height:auto src=../../p/tn6y85z/separator2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class ClassB {
-  property1
-  .. dashed line ..
-  property2
-  -- normal line --
-  property3
-  __ heavy line __
-  property4
-  == double line ==
-  property5
-}
-@enduml</code></pre></div></div>
-</div>
-<h3 id=フィールドとメソッドのどちらに割り振るかを制御する>フィールドとメソッドのどちらに割り振るかを制御する</h3>
-<p>デフォルトの振る舞いでは、末尾に <code>()</code> の付いた属性はメソッドだと認識され、それ以外はフィールドだと認識されます。
-この振る舞いを強制的に変更するには、先頭に <strong><code>{field}</code></strong> や <strong><code>{method}</code></strong> モディファイアを付けます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:250px;height:auto src=../../p/tn6y85z/field-and-method-modifier.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml field-and-method-modifier
-class MyClass {
-  これは括弧がないのでフィールド
-  {field} これは括弧があるけどフィールド()
-  これは括弧があるのでメソッド()
-  {method} これは括弧がないけどメソッド
-}
-@enduml</code></pre></div></div>
-</div>
-<p>セパレータを入れることでも同様の表現が可能なので、こちらの方がシンプルでよいかもしれません。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:250px;height:auto src=../../p/tn6y85z/field-and-method-modifier.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml field-and-method-modifier2
-class MyClass {
-  これは括弧がないのでフィールド
-  これは括弧があるけどフィールド()
-  __
-  これは括弧があるのでメソッド()
-  これは括弧がないけどメソッド
-}
-@enduml</code></pre></div></div>
-</div>
-<h3 id=メソッドがない場合にメソッドの領域を非表示にする>メソッドがない場合にメソッドの領域を非表示にする</h3>
-<p>フィールドやメソッドが存在しない場合、その表示領域を非表示にするには、<strong><code>hide empty fields</code></strong> コマンドや、<strong><code>hide empty methods</code></strong> コマンドを使用します。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/hide-empty.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-hide empty fields
-hide empty methods
-
-class ClassA
-class ClassB {
-  field
-}
-class ClassC {
-  method()
-}
-class classD {
-  field
-  method()
-}
-@enduml</code></pre></div></div>
-</div>
-<h2 id=パッケージ>パッケージ</h2>
-<h3 id=クラスをパッケージ囲む>クラスをパッケージ囲む</h3>
-<p>クラスを <strong><code>package</code></strong> ブロックで囲むことで、パッケージ内にクラスを表示することができます。
-パッケージ名の後ろには背景色を指定することもできます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/package1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml package1
-package util {
-  class UtilClass1
-  class UtilClass2
-}
-package main #acf {
-  class MainClass1
-  class MainClass2
-}
-UtilClass1 &lt;-- MainClass1
-UtilClass2 &lt;-- MainClass2
-@enduml</code></pre></div></div>
-</div>
-<h3 id=パッケージ間の矢印>パッケージ間の矢印</h3>
-<p>パッケージも、クラスと同様に関連の矢印を引くことができます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/package2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-package main {
-  class Main1
-}
-package feature {
-  class Feature1
-  class Feature2
-}
-main --&gt; feature
-@enduml</code></pre></div></div>
-</div>
-<h3 id=パッケージのスタイル>パッケージのスタイル</h3>
-<p>パッケージ名の後ろに特定のステレオタイプを指定することで、パッケージのスタイル（形状）を変更することができます。
-デフォルトは <code>&lt;&lt;Folder>></code> を指定したものと同じ形状で表示されます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/package3.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-package node &lt;&lt;Node&gt;&gt; {
-  class Class1
-}
-package rectangle &lt;&lt;Rectangle&gt;&gt; {
-  class Class2
-}
-package folder &lt;&lt;Folder&gt;&gt; {
-  class Class3
-}</code></pre></div></div>
-</div>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/package4.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-package frame &lt;&lt;Frame&gt;&gt; {
-  class Class4
-}
-package cloud &lt;&lt;Cloud&gt;&gt; {
-  class Class5
-}
-package database &lt;&lt;Database&gt;&gt; {
-  class Class6
-}
-@enduml</code></pre></div></div>
-</div>
-<p>個々のパッケージのスタイルを指定する代わりに、先頭で <strong><code>skinparam packageStyle</code></strong> コマンドを実行することで、すべてのパッケージのスタイルを変更することができます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/package5.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml package5
-skinparam packageStyle rectangle
-package package1 {
-  class Class1
-}
-package package2 {
-  Class1 -&gt; Class2
-}
-package package3 {
-  Class2 --&gt; Class3
-}
-package package4 {
-  Class3 .&gt; Class4
-}
-@enduml</code></pre></div></div>
-</div>
-<p>ちなみに、上記のサンプルコードからも分かるように、すべてのクラスを <code>package</code> ブロック内で <code>class</code> キーワードを使って定義する必要はなく、<code>package</code> ブロック内で初めて登場したクラスは、自動的にそのパッケージ内に所属するものとみなされます。</p>
-<h2 id=名前空間>名前空間</h2>
-<h3 id=名前空間にクラスを配置する>名前空間にクラスを配置する</h3>
-<p>名前空間 (<code>namespace</code>) の機能によりクラス名を修飾すると、同じ名前のクラスを 1 つのダイアグラム内に登場させることができます。
-下記の例では、名前空間 <code>ns1</code> と <code>ns2</code> に、同じ名前のクラス <code>MyClass</code> を定義しています。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/namespace1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-namespace ns1 {
-  class MyClass
-}
-namespace ns2 {
-  class MyClass
-}
-ns1.MyClass -&gt; ns2.MyClass
-@enduml</code></pre></div></div>
-</div>
-<p><code>namespace</code> キーワードを使った名前空間の定義は必須ではなく、<code>aaa.bbb.MyName</code> のように、ドットで区切られたクラス名を使用することで、自動的にその名前空間に所属するクラスとして定義されます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/namespace2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class ns1.MyClass
-ns1.MyClass -&gt; ns2.MyClass
-ns2.MyClass -&gt; ns3.MyClass
-@enduml</code></pre></div></div>
-</div>
-<h3 id=名前空間の機能を無効にする>名前空間の機能を無効にする</h3>
-<p>上記の例のように、デフォルトではクラス名にドット (<code>.</code>) を含めることで自動的にそのクラスは名前空間に配置されてしまいます。
-この機能を無効にして、クラス名にドットを含められるようにするには、<strong><code>set namespaceSeparator none</code></strong> コマンドを実行します。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/namespace-none.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml namespace-none
-set namespaceSeparator none
-
-class aaa.MyClass
-aaa.MyClass -&gt; bbb.MyClass
-bbb.MyClass -&gt; ccc.MyClass
-@enduml</code></pre></div></div>
-</div>
-<h3 id=名前空間のセパレータ文字を変更する>名前空間のセパレータ文字を変更する</h3>
-<p>名前空間 (namespace) のセパレータ文字は、デフォルトではドット (<code>.</code>) になっていますが、<strong><code>set namespaceSeparator</code></strong> コマンドを使用して任意の文字列に変更することができます。
-下記の例では、セパレータ文字列として <code>::</code> を設定しています。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/namespace-separator.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-set namespaceSeparator ::
-
-class X::Y::Foo {
-  func()
-}
-X::Y::Foo -&gt; X::Y::Z::Bar
-@enduml</code></pre></div></div>
-</div>
-<h2 id=注釈コメントを表示する>注釈（コメント）を表示する</h2>
-<h3 id=クラスに直接注釈-note-を付ける>クラスに直接注釈 (note) を付ける</h3>
-<p><strong><code>note</code></strong> コマンドを使用すると、クラスの箱の上下左右の位置に注釈を表示することができます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/note1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class MyClass
-note left of MyClass : 左に表示される注釈
-note right of MyClass : 右に表示される注釈
-note top of MyClass : 上に表示される注釈
-note bottom of MyClass : 下に表示される注釈1
-note bottom of MyClass : 下に表示される注釈2
-@enduml</code></pre></div></div>
-</div>
-<p><code>of MyClass</code> などのターゲット指定を省略すると、直前に登場したオブジェクトに対しての注釈だとみなされます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/note2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class Foo
-note left : &#34;注釈1&#34;
-Foo &lt;-- Bar
-note left : &#34;注釈2&#34;
-note left : &#34;注釈3&#34;
-@enduml</code></pre></div></div>
-</div>
-<p>次のようにして複数行に渡る注釈を記述することもできます。
-改行位置はそのまま表示に反映されます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/note3.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class Foo
-note bottom of Foo
-  これは複数行にわたる
-  注釈です。改行の位置も
-  そのまま反映されます。
-endnote
-@enduml</code></pre></div></div>
-</div>
-<h3 id=注釈-note-定義しておいて後からクラスに付加する>注釈 (note) 定義しておいて後からクラスに付加する</h3>
-<p><strong><code>note テキスト as 注釈名</code></strong> という形で注釈 (note) に名前を付けて定義しておくと、後から <strong><code>クラス名 .. 注釈名</code></strong> のような感じでクラスに割り当てることもできます。
-この方法を使うと、同じ注釈を複数のクラスに適用することができます。</p>
-<p>注釈の表示位置は次のような感じで、ある程度制御することができます。</p>
-<table>
-<thead>
-<tr>
-<th>記述</th>
-<th>注釈の表示位置</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>注釈名 .. クラス名</code></td>
-<td>クラスの上</td>
-</tr>
-<tr>
-<td><code>クラス名 .. 注釈名</code></td>
-<td>クラスの下</td>
-</tr>
-<tr>
-<td><code>注釈名 . クラス名</code></td>
-<td>クラスの左</td>
-</tr>
-<tr>
-<td><code>クラス名 . 注釈名</code></td>
-<td>クラスの右</td>
-</tr>
-</tbody>
-</table>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/note-define1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class Foo
-class Bar
-note &#34;注釈1です&#34; as note1
-note &#34;注釈2です&#34; as note2
-note &#34;注釈3です&#34; as note3
-
-note1 . Foo
-Foo .. note2
-Bar .. note2
-Bar . note3
-@enduml</code></pre></div></div>
-</div>
-<p>複数行に渡る注釈を定義しておくこともできます（直接クラスに付加してしまう場合と同様です）。
-改行位置はそのまま表示に反映されます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/note-define2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class Foo
-note as note1
-  これは複数行にわたる
-  注釈です。改行の位置も
-  そのまま反映されます。
-endnote
-Foo .. note1
-@enduml</code></pre></div></div>
-</div>
-<h3 id=フィールドやメソッドに注釈を付ける>フィールドやメソッドに注釈を付ける</h3>
-<p>注釈を付けるターゲットとして、<strong><code>クラス名::フィールド名</code></strong> のように指定すると、フィールドやメソッドに対して注釈を付けることができます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/note-method.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class Foo {
-  field1
-  method1()
-}
-note left of Foo::field1
-  フィールドの注釈
-endnote
-note right of Foo::method1
-  メソッドの注釈
-endnote
-@enduml</code></pre></div></div>
-</div>
-<p>ポジションの指定は <code>left</code> あるいは <code>right</code> のみで、複数行コメントの形 (<code>note</code>~<code>endnote</code>) で指定しないとうまくいかないようです。</p>
-<h3 id=関連リンクに対して注釈をつける>関連（リンク）に対して注釈をつける</h3>
-<p>関連の線に注釈 (note) を付加したいときは、リンクの定義の直後に <strong><code>note on link</code></strong> コマンドを使用します。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/note-on-link.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-Foo --&gt; Bar
-note on link : これは関連に対する注釈です
-
-Foo -&gt; Hoge
-note on link #pink : &lt;b&gt;背景色&lt;/b&gt;を変更できます
-
-Hoge --&gt; Hemu
-note right on link
-  &lt;b&gt;複数行に渡る&lt;/b&gt;注釈を
-  記述できます。
-endnote
-@enduml</code></pre></div></div>
-</div>
-<h3 id=注釈テキストを-html-タグで装飾する>注釈テキストを HTML タグで装飾する</h3>
-<p>注釈内のテキストは、下記のような HTML 風タグで装飾することができます。
-ダイアログの目的は設計情報を伝えることなので、あまり装飾にこだわりすぎないように、<strong><code>&lt;b></code></strong> による強調くらいにしておくのがよいでしょう。</p>
-<table>
-<thead>
-<tr>
-<th>タグ</th>
-<th>意味</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>&lt;b></code></td>
-<td>太字</td>
-</tr>
-<tr>
-<td><code>&lt;u></code></td>
-<td>下線</td>
-</tr>
-<tr>
-<td><code>&lt;i></code></td>
-<td>イタリック</td>
-</tr>
-<tr>
-<td><code>&lt;s></code>, <code>&lt;del></code>, <code>&lt;strike></code></td>
-<td>打ち消し線</td>
-</tr>
-<tr>
-<td><code>&lt;color:#AAAAAA></code>, <code>&lt;font color="#AAAAAA"></code></td>
-<td>フォント色</td>
-</tr>
-<tr>
-<td><code>&lt;size:nn></code></td>
-<td>フォントサイズ</td>
-</tr>
-<tr>
-<td><code>&lt;img:file></code>, <code>&lt;img src="file"></code></td>
-<td>画像表示</td>
-</tr>
-</tbody>
-</table>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/note-decoration.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-class Foo
-note bottom of Foo
-  注釈テキストは&lt;b&gt;HTMLタグ&lt;/b&gt;で装飾できます。
-  &lt;color:red&gt;色の変更&lt;/color&gt;などもできますが、
-  &lt;size:20&gt;必要最小限&lt;/size&gt;にしましょう。
-endnote
-@enduml</code></pre></div></div>
-</div>
-<h2 id=レイアウト配置を調整する>レイアウト（配置）を調整する</h2>
-<p>クラスの配置はできるだけ PlantUML の自動レイアウトにまかせるべきですが、どうしてもよい配置にならないときがあります。
-そのような場合は、下記のようなテクニックを使ってある程度は配置の調整を行うことができます。</p>
-<h3 id=クラスの箱の配置順>クラスの箱の配置順</h3>
-<p>クラスの箱は、基本的に登場した順に左上から配置されていきます。
+ハイフンやドットの数を 1 つにすれば、クラスを横方向に並べることができますが、ここでの紹介例ではすべて縦方向に並べています。</p><ul><li><code>--></code>: 関連 (Association) ※長期的な依存</li><li><code>..></code>: 依存 (Dependency) ※短期的な依存</li><li><code>o--</code>: 集約 (Aggregation)</li><li><code>*--</code>: 合成、コンポジション (Composition)</li><li><code>&lt;|--</code>: 汎化 (Extension)</li><li><code>&lt;|..</code>: 実現 (Realization)</li></ul><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/arrow1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>A --&gt; B
+</span></span><span class=line><span class=cl>C ..&gt; D
+</span></span><span class=line><span class=cl>E o-- F
+</span></span><span class=line><span class=cl>G *-- H
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/arrow2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>abstract Parent
+</span></span><span class=line><span class=cl>interface MyInterface
+</span></span><span class=line><span class=cl>Parent &lt;|-- ChildA
+</span></span><span class=line><span class=cl>Parent &lt;|-- ChildB
+</span></span><span class=line><span class=cl>MyInterface &lt;|.. ImplA
+</span></span><span class=line><span class=cl>MyInterface &lt;|.. ImplB
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=多重度と関連のラベル制約>多重度と関連のラベル（制約）</h3><p>次のようにして、線の両端に多重度を表示したり、関連の意味や制約を示すラベルを表示したりすることができます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/arrow-label1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>BookShelf &#34;1&#34; o-- &#34;*&#34; Book : contains
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>ラベルの先頭か末尾に <code>&lt;</code> や <code>></code> を付けることでラベルに方向を表示することができます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/arrow-label2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>Driver - Car : drives &gt;
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>下記の例では、Customer が順序のある Purchase を保持していることを示しています。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/arrow-label3.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>Customer --&gt; &#34;1..* {ordered}&#34; Purchase
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=関連間の制約>関連間の制約</h3><p>関連の線の間に <code>{ xor }</code> 制約などを表示することは PlantUML ではまだできないっぽいです。
+コメントなどで対応するしかなさそうです。</p><h2 id=属性を定義する>属性を定義する</h2><h3 id=メソッドやフィールド属性を追加する>メソッドやフィールド（属性）を追加する</h3><p>クラスにメソッドやフィールドを追加していくには、クラス名の後ろに <code>{}</code> で囲んだブロックを作成します。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:150px;height:auto src=../../p/tn6y85z/attr.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class MyClass {
+</span></span><span class=line><span class=cl>  property1 : Int
+</span></span><span class=line><span class=cl>  property2 : String
+</span></span><span class=line><span class=cl>  func1() : String
+</span></span><span class=line><span class=cl>  func2(p1, p2) : Int
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=メソッドやフィールドの可視性-visibility>メソッドやフィールドの可視性 (Visibility)</h3><p>メソッドやフィールドの先頭に、<code>+</code>、<code>#</code>、<code>-</code>、<code>~</code> を付加することで、可視性を示すアイコンが表示されるようになります。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:230px;height:auto src=../../p/tn6y85z/visibility1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class MyClass {
+</span></span><span class=line><span class=cl>  +publicField
+</span></span><span class=line><span class=cl>  #protectedField
+</span></span><span class=line><span class=cl>  -privateField
+</span></span><span class=line><span class=cl>  ~packagePrivateField
+</span></span><span class=line><span class=cl>  +publicMethod()
+</span></span><span class=line><span class=cl>  #protectedMethod()
+</span></span><span class=line><span class=cl>  -privateMethod()
+</span></span><span class=line><span class=cl>  ~packagePrivateMethod()
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>可視性を示すアイコンが分かりにくい場合は、最初に <strong><code>skinparam classAttributeIconSize 0</code></strong> というコマンドを実行しておけば、<code>+</code> や <code>-</code> 記号がそのまま表示されるようになります。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:230px;height:auto src=../../p/tn6y85z/visibility2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>skinparam classAttributeIconSize 0
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>class MyClass {
+</span></span><span class=line><span class=cl>  +publicField
+</span></span><span class=line><span class=cl>  #protectedField
+</span></span><span class=line><span class=cl>  -privateField
+</span></span><span class=line><span class=cl>  ~packagePrivateField
+</span></span><span class=line><span class=cl>  +publicMethod()
+</span></span><span class=line><span class=cl>  #protectedMethod()
+</span></span><span class=line><span class=cl>  -privateMethod()
+</span></span><span class=line><span class=cl>  ~packagePrivateMethod()
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=static-メソッドと-abstract-メソッド>Static メソッドと Abstract メソッド</h3><p>メソッドの前に、<strong><code>{static}</code></strong> モディファイアを付けることで静的メソッド (static method)、<strong><code>{abstract}</code></strong> モディファイアを付けることで抽象メソッド (abstract method) であることを示すことができます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:200px;height:auto src=../../p/tn6y85z/static-and-abstract.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml static-and-abstract
+</span></span><span class=line><span class=cl>class MyClass {
+</span></span><span class=line><span class=cl>  {static} staticField: String
+</span></span><span class=line><span class=cl>  {abstract} abstractField: String
+</span></span><span class=line><span class=cl>  {static} staticMethod(): void
+</span></span><span class=line><span class=cl>  {abstract} abstractMethod(): void
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=セパレータで自由に区切る>セパレータで自由に区切る</h3><p>デフォルトでは、括弧の有無によってメソッドとフィールドがグルーピングされて表示されます。
+下記のようなセパレータを使用することで、自由な位置に区切り線を入れて表示をグルーピングすることができます。</p><table><thead><tr><th>セパレータ</th><th>線の種類</th></tr></thead><tbody><tr><td><code>..</code></td><td>破線</td></tr><tr><td><code>--</code></td><td>ノーマル</td></tr><tr><td><code>__</code></td><td>太線</td></tr><tr><td><code>==</code></td><td>二重線</td></tr></tbody></table><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:130px;height:auto src=../../p/tn6y85z/separator1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class ClassA {
+</span></span><span class=line><span class=cl>  property1
+</span></span><span class=line><span class=cl>  ..
+</span></span><span class=line><span class=cl>  property2
+</span></span><span class=line><span class=cl>  --
+</span></span><span class=line><span class=cl>  property3
+</span></span><span class=line><span class=cl>  __
+</span></span><span class=line><span class=cl>  property4
+</span></span><span class=line><span class=cl>  ==
+</span></span><span class=line><span class=cl>  property5
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>セパレータの線の上にテキストを表示することもできます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:130px;height:auto src=../../p/tn6y85z/separator2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class ClassB {
+</span></span><span class=line><span class=cl>  property1
+</span></span><span class=line><span class=cl>  .. dashed line ..
+</span></span><span class=line><span class=cl>  property2
+</span></span><span class=line><span class=cl>  -- normal line --
+</span></span><span class=line><span class=cl>  property3
+</span></span><span class=line><span class=cl>  __ heavy line __
+</span></span><span class=line><span class=cl>  property4
+</span></span><span class=line><span class=cl>  == double line ==
+</span></span><span class=line><span class=cl>  property5
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=フィールドとメソッドのどちらに割り振るかを制御する>フィールドとメソッドのどちらに割り振るかを制御する</h3><p>デフォルトの振る舞いでは、末尾に <code>()</code> の付いた属性はメソッドだと認識され、それ以外はフィールドだと認識されます。
+この振る舞いを強制的に変更するには、先頭に <strong><code>{field}</code></strong> や <strong><code>{method}</code></strong> モディファイアを付けます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:250px;height:auto src=../../p/tn6y85z/field-and-method-modifier.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml field-and-method-modifier
+</span></span><span class=line><span class=cl>class MyClass {
+</span></span><span class=line><span class=cl>  これは括弧がないのでフィールド
+</span></span><span class=line><span class=cl>  {field} これは括弧があるけどフィールド()
+</span></span><span class=line><span class=cl>  これは括弧があるのでメソッド()
+</span></span><span class=line><span class=cl>  {method} これは括弧がないけどメソッド
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>セパレータを入れることでも同様の表現が可能なので、こちらの方がシンプルでよいかもしれません。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:250px;height:auto src=../../p/tn6y85z/field-and-method-modifier.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml field-and-method-modifier2
+</span></span><span class=line><span class=cl>class MyClass {
+</span></span><span class=line><span class=cl>  これは括弧がないのでフィールド
+</span></span><span class=line><span class=cl>  これは括弧があるけどフィールド()
+</span></span><span class=line><span class=cl>  __
+</span></span><span class=line><span class=cl>  これは括弧があるのでメソッド()
+</span></span><span class=line><span class=cl>  これは括弧がないけどメソッド
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=メソッドがない場合にメソッドの領域を非表示にする>メソッドがない場合にメソッドの領域を非表示にする</h3><p>フィールドやメソッドが存在しない場合、その表示領域を非表示にするには、<strong><code>hide empty fields</code></strong> コマンドや、<strong><code>hide empty methods</code></strong> コマンドを使用します。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/hide-empty.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>hide empty fields
+</span></span><span class=line><span class=cl>hide empty methods
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>class ClassA
+</span></span><span class=line><span class=cl>class ClassB {
+</span></span><span class=line><span class=cl>  field
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>class ClassC {
+</span></span><span class=line><span class=cl>  method()
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>class classD {
+</span></span><span class=line><span class=cl>  field
+</span></span><span class=line><span class=cl>  method()
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h2 id=パッケージ>パッケージ</h2><h3 id=クラスをパッケージ囲む>クラスをパッケージ囲む</h3><p>クラスを <strong><code>package</code></strong> ブロックで囲むことで、パッケージ内にクラスを表示することができます。
+パッケージ名の後ろには背景色を指定することもできます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/package1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml package1
+</span></span><span class=line><span class=cl>package util {
+</span></span><span class=line><span class=cl>  class UtilClass1
+</span></span><span class=line><span class=cl>  class UtilClass2
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>package main #acf {
+</span></span><span class=line><span class=cl>  class MainClass1
+</span></span><span class=line><span class=cl>  class MainClass2
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>UtilClass1 &lt;-- MainClass1
+</span></span><span class=line><span class=cl>UtilClass2 &lt;-- MainClass2
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=パッケージ間の矢印>パッケージ間の矢印</h3><p>パッケージも、クラスと同様に関連の矢印を引くことができます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/package2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>package main {
+</span></span><span class=line><span class=cl>  class Main1
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>package feature {
+</span></span><span class=line><span class=cl>  class Feature1
+</span></span><span class=line><span class=cl>  class Feature2
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>main --&gt; feature
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=パッケージのスタイル>パッケージのスタイル</h3><p>パッケージ名の後ろに特定のステレオタイプを指定することで、パッケージのスタイル（形状）を変更することができます。
+デフォルトは <code>&lt;&lt;Folder>></code> を指定したものと同じ形状で表示されます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/package3.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>package node &lt;&lt;Node&gt;&gt; {
+</span></span><span class=line><span class=cl>  class Class1
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>package rectangle &lt;&lt;Rectangle&gt;&gt; {
+</span></span><span class=line><span class=cl>  class Class2
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>package folder &lt;&lt;Folder&gt;&gt; {
+</span></span><span class=line><span class=cl>  class Class3
+</span></span><span class=line><span class=cl>}</span></span></code></pre></div></div></div><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/package4.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>package frame &lt;&lt;Frame&gt;&gt; {
+</span></span><span class=line><span class=cl>  class Class4
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>package cloud &lt;&lt;Cloud&gt;&gt; {
+</span></span><span class=line><span class=cl>  class Class5
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>package database &lt;&lt;Database&gt;&gt; {
+</span></span><span class=line><span class=cl>  class Class6
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>個々のパッケージのスタイルを指定する代わりに、先頭で <strong><code>skinparam packageStyle</code></strong> コマンドを実行することで、すべてのパッケージのスタイルを変更することができます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/package5.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml package5
+</span></span><span class=line><span class=cl>skinparam packageStyle rectangle
+</span></span><span class=line><span class=cl>package package1 {
+</span></span><span class=line><span class=cl>  class Class1
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>package package2 {
+</span></span><span class=line><span class=cl>  Class1 -&gt; Class2
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>package package3 {
+</span></span><span class=line><span class=cl>  Class2 --&gt; Class3
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>package package4 {
+</span></span><span class=line><span class=cl>  Class3 .&gt; Class4
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>ちなみに、上記のサンプルコードからも分かるように、すべてのクラスを <code>package</code> ブロック内で <code>class</code> キーワードを使って定義する必要はなく、<code>package</code> ブロック内で初めて登場したクラスは、自動的にそのパッケージ内に所属するものとみなされます。</p><h2 id=名前空間>名前空間</h2><h3 id=名前空間にクラスを配置する>名前空間にクラスを配置する</h3><p>名前空間 (<code>namespace</code>) の機能によりクラス名を修飾すると、同じ名前のクラスを 1 つのダイアグラム内に登場させることができます。
+下記の例では、名前空間 <code>ns1</code> と <code>ns2</code> に、同じ名前のクラス <code>MyClass</code> を定義しています。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/namespace1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>namespace ns1 {
+</span></span><span class=line><span class=cl>  class MyClass
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>namespace ns2 {
+</span></span><span class=line><span class=cl>  class MyClass
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>ns1.MyClass -&gt; ns2.MyClass
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p><code>namespace</code> キーワードを使った名前空間の定義は必須ではなく、<code>aaa.bbb.MyName</code> のように、ドットで区切られたクラス名を使用することで、自動的にその名前空間に所属するクラスとして定義されます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/namespace2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class ns1.MyClass
+</span></span><span class=line><span class=cl>ns1.MyClass -&gt; ns2.MyClass
+</span></span><span class=line><span class=cl>ns2.MyClass -&gt; ns3.MyClass
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=名前空間の機能を無効にする>名前空間の機能を無効にする</h3><p>上記の例のように、デフォルトではクラス名にドット (<code>.</code>) を含めることで自動的にそのクラスは名前空間に配置されてしまいます。
+この機能を無効にして、クラス名にドットを含められるようにするには、<strong><code>set namespaceSeparator none</code></strong> コマンドを実行します。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/namespace-none.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml namespace-none
+</span></span><span class=line><span class=cl>set namespaceSeparator none
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>class aaa.MyClass
+</span></span><span class=line><span class=cl>aaa.MyClass -&gt; bbb.MyClass
+</span></span><span class=line><span class=cl>bbb.MyClass -&gt; ccc.MyClass
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=名前空間のセパレータ文字を変更する>名前空間のセパレータ文字を変更する</h3><p>名前空間 (namespace) のセパレータ文字は、デフォルトではドット (<code>.</code>) になっていますが、<strong><code>set namespaceSeparator</code></strong> コマンドを使用して任意の文字列に変更することができます。
+下記の例では、セパレータ文字列として <code>::</code> を設定しています。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/namespace-separator.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>set namespaceSeparator ::
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>class X::Y::Foo {
+</span></span><span class=line><span class=cl>  func()
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>X::Y::Foo -&gt; X::Y::Z::Bar
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h2 id=注釈コメントを表示する>注釈（コメント）を表示する</h2><h3 id=クラスに直接注釈-note-を付ける>クラスに直接注釈 (note) を付ける</h3><p><strong><code>note</code></strong> コマンドを使用すると、クラスの箱の上下左右の位置に注釈を表示することができます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/note1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class MyClass
+</span></span><span class=line><span class=cl>note left of MyClass : 左に表示される注釈
+</span></span><span class=line><span class=cl>note right of MyClass : 右に表示される注釈
+</span></span><span class=line><span class=cl>note top of MyClass : 上に表示される注釈
+</span></span><span class=line><span class=cl>note bottom of MyClass : 下に表示される注釈1
+</span></span><span class=line><span class=cl>note bottom of MyClass : 下に表示される注釈2
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p><code>of MyClass</code> などのターゲット指定を省略すると、直前に登場したオブジェクトに対しての注釈だとみなされます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/note2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class Foo
+</span></span><span class=line><span class=cl>note left : &#34;注釈1&#34;
+</span></span><span class=line><span class=cl>Foo &lt;-- Bar
+</span></span><span class=line><span class=cl>note left : &#34;注釈2&#34;
+</span></span><span class=line><span class=cl>note left : &#34;注釈3&#34;
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>次のようにして複数行に渡る注釈を記述することもできます。
+改行位置はそのまま表示に反映されます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/note3.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class Foo
+</span></span><span class=line><span class=cl>note bottom of Foo
+</span></span><span class=line><span class=cl>  これは複数行にわたる
+</span></span><span class=line><span class=cl>  注釈です。改行の位置も
+</span></span><span class=line><span class=cl>  そのまま反映されます。
+</span></span><span class=line><span class=cl>endnote
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=注釈-note-定義しておいて後からクラスに付加する>注釈 (note) 定義しておいて後からクラスに付加する</h3><p><strong><code>note テキスト as 注釈名</code></strong> という形で注釈 (note) に名前を付けて定義しておくと、後から <strong><code>クラス名 .. 注釈名</code></strong> のような感じでクラスに割り当てることもできます。
+この方法を使うと、同じ注釈を複数のクラスに適用することができます。</p><p>注釈の表示位置は次のような感じで、ある程度制御することができます。</p><table><thead><tr><th>記述</th><th>注釈の表示位置</th></tr></thead><tbody><tr><td><code>注釈名 .. クラス名</code></td><td>クラスの上</td></tr><tr><td><code>クラス名 .. 注釈名</code></td><td>クラスの下</td></tr><tr><td><code>注釈名 . クラス名</code></td><td>クラスの左</td></tr><tr><td><code>クラス名 . 注釈名</code></td><td>クラスの右</td></tr></tbody></table><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/note-define1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class Foo
+</span></span><span class=line><span class=cl>class Bar
+</span></span><span class=line><span class=cl>note &#34;注釈1です&#34; as note1
+</span></span><span class=line><span class=cl>note &#34;注釈2です&#34; as note2
+</span></span><span class=line><span class=cl>note &#34;注釈3です&#34; as note3
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>note1 . Foo
+</span></span><span class=line><span class=cl>Foo .. note2
+</span></span><span class=line><span class=cl>Bar .. note2
+</span></span><span class=line><span class=cl>Bar . note3
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>複数行に渡る注釈を定義しておくこともできます（直接クラスに付加してしまう場合と同様です）。
+改行位置はそのまま表示に反映されます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/note-define2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class Foo
+</span></span><span class=line><span class=cl>note as note1
+</span></span><span class=line><span class=cl>  これは複数行にわたる
+</span></span><span class=line><span class=cl>  注釈です。改行の位置も
+</span></span><span class=line><span class=cl>  そのまま反映されます。
+</span></span><span class=line><span class=cl>endnote
+</span></span><span class=line><span class=cl>Foo .. note1
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=フィールドやメソッドに注釈を付ける>フィールドやメソッドに注釈を付ける</h3><p>注釈を付けるターゲットとして、<strong><code>クラス名::フィールド名</code></strong> のように指定すると、フィールドやメソッドに対して注釈を付けることができます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/note-method.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class Foo {
+</span></span><span class=line><span class=cl>  field1
+</span></span><span class=line><span class=cl>  method1()
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>note left of Foo::field1
+</span></span><span class=line><span class=cl>  フィールドの注釈
+</span></span><span class=line><span class=cl>endnote
+</span></span><span class=line><span class=cl>note right of Foo::method1
+</span></span><span class=line><span class=cl>  メソッドの注釈
+</span></span><span class=line><span class=cl>endnote
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>ポジションの指定は <code>left</code> あるいは <code>right</code> のみで、複数行コメントの形 (<code>note</code>~<code>endnote</code>) で指定しないとうまくいかないようです。</p><h3 id=関連リンクに対して注釈をつける>関連（リンク）に対して注釈をつける</h3><p>関連の線に注釈 (note) を付加したいときは、リンクの定義の直後に <strong><code>note on link</code></strong> コマンドを使用します。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/note-on-link.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>Foo --&gt; Bar
+</span></span><span class=line><span class=cl>note on link : これは関連に対する注釈です
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Foo -&gt; Hoge
+</span></span><span class=line><span class=cl>note on link #pink : &lt;b&gt;背景色&lt;/b&gt;を変更できます
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Hoge --&gt; Hemu
+</span></span><span class=line><span class=cl>note right on link
+</span></span><span class=line><span class=cl>  &lt;b&gt;複数行に渡る&lt;/b&gt;注釈を
+</span></span><span class=line><span class=cl>  記述できます。
+</span></span><span class=line><span class=cl>endnote
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=注釈テキストを-html-タグで装飾する>注釈テキストを HTML タグで装飾する</h3><p>注釈内のテキストは、下記のような HTML 風タグで装飾することができます。
+ダイアログの目的は設計情報を伝えることなので、あまり装飾にこだわりすぎないように、<strong><code>&lt;b></code></strong> による強調くらいにしておくのがよいでしょう。</p><table><thead><tr><th>タグ</th><th>意味</th></tr></thead><tbody><tr><td><code>&lt;b></code></td><td>太字</td></tr><tr><td><code>&lt;u></code></td><td>下線</td></tr><tr><td><code>&lt;i></code></td><td>イタリック</td></tr><tr><td><code>&lt;s></code>, <code>&lt;del></code>, <code>&lt;strike></code></td><td>打ち消し線</td></tr><tr><td><code>&lt;color:#AAAAAA></code>, <code>&lt;font color="#AAAAAA"></code></td><td>フォント色</td></tr><tr><td><code>&lt;size:nn></code></td><td>フォントサイズ</td></tr><tr><td><code>&lt;img:file></code>, <code>&lt;img src="file"></code></td><td>画像表示</td></tr></tbody></table><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/note-decoration.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>class Foo
+</span></span><span class=line><span class=cl>note bottom of Foo
+</span></span><span class=line><span class=cl>  注釈テキストは&lt;b&gt;HTMLタグ&lt;/b&gt;で装飾できます。
+</span></span><span class=line><span class=cl>  &lt;color:red&gt;色の変更&lt;/color&gt;などもできますが、
+</span></span><span class=line><span class=cl>  &lt;size:20&gt;必要最小限&lt;/size&gt;にしましょう。
+</span></span><span class=line><span class=cl>endnote
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h2 id=レイアウト配置を調整する>レイアウト（配置）を調整する</h2><p>クラスの配置はできるだけ PlantUML の自動レイアウトにまかせるべきですが、どうしてもよい配置にならないときがあります。
+そのような場合は、下記のようなテクニックを使ってある程度は配置の調整を行うことができます。</p><h3 id=クラスの箱の配置順>クラスの箱の配置順</h3><p>クラスの箱は、基本的に登場した順に左上から配置されていきます。
 クラス間の関連を表す矢印のハイフンが 1 つだと横方向、2 つ以上だと縦方向に配置されます。
-依存関係によって PlantUML は最適な位置にクラスを配置していきますが、矢印とクラス配置の関係はおおよそ次のようになります。</p>
-<table>
-<thead>
-<tr>
-<th>矢印</th>
-<th>クラスの配置</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>-></code></td>
-<td>左から右</td>
-</tr>
-<tr>
-<td><code>&lt;-</code></td>
-<td>右から左</td>
-</tr>
-<tr>
-<td><code>--></code></td>
-<td>上から下</td>
-</tr>
-<tr>
-<td><code>&lt;--</code></td>
-<td>下から上</td>
-</tr>
-</tbody>
-</table>
-<p>思った位置と逆に表示されてしまったら、クラスが登場する順序を逆にして、それに合わせて矢印の向きを逆転させるとうまくいくことが多いです。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/layout1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-A --|&gt; B
-B -&gt; C
-@enduml</code></pre></div></div>
-</div>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/layout2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-B &lt;|-- A
-C &lt;- B
-@enduml</code></pre></div></div>
-</div>
-<h3 id=矢印の方向>矢印の方向</h3>
-<p>矢印の内側に <strong><code>left</code></strong>、<strong><code>right</code></strong>、<strong><code>up</code></strong>、<strong><code>down</code></strong> と記述することで、その方向に矢印が向かうように配置を調整することができます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/layout3.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-Center -up-&gt; Up
-Center -left-&gt; Left
-Center -right-&gt; Right
-Center -down-&gt; Down
-@enduml</code></pre></div></div>
-</div>
-<h3 id=見えない関連の線を引いて配置>見えない関連の線を引いて配置</h3>
-<p>次の例では、6 つのクラスを自動レイアウトで配置していますが、無駄に横長に配置されてしまっています。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/hidden-line1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml hidden-line1
-class A
-A -&gt; B
-C -&gt; D
-E --&gt; F
-@enduml</code></pre></div></div>
-</div>
-<p>クラス A と B の下に、C と D を配置できればもっとコンパクトに表示できるはずです。
-このようなケースでは、<strong><code>[hidden]</code></strong> キーワードを使って、A と C の間に見えない関連の線（縦方向の線）を引いてやることで、うまく A と C が縦に並ぶようになります。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/hidden-line2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml hidden-line2
-class A
-A -&gt; B
-A -[hidden]- C
-C -&gt; D
-E --&gt; F
-@enduml</code></pre></div></div>
-</div>
-<h2 id=関連クラス>関連クラス</h2>
-<p>クラスをある 2 つのクラス A, B の関連クラスとして表示するには、<strong><code>(クラスA, クラスB) .. 関連クラス名</code></strong> という記述を使います。</p>
-<p>クラス間の接続では <code>クラス .. クラス</code> と記述していましたが、この片方を <code>(クラス, クラス)</code> というペアの記述に変えたものだと考えると分かりやすいです。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/relation-class1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-Student &#34;1&#34; - &#34;1&#34; Course
-(Student, Course) .. Enrollment
-@enduml</code></pre></div></div>
-</div>
-<p>関連クラスの表示位置も、クラスの表示位置と同様にある程度制御することができます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/relation-class2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-Student &#34;1&#34; - &#34;1&#34; Course
-Enrollment .. (Student, Course)
-@enduml</code></pre></div></div>
-</div>
-<h2 id=全体のカラー配色を変更する>全体のカラー（配色）を変更する</h2>
-<p><strong><code>skinparam</code></strong> コマンドを使って、クラス図全体の配色をまとめて変更することができます。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/skinparam1.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-skinparam classBackgroundColor #FFFFFF
-skinparam classBorderColor #black
-skinparam classArrowColor #black
-skinparam classFontColor #blue
-skinparam classFontSize 20
-skinparam classFontName Helvetica
-&#39; 可視性をアイコンではなく文字で表示
-skinparam classAttributeIconSize 0
-&#39; 影をなくす
-skinparam shadowing false
-
-Foo &lt;|-- Bar
-@enduml</code></pre></div></div>
-</div>
-<p><code>skinparam</code> コマンドはブロック化することで、プレフィックス部分を省略して記述することができます。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>skinparam class {
-  BackgroundColor #FFFFFF
-  BorderColor #black
-  ArrowColor #black
-  FontColor #blue
-  FontSize 20
-  FontName Helvetica
-  AttributeIconSize 0
-}
-skinparam shadowing false</code></pre></div></div>
-</figure>
-<p>シンプルにグレースケール表示にしたい場合は、<strong><code>skinparam monochrome true</code></strong> とするのが手っ取り早いです。</p>
-<div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em">
-<div style=display:inline-block;width:49%;text-align:center>
-<img style=width:auto;height:auto src=../../p/tn6y85z/skinparam2.svg>
-</div>
-<div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-skinparam monochrome true
-&#39; 可視性をアイコンではなく文字で表示
-skinparam classAttributeIconSize 0
-&#39; 影をなくす
-skinparam shadowing false
-
-Foo &lt;|-- Bar
-@enduml</code></pre></div></div>
-</div>
-<p>一連の <code>skinparam</code> の定義は別ファイル (.iuml) に保存してしまい、プロジェクト全体でインクルード (<strong><code>!include</code></strong>) して使用するのがよいでしょう。
-ネット上のファイルをインクルード (<strong><code>!includeurl</code></strong>) することもできます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>skinparams.iuml</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>skinparam class {
-  BackgroundColor #white
-  BorderColor #black
-  ArrowColor #black
-  FontColor #black
-  FontSize 20
-  FontName Helvetica
-  &#39; 可視性をアイコンではなく文字で表示
-  AttributeIconSize 0
-}
-
-&#39; 影をなくす
-skinparam shadowing false</code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>使用例</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>@startuml
-!include skinparams.iuml
-
-class Foo
-class Bar
-@enduml</code></pre></div></div>
-</figure>
-<ul>
-<li>参考: <a href=http://plantuml.com/ja/skinparam>PlantUML &ndash; Changing colors and fonts</a></li>
-</ul>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=../../p/t7cfj92/>PlantUML でオブジェクト図を作成する</a></li>
-<li><a href=../../p/n8p7qmw/>PlantUML でシーケンス図を作成する</a></li>
-<li><a href=../../p/opxhnho/>PlantUML の基本（インストール〜画像ファイルへの保存）</a></li>
-<li><a href=../../p/yzs49gv/>UML ダイアグラムの一覧と分類</a></li>
-<li><a href=../../p/tc73ttt/>読書メモ『UMLモデリングのエッセンス第3版』マーチン・ファウラー</a></li>
-<li><a href=../../p/9kuptdn/>『オブジェクト開発の神髄 UML2.0を使ったアジャイルモデル駆動開発のすべて』スコット・W・アンブラー</a></li>
-<li><a href=../../p/d3ehztz/>読書メモ『ワークブック形式で学ぶ UML オブジェクトモデリング─ユースケース駆動でソフトウェアを開発する』ダグ・ローゼンバーグ、ケンドール・スコット</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/uml>UML</a></span>
-<span class=xPageTags_item><a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=../../p/zbgbb5u/><span class=xArticle_up_label>PlantUML（テキストベースのUML作図ツール）</span><br>へ戻る</a>
-</div>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/opxhnho/>PlantUML の基本（インストール〜画像ファイルへの保存）</a>
-</div>
-<div class=xPrevNextLink_next>
-<a href=../../p/n8p7qmw/>PlantUML でシーケンス図を作成する</a>
-</div>
-</div>
-</aside>
-</article>
-<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+依存関係によって PlantUML は最適な位置にクラスを配置していきますが、矢印とクラス配置の関係はおおよそ次のようになります。</p><table><thead><tr><th>矢印</th><th>クラスの配置</th></tr></thead><tbody><tr><td><code>-></code></td><td>左から右</td></tr><tr><td><code>&lt;-</code></td><td>右から左</td></tr><tr><td><code>--></code></td><td>上から下</td></tr><tr><td><code>&lt;--</code></td><td>下から上</td></tr></tbody></table><p>思った位置と逆に表示されてしまったら、クラスが登場する順序を逆にして、それに合わせて矢印の向きを逆転させるとうまくいくことが多いです。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/layout1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>A --|&gt; B
+</span></span><span class=line><span class=cl>B -&gt; C
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/layout2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>B &lt;|-- A
+</span></span><span class=line><span class=cl>C &lt;- B
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=矢印の方向>矢印の方向</h3><p>矢印の内側に <strong><code>left</code></strong>、<strong><code>right</code></strong>、<strong><code>up</code></strong>、<strong><code>down</code></strong> と記述することで、その方向に矢印が向かうように配置を調整することができます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/layout3.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>Center -up-&gt; Up
+</span></span><span class=line><span class=cl>Center -left-&gt; Left
+</span></span><span class=line><span class=cl>Center -right-&gt; Right
+</span></span><span class=line><span class=cl>Center -down-&gt; Down
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h3 id=見えない関連の線を引いて配置>見えない関連の線を引いて配置</h3><p>次の例では、6 つのクラスを自動レイアウトで配置していますが、無駄に横長に配置されてしまっています。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/hidden-line1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml hidden-line1
+</span></span><span class=line><span class=cl>class A
+</span></span><span class=line><span class=cl>A -&gt; B
+</span></span><span class=line><span class=cl>C -&gt; D
+</span></span><span class=line><span class=cl>E --&gt; F
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>クラス A と B の下に、C と D を配置できればもっとコンパクトに表示できるはずです。
+このようなケースでは、<strong><code>[hidden]</code></strong> キーワードを使って、A と C の間に見えない関連の線（縦方向の線）を引いてやることで、うまく A と C が縦に並ぶようになります。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/hidden-line2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml hidden-line2
+</span></span><span class=line><span class=cl>class A
+</span></span><span class=line><span class=cl>A -&gt; B
+</span></span><span class=line><span class=cl>A -[hidden]- C
+</span></span><span class=line><span class=cl>C -&gt; D
+</span></span><span class=line><span class=cl>E --&gt; F
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h2 id=関連クラス>関連クラス</h2><p>クラスをある 2 つのクラス A, B の関連クラスとして表示するには、<strong><code>(クラスA, クラスB) .. 関連クラス名</code></strong> という記述を使います。</p><p>クラス間の接続では <code>クラス .. クラス</code> と記述していましたが、この片方を <code>(クラス, クラス)</code> というペアの記述に変えたものだと考えると分かりやすいです。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/relation-class1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>Student &#34;1&#34; - &#34;1&#34; Course
+</span></span><span class=line><span class=cl>(Student, Course) .. Enrollment
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>関連クラスの表示位置も、クラスの表示位置と同様にある程度制御することができます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/relation-class2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>Student &#34;1&#34; - &#34;1&#34; Course
+</span></span><span class=line><span class=cl>Enrollment .. (Student, Course)
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><h2 id=全体のカラー配色を変更する>全体のカラー（配色）を変更する</h2><p><strong><code>skinparam</code></strong> コマンドを使って、クラス図全体の配色をまとめて変更することができます。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/skinparam1.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>skinparam classBackgroundColor #FFFFFF
+</span></span><span class=line><span class=cl>skinparam classBorderColor #black
+</span></span><span class=line><span class=cl>skinparam classArrowColor #black
+</span></span><span class=line><span class=cl>skinparam classFontColor #blue
+</span></span><span class=line><span class=cl>skinparam classFontSize 20
+</span></span><span class=line><span class=cl>skinparam classFontName Helvetica
+</span></span><span class=line><span class=cl>&#39; 可視性をアイコンではなく文字で表示
+</span></span><span class=line><span class=cl>skinparam classAttributeIconSize 0
+</span></span><span class=line><span class=cl>&#39; 影をなくす
+</span></span><span class=line><span class=cl>skinparam shadowing false
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Foo &lt;|-- Bar
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p><code>skinparam</code> コマンドはブロック化することで、プレフィックス部分を省略して記述することができます。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>skinparam class {
+</span></span><span class=line><span class=cl>  BackgroundColor #FFFFFF
+</span></span><span class=line><span class=cl>  BorderColor #black
+</span></span><span class=line><span class=cl>  ArrowColor #black
+</span></span><span class=line><span class=cl>  FontColor #blue
+</span></span><span class=line><span class=cl>  FontSize 20
+</span></span><span class=line><span class=cl>  FontName Helvetica
+</span></span><span class=line><span class=cl>  AttributeIconSize 0
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>skinparam shadowing false</span></span></code></pre></div></div></figure><p>シンプルにグレースケール表示にしたい場合は、<strong><code>skinparam monochrome true</code></strong> とするのが手っ取り早いです。</p><div style="border:solid 1px gray;padding:.5em 0;border:solid 1px #ccc;border-radius:.5em"><div style=display:inline-block;width:49%;text-align:center><img style=width:auto;height:auto src=../../p/tn6y85z/skinparam2.svg></div><div style=display:inline-block;width:49%;vertical-align:top;white-space:nowrap;overflow-wrap:break-word><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>skinparam monochrome true
+</span></span><span class=line><span class=cl>&#39; 可視性をアイコンではなく文字で表示
+</span></span><span class=line><span class=cl>skinparam classAttributeIconSize 0
+</span></span><span class=line><span class=cl>&#39; 影をなくす
+</span></span><span class=line><span class=cl>skinparam shadowing false
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Foo &lt;|-- Bar
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></div><p>一連の <code>skinparam</code> の定義は別ファイル (.iuml) に保存してしまい、プロジェクト全体でインクルード (<strong><code>!include</code></strong>) して使用するのがよいでしょう。
+ネット上のファイルをインクルード (<strong><code>!includeurl</code></strong>) することもできます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>skinparams.iuml</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>skinparam class {
+</span></span><span class=line><span class=cl>  BackgroundColor #white
+</span></span><span class=line><span class=cl>  BorderColor #black
+</span></span><span class=line><span class=cl>  ArrowColor #black
+</span></span><span class=line><span class=cl>  FontColor #black
+</span></span><span class=line><span class=cl>  FontSize 20
+</span></span><span class=line><span class=cl>  FontName Helvetica
+</span></span><span class=line><span class=cl>  &#39; 可視性をアイコンではなく文字で表示
+</span></span><span class=line><span class=cl>  AttributeIconSize 0
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>&#39; 影をなくす
+</span></span><span class=line><span class=cl>skinparam shadowing false</span></span></code></pre></div></div></figure><figure class=xCodeBlock><figcaption class=xCodeBlock_title>使用例</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>@startuml
+</span></span><span class=line><span class=cl>!include skinparams.iuml
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>class Foo
+</span></span><span class=line><span class=cl>class Bar
+</span></span><span class=line><span class=cl>@enduml</span></span></code></pre></div></div></figure><ul><li>参考: <a href=http://plantuml.com/ja/skinparam>PlantUML &ndash; Changing colors and fonts</a></li></ul><meta itemprop=author content="まく"><span itemprop=publisher itemscope itemtype=https://schema.org/Organization><meta itemprop=name content="まく"></span><h3 style="border-bottom:1px solid gray">関連記事</h3><ul><li><a href=../../p/t7cfj92/>PlantUML でオブジェクト図を作成する</a></li><li><a href=../../p/n8p7qmw/>PlantUML でシーケンス図を作成する</a></li><li><a href=../../p/opxhnho/>PlantUML の基本（インストール〜画像ファイルへの保存）</a></li><li><a href=../../p/yzs49gv/>UML ダイアグラムの一覧と分類</a></li><li><a href=../../p/tc73ttt/>読書メモ『UMLモデリングのエッセンス第3版』マーチン・ファウラー</a></li><li><a href=../../p/9kuptdn/>『オブジェクト開発の神髄 UML2.0を使ったアジャイルモデル駆動開発のすべて』スコット・W・アンブラー</a></li><li><a href=../../p/d3ehztz/>読書メモ『ワークブック形式で学ぶ UML オブジェクトモデリング─ユースケース駆動でソフトウェアを開発する』ダグ・ローゼンバーグ、ケンドール・スコット</a></li></ul><div class=xPageTags><span class=xPageTags_item><a href=../../tags/uml>UML</a></span>
+<span class=xPageTags_item><a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール</a></span></div></div><div style=text-align:right><div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div></div><div class=xArticle_up><a href=../../p/zbgbb5u/><span class=xArticle_up_label>PlantUML（テキストベースのUML作図ツール）</span><br>へ戻る</a></div><aside><div class=xPrevNextLink><div class=xPrevNextLink_prev><a href=../../p/opxhnho/>PlantUML の基本（インストール〜画像ファイルへの保存）</a></div><div class=xPrevNextLink_next><a href=../../p/n8p7qmw/>PlantUML でシーケンス図を作成する</a></div></div></aside></article><script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
 <ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
-<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
-</main>
-</div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/zbgbb5u/>PlantUML</a>
-</span>
-<span class=xBreadcrumb_item>PlantUML でクラス図を作成する
-</span>
-</div>
-</aside>
-<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
-<div id=xSiteFooter2>
-<a href=../../sitemap/>サイトマップ</a> ｜
-<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
-</div>
-</div>
-<script src=../../assets/js/sidebar.js></script>
-<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c],d=b.getElementsByTagName('img');if(d.length>0)continue;const e=b.getElementsByTagName('svg');if(e.length>0)continue;b.classList.add('xExternalLinkIcon'),b.setAttribute('target','_blank'),b.setAttribute('rel','noopener')}})</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"PlantUML","item":"https://maku.blog/p/zbgbb5u/"},{"@type":"ListItem","position":4,"name":"PlantUML でクラス図を作成する","item":"https://maku.blog/p/tn6y85z/"}]}</script>
-</body>
-</html>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/zbgbb5u/>PlantUML</a></span>
+<span class=xBreadcrumb_item>PlantUML でクラス図を作成する</span></div></aside><div id=xSiteFooter><a href=../../>まくろぐ</a></div><div id=xSiteFooter2><a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a></div></div><script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener("DOMContentLoaded",function(){const e=document.querySelectorAll("a[href^=http]");for(let n=0;n<e.length;++n){const t=e[n],s=t.getElementsByTagName("img");if(s.length>0)continue;const o=t.getElementsByTagName("svg");if(o.length>0)continue;t.classList.add("xExternalLinkIcon"),t.setAttribute("target","_blank"),t.setAttribute("rel","noopener")}})</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"PlantUML","item":"https://maku.blog/p/zbgbb5u/"},{"@type":"ListItem","position":4,"name":"PlantUML でクラス図を作成する","item":"https://maku.blog/p/tn6y85z/"}]}</script></body></html>

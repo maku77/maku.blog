@@ -1,881 +1,118 @@
-<!doctype html><html lang=ja-jp>
-<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<title>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる｜まくろぐ</title>
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','UA-63069513-4')</script><meta property="og:site_name" content="まくろぐ">
-<meta property="og:title" content="Azure Table Strage を使ってみる (3) Python からテーブル操作してみる">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://maku.blog/p/o8ufwct/">
-<meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/p/vrhjtds/azure-logo.jpg">
-<meta property="og:image:width" content="500">
-<meta property="og:image:height" content="281">
-<meta property="og:description" content="azure-cosmosdb-table パッケージのインストール Python から Azure Table Storage を操作するには、azure-cosmosdb-table というライブラリを使用します。
-azure-cosmosdb-table のインストール $ pip install azure-cosmosdb-table  ☝️ ワンポイント Cosmos DB をまったく使わない場合でも cosmosdb と名前のついたライブラリを使わせようとするのは、 Microsoft の策略 Cosmos DB に力を入れているという意思表示でしょう。 正直なところ Cosmos DB はお金がかかりすぎて個人の趣味レベルでは使えないのですが。。。
+<!doctype html><html lang=ja-jp><head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#"><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる｜まくろぐ</title><script async src="https://www.googletagmanager.com/gtag/js?id=UA-63069513-4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-63069513-4")</script><meta property="og:site_name" content="まくろぐ"><meta property="og:title" content="Azure Table Strage を使ってみる (3) Python からテーブル操作してみる"><meta property="og:type" content="website"><meta property="og:url" content="https://maku.blog/p/o8ufwct/"><meta property="og:locale" content="ja_JP"><meta property="og:image" content="https://maku.blog/p/vrhjtds/azure-logo.jpg"><meta property="og:image:width" content="500"><meta property="og:image:height" content="281"><meta property="og:description" content="azure-cosmosdb-table パッケージのインストール Python から Azure Table Storage を操作するには、azure-cosmosdb-table というライブラリを使用します。
+azure-cosmosdb-table のインストール $ pip install azure-cosmosdb-table ☝️ ワンポイント Cosmos DB をまったく使わない場合でも cosmosdb と名前のついたライブラリを使わせようとするのは、 Microsoft の策略 Cosmos DB に力を入れているという意思表示でしょう。 正直なところ Cosmos DB はお金がかかりすぎて個人の趣味レベルでは使えないのですが。。。
 （追記: 2021年）CosmosDB に無料枠ができて少しずつ個人利用もできそうな感じになってきました。
-  TableService オブジェクトの生成 Azure Storage にアクセスするには、接続情報（ストレージアカウント名とキー）が必要になるので、Azure ポータル で確認しておいてください。
- 参考: Azure Storage の接続情報（キー）を確認する  Table Storage にアクセスしてごにょごにょするには、TableService クラス のメソッドを使用します。 TableService のコンストラクタには、ストレージアカウント名とキーを渡します。
-from azure.cosmosdb.table.tableservice import TableService STORAGE_NAME = 'maku77storage' STORAGE_KEY = 'XlgKN4Hv...(省略)...F55o3N9g==' table_service = TableService(account_name=STORAGE_NAME, account_key=STORAGE_KEY)  ☝️ URL の指定は必要ない？ 接続先アドレス (URL) の構築は TableService クラスがよろしくやってくれるので、実装コードがとてもスッキリします。 ストレージアカウント名は Azure 内（世界中）で一意になっているので、ストレージアカウント名さえ指定すれば、Web API の URL も自動的に決まるということですね。  ストレージアカウントのキーを環境変数から取得する ストレージアカウントにアクセスするためのキー情報をスクリプト内にハードコーディングするのは望ましくないので、環境変数などから取得するようにしておくとよいでしょう。">
-<meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css>
-<link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico>
-<link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png>
-<link rel=apple-touch-icon href=../../assets/favicon/180x180.png>
-<script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script>
-<style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style>
-<script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script>
-</head>
-<body>
-<div id=xRoot>
-<div id=xSiteHeader><a href=../../>まくろぐ</a></div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/vrhjtds/>Azure</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/um2wi2o/>Azure Storage のメモ</a>
-</span>
-<span class=xBreadcrumb_item>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる
-</span>
-</div>
-</aside>
-<div id=xContainer>
-<nav id=xMenu aria-label=メニュー>
-<div id=sidebar style=height:100%>
-<div id=sidebar_notFixed>
-<a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a>
-<div class=xMenu_box data-sticky>
-<form action=https://cse.google.com/cse target=_blank>
-<div class=xSearchBox>
-<input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
+TableService オブジェクトの生成 Azure Storage にアクセスするには、接続情報（ストレージアカウント名とキー）が必要になるので、Azure ポータル で確認しておいてください。
+参考: Azure Storage の接続情報（キー）を確認する Table Storage にアクセスしてごにょごにょするには、TableService クラス のメソッドを使用します。 TableService のコンストラクタには、ストレージアカウント名とキーを渡します。
+from azure.cosmosdb.table.tableservice import TableService STORAGE_NAME = 'maku77storage' STORAGE_KEY = 'XlgKN4Hv...(省略)...F55o3N9g==' table_service = TableService(account_name=STORAGE_NAME, account_key=STORAGE_KEY) ☝️ URL の指定は必要ない？ 接続先アドレス (URL) の構築は TableService クラスがよろしくやってくれるので、実装コードがとてもスッキリします。 ストレージアカウント名は Azure 内（世界中）で一意になっているので、ストレージアカウント名さえ指定すれば、Web API の URL も自動的に決まるということですね。 ストレージアカウントのキーを環境変数から取得する ストレージアカウントにアクセスするためのキー情報をスクリプト内にハードコーディングするのは望ましくないので、環境変数などから取得するようにしておくとよいでしょう。"><meta property="fb:app_id" content="1572235596285254"><link rel=stylesheet href=../../css/main.min.eadfac7aa78c756402c549dc008d43c133ad3c4ca684deb9f2bcd2ad06141128.css><link rel=icon sizes="16x16 32x32 48x48 64x64" href=../../assets/favicon/favicon.ico><link rel=icon sizes=192x192 href=../../assets/favicon/192x192.png><link rel=apple-touch-icon href=../../assets/favicon/180x180.png><script src=https://code.jquery.com/jquery-3.5.1.slim.min.js integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin=anonymous></script><style>.codoc-support{display:inline-block;margin:.5rem 0 0!important;padding:12px!important;width:210px!important;max-width:100%}.codoc-support .codoc-support-title{font-size:smaller!important;white-space:nowrap;margin-bottom:12px!important}.codoc-support .codoc-btn{width:180px!important}</style><script src=https://codoc.jp/js/cms.js data-css=black data-usercode=tp6ZPzTj3w defer></script></head><body><div id=xRoot><div id=xSiteHeader><a href=../../>まくろぐ</a></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/vrhjtds/>Azure</a></span>
+<span class=xBreadcrumb_item><a href=../../p/um2wi2o/>Azure Storage のメモ</a></span>
+<span class=xBreadcrumb_item>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる</span></div></aside><div id=xContainer><nav id=xMenu aria-label=メニュー><div id=sidebar style=height:100%><div id=sidebar_notFixed><a href=../../><img src=https://maku.blog/img/site-logo-sidebar.png></a><div class=xMenu_box data-sticky><form action=https://cse.google.com/cse target=_blank><div class=xSearchBox><input type=hidden name=cx value=partner-pub-6317852277883092:6890083468>
 <input type=hidden name=ie value=UTF-8>
 <input type=search name=q placeholder=サイト内検索 size=30 autocomplete=off>
-<input type=submit value=検索></input>
-</div>
-</form>
-<div class=xMenu_box_body>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3>
-<div class=xMenu_box_body>
-<div class=xBoxLink>
-<a href=../../p/zycmw6f/>
-Next.js アプリに Google Analytics を設定する (next/script)
-<time>2023-03-21</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/cv6fpx7/>
-React で入力フォームの onChange イベントを IME ON のときに無視する
-<time>2023-01-29</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/bo8q8p7/>
-Meilisearch サーチエンジンを使ってみる
-<time>2023-01-24</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/y6zgrg2/>
-Docker で MongoDB サーバーを立ち上げる
-<time>2023-01-18</time></a>
-</div>
-<div class=xBoxLink>
-<a href=../../p/3pwojuj/>
-Deno で MongoDB にアクセスする
-<time>2023-01-18</time></a>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3>
-<div class=xMenu_box_body>
-<div class=xNavTree>
-<ul>
-<li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a>
-<ul>
-<li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a>
-<li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a>
-<ul>
-<li><a class=xNavTree-dir href=../../p/xjwakv8/>Cosmos DB</a>
-<li><a class=xNavTree-dir href=../../p/59jt4ck/>Azure Functions</a>
-<li><a class=xNavTree-dir href=../../p/fe7aiyp/>Azure DevOps</a>
-<li><a class=xNavTree-dir href=../../p/um2wi2o/>Azure Storage のメモ</a>
-<ul>
-</ul>
-<li><a class=xNavTree-dir href=../../p/3u2m6an/>Azure AppServices のメモ</a>
-<li><a class=xNavTree-dir href=../../p/d8apqgw/>LUIS のメモ</a>
-<li><a class=xNavTree-dir href=../../p/joexet9/>QnA Maker のメモ</a>
-<li><a class=xNavTree-dir href=../../p/yya9sbm/>逆引き Azure CLI</a>
-<li><a class=xNavTree-dir href=../../p/k43zbd8/>チャットボット</a>
-</ul>
-<li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a>
-<li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a>
-<li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a>
-<li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a>
-<li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a>
-<li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a>
-<li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a>
-<li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a>
-<li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a>
-<li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a>
-<li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a>
-<li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a>
-<li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a>
-<li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a>
-<li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a>
-<li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a>
-<li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a>
-<li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a>
-<li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a>
-<li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a>
-<li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a>
-<li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a>
-</ul>
-<li><a class=xNavTree-dir href=../../p/35odek9/>読書</a>
-<li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a>
-<li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a>
-<li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a>
-<li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a>
-<li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a>
-<li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a>
-</ul>
-</div>
-</div>
-</div>
-<div class=xMenu_box data-sticky>
-<h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3>
-<div class=xMenu_box_body><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws>aws (61)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure>azure (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/typescript>typescript (58)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/next.js>next.js (38)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/graphql>graphql (35)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/react>react (29)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/chatbot>chatbot (28)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/gnuplot>gnuplot (27)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cdk>aws/cdk (26)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/linux>linux (25)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github>github (24)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ansible>ansible (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/node.js>node.js (19)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/electron>electron (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mongodb>mongodb (15)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/protocol-buffers>protocol-buffers (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vs-code>vs-code (14)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/javascript>javascript (13)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cognito>aws/cognito (12)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/nginx>nginx (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/android>android (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/lambda>aws/lambda (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/java>java (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/python>python (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ssh>ssh (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/uml>uml (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/3d>3d (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sam>aws/sam (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/docker>docker (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/firestore>firebase/firestore (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unity>unity (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webgl>webgl (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo>apollo (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-cli>azure-cli (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-pipelines>azure-pipelines (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/deno>deno (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jade>jade (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/material-ui>material-ui (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/cli>aws/cli (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-storage>azure-storage (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/doxygen>doxygen (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-table-storage>azure-table-storage (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/c/c++>c/c++ (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-actions>github-actions (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/luis>luis (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/qna-maker>qna-maker (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/ssm>aws/ssm (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/eslint>eslint (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase>firebase (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/github-pages>github-pages (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html/css>html/css (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jekyll>jekyll (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/lets-encrypt>lets-encrypt (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sql>sql (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/windows>windows (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-functions>azure-functions (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cosmos-db>cosmos-db (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/grpc>grpc (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/hugo>hugo (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/kotlin>kotlin (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mac>mac (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/powershell>powershell (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/prettier>prettier (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/sqlite>sqlite (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/textlint>textlint (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tv>tv (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apache>apache (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/arib>arib (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/amplify>aws/amplify (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/appsync>aws/appsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/codebuild>aws/codebuild (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/iam>aws/iam (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/kms>aws/kms (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/s3>aws/s3 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/aws/sdk>aws/sdk (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/azure-app-service>azure-app-service (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/excel>excel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/firebase/authentication>firebase/authentication (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/go>go (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/http>http (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/json>json (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/mui>mui (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/npm>npm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/oauth>oauth (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/opengl>opengl (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/rsync>rsync (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/scp>scp (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/slack>slack (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teraterm>teraterm (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/unicode>unicode (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vercel>vercel (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/zip>zip (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/.net>.net (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/androidstudio>androidstudio (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/apollo-server>apollo-server (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/atomic-design>atomic-design (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/blender>blender (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bluetooth>bluetooth (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bootstrap>bootstrap (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/bot-framework>bot-framework (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/boto3>boto3 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/certbot>certbot (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/cloudflare>cloudflare (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/css>css (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dns>dns (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/dvb>dvb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/editorconfig>editorconfig (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/evernote>evernote (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/git>git (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/golang>golang (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/google-analytics>google-analytics (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/groovy>groovy (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/html>html (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/igdb>igdb (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/iso>iso (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/jest>jest (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/macos>macos (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/meilisearch>meilisearch (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/parcel>parcel (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/raspberrypi>raspberrypi (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/teams>teams (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/tex>tex (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/ubuntu>ubuntu (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/url>url (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vim>vim (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/vps>vps (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/web>web (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/webpack>webpack (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/wsl>wsl (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a>
-</div><div class=xMenu_tag>
-<a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a>
-</div></div>
-</div>
-<div class=xMenu_box data-sticky><br></div>
-</div>
-<div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem>
-</div>
-</div>
-</nav>
-<main id=xMain>
-<article class=xArticle itemscope itemtype=https://schema.org/BlogPosting>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/dofzeua/>Azure Table Strage を使ってみる (2) 接続情報（キー）を確認する</a>
-</div>
-<div class=xPrevNextLink_next>
-<a href=../../p/ccoonon/>Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる</a>
-</div>
-</div>
-</aside>
-<header class=xArticle_headerBox>
-<div>
-<span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
+<input type=submit value=検索></input></div></form><div class=xMenu_box_body></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../latest/>新着</a></h3><div class=xMenu_box_body><div class=xBoxLink><a href=../../p/zycmw6f/>Next.js アプリに Google Analytics を設定する (next/script)
+<time>2023-03-21</time></a></div><div class=xBoxLink><a href=../../p/cv6fpx7/>React で入力フォームの onChange イベントを IME ON のときに無視する
+<time>2023-01-29</time></a></div><div class=xBoxLink><a href=../../p/bo8q8p7/>Meilisearch サーチエンジンを使ってみる
+<time>2023-01-24</time></a></div><div class=xBoxLink><a href=../../p/y6zgrg2/>Docker で MongoDB サーバーを立ち上げる
+<time>2023-01-18</time></a></div><div class=xBoxLink><a href=../../p/3pwojuj/>Deno で MongoDB にアクセスする
+<time>2023-01-18</time></a></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../sitemap/>フォルダ</a></h3><div class=xMenu_box_body><div class=xNavTree><ul><li><a class=xNavTree-dir href=../../p/3ftx6b2/>技術系</a><ul><li><a class=xNavTree-dir href=../../p/ujqinda/>プログラミング</a><li><a class=xNavTree-dir href=../../p/vrhjtds/>Azure</a><ul><li><a class=xNavTree-dir href=../../p/xjwakv8/>Cosmos DB</a><li><a class=xNavTree-dir href=../../p/59jt4ck/>Azure Functions</a><li><a class=xNavTree-dir href=../../p/fe7aiyp/>Azure DevOps</a><li><a class=xNavTree-dir href=../../p/um2wi2o/>Azure Storage のメモ</a><ul></ul><li><a class=xNavTree-dir href=../../p/3u2m6an/>Azure AppServices のメモ</a><li><a class=xNavTree-dir href=../../p/d8apqgw/>LUIS のメモ</a><li><a class=xNavTree-dir href=../../p/joexet9/>QnA Maker のメモ</a><li><a class=xNavTree-dir href=../../p/yya9sbm/>逆引き Azure CLI</a><li><a class=xNavTree-dir href=../../p/k43zbd8/>チャットボット</a></ul><li><a class=xNavTree-dir href=../../p/ndbcxgb/>Meilisearch</a><li><a class=xNavTree-dir href=../../p/cm9nyco/>GraphQL</a><li><a class=xNavTree-dir href=../../p/nd3cmt3/>ネットワーク</a><li><a class=xNavTree-dir href=../../p/c9sar9p/>Cloudflare</a><li><a class=xNavTree-dir href=../../p/xdsom3a/>Nginx（Web サーバー）</a><li><a class=xNavTree-dir href=../../p/e58h5in/>雑多な技術メモ</a><li><a class=xNavTree-dir href=../../p/dj28oy5/>Docker 関連メモ</a><li><a class=xNavTree-dir href=../../p/8t6hr3d/>Ansible</a><li><a class=xNavTree-dir href=../../p/5q4fr3d/>GitHub</a><li><a class=xNavTree-dir href=../../p/9xv5548/>Jekyll</a><li><a class=xNavTree-dir href=../../p/ruk3gu9/>Linux</a><li><a class=xNavTree-dir href=../../p/6p3dox9/>Firebase</a><li><a class=xNavTree-dir href=../../p/7s7hs4e/>AWS</a><li><a class=xNavTree-dir href=../../p/inh3k2j/>Visual Studio Code</a><li><a class=xNavTree-dir href=../../p/somcgdw/>macOS</a><li><a class=xNavTree-dir href=../../p/y42o4hw/>Windows</a><li><a class=xNavTree-dir href=../../p/jto2isn/>HTML/CSS のメモ</a><li><a class=xNavTree-dir href=../../p/ibs96hs/>フォント/文字コード/Locale/Unicode</a><li><a class=xNavTree-dir href=../../p/xb5w4in/>デザインパターン/UML</a><li><a class=xNavTree-dir href=../../p/zbgbb5u/>PlantUML</a><li><a class=xNavTree-dir href=../../p/jxvi6vv/>Excel のメモ</a><li><a class=xNavTree-dir href=../../p/jdgfe97/>セキュリティ</a></ul><li><a class=xNavTree-dir href=../../p/35odek9/>読書</a><li><a class=xNavTree-dir href=../../p/qb73pxx/>日記・コラム</a><li><a class=xNavTree-dir href=../../p/zb9ocav/>ツール</a><li><a class=xNavTree-dir href=../../p/ajj5753/>遊び</a><li><a class=xNavTree-dir href=../../p/syy4ryp/>設定</a><li><a class=xNavTree-dir href=../../p/tsjyzrn/>雑多</a><li><a class=xNavTree-dir href=../../p/hnoamfo/>管理人</a></ul></div></div></div><div class=xMenu_box data-sticky><h3 class=xMenu_box_title><a href=../../tags/>タグ</a></h3><div class=xMenu_box_body><div class=xMenu_tag><a href=../../tags/%E8%AA%AD%E6%9B%B8>読書 (81)</a></div><div class=xMenu_tag><a href=../../tags/aws>aws (61)</a></div><div class=xMenu_tag><a href=../../tags/azure>azure (58)</a></div><div class=xMenu_tag><a href=../../tags/typescript>typescript (58)</a></div><div class=xMenu_tag><a href=../../tags/%E6%97%A5%E8%A8%98>日記 (54)</a></div><div class=xMenu_tag><a href=../../tags/next.js>next.js (38)</a></div><div class=xMenu_tag><a href=../../tags/graphql>graphql (35)</a></div><div class=xMenu_tag><a href=../../tags/react>react (29)</a></div><div class=xMenu_tag><a href=../../tags/chatbot>chatbot (28)</a></div><div class=xMenu_tag><a href=../../tags/gnuplot>gnuplot (27)</a></div><div class=xMenu_tag><a href=../../tags/aws/cdk>aws/cdk (26)</a></div><div class=xMenu_tag><a href=../../tags/linux>linux (25)</a></div><div class=xMenu_tag><a href=../../tags/github>github (24)</a></div><div class=xMenu_tag><a href=../../tags/ansible>ansible (21)</a></div><div class=xMenu_tag><a href=../../tags/bot-builder-sdk>bot-builder-sdk (21)</a></div><div class=xMenu_tag><a href=../../tags/node.js>node.js (19)</a></div><div class=xMenu_tag><a href=../../tags/aws/dynamodb>aws/dynamodb (18)</a></div><div class=xMenu_tag><a href=../../tags/aws/cloudformation>aws/cloudformation (16)</a></div><div class=xMenu_tag><a href=../../tags/electron>electron (15)</a></div><div class=xMenu_tag><a href=../../tags/mongodb>mongodb (15)</a></div><div class=xMenu_tag><a href=../../tags/protocol-buffers>protocol-buffers (14)</a></div><div class=xMenu_tag><a href=../../tags/vs-code>vs-code (14)</a></div><div class=xMenu_tag><a href=../../tags/javascript>javascript (13)</a></div><div class=xMenu_tag><a href=../../tags/aws/cognito>aws/cognito (12)</a></div><div class=xMenu_tag><a href=../../tags/nginx>nginx (11)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0>プログラム (11)</a></div><div class=xMenu_tag><a href=../../tags/android>android (10)</a></div><div class=xMenu_tag><a href=../../tags/aws/lambda>aws/lambda (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%B2%E3%83%BC%E3%83%A0>ゲーム (10)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%93%E3%83%AA%E3%83%A4%E3%83%BC%E3%83%89>ビリヤード (10)</a></div><div class=xMenu_tag><a href=../../tags/java>java (9)</a></div><div class=xMenu_tag><a href=../../tags/python>python (9)</a></div><div class=xMenu_tag><a href=../../tags/ssh>ssh (9)</a></div><div class=xMenu_tag><a href=../../tags/uml>uml (9)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%83%9F%E3%83%8A%E3%83%BC%E8%AC%9B%E6%BC%94%E4%BC%9A>セミナー講演会 (9)</a></div><div class=xMenu_tag><a href=../../tags/%E6%95%B0%E5%AD%A6>数学 (9)</a></div><div class=xMenu_tag><a href=../../tags/3d>3d (8)</a></div><div class=xMenu_tag><a href=../../tags/aws/sam>aws/sam (8)</a></div><div class=xMenu_tag><a href=../../tags/docker>docker (8)</a></div><div class=xMenu_tag><a href=../../tags/firebase/firestore>firebase/firestore (8)</a></div><div class=xMenu_tag><a href=../../tags/unity>unity (8)</a></div><div class=xMenu_tag><a href=../../tags/webgl>webgl (8)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%A4%E3%83%87%E3%82%A2>アイデア (8)</a></div><div class=xMenu_tag><a href=../../tags/%E4%BB%95%E4%BA%8B>仕事 (8)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%80%E8%A1%93>技術 (8)</a></div><div class=xMenu_tag><a href=../../tags/apollo>apollo (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-cli>azure-cli (7)</a></div><div class=xMenu_tag><a href=../../tags/azure-pipelines>azure-pipelines (7)</a></div><div class=xMenu_tag><a href=../../tags/deno>deno (7)</a></div><div class=xMenu_tag><a href=../../tags/jade>jade (7)</a></div><div class=xMenu_tag><a href=../../tags/material-ui>material-ui (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>デザインパターン (7)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A9%E3%82%A4%E3%83%95%E3%83%8F%E3%83%83%E3%82%AF>ライフハック (7)</a></div><div class=xMenu_tag><a href=../../tags/aws/api-gateway>aws/api-gateway (6)</a></div><div class=xMenu_tag><a href=../../tags/aws/cli>aws/cli (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-storage>azure-storage (6)</a></div><div class=xMenu_tag><a href=../../tags/doxygen>doxygen (6)</a></div><div class=xMenu_tag><a href=../../tags/firebase/cloudfunctions>firebase/cloudfunctions (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3>セキュリティ (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%84%E3%83%BC%E3%83%AB>ツール (6)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88>ユニットテスト (6)</a></div><div class=xMenu_tag><a href=../../tags/azure-table-storage>azure-table-storage (5)</a></div><div class=xMenu_tag><a href=../../tags/c/c++>c/c++ (5)</a></div><div class=xMenu_tag><a href=../../tags/github-actions>github-actions (5)</a></div><div class=xMenu_tag><a href=../../tags/luis>luis (5)</a></div><div class=xMenu_tag><a href=../../tags/qna-maker>qna-maker (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E7%B5%B5%E3%81%8B%E3%81%8D>お絵かき (5)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF>ネットワーク (5)</a></div><div class=xMenu_tag><a href=../../tags/%E6%8A%95%E8%B3%87>投資 (5)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%9F%E3%81%8D%E6%96%B9>生き方 (5)</a></div><div class=xMenu_tag><a href=../../tags/aws/ssm>aws/ssm (4)</a></div><div class=xMenu_tag><a href=../../tags/eslint>eslint (4)</a></div><div class=xMenu_tag><a href=../../tags/firebase>firebase (4)</a></div><div class=xMenu_tag><a href=../../tags/github-pages>github-pages (4)</a></div><div class=xMenu_tag><a href=../../tags/html/css>html/css (4)</a></div><div class=xMenu_tag><a href=../../tags/jekyll>jekyll (4)</a></div><div class=xMenu_tag><a href=../../tags/lets-encrypt>lets-encrypt (4)</a></div><div class=xMenu_tag><a href=../../tags/sql>sql (4)</a></div><div class=xMenu_tag><a href=../../tags/windows>windows (4)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF>エディタ (4)</a></div><div class=xMenu_tag><a href=../../tags/azure-functions>azure-functions (3)</a></div><div class=xMenu_tag><a href=../../tags/cosmos-db>cosmos-db (3)</a></div><div class=xMenu_tag><a href=../../tags/grpc>grpc (3)</a></div><div class=xMenu_tag><a href=../../tags/hugo>hugo (3)</a></div><div class=xMenu_tag><a href=../../tags/kotlin>kotlin (3)</a></div><div class=xMenu_tag><a href=../../tags/mac>mac (3)</a></div><div class=xMenu_tag><a href=../../tags/pc%E8%A8%AD%E5%AE%9A>pc設定 (3)</a></div><div class=xMenu_tag><a href=../../tags/powershell>powershell (3)</a></div><div class=xMenu_tag><a href=../../tags/prettier>prettier (3)</a></div><div class=xMenu_tag><a href=../../tags/sqlite>sqlite (3)</a></div><div class=xMenu_tag><a href=../../tags/textlint>textlint (3)</a></div><div class=xMenu_tag><a href=../../tags/tv>tv (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91>おでかけ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%97%E3%83%AA>アプリ (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0>アルゴリズム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88>チャットボット (3)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%9C%E3%83%BC%E3%83%89%E3%82%B2%E3%83%BC%E3%83%A0>ボードゲーム (3)</a></div><div class=xMenu_tag><a href=../../tags/%E5%83%8D%E3%81%8D%E6%96%B9>働き方 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E7%A7%80%E4%B8%B8>秀丸 (3)</a></div><div class=xMenu_tag><a href=../../tags/%E8%87%AA%E5%88%86>自分 (3)</a></div><div class=xMenu_tag><a href=../../tags/apache>apache (2)</a></div><div class=xMenu_tag><a href=../../tags/arib>arib (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/amplify>aws/amplify (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/appsync>aws/appsync (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/codebuild>aws/codebuild (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/iam>aws/iam (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/kms>aws/kms (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/s3>aws/s3 (2)</a></div><div class=xMenu_tag><a href=../../tags/aws/sdk>aws/sdk (2)</a></div><div class=xMenu_tag><a href=../../tags/azure-app-service>azure-app-service (2)</a></div><div class=xMenu_tag><a href=../../tags/excel>excel (2)</a></div><div class=xMenu_tag><a href=../../tags/firebase/authentication>firebase/authentication (2)</a></div><div class=xMenu_tag><a href=../../tags/go>go (2)</a></div><div class=xMenu_tag><a href=../../tags/http>http (2)</a></div><div class=xMenu_tag><a href=../../tags/json>json (2)</a></div><div class=xMenu_tag><a href=../../tags/mui>mui (2)</a></div><div class=xMenu_tag><a href=../../tags/npm>npm (2)</a></div><div class=xMenu_tag><a href=../../tags/oauth>oauth (2)</a></div><div class=xMenu_tag><a href=../../tags/opengl>opengl (2)</a></div><div class=xMenu_tag><a href=../../tags/rsync>rsync (2)</a></div><div class=xMenu_tag><a href=../../tags/scp>scp (2)</a></div><div class=xMenu_tag><a href=../../tags/slack>slack (2)</a></div><div class=xMenu_tag><a href=../../tags/teraterm>teraterm (2)</a></div><div class=xMenu_tag><a href=../../tags/unicode>unicode (2)</a></div><div class=xMenu_tag><a href=../../tags/vercel>vercel (2)</a></div><div class=xMenu_tag><a href=../../tags/zip>zip (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%81%8A%E5%90%8D%E5%89%8D.com>お名前.com (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A8%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC>エミュレーター (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88>フォント (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0>プログラミング (2)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9>リファレンス (2)</a></div><div class=xMenu_tag><a href=../../tags/%E5%9C%A7%E7%B8%AE%E5%B1%95%E9%96%8B>圧縮展開 (2)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E5%88%97>文字列 (2)</a></div><div class=xMenu_tag><a href=../../tags/.net>.net (1)</a></div><div class=xMenu_tag><a href=../../tags/androidstudio>androidstudio (1)</a></div><div class=xMenu_tag><a href=../../tags/apollo-server>apollo-server (1)</a></div><div class=xMenu_tag><a href=../../tags/atomic-design>atomic-design (1)</a></div><div class=xMenu_tag><a href=../../tags/blender>blender (1)</a></div><div class=xMenu_tag><a href=../../tags/bluetooth>bluetooth (1)</a></div><div class=xMenu_tag><a href=../../tags/bootstrap>bootstrap (1)</a></div><div class=xMenu_tag><a href=../../tags/bot-framework>bot-framework (1)</a></div><div class=xMenu_tag><a href=../../tags/boto3>boto3 (1)</a></div><div class=xMenu_tag><a href=../../tags/certbot>certbot (1)</a></div><div class=xMenu_tag><a href=../../tags/cloudflare>cloudflare (1)</a></div><div class=xMenu_tag><a href=../../tags/css>css (1)</a></div><div class=xMenu_tag><a href=../../tags/dns>dns (1)</a></div><div class=xMenu_tag><a href=../../tags/dvb>dvb (1)</a></div><div class=xMenu_tag><a href=../../tags/editorconfig>editorconfig (1)</a></div><div class=xMenu_tag><a href=../../tags/evernote>evernote (1)</a></div><div class=xMenu_tag><a href=../../tags/git>git (1)</a></div><div class=xMenu_tag><a href=../../tags/golang>golang (1)</a></div><div class=xMenu_tag><a href=../../tags/google-analytics>google-analytics (1)</a></div><div class=xMenu_tag><a href=../../tags/groovy>groovy (1)</a></div><div class=xMenu_tag><a href=../../tags/html>html (1)</a></div><div class=xMenu_tag><a href=../../tags/igdb>igdb (1)</a></div><div class=xMenu_tag><a href=../../tags/iso>iso (1)</a></div><div class=xMenu_tag><a href=../../tags/jest>jest (1)</a></div><div class=xMenu_tag><a href=../../tags/macos>macos (1)</a></div><div class=xMenu_tag><a href=../../tags/meilisearch>meilisearch (1)</a></div><div class=xMenu_tag><a href=../../tags/parcel>parcel (1)</a></div><div class=xMenu_tag><a href=../../tags/raspberrypi>raspberrypi (1)</a></div><div class=xMenu_tag><a href=../../tags/teams>teams (1)</a></div><div class=xMenu_tag><a href=../../tags/tex>tex (1)</a></div><div class=xMenu_tag><a href=../../tags/ubuntu>ubuntu (1)</a></div><div class=xMenu_tag><a href=../../tags/url>url (1)</a></div><div class=xMenu_tag><a href=../../tags/vim>vim (1)</a></div><div class=xMenu_tag><a href=../../tags/vps>vps (1)</a></div><div class=xMenu_tag><a href=../../tags/web>web (1)</a></div><div class=xMenu_tag><a href=../../tags/webpack>webpack (1)</a></div><div class=xMenu_tag><a href=../../tags/wsl>wsl (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB>アジャイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%90%E3%83%83%E3%83%81%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB>バッチファイル (1)</a></div><div class=xMenu_tag><a href=../../tags/%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E8%A8%AD%E5%AE%9A>プロキシ設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E5%AD%97%E3%82%B3%E3%83%BC%E3%83%89>文字コード (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%87%E6%88%BF%E5%85%B7>文房具 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%96%99%E7%90%86>料理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE>正規表現 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86>画像処理 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%80%E8%91%89>言葉 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%A8%AD%E5%AE%9A>設定 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E8%AA%8D%E8%A8%BC>認証 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%80%9F%E8%AA%AD>速読 (1)</a></div><div class=xMenu_tag><a href=../../tags/%E9%9F%B3%E5%A3%B0%E8%AA%8D%E8%AD%98>音声認識 (1)</a></div></div></div><div class=xMenu_box data-sticky><br></div></div><div id=sidebar_fixed style=position:-webkit-sticky;position:sticky;top:4rem></div></div></nav><main id=xMain><article class=xArticle itemscope itemtype=https://schema.org/BlogPosting><aside><div class=xPrevNextLink><div class=xPrevNextLink_prev><a href=../../p/dofzeua/>Azure Table Strage を使ってみる (2) 接続情報（キー）を確認する</a></div><div class=xPrevNextLink_next><a href=../../p/ccoonon/>Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる</a></div></div></aside><header class=xArticle_headerBox><div><span class=xArticle_headerBox_breadcrumb><a href=../../>&#x1F3E0;</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/3ftx6b2/>技術系</a></span>
 <span class=xArticle_headerBox_breadcrumb><a href=../../p/vrhjtds/>Azure</a></span>
-<span class=xArticle_headerBox_breadcrumb><a href=../../p/um2wi2o/>Azure Storage のメモ</a></span></div>
-<div style=display:flex;margin-top:.8em>
-<div style=width:80px;margin-right:.5em>
-<img src=../../p/vrhjtds/azure-icon.svg style=width:80px;height:80px>
-</div>
-<div style=flex:1>
-<h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/o8ufwct/>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる</a></h1>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/azure-table-storage>Azure Table Storage</a></span>
-<span class=xPageTags_item><a href=../../tags/python>Python</a></span>
-</div>
-</div>
-</div>
-<span class=xPageDate>
-更新: <time itemprop=dateModified datetime=2020-01-29>2020-01-29</time><br>
-作成: <time itemprop=datePublished datetime=2020-01-29>2020-01-29</time>
-</span>
-</header>
-<div itemprop=articleBody class=xArticle_content>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#azure-cosmosdb-table-パッケージのインストール>azure-cosmosdb-table パッケージのインストール</a></li>
-<li><a href=#tableservice-オブジェクトの生成>TableService オブジェクトの生成</a>
-<ul>
-<li><a href=#ストレージアカウントのキーを環境変数から取得する>ストレージアカウントのキーを環境変数から取得する</a></li>
-<li><a href=#プロキシ環境からアクセスする場合>プロキシ環境からアクセスする場合</a></li>
-</ul>
-</li>
-<li><a href=#テーブルの操作>テーブルの操作</a>
-<ul>
-<li><a href=#テーブルのリストを取得する-list_tables>テーブルのリストを取得する (list_tables)</a></li>
-<li><a href=#テーブルの存在を確認する-exist>テーブルの存在を確認する (exist)</a></li>
-<li><a href=#テーブルを作成する-create_table>テーブルを作成する (create_table)</a></li>
-<li><a href=#テーブルを削除する-delete_table>テーブルを削除する (delete_table)</a></li>
-</ul>
-</li>
-<li><a href=#エンティティの操作>エンティティの操作</a>
-<ul>
-<li><a href=#テーブルにエンティティを追加する-insert_xxx>テーブルにエンティティを追加する (insert_xxx)</a></li>
-<li><a href=#指定したキーのエンティティを取得する-get_entity>指定したキーのエンティティを取得する (get_entity)</a></li>
-<li><a href=#指定したキーのエンティティを削除する-delete_entity>指定したキーのエンティティを削除する (delete_entity)</a></li>
-<li><a href=#エンティティのリストを取得する-query_entities>エンティティのリストを取得する (query_entities)</a></li>
-</ul>
-</li>
-<li><a href=#バッチ処理化>バッチ処理化</a></li>
-</ul>
-</nav><h2 id=azure-cosmosdb-table-パッケージのインストール>azure-cosmosdb-table パッケージのインストール</h2>
-<p>Python から Azure Table Storage を操作するには、<a href=https://pypi.org/project/azure-cosmosdb-table/><code>azure-cosmosdb-table</code></a> というライブラリを使用します。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>azure-cosmosdb-table のインストール</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>$ pip install azure-cosmosdb-table</code></pre></div></div>
-</figure>
-<div class=xNote>
-<span class=xNote_title>☝️ ワンポイント</span>
+<span class=xArticle_headerBox_breadcrumb><a href=../../p/um2wi2o/>Azure Storage のメモ</a></span></div><div style=display:flex;margin-top:.8em><div style=width:80px;margin-right:.5em><img src=../../p/vrhjtds/azure-icon.svg style=width:80px;height:80px></div><div style=flex:1><h1 itemprop=headline class=xArticle_headerBox_title><a itemprop=mainEntityOfPage href=../../p/o8ufwct/>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる</a></h1><div class=xPageTags><span class=xPageTags_item><a href=../../tags/azure-table-storage>Azure Table Storage</a></span>
+<span class=xPageTags_item><a href=../../tags/python>Python</a></span></div></div></div><span class=xPageDate>更新: <time itemprop=dateModified datetime=2020-01-29>2020-01-29</time><br>作成: <time itemprop=datePublished datetime=2020-01-29>2020-01-29</time></span></header><div itemprop=articleBody class=xArticle_content><nav id=TableOfContents><ul><li><a href=#azure-cosmosdb-table-パッケージのインストール>azure-cosmosdb-table パッケージのインストール</a></li><li><a href=#tableservice-オブジェクトの生成>TableService オブジェクトの生成</a><ul><li><a href=#ストレージアカウントのキーを環境変数から取得する>ストレージアカウントのキーを環境変数から取得する</a></li><li><a href=#プロキシ環境からアクセスする場合>プロキシ環境からアクセスする場合</a></li></ul></li><li><a href=#テーブルの操作>テーブルの操作</a><ul><li><a href=#テーブルのリストを取得する-list_tables>テーブルのリストを取得する (list_tables)</a></li><li><a href=#テーブルの存在を確認する-exist>テーブルの存在を確認する (exist)</a></li><li><a href=#テーブルを作成する-create_table>テーブルを作成する (create_table)</a></li><li><a href=#テーブルを削除する-delete_table>テーブルを削除する (delete_table)</a></li></ul></li><li><a href=#エンティティの操作>エンティティの操作</a><ul><li><a href=#テーブルにエンティティを追加する-insert_xxx>テーブルにエンティティを追加する (insert_xxx)</a></li><li><a href=#指定したキーのエンティティを取得する-get_entity>指定したキーのエンティティを取得する (get_entity)</a></li><li><a href=#指定したキーのエンティティを削除する-delete_entity>指定したキーのエンティティを削除する (delete_entity)</a></li><li><a href=#エンティティのリストを取得する-query_entities>エンティティのリストを取得する (query_entities)</a></li></ul></li><li><a href=#バッチ処理化>バッチ処理化</a></li></ul></nav><h2 id=azure-cosmosdb-table-パッケージのインストール>azure-cosmosdb-table パッケージのインストール</h2><p>Python から Azure Table Storage を操作するには、<a href=https://pypi.org/project/azure-cosmosdb-table/><code>azure-cosmosdb-table</code></a> というライブラリを使用します。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>azure-cosmosdb-table のインストール</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>$ pip install azure-cosmosdb-table</span></span></code></pre></div></div></figure><div class=xNote><span class=xNote_title>☝️ ワンポイント</span>
 <span class=xNote_body><p>Cosmos DB をまったく使わない場合でも cosmosdb と名前のついたライブラリを使わせようとするのは、 <del>Microsoft の策略</del> Cosmos DB に力を入れているという意思表示でしょう。
-正直なところ Cosmos DB はお金がかかりすぎて個人の趣味レベルでは使えないのですが。。。</p>
-<p>（追記: 2021年）CosmosDB に無料枠ができて少しずつ個人利用もできそうな感じになってきました。</p>
-</span>
-</div>
-<h2 id=tableservice-オブジェクトの生成>TableService オブジェクトの生成</h2>
-<p>Azure Storage にアクセスするには、接続情報（ストレージアカウント名とキー）が必要になるので、<a href=https://portal.azure.com/>Azure ポータル</a> で確認しておいてください。</p>
-<ul>
-<li>参考: <a href=../../p/dofzeua>Azure Storage の接続情報（キー）を確認する</a></li>
-</ul>
-<p>Table Storage にアクセスしてごにょごにょするには、<a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python">TableService クラス</a> のメソッドを使用します。
-<code>TableService</code> のコンストラクタには、ストレージアカウント名とキーを渡します。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=kn>from</span> <span class=nn>azure.cosmosdb.table.tableservice</span> <span class=kn>import</span> <span class=n>TableService</span>
-
-<span class=n>STORAGE_NAME</span> <span class=o>=</span> <span class=s1>&#39;maku77storage&#39;</span>
-<span class=n>STORAGE_KEY</span> <span class=o>=</span> <span class=s1>&#39;XlgKN4Hv...(省略)...F55o3N9g==&#39;</span>
-
-<span class=n>table_service</span> <span class=o>=</span> <span class=n>TableService</span><span class=p>(</span><span class=n>account_name</span><span class=o>=</span><span class=n>STORAGE_NAME</span><span class=p>,</span> <span class=n>account_key</span><span class=o>=</span><span class=n>STORAGE_KEY</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<div class=xNote>
-<span class=xNote_title>☝️ URL の指定は必要ない？</span>
+正直なところ Cosmos DB はお金がかかりすぎて個人の趣味レベルでは使えないのですが。。。</p><p>（追記: 2021年）CosmosDB に無料枠ができて少しずつ個人利用もできそうな感じになってきました。</p></span></div><h2 id=tableservice-オブジェクトの生成>TableService オブジェクトの生成</h2><p>Azure Storage にアクセスするには、接続情報（ストレージアカウント名とキー）が必要になるので、<a href=https://portal.azure.com/>Azure ポータル</a> で確認しておいてください。</p><ul><li>参考: <a href=../../p/dofzeua>Azure Storage の接続情報（キー）を確認する</a></li></ul><p>Table Storage にアクセスしてごにょごにょするには、<a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python">TableService クラス</a> のメソッドを使用します。
+<code>TableService</code> のコンストラクタには、ストレージアカウント名とキーを渡します。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>azure.cosmosdb.table.tableservice</span> <span class=kn>import</span> <span class=n>TableService</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>STORAGE_NAME</span> <span class=o>=</span> <span class=s1>&#39;maku77storage&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>STORAGE_KEY</span> <span class=o>=</span> <span class=s1>&#39;XlgKN4Hv...(省略)...F55o3N9g==&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>table_service</span> <span class=o>=</span> <span class=n>TableService</span><span class=p>(</span><span class=n>account_name</span><span class=o>=</span><span class=n>STORAGE_NAME</span><span class=p>,</span> <span class=n>account_key</span><span class=o>=</span><span class=n>STORAGE_KEY</span><span class=p>)</span></span></span></code></pre></div></div></figure><div class=xNote><span class=xNote_title>☝️ URL の指定は必要ない？</span>
 <span class=xNote_body>接続先アドレス (URL) の構築は <code>TableService</code> クラスがよろしくやってくれるので、実装コードがとてもスッキリします。
-ストレージアカウント名は Azure 内（世界中）で一意になっているので、ストレージアカウント名さえ指定すれば、Web API の URL も自動的に決まるということですね。</span>
-</div>
-<h3 id=ストレージアカウントのキーを環境変数から取得する>ストレージアカウントのキーを環境変数から取得する</h3>
-<p>ストレージアカウントにアクセスするためのキー情報をスクリプト内にハードコーディングするのは望ましくないので、環境変数などから取得するようにしておくとよいでしょう。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>環境変数から Azure Storage のアクセスキーを取得</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=kn>import</span> <span class=nn>os</span>
-<span class=kn>import</span> <span class=nn>sys</span>
-
-<span class=k>if</span> <span class=s1>&#39;AZURE_STORAGE_KEY&#39;</span> <span class=ow>not</span> <span class=ow>in</span> <span class=n>os</span><span class=o>.</span><span class=n>environ</span><span class=p>:</span>
-    <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;Error: AZURE_STORAGE_KEY not found&#39;</span><span class=p>,</span> <span class=n>file</span><span class=o>=</span><span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>)</span>
-    <span class=n>sys</span><span class=o>.</span><span class=n>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
-<span class=n>storage_key</span> <span class=o>=</span> <span class=n>os</span><span class=o>.</span><span class=n>getenv</span><span class=p>(</span><span class=s1>&#39;AZURE_STORAGE_KEY&#39;</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<h3 id=プロキシ環境からアクセスする場合>プロキシ環境からアクセスする場合</h3>
-<p><code>TableService</code> クラスをプロキシ環境内で使用する場合は、OS の <strong><code>https_proxy</code></strong> 環境変数で設定してしまうのが簡単です。
-OS の <code>https_proxy</code> 環境変数を設定するのを避けたいときは、Python スクリプトの中からプロキシを設定してしまうこともできます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>プロキシ情報をハードコードする</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=kn>import</span> <span class=nn>os</span>
-<span class=n>os</span><span class=o>.</span><span class=n>environ</span><span class=p>[</span><span class=s1>&#39;https_proxy&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=s1>&#39;http://proxy.example.com:12345&#39;</span></code></pre></div></div>
-</figure>
-<p>OS の <code>https_proxy</code> 環境変数を設定するのも嫌だし、Python スクリプト内にプロキシ情報をハードコードするのも嫌なときは、例えば、独自の <code>AZURE_PROXY</code> のような <strong>独自の環境変数</strong> を用意して、その値をプロキシ情報として使用するという方法があります。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>AZURE_PROXY 環境変数の値をプロキシ情報として使う</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=k>if</span> <span class=s1>&#39;AZURE_PROXY&#39;</span> <span class=ow>in</span> <span class=n>os</span><span class=o>.</span><span class=n>environ</span><span class=p>:</span>
-    <span class=n>os</span><span class=o>.</span><span class=n>environ</span><span class=p>[</span><span class=s1>&#39;https_proxy&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=n>os</span><span class=o>.</span><span class=n>getenv</span><span class=p>(</span><span class=s1>&#39;AZURE_PROXY&#39;</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<h2 id=テーブルの操作>テーブルの操作</h2>
-<p>ここから先のテーブル操作に関しては、前述の <code>TableService</code> オブジェクトの生成が終わっていることを想定しています。</p>
-<h3 id=テーブルのリストを取得する-list_tables>テーブルのリストを取得する (list_tables)</h3>
-<p>Table Storage 上に存在するテーブルの一覧を取得するには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#list-tables-num-results-none--marker-none--timeout-none-">list_tables() メソッド</a> を使用します。
+ストレージアカウント名は Azure 内（世界中）で一意になっているので、ストレージアカウント名さえ指定すれば、Web API の URL も自動的に決まるということですね。</span></div><h3 id=ストレージアカウントのキーを環境変数から取得する>ストレージアカウントのキーを環境変数から取得する</h3><p>ストレージアカウントにアクセスするためのキー情報をスクリプト内にハードコーディングするのは望ましくないので、環境変数などから取得するようにしておくとよいでしょう。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>環境変数から Azure Storage のアクセスキーを取得</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>os</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>sys</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=s1>&#39;AZURE_STORAGE_KEY&#39;</span> <span class=ow>not</span> <span class=ow>in</span> <span class=n>os</span><span class=o>.</span><span class=n>environ</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;Error: AZURE_STORAGE_KEY not found&#39;</span><span class=p>,</span> <span class=n>file</span><span class=o>=</span><span class=n>sys</span><span class=o>.</span><span class=n>stderr</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>sys</span><span class=o>.</span><span class=n>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>storage_key</span> <span class=o>=</span> <span class=n>os</span><span class=o>.</span><span class=n>getenv</span><span class=p>(</span><span class=s1>&#39;AZURE_STORAGE_KEY&#39;</span><span class=p>)</span></span></span></code></pre></div></div></figure><h3 id=プロキシ環境からアクセスする場合>プロキシ環境からアクセスする場合</h3><p><code>TableService</code> クラスをプロキシ環境内で使用する場合は、OS の <strong><code>https_proxy</code></strong> 環境変数で設定してしまうのが簡単です。
+OS の <code>https_proxy</code> 環境変数を設定するのを避けたいときは、Python スクリプトの中からプロキシを設定してしまうこともできます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>プロキシ情報をハードコードする</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>os</span>
+</span></span><span class=line><span class=cl><span class=n>os</span><span class=o>.</span><span class=n>environ</span><span class=p>[</span><span class=s1>&#39;https_proxy&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=s1>&#39;http://proxy.example.com:12345&#39;</span></span></span></code></pre></div></div></figure><p>OS の <code>https_proxy</code> 環境変数を設定するのも嫌だし、Python スクリプト内にプロキシ情報をハードコードするのも嫌なときは、例えば、独自の <code>AZURE_PROXY</code> のような <strong>独自の環境変数</strong> を用意して、その値をプロキシ情報として使用するという方法があります。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>AZURE_PROXY 環境変数の値をプロキシ情報として使う</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>if</span> <span class=s1>&#39;AZURE_PROXY&#39;</span> <span class=ow>in</span> <span class=n>os</span><span class=o>.</span><span class=n>environ</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>os</span><span class=o>.</span><span class=n>environ</span><span class=p>[</span><span class=s1>&#39;https_proxy&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=n>os</span><span class=o>.</span><span class=n>getenv</span><span class=p>(</span><span class=s1>&#39;AZURE_PROXY&#39;</span><span class=p>)</span></span></span></code></pre></div></div></figure><h2 id=テーブルの操作>テーブルの操作</h2><p>ここから先のテーブル操作に関しては、前述の <code>TableService</code> オブジェクトの生成が終わっていることを想定しています。</p><h3 id=テーブルのリストを取得する-list_tables>テーブルのリストを取得する (list_tables)</h3><p>Table Storage 上に存在するテーブルの一覧を取得するには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#list-tables-num-results-none--marker-none--timeout-none-">list_tables() メソッド</a> を使用します。
 このメソッドの戻り値を for ループで処理すると、<a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.models.table?view=azure-python">azure.cosmosdb.table.models.Table</a> オブジェクトを 1 つずつ取り出すことができます。
-テーブル名を示す <code>name</code> プロパティしかありませんが。。。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>すべてのテーブルを列挙</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=k>for</span> <span class=n>table</span> <span class=ow>in</span> <span class=n>table_service</span><span class=o>.</span><span class=n>list_tables</span><span class=p>():</span>
-    <span class=nb>print</span><span class=p>(</span><span class=n>table</span><span class=o>.</span><span class=n>name</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<p>仮に、<code>books</code> と <code>todos</code> というテーブルが作成済みであれば、次のように表示されます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>実行結果</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>books
-todos</code></pre></div></div>
-</figure>
-<h3 id=テーブルの存在を確認する-exist>テーブルの存在を確認する (exist)</h3>
-<p>Table Storage 上に、指定した名前のテーブルが存在するかどうかをチェックするには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#exists-table-name--timeout-none-">exists() メソッド</a> を使用します。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=k>if</span> <span class=n>table_service</span><span class=o>.</span><span class=n>exists</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>):</span>
-    <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;books テーブルが存在するよ&#39;</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<h3 id=テーブルを作成する-create_table>テーブルを作成する (create_table)</h3>
-<p>Table Storage 上に、新しいテーブルを作成するには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#create-table-table-name--fail-on-exist-false--timeout-none-">create_table() メソッド</a> を使用します。
-テーブルの作成に成功すると <code>True</code> を返します。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=n>result</span> <span class=o>=</span> <span class=n>table_service</span><span class=o>.</span><span class=n>create_table</span><span class=p>(</span><span class=s1>&#39;mytable&#39;</span><span class=p>)</span>
-<span class=k>if</span> <span class=n>result</span><span class=p>:</span>
-    <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;テーブルを作成しました&#39;</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<div class=xNote>
-<span class=xNote_title>☝️ ワンポイント</span>
-<span class=xNote_body>テーブルのプロパティ（RDB のカラムに相当するもの）の指定がありませんが、プロパティはエンティティを追加するときに自動的に生成されるので、ここで指定しておく必要はありません。</span>
-</div>
-<h3 id=テーブルを削除する-delete_table>テーブルを削除する (delete_table)</h3>
-<p>Table Storage 上の、既存のテーブルを削除するには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#delete-table-table-name--fail-not-exist-false--timeout-none-">delete_table() メソッド</a> を使用します。
-テーブルを削除すると、そこに含まれているすべてのエンティティも削除されてしまうので注意してください。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=n>table_service</span><span class=o>.</span><span class=n>delete_table</span><span class=p>(</span><span class=s1>&#39;mytable&#39;</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<h2 id=エンティティの操作>エンティティの操作</h2>
-<h3 id=テーブルにエンティティを追加する-insert_xxx>テーブルにエンティティを追加する (insert_xxx)</h3>
-<p>指定したテーブルにデータ（エンティティ）を追加するには、<code>TableService</code> クラスの下記のいずれかのメソッドを使用します。
-同じキー情報を持つエンティティを追加しようとしたときの振る舞いだけが異なります。</p>
-<dl>
-<dt><a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#insert-entity-table-name--entity--timeout-none-">insert_entity()</a></dt>
-<dd>テーブル内に既に同じ <code>PartitionKey</code> と <code>RowKey</code> を持つエンティティがある場合は、例外を発生します。</dd>
-<dt><a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#insert-or-merge-entity-table-name--entity--timeout-none-">insert_or_merge_entity()</a></dt>
-<dd>テーブル内に既に同じ <code>PartitionKey</code> と <code>RowKey</code> を持つエンティティがある場合は、指定したプロパティだけ上書きされます（既存エンティティのプロパティとマージされる）。</dd>
-<dt><a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#insert-or-replace-entity-table-name--entity--timeout-none-">insert_or_replace_entity()</a></dt>
-<dd>テーブル内に既に同じ <code>ParitionKey</code> と <code>RowKey</code> を持つエンティティがある場合は、指定したエンティティに置き換えられます。</dd>
-</dl>
-<p>これらのメソッドのパラメータはすべて同じで、追加先のテーブル名と、追加するエンティティを渡します。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=n>insert_entity</span><span class=p>(</span><span class=n>table_name</span><span class=p>,</span> <span class=n>entity</span><span class=p>,</span> <span class=n>timeout</span><span class=o>=</span><span class=kc>None</span><span class=p>)</span>
-<span class=n>insert_or_merge_entity</span><span class=p>(</span><span class=n>table_name</span><span class=p>,</span> <span class=n>entity</span><span class=p>,</span> <span class=n>timeout</span><span class=o>=</span><span class=kc>None</span><span class=p>)</span>
-<span class=n>insert_or_replace_entity</span><span class=p>(</span><span class=n>table_name</span><span class=p>,</span> <span class=n>entity</span><span class=p>,</span> <span class=n>timeout</span><span class=o>=</span><span class=kc>None</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<p><code>entity</code> パラメータには、辞書オブジェクトか <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.models.entity?view=azure-python">Entity クラス</a> のオブジェクトを渡すことができます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>辞書でデータを指定する方法</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=n>book</span> <span class=o>=</span> <span class=p>{</span>
-    <span class=s1>&#39;PartitionKey&#39;</span><span class=p>:</span> <span class=s1>&#39;book&#39;</span><span class=p>,</span>  <span class=c1># 必須のキー情報</span>
-    <span class=s1>&#39;RowKey&#39;</span><span class=p>:</span> <span class=s1>&#39;0004&#39;</span><span class=p>,</span>        <span class=c1># 必須のキー情報</span>
-    <span class=s1>&#39;Title&#39;</span><span class=p>:</span> <span class=s1>&#39;雪男の秘密&#39;</span><span class=p>,</span>
-    <span class=s1>&#39;Author&#39;</span><span class=p>:</span> <span class=s1>&#39;雪男&#39;</span>
-<span class=p>}</span>
-<span class=n>table_service</span><span class=o>.</span><span class=n>insert_or_replace_entity</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>,</span> <span class=n>book</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>Entity オブジェクトでデータを指定する方法</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=kn>from</span> <span class=nn>azure.cosmosdb.table.models</span> <span class=kn>import</span> <span class=n>Entity</span>
-
-<span class=n>book</span> <span class=o>=</span> <span class=n>Entity</span><span class=p>()</span>
-<span class=n>book</span><span class=o>.</span><span class=n>PartitionKey</span> <span class=o>=</span> <span class=s1>&#39;book&#39;</span>  <span class=c1># 必須のキー情報</span>
-<span class=n>book</span><span class=o>.</span><span class=n>RowKey</span> <span class=o>=</span> <span class=s1>&#39;0004&#39;</span>        <span class=c1># 必須のキー情報</span>
-<span class=n>book</span><span class=o>.</span><span class=n>Title</span> <span class=o>=</span> <span class=s1>&#39;雪男の秘密&#39;</span>
-<span class=n>book</span><span class=o>.</span><span class=n>Author</span> <span class=o>=</span> <span class=s1>&#39;雪男&#39;</span>
-<span class=n>table_service</span><span class=o>.</span><span class=n>insert_or_replace_entity</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>,</span> <span class=n>book</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<p>別に <code>Entity</code> オブジェクトを使ったところで型安全になるわけでもないので、辞書オブジェクトをそのまま使った方が楽かもしれません。</p>
-<div class=xNote>
-<span class=xNote_title>☝️ 存在しないプロパティは自動で追加される</span>
+テーブル名を示す <code>name</code> プロパティしかありませんが。。。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>すべてのテーブルを列挙</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>for</span> <span class=n>table</span> <span class=ow>in</span> <span class=n>table_service</span><span class=o>.</span><span class=n>list_tables</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=n>table</span><span class=o>.</span><span class=n>name</span><span class=p>)</span></span></span></code></pre></div></div></figure><p>仮に、<code>books</code> と <code>todos</code> というテーブルが作成済みであれば、次のように表示されます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>実行結果</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>books
+</span></span><span class=line><span class=cl>todos</span></span></code></pre></div></div></figure><h3 id=テーブルの存在を確認する-exist>テーブルの存在を確認する (exist)</h3><p>Table Storage 上に、指定した名前のテーブルが存在するかどうかをチェックするには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#exists-table-name--timeout-none-">exists() メソッド</a> を使用します。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>if</span> <span class=n>table_service</span><span class=o>.</span><span class=n>exists</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;books テーブルが存在するよ&#39;</span><span class=p>)</span></span></span></code></pre></div></div></figure><h3 id=テーブルを作成する-create_table>テーブルを作成する (create_table)</h3><p>Table Storage 上に、新しいテーブルを作成するには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#create-table-table-name--fail-on-exist-false--timeout-none-">create_table() メソッド</a> を使用します。
+テーブルの作成に成功すると <code>True</code> を返します。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>result</span> <span class=o>=</span> <span class=n>table_service</span><span class=o>.</span><span class=n>create_table</span><span class=p>(</span><span class=s1>&#39;mytable&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=n>result</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;テーブルを作成しました&#39;</span><span class=p>)</span></span></span></code></pre></div></div></figure><div class=xNote><span class=xNote_title>☝️ ワンポイント</span>
+<span class=xNote_body>テーブルのプロパティ（RDB のカラムに相当するもの）の指定がありませんが、プロパティはエンティティを追加するときに自動的に生成されるので、ここで指定しておく必要はありません。</span></div><h3 id=テーブルを削除する-delete_table>テーブルを削除する (delete_table)</h3><p>Table Storage 上の、既存のテーブルを削除するには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#delete-table-table-name--fail-not-exist-false--timeout-none-">delete_table() メソッド</a> を使用します。
+テーブルを削除すると、そこに含まれているすべてのエンティティも削除されてしまうので注意してください。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>table_service</span><span class=o>.</span><span class=n>delete_table</span><span class=p>(</span><span class=s1>&#39;mytable&#39;</span><span class=p>)</span></span></span></code></pre></div></div></figure><h2 id=エンティティの操作>エンティティの操作</h2><h3 id=テーブルにエンティティを追加する-insert_xxx>テーブルにエンティティを追加する (insert_xxx)</h3><p>指定したテーブルにデータ（エンティティ）を追加するには、<code>TableService</code> クラスの下記のいずれかのメソッドを使用します。
+同じキー情報を持つエンティティを追加しようとしたときの振る舞いだけが異なります。</p><dl><dt><a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#insert-entity-table-name--entity--timeout-none-">insert_entity()</a></dt><dd>テーブル内に既に同じ <code>PartitionKey</code> と <code>RowKey</code> を持つエンティティがある場合は、例外を発生します。</dd><dt><a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#insert-or-merge-entity-table-name--entity--timeout-none-">insert_or_merge_entity()</a></dt><dd>テーブル内に既に同じ <code>PartitionKey</code> と <code>RowKey</code> を持つエンティティがある場合は、指定したプロパティだけ上書きされます（既存エンティティのプロパティとマージされる）。</dd><dt><a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#insert-or-replace-entity-table-name--entity--timeout-none-">insert_or_replace_entity()</a></dt><dd>テーブル内に既に同じ <code>ParitionKey</code> と <code>RowKey</code> を持つエンティティがある場合は、指定したエンティティに置き換えられます。</dd></dl><p>これらのメソッドのパラメータはすべて同じで、追加先のテーブル名と、追加するエンティティを渡します。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>insert_entity</span><span class=p>(</span><span class=n>table_name</span><span class=p>,</span> <span class=n>entity</span><span class=p>,</span> <span class=n>timeout</span><span class=o>=</span><span class=kc>None</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>insert_or_merge_entity</span><span class=p>(</span><span class=n>table_name</span><span class=p>,</span> <span class=n>entity</span><span class=p>,</span> <span class=n>timeout</span><span class=o>=</span><span class=kc>None</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>insert_or_replace_entity</span><span class=p>(</span><span class=n>table_name</span><span class=p>,</span> <span class=n>entity</span><span class=p>,</span> <span class=n>timeout</span><span class=o>=</span><span class=kc>None</span><span class=p>)</span></span></span></code></pre></div></div></figure><p><code>entity</code> パラメータには、辞書オブジェクトか <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.models.entity?view=azure-python">Entity クラス</a> のオブジェクトを渡すことができます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>辞書でデータを指定する方法</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>book</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;PartitionKey&#39;</span><span class=p>:</span> <span class=s1>&#39;book&#39;</span><span class=p>,</span>  <span class=c1># 必須のキー情報</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;RowKey&#39;</span><span class=p>:</span> <span class=s1>&#39;0004&#39;</span><span class=p>,</span>        <span class=c1># 必須のキー情報</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;Title&#39;</span><span class=p>:</span> <span class=s1>&#39;雪男の秘密&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;Author&#39;</span><span class=p>:</span> <span class=s1>&#39;雪男&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=n>table_service</span><span class=o>.</span><span class=n>insert_or_replace_entity</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>,</span> <span class=n>book</span><span class=p>)</span></span></span></code></pre></div></div></figure><figure class=xCodeBlock><figcaption class=xCodeBlock_title>Entity オブジェクトでデータを指定する方法</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>azure.cosmosdb.table.models</span> <span class=kn>import</span> <span class=n>Entity</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>book</span> <span class=o>=</span> <span class=n>Entity</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>book</span><span class=o>.</span><span class=n>PartitionKey</span> <span class=o>=</span> <span class=s1>&#39;book&#39;</span>  <span class=c1># 必須のキー情報</span>
+</span></span><span class=line><span class=cl><span class=n>book</span><span class=o>.</span><span class=n>RowKey</span> <span class=o>=</span> <span class=s1>&#39;0004&#39;</span>        <span class=c1># 必須のキー情報</span>
+</span></span><span class=line><span class=cl><span class=n>book</span><span class=o>.</span><span class=n>Title</span> <span class=o>=</span> <span class=s1>&#39;雪男の秘密&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>book</span><span class=o>.</span><span class=n>Author</span> <span class=o>=</span> <span class=s1>&#39;雪男&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>table_service</span><span class=o>.</span><span class=n>insert_or_replace_entity</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>,</span> <span class=n>book</span><span class=p>)</span></span></span></code></pre></div></div></figure><p>別に <code>Entity</code> オブジェクトを使ったところで型安全になるわけでもないので、辞書オブジェクトをそのまま使った方が楽かもしれません。</p><div class=xNote><span class=xNote_title>☝️ 存在しないプロパティは自動で追加される</span>
 <span class=xNote_body><code>insert</code> 系メソッドでエンティティを追加するときに、<strong>テーブルにまだ存在しないプロパティを指定することもできます</strong>。
-その場合、自動的にテーブルにそのプロパティが追加されるので、プロパティ名は間違えないように要注意です。</span>
-</div>
-<h3 id=指定したキーのエンティティを取得する-get_entity>指定したキーのエンティティを取得する (get_entity)</h3>
-<p>取得したいエンティティのキー（<code>PartitionKey</code> と <code>RowKey</code>）が分かっている場合は、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#get-entity-table-name--partition-key--row-key--select-none--accept--application-json-odata-minimalmetadata---property-resolver-none--timeout-none-">get_entity() メソッド</a> を使って <code>Entity</code> オブジェクトを取得することができます。
-指定したキーのエンティティが見つからない場合は、例外が発生します。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=n>book</span> <span class=o>=</span> <span class=n>table_service</span><span class=o>.</span><span class=n>get_entity</span><span class=p>(</span>
-    <span class=n>table_name</span><span class=o>=</span><span class=s1>&#39;books&#39;</span><span class=p>,</span>
-    <span class=n>partition_key</span><span class=o>=</span><span class=s1>&#39;book&#39;</span><span class=p>,</span>
-    <span class=n>row_key</span><span class=o>=</span><span class=s1>&#39;0004&#39;</span><span class=p>)</span>
-
-<span class=nb>print</span><span class=p>(</span><span class=n>book</span><span class=o>.</span><span class=n>Title</span><span class=p>)</span>
-<span class=nb>print</span><span class=p>(</span><span class=n>book</span><span class=o>.</span><span class=n>Author</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<p>特定のプロパティしか参照しないことが分かっている場合は、<code>select</code> パラメータでプロパティ名を列挙しておくと、通信量を節約することができます。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=n>book</span> <span class=o>=</span> <span class=n>table_service</span><span class=o>.</span><span class=n>get_entity</span><span class=p>(</span>
-    <span class=n>table_name</span><span class=o>=</span><span class=s1>&#39;books&#39;</span><span class=p>,</span>
-    <span class=n>partition_key</span><span class=o>=</span><span class=s1>&#39;book&#39;</span><span class=p>,</span>
-    <span class=n>row_key</span><span class=o>=</span><span class=s1>&#39;0004&#39;</span><span class=p>,</span>
-    <span class=n>select</span><span class=o>=</span><span class=s1>&#39;Title,Author&#39;</span><span class=p>)</span>  <span class=c1># Title と Author プロパティだけ取得</span></code></pre></div></div>
-</figure>
-<h3 id=指定したキーのエンティティを削除する-delete_entity>指定したキーのエンティティを削除する (delete_entity)</h3>
-<p>指定したキー（<code>PartitionKey</code> と <code>RowKey</code>）のエンティティを削除するには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#delete-entity-table-name--partition-key--row-key--if-match------timeout-none-">delete_entity() メソッド</a> を使用します。
-指定したキーのエンティティが見つからない場合は、例外が発生します。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=n>table_service</span><span class=o>.</span><span class=n>delete_entity</span><span class=p>(</span>
-    <span class=n>table_name</span><span class=o>=</span><span class=s1>&#39;books&#39;</span><span class=p>,</span>
-    <span class=n>partition_key</span><span class=o>=</span><span class=s1>&#39;book&#39;</span><span class=p>,</span>
-    <span class=n>row_key</span><span class=o>=</span><span class=s1>&#39;0004&#39;</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<h3 id=エンティティのリストを取得する-query_entities>エンティティのリストを取得する (query_entities)</h3>
-<p>テーブルから条件に一致するエンティティをすべて取得するには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#query-entities-table-name--filter-none--select-none--num-results-none--marker-none--accept--application-json-odata-minimalmetadata---property-resolver-none--timeout-none-">query_entities() メソッド</a> を使用します。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>条件なしで検索</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=n>books</span> <span class=o>=</span> <span class=n>table_service</span><span class=o>.</span><span class=n>query_entities</span><span class=p>(</span>
-    <span class=n>table_name</span><span class=o>=</span><span class=s1>&#39;books&#39;</span><span class=p>,</span>
-    <span class=n>num_results</span><span class=o>=</span><span class=mi>5</span><span class=p>)</span>
-
-<span class=k>for</span> <span class=n>book</span> <span class=ow>in</span> <span class=n>books</span><span class=p>:</span>
-    <span class=nb>print</span><span class=p>(</span><span class=n>book</span><span class=o>.</span><span class=n>Title</span><span class=p>,</span> <span class=n>book</span><span class=o>.</span><span class=n>Author</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<p>検索条件は、<strong><code>filter</code></strong> パラメータを使って指定することができます。<code>filter</code> パラメータには文字列でフィルタ条件を指定するのですが、どのようなフォーマットで指定すればよいかは、下記のサイトが参考になります。</p>
-<ul>
-<li>参考: <a href=https://docs.microsoft.com/ja-jp/rest/api/storageservices/Querying-Tables-and-Entities>Querying tables and entities (REST API) - Azure Storage | Microsoft Docs</a></li>
-<li>参考: <a href=https://docs.microsoft.com/ja-jp/azure/storage/tables/table-storage-design-patterns#inter-partition-secondary-index-pattern>Azure ストレージ テーブルの設計パターン | Microsoft Docs</a></li>
-</ul>
-<h4 id=例-partitionkey-が-python-である>例: PartitionKey が Python である</h4>
-<p><code>filter</code> パラメータに <code>ParitionKey eq 'Python'</code> と指定すると、<code>PartitionKey</code> が <code>Python</code> であるエンティティをすべて取得することができます。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=n>python_books</span> <span class=o>=</span> <span class=n>table_service</span><span class=o>.</span><span class=n>query_entities</span><span class=p>(</span>
-    <span class=s1>&#39;books&#39;</span><span class=p>,</span> <span class=nb>filter</span><span class=o>=</span><span class=s2>&#34;PartitionKey eq &#39;Python&#39;&#34;</span><span class=p>)</span>
-
-<span class=k>for</span> <span class=n>book</span> <span class=ow>in</span> <span class=n>python_books</span><span class=p>:</span>
-    <span class=nb>print</span><span class=p>(</span><span class=n>book</span><span class=o>.</span><span class=n>Title</span><span class=p>,</span> <span class=n>book</span><span class=o>.</span><span class=n>Author</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<h4 id=例-rowkey-が-0002-より大きい>例: RowKey が 0002 より大きい</h4>
-<p><code>filter</code> パラメータに <code>RowKey gt '0002'</code> と指定すると、<code>RowKey</code> が <code>0002</code> よりも大きいエンティティのみを取得することができます。</p>
-<figure class=xCodeBlock>
-<figcaption class=xCodeBlock_title>filter 条件を指定して検索</figcaption>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=n>books</span> <span class=o>=</span> <span class=n>table_service</span><span class=o>.</span><span class=n>query_entities</span><span class=p>(</span>
-    <span class=n>table_name</span><span class=o>=</span><span class=s1>&#39;books&#39;</span><span class=p>,</span>
-    <span class=nb>filter</span><span class=o>=</span><span class=s2>&#34;RowKey gt &#39;0002&#39;&#34;</span><span class=p>)</span>
-
-<span class=k>for</span> <span class=n>book</span> <span class=ow>in</span> <span class=n>books</span><span class=p>:</span>
-    <span class=nb>print</span><span class=p>(</span><span class=n>book</span><span class=o>.</span><span class=n>Title</span><span class=p>,</span> <span class=n>book</span><span class=o>.</span><span class=n>Author</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain>へむの秘密 へむ
-ちいの秘密 ちい
-雪男の秘密 雪男</code></pre></div></div>
-</figure>
-<h2 id=バッチ処理化>バッチ処理化</h2>
-<p>複数のエンティティを追加したい場合などは、バッチ処理で行うようにすると、サーバーとの通信回数を減らすことができます。
-バッチ処理を行うには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#batch-table-name--timeout-none-">batch() メソッド</a> を使用します。</p>
-<figure class=xCodeBlock>
-<div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=n>book1</span> <span class=o>=</span> <span class=p>{</span><span class=s1>&#39;PartitionKey&#39;</span><span class=p>:</span> <span class=s1>&#39;book&#39;</span><span class=p>,</span> <span class=s1>&#39;RowKey&#39;</span><span class=p>:</span> <span class=s1>&#39;001&#39;</span><span class=p>,</span> <span class=n>Title</span><span class=p>:</span> <span class=s1>&#39;Title1&#39;</span><span class=p>}</span>
-<span class=n>book2</span> <span class=o>=</span> <span class=p>{</span><span class=s1>&#39;PartitionKey&#39;</span><span class=p>:</span> <span class=s1>&#39;book&#39;</span><span class=p>,</span> <span class=s1>&#39;RowKey&#39;</span><span class=p>:</span> <span class=s1>&#39;002&#39;</span><span class=p>,</span> <span class=n>Title</span><span class=p>:</span> <span class=s1>&#39;Title2&#39;</span><span class=p>}</span>
-<span class=n>book3</span> <span class=o>=</span> <span class=p>{</span><span class=s1>&#39;PartitionKey&#39;</span><span class=p>:</span> <span class=s1>&#39;book&#39;</span><span class=p>,</span> <span class=s1>&#39;RowKey&#39;</span><span class=p>:</span> <span class=s1>&#39;003&#39;</span><span class=p>,</span> <span class=n>Title</span><span class=p>:</span> <span class=s1>&#39;Title3&#39;</span><span class=p>}</span>
-
-<span class=k>with</span> <span class=n>table_service</span><span class=o>.</span><span class=n>batch</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>)</span> <span class=k>as</span> <span class=n>batch</span><span class=p>:</span>
-    <span class=n>batch</span><span class=o>.</span><span class=n>insert_entity</span><span class=p>(</span><span class=n>book1</span><span class=p>)</span>
-    <span class=n>batch</span><span class=o>.</span><span class=n>insert_entity</span><span class=p>(</span><span class=n>book2</span><span class=p>)</span>
-    <span class=n>batch</span><span class=o>.</span><span class=n>insert_entity</span><span class=p>(</span><span class=n>book3</span><span class=p>)</span></code></pre></div></div>
-</figure>
-<meta itemprop=author content="まく">
-<span itemprop=publisher itemscope itemtype=https://schema.org/Organization>
-<meta itemprop=name content="まく">
-</span>
-<h3 style="border-bottom:1px solid gray">関連記事</h3>
-<ul>
-<li><a href=../../p/xyzwod2/>Azure Table Strage を使ってみる (1) テーブルの作成</a></li>
-<li><a href=../../p/sfpwow9/>Python で OpenGL (1) pyGLFW のインストール</a></li>
-<li><a href=../../p/665rua3/>Python で OpenGL (2) PyOpenGL のインストール</a></li>
-<li><a href=../../p/5zx3ozz/>Azure Speech Service を使って音声をテキストに変換する (STT)</a></li>
-<li><a href=../../p/fwyi2fh/>QnA Maker (4) Python から QnA Maker の API を利用する</a></li>
-<li><a href=../../p/29awadj/>数学メモ: 任意の桁のレプ・ユニット (repeated units) を求める方法</a></li>
-<li><a href=../../p/qyohkjh/>数学メモ: 書籍『はじめての数論（原著第3版）』の練習問題メモ</a></li>
-</ul>
-<div class=xPageTags>
-<span class=xPageTags_item><a href=../../tags/azure-table-storage>Azure Table Storage</a></span>
-<span class=xPageTags_item><a href=../../tags/python>Python</a></span>
-</div>
-</div>
-<div style=text-align:right>
-<div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div>
-</div>
-<div class=xArticle_up>
-<a href=../../p/um2wi2o/><span class=xArticle_up_label>Azure Storage のメモ</span><br>へ戻る</a>
-</div>
-<aside>
-<div class=xPrevNextLink>
-<div class=xPrevNextLink_prev>
-<a href=../../p/dofzeua/>Azure Table Strage を使ってみる (2) 接続情報（キー）を確認する</a>
-</div>
-<div class=xPrevNextLink_next>
-<a href=../../p/ccoonon/>Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる</a>
-</div>
-</div>
-</aside>
-</article>
-<script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
+その場合、自動的にテーブルにそのプロパティが追加されるので、プロパティ名は間違えないように要注意です。</span></div><h3 id=指定したキーのエンティティを取得する-get_entity>指定したキーのエンティティを取得する (get_entity)</h3><p>取得したいエンティティのキー（<code>PartitionKey</code> と <code>RowKey</code>）が分かっている場合は、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#get-entity-table-name--partition-key--row-key--select-none--accept--application-json-odata-minimalmetadata---property-resolver-none--timeout-none-">get_entity() メソッド</a> を使って <code>Entity</code> オブジェクトを取得することができます。
+指定したキーのエンティティが見つからない場合は、例外が発生します。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>book</span> <span class=o>=</span> <span class=n>table_service</span><span class=o>.</span><span class=n>get_entity</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>table_name</span><span class=o>=</span><span class=s1>&#39;books&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>partition_key</span><span class=o>=</span><span class=s1>&#39;book&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>row_key</span><span class=o>=</span><span class=s1>&#39;0004&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>book</span><span class=o>.</span><span class=n>Title</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>book</span><span class=o>.</span><span class=n>Author</span><span class=p>)</span></span></span></code></pre></div></div></figure><p>特定のプロパティしか参照しないことが分かっている場合は、<code>select</code> パラメータでプロパティ名を列挙しておくと、通信量を節約することができます。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>book</span> <span class=o>=</span> <span class=n>table_service</span><span class=o>.</span><span class=n>get_entity</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>table_name</span><span class=o>=</span><span class=s1>&#39;books&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>partition_key</span><span class=o>=</span><span class=s1>&#39;book&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>row_key</span><span class=o>=</span><span class=s1>&#39;0004&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>select</span><span class=o>=</span><span class=s1>&#39;Title,Author&#39;</span><span class=p>)</span>  <span class=c1># Title と Author プロパティだけ取得</span></span></span></code></pre></div></div></figure><h3 id=指定したキーのエンティティを削除する-delete_entity>指定したキーのエンティティを削除する (delete_entity)</h3><p>指定したキー（<code>PartitionKey</code> と <code>RowKey</code>）のエンティティを削除するには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#delete-entity-table-name--partition-key--row-key--if-match------timeout-none-">delete_entity() メソッド</a> を使用します。
+指定したキーのエンティティが見つからない場合は、例外が発生します。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>table_service</span><span class=o>.</span><span class=n>delete_entity</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>table_name</span><span class=o>=</span><span class=s1>&#39;books&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>partition_key</span><span class=o>=</span><span class=s1>&#39;book&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>row_key</span><span class=o>=</span><span class=s1>&#39;0004&#39;</span><span class=p>)</span></span></span></code></pre></div></div></figure><h3 id=エンティティのリストを取得する-query_entities>エンティティのリストを取得する (query_entities)</h3><p>テーブルから条件に一致するエンティティをすべて取得するには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#query-entities-table-name--filter-none--select-none--num-results-none--marker-none--accept--application-json-odata-minimalmetadata---property-resolver-none--timeout-none-">query_entities() メソッド</a> を使用します。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>条件なしで検索</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>books</span> <span class=o>=</span> <span class=n>table_service</span><span class=o>.</span><span class=n>query_entities</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>table_name</span><span class=o>=</span><span class=s1>&#39;books&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>num_results</span><span class=o>=</span><span class=mi>5</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>for</span> <span class=n>book</span> <span class=ow>in</span> <span class=n>books</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=n>book</span><span class=o>.</span><span class=n>Title</span><span class=p>,</span> <span class=n>book</span><span class=o>.</span><span class=n>Author</span><span class=p>)</span></span></span></code></pre></div></div></figure><p>検索条件は、<strong><code>filter</code></strong> パラメータを使って指定することができます。<code>filter</code> パラメータには文字列でフィルタ条件を指定するのですが、どのようなフォーマットで指定すればよいかは、下記のサイトが参考になります。</p><ul><li>参考: <a href=https://docs.microsoft.com/ja-jp/rest/api/storageservices/Querying-Tables-and-Entities>Querying tables and entities (REST API) - Azure Storage | Microsoft Docs</a></li><li>参考: <a href=https://docs.microsoft.com/ja-jp/azure/storage/tables/table-storage-design-patterns#inter-partition-secondary-index-pattern>Azure ストレージ テーブルの設計パターン | Microsoft Docs</a></li></ul><h4 id=例-partitionkey-が-python-である>例: PartitionKey が Python である</h4><p><code>filter</code> パラメータに <code>ParitionKey eq 'Python'</code> と指定すると、<code>PartitionKey</code> が <code>Python</code> であるエンティティをすべて取得することができます。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>python_books</span> <span class=o>=</span> <span class=n>table_service</span><span class=o>.</span><span class=n>query_entities</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;books&#39;</span><span class=p>,</span> <span class=nb>filter</span><span class=o>=</span><span class=s2>&#34;PartitionKey eq &#39;Python&#39;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>for</span> <span class=n>book</span> <span class=ow>in</span> <span class=n>python_books</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=n>book</span><span class=o>.</span><span class=n>Title</span><span class=p>,</span> <span class=n>book</span><span class=o>.</span><span class=n>Author</span><span class=p>)</span></span></span></code></pre></div></div></figure><h4 id=例-rowkey-が-0002-より大きい>例: RowKey が 0002 より大きい</h4><p><code>filter</code> パラメータに <code>RowKey gt '0002'</code> と指定すると、<code>RowKey</code> が <code>0002</code> よりも大きいエンティティのみを取得することができます。</p><figure class=xCodeBlock><figcaption class=xCodeBlock_title>filter 条件を指定して検索</figcaption><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>books</span> <span class=o>=</span> <span class=n>table_service</span><span class=o>.</span><span class=n>query_entities</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>table_name</span><span class=o>=</span><span class=s1>&#39;books&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nb>filter</span><span class=o>=</span><span class=s2>&#34;RowKey gt &#39;0002&#39;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>for</span> <span class=n>book</span> <span class=ow>in</span> <span class=n>books</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=n>book</span><span class=o>.</span><span class=n>Title</span><span class=p>,</span> <span class=n>book</span><span class=o>.</span><span class=n>Author</span><span class=p>)</span></span></span></code></pre></div></div></figure><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>へむの秘密 へむ
+</span></span><span class=line><span class=cl>ちいの秘密 ちい
+</span></span><span class=line><span class=cl>雪男の秘密 雪男</span></span></code></pre></div></div></figure><h2 id=バッチ処理化>バッチ処理化</h2><p>複数のエンティティを追加したい場合などは、バッチ処理で行うようにすると、サーバーとの通信回数を減らすことができます。
+バッチ処理を行うには、<code>TableService</code> クラスの <a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python#batch-table-name--timeout-none-">batch() メソッド</a> を使用します。</p><figure class=xCodeBlock><div class=xCodeBlock_code><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>book1</span> <span class=o>=</span> <span class=p>{</span><span class=s1>&#39;PartitionKey&#39;</span><span class=p>:</span> <span class=s1>&#39;book&#39;</span><span class=p>,</span> <span class=s1>&#39;RowKey&#39;</span><span class=p>:</span> <span class=s1>&#39;001&#39;</span><span class=p>,</span> <span class=n>Title</span><span class=p>:</span> <span class=s1>&#39;Title1&#39;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=n>book2</span> <span class=o>=</span> <span class=p>{</span><span class=s1>&#39;PartitionKey&#39;</span><span class=p>:</span> <span class=s1>&#39;book&#39;</span><span class=p>,</span> <span class=s1>&#39;RowKey&#39;</span><span class=p>:</span> <span class=s1>&#39;002&#39;</span><span class=p>,</span> <span class=n>Title</span><span class=p>:</span> <span class=s1>&#39;Title2&#39;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=n>book3</span> <span class=o>=</span> <span class=p>{</span><span class=s1>&#39;PartitionKey&#39;</span><span class=p>:</span> <span class=s1>&#39;book&#39;</span><span class=p>,</span> <span class=s1>&#39;RowKey&#39;</span><span class=p>:</span> <span class=s1>&#39;003&#39;</span><span class=p>,</span> <span class=n>Title</span><span class=p>:</span> <span class=s1>&#39;Title3&#39;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>with</span> <span class=n>table_service</span><span class=o>.</span><span class=n>batch</span><span class=p>(</span><span class=s1>&#39;books&#39;</span><span class=p>)</span> <span class=k>as</span> <span class=n>batch</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>batch</span><span class=o>.</span><span class=n>insert_entity</span><span class=p>(</span><span class=n>book1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>batch</span><span class=o>.</span><span class=n>insert_entity</span><span class=p>(</span><span class=n>book2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>batch</span><span class=o>.</span><span class=n>insert_entity</span><span class=p>(</span><span class=n>book3</span><span class=p>)</span></span></span></code></pre></div></div></figure><meta itemprop=author content="まく"><span itemprop=publisher itemscope itemtype=https://schema.org/Organization><meta itemprop=name content="まく"></span><h3 style="border-bottom:1px solid gray">関連記事</h3><ul><li><a href=../../p/xyzwod2/>Azure Table Strage を使ってみる (1) テーブルの作成</a></li><li><a href=../../p/sfpwow9/>Python で OpenGL (1) pyGLFW のインストール</a></li><li><a href=../../p/665rua3/>Python で OpenGL (2) PyOpenGL のインストール</a></li><li><a href=../../p/5zx3ozz/>Azure Speech Service を使って音声をテキストに変換する (STT)</a></li><li><a href=../../p/fwyi2fh/>QnA Maker (4) Python から QnA Maker の API を利用する</a></li><li><a href=../../p/29awadj/>数学メモ: 任意の桁のレプ・ユニット (repeated units) を求める方法</a></li><li><a href=../../p/qyohkjh/>数学メモ: 書籍『はじめての数論（原著第3版）』の練習問題メモ</a></li></ul><div class=xPageTags><span class=xPageTags_item><a href=../../tags/azure-table-storage>Azure Table Storage</a></span>
+<span class=xPageTags_item><a href=../../tags/python>Python</a></span></div></div><div style=text-align:right><div id=codoc-entry-4gYwTntzzw class=codoc-entries data-without-body=1 data-support-button-text="（っ'-')╮シュッ=͟͟͞͞ 💵" data-show-like=0 data-show-about-codoc=0 data-show-powered-by=0 data-support-message=まくに投げ銭できるよ></div></div><div class=xArticle_up><a href=../../p/um2wi2o/><span class=xArticle_up_label>Azure Storage のメモ</span><br>へ戻る</a></div><aside><div class=xPrevNextLink><div class=xPrevNextLink_prev><a href=../../p/dofzeua/>Azure Table Strage を使ってみる (2) 接続情報（キー）を確認する</a></div><div class=xPrevNextLink_next><a href=../../p/ccoonon/>Azure Table Strage を使ってみる (4) Node.js からテーブル操作してみる</a></div></div></aside></article><script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script>
 <ins class=adsbygoogle style=display:block;text-align:center data-ad-layout=in-article data-ad-format=fluid data-ad-client=ca-pub-6317852277883092 data-ad-slot=8636867067></ins>
-<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
-</main>
-</div>
-<aside>
-<div class=xBreadcrumb>
-<span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/vrhjtds/>Azure</a>
-</span>
-<span class=xBreadcrumb_item><a href=../../p/um2wi2o/>Azure Storage のメモ</a>
-</span>
-<span class=xBreadcrumb_item>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる
-</span>
-</div>
-</aside>
-<div id=xSiteFooter><a href=../../>まくろぐ</a></div>
-<div id=xSiteFooter2>
-<a href=../../sitemap/>サイトマップ</a> ｜
-<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a>
-</div>
-</div>
-<script src=../../assets/js/sidebar.js></script>
-<script>document.addEventListener('DOMContentLoaded',function(){const a=document.querySelectorAll('a[href^=http]');for(let c=0;c<a.length;++c){const b=a[c],d=b.getElementsByTagName('img');if(d.length>0)continue;const e=b.getElementsByTagName('svg');if(e.length>0)continue;b.classList.add('xExternalLinkIcon'),b.setAttribute('target','_blank'),b.setAttribute('rel','noopener')}})</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"Azure","item":"https://maku.blog/p/vrhjtds/"},{"@type":"ListItem","position":4,"name":"Azure Storage のメモ","item":"https://maku.blog/p/um2wi2o/"},{"@type":"ListItem","position":5,"name":"Azure Table Strage を使ってみる (3) Python からテーブル操作してみる","item":"https://maku.blog/p/o8ufwct/"}]}</script>
-</body>
-</html>
+<script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main></div><aside><div class=xBreadcrumb><span class=xBreadcrumb_item><a href=../../>&#x1F3E0;</a></span>
+<span class=xBreadcrumb_item><a href=../../p/3ftx6b2/>技術系</a></span>
+<span class=xBreadcrumb_item><a href=../../p/vrhjtds/>Azure</a></span>
+<span class=xBreadcrumb_item><a href=../../p/um2wi2o/>Azure Storage のメモ</a></span>
+<span class=xBreadcrumb_item>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる</span></div></aside><div id=xSiteFooter><a href=../../>まくろぐ</a></div><div id=xSiteFooter2><a href=../../sitemap/>サイトマップ</a> ｜
+<a tatget=_blank href=https://forms.gle/xdUszEv4f5CEqH947>まくへのメッセージ</a></div></div><script src=../../assets/js/sidebar.js></script>
+<script>document.addEventListener("DOMContentLoaded",function(){const e=document.querySelectorAll("a[href^=http]");for(let n=0;n<e.length;++n){const t=e[n],s=t.getElementsByTagName("img");if(s.length>0)continue;const o=t.getElementsByTagName("svg");if(o.length>0)continue;t.classList.add("xExternalLinkIcon"),t.setAttribute("target","_blank"),t.setAttribute("rel","noopener")}})</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"まくろぐ","item":"https://maku.blog/"},{"@type":"ListItem","position":2,"name":"技術系","item":"https://maku.blog/p/3ftx6b2/"},{"@type":"ListItem","position":3,"name":"Azure","item":"https://maku.blog/p/vrhjtds/"},{"@type":"ListItem","position":4,"name":"Azure Storage のメモ","item":"https://maku.blog/p/um2wi2o/"},{"@type":"ListItem","position":5,"name":"Azure Table Strage を使ってみる (3) Python からテーブル操作してみる","item":"https://maku.blog/p/o8ufwct/"}]}</script></body></html>
