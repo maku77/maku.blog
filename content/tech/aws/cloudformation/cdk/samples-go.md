@@ -61,7 +61,7 @@ func main() {
 	createStack(app)
 	app.Synth(nil)
 }
-{{< code >}}
+{{< /code >}}
 
 
 API Gateway
