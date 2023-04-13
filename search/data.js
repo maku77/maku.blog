@@ -2,7 +2,7 @@ var data = [
 {
 url: "/p/ujqinda/",
 title: "プログラミング",
-date: "2023-03-21T00:00:00Z",
+date: "2023-04-13T00:00:00Z",
 body: "プログラミング"
 },
 {
@@ -1542,6 +1542,30 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/d7p5jye/",
+title: "React 関連記事",
+date: "2023-04-13T00:00:00Z",
+body: "React 関連記事"
+},
+{
+url: "/p/j52iy4k/",
+title: "React アプリの中で D3.js を使ってチャートを描画する",
+date: "2023-04-13T00:00:00Z",
+body: "React アプリの中で D3.js を使ってチャートを描画する 何をするか？ D3.js は、Web ブラウザ上で様々なデータをビジュアライズするためのデファクトスタンダードな描画ライブラリです。 ここでは、React (Next.js) アプリ内で、D3.js を使って簡単なチャートを描画してみます。 ☝️ ほかの描画ライブラリ JavaScript による描画ライブラリには、他にも Chart.js や Mermaid.js などいろいろなものがあります。 Chart.js を使うと、は折れ線グラフや散布図などを簡単に描画することができます。 Mermaid.js を使うと、独自フォーマットのテキストをもとにフローチャートなどを描画することができます。 これらの描画ライブラリは、D3.js と比べて簡単に使うことができますが、描画可能な図の種類は限られています。 一方、D3.js は高度なカスタマイズや自由度の高いデータの可視化が可能ですが、初学者にとってはやや学習コストが高くなっています。 D3.js のインストール NPM あるいは Yarn で、プロジェクトに D3.js の依存を追加します。 TypeScript を使用している場合は、D3.js 本体 (d3) に加え、型情報 (@types/d3) もインストールします。 D3.js のインストール（NPM の場合） $ npm install d3 $ npm install --save-dev @types/d3 D3.js のインストール（Yarn の場合） $ yarn add d3 $ yarn add --dev @types/d3 React コンポーネント内で D3.js を使う React アプリは作成済みであるとし、D3.js を使って描画を行うコンポーネントを新しく作成します。 次の HelloChart コンポーネントは、D3.js を使って簡単な棒グラフを描画します。 内部的に svg 要素を保持しており、その中に複数の rect を配置することで棒グラフを構築しています。 useRef フックで svg 要素の参照を取得し、D3.js の描画先として設定しています。 src/components/HelloChart.tsx import { FC, useEffect, useRef } from \u0026#39;react\u0026#39; import * as d3 from \u0026#39;d3\u0026#39; export const HelloChart: FC = () =\u0026gt; { const svg = useRef\u0026lt;SVGSVGElement\u0026gt;(null) useEffect(() =\u0026gt; { drawChart(svg) }, [svg]) return \u0026lt;svg ref={svg} width=\u0026#34;200\u0026#34; height=\u0026#34;100\u0026#34; /\u0026gt; } function drawChart(svgRef: React.RefObject\u0026lt;SVGSVGElement\u0026gt;) { const data = [10, 30, 60, 40, 90, 20, 50, 70, 10, 40] const svg = d3.select(svgRef.current) svg .style(\u0026#39;background\u0026#39;, \u0026#39;#ddd\u0026#39;) .selectAll(\u0026#39;rect\u0026#39;) .data(data) .enter() .append(\u0026#39;rect\u0026#39;) .attr(\u0026#39;x\u0026#39;, (_d, i) =\u0026gt; i * 20) .attr(\u0026#39;y\u0026#39;, (d) =\u0026gt; 100 - d) .attr(\u0026#39;width\u0026#39;, 18) .attr(\u0026#39;height\u0026#39;, (d) =\u0026gt; d) .attr(\u0026#39;fill\u0026#39;, \u0026#39;steelblue\u0026#39;) } あとは、何らかのページでこの HelloChart コンポーネントを呼び出すだけです。 src/pages/index.tsx import { HelloChart } from \u0026#39;@/components/HelloChart\u0026#39; export default function Home() { return ( \u0026lt;\u0026gt; \u0026lt;h1\u0026gt;Hello, D3.js!\u0026lt;/h1\u0026gt; \u0026lt;HelloChart /\u0026gt; \u0026lt;/\u0026gt; ) } 次のように svg 要素が表示されれば成功です。 図: D3.js による棒グラフの描画 ٩(๑❛ᴗ❛๑)۶ わーぃ"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2023-04-13T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2023-04-13T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/saku4ck/",
 title: "Next.js 関連記事",
 date: "2023-03-21T00:00:00Z",
@@ -1554,28 +1578,10 @@ date: "2023-03-21T00:00:00Z",
 body: "Next.js アプリに Google Analytics を設定する (next/script) 何をするか？ Google Analytics で Web サイトのアクセス解析を行うには、次のような感じのコードを各ページに埋め込む必要があります。 Google Analytics 用の埋め込みコード \u0026lt;!-- Google tag (gtag.js) --\u0026gt; \u0026lt;script async src=\u0026#34;https://www.googletagmanager.com/gtag/js?id=G-ABCDE12345\u0026#34;\u0026gt;\u0026lt;/script\u0026gt; \u0026lt;script\u0026gt; window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag(\u0026#39;js\u0026#39;, new Date()); gtag(\u0026#39;config\u0026#39;, \u0026#39;G-ABCDE12345\u0026#39;); \u0026lt;/script\u0026gt; ここでは、Next.js が提供する Script コンポーネント (next/script) を使用して、Next.js アプリに同等のコードを埋め込む方法を説明します。 HTML 標準の script ではなく、Next.js の Script コンポーネントを使用することで、Next.js アプリのレンダリング処理に合わせて実行タイミングを最適化できます。 事前準備（Google Analitics でプロパティとデータストリームを追加する） 事前準備として、Google Analytics のサイトで、サイドバーの 管理 メニューから対象アプリ用に プロパティ を追加しておいてください。 さらに、そのプロパティに対して データストリーム を追加すると、Web サイトや Android アプリの利用状況を監視できるようになります。 図: プロパティにデータストリームを追加する データストリームを追加すると、次のように 測定 ID が発行されます。 これが、前述の JavaScript コードで指定する ID になります。 図: 測定 ID が発行された Next.js 用の Analytics コンポーネントを作成する 下記の Analytics.tsx は、Google Analytics 用のコードを埋め込むためのコンポーネントの実装例です。 Google Analytics の測定 ID は、ホスティングサーバー（例えば Vercel）の環境変数 NEXT_PUBLIC_ANALYTICS_ID で設定することを想定しています（自サイト専用のコンポーネントにするなら、ハードコーディングしちゃっても大丈夫です）。 components/common/Analytics.tsx import { FC } from \u0026#39;react\u0026#39; import Script from \u0026#39;next/script\u0026#39; // サーバーの環境変数で Google Analytics の測定 ID を指定します const ANALYTICS_ID = process.env.NEXT_PUBLIC_ANALYTICS_ID // あるいはハードコーディングでも可 // const ANALYTICS_ID = \u0026#39;G-ABCDE12345\u0026#39; /** Google Analytics によるアクセス解析を行うためのコンポーネント */ export const Analytics: FC = () =\u0026gt; { if (process.env.NODE_ENV !== \u0026#39;production\u0026#39;) { // 開発サーバー上での実行 (next dev) では何も出力しない return \u0026lt;\u0026gt;\u0026lt;/\u0026gt; } if (!ANALYTICS_ID) { console.warn(\u0026#39;NEXT_PUBLIC_ANALYTICS_ID not defined\u0026#39;) return \u0026lt;\u0026gt;\u0026lt;/\u0026gt; } return ( \u0026lt;\u0026gt; \u0026lt;Script src=\u0026#34;https://www.googletagmanager.com/gtag/js?id=${ANALYTICS_ID}\u0026#34; strategy=\u0026#34;afterInteractive\u0026#34; /\u0026gt; \u0026lt;Script id=\u0026#34;google-analytics\u0026#34; strategy=\u0026#34;afterInteractive\u0026#34;\u0026gt; {` window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag(\u0026#39;js\u0026#39;, new Date()); gtag(\u0026#39;config\u0026#39;, \u0026#39;${ANALYTICS_ID}\u0026#39;); `} \u0026lt;/Script\u0026gt; \u0026lt;/\u0026gt; ) } Script コンポーネントの strategy プロパティでは、読み込みタイミングを細かく制御できます（参考: Handling Scripts | Next.js）。 afterInteractive を指定すると、ページのハイドレーション処理が行われたタイミング（つまりユーザー操作が可能になったタイミング）で実行されます。 デフォルト値は afterInteractive なので、実はサンプルコード内の strategy プロパティの指定は省略することができます。 JavaScript コードをインラインで埋め込んでいる方の Script タグには、id プロパティを指定しておく必要があります。 この id は、Next.js が内部での最適化に使用します。 サンプルコードでは google-analytics と指定していますが、一意の文字列であれば何でも構いません。 Analytics コンポーネントを設置する Analytics コンポーネントは、各ページで実行されるように pages/_app.tsx から呼び出すようにします。 pages/_app.tsx import type { AppProps } from \u0026#39;next/app\u0026#39; import Head from \u0026#39;next/head\u0026#39; import { Analytics } from \u0026#39;../components/common/Analytics\u0026#39; export default function MyApp({ Component, pageProps }: AppProps) { return ( \u0026lt;\u0026gt; \u0026lt;Head\u0026gt; \u0026lt;meta charSet=\u0026#34;utf-8\u0026#34; /\u0026gt; \u0026lt;meta name=\u0026#34;viewport\u0026#34; content=\u0026#34;initial-scale=1, width=device-width\u0026#34; /\u0026gt; \u0026lt;title\u0026gt;Awesome website\u0026lt;/title\u0026gt; \u0026lt;/Head\u0026gt; \u0026lt;Analytics /\u0026gt; \u0026lt;Component {...pageProps} /\u0026gt; \u0026lt;/\u0026gt; ) } Next.js の Script 要素は Head 要素の外に記述しないと動作しないようなので注意してください。 これで、Web サイトのアクセス情報を Google Analytics のページで確認できるようになります。 ٩(๑❛ᴗ❛๑)۶ わーぃ"
 },
 {
-url: "/p/d7p5jye/",
-title: "React 関連記事",
-date: "2023-03-21T00:00:00Z",
-body: "React 関連記事"
-},
-{
 url: "/p/s5m7cbh/",
 title: "Next.js のその他の記事",
 date: "2023-03-21T00:00:00Z",
 body: "Next.js のその他の記事"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2023-03-21T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2023-03-21T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/cv6fpx7/",
