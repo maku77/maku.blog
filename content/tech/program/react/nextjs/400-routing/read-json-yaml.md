@@ -39,12 +39,13 @@ JSON ファイルを読み込む（in getStaticProps 関数）
 
 次のコードでは、`getStaticProps` 関数の中で `src/data/games.json` ファイルを読み込んで、ページコンポーネントに渡す `props` データを作成しています。
 
-{{< code lang="ts" title="src/pages/games.tsx" >}}
+{{< code lang="tsx" title="src/pages/games.tsx" >}}
 import * as fs from 'fs'
 import * as path from 'path'
+import { GetStaticProps, NextPage } from 'next'
 
-types Game = { id: string, title: string }
-types PageProps = { games: Game[] }
+type Game = { id: string, title: string }
+type PageProps = { games: Game[] }
 
 export const getStaticProps: GetStaticProps<PageProps> = async (context) => {
   // JSON ファイルを読み込む
@@ -53,14 +54,14 @@ export const getStaticProps: GetStaticProps<PageProps> = async (context) => {
   const games = JSON.parse(jsonText) as Game[]
 
   // ページコンポーネントに渡す props オブジェクトを設定する
-  return {
-    props: { games }
-  }
+  return { props: { games } }
 }
 
-const GamesPage: React.FC<PageProps> = ({ games }: PageProps) => {
+const GamesPage: NextPage<PageProps> = ({ games }: PageProps) => {
   // ...
 }
+
+export default GamesPage
 {{< /code >}}
 
 JSON 形式のテキストは、JavaScript 標準の `JSON.parse` 関数でオブジェクトに変換することができるので、プログラム内での扱いはお手軽です。
