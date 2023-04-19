@@ -750,6 +750,12 @@ date: "2019-09-05T00:00:00Z",
 body: "Azure: Cosmos DB の SQL API をプロキシ経由で使用する 参照するサンプルコード Azure の Cosmos DB を SQL API で操作するための最初の手順は下記のドキュメントに記載されています。 クイック スタート:Azure Cosmos DB SQL API アカウントを使用して Node.js アプリを構築する ここに Node.js 用のサンプルコードがあり、@azure/cosmos パッケージが提供する CosmosClient クラスを使用したコードになっています（昔のサンプルコードでは documentdb というライブラリを使用していたりしますが、今は Microsoft が提供する @azure/cosmos を使用すると完結なコードを記述できます）。 const CosmosClient = require(\u0026#39;@azure/cosmos\u0026#39;).CosmosClient; 基本的には、config.js ファイルに記述されたエンドポイントとキーを下記のような感じで設定すれば実行できるようになるのですが、 config.js var config = {}; config.endpoint = \u0026#39;https://your-cosmosdb.documents.azure.com:443/\u0026#39;; config.key = \u0026#39;9Hp4WSwgvggexAuGy4dKdl...snipped...lV9Nm44Pg8WVkH==\u0026#39;; 会社などのプロキシ環境内からだとうまく接続できず、次のような感じのエラーが発生すると思います。 $ node app.js Completed with error {\u0026#34;message\u0026#34;:\u0026#34;request to https://your-cosmosdb.documents.azure.com:443/dbs/FamilyDatabase failed, reason: connect ETIMEDOUT 123.34.56.78:443\u0026#34;,\u0026#34;type\u0026#34;:\u0026#34;system\u0026#34;,\u0026#34;errno\u0026#34;:\u0026#34;ETIMEDOUT\u0026#34;, \u0026#34;code\u0026#34;:\u0026#34;ETIMEDOUT\u0026#34;,\u0026#34;headers\u0026#34;:{\u0026#34;x-ms-throttle-retry-count\u0026#34;:0,\u0026#34;x-ms-throttle-retry-wait-time-ms\u0026#34;:0}} HTTPS_PROXY 環境変数を設定しても同様で効果がありません。 プロキシ経由で CosmosClient を使用する CosmosClient クラスでの Cosmos DB へのアクセスをプロキシ経由で行うには、コンストラクタのパラメータとして渡せる CosmosClientOptions の agent プロパティを設定します。 ここでは、エージェントとして proxy-agent モジュールを使用します。 proxy-agent のインストール $ npm install --save proxy-agent sample.js const { CosmosClient } = require(\u0026#39;@azure/cosmos\u0026#39;); const ProxyAgent = require(\u0026#39;proxy-agent\u0026#39;); // HTTP, HTTPS, or SOCKS proxy to use const PROXY_URI = \u0026#39;http://proxy.example.com:3128/\u0026#39;; const client = new CosmosClient({ endpoint: config.endpoint, key: config.key, agent: new ProxyAgent(PROXY_URI) }); プロキシを使用するかどうかを簡単に切り替えられるようにするには、例えば、AZURE_PROXY 環境変数に URI がセットされていたら、それをプロキシアドレスとして使用する、というように処理を分けるとよいでしょう。 sample.js const { CosmosClient } = require(\u0026#39;@azure/cosmos\u0026#39;); const options = { endpoint: config.endpoint, key: config.key }; // AZURE_PROXY 環境変数がセットされていたらプロキシ経由のアクセスにする if (process.env.AZURE_PROXY) { const ProxyAgent = require(\u0026#39;proxy-agent\u0026#39;); options.agent = new ProxyAgent(process.env.AZURE_PROXY); } const client = new CosmosClient(options); あとは、普通に CosmosClient インスタンスを使用して API を呼び出すだけです。 my-db データベースの my-collection コレクションに、適当な JSON データを格納してみます。 async function createItem(item) { // Create the database if it does not exist const { database } = await client.databases.createIfNotExists({ id: \u0026#39;my-db\u0026#39; }); // Create the container if it does not exist const { container } = await database.containers.createIfNotExists({ id: \u0026#39;my-collection\u0026#39; }); // Create the item if it does not exist const { resource } = await container.items.upsert(item); } // コレクションに追加してみる const item = { id: \u0026#39;id1\u0026#39;, key1: \u0026#39;value1\u0026#39;, key2: \u0026#39;value2\u0026#39; }; createItem(item).catch(err =\u0026gt; { console.error(err); }); Azure ポータル から Cosmos DB の データエクスプローラー を開くと、my-db データベースの my-collection コレクションにアイテムが追加されていることを確認できます。 図: Cosmos DB データエクスプローラー"
 },
 {
+url: "/p/eycnw8h/",
+title: "VS Code の設定メモ",
+date: "2023-04-19T00:00:00Z",
+body: "VS Code の設定メモ"
+},
+{
 url: "/p/q8hry9h/",
 title: "MongoDB サーバー (mongod デーモン)",
 date: "2023-01-18T00:00:00Z",
@@ -760,12 +766,6 @@ url: "/p/u6p6n4i/",
 title: "Ansible の操作／設定",
 date: "2022-07-18T00:00:00Z",
 body: "Ansible の操作／設定"
-},
-{
-url: "/p/eycnw8h/",
-title: "VS Code の設定メモ",
-date: "2021-11-13T00:00:00Z",
-body: "VS Code の設定メモ"
 },
 {
 url: "/p/q7fov5c/",
@@ -1542,6 +1542,30 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/inh3k2j/",
+title: "Visual Studio Code のメモ",
+date: "2023-04-19T00:00:00Z",
+body: "Visual Studio Code のメモ"
+},
+{
+url: "/p/2apzood/",
+title: "VS Code で YAML ファイルをソートする（YAML Sort 拡張）",
+date: "2023-04-19T00:00:00Z",
+body: "VS Code で YAML ファイルをソートする（YAML Sort 拡張） YAML Sort の概要 VS Code に YAML Sort 拡張 をインストールすると、YAML ファイルの内容をキー名でソートすることができます。 主にソート用に使うものですが、YAML フォーマッターとしても利用できます。 次のような簡単なカスタマイズを行うこともできます。 指定したキーを優先的に上から並べる 1 階層目の各キーの間に空白行を入れる 配列要素をソートする YAML Sort の使い方 YAML Sort のページで Install ボタンを押すだけで、VS Code への拡張のインストールは完了です。 ここでは、次のような YAML ファイルをソートしてみます。 sample.yml（ソート前） root2: ccc: 300 aaa: 100 bbb: 200 root1: fruits: - grape - apple - banana animals: [\u0026#39;wolf\u0026#39;, \u0026#39;fox\u0026#39;, \u0026#39;dolphin\u0026#39;, \u0026#39;eagle\u0026#39;] VS Code で YAML ファイルを開いた状態で、コマンドパレットを開いて (Ctrl/Cmd + Shift + P)、YAML Sort: Sort YAML を選択すると、YAML ファイルの内容がソートされます。 sample.yml（ソート後） --- root1: animals: [\u0026#39;wolf\u0026#39;, \u0026#39;fox\u0026#39;, \u0026#39;dolphin\u0026#39;, \u0026#39;eagle\u0026#39;] fruits: - grape - apple - banana root2: aaa: 100 bbb: 200 ccc: 300 先頭行に自動でセパレーター (---) が挿入され、すべてのキーがアルファベット順にソートされていることが分かります。 キー間の空白行はすべて削除されています。 一方で、配列要素は自動ではソートされないようです（順番が意味を持つことがあるので当然ですが）。 YAML Sort のカスタマイズ ソート方法は VS Code の設定ファイルでカスタマイズできるのですが、プロジェクトごと（あるいは YAML ファイルごと）に、ソート方法のルールは変わってくるはずなので、ワークスペース設定ファイル (\u0026lt;Project\u0026gt;/.vscode/settings.json) で設定するのがよいでしょう（参考: VS Code の設定ファイルの場所）。 ワークスペース設定ファイルは次のように開くことができます。 Ctrl/Cmd + Shift + P でコマンドパレットを開く Preferences: Open Workspace Settings (JSON) を選択 設定可能な項目は 公式サイト を参照してください。 以下、いくつか設定例を示しておきます。 優先的に並べるキーを指定する (customSortKeywords_1) \u0026lt;Project\u0026gt;/.vscode/settings.json { \u0026#34;vscode-yaml-sort.customSortKeywords_1\u0026#34;: [\u0026#34;id\u0026#34;, \u0026#34;name\u0026#34;] } \u0026quot;vscode-yaml-sort.customSortKeywords_1\u0026quot; というプロパティで、1 階層目のキーのソート順序を定義することができます。 残念ながら、2 階層目移行のキーは指定できないようです。 この設定を使ってソートするには、コマンドパレットから YAML Sort: Sort YAML を選択する代わりに、YAML Sort: Custom sort 1 を選択します。 プロパティ名の末尾の数字を 2、3 と変えることで、複数のカスタムソート設定を定義しておくことができます。 キー間に空行を入れる (emptyLinesUntilLevel) \u0026lt;Project\u0026gt;/.vscode/settings.json { \u0026#34;vscode-yaml-sort.emptyLinesUntilLevel\u0026#34;: 1 } \u0026quot;vscode-yaml-sort.emptyLinesUntilLevel\u0026quot; プロパティに 1 以上の数値を設定しておくと、その階層まで、各キー間に空白行が入るようになります。 上記の設定例の場合、ルート階層（1 階層目）のキー間に空白行が入ります。"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2023-04-19T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2023-04-19T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/d7p5jye/",
 title: "React 関連記事",
 date: "2023-04-13T00:00:00Z",
@@ -1552,18 +1576,6 @@ url: "/p/j52iy4k/",
 title: "React アプリの中で D3.js を使ってチャートを描画する",
 date: "2023-04-13T00:00:00Z",
 body: "React アプリの中で D3.js を使ってチャートを描画する 何をするか？ D3.js は、Web ブラウザ上で様々なデータをビジュアライズするためのデファクトスタンダードな描画ライブラリです。 ここでは、React (Next.js) アプリ内で、D3.js を使って簡単なチャートを描画してみます。 ☝️ ほかの描画ライブラリ JavaScript による描画ライブラリには、他にも Chart.js や Mermaid.js などいろいろなものがあります。 Chart.js を使うと、は折れ線グラフや散布図などを簡単に描画することができます。 Mermaid.js を使うと、独自フォーマットのテキストをもとにフローチャートなどを描画することができます。 これらの描画ライブラリは、D3.js と比べて簡単に使うことができますが、描画可能な図の種類は限られています。 一方、D3.js は高度なカスタマイズや自由度の高いデータの可視化が可能ですが、初学者にとってはやや学習コストが高くなっています。 D3.js のインストール NPM あるいは Yarn で、プロジェクトに D3.js の依存を追加します。 TypeScript を使用している場合は、D3.js 本体 (d3) に加え、型情報 (@types/d3) もインストールします。 D3.js のインストール（NPM の場合） $ npm install d3 $ npm install --save-dev @types/d3 D3.js のインストール（Yarn の場合） $ yarn add d3 $ yarn add --dev @types/d3 React コンポーネント内で D3.js を使う React アプリは作成済みであるとし、D3.js を使って描画を行うコンポーネントを新しく作成します。 次の HelloChart コンポーネントは、D3.js を使って簡単な棒グラフを描画します。 内部的に svg 要素を保持しており、その中に複数の rect を配置することで棒グラフを構築しています。 useRef フックで svg 要素の参照を取得し、D3.js の描画先として設定しています。 src/components/HelloChart.tsx import { FC, useEffect, useRef } from \u0026#39;react\u0026#39; import * as d3 from \u0026#39;d3\u0026#39; export const HelloChart: FC = () =\u0026gt; { const svg = useRef\u0026lt;SVGSVGElement\u0026gt;(null) useEffect(() =\u0026gt; { drawChart(svg) }, [svg]) return \u0026lt;svg ref={svg} width=\u0026#34;200\u0026#34; height=\u0026#34;100\u0026#34; /\u0026gt; } function drawChart(svgRef: React.RefObject\u0026lt;SVGSVGElement\u0026gt;) { const data = [10, 30, 60, 40, 90, 20, 50, 70, 10, 40] const svg = d3.select(svgRef.current) svg .style(\u0026#39;background\u0026#39;, \u0026#39;#ddd\u0026#39;) .selectAll(\u0026#39;rect\u0026#39;) .data(data) .join(\u0026#39;rect\u0026#39;) .attr(\u0026#39;x\u0026#39;, (_d, i) =\u0026gt; i * 20) .attr(\u0026#39;y\u0026#39;, (d) =\u0026gt; 100 - d) .attr(\u0026#39;width\u0026#39;, 18) .attr(\u0026#39;height\u0026#39;, (d) =\u0026gt; d) .attr(\u0026#39;fill\u0026#39;, \u0026#39;steelblue\u0026#39;) } あとは、何らかのページでこの HelloChart コンポーネントを呼び出すだけです。 src/pages/index.tsx import { HelloChart } from \u0026#39;@/components/HelloChart\u0026#39; export default function Home() { return ( \u0026lt;\u0026gt; \u0026lt;h1\u0026gt;Hello, D3.js!\u0026lt;/h1\u0026gt; \u0026lt;HelloChart /\u0026gt; \u0026lt;/\u0026gt; ) } 次のように svg 要素が表示されれば成功です。 図: D3.js による棒グラフの描画 ٩(๑❛ᴗ❛๑)۶ わーぃ"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2023-04-13T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2023-04-13T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/saku4ck/",
@@ -2470,12 +2482,6 @@ url: "/p/ajj5753/",
 title: "遊び",
 date: "2021-11-22T00:00:00Z",
 body: "遊び"
-},
-{
-url: "/p/inh3k2j/",
-title: "Visual Studio Code のメモ",
-date: "2021-11-13T00:00:00Z",
-body: "Visual Studio Code のメモ"
 },
 {
 url: "/p/4oybku6/",
