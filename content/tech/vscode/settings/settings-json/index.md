@@ -1,6 +1,6 @@
 ---
 title: "VS Code の設定ファイルの場所 (settings.json)"
-url: "/p/tfq2cnw"
+url: "p/tfq2cnw/"
 date: "2021-07-11"
 lastmod: "2022-01-10"
 tags: ["VS Code"]
