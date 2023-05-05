@@ -1542,6 +1542,30 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/c9sar9p/",
+title: "Cloudflare 関連メモ",
+date: "2023-05-04T00:00:00Z",
+body: "Cloudflare 関連メモ"
+},
+{
+url: "/p/p6o6m3i/",
+title: "rclone コマンドで Cloudflare R2 とファイルを同期する",
+date: "2023-05-04T00:00:00Z",
+body: "rclone コマンドで Cloudflare R2 とファイルを同期する rclone とは？ rclone は、Cloudflare R2 や AWS S3、Azure Blob Storage などのクラウドストレージにファイルを同期アップロードするためのコマンドラインツールです。 似たようなコマンドラインツールとしては rsync がありますが、rsync が SSH での通信をベースとしているのに対し、rclone は様々なクラウドサービスへの接続をターゲットにしています。 ここでは、同期先のストレージサービスとして Cloudflare R2 を使うことを想定し、ローカル PC 上のファイル（ディレクトリ）を同期してみます。 ☝️ R2 vs S3 R2 は AWS S3 や Azure Blob Storage と比べて、エグレス料金が無料（下り転送が無料）という太っ腹な料金体系になっており、今後の展開が楽しみなサービスです。 ちなみに、R2 という名前は、S3 より前という意味が込められているとのこと。 rclone のインストール rclone コマンドは Golang で実装されているため、単一の実行バイナリとして提供されています。 下記のページから各 OS 用の実行ファイルをダウンロードして、パスの通ったディレクトリに置くだけでインストールは完了です。 Rclone downloads macOS や Windows であれば、パッケージマネージャでインストールするのが簡単です。 macOS の Homebrew でインストール $ brew install rclone Windows の Chocolatey でインストール $ choco search rclone $ choco install rclone Windows の Scoop でインストール $ scoop install rclone 次のように rclone コマンドを実行できるようになれば OK です。 $ rclone version rclone v1.62.2 ... Cloudflare R2 用の API トークンの作成 R2 アクセス用のエンドポイント URL を確認する rclone による同期先として、Cloudflare R2 を使用する場合、設定ファイルでエンドポイント URL の指定が必要になります。 エンドポイント URL は、R2 のアカウント ID を組み合わせたものになるので、次のようにアカウント ID を確認します。 Cloudflare ダッシュボード を開きます（Cloudflare のアカウントがなければ作成してください）。 サイドバーから R2 を選択し、Account ID （32 文字の文字列）を確認する。 エンドポイント URL は、このアカウント ID を組み合わせた次のような URL です。 R2 エンドポイント URL https://\u0026lt;R2_ACCOUNT_ID\u0026gt;.r2.cloudflarestorage.com ☝️ このアカウント ID は何？ R2 バケットのエンドポイント URL の先頭の 32 文字は、Cloudflare アカウントごとに割り当てられた R2 用のアカウント ID です。 若干混乱しますが、AWS のアカウント ID と互換性のある形式になっているようです。 Cloudflare のサービスの中で、AWS と互換性があるのはあくまで R2 サービスだけなので、このアカウント ID は、R2 サービスのページを開いたときだけ表示されます。 R2 用の API トークンを発行する R2 バケットを rclone コマンドで操作するには、AWS 互換の API トークン（Access Key ID と Secret Access Key）を使用します。 下記のように辿ると、R2 用の API トークンを発行できます。 Cloudflare ダッシュボード を開きます サイドバーから R2 を選択し、Manage R2 API Tokens をクリックします。 Create API token ボタンを押して、新規トークンの設定画面を開きます。 R2 バケットへの書き込みを許可するため、Permissions で Edit を選択してトークンを発行します。 Edit: Allow edit access of all objects and List, Write, and Delete operations of all buckets 次のような感じの API トークンが発行されれば成功です。 Access Key ID: 04db978c136...省略...ae05e2ec7e Secret Access Key: fef28946ebfa44e34b2e...省略...ffd9f76069eed6a039b rclone でファイル同期 接続先を登録する rclone の接続先の情報は、下記のような設定ファイル (rclone.conf) に記述しておく必要があります。 ここでは、r2 という名前の接続先を登録しています。 rclone コマンドでは、R2 は S3 互換サービスの一種という扱いなので、type には s3 を指定することに注意してください。 ~/.config/rclone/rclone.conf [r2] type = s3 provider = Cloudflare access_key_id = 04db978c136...省略...ae05e2ec7e secret_access_key = fef28946ebfa44e34b2e...省略...ffd9f76069eed6a039b endpoint = https://abcde12345abcde12345abcde12.r2.cloudflarestorage.com acl = private rclone config コマンドを使って、質問形式で設定ファイルを作成・修正することもできます。 ディレクトリの内容を同期してみる あとは、rclone sync コマンドなどを使って、ローカルとリモートのファイルを同期させることができます。 次の例では、ローカルの dir ディレクトリ内のすべてのファイルを R2 側の my-bucket バケットに同期させています（バケットがない場合は自動的に生成されます）。 sync という名前のサブコマンドですが、ディレクトリの内容が変化するのは、転送先のバケットのみです。 R2 バケットに dir ディレクトリ内のファイルをアップロード $ rclone sync ./dir r2:my-bucket # R2 側には dir ディレクトリを作成しない $ rclone sync ./dir r2:my-bucket/dir # R2 側にも dir ディレクトリを作成する 逆に、リモートのファイルをダウンロードしたいときは、引数の順番を入れ替えます。 R2 バケットの内容を local_dir に取得 $ rclone sync r2:my-bucket ./local_dir （おまけ）その他の rclone コマンド 同期の内容を詳しく表示する (r2 sync -v) % rclone sync -v ./dir r2:my-bucket 2023/05/05 22:25:09 INFO : old/a.txt: Deleted 2023/05/05 22:25:09 INFO : old/b.txt: Deleted 2023/05/05 22:25:09 INFO : There was nothing to transfer 2023/05/05 22:25:09 INFO : Transferred: 0 B / 0 B, -, 0 B/s, ETA - Checks: 5 / 5, 100% Deleted: 2 (files), 0 (dirs) Elapsed time: 0.7s バケットとファイルの一覧を表示する (r2 ls) $ rclone ls r2: 2323 my-bucket/a.txt 200 my-bucket/b.txt 1309 my-bucket/c.txt 763183 my-bucket2/test/nanachi.gif 登録されているリモートの一覧を表示する (rs listremote) $ rclone listremotes r2: その他のコマンドは rclone help で確認できます。"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2023-05-04T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2023-05-04T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/inh3k2j/",
 title: "Visual Studio Code のメモ",
 date: "2023-04-19T00:00:00Z",
@@ -1558,18 +1582,6 @@ url: "/p/2apzood/",
 title: "VS Code で YAML ファイルをソートする（YAML Sort 拡張）",
 date: "2023-04-19T00:00:00Z",
 body: "VS Code で YAML ファイルをソートする（YAML Sort 拡張） YAML Sort の概要 VS Code に YAML Sort 拡張 をインストールすると、YAML ファイルの内容をキー名でソートすることができます。 主にソート用に使うものですが、YAML フォーマッターとしても利用できます。 次のような簡単なカスタマイズを行うこともできます。 指定したキーを優先的に上から並べる 1 階層目の各キーの間に空白行を入れる リスト要素をソートする YAML Sort の使い方 YAML Sort のページで Install ボタンを押すだけで、VS Code への拡張のインストールは完了です。 ここでは、次のような YAML ファイルをソートしてみます。 sample.yml（ソート前） root2: ccc: 300 aaa: 100 bbb: 200 root1: fruits: - grape - apple - banana animals: [\u0026#39;wolf\u0026#39;, \u0026#39;fox\u0026#39;, \u0026#39;dolphin\u0026#39;, \u0026#39;eagle\u0026#39;] VS Code で YAML ファイルを開いた状態で、コマンドパレットを開いて (Ctrl/Cmd + Shift + P)、YAML Sort: Sort YAML を選択すると、YAML ファイルの内容がソートされます。 sample.yml（ソート後） --- root1: animals: [\u0026#39;wolf\u0026#39;, \u0026#39;fox\u0026#39;, \u0026#39;dolphin\u0026#39;, \u0026#39;eagle\u0026#39;] fruits: - grape - apple - banana root2: aaa: 100 bbb: 200 ccc: 300 先頭行に自動でセパレーター (---) が挿入され、すべてのキーがアルファベット順にソートされていることが分かります。 キー間の空白行はすべて削除されています。 一方で、リスト要素は自動ではソートされないようです（順番が意味を持つことがあるので当然ですが）。 YAML Sort のカスタマイズ ソート方法は VS Code の設定ファイルでカスタマイズできるのですが、プロジェクトごと（あるいは YAML ファイルごと）に、ソート方法のルールは変わってくるはずなので、ワークスペース設定ファイル (\u0026lt;Project\u0026gt;/.vscode/settings.json) で設定するのがよいでしょう（参考: VS Code の設定ファイルの場所）。 ワークスペース設定ファイルは次のように開くことができます。 Ctrl/Cmd + Shift + P でコマンドパレットを開く Preferences: Open Workspace Settings (JSON) を選択 設定可能な項目は 公式サイト を参照してください。 以下、いくつか設定例を示しておきます。 優先的に並べるキーを指定する (customSortKeywords_1) \u0026lt;Project\u0026gt;/.vscode/settings.json { \u0026#34;vscode-yaml-sort.customSortKeywords_1\u0026#34;: [\u0026#34;id\u0026#34;, \u0026#34;name\u0026#34;] } \u0026quot;vscode-yaml-sort.customSortKeywords_1\u0026quot; というプロパティで、1 階層目のキーのソート順序を定義することができます。 残念ながら、2 階層目移行のキーは指定できないようです。 この設定を使ってソートするには、コマンドパレットから YAML Sort: Sort YAML を選択する代わりに、YAML Sort: Custom sort 1 を選択します。 プロパティ名の末尾の数字を 2、3 と変えることで、複数のカスタムソート設定を定義しておくことができます。 キー間に空行を入れる (emptyLinesUntilLevel) \u0026lt;Project\u0026gt;/.vscode/settings.json { \u0026#34;vscode-yaml-sort.emptyLinesUntilLevel\u0026#34;: 1 } \u0026quot;vscode-yaml-sort.emptyLinesUntilLevel\u0026quot; プロパティに 1 以上の数値を設定しておくと、その階層まで、各キー間に空白行が入るようになります。 上記の設定例の場合、ルート階層（1 階層目）のキー間に空白行が入ります。"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2023-04-19T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2023-04-19T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/d7p5jye/",
@@ -1732,12 +1744,6 @@ url: "/p/napwb4e/",
 title: ".proto の文法: サービス型 (service)",
 date: "2022-12-13T00:00:00Z",
 body: ".proto の文法: サービス型 (service) Protoco Buffers の サービス型 は、クライアントとサーバー間の通信方法 (RPC メソッド群) を定義するための型で、.proto ファイルの中で service キーワードを使って定義します。 次の例では、Echo メソッドを持つ EchoService サービス型を定義しています。 // Echo メソッドを持つ EchoService の定義 service EchoService { rpc Echo (EchoRequest) returns (EchoResponse); } // Echo に送るリクエストメッセージの定義 message EchoRequest { string message = 1; optional string payload = 2; } // Echo が返すレスポンスメッセージの定義 message EchoResponse { string message = 1; } 引数と戻り値の方には、上記のように単一のメッセージ型を指定します。 スカラー型を指定することはできないので、単一の値を渡したいときも、独自のメッセージ型を用意する必要があります。 慣例として、引数の型には Request、戻り値の型には Response というサフィックスを付けます。 引数や戻り値が存在しない場合は、Google が用意している google.protobuf.Empty 型を使用することができます。 import \u0026#34;google/protobuf/empty.proto\u0026#34;; service HelloService { rpc Hello(google.protobuf.Empty) returns (google.protobuf.Empty); } ただ、将来的に何らかの値を渡す可能性がある場合は、独自の空っぽのメッセージ型を定義しておくのがよいでしょう。 service HelloService { rpc Hello(HelloRequest) returns (HelloResponse); } message HelloRequest {} message HelloResponse {} RPC の通信プロトコルは、独自で実装してしまうことも可能ですが、多くの場合は Google が作った gRPC というプロトコルを使います。 というより、gRPC による通信を実現するために、Protocol Buffers (protobuf) によるシリアライズを使用することになるというケースが多いと思います。 protoc コマンド本体には、gRPC 用のスタブコードを生成する機能は入っていないので、protoc のプラグイン（protoc-gen-go-grpc など）を入れてコード生成することになります。 参考: Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）"
-},
-{
-url: "/p/c9sar9p/",
-title: "Cloudflare 関連メモ",
-date: "2022-12-11T00:00:00Z",
-body: "Cloudflare 関連メモ"
 },
 {
 url: "/p/rn7p7n5/",
