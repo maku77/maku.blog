@@ -57,22 +57,16 @@ Cloudflare R2 用の API トークンの作成
 ### R2 アクセス用のエンドポイント URL を確認する
 
 `rclone` による同期先として、Cloudflare R2 を使用する場合、設定ファイルでエンドポイント URL の指定が必要になります。
-エンドポイント URL は、R2 のアカウント ID を組み合わせたものになるので、次のようにアカウント ID を確認します。
+エンドポイント URL は、Cloudflare のアカウント ID を組み合わせたものになるので、次のようにアカウント ID を確認しておきます。
 
 1. [Cloudflare ダッシュボード](https://dash.cloudflare.com/) を開きます（Cloudflare のアカウントがなければ作成してください）。
-2. サイドバーから __R2__ を選択し、__Account ID__ （32 文字の文字列）を確認する。
+2. サイドバーから __R2__ を選択し、__Account ID__ （32 文字の文字列）を確認します（R2 ではなく Workers のページなどでも確認できます）。
 
-エンドポイント URL は、このアカウント ID を組み合わせた次のような URL です。
+R2 のエンドポイント URL は、このアカウント ID を組み合わせた次のような URL です。
 
 {{< code title="R2 エンドポイント URL" >}}
-https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com
+https://<アカウントID>.r2.cloudflarestorage.com
 {{< /code >}}
-
-{{% note title="このアカウント ID は何？" %}}
-R2 バケットのエンドポイント URL の先頭の 32 文字は、Cloudflare アカウントごとに割り当てられた __R2 用のアカウント ID__ です。
-若干混乱しますが、AWS のアカウント ID と互換性のある形式になっているようです。
-Cloudflare のサービスの中で、AWS と互換性があるのはあくまで R2 サービスだけなので、このアカウント ID は、R2 サービスのページを開いたときだけ表示されます。
-{{% /note %}}
 
 ### R2 用の API トークンを発行する
 
