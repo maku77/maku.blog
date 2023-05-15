@@ -8,10 +8,15 @@ tags: ["nginx"]
 nginx サーバーが読み込む設定情報を確認するには、__`nginx -T`__ コマンドを使用します。
 正確には、このコマンドは設定ファイルの検証 (`nginx -t`) と、内容の出力を同時に行うコマンドです。
 
+{{< code lang="console" title="nginx が実際に読み込む設定を確認" >}}
+$ nginx -T
+{{< /code >}}
+
 下記は、`nginx -T` コマンドを実行したときの出力例です。
 最初の 2 行が設定ファイルの検証結果で、3 行目以降が具体的な設定内容です。
 
-{{< code lang="shell" title="nginx -T コマンドの出力例" >}}
+{{% accordion title="出力例" %}}
+```shell
 nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
 nginx: configuration file /etc/nginx/nginx.conf test is successful
 # configuration file /etc/nginx/nginx.conf:
@@ -193,7 +198,8 @@ server {
     #    deny  all;
     #}
 }
-{{< /code >}}
+```
+{{% /accordion %}}
 
 Docker がインストールされている環境では、上記の出力は次のような感じで確認できます。
 

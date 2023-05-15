@@ -17,7 +17,7 @@ nginx: configuration file /etc/nginx/nginx.conf test is successful
 `nginx` コマンド (`/usr/sbin/nginx`) を認識している環境であれば、このコマンドの __`-t`__ オプションで確認することもできます。
 
 ```console
-$ nginx -t
+$ sudo nginx -t
 nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
 nginx: configuration file /etc/nginx/nginx.conf test is successful
 ```

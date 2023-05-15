@@ -7,14 +7,14 @@ tags: ["nginx"]
 
 nginx の設定ファイル (`/etc/nginx/nginx.conf` や `/etc/nginx/conf.d/*.conf`) の内容を変更した場合は、下記のようにして反映することができます。
 
-```
+```console
 $ sudo service nginx reload
 $ sudo /etc/init.d/nginx reload
 ```
 
 nginx の起動はとても速いので、単純な Web コンテンツだけを提供しているの Web サーバであれば、nginx サービス自体を再起動してしまってもよいでしょう。
 
-```
+```console
 $ sudo service nginx restart
 $ sudo /etc/init.d/nginx restart
 ```
