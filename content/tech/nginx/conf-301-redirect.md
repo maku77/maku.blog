@@ -132,3 +132,31 @@ server {
 `div` 要素の初期スタイルは `display: none` となっており、お知らせメッセージは非表示になっていますが、URL のクエリ文字列に `redirected` が含まれている場合は、`display: block` に変更してメッセージを表示するようにしています。
 ついでに、`history.replaceState` を実行することにより、ブラウザ上の URL 表示から `redirected` というクエリ文字列を削除しています。
 
+
+（おまけ）リダイレクトの対象外にするパスを設定する
+----
+
+特定のパスで旧 URL にアクセスした場合のみ、301 リダイレクトを行わない（旧ドメインのリソースを参照する）ようにするには、次のように `location` ディレクティブで処理を振り分けます。
+
+{{< code lang="nginx" title="/etc/nginx/conf.d/old.example.com.conf" hl_lines="4 9-15" >}}
+server {
+    server_name old.example.com;
+    listen 443 ssl http2;
+    root /home/maku/old.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/old.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/old.example.com/privkey.pem;
+
+    location ^~ /.well-known {
+        allow all;
+    }
+
+    location / {
+        rewrite ^ https://new.example.com$uri?redirected permanent;
+    }
+}
+{{< /code >}}
+
+この例では、[certbot による Let's Encrypt の SSL 証明書の自動更新](/p/io4gs6h/) を行えるようにするため、`/.well-known` というパスでアクセスしてきた場合のみ、旧ドメインのリソース (`/home/maku/old.example.com`) を返すようにしています（`certbot` コマンドはドメイン確認のために `/.well-known` というパスを使用します）。
+`root` ディレクティブは、`location` ディレクティブ内にネストさせて記述することもできます。
+
