@@ -26,7 +26,7 @@ Elasticsearch などでは大袈裟すぎるというニーズにマッチする
 JSON 形式のドキュメントを REST API で登録してインデックスを作成するだけで、REST API による検索が可能になります。
 最終的にはフロントエンドから直接 REST API を呼び出すように UI を作り込んでいく必要がありますが、プレビュー用の Web サーバー（ダッシュボード UI）が内蔵されているので、コーディングなしでインクリメンタルサーチを試すことができます。
 
-{{< image border="true" src="https://docs.meilisearch.com/search_preview/no_documents.png" title="Meilisearch ダッシュボード" >}}
+{{< image border="true" src="img-003.png" title="Meilisearch ダッシュボード" >}}
 
 似たような検索エンジンとしては、Algolia という SaaS があります。
 Meilisearch は Algolia にインスパイアされて作られているので、アルゴリズム等は似ていますが、__オープンソース__ であるという大きな違いがあります（Algolia は個人で使うには高すぎるというのもあります...）。
