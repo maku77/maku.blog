@@ -2,6 +2,9 @@
 title: "HMAC-SHA256 コードを生成する"
 url: "/p/uqhbb5p"
 date: "2013-08-2"
+lastmod: "2023-06-09"
+changes:
+  - 2023-06-09: Python の hashlib の使い方ページへのリンクを追加
 tags: ["Python", "セキュリティ"]
 ---
 
@@ -17,7 +20,7 @@ import hmac
 
 def usage():
     print('python ' + sys.argv[0] + ' <key> <message>')
-    sys.exit(-1)
+    sys.exit(1)
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
@@ -68,4 +71,10 @@ print(password)
 $ python random-password.py
 GAFJ[XHrAClx_#ZPfE$O
 {{< /code >}}
+
+
+関連リンク
+----
+
+- [Python でハッシュ値 (MD5/SHA-1/SHA-256/SHA-512) を求める (`hashlib`) - まくまく Python ノート](https://maku77.github.io/p/gn4cn3s/)
 
