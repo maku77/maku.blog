@@ -2,7 +2,7 @@ var data = [
 {
 url: "/p/ujqinda/",
 title: "プログラミング",
-date: "2023-04-13T00:00:00Z",
+date: "2023-06-09T00:00:00Z",
 body: "プログラミング"
 },
 {
@@ -1542,6 +1542,30 @@ date: "2020-05-08T00:00:00Z",
 body: "TypeScriptのサンプルコード"
 },
 {
+url: "/p/uqhbb5p/",
+title: "HMAC-SHA256 コードを生成する",
+date: "2023-06-09T00:00:00Z",
+body: "HMAC-SHA256 コードを生成する Python で HMAC-SHA256 を生成する 下記の siggen.py スクリプトは、コマンドライン引数で渡された「秘密鍵テキスト」と「メッセージ」をもとに HMAC (Hash-based Message Authentication Code) 署名を生成します。 siggen.py import sys import hashlib import hmac def usage(): print(\u0026#39;python \u0026#39; + sys.argv[0] + \u0026#39; \u0026lt;key\u0026gt; \u0026lt;message\u0026gt;\u0026#39;) sys.exit(1) if __name__ == \u0026#39;__main__\u0026#39;: if len(sys.argv) \u0026lt; 3: usage() key = sys.argv[1] msg = sys.argv[2] sig = hmac.new(key.encode(\u0026#39;ascii\u0026#39;), msg.encode(\u0026#39;ascii\u0026#39;), hashlib.sha256) print(sig.hexdigest()) 使用例 $ python siggen.py \u0026#39;SecretKey\u0026#39; \u0026#39;YourMessage\u0026#39; 8aff2951003c218bd26ee43c99e30527a0c30e06042008a60935ef1ab28891ec ここでは、SHA256 ハッシュ関数を使用していますが (HMAC-SHA256)、hashlib.sha256 の部分を変更すれば、他のハッシュ関数を適用することができます。 openssl コマンドで HMAC-SHA256 を生成する Linux や macOS などの、openssl コマンドを使用できる環境では、下記のようにして簡単に HMAC-SHA256 を求めることができます。 $ echo -n \u0026#39;YourMessage\u0026#39; | openssl dgst -sha256 -hmac \u0026#39;SecretKey\u0026#39; 8aff2951003c218bd26ee43c99e30527a0c30e06042008a60935ef1ab28891ec おまけ（ランダムで秘密鍵テキストを生成するスクリプト） 下記の random-password.py スクリプトは、HMAC 計算に使用可能な 20 桁のランダムな文字列（秘密鍵）を生成します。 上記の siggen.py スクリプトに入力する秘密鍵として使用することができます。 ramdom-password.py from random import randint CHARS = \u0026#39;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ#$-=?@[]_\u0026#39; password = \u0026#39;\u0026#39; for i in range(20): password += CHARS[randint(0, len(CHARS)-1)] print(password) 使用例 $ python random-password.py GAFJ[XHrAClx_#ZPfE$O 関連リンク Python でハッシュ値 (MD5/SHA-1/SHA-256/SHA-512) を求める (hashlib) - まくまく Python ノート"
+},
+{
+url: "/p/sfs4fq2/",
+title: "プログラム雑多メモ",
+date: "2023-06-09T00:00:00Z",
+body: "プログラム雑多メモ"
+},
+{
+url: "/",
+title: "まくろぐ",
+date: "2023-06-09T00:00:00Z",
+body: "まくろぐ"
+},
+{
+url: "/p/3ftx6b2/",
+title: "技術系のメモ",
+date: "2023-06-09T00:00:00Z",
+body: "技術系のメモ"
+},
+{
 url: "/p/mjs29go/",
 title: "Nginx の設定: Web サイトのドメインを移転したときの 301 リダイレクト設定",
 date: "2023-05-15T00:00:00Z",
@@ -1552,18 +1576,6 @@ url: "/p/xdsom3a/",
 title: "Nginx（Web サーバー）のメモ",
 date: "2023-05-15T00:00:00Z",
 body: "Nginx（Web サーバー）のメモ"
-},
-{
-url: "/",
-title: "まくろぐ",
-date: "2023-05-15T00:00:00Z",
-body: "まくろぐ"
-},
-{
-url: "/p/3ftx6b2/",
-title: "技術系のメモ",
-date: "2023-05-15T00:00:00Z",
-body: "技術系のメモ"
 },
 {
 url: "/p/c9sar9p/",
@@ -3636,12 +3648,6 @@ date: "2019-12-09T00:00:00Z",
 body: "プログラムでレインボーカラー（虹色）のグラデーションを作成するには とあるコーディングにおいて、色を滑らかに変化させる必要があったのでメモメモ。 RGB ではなく HSV で考える 何らかのプログラミング言語から虹色のグラデーションを作る必要がある場合、RGB の色空間で色調整を行うのは大変ですが、HSV の色空間で考えると簡単に表現することができます。 図: HSV 色空間 参考: HSV 色空間 - Wikipedia HSV はそれぞれ下記のような情報を表しており、 色相 (Hue): 0～360 彩度 (Saturation・Chroma): 0～1 明度 (Value・Brightness): 0～1 このうち、色相 (Hue) の値を 0～360 の間で変化させてやることでレインボーカラーを表現することができます。 プログラムのサンプル 図: 虹色グラデーションの描画 例えば、Android では、android.graphics.Color.HSVToColor() という関数を使用すると、HSV 色空間における値を、描画に使用するカラーデータに変換することができます。 下記の ColorGenerator クラスの nextColor() メソッドを連続して呼び出すと、徐々に変わっていく色をひとつずつ取り出すことができます。 やっていることは、メソッドの呼び出しごとに、色相 (Hue) の値を少しずつ変化させているだけです。 色相 (Hue) が、何度の nextColor() 呼び出しで一周するかは、コンストラクタの steps パラメータで指定できるようにしています。 ColorGenerator.kt class ColorGenerator(val steps: Int, initialHue: Float = 0.0F) { private val hueStep: Float = 360F / steps private var currentHue = initialHue fun nextColor(): Int { val hsv = floatArrayOf(currentHue, 1.0F, 1.0F) val color: Int = Color.HSVToColor(255, hsv) currentHue = (currentHue + hueStep) % 360F return color } } 次のコードは、このクラスを使って、虹色のグラデーション（細い矩形の連続）を描画するコードの抜粋です。 ここでは、色を 30 段階に分けて描画しています。 虹色の矩形を描画する（抜粋） val colorGen = ColorGenerator(30) override fun onDraw(canvas: Canvas){ var left = 0F val paint = Paint() for (i in 0 until colorGen.steps) { paint.color = colorGen.nextColor() c.drawRect(left, 0F, left + 10, 100F, paint) left += 10 } }"
 },
 {
-url: "/p/sfs4fq2/",
-title: "プログラム雑多メモ",
-date: "2019-12-09T00:00:00Z",
-body: "プログラム雑多メモ"
-},
-{
 url: "/p/cr83qcw/",
 title: "読書メモ『起業家』藤田晋",
 date: "2019-11-15T00:00:00Z",
@@ -5350,12 +5356,6 @@ url: "/p/oi66eim/",
 title: "TV規格: DVBメモ",
 date: "0001-01-01T00:00:00Z",
 body: "TV規格: DVBメモ DVB について DVB (Digital Video Broadcasting) はヨーロッパのデジタル放送規格。標準化団体名でもある。DVB には以下のような種類がある。 DVB-T (Terrestrial) \u0026ndash; 地上デジタル放送の規格 DVB-S (Satellite) \u0026ndash; 衛星放送の規格 DVB-C (Cable) \u0026ndash; CATV の規格 ISDB (Integrated Services Digital Broadcasting) は日本、ブラジル向けのデジタル放送規格。ちなみに ARIB (Association of Radio Industries and Broadcast): 社団法人電波産業会というのは通信・放送分野の研究、標準化などを行う団体名であって規格の名前ではない。ISDB には以下のような種類がある。 ISDB-T (Terrestrial) \u0026ndash; 地上デジタル放送の規格 ISDB-S (Satellite) \u0026ndash; 衛星放送の規格 ISDB-TSB (Terrestrial for Sound Broadcasting) \u0026ndash; 地上デジタルラジオ放送の規格 DVB の資料 EPG に関することを知りたかったら、DVB SI 系の資料を読むと良い。まずは、DVB の Web サイトにある、DVB SI の 2 冊の Bluebook (PDF) から読み始めると楽（150ページくらい）。Bluebook はメアド登録しなくてもダウンロードできる。 DVB - Digital Video Broadcasting [Standards \u0026amp; Technology] → [Standards \u0026amp; BlueBooks] → DVB SI 日本、ブラジル向けのデジタル放送規格 ISDB も DVB をもとに考えられているので、DVB の資料を先に読んでおくと理解しやすい。 service, programme, event の違い service \u0026ndash; DVB で定義 event, programme \u0026ndash; MPEG2 で定義 broadcaster （放送局）が 1 つの TV チャンネルとして垂れ流している一連の放送を service という。つまり TV チャンネルと考えてよい。service は映像、音声、字幕などの Components (ES: Elementary Stream) をまとめたものとして構成されている。 programme は、MPEG-2 のストリームを分けるための概念で、TV のチャンネルの考え方に近い。ただし、MPEG-2 では TV に特化したものは定義していないので、DVB で TV のチャンネルに相当する service というものを定義している。service には TV のチャンネル名などが含まれる。 service 自体には時間の概念はなく、延々と続く映像や音声の ES を垂れ流しているだけ。ここに、時間の概念を入れて、1 つの番組として、開始時刻や長さを定義したものが event。複数の event を集めたものを service と考えるよりは、1 つの service を event という概念で区切ったものが番組であると考える方が正しい。 1 つの transponder（あるいは channel）で複数の service が multiplex （多重化）されて、同時に配信されている。※ここでいう channel は TV のチャンネルではなく、チャネル。ケーブル TV や地上波での 1 つの配信システムを表している。 Network ID について DVB Services - identifiers http://www.dvbservices.com/identifiers/network_id http://www.dvbservices.com/identifiers/original_network_id ここが分かりやすい http://www.interactivetvweb.org/tutorials/dtv_intro/dtv_intro 階層構造はこんなイメージ。 Network（Cable とか Satellite とかのシステムを表す。1つ以上の Transport stream を流せる） Transport stream (MPEG-2 のストリーム。複数の Service を含む） Service (TV channel) Event (TV show) Elementary stream TS パケット MPEG-2 の TS (Transport Stream) は、TS パケットという単位でいろんなデータが多重化されて配信されている（複数のチャンネルの映像や音声、字幕、番組情報、時刻データなど）。TS パケットは 188byte 固定長。 TS パケット (188byte) = TS ヘッダ (4byte) + ペイロード (184byte) TS パケットは、Audio/Video/Teletext などのデータを構成する PES (Packetized Elementary Stream) の一部であったり、SI (Service Information) や BML データを構成する section data の一部であったりする。 ある TS パケットが、これらのどのデータの一部であるかを判別するために、TS ヘッダの中に 13bit の PID (PacketID) が入っている。デコーダはこの PID を見て、TS ストリームを多重分離 (demultiplex) することができる。例えば、SI の PAT 情報を構成する TS パケットの場合、PID は 0x0000 が入っている。 SI (Service Information) tables DVB の SI (Service Information) は、ISO/IEC 13818-1 (MPEG-2) で定義されている PSI のテーブルに加え、service （チャンネル）情報や event （番組）情報を示す各種テーブルで構成されている。 PSI (Program Specific Information) のテーブル PSI は、受信機が多重化された multiplex データ（MPEG-2 TS ストリーム）を demultiplex するための情報で、MPEG-2 にて定義されている。 ※複数の service を 1 つの channel、transponder で多重送信することを multiplex という。 PSI には下記の 4 つのテーブルがある。 PAT: Program Association Table MPEG-2 の TS ストリームで伝送されるプログラムを管理する情報。各 service（チャンネル）における PMT の PID (PacketID) を示す（正確に言えば、PMT の一部のデータである TS パケットの PID）。 その TS で流している service の数だけ PID (PacketID) を含んでいる（つまり PMT もチャンネルの数だけある）。 デコーダは、この PAT の情報を起点として各 service（チャンネル）ごとの PMT パケットの PID を知るので、PAT の PID (PacketID) は 0x0000 になっている。 NIT: Network Information Table MPEG-2 の TS ストリームを配信するのに使用されている physical network の情報を示す。 MPEG-2 の PSI では NIT の構造は定義していないので、各放送方式などで独自に定義する必要がある。 PMT: Program Map Table 各 service を構成する ES: Elementary Stream（映像、音声ストリームなど）の位置を示す。チャンネルの数だけ PMT が存在する。 その service（チャンネル）が Video、Audio、Teletext の 3 つの ES で構成されているなら、PMT の中に PID (PacketID) が 3 つ含まれる。 PMT データ自体の TS パケットの PID は、PAT 内で指定されるので、PAT や CAT パケットの PID とは違って固定値ではない。 CAT: Conditional Access Table CA システムに関する情報。EMM stream (Entitlement Management Message) の位置を示す。EMM はそれぞれの CA システムに特化した情報であり、例えば日本のデジタル T V では、B-CAS カードの契約情報や暗号解除するための鍵情報などが含まれている。EMM は B-CAS カードごとに個別に送信され、情報はカード内に保存される。 PAT と同じく、TS パケットにおいて最初の段階で取得しないといけない情報なので、CAT には固定の PID (PacketID) 0x0001 が割り当てられている。 DVB 独自のテーブル DVB の SI データには、MPEG-2 で定義されている PSI の 4 つのテーブルの他に、以下の 9 種類のテーブルが含まれている。これらのテーブルは、チャンネル情報、番組情報、時刻情報などを示している。 BAT: Bouquet Association Table bouquet （ブーケ）情報を示す。bouquet を構成する service のリストなど。異なるネットワークで送信された service も 1 つの bouquet にまとめられ得る。 SDT: Service Description Table チャンネル情報（service 情報）。チャンネル名、放送局の識別子など。 EIT: Event Information Table 番組情報（event 情報）。番組名、番組の開始時刻、番組長など。SI のテーブルのうち、この EIT だけはスクランブルがかかることがある。 RST: Running Status Table 番組の現在の進行状況。 TDT: Time and Date Table 現在時刻の情報。 TOT: Time Offset Table ローカルタイム（現地時間）に関する情報。 ST: Stuffing Table 現在のセクションを無効にする。データ境界を合わせるために使用。 SIT: Selection Information Table DIT: Discontinuity Information Table SED と EED 参考資料（規格） https://www.dvb.org/standards DVB SI [DVB BlueBook A038] Specification for Service Information (SI) in DVB system https://www.dvb.org/resources/public/standards/a038_dvb-si_spec.pdf DVB SI [DVB BlueBook A005] Guidelines on implementation and usage of Service Information (SI) https://www.dvb.org/resources/public/standards/a005_dvb-si_impl_guide.pdf SED と EED の定義 SED (Short Event Descript) と EED (Extended Event Descriptor) は、SI データの EIT-section で流される (EIT: Event Information Table) の一種です。 SED には「番組名とその短い説明」が入り、EED はそれを補足する形で、「出演者: ○○○」「あらすじ: ○○○」みたいな、いわゆる Key and Value のような形で詳細説明が入ってます。 以下、DVB BlueBook A005 より 4.2.4.10 Short event descriptor This descriptor is used to transmit the name and a short text description for an event. A language code is transmitted in order to indicate in which language the title and the text are written. Transmission of this descriptor is mandatory, unless there is a time_shifted_event_descriptor, in which case the descriptor is not allowed. This descriptor is allowed more than once in the EIT event loop for different languages. Thus it is not allowed to have more than one short_event_descriptor with the same language code. 4.2.4.5 Extended event descriptor This descriptor is used to transmit a bigger amount of textual information for an event than is possible with the short_event_descriptor. The information in extended event descriptors supplements that given in a short event descriptor. A language code is transmitted in order to indicate in which language the text is written. More than one extended_event_descriptor is allowed in the EIT event loop, for transmitting more data than one descriptor can contain (255 bytes excluding header), and for different languages. The last_descriptor field specifies the number of the last extended_event_descriptor for a specific language. If there is a time_shifted_event_descriptor, this descriptor is not allowed. Transmission of this descriptor is optional. SED と EED のテーブルのフォーマット 以下、DVB BlueBook A038 より。 6.2.37 Short event descriptor short_event_descriptor(){ descriptor_tag descriptor_length ISO_639_language_code event_name_length for (i=0;i\u0026lt;event_name_length;i++){ event_name_char } text_length for (i=0;i\u0026lt;text_length;i++){ text_char } } 6.2.15 Extended event descripto extended_event_descriptor(){ descriptor_tag descriptor_length descriptor_number last_descriptor_number ISO_639_language_code length_of_items for ( i=0;i\u0026lt;N;i++){ item_description_length for (j=0;j\u0026lt;N;j++){ item_description_char } item_length for (j=0;j\u0026lt;N;j++){ item_char } } text_length for (i=0;i\u0026lt;N;i++){ text_char } } MPEG-2 TS を多重分離する流れの概要 ES（映像、音声など）を多重分離する流れ PAT (PID=0x0000) の TS パケットを受信 （TS パケットを結合して PAT を復元） PAT の内容を見て、PMT の PID を取得（チャンネル数だけある） PMT の内容を見て、各 ES の PID を取得（ES の数だけある） ES の TS パケットを結合して再生 EIT（番組情報テーブル）を多重分離する流れ EIT (PID=0x0012) の TS パケットを受信。 （TS パケットを結合して EIT を復元） EIT の内容がそのチャンネルの番組情報。 他の SI のテーブル、例えば SDT (PID=0x0011)、RST (PID=0x0013)、TDT/TOT (PID=0x0014) なども同様に多重分離される。 DVB 標準一覧 図: 出典: 映像情報メディア学会誌 Vol.60, No. 5 (2006) ディジタル地上波マルチプレックスの例 図: 出典: 映像情報メディア学会誌 Vol.60, No. 5 (2006) 各サービスをどのような比率で送信するかは、欧州各国政府が決める。"
-},
-{
-url: "/p/uqhbb5p/",
-title: "HMAC-SHA256 コードを生成する",
-date: "0001-01-01T00:00:00Z",
-body: "HMAC-SHA256 コードを生成する Python で HMAC-SHA256 を生成する 下記の siggen.py スクリプトは、コマンドライン引数で渡された「秘密鍵テキスト」と「メッセージ」をもとに HMAC (Hash-based Message Authentication Code) 署名を生成します。 siggen.py import sys import hashlib import hmac def usage(): print(\u0026#39;python \u0026#39; + sys.argv[0] + \u0026#39; \u0026lt;key\u0026gt; \u0026lt;message\u0026gt;\u0026#39;) sys.exit(-1) if __name__ == \u0026#39;__main__\u0026#39;: if len(sys.argv) \u0026lt; 3: usage() key = sys.argv[1] msg = sys.argv[2] sig = hmac.new(key.encode(\u0026#39;ascii\u0026#39;), msg.encode(\u0026#39;ascii\u0026#39;), hashlib.sha256) print(sig.hexdigest()) 使用例 $ python siggen.py \u0026#39;SecretKey\u0026#39; \u0026#39;YourMessage\u0026#39; 8aff2951003c218bd26ee43c99e30527a0c30e06042008a60935ef1ab28891ec ここでは、SHA256 ハッシュ関数を使用していますが (HMAC-SHA256)、hashlib.sha256 の部分を変更すれば、他のハッシュ関数を適用することができます。 openssl コマンドで HMAC-SHA256 を生成する Linux や macOS などの、openssl コマンドを使用できる環境では、下記のようにして簡単に HMAC-SHA256 を求めることができます。 $ echo -n \u0026#39;YourMessage\u0026#39; | openssl dgst -sha256 -hmac \u0026#39;SecretKey\u0026#39; 8aff2951003c218bd26ee43c99e30527a0c30e06042008a60935ef1ab28891ec おまけ（ランダムで秘密鍵テキストを生成するスクリプト） 下記の random-password.py スクリプトは、HMAC 計算に使用可能な 20 桁のランダムな文字列（秘密鍵）を生成します。 上記の siggen.py スクリプトに入力する秘密鍵として使用することができます。 ramdom-password.py from random import randint CHARS = \u0026#39;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ#$-=?@[]_\u0026#39; password = \u0026#39;\u0026#39; for i in range(20): password += CHARS[randint(0, len(CHARS)-1)] print(password) 使用例 $ python random-password.py GAFJ[XHrAClx_#ZPfE$O"
 },
 {
 url: "/p/qm9cfjn/",
