@@ -1,5 +1,6 @@
 ---
 title: "サイト内全文検索"
-url: "/search"
+layout: maku-common/search
 _build: { list: false }
 ---
+
