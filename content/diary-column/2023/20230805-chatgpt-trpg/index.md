@@ -5,6 +5,8 @@ date: "2023-08-05"
 tags: ["ChatGPT"]
 ---
 
+{{< image w="900" src="img-001.png" >}}
+
 ChatGPT にゲームマスターになってもらう
 ----
 
