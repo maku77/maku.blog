@@ -18,7 +18,6 @@ Astro vs. Svelte
 感覚としては、__完全に静的な Web サイトを作るのであれば Astro がとてもシンプル__ でよさそうです。
 ただし、フォームなどの入力要素が必要な場合は、__データバインドを独自構文でサポートしている Svelte__ の方が便利かもしれません。
 Svelte は簡単に使えるというけれど、独自のテンプレート構文などは若干 Vue.js の匂いがするので、そこを嫌う人は多そうです。
-Vue.js の人が作ってるから仕方がないです。
 一方、Astro であれば、ほとんどドキュメントすら読まなくても理解できるくらい簡単です（React.js 触ったことがあれば即理解できるはず）。
 
 Astro も Svelte も `npm` でビルドツールをインストールしますが、Astro であれば `package.json` の `dependencies` セクションが `astro` モジュールだけになるくらいシンプルです。
@@ -119,8 +118,9 @@ Web サイトを作るためのフレームワークはいっぱいあります�
 | 作りたいもの | フレームワーク | デプロイ先 |
 | ---- | ---- | ---- |
 | Markdown ベースのブログ | __Hugo__ | GitHub Pages |
-| 動的にガリガリ動く Web アプリ | __Next.js__ | Vercel / Cloudflare |
-| 静的な Web サイト | __Astro__ | Vercel / Cloudflare / GitHub Pages |
+| 重量級の Web アプリ | __Next.js__ | Vercel / Cloudflare |
+| 静的な Web サイト | __Astro__ | Vercel / Cloudflare |
+| ちょっとインタラクティブな Web サイト | __Svelte__ | Vercel / Cloudflare |
 
 月 10 万アクセス程度の Web サイトであれば、この構成で無料で運用できるし、デプロイ設定も一瞬で終わるのでお手軽です。
 また、ここで挙げたフレームワークはいずれもパフォーマンスに優れています。

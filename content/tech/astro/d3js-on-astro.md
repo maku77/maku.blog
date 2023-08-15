@@ -114,3 +114,53 @@ import Chart from "../components/Chart.astro";
 
 できたー ٩(๑❛ᴗ❛๑)۶ わーぃ
 
+
+（おまけ）外から JSON データを渡せるようにしてみる
+----
+
+次の `Chart.astro` コンポーネントは、props で外から JSON データを渡せるようにしてみたものです。
+これが意外とくせものでした。
+
+Astro の設計上、`script` タグの __`define:vars`__ 属性経由で JSON データを橋渡ししようとすると、その JavaScript コードはインライン展開扱い (`is:inline`) になってしまうので、`import * as d3 from "d3"` のように NPM モジュールを読み込むことができなくなってしまいます。
+しょうがないので、D3.js は別の `script` タグで読み込んでいます。
+むむぅ。
+
+{{< code lang="tsx" title="src/components/Chart.astro" >}}
+---
+interface Props {
+  x: number;
+  y: number;
+  data: any;
+}
+const { w, h, data } = Astro.props as Props;
+---
+
+<svg id="mysvg" width={w} height={h}></svg>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script define:vars={{ data }} type="module">
+  d3.select("#mysvg")
+    .style("background", "mistyrose")
+    .selectAll("circle")
+    .data(data.points)
+    .join("circle")
+    .attr("cx", (d) => d[0])
+    .attr("cy", (d) => d[1])
+    .attr("r", 10)
+    .attr("fill", "dodgerblue");
+</script>
+{{< /code >}}
+
+{{< code lang="tsx" title="src/pages/test.astro" >}}
+---
+import Chart from "../components/Chart.astro";
+import jsonData from "../data/sample.json";
+---
+
+<!DOCTYPE html>
+<meta charset="UTF-8" />
+<title>D3.js test</title>
+<Chart w="400" h="200" data={jsonData} />
+{{< /code >}}
+
+こーゆーことしたいときは、Svelte の方がやりやすいのかも。
+
