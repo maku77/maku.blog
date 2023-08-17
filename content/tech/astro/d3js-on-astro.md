@@ -162,5 +162,5 @@ import jsonData from "../data/sample.json";
 <Chart w="400" h="200" data={jsonData} />
 {{< /code >}}
 
-こーゆーことしたいときは、Svelte の方がやりやすいのかも。
+こーゆークライアントサイドで動く JavaScript がメインになるようなサイトであれば、[Svelte を使う](/p/td962u6/) 方がよいのかもしれません。
 

@@ -3,6 +3,7 @@ title: "Astro と Svelte を使ってみた所感（Web サイト作るときに
 url: "p/zays9nw/"
 date: "2023-08-15"
 tags: ["Astro", "Svelte"]
+weight: 1
 ---
 
 Next.js 以外の選択肢
@@ -10,6 +11,8 @@ Next.js 以外の選択肢
 
 2023 年現在、ある程度の規模の Web アプリを作れと言われたら、間違いなく Next.js (React.js) を使うのですが、小規模でほとんど静的な Web サイトを作れと言われたらちょっと迷ってしまうので、[Astro](https://astro.build/) と [Svelte](https://svelte.dev/) を少しだけ触ってみました。
 もちろん、HTML や CSS を生でガリガリ書いて Web サイトを作ることもできますが、これらのフレームワークを使うことで、コンポーネント単位で Web ページを組み上げていくことができるのでコードの見通しがよくなります。
+
+- 参考: [Svelte 関連記事](/p/td962u6/)
 
 
 Astro vs. Svelte
