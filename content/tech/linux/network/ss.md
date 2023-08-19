@@ -1,5 +1,5 @@
 ---
-title: "Linuxコマンド: ss コマンドの使い方"
+title: "Linuxコマンド: TCP/TDP ポートの通信状態を確認する (ss)"
 url: "p/sg2m6wm/"
 date: "2022-07-05"
 tags: ["Linux", "ネットワーク"]
