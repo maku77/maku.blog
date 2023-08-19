@@ -1,32 +1,32 @@
-$(function() {
-  $(window).on('resize', handleResize);
+document.addEventListener('DOMContentLoaded', () => {
+  window.addEventListener('resize', handleResize);
   handleResize();
 
   function handleResize() {
-    var $sidebarNotFixed = $('#sidebar_notFixed');
-    var $sidebarFixed = $('#sidebar_fixed');
-    var $elems = $('#sidebar').find('[data-sticky]');
-    var winHeight = $(window).height();
+    const sidebarNotFixed = document.getElementById('sidebar_notFixed');
+    const sidebarFixed = document.getElementById('sidebar_fixed');
+    const elems = document.querySelectorAll('#sidebar [data-sticky]');
+    const winHeight = window.innerHeight;
 
     // data-sticky 属性を持つ要素を後ろから見ていき、
-    // ウィンドウ内に収まる要素にフラグを立てる
-    //（data-sticky 属性の値を true にする）。
-    // $(...get().reverse()) は要素を逆順に処理するイディオム。
-    var sum = 0;
-    $($elems.get().reverse()).each(function() {
-      sum += $(this).outerHeight(true);
-      $(this).data('sticky', sum < winHeight);
+    // ウィンドウ内に収まる要素の data-sticky 属性の値を true にする。
+    // NodeList は配列ではないので、Array.from(elems) で配列に変換してから reverse() する。
+    let sum = 0;
+    Array.from(elems).reverse().forEach((elem) => {
+      const style = getComputedStyle(elem);
+      sum += elem.offsetHeight + parseInt(style.marginTop) + parseInt(style.marginBottom);
+      elem.setAttribute('data-sticky', sum < winHeight ? 'true' : 'false');
     });
 
-    // サイドバー内の要素を #sidebar_notFixed と、
-    // #sidebar-fixed の子要素として振り分ける。
+    // サイドバー内の要素を #sidebar_notFixed と #sidebar-fixed の子要素として振り分ける。
     // 順番がおかしくならないようにループを分ける。
-    $elems.each(function() {
-      if ($(this).data('sticky')) {
-        $sidebarFixed.append($(this));
+    elems.forEach((elem) => {
+      if (elem.getAttribute('data-sticky') === 'true') {
+        sidebarFixed.appendChild(elem);
       } else {
-        $sidebarNotFixed.append($(this));
+        sidebarNotFixed.appendChild(elem);
       }
     });
   }
 });
+
