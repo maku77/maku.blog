@@ -3,6 +3,7 @@ title: "Svelte を始める (SvelteKit で Hello World）"
 url: "p/qmy6cdh/"
 date: "2023-08-17"
 tags: ["Svelte"]
+weight: 1
 ---
 
 Svelte とは
