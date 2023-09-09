@@ -72,7 +72,7 @@ export default config;
 SSG によるビルドを行うためには、さらに各ページ (routes) でプリレンダリングを行う想定であることを宣言しておく必要があります。
 これは、__`prerender`__ という公開変数に `true` をセットするだけでよいのですが、次のような __`+layout.js`__ ファイルを作成して、全ページにまとめて適用してしまうのが簡単です。
 
-{{< code lang="js" title="src/routes/+layouts.js" hl_lines="2" >}}
+{{< code lang="js" title="src/routes/+layout.js" hl_lines="2" >}}
 // SSG (Static Site Generation) のためプリレンダリングを有効化
 export const prerender = true;
 
