@@ -2,8 +2,8 @@
 title: "D3.js による SVG 描画の基本"
 url: "p/v38nmhw/"
 date: "2023-08-08"
-tags: ["D3.js"]
-draft: true
+tags: ["D3.js", "SVG"]
+weight: 1
 ---
 
 [D3.js](https://d3js.org/) は、クライアントサイド JavaScript で SVG 描画を行うためのライブラリです。
@@ -57,32 +57,32 @@ d3.select("#mysvg")  // svg 要素を選択
 
 配列に格納された複数の値をまとめてプロットするには、D3 セレクションオブジェクトの __`data()`__ メソッドに配列データをセットします。
 
-{{< maku-common/d3 id="mysvg2" w="200" h="100" >}}
-const data = [30, 60, 90]
+{{< maku-common/d3 id="mysvg2" w="200" h="100" title="配列データをプロット" >}}
+const data = [25, 50, 75]
 
 d3.select("#mysvg2")
   .selectAll("rect")
   .data(data)
   .join("rect")
-  .attr("x", (_d, i) => i * 60 + 10)
+  .attr("x", (_d, i) => i * 60 + 20)
   .attr("y", (d) => 100 - d)
-  .attr("width", 55)
+  .attr("width", 40)
   .attr("height", (d) => d)
-  .attr("fill", "blue")
+  .attr("fill", "darkred")
 {{< /maku-common/d3 >}}
 
 ```html
 <div id="mysvg2" width="200" height="100" />
 <script>
-const arr = [30, 60, 90]
+const data = [25, 50, 75]
 
 d3.select("#mysvg2")
   .selectAll("rect")
   .data(arr)
   .join("rect")
-  .attr("x", (_d, i) => i * 60 + 10)
+  .attr("x", (_d, i) => i * 60 + 20)
   .attr("y", (d) => 100 - d)
-  .attr("width", 55)
+  .attr("width", 40)
   .attr("height", (d) => d)
   .attr("fill", "blue")
 </script>
