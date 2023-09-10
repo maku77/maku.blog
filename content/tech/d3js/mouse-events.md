@@ -1,5 +1,5 @@
 ---
-title: "D3.js でマウスイベントを扱う"
+title: "D3.js でマウスイベントを扱う (click, mousemove, mouseover, mouseout)"
 url: "p/ffz4v3w/"
 date: "2023-09-09"
 tags: ["D3.js"]
@@ -11,8 +11,8 @@ D3.js でマウスイベントを扱うコードのサンプルです。
 click イベント
 ----
 
-{{< maku-common/d3 id="mysvg" w="200" h="100" title="click イベントをハンドルする" >}}
-const svg = d3.select("#mysvg");  // D3 Selection オブジェクトを取得
+{{< maku-common/d3 id="svg-vwuifrt" w="200" h="100" title="click イベントをハンドルする" >}}
+const svg = d3.select("#svg-vwuifrt");  // D3 Selection オブジェクトを取得
 
 svg.on("click", (event) => {
   const [x, y] = d3.pointer(event)
@@ -29,9 +29,9 @@ D3.js でマウスのクリックイベントをハンドルするには、D3 Se
 上記の svg 要素内でクリックすると、その座標にピンク色の円が表示されます。
 
 ```html
-<svg id="mysvg" width="200" height="100" />
+<svg id="svg-vwuifrt" width="200" height="100" />
 <script>
-const svg = d3.select("#mysvg");  // D3 Selection オブジェクトを取得
+const svg = d3.select("#svg-vwuifrt");  // D3 Selection オブジェクトを取得
 
 svg.on("click", (event) => {
   const [x, y] = d3.pointer(event)
