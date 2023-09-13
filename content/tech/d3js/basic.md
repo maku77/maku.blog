@@ -58,11 +58,11 @@ d3.select("#mysvg")  // svg 要素を選択
 配列に格納された複数の値をまとめてプロットするには、D3 セレクションオブジェクトの __`data()`__ メソッドに配列データをセットします。
 
 {{< maku-common/d3 id="mysvg2" w="200" h="100" title="配列データをプロット" >}}
-const data = [25, 50, 75]
+const arr = [25, 50, 75]
 
 d3.select("#mysvg2")
   .selectAll("rect")
-  .data(data)
+  .data(arr)
   .join("rect")
   .attr("x", (_d, i) => i * 60 + 20)
   .attr("y", (d) => 100 - d)
@@ -74,7 +74,7 @@ d3.select("#mysvg2")
 ```html
 <div id="mysvg2" width="200" height="100" />
 <script>
-const data = [25, 50, 75]
+const arr = [25, 50, 75]
 
 d3.select("#mysvg2")
   .selectAll("rect")
