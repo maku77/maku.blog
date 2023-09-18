@@ -27,3 +27,33 @@ svg
 {{< /maku-common/d3 >}}
 
 
+ノードの設定
+----
+
+ノードにかかる力をシミュレートするには、__`d3.forceSimulation()`__ 関数でシミュレーションオブジェクトを生成します。
+この関数に、ノードの配列を渡すと、自動的に
+
+- `index` ... 0 始まりのインデックス
+- `x` ... X 座標
+- `y` ... Y 座標
+- `x` ... X 軸の移動速度
+- `y` ... Y 軸の移動速度
+
+{{% private %}}
+// 摩擦係数。大きくすると止まりやすくなる。デフォルトは 0.04?
+simulation.velocityDecay(0.01)
+
+// 全ノードが中心に集まるようにする
+simulation.force("center", d3.forceCenter(width / 2, height / 2))
+
+// 全ノードが指定した X 座標、Y 座標に集まるようにする
+simulation.force("x", d3.forceX(width / 2))
+simulation.force("y", d3.forceY(height / 2))
+{{% /private %}}
+
+
+- Simulation オブジェクトからノードオブジェクトを取り出す
+  ```js
+  const node = simulation.nodes()[0]
+  ```
+

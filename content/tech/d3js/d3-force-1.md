@@ -1,5 +1,5 @@
 ---
-title: "D3.js の d3-force でノードの引力・反発力・重力を考慮したレイアウトを行う (1) 基礎編"
+title: "D3.js による Force Simulation (1) d3-force の基本"
 url: "p/6kavdch/"
 date: "2023-09-13"
 tags: ["D3.js"]
@@ -28,7 +28,7 @@ const height = +svg.attr("height")
 const nodesData = [{}, {}, {}, {}, {}]
 
 // ノードを描画するための circle 要素を svg に追加しておく
-const nodes = svg.selectAll("circle")
+const circles = svg.selectAll("circle")
   .data(nodesData)
   .join("circle")
   .attr("r", 10)
@@ -43,7 +43,7 @@ const simulation = d3.forceSimulation()
 simulation.nodes(nodesData).on("tick", tickHandler)
 
 function tickHandler() {
-  nodes
+  circles
     .attr("cx", (d) => d.x)
     .attr("cy", (d) => d.y)
 }
@@ -60,7 +60,7 @@ const height = +svg.attr("height")
 const nodesData = [{}, {}, {}, {}, {}]
 
 // ノードを描画するための circle 要素を svg に追加しておく
-const nodes = svg.selectAll("circle")
+const circles = svg.selectAll("circle")
   .data(nodesData)
   .join("circle")
   .attr("r", 10)
@@ -75,7 +75,7 @@ const simulation = d3.forceSimulation()
 simulation.nodes(nodesData).on("tick", tickHandler)
 
 function tickHandler() {
-  nodes
+  circles
     .attr("cx", (d) => d.x)  // d3-force が求めた X 座標をそのまま採用
     .attr("cy", (d) => d.y)  // d3-force が求めた Y 座標をそのまま採用
 }
@@ -118,7 +118,7 @@ const nodesData = [{}, {}, {}, {}, {}]
 ### 描画用の circle 要素を作成
 
 ```js
-const nodes = svg.selectAll("circle")
+const circles = svg.selectAll("circle")
   .data(nodesData)
   .join("circle")
   .attr("r", 10)
@@ -164,7 +164,7 @@ const simulation = d3.forceSimulation()
 simulation.nodes(nodesData).on("tick", tickHandler)
 
 function tickHandler() {
-  nodes
+  circles
     .attr("cx", (d) => d.x)
     .attr("cy", (d) => d.y)
 }
@@ -175,7 +175,7 @@ Simulation オブジェクトの __`nodes()`__ メソッドでノード配列を
 `tick` イベントハンドラーが呼び出されるとき、各ノードの最新の X、Y 座標は、__`.x`__ プロパティと __`.y`__ プロパティに設定されています（`nodesData` 配列内の各ノードオブジェクトの内容が勝手に更新されることに注意してください）。
 これらの座標値を参照して、`svg` の中の各描画要素を動かせば、ノードをアニメーションさせることができます。
 
-ちなみに、上記サンプルコードの `nodes` 変数は、複数の `circle` 要素の D3 セレクションオブジェクトです。
+ちなみに、上記サンプルコードの `circles` 変数は、複数の `circle` 要素の D3 セレクションオブジェクトです。
 この `cx` 属性や `cy` 属性を設定してやることで、各 `circle` 要素の位置を動かしています。
 
 
@@ -191,12 +191,15 @@ Force Simulation では、他にも次のようなフォースを設定するこ
 
 さらに、ノードオブジェクトの `fx` および `fy` プロパティに座標値を設定することにより、そのノードの座標計算を一時的に停止（つまり、位置を固定）することができるようになっています。
 これを利用すると、各ノードをドラッグして動かすことができるようになります。
-ただし、前述の通り `d3-force` はあくまで座標値の計算をするレイアウトモジュールであり、ドラッグ＆ドロップの機能は提供していません。
-ドラッグ＆ドロップのイベントは D3.js のコア機能でハンドルしつつ、`d3-force` の `fx`、`fy` プロパティの仕組みを利用する、という構成になります。
+ただし、前述の通り `d3-force` はあくまで座標値の計算をするレイアウトモジュールであり、ドラッグ操作に関する機能は提供していません。
+ドラッグ関連のイベントは別の D3.js 機能 (`d3-drag`) でハンドルしつつ、`d3-force` の `fx`、`fy` プロパティの仕組みを利用する、という構成になります。
 
 `d3-force` には多くの設定項目があって複雑な印象を受けるかもしれませんが、ここで学んだ基本原則を理解していれば、応用的なレイアウトも比較的容易に実現できるはずです。
 
 ٩(๑❛ᴗ❛๑)۶ わーぃ
 
-（応用編へ続く）
+下記の応用編へ続く。
+
+- [D3.js による Force Simulation (2) link force でノードを結合する](/p/9ujohp6/)
+- [D3.js による Force Simulation (3) 各ノードをドラッグして動かせるようにする](/p/8dmb73t/)
 
