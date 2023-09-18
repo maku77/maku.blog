@@ -22,8 +22,8 @@ link force の基本的な使い方
 
 次の例では、4 つのノードに環状に繋がるような link force を設定しています（ここではリンクの可視化はしていません）。
 
-{{< maku-common/d3 id="svg-gi3ajww" w="300" h="200" title="link force を設定したフォースシミュレーション" >}}
-const svg = d3.select("#svg-gi3ajww")
+{{< maku-common/d3 id="svg-a2f28wm" w="300" h="200" title="link force を設定したフォースシミュレーション" >}}
+const svg = d3.select("#svg-a2f28wm")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
 
@@ -64,9 +64,9 @@ function tickHandler() {
 {{< /maku-common/d3 >}}
 
 {{< code lang="html" title="ソースコード" >}}
-<svg id="svg-gi3ajww" width="300" height="200"></svg>
+<svg id="svg-a2f28wm" width="300" height="200"></svg>
 <script>
-const svg = d3.select("#svg-gi3ajww")
+const svg = d3.select("#svg-a2f28wm")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
 
