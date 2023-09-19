@@ -55,13 +55,13 @@ HTML 要素の class 属性の値を動的に変化させることで、スタ�
 ```
 
 ただし、これは Svelte では冗長な書き方です。
-上記のように、boolean 変数名と CSS のクラス名が同じ場合（ここでは `active`）、Svelte では次のような省略記述が可能です。
+上記のように、boolean 変数名と CSS のクラス名が同じ場合（ここでは `active`）、Svelte では __`class:クラス名`__ という省略記述が可能です。
 
 ```svelte
 <div class="lamp" class:active />
 ```
 
-変数名が異なる場合（例えば `active` ではなく `isActive` である場合）は、次のように指定することができます。
+変数名が異なる場合（例えば `active` ではなく `isActive` である場合）は、__`class:クラス名={変数名}`__ のように指定することができます。
 
 ```svelte
 <div class="lamp" class:active={isActive} />
