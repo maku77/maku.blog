@@ -104,7 +104,7 @@ SVG の __`g`__ 要素は、子要素をグループ化して操作を行うた�
 </center>
 
 ちなみに、このような `g` 要素を D3.js で生成する場合のコードは次のような感じになります。
-複数の `g` 要素を参照する D3 セレクションオブジェクトを変数化して使いまわすところがポイントです（下記の例では `nodes` 変数）。
+同じ `g` 要素に `circle` と `text` を追加するため、`g` 要素を参照する D3 セレクションオブジェクトを変数化して使いまわすところがポイントです（下記の例では `nodes` 変数）。
 
 {{< code lang="html" title="D3.js で g 要素の transform 処理" >}}
 <svg id="svg-hsae2we" w="200" height="80"></svg>
@@ -143,6 +143,67 @@ nodes.attr('transform', (d) => `translate(${d.x} ${d.y})`);
 </script>
 {{< /code >}}
 
+{{< maku-common/d3 id="svg-5a4n9yy" w="200" h="80" title="上記 D3.js コードの実行結果" >}}
+const nodesData = [
+  { label: 'AAA', x: 20, y: 20 },
+  { label: 'BBB', x: 40, y: 40 },
+  { label: 'CCC', x: 60, y: 60 }
+];
+
+d3.select('#svg-5a4n9yy')
+  .selectAll('g')
+  .data(nodesData)
+  .join('g')
+  .call((g) => g.append('circle')
+    .attr('cx', 0)
+    .attr('cy', 0)
+    .attr('r', 10)
+    .attr('fill', 'red')
+  )
+  .call((g) => g.append('text')
+    .attr('x', 15)
+    .attr('y', 2)
+    .attr('dominant-baseline', 'middle')
+    .attr('font-size', 20)
+    .attr('font-weight', '800')
+    .attr('fill', 'blue')
+    .text((d) => d.label)
+  )
+  .call((g) => g.attr('transform', (d) => `translate(${d.x} ${d.y})`))
+{{< /maku-common/d3 >}}
+
+あるいは、D3 セレクションオブジェクトの __`call`__ メソッドを使えば、次のようにメソッドチェーンですべて繋いで記述することも可能です。
+どちらかというと、こちらの方が D3.js っぽい書き方なのかもしれません。
+
+```js
+const nodesData = [
+  { label: 'AAA', x: 20, y: 20 },
+  { label: 'BBB', x: 40, y: 40 },
+  { label: 'CCC', x: 60, y: 60 }
+];
+
+d3.select('#svg-hsae2we')
+  .selectAll('g')
+  .data(nodesData)
+  .join('g')
+  .call((g) => g.append('circle')
+    .attr('cx', 0)
+    .attr('cy', 0)
+    .attr('r', 10)
+    .attr('fill', 'red')
+  )
+  .call((g) => g.append('text')
+    .attr('x', 15)
+    .attr('y', 2)
+    .attr('dominant-baseline', 'middle')
+    .attr('font-size', 20)
+    .attr('font-weight', '800')
+    .attr('fill', 'blue')
+    .text((d) => d.label)
+  )
+  .call((g) => g.attr('transform', (d) => `translate(${d.x} ${d.y})`))
+```
+
 
 レイヤー構造を作り表示順序を制御する
 ----
@@ -150,21 +211,21 @@ nodes.attr('transform', (d) => `translate(${d.x} ${d.y})`);
 D3.js を使った JavaScript コードなどで SVG を動的に構築する場合、各要素の表示順序（どちらが手前に表示されるか）が問題になったりします。
 このようなケースでは、`g` 要素で表示順序を制御するだけのレイヤー構造を作り、そこに子要素を追加していくというテクニックが使えます。
 
-次の例では、2 つの `g` 要素（`layer1` と `layer2`）を作成し、その子要素として `circle` や `rect` 要素を配置しています。
-`layer1`、`layer2` の順番で `g` 要素を追加しているので、`layer2` に配置した子要素（この場合は `circle`）の方が、手前に表示されることが保証されます。
+次の例では、2 つの `g` 要素（`backLayer` と `frontLayer`）を作成し、その子要素として `circle` や `rect` 要素を配置しています。
+`backLayer`、`frontLayer` の順番で `g` 要素を追加しているので、`frontLayer` に配置した子要素（この場合は `circle`）の方が、手前に表示されることが保証されます。
 
 {{< maku-common/d3 id="svg-rub6v9m" w="120" h="80" title="レイヤー構造による表示順序の制御" >}}
 const svg = d3.select("#svg-rub6v9m")
-const layer1 = svg.append("g");
-const layer2 = svg.append("g");
+const backLayer = svg.append("g");
+const frontLayer = svg.append("g");
 
-layer2.append("circle")
+frontLayer.append("circle")
   .attr("cx", 75)
   .attr("cy", 40)
   .attr("r", 20)
   .attr("fill", "red")
 
-layer1.append("rect")
+backLayer.append("rect")
   .attr("x", 25)
   .attr("y", 15)
   .attr("width", 50)
@@ -177,18 +238,18 @@ layer1.append("rect")
 
 <script>
 const svg = d3.select("#svg-rub6v9m")
-const layer1 = svg.append("g");
-const layer2 = svg.append("g");
+const backLayer = svg.append("g");
+const frontLayer = svg.append("g");
 
-// layer2 に追加したものは手前に表示される
-layer2.append("circle")
+// frontLayer に追加したものは手前に表示される
+frontLayer.append("circle")
   .attr("cx", 75)
   .attr("cy", 40)
   .attr("r", 20)
   .attr("fill", "red")
 
-// layer1 に追加したものは奥に表示される
-layer1.append("rect")
+// backLayer に追加したものは奥に表示される
+backLayer.append("rect")
   .attr("x", 25)
   .attr("y", 15)
   .attr("width", 50)
