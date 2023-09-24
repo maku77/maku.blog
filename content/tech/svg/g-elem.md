@@ -55,7 +55,8 @@ SVG の __`g`__ 要素は、子要素をグループ化して操作を行うた�
 <svg width="180" height="60" style="border: thin solid gray;">
   <g transform="translate(50 30)">
     <circle cx="0" cy="0" r="10" fill="red" />
-    <text x="15" y="2" dominant-baseline="middle" font-size="20" font-weight="800" fill="blue">
+    <text x="15" y="2" dominant-baseline="middle"
+        font-size="20" font-weight="800" fill="blue">
       Hello!
     </text>
   </g>
@@ -66,7 +67,8 @@ SVG の __`g`__ 要素は、子要素をグループ化して操作を行うた�
 <svg width="180" height="60" style="border: thin solid gray;">
   <g transform="translate(50 30)">
     <circle cx="0" cy="0" r="10" fill="red" />
-    <text x="15" y="2" dominant-baseline="middle" font-size="20" font-weight="800" fill="blue">
+    <text x="15" y="2" dominant-baseline="middle"
+        font-size="20" font-weight="800" fill="blue">
       Hello!
     </text>
   </g>
@@ -80,10 +82,11 @@ SVG の __`g`__ 要素は、子要素をグループ化して操作を行うた�
 `transform` の値には、次のような変換処理を指定することができます。
 複数の変換処理をスペース区切りで並べて指定できます。
 
-- 移動 ... __`translate(30 10)`__ で x 軸方向にへ 30、y 軸方向に 10 だけ平行移動する
-- 拡縮 ... __`scale(2 0.5)`__ で x 軸方向に 2 倍、y 軸方向に 0.5 倍にスケールする
-- 回転 ... __`rotate(30 10 10)`__ で (10, 10) の座標を中心に 30 度回転する
-- 歪み ... __`skewX(30)`__、__`skewY(30)`__ で x 軸あるいは y 軸方向に 30 度歪ませる
+- 移動 ... __`translate(30 10)`__ で x 軸方向にへ 30、y 軸方向に 10 だけ平行移動します
+- 拡縮 ... __`scale(2 0.5)`__ で x 軸方向に 2 倍、y 軸方向に 0.5 倍にスケールします
+- 回転 ... __`rotate(30 10 10)`__ で (10, 10) の座標を中心に 30 度回転します
+- 歪み ... __`skewX(30)`__、__`skewY(30)`__ で x 軸あるいは y 軸方向に 30 度歪ませます
+- 行列 ... __`matrix()`__ ... 変換行列を適用して変換します ([MDN](https://developer.mozilla.org/ja/docs/Web/SVG/Attribute/transform#matrix))
 
 例えば、次のように指定すると、平行移動、スキュー、スケールを順番に適用します。
 
@@ -175,7 +178,7 @@ d3.select('#svg-5a4n9yy')
 あるいは、D3 セレクションオブジェクトの __`call`__ メソッドを使えば、次のようにメソッドチェーンですべて繋いで記述することも可能です。
 どちらかというと、こちらの方が D3.js っぽい書き方なのかもしれません。
 
-```js
+{{< code lang="js" title="メソッドチェーンで g 要素以下に複数の要素を配置する方法" >}}
 const nodesData = [
   { label: 'AAA', x: 20, y: 20 },
   { label: 'BBB', x: 40, y: 40 },
@@ -202,7 +205,22 @@ d3.select('#svg-hsae2we')
     .text((d) => d.label)
   )
   .call((g) => g.attr('transform', (d) => `translate(${d.x} ${d.y})`))
+{{< /code >}}
+
+ちなみに、`transform` 属性は `g` 要素だけでなく、`rect` などの個々の描画要素にも設定できます。
+矩形を `skewX` で変形させて菱形を作ったり、一時的に位置を移動させる場合などに使用できます。
+
+```html
+<rect x="0" y="0" width="10" height="10"
+    transform="translate(30,40) rotate(45)" />
 ```
+
+<center>
+<svg width="180" height="60" style="border: thin solid gray;">
+  <rect x="0" y="0" width="30" height="10"
+      transform="translate(20,30) rotate(-30)" />
+</svg>
+</center>
 
 
 レイヤー構造を作り表示順序を制御する

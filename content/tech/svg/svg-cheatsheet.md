@@ -12,6 +12,7 @@ tags: ["cheatsheet", "SVG"]
 `svg` 要素内に配置できる描画要素のまとめです。
 座標値のデフォルトの単位はピクセル (`px`) ですが、`svg` 要素に [`viewBox`](/p/563uibg/) が設定されている場合は `viewBox` 内の座標系で座標値を指定します。
 
+
 text 要素（テキスト）
 ----
 
@@ -37,15 +38,19 @@ text 要素（テキスト）
 | [`dominant-baseline`](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline) | 垂直方向のベースライン | * `auto` ... 通常は下端<br/>* `middle` ... 中央<br/>* `hanging` ... 通常は上端 |
 | `font-size` | フォントサイズ | `30` |
 | `font-weight` | 文字の太さ | `600` |
-| `fill` | テキスト内部の色 | `red`, <code style="white-space:nowrap">rgb(39, 250, 102)</code>, `#ff0033` |
-| `fill-opacity` | テキスト内部の色の透明度 | `0`（完全透過）〜 `1.0`（非透過） |
+| `fill` | テキスト内部の色 | `red`, <code style="white-space:nowrap">rgb(255, 0, 0)</code>,<code style="white-space:nowrap">rgba(255, 0, 0, 0.7)</code> `#ff0033` |
+| `fill-opacity` | テキスト内部の色の透明度。`fill` 属性で `rgba` を使って透明度を指定することも可能。 | `0`（完全透過）〜 `1.0`（非透過） |
 | `stroke` | テキスト周囲の線の色 | `red` |
 | `stroke-width` | テキスト周囲の線の太さ | `2` |
-| `stroke-opacity` | テキスト周囲の線の透明度 | `0`（完全透過）〜 `1.0`（非透過） |
+| `stroke-opacity` | テキスト周囲の線の透明度。`stroke` 属性で `rgba` を使って透明度を指定することも可能。 | `0`（完全透過）〜 `1.0`（非透過） |
+| [`text-decoration`](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-decoration) | テキストの装飾 | * `none` ... デフォルト<br/>* `underline` ... 下線<br/>* `line-through` ... 取消線 |
+| `opacity` | 要素全体の透明度 | `0`（完全透過）〜 `1.0`（非透過） |
 
-- `text` 要素のテクニック
-  - viewBox 内で水平方向に中央寄せする ... `x="50%" text-anchor="middle"`
-  - viewBox 内で垂直方向に中央寄せする ... `y="50%" dominant-baseline="middle"`
+### text 要素のメモ
+
+- `viewBox` 内で水平方向に中央寄せする ... `x="50%" text-anchor="middle"`
+- `viewBox` 内で垂直方向に中央寄せする ... `y="50%" dominant-baseline="middle"`
+- 部分テキストの装飾 ... `text` 要素の子要素として [`tspan`](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/tspan) を配置すると、部分テキストごとにスタイルや位置を設定できます。
 
 {{% private %}}
 - [MDN - text element](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text)
@@ -57,12 +62,20 @@ line 要素（直線）
 ----
 
 {{< code lang="html" title="line 要素の例" >}}
-<line x1="30" y1="70" x2="170" y2="30" stroke="red" stroke-width="3" />
+<line x1="30" y1="20" x2="170" y2="20" stroke="red" stroke-width="10" />
+<line x1="30" y1="40" x2="170" y2="40" stroke="red" stroke-width="10" stroke-linecap="square" />
+<line x1="30" y1="60" x2="170" y2="60" stroke="red" stroke-width="10" stroke-linecap="round" />
+<line x1="30" y1="80" x2="170" y2="80" stroke="blue" stroke-width="3" stroke-dasharray="5,5" />
+<line x1="30" y1="100" x2="170" y2="100" stroke="blue" stroke-width="3" stroke-dasharray="5,10,5" />
 {{< /code >}}
 
 <center>
-  <svg width="200" height="100" style="border: 3px double gray">
-    <line x1="30" y1="70" x2="170" y2="30" stroke="red" stroke-width="3" />
+  <svg width="200" height="120" style="border: 3px double gray">
+    <line x1="30" y1="20" x2="170" y2="20" stroke="red" stroke-width="10" />
+    <line x1="30" y1="40" x2="170" y2="40" stroke="red" stroke-width="10" stroke-linecap="square" />
+    <line x1="30" y1="60" x2="170" y2="60" stroke="red" stroke-width="10" stroke-linecap="round" />
+    <line x1="30" y1="80" x2="170" y2="80" stroke="blue" stroke-width="3" stroke-dasharray="5,5" />
+    <line x1="30" y1="100" x2="170" y2="100" stroke="blue" stroke-width="3" stroke-dasharray="5,10,5" />
   </svg>
 </center>
 
@@ -72,8 +85,12 @@ line 要素（直線）
 | `y1` | 線の始点 Y 座標 | `70`, `20%` |
 | `x2` | 線の終点 X 座標 | `170`, `100%` |
 | `y2` | 線の終点 Y 座標 | `30`, `60%` |
-| `stroke` | 線の色 | `red` |
+| `stroke` | 線の色 | `red`, `rgba(255, 255, 0, 0.5)` |
 | `stroke-width` | 線の太さ | `3` |
+| `stroke-linecap` | 両端の形 | * `butt` ... デフォルト<br/>* `square` ... 四角（`stroke-width` の半分だけ長くなる）<br/>* `round` ... 丸 |
+| `stroke-dasharray` | 破線にする | * `5,5` ... 5 の線、5 の空白を繰り返す<br/>* `5,10,5` ... 5 の線、10 の空白、5 の線、5 の空白、10 の線、5 の空白を繰り返す |
+| `stroke-opacity` | 線の透明度（`line` 要素の場合 `opacity` と同じ？） | `0`（完全透過）〜 `1.0`（非透過） |
+| `opacity` | 要素全体の透明度 | `0`（完全透過）〜 `1.0`（非透過） |
 
 
 rect 要素（矩形）
@@ -99,10 +116,13 @@ rect 要素（矩形）
 | `width` | 矩形の幅 | `100` |
 | `height` | 矩形の高さ | `200` |
 | `fill` | 塗りつぶし色。塗りつぶしを行わない場合、`none` あるいは `transparent` を指定できます。`none` の場合は場合はそこに何も存在しないかのように扱われます。`mouseover` などのイベントをハンドルする場合は、`transparent` の方を指定する必要があります。 | `none`, `transparent`, `green`, <code style="white-space:nowrap">rgb(0, 255, 0)</code>, `#00ff00`, `#0f0` |
+| `fill-opacity` | 塗りつぶしの透明度。`fill` 属性で `rgba` を使って透過度を指定することも可能。 | `0`（完全透過）〜 `1.0`（非透過） |
 | `stroke` | 枠線の色 | |
 | `stroke-width` | 枠線の太さ。デフォルトは `1`。`0` が設定されると見えなくなります。 | `1`, `1.5`, `2` |
-| `rx` | 角を丸くするときの半径（水平方向）。省略した場合は `ry` と同じ値が使われます。通常は `rx` だけ指定すれば OK です。 | |
-| `ry` | 角を丸くするときの半径（垂直方向）。省略した場合は `rx` と同じ値が使われます。通常は `rx` だけ指定すれば OK です。 | |
+| `stroke-opacity` | 線の透明度。`stroke` 属性で `rgba` を使って透明度を指定することも可能。線の半分の領域は塗りつぶし色の上に重なることに注意。 | `0`（完全透過）〜 `1.0`（非透過） |
+| `rx` | 角を丸くするときの半径（水平方向）。省略した場合は `ry` と同じ値が使われます。通常は `rx` だけ指定すれば OK です。 | `5` |
+| `ry` | 角を丸くするときの半径（垂直方向）。省略した場合は `rx` と同じ値が使われます。通常は `rx` だけ指定すれば OK です。 | `5` |
+| `opacity` | 要素全体の透明度 | `0`（完全透過）〜 `1.0`（非透過） |
 
 
 circle 要素（円）
@@ -159,9 +179,9 @@ plyline 要素（連続線） {#polyline}
 <polyline points="20,10 40,60 60,40 80,90"
     fill="aqua" />
 <polyline points="90,10 110,60 130,40 150,90"
-    fill="none" stroke="blue" stroke-width="2" />
+    fill="none" stroke="blue" stroke-width="2" stroke-linecap="round" />
 <polyline points="160,10 180,60 200,40 220,90"
-    fill="aqua" stroke="blue" stroke-width="2" />
+    fill="aqua" stroke="blue" stroke-width="2" stroke-linecap="round" />
 {{< /code >}}
 
 <center>
@@ -169,9 +189,9 @@ plyline 要素（連続線） {#polyline}
     <polyline points="20,10 40,60 60,40 80,90"
         fill="aqua" />
     <polyline points="90,10 110,60 130,40 150,90"
-        fill="none" stroke="blue" stroke-width="2" />
+        fill="none" stroke="blue" stroke-width="2" stroke-linecap="round" />
     <polyline points="160,10 180,60 200,40 220,90"
-        fill="aqua" stroke="blue" stroke-width="2" />
+        fill="aqua" stroke="blue" stroke-width="2" stroke-linecap="round" />
   </svg>
 </center>
 
@@ -181,6 +201,8 @@ plyline 要素（連続線） {#polyline}
 | `fill` | 塗りつぶし色。始点と終点を結ぶラインと、他のラインで囲まれる領域が塗りつぶされます。線だけを引きたい場合は、明示的に `none` を指定する必要があります | `red`, `none` |
 | `stroke` | 線の色 | `black` |
 | `stroke-width` | 線の太さ | `4` |
+| `stroke-linecap` | 両端の形 | * `butt` ... デフォルト<br/>* `square` ... 四角<br/>* `round` ... 丸 |
+| `stroke-linejoin` | 線の接続部の形 | * `miter` ... デフォルト<br/>* `bevel` ... 斜めに削る<br/>* `round` ... 丸 |
 
 始点と終点を自動的に接続するには、`polyline` の代わりに [`polygon`](#polygon) 要素を使用します。
 
@@ -196,9 +218,9 @@ polygon 要素（多角形） {#polygon}
 <polygon points="20,10 40,60 60,40 80,90"
     fill="aqua" />
 <polygon points="90,10 110,60 130,40 150,90"
-    fill="none" stroke="blue" stroke-width="2" />
+    fill="none" stroke="blue" stroke-width="2" stroke-linejoin="round" />
 <polygon points="160,10 180,60 200,40 220,90"
-    fill="aqua" stroke="blue" stroke-width="2" />
+    fill="aqua" stroke="blue" stroke-width="2" stroke-linejoin="round" />
 {{< /code >}}
 
 <center>
@@ -206,9 +228,9 @@ polygon 要素（多角形） {#polygon}
     <polygon points="20,10 40,60 60,40 80,90"
         fill="aqua" />
     <polygon points="90,10 110,60 130,40 150,90"
-        fill="none" stroke="blue" stroke-width="2" />
+        fill="none" stroke="blue" stroke-width="2" stroke-linejoin="round" />
     <polygon points="160,10 180,60 200,40 220,90"
-        fill="aqua" stroke="blue" stroke-width="2" />
+        fill="aqua" stroke="blue" stroke-width="2" stroke-linejoin="round" />
   </svg>
 </center>
 
