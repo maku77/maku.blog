@@ -108,7 +108,7 @@ svg.on("mousemove", (event) => {
 mouseover / mouseout イベント
 ----
 
-{{< maku-common/d3 id="svg-mouseover" w="200" h="100" title="mousemove イベントをハンドルする" >}}
+{{< maku-common/d3 id="svg-mouseover" w="200" h="100" title="mouseover/mouseout イベントをハンドルする" >}}
 const svg = d3.select("#svg-mouseover");
 
 // 矩形を追加
