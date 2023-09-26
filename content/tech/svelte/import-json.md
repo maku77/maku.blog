@@ -2,7 +2,7 @@
 title: "Svelte 応用: JSON ファイルをインポートして使う"
 url: "p/pzrza7m/"
 date: "2023-09-19"
-tags: ["Svelte"]
+tags: ["JSON", "Svelte"]
 ---
 
 {{% private %}}
@@ -80,3 +80,7 @@ export const games = rawJson as Game[];
 ```
 
 この JSON インポート処理はビルド時に実行されるので、Svelte アプリを [SSG (Static Site Generation)](/p/4oudmxy/) ビルドするときにも使うことができます。
+JSON ファイルの代わりに YAML ファイルをインポートしたいときは次の記事を参考にしてください。
+
+- 参考: [Svelte 応用: YAML ファイルをインポートして使う](/p/umhwooq/)
+
