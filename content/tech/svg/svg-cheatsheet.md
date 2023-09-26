@@ -285,12 +285,3 @@ __`path`__ 要素を使うと、複数の直線や曲線を組み合わせた複
 - https://developer.mozilla.org/ja/docs/Web/SVG/Tutorial/Paths
 {{% /private %}}
 
-
-その他
-----
-
-- 透過度は CSS の `opacity` プロパティで指定することも可能。ただし、この場合は `fill-opacity`、`stroke-opacity` のように別々に透過度を指定することはできません。
-  - `style="opacity: 0.0;"` ... 完全に透過（見えない）
-  - `style="opacity: 0.5;"` ... 50% 透過
-  - `style="opacity: 1.0;"` ... 非透過 (default)
-
