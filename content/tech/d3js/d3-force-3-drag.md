@@ -206,6 +206,18 @@ function dragEnded(event, d) {
 }
 ```
 
+{{% note title="ドラッグ中の動きを穏やかにしたいとき" %}}
+ドラッグ中にノードが激しく動き回ってしまう場合は、`start` イベントハンドラで指定する `alphaTarget` の値を小さい値（0.05 ～ 0.1 くらい）に設定すると、動きが安定しやすくなります。
+
+{{< code lang="ts" hl_lines="2" >}}
+function dragStarted(event, d) {
+  if(!event.active) simulation.alphaTarget(0.05).restart();
+  d.fx = d.x;
+  d.fy = d.y;
+}
+{{< /code >}}
+{{% /note %}}
+
 
 ドラッグ挙動オブジェクトを生成する関数を定義する
 ----

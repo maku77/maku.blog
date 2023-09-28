@@ -333,8 +333,29 @@ const simulation = d3.forceSimulation()
   .force("link", d3.forceLink().id((d) => d.label))
 {{< /code >}}
 
+
+（応用）link force の設定 (distance, strength)
+----
+
+`d3.forceLink()` で作成した link force（フォースオブジェクト）は、デフォルト設定のままで使うこともできますが、次のような関数で、リンクの長さやその長さに向かう強さを設定できます。
+
+`force.distance(distance)`
+: リンクの長さを定数あるいはアクセサ関数で設定します。デフォルトは `30` です。
+
+`force.strength(strength)`
+: リンクの強度を `0` ～ `1.0` の範囲で指定します。
+デフォルトは `1.0` です。リンクの強度が強いほど、`linkDistance()` でセットしたリンク長に戻ろうとする動きが強くなります。
+
+{{< code lang="ts" title="link force のカスタマイズ例" >}}
+// link force オブジェクトの作成と設定
+const linkForce = d3.forceLink()
+  .distance(100) // リンクの長さ (default: 30)
+  .strength(0.8) // リンクの強さ (default: 1)
+  .id((d) => d.id);
+{{< /code >}}
+
+
 {{% reference %}}
 - [D3.js による Force Simulation (1) d3-force の基本](/p/6kavdch/)
 - [D3.js による Force Simulation (3) 各ノードをドラッグして動かせるようにする](/p/8dmb73t/)
 {{% /reference %}}
-
