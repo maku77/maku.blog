@@ -133,15 +133,15 @@ const circle = svg.append("circle")
   .on("mouseout", handleMouseOut)
 
 // 要素にカーソルが入ったとき
-function handleMouseOver() {
-  d3.select(this)
-    .attr("fill", "cyan")
+function handleMouseOver(event) {
+  d3.select(event.currentTarget).attr("fill", "cyan")
+  // d3.select(this).attr("fill", "cyan")
 }
 
 // 要素からカーソルが出たとき
 function handleMouseOut(event) {
-  d3.select(this)
-    .attr("fill", "transparent")
+  d3.select(event.currentTarget).attr("fill", "transparent")
+  // d3.select(this).attr("fill", "transparent")
 }
 {{< /maku-common/d3 >}}
 
@@ -175,15 +175,15 @@ const circle = svg.append("circle")
   .on("mouseout", handleMouseOut)
 
 // 要素にカーソルが入ったとき
-function handleMouseOver() {
-  d3.select(this)
-    .attr("fill", "cyan")
+function handleMouseOver(event) {
+  d3.select(event.currentTarget).attr("fill", "cyan")
+  // d3.select(this).attr("fill", "cyan")
 }
 
 // 要素からカーソルが出たとき
 function handleMouseOut(event) {
-  d3.select(this)
-    .attr("fill", "transparent")
+  d3.select(event.currentTarget).attr("fill", "transparent")
+  // d3.select(this).attr("fill", "transparent")
 }
 </script>
 ```

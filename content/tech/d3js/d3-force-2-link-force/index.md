@@ -299,20 +299,140 @@ function tickHandler() {
 {{< /code >}}
 
 
+（応用）リンクを表す線にテキストラベルを表示する
+----
+
+{{< maku-common/d3 id="svg-4hsdfud" w="300" h="200" title="ノード間のリンクの上にラベルを表示する" >}}
+const svg = d3.select("#svg-4hsdfud")
+const width = +svg.attr("width")
+const height = +svg.attr("height")
+
+// ノード配列
+const nodesData = [{}, {}, {}, {}]
+
+// リンク配列
+const linksData = [
+  { source: 0, target: 1, label: "Link-1" },
+  { source: 1, target: 2, label: "Link-2" },
+  { source: 2, target: 3, label: "Link-3" },
+  { source: 3, target: 0, label: "Link-4" },
+]
+
+// リンクを描画するための line 要素を svg に追加しておく
+const lines = svg.selectAll("line")
+  .data(linksData)
+  .join("line")
+  .attr("stroke", "red")
+  .attr("stroke-width", 2)
+
+// リンクの中間に表示する text 要素を追加しておく
+const lineTexts = svg.selectAll("text")
+  .data(linksData)
+  .join("text")
+  .attr("text-anchor", "middle")  // 水平方法のアンカーを中央に
+  .attr("dominant-baseline", "middle")  // 垂直方向も中央に
+  .attr("font-size", "14pt")
+  .attr("font-weight", "bold")
+  .attr("fill", "black")
+  .attr("stroke", "white")
+  .attr("stroke-width", 0.5)
+  .text((d) => d.label)
+
+// ノードを描画するための circle 要素を svg に追加しておく
+const circles = svg.selectAll("circle")
+  .data(nodesData)
+  .join("circle")
+  .attr("r", 10)
+  .attr("fill", "blue")
+
+// Simulation オブジェクトの作成とフォース設定
+const simulation = d3.forceSimulation()
+  .force("center", d3.forceCenter(width / 2, height / 2))
+  .force("charge", d3.forceManyBody().strength(-1000))
+  .force("link", d3.forceLink())
+
+// Simulation オブジェクトにノード配列をセットして tick イベントをハンドル開始
+simulation.nodes(nodesData).on("tick", tickHandler)
+simulation.force("link").links(linksData)
+
+function tickHandler() {
+  circles
+    .attr("cx", (d) => d.x)
+    .attr("cy", (d) => d.y)
+  lines
+    .attr("x1", (d) => d.source.x)
+    .attr("y1", (d) => d.source.y)
+    .attr("x2", (d) => d.target.x)
+    .attr("y2", (d) => d.target.y)
+  lineTexts
+    .attr("x", (d) => (d.source.x + d.target.x) / 2)
+    .attr("y", (d) => (d.source.y + d.target.y) / 2)
+}
+{{< /maku-common/d3 >}}
+
+リンクを表す線の上に、そのリンクの意味などをテキストで表示したいときは、リンク配列データ (`linksData`) のサイズだけ `text` 要素を作成してやれば OK です。
+`text` 要素で表示する文字列は、`linksData` 配列などに次のような感じで追加しておきます。
+
+```js
+// リンク配列
+const linksData = [
+  { source: 0, target: 1, label: "Link-1" },
+  { source: 1, target: 2, label: "Link-2" },
+  { source: 2, target: 3, label: "Link-3" },
+  { source: 3, target: 0, label: "Link-4" },
+]
+```
+
+`text` 要素を作成するときに、上記データ内の `label` プロパティの値を表示テキストとして設定します。
+
+{{< code lang="js" hl_lines="12" >}}
+// リンクの中間に表示する text 要素を追加しておく
+const lineTexts = svg.selectAll("text")
+  .data(linksData)
+  .join("text")
+  .attr("text-anchor", "middle")  // 水平方法のアンカーを中央に
+  .attr("dominant-baseline", "middle")  // 垂直方向も中央に
+  .attr("font-size", "14pt")
+  .attr("font-weight", "bold")
+  .attr("fill", "black")
+  .attr("stroke", "white")
+  .attr("stroke-width", 0.5)
+  .text((d) => d.label)  // 表示するテキスト
+{{< /code >}}
+
+あとは、`tick` イベントハンドラーで、`text` 要素の位置をノードの中間点に移動させてやれば OK です。
+
+{{< code lang="js" hl_lines="10-12" >}}
+function tickHandler() {
+  circles
+    .attr("cx", (d) => d.x)
+    .attr("cy", (d) => d.y)
+  lines
+    .attr("x1", (d) => d.source.x)
+    .attr("y1", (d) => d.source.y)
+    .attr("x2", (d) => d.target.x)
+    .attr("y2", (d) => d.target.y)
+  lineTexts
+    .attr("x", (d) => (d.source.x + d.target.x) / 2)
+    .attr("y", (d) => (d.source.y + d.target.y) / 2)
+}
+{{< /code >}}
+
+
 応用 - ノードを表すキーとして任意のプロパティを使用する (id)
 ----
 
-前述の例では、リンク配列要素の `source` と `target` プロパティで指定するノードのキーとして、ノードのインデックス (`index`) を指定していました。
+前述までの例では、リンク配列要素の `source` と `target` プロパティで指定するノードのキーとして、ノードのインデックス (`index`) を指定していました。
 ここで指定するキーとしてどのプロパティを使用するかは自由に変更することができます。
-例えば、次のようにリンク情報を各ノードの `label` プロパティをキーにして設定したいとします。
+例えば、次のようにリンク情報を各ノードの `id` プロパティをキーにして設定したいとします。
 
 ```js
 // ノード配列
 const nodesData = [
-  { label: "node-A" },
-  { label: "node-B" },
-  { label: "node-C" },
-  { label: "node-D" },
+  { id: "node-A" },
+  { id: "node-B" },
+  { id: "node-C" },
+  { id: "node-D" },
 ]
 
 // リンク配列
@@ -324,14 +444,16 @@ const linksData = [
 ]
 ```
 
-`d3.forceLink()` 関数で作成したフォースオブジェクトの、__`id()`__ メソッドを使うと、各ノードのどのプロパティをキーにしてリンクを表現するかを指定できます。
+`d3.forceLink()` 関数で作成したフォースオブジェクトの、__`id()`__ メソッドを使うと、各ノードのどのプロパティをキーとして使うかを指定できます。
 
-{{< code lang="js" title="label プロパティをリンクのキーとする" hl_lines="4" >}}
+{{< code lang="js" title="ノードの id プロパティをキーとする" hl_lines="4" >}}
 const simulation = d3.forceSimulation()
   .force("center", d3.forceCenter(width / 2, height / 2))
   .force("charge", d3.forceManyBody().strength(-1000))
-  .force("link", d3.forceLink().id((d) => d.label))
+  .force("link", d3.forceLink().id((d) => d.id))
 {{< /code >}}
+
+この設定により、`linksData` 配列内の `source` プロパティと `target` プロパティの値として、ノードの `id` が指定されているということを D3.js に伝えることができます。
 
 
 （応用）link force の設定 (distance, strength)

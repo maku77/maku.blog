@@ -6,10 +6,14 @@ tags: ["D3.js"]
 ---
 
 <style>
+  circle {
+    cursor: pointer;
+  }
   .selected-qpi7j9n {
     fill: cyan;
     stroke: red;
     stroke-width: 5;
+    cursor: default;
   }
 </style>
 
@@ -51,11 +55,16 @@ circles.on("click", (event) => {
 
 {{< code lang="html" title="実装コード" >}}
 <style>
+  circle {
+    cursor: pointer;
+  }
+
   /* 選択された要素に付加するクラス */
   .selected {
     fill: cyan;
     stroke: red;
     stroke-width: 5;
+    cursor: default;
   }
 </style>
 <svg id="svg-uh6jd9p" width="200" height="50"></svg>
@@ -90,6 +99,19 @@ circles.on("click", (event) => {
 selection.classed("foo", true);   // foo クラスを付ける
 selection.classed("foo", false);  // foo クラスを外す
 {{< /code >}}
+
+SVG 内の描画要素に `click` イベントハンドラーを設定した場合は、セレクションオブジェクトの `attr()` メソッドか、CSS の __`cursor`__ プロパティを設定して、マウスカーソルの形が変わるようにしておくとよいです。
+
+```css
+circle {
+  cursor: pointer;  /* カーソル形状を変えてクリック可能だと伝える */
+}
+
+.selected {
+  cursor: default;  /* 選択状態になったら元のカーソル形状に戻す */
+}
+```
+
 
 
 選択された要素のデータ (datum) を表示する

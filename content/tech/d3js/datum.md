@@ -33,8 +33,9 @@ svg
   .on("mouseover", handleMouseOver)
   .on("mouseout", handleMouseOut)
 
-function handleMouseOver() {
-  const d = d3.select(this).datum()  // カーソル位置の要素のデータを参照
+function handleMouseOver(event) {
+  const d = d3.select(event.currentTarget).datum()  // カーソル位置の要素のデータを参照
+  // const d = d3.select(this).datum()
   text.text(`${d.name}, ${d.color}`)  // 情報表示
 }
 
@@ -80,8 +81,9 @@ svg
   .on("mouseover", handleMouseOver)
   .on("mouseout", handleMouseOut)
 
-function handleMouseOver() {
-  const d = d3.select(this).datum()  // カーソル位置の要素のデータを参照
+function handleMouseOver(event) {
+  const d = d3.select(event.currentTarget).datum()  // カーソル位置の要素のデータを参照
+  // const d = d3.select(this).datum()
   text.text(`${d.name}, ${d.color}`)  // 情報表示
 }
 
