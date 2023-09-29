@@ -269,6 +269,12 @@ SVG で複数の直線や曲線を繋げた複雑な線を描画するときは�
 
 基本的にはマーカーサイズは `stroke-width` に連動させておいた方が見た目はよさそうです。
 
+
+参考
+----
+
+- 参考: [D3.js で矢印を表示する (defs, marker, marker-end)](/p/gtg33no/)
+
 {{% private %}}
 - https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/markerUnits
 {{% /private %}}
