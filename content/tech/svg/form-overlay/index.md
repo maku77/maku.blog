@@ -14,8 +14,8 @@ svg 要素を背景として表示する方法 (position: fixed)
 ----
 
 <center>
-  <iframe width="260" height="80" src="./demo.html" style="resize: both; overflow: auto;"></iframe>
-  <div>デモ1（<a target="_blank" href="./demo.html">別ページで開く</a>）</div>
+  <iframe width="260" height="80" src="/p/fmxdrcp/demo.html" style="resize: both; overflow: auto;"></iframe>
+  <div>デモ1（<a target="_blank" href="/p/fmxdrcp/demo.html">別ページで開く</a>）</div>
 </center>
 
 この例では、`svg` 要素を __`position: fixed`__ スタイルを用いて、画面全体に固定表示しています。
@@ -57,8 +57,8 @@ svg {
 ----
 
 <center>
-  <iframe width="360" height="135" src="./demo2.html" style="resize: both; overflow: auto;"></iframe>
-  <div>デモ2（<a target="_blank" href="./demo2.html">別ページで開く</a>）</div>
+  <iframe width="360" height="135" src="/p/fmxdrcp/demo2.html" style="resize: both; overflow: auto;"></iframe>
+  <div>デモ2（<a target="_blank" href="/p/fmxdrcp/demo2.html">別ページで開く</a>）</div>
 </center>
 
 __`position: absolute`__ スタイルを指定すると、親要素の位置からの相対座標で表示できるので、これを利用して `svg` 要素の上に他の要素を重ねて表示することができます。
@@ -137,7 +137,7 @@ svg {
 `svg` 要素の上にコントロールパネルなどを表示する場合、アルファ値を設定した背景色でパネル表示するとかっこいい感じになります。
 
 <center>
-  <iframe width="270" height="150" src="./demo3.html" style="resize: both; overflow: auto; border: none;"></iframe>
-  <div>デモ3（<a target="_blank" href="./demo3.html">別ページで開く</a>）</div>
+  <iframe width="270" height="150" src="/p/fmxdrcp/demo3.html" style="resize: both; overflow: auto; border: none;"></iframe>
+  <div>デモ3（<a target="_blank" href="/p/fmxdrcp/demo3.html">別ページで開く</a>）</div>
 </center>
 
