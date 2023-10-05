@@ -52,6 +52,54 @@ svg {
 }
 {{< /code >}}
 
+{{% note title="マウスイベントを透過させる" %}}
+`svg` 要素の上に重なった `p` 要素上でのマウスイベントを `svg` 要素に伝播するには、`p` 要素に __`pointer-events: none`__ を指定します。
+
+```css
+p {
+  pointer-events: none; /* マウスイベントを伝播させる */
+  /* ... */
+}
+```
+
+注意点として、前述の `svg` 要素のように `z-index` に負の値が設定されていると、うまく `svg` 要素にマウスイベントが伝わりません。
+これは、`body` 要素のデフォルトの `z-index` が `auto` (0) に設定されているため、`p` 要素から伝播されたマウスイベントが先に `body` 要素で消費されてしまうからです。
+この問題を解決するには、マウスイベントの伝播先である `svg` 要素の `z-index` を 0 以上に設定し、その上に表示する `p` 要素をそれよりも大きな `z-index` に設定します（あるいは、`svg` 要素よりも `p` 要素を後に配置します）。
+
+```css
+svg {
+  position: fixed;
+  z-index: 0;  /* デフォルトで auto=0 なので省略しても OK */
+  /* ... */
+}
+
+p {
+  position: relative;
+  z-index: 1;  /* 確実に svg の上に表示するなら指定しておく */
+  pointer-events: none;  /* マウスイベントを伝播させる */
+  /* ... */
+}
+```
+
+あるいはちょっと特殊ですが、`body` 要素の `z-index` を一番奥にして、`body` 要素でのマウスイベントの処理を後回しにするという方法もあります。
+
+```css
+svg {
+  position: fixed;
+  z-index: -1;  /* svg は他の要素よりも奥に表示 */
+  /* ... */
+}
+
+body {
+  position: relative;
+  z-index: -100;  /* body 要素でのマウスイベント処理は後回し */
+}
+
+p {
+  pointer-events: none;
+}
+{{% /note %}}
+
 
 他の要素を親要素の相対座標で配置する方法 (position: absolute;)
 ----
