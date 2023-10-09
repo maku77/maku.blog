@@ -160,7 +160,7 @@ function drawLine(selection, x1, y1, x2, y2, startR, endR) {
   if (x1 == x2 && y1 == y2) return
 
   // 始点と終点の円に重ならないように長さを調整
-  const dist = Math.sqrt((x1 - x2) ** 2, (y1 - y2) ** 2)
+  const dist = Math.hypot(x1 - x2, y1 - y2)
   const cos = (x2 - x1) / dist
   const sin = (y2 - y1) / dist
   const dx1 = startR * cos
@@ -224,7 +224,7 @@ function drawLine(selection, x1, y1, x2, y2, startR, endR) {
   if (x1 == x2 && y1 == y2) return
 
   // 始点と終点の円に重ならないように長さを調整
-  const dist = Math.sqrt((x1 - x2) ** 2, (y1 - y2) ** 2)
+  const dist = Math.hypot(x1 - x2, y1 - y2)
   const cos = (x2 - x1) / dist
   const sin = (y2 - y1) / dist
   const dx1 = startR * cos
