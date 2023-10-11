@@ -259,3 +259,77 @@ d3.select("#svg-2du6dtt")
   .call(drawCircle, p2.x, p2.y, 10)
 ```
 
+
+（応用）marker を静的に定義する
+----
+
+前述のコードの `defs` 要素によるマーカーの定義をよく見ると、アタッチ先の座標に影響されない静的な定義であることが分かります。
+であれば、クライアントサイド JavaScript で実行される D3.js を使って `defs` 要素を動的に生成する必要はないはずです。
+
+下記のコードは、Svelte コンポーネントから D3.js を使用する例です。
+マーカーの定義は、静的な `svg` 要素の定義の中にハードコードされています。
+
+{{< code lang="html" title="src/lib/components/Diagram.svelte（Svelte コンポーネントの実装例）" hl_lines="56-61">}}
+<script>
+	import * as d3 from 'd3';
+	import { onMount } from 'svelte';
+
+	// 始点と終点の座標
+	const p1 = { x: 20, y: 50 };
+	const p2 = { x: 95, y: 25 };
+	const MARKER_ID = 'my-marker';
+
+	// 線 (line) を描画する
+	// * startR ... 始点ノードの円の半径
+	// * endR ... 終点ノードの円の半径
+	function drawLine(selection, x1, y1, x2, y2, startR, endR) {
+		if (x1 == x2 && y1 == y2) return;
+
+		// 始点と終点の円に重ならないように長さを調整
+		const dist = Math.hypot(x1 - x2, y1 - y2);
+		const cos = (x2 - x1) / dist;
+		const sin = (y2 - y1) / dist;
+		const dx1 = startR * cos;
+		const dy1 = startR * sin;
+		const dx2 = endR * cos;
+		const dy2 = endR * sin;
+
+		selection
+			.append('line')
+			.attr('x1', x1 + dx1)
+			.attr('y1', y1 + dy1)
+			.attr('x2', x2 - dx2)
+			.attr('y2', y2 - dy2)
+			.attr('stroke', 'blue')
+			.attr('marker-end', `url(#${MARKER_ID})`);
+	}
+
+	// 円 (circle) を描画する
+	function drawCircle(selection, x, y, r) {
+		selection
+			.append('circle')
+			.attr('cx', x)
+			.attr('cy', y)
+			.attr('r', r)
+			.attr('stroke', 'red')
+			.attr('fill', 'transparent');
+	}
+
+	// DOM 要素の参照はマウント後に行う
+	onMount(() => {
+		d3.select('svg')
+			.call(drawLine, p1.x, p1.y, p2.x, p2.y, 5, 10)
+			.call(drawCircle, p1.x, p1.y, 5)
+			.call(drawCircle, p2.x, p2.y, 10);
+	});
+</script>
+
+<svg width="200" viewBox="0 0 120 70" style="border: thin solid gray">
+	<defs>
+		<marker id={MARKER_ID} viewBox="0 0 2 2" refX="2" refY="1"
+				markerWidth="10" markerHeight="10" orient="auto">
+			<path d="M0,0 L2,1 0,2 1,1 Z" fill="blue" />
+		</marker>
+	</defs>
+</svg>
+{{< /code >}}
