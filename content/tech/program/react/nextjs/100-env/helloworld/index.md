@@ -1,6 +1,6 @@
 ---
 title: "Next.js で HelloWorld（プロジェクト作成からサーバー起動まで）"
-url: "/p/ubmu3bj"
+url: "p/ubmu3bj/"
 date: "2021-04-18"
 lastmod: "2021-04-24"
 tags: ["Next.js", "React"]
@@ -117,9 +117,9 @@ Web サイトを更新したいときは、変更内容を GitHub へプッシ�
 変更を事前確認したいときなどは、GitHub 上で PullRequest を作成すれば、確認用のサイトを生成してくれます。
 いたれりつくせりです。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Next.js アプリを Vercel で公開する](/p/j6ht5fq)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 静的 HTML のエクスポート
@@ -158,9 +158,9 @@ $ ls out
 $ npm run export
 {{< /code >}}
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Next.js アプリを GitHub Actions でビルドして GitHub Pages で公開する](/p/au8ju6g)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 次のステップ

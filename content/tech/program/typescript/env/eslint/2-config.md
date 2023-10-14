@@ -1,7 +1,7 @@
 ---
 title: "ESLint の設定ファイル (.eslintrc) の各プロパティの意味を理解する"
 linkTitle: "ESLint (2) 設定ファイル (.eslintrc) の各プロパティの意味を理解する"
-url: "/p/j6iu7it"
+url: "p/j6iu7it/"
 date: "2021-05-22"
 tags: ["ESLint"]
 weight: 302
@@ -65,9 +65,9 @@ env:
   es2021: true
 {{< /code >}}
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [ESLint - Specifying Environments](https://eslint.org/docs/user-guide/configuring/language-options#specifying-environments)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 ### `parser`: 使用するパーサー
@@ -104,10 +104,10 @@ parserOptions:
   project: ./tsconfig.json  # プロジェクト内の型認識に使用
 {{< /code >}}
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [ESLint - Specifying Parser Options](https://eslint.org/docs/user-guide/configuring/language-options#specifying-parser-options)
 - [typescript-eslint/README.md - Configuration](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/parser/README.md#configuration)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 ### `plugins`: 使用するプラグインの指定
@@ -123,9 +123,9 @@ plugins:
 
 上記の例からも分かるように、__`eslint-plugin`__ というプレフィックスは省略できるようになっています（参考: [Naming convention](https://eslint.org/docs/user-guide/configuring/plugins#naming-convention)）。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [ESLint - Configuring Plugins](https://eslint.org/docs/user-guide/configuring/plugins#configuring-plugins)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 ### `extends`: 共有設定の適用 (Sharable configuration)
@@ -165,7 +165,7 @@ plugin:プラグインの省略名/コンフィグ名
 個々のルール単位で有効／無効にする設定を行います。
 多くのケースでは、`extends` による共有設定で大まかなルール設定を行い、ここで個別ルールを細かく調整します。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [ESLint - Rules](https://eslint.org/docs/rules/)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 

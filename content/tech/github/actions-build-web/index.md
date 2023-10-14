@@ -1,6 +1,6 @@
 ---
 title: "GitHub Actions で Web サイトをビルドして GitHub Pages へ公開する"
-url: "/p/5q3eq2c"
+url: "p/5q3eq2c/"
 date: "2020-09-01"
 lastmod: "2020-04-07"
 tags: ["GitHub", "GitHub Actions"]
@@ -81,7 +81,7 @@ jobs:
 これで、`https://yourname.github.io/project名/` にアクセスすれば、Web サイトが表示されます。
 う〜ん、お手軽すぎる！
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Next.js アプリを GitHub Actions でビルドして GitHub Pages でホスティングする](/p/au8ju6g)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 

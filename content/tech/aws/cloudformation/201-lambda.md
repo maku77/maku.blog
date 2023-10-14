@@ -1,7 +1,7 @@
 ---
 title: "AWS CloudFormation で Lambda 関数のリソースを生成する"
 linkTitle: "CloudFormation で Lambda 関数のリソースを生成する"
-url: "/p/w8s8kx9"
+url: "p/w8s8kx9/"
 date: "2021-04-05"
 tags: ["AWS", "AWS/SAM", "AWS/Lambda"]
 weight: 201
@@ -292,7 +292,7 @@ $ aws cloudformation deploy --stack-name mystack \
 この方法の注意点としては、__`CodeUri` で指定したディレクトリ（ここでは `src`）の下のファイル群がすべて ZIP にパッケージングされてしまう__ という点です。
 カスタマイズされた方法で ZIP パッケージを作成したい場合（特定のファイルを含めたくないときなど）は、この方法は使えないかもしれません。
 
-{{< reference >}}
-- [AWS Lambda にデプロイするための ZIP パッケージを npm で作成する (npm-pack-zip)](/p/zmydq3f)
-{{< /reference >}}
+{{% maku-common/reference %}}
+- [AWS Lambda にデプロイするための ZIP パッケージを npm で作成する (npm-pack-zip)](/p/zmydq3f/)
+{{% /maku-common/reference %}}
 

@@ -1,7 +1,7 @@
 ---
 title: "ESLint + Prettier の設定方法まとめ"
 linkTitle: "ESLint (3) ESLint + Prettier の設定方法まとめ"
-url: "/p/yfow6dk"
+url: "p/yfow6dk/"
 date: "2021-05-23"
 tags: ["ESLint", "Prettier"]
 weight: 303
@@ -25,10 +25,10 @@ $ create-next-app myapp --example with-typescript
 $ create-next-app myapp --typescript
 {{< /code >}}
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Next.js で HelloWorld（プロジェクト作成からサーバー起動まで）](/p/ubmu3bj)
 - [Next.js のプロジェクトを TypeScript 化する](/p/ny9fmty)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 Prettier + ESLint の基本設定 (for TypeScript with React)
@@ -274,9 +274,9 @@ TypeScript の型チェックを行うよう設定すると、追加で TypeScri
 `tsconfig.json` の情報をそのまま使うのではなく、ESLint 用に `tsconfig.eslint.json` を作成してパフォーマンス向上させる方法が提案されています。
 いずれにしても、型チェックの仕組みはあまり洗練されているとは言えないので、型チェックに関しては TypeScript コードの `tsc` ビルド時にだけ行うと割り切ってもいいかもしれません（VS Code デフォルトの検出機能もあります）。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [typescript-eslint - Getting Started - Linting with Type Information](https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/TYPED_LINTING.md)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 ### TypeScript / Prettier の設定は後ろへ
@@ -307,9 +307,9 @@ extends:
   - prettier
 {{< /code >}}
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [typescript-eslint/typescript-eslint - Usage with prettier](https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/README.md#usage-with-prettier)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 ### Airbnb スタイルは React 込み

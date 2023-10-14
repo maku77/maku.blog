@@ -1,6 +1,6 @@
 ---
 title: "mongo シェルで各フィールドの型を調べる (typeof, instanceof)"
-url: "/p/yejmu4v"
+url: "p/yejmu4v/"
 date: "2013-10-22"
 tags: ["MongoDB"]
 ---
@@ -15,7 +15,7 @@ typeof mydoc._id
 mydoc._id instanceof ObjectId
 {{< /code >}}
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Data Types in the mongo Shell — MongoDB Manual](http://docs.mongodb.org/manual/core/shell-types/#check-types-in-shell)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 

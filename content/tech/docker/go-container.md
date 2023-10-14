@@ -52,9 +52,9 @@ func main() {
 
 __`go run .`__ でサーバーを起動して、Web ブラウザーなどで `http://localhost:8080` にアクセスすれば、`Hello World` というレスポンスが返ってくることを確認できます。
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [Golang で HTTP サーバーを作成する (net/http, rs/cors) - まくまく Golang ノート](https://maku77.github.io/p/goruwy4/)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 
 
 Alpine Linux ベースの実行イメージを作成する

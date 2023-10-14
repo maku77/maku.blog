@@ -1,5 +1,5 @@
 ---
-title: "D3.js のデータ結合について理解する (enter, update, exit)"
+title: "D3.js のデータ結合を理解する (1) data/enter/exit/join の基本"
 url: "p/bp2btie/"
 date: "2023-10-01"
 tags: ["D3.js"]

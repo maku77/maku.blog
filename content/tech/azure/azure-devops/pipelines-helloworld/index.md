@@ -1,6 +1,6 @@
 ---
 title: "Azure Pipelines の使い方 (Hello World)"
-url: "/p/vxoctbs"
+url: "p/vxoctbs/"
 date: "2020-03-25"
 tags: ["Azure", "Azure Pipelines"]
 weight: 101
@@ -71,9 +71,9 @@ Pipelines を設定するには、何らかの Git リポジトリが必要に�
 
 あるいは、DevOps プロジェクト内にある Azure Repos に新しく Git リポジトリを作成することもできます。
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [Azure DevOps で無料のプライベート Git リポジトリ (Repos) を使用する](/p/qt5qyzu)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 
 ### Pipelines の作成
 

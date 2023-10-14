@@ -1,7 +1,7 @@
 ---
 title: "TypeScriptの環境: tsconfig.json の基本"
 linkTitle: "tsconfig.json の基本"
-url: "/p/27m3brm"
+url: "p/27m3brm/"
 date: "2019-10-01"
 tags: ["JavaScript", "TypeScript"]
 weight: 101
@@ -127,7 +127,5 @@ Web アプリであれば、どれだけ古い Web ブラウザに対応する�
 これらは、既存の JavaScript プロジェクトに TypeScript を適用する際に便利なオプションです。
 このあたりは、下記の記事で詳しく紹介します。
 
-{{< reference >}}
-- [既存の JavaScript プロジェクトを TypeScript に乗り換える](/p/3eccb2t)
-{{< /reference >}}
+- [既存の JavaScript プロジェクトを TypeScript に乗り換える](/p/3eccb2t/)
 

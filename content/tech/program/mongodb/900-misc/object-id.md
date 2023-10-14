@@ -31,7 +31,7 @@ MongoDB の各 Document（RDB でいうレコード）は、それぞれ __`_id`
 ISODate("2013-10-22T02:30:48Z")
 {{< /code >}}
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [ObjectId — MongoDB Manual](http://docs.mongodb.org/manual/reference/object-id/)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 

@@ -1,6 +1,6 @@
 ---
 title: "逆引き Azure CLI: ストレージアカウントのキーを確認する (storage account keys list)"
-url: "/p/3wk5vnw"
+url: "p/3wk5vnw/"
 date: "2020-03-17"
 tags: ["Azure", "Azure CLI", "Azure Storage"]
 weight: 200
@@ -26,7 +26,7 @@ $ az storage account keys list --account-name ストレージアカウント名
 
 このストレージアカウントキーは、`az storage` コマンドを使って Azure ストレージ上のデータを操作するときに必要になります。
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [BLOB ストレージにファイルをアップロードする (storage blob upload)](/p/ptx36ue)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 

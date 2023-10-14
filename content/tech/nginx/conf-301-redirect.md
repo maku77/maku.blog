@@ -49,9 +49,9 @@ $ sudo service nginx reload
 
 これで、例えば、`https://old.example.com/hoge` へのアクセスが、`https://new.example.com/hoge` にリダイレクトされ、ブラウザの URL 表示も自動的に新しい URL に変わるようになります。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Nginx の設定: http でアクセスされた場合に https にリダイレクトする](/p/jowgstm/)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 （おまけ）Google Search Console のお引越し設定

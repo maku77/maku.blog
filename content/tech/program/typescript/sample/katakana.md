@@ -1,7 +1,7 @@
 ---
 title: "TypeScriptサンプル: 文字列内のひらがなとカタカナを変換する (hiraToKana, kanaToHira)"
 linkTitle: "文字列内のひらがなとカタカナを変換する (hiraToKana, kanaToHira)"
-url: "/p/tzjvcad"
+url: "p/tzjvcad/"
 date: "2020-02-17"
 tags: ["TypeScript"]
 ---
@@ -39,7 +39,7 @@ console.log(Util.hiraToKata('あいうアイウ'));  //=> アイウアイウ
 console.log(Util.kataToHira('あいうアイウ'));  //=> あいうあいう
 {{< /code >}}
 
-{{< reference >}}
-- [ひらがなとカタカナを正規表現で表す](/p/kkaq7q5)
-{{< /code >}}
+{{% maku-common/reference %}}
+- [ひらがなとカタカナを正規表現で表す](/p/kkaq7q5/)
+{{% /maku-common/reference %}}
 

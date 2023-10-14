@@ -1,7 +1,7 @@
 ---
 title: "TypeScriptの型: タイプエイリアスを定義する (type)"
 linkTitle: "タイプエイリアスを定義する (type)"
-url: "/p/5zoqtmi"
+url: "p/5zoqtmi/"
 date: "2019-09-26"
 tags: ["TypeScript"]
 weight: 200
@@ -37,7 +37,7 @@ sample.ts:7:43 - error TS2322: Type '{ name: string; age: number; xxx: number; }
   Object literal may only specify known properties, and 'xxx' does not exist in type 'Person'.
 {{< /code >}}
 
-{{< reference >}}
-- [TypeScript: リテラル型を定義する (Literal types)](/p/6iuo8aj)
-{{< /reference >}}
+{{% maku-common/reference %}}
+- [TypeScript: リテラル型を定義する (Literal types)](/p/6iuo8aj/)
+{{% /maku-common/reference %}}
 

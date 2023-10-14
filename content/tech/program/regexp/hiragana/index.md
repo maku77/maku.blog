@@ -1,7 +1,7 @@
 ---
 title: "正規表現: ひらがなとカタカナを正規表現で表す"
 linkTitle: "ひらがなとカタカナを正規表現で表す"
-url: "/p/kkaq7q5"
+url: "p/kkaq7q5/"
 date: "2020-02-17"
 tags: ["正規表現"]
 ---
@@ -31,7 +31,7 @@ tags: ["正規表現"]
 
 {{< image src="img-002.png" >}}
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [TypeScriptサンプル: 文字列内のひらがなとカタカナを変換する](/p/tzjvcad)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 

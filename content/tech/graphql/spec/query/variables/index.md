@@ -77,8 +77,8 @@ query GetOrganization($org: String = "graphql") {
 
 GraphQL スキーマで列挙型や入力型を定義する方法は、下記を参考にしてください。
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [GraphQL スキーマ仕様: 入力型 (input type) を定義する](/p/nhhwqtu/)
 - [GraphQL スキーマ仕様: 列挙型 (enum type) を定義する](/p/isotm77/)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 

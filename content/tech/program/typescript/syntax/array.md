@@ -1,7 +1,7 @@
 ---
 title: "TypeScriptの型: 配列を定義する (Array)"
 linkTitle: "配列を定義する (Array)"
-url: "/p/ttwoetd"
+url: "p/ttwoetd/"
 date: "2020-01-22"
 tags: ["TypeScript"]
 weight: 10
@@ -35,7 +35,7 @@ for (const x of nums) {
 300
 {{< /code >}}
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [TypeScript: タプルを定義する (Tuple types)](/p/6uzqf4q)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 

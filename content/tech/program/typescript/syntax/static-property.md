@@ -1,7 +1,7 @@
 ---
 title: "TypeScriptの型: クラスに static プロパティを定義する"
 linkTitle: "クラスに static プロパティを定義する"
-url: "/p/2snuk25"
+url: "p/2snuk25/"
 date: "2020-02-04"
 tags: ["TypeScript"]
 weight: 101
@@ -33,7 +33,7 @@ static プロパティに、さらに **`readonly`** キーワードを付加す
 static readonly DEBUG: boolean = true;
 {{< /code >}}
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [TypeScript: クラス定数を定義する (static readonly)](/p/nky6cbb)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 

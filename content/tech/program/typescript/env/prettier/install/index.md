@@ -1,6 +1,6 @@
 ---
 title: "TypeScript コードを Prettier で自動整形する"
-url: "/p/au8iu6u"
+url: "p/au8iu6u/"
 date: "2021-05-26"
 tags: ["Prettier", "TypeScript"]
 ---
@@ -146,10 +146,10 @@ $ npm run fix:prettier   # 自動で fix 実行
 
 npm スクリプト名は `lint`、`fix` のようなシンプルな名前にしてもよいのですが、ここでは ESLint も導入することを考えて、詳細な名前を付けるようにしています（ESLint 側のスクリプトには `lint:eslint`、`fix:eslint` という名前を付ける想定）。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [TypeScript プロジェクトに ESLint を導入する](/p/xz9iry9)
 - [ESLint + Prettier の設定方法まとめ](/p/yfow6dk)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 Prettier と一緒に ESLint を使う場合

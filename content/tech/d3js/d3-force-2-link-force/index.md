@@ -477,7 +477,7 @@ const linkForce = d3.forceLink()
 {{< /code >}}
 
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [D3.js による Force Simulation (1) d3-force の基本](/p/6kavdch/)
 - [D3.js による Force Simulation (3) 各ノードをドラッグして動かせるようにする](/p/8dmb73t/)
-{{% /reference %}}
+{{% /maku-common/reference %}}

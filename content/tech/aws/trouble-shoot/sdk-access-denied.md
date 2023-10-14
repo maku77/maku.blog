@@ -1,6 +1,6 @@
 ---
 title: "AWS CLI でアクセスできるのに AWS SDK で Access Denied (403) になるとき"
-url: "/p/7tds7bw"
+url: "p/7tds7bw/"
 date: "2021-04-26"
 tags: ["AWS"]
 ---
@@ -81,9 +81,9 @@ $ ts-node printCallerIdentity.ts
 
 AWS CLI に設定されている認証情報は、`aws configure list` コマンドなどで確認できます。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [AWS SDK の使用中に発生する S3 アクセス拒否エラーの解決](https://aws.amazon.com/jp/premiumsupport/knowledge-center/s3-access-denied-aws-sdk/)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 （おまけ）今回の原因
@@ -122,9 +122,9 @@ async function assumeRole() {
 
 複雑すぎでしょ・・・（´へ｀;
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [sts_assumerole.js - AWS Code Sample](https://docs.aws.amazon.com/ja_jp/code-samples/latest/catalog/javascript-iam-sts_assumerole.js.html)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 （おまけ）Access Key Id の情報を調べる
@@ -146,7 +146,7 @@ function printAccessKey() {
 printAccessKey();
 {{< /code >}}
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [SDK v2 開発者ガイド ─ グローバル設定オブジェクトの使用](https://docs.aws.amazon.com/ja_jp/sdk-for-javascript/v2/developer-guide/global-config-object.html)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 

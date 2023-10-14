@@ -1,6 +1,6 @@
 ---
 title: "Next.js アプリを GitHub Actions でビルドして GitHub Pages で公開する"
-url: "/p/au8ju6g"
+url: "p/au8ju6g/"
 date: "2021-04-24"
 tags: ["GitHub Actions", "Next.js", "React"]
 weight: 104
@@ -43,9 +43,9 @@ $ git push -u origin main
 
 上記のように実行すると、初期状態の Next.js アプリが GitHub にプッシュされます。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Next.js アプリのソースコードを GitHub で管理する](/p/xjw8it5)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 package.json および next.config.js の修正
@@ -178,7 +178,7 @@ GitHub Pages を有効にする
 
 しばらくして、`https://<username>.github.io/myapp/` にアクセスして、Next.js アプリのトップページが表示されれば成功です！
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [GitHub Actions で Web サイトをビルドして GitHub Pages へ公開する](/p/5q3eq2c)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 

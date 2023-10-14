@@ -1,7 +1,7 @@
 ---
 title: "TypeScriptの型: リテラル型を定義する (Literal types)"
 linkTitle: "リテラル型を定義する (Literal types)"
-url: "/p/6iuo8aj"
+url: "p/6iuo8aj/"
 date: "2020-02-04"
 tags: ["TypeScript"]
 weight: 200
@@ -24,7 +24,7 @@ answer = 'maybe';  // Error
 answer = 100;      // Error
 {{< /code >}}
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [TypeScript: 列挙型を定義する (enum)](/p/fdjk4hh)
 - [TypeScript: タイプエイリアスを定義する (type)](/p/5zoqtmi)
-{{< /reference >}}
+{{% /maku-common/reference %}}

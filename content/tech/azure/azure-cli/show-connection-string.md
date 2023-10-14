@@ -1,6 +1,6 @@
 ---
 title: "逆引き Azure CLI: ストレージアカウントの接続文字列を確認する (storage account show-connection-string)"
-url: "/p/hquhjki"
+url: "p/hquhjki/"
 date: "2020-03-17"
 tags: ["Azure", "Azure CLI", "Azure Storage"]
 weight: 200
@@ -17,7 +17,7 @@ $ az storage account show-connection-string --name yourstorage
 }
 {{< /code >}}
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [az storage account show-connection-string コマンド](https://docs.microsoft.com/en-us/cli/azure/storage/account?view=azure-cli-latest#az-storage-account-show-connection-string)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 

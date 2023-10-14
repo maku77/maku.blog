@@ -1,6 +1,6 @@
 ---
 title: "Azure: デプロイスロットでリリース時のダウンタイムをなくす（Blue-Green デプロイメント）"
-url: "/p/bog7iq8"
+url: "p/bog7iq8/"
 date: "2020-02-12"
 tags: ["Azure"]
 ---
@@ -93,9 +93,9 @@ GitHub や Azure Repos などの Git リポジトリへソースコードをプ�
 この設定では、ソースコードの取得先となる GitHub や Azure Repos のリポジトリを指定し、ビルドツールとして Kudu (App Service build service) と Azure Pipelines のどちらを使うかなどを指定します。
 ビルド設定に関して説明すると長くなってしまうのでここでは省略します。
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [Node.js アプリを App Service へデプロイする（Kudu ビルド編）](/p/wx3fvib/)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 
 この設定が終わると、GitHub や Azure Repos にソースコードをコミット＆プッシュするだけで、自動的に Pipelines などでビルドが実行され、App Service のステージング環境 (staging slot) にデプロイされるようになります。
 

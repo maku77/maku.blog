@@ -1,7 +1,7 @@
 ---
 title: "TypeScriptでモジュールを作成する／インポートする (export, import)"
 linkTitle: "モジュールを作成する／インポートする (export, import)"
-url: "/p/fbu8k8j"
+url: "p/fbu8k8j/"
 date: "2019-11-21"
 tags: ["JavaScript", "TypeScript"]
 weight: 201
@@ -108,9 +108,9 @@ export class Config {
 }
 {{< /code >}}
 
-{{< reference >}}
-- [TypeScript: クラス定数を定義する (static readonly)](/p/nky6cbb)
-{{< /reference >}}
+{{% maku-common/reference %}}
+- [TypeScript: クラス定数を定義する (static readonly)](/p/nky6cbb/)
+{{% /maku-common/reference %}}
 
 {{< code lang="typescript" title="index.ts" >}}
 import { Config } from './config';

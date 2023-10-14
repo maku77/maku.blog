@@ -1,7 +1,7 @@
 ---
 title: "AWS CloudFormation の設定例: Lambda 関数の設定いろいろ"
 linkTitle: "CloudFormation の設定例: Lambda 関数の設定いろいろ"
-url: "/p/pbo2dpy"
+url: "p/pbo2dpy/"
 date: "2021-04-08"
 tags: ["AWS", "AWS/CloudFormation", "AWS/Lambda", "AWS/SAM"]
 weight: 202
@@ -134,10 +134,10 @@ mystack-HelloFunctionMySchedule-H5JKY9WW8AOI
 
 物理 ID を明示的に指定したい場合は、`Schedule` イベントの `Name` プロパティを指定します。
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [Schedule - AWS Serverless Application Model](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/sam-property-function-schedule.html)
 - [Amazon EventBridge ルールのスケジュール式](https://docs.aws.amazon.com/ja_jp/eventbridge/latest/userguide/eb-schedule-expressions.html)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 
 ### S3 バケットからのイベント (Type: S3)
 

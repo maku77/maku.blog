@@ -1,6 +1,6 @@
 ---
 title: "Vercel のウェブサイトに独自ドメインを割り当てる"
-url: "/p/9vakw8i"
+url: "p/9vakw8i/"
 date: "2021-05-07"
 tags: ["お名前.com", "Next.js", "Vercel"]
 weight: 112
@@ -20,9 +20,7 @@ Vercel 上での Next.js アプリ公開までの手順は、下記の記事を�
 独自ドメインの「レジストラ」と「DNS サーバー」の関係については、下記の記事で簡単にまとめていますので参考にしてください。
 後述の設定で何をしているのかが分かりやすくなると思います。
 
-{{< reference >}}
-- [ドメイン管理と DNS 管理の違いを理解する](/p/bwamwgp)
-{{< /reference >}}
+- [ドメイン管理と DNS 管理の違いを理解する](/p/bwamwgp/)
 
 
 Vercel の DNS サーバーを使う方法
@@ -48,10 +46,10 @@ DNS のレコード設定をしてしばらく待つと、次のように `Inval
 
 {{< image w="600" border="true" src="img-006.png" title="Vercel の独自ドメイン設定完了！" >}}
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [お名前.com - DNS設定の変更手続きをしてから有効になるまでの期間は？](https://help.onamae.com/answer/8081)）
 - [DNS Checker（DNS 設定がどれだけ伝搬しているかの確認）](https://www.whatsmydns.net/)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 
 
 Vercel 以外の DNS サーバーを使う方法

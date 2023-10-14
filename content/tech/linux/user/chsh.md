@@ -16,10 +16,10 @@ $ chsh -s /bin/bash
 例えば、Bash を使いたければ、`bash` ではなく `/bin/bash` と入力します。
 `-s` オプションを省略すると、インタラクティブにシェルのパスを入力できます。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Linux のユーザーを管理する (useradd, userdel, passwd)](/p/7m5k3hx/)
   - ユーザーを追加する (`useradd`) ときに、ついでにログインシェルを指定できます。
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 現在のシステムで選択可能なシェルの一覧は、__`/etc/shells`__ ファイルで確認できます。
 

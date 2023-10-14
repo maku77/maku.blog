@@ -1,6 +1,6 @@
 ---
 title: "Azure Pipelines トラブル: npm タスクを実行できないとき"
-url: "/p/7c2kdub"
+url: "p/7c2kdub/"
 date: "2020-07-22"
 tags: ["Azure", "Azure Pipelines"]
 ---
@@ -38,9 +38,9 @@ steps:
   displayName: 'Install Node.js'
 {{< /code >}}
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [Node.js Tool Installer task - Azure Pipelines | Microsoft Docs](https://docs.microsoft.com/ja-jp/azure/devops/pipelines/tasks/tool/node-js?view=azure-devops)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 
 NodeTool タスクは実行のたびに Node.js をダウンロード＆インストールするわけではなく、VM 上に存在するキャッシュなどを使って Node.js の環境をセットアップするため、通常は数秒で実行が完了します。
 

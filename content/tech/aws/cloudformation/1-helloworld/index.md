@@ -1,6 +1,6 @@
 ---
 title: "AWS CloudFormation 入門 (Hello World)"
-url: "/p/h7arpdj"
+url: "p/h7arpdj/"
 date: "2021-04-01"
 tags: ["AWS", "AWS/CloudFormation"]
 weight: 1
@@ -85,7 +85,7 @@ $ aws cloudformation describe-stacks --stack-name mystack
 $ aws cloudformation delete-stack --stack-name mystack
 {{< /code >}}
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [AWS CloudFormation をコマンドライン (CLI) で操作する](/p/zkxamw9)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 

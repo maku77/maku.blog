@@ -1,6 +1,6 @@
 ---
 title: "Next.js のプロジェクトを TypeScript 化する"
-url: "/p/ny9fmty"
+url: "p/ny9fmty/"
 date: "2021-04-26"
 tags: ["Next.js", "React"]
 weight: 102
@@ -21,9 +21,9 @@ $ npx create-next-app myapp --example with-typescript
 また、Next.js は既存の JavaScript プロジェクトを TypeScript 化する機能も備えています。
 ここから先は、その方法を説明します。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Next.js で HelloWorld](/p/ubmu3bj)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 TypeScript 環境の導入
@@ -172,9 +172,9 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 これで、正しくビルドが通るようになります。
 Next.js が提供する他の型情報に関しては、下記のサイトを参考にしてください。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Basic Features: TypeScript | Next.js](https://nextjs.org/docs/basic-features/typescript)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 おまけ（example オプションでさまざまな環境が整ったプロジェクトを作成する）

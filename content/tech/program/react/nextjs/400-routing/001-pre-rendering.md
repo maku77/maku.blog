@@ -1,6 +1,6 @@
 ---
 title: "Next.js のプリレンダリング機能を使用する (getStaticProps)"
-url: "/p/iv4agnt"
+url: "p/iv4agnt/"
 date: "2021-05-04"
 tags: ["Next.js"]
 weight: 1
@@ -131,7 +131,7 @@ export default BooksPage
 これらのページを、`pages/books/001.tsx` や `pages/books/002.tsx` のようなファイルで、ひとつずつページコンポーネントとして実装していくのは大変です。
 Next.js は、上記のような URL によるアクセスを 1 つのページコンポーネント (`pages/books/[id].tsx`) でハンドルする __ダイナミックルーティング__ という仕組みを提供しています。
 
-{{< reference >}}
-- [Next.js のダイナミックルーティング機能を利用する (getStaticPaths, getStaticProps, getServerSideProps)](/p/rdq3ep2)
-{{< /reference >}}
+{{% maku-common/reference %}}
+- [Next.js のダイナミックルーティング機能を利用する (getStaticPaths, getStaticProps, getServerSideProps)](/p/rdq3ep2/)
+{{% /maku-common/reference %}}
 

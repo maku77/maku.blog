@@ -1,7 +1,7 @@
 ---
 title: "TypeScriptの型: タプルを定義する (Tuple types)"
 linkTitle: "タプルを定義する (Tuple types)"
-url: "/p/6uzqf4q"
+url: "p/6uzqf4q/"
 tags: ["TypeScript"]
 weight: 10
 ---
@@ -78,7 +78,7 @@ console.log(result.code);  //=> 404
 console.log(result.message);  //=> Not Found
 {{< /code >}}
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [TypeScript: 配列を定義する (Array)](/p/ttwoetd)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 

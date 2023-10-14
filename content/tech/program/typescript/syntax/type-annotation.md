@@ -1,7 +1,7 @@
 ---
 title: "TypeScriptの型: 変数の型指定（タイプアノテーション）の基本"
 linkTitle: "変数の型指定（タイプアノテーション）の基本"
-url: "/p/ugyw5ee"
+url: "p/ugyw5ee/"
 date: "2019-09-26"
 tags: ["TypeScript"]
 weight: 2
@@ -36,11 +36,9 @@ Cannot assign to 'age' because it is a constant.
 
 配列や辞書、クラスなどの使い方は下記のページを参考にしてください。
 
-{{< reference >}}
-- [配列を定義する (Array)](/p/ttwoetd)
-- [辞書型を定義する (Dictionary)](/p/x3ocp9a)
-- [クラス定義の基本 (class)](/p/qhxet9n)
-{{< /reference >}}
+- [配列を定義する (Array)](/p/ttwoetd/)
+- [辞書型を定義する (Dictionary)](/p/x3ocp9a/)
+- [クラス定義の基本 (class)](/p/qhxet9n/)
 
 
 関数のタイプアノテーション

@@ -1,7 +1,7 @@
 ---
 title: "AWS CloudFormation で DyanamoDB のリソースを作成する"
 linkTitle: "CloudFormation で DyanamoDB のリソースを作成する"
-url: "/p/h3gsjs2"
+url: "p/h3gsjs2/"
 date: "2021-04-07"
 tags: ["AWS", "AWS/DynamoDB", "AWS/SAM"]
 weight: 350
@@ -106,8 +106,8 @@ Resources:
 その他の情報源
 ----
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [AWS::Serverless::SimpleTable - AWS Serverless Application Model](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/sam-resource-simpletable.html)
 - [AWS::DynamoDB::Table - AWS CloudFormation](https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 

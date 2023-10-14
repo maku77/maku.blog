@@ -1,6 +1,6 @@
 ---
 title: "AWS の初期設定: AWS CLI と認証情報の設定"
-url: "/p/j5iu7it"
+url: "p/j5iu7it/"
 date: "2021-02-07"
 tags: ["AWS", "AWS/CLI"]
 weight: 1
@@ -34,9 +34,9 @@ AWS CLI を使用するには、下記のような IAM ユーザーのアクセ�
 - API 用アクセスキー（例）: `INMCAKIAQX77PNSXQAGP`
 - API 用シークレットアクセスキー（例）: `2ufOA3Q2KAmpNTo2GHPDXFJK7Jiv9yfZGegIdbCW`
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [IAM ユーザーのアクセスキーを作成するには - AWS CLI](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-creds)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 
 
 AWS CLI のインストール

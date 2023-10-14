@@ -1,7 +1,7 @@
 ---
 title: "TypeScript プロジェクトに ESLint を導入する"
 linkTitle: "ESLint (1) ESLint を導入する"
-url: "/p/xz9iry9"
+url: "p/xz9iry9/"
 date: "2021-05-20"
 tags: ["ESLint"]
 weight: 301
@@ -183,9 +183,9 @@ $ npm run fix:eslint   # 自動修正
 npm スクリプト名を単純に `lint`、`fix` にしていないのは、追加で Prettier（自動整形ツール）を導入することを想定したものです。
 Prettier の方にも同様の機能があるため、`lint:prettier`、`fix:prettier` という名前を付ける余地を残しています。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [TypeScript/JavaScript コードを Prettier で自動整形する](/p/au8iu6u)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 （おまけ）VS Code への ESLint プラグインのインストール
@@ -287,10 +287,10 @@ parserOptions:
 
 インストール方法や、`.eslintrc.*` ファイルの記述方法は、各パッケージの GitHub サイトを参照してください。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [GitHub - iamturns/eslint-config-airbnb-typescript](https://github.com/iamturns/eslint-config-airbnb-typescript)
 - [GitHub - standard/eslint-config-standard-with-typescript](https://github.com/standard/eslint-config-standard-with-typescript)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 （おまけ）Standard スタイルか Airbnb スタイルか

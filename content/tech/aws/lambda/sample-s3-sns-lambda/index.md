@@ -1,6 +1,6 @@
 ---
 title: "Lambda 実装例: S3 へのアップロードを SNS で通知して Lambda から読み込む"
-url: "/p/f2fq2cn"
+url: "p/f2fq2cn/"
 date: "2021-04-19"
 tags: ["AWS"]
 ---
@@ -13,10 +13,10 @@ tags: ["AWS"]
 ここでは Lambda 関数の実装例として、SNS トピックから S3 バケットの PutObject イベント通知を受けて、アップロードされたファイルを読み込む例を示します。
 S3 バケット、および SNS トピックの作成と、S3 → SNS の通知設定は完了していると想定します。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [CloudFormation の設定例: S3 通知を SNS トピックに Publish する](/p/3o2dpyb)
 - [CloudFormation の設定例: SNS トピックを Lambda 関数からサブスクライブする](/p/5q4epyb)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 
@@ -212,9 +212,9 @@ Resources:
 
 このテンプレートを使って実際に CloudFormation スタックを生成する方法をここで説明すると長くなってしまうので、そのあたりは下記の記事を参照してください。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [AWS CloudFormation で Lambda 関数のリソースを生成する](/p/w8s8kx9)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 ### package.json
 
@@ -258,7 +258,7 @@ $ npm run cf:deploy   # デプロイ（CloudFormation スタックを生成）
 
 TypeScript で実装した Lambda 関数を ZIP 化する方法に関しては、以下の記事を参考にしてください。
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [AWS Lambda にデプロイするための ZIP パッケージを npm で作成する (npm-pack-zip)](/p/zmydq3f)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 

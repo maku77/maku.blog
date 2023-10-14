@@ -1,7 +1,7 @@
 ---
 title: "Next.js ですべてのページにグローバルな CSS を適用する (pages/_app.ts)"
 linkTitle: "すべてのページにグローバルな CSS を適用する (pages/_app.ts)"
-url: "/p/s9iry9g"
+url: "p/s9iry9g/"
 date: "2021-05-06"
 tags: ["Next.js"]
 weight: 1
@@ -59,7 +59,7 @@ Next.js は `pages/_app.tsx` を特殊なファイルとして扱い、ここで
 
 Bootstrap や Tailwind CSS などの CSS フレームワークを使いたい場合も、この `pages/_app.tsx` ファイルでインポートすれば OK です。
 
-{{% reference %}}
-- [Next.js で Bootstrap (React Bootstrap) を使う](/p/k8mxakw)
-{{% /reference %}}
+{{% maku-common/reference %}}
+- [Next.js で Bootstrap (React Bootstrap) を使う](/p/k8mxakw/)
+{{% /maku-common/reference %}}
 

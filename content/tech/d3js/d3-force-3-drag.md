@@ -253,8 +253,8 @@ const circles = svg.selectAll("circle")
   .call(createDragBehavior(simulation))
 {{< /code >}}
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [D3.js による Force Simulation (1) d3-force の基本](/p/6kavdch/)
 - [D3.js による Force Simulation (2) link force でノードを結合する](/p/9ujohp6/)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 

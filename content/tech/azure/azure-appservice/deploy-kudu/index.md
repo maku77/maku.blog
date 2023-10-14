@@ -1,6 +1,6 @@
 ---
 title: "Azure: Node.js アプリを App Service へデプロイする（Kudu ビルド編）"
-url: "/p/wx3fvib"
+url: "p/wx3fvib/"
 date: "2019-10-09"
 tags: ["Azure", "Azure App Service", "Azure Pipelines"]
 ---
@@ -38,7 +38,9 @@ App Service には組み込みで Kudu エンジンが搭載されており、�
 ここでは、Azure Repos に Git リポジトリを作成し、そこに Node.js アプリのコードをコミットしてあると想定します。
 GitHub でも大丈夫です。
 
-- 参考: [Azure DevOps で無料のプライベート Git リポジトリ (Repos) を使用する](/p/qt5qyzu)
+{{% maku-common/reference %}}
+- [Azure DevOps で無料のプライベート Git リポジトリ (Repos) を使用する](/p/qt5qyzu)
+{{% /maku-common/reference %}}
 
 
 デプロイセンターの設定 (Azure Repos + Kudu)

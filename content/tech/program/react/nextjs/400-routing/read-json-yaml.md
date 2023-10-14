@@ -75,9 +75,9 @@ const jsonPath = path.join(process.cwd(), 'src', 'data', 'games.json')
 一般的な Node.js プログラムで相対パスを扱うときは `__dirname` を使用することがあると思いますが、Next.js サーバー上で `__dirname` を参照すると、自動生成された `.next` ディレクトリ以下のパスが返されてしまってうまくいきまん。
 代わりに、__`process.cwd()`__ でカレントディレクトリ（通常はプロジェクトのルートディレクトリ）のパスを取得して YAML ファイルのパスを構築するようにします
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Reading files: Use process.cwd() - Next.js](https://nextjs.org/docs/basic-features/data-fetching#reading-files-use-processcwd)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 YAML ファイルを読み込む（in API ルート）

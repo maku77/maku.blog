@@ -2,7 +2,7 @@
 title: "MongoDB サーバー (mongod) を起動する"
 date: "2015-04-13"
 lastmod: "2021-05-09"
-url: "/p/3ucs8n3"
+url: "p/3ucs8n3/"
 tags: ["MongoDB"]
 weight: 1
 ---
@@ -73,9 +73,9 @@ $ mongod --config mongod.yml
 
 設定ファイルの詳細については下記の公式ドキュメントを参照してください。
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [Configuration File Options — MongoDB Manual](https://docs.mongodb.com/manual/reference/configuration-options/)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 
 ### 起動用のスクリプトを作成する
 

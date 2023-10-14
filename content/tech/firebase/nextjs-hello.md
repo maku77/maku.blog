@@ -1,6 +1,6 @@
 ---
 title: "Next.js で Firebase: プロジェクトの作成と接続準備"
-url: "/p/73eq2cm"
+url: "p/73eq2cm/"
 date: "2021-12-26"
 tags: ["Firebase", "Next.js"]
 ---
@@ -199,7 +199,7 @@ export default MyApp
 `init.ts` 内の処理は `FirebaseApp` インスタンスの初期化にとどめておき、必要に応じて `getAuth()` や `getFirestore()` を呼び出すことをお勧めします。
 {{% /note %}}
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Next.js で Firebase: Authentication 機能でユーザー認証できるようにする](/p/8t6gq2b)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 

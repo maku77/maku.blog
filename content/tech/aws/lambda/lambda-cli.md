@@ -1,6 +1,6 @@
 ---
 title: "AWS Lambda をコマンドライン (CLI) で操作する"
-url: "/p/n9nydjc"
+url: "p/n9nydjc/"
 date: "2021-03-12"
 tags: ["AWS", "AWS/Lambda"]
 ---
@@ -133,9 +133,9 @@ aws lambda update-function-code \
 {{< /code >}}
 {{< /accordion >}}
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [Windows のコマンドラインから zip ファイルを作成する (Compress-Archive)](/p/vin35f7)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 
 
 Lambda 関数を呼び出す (lambda invoke)

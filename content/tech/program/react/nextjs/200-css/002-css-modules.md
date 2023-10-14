@@ -1,7 +1,7 @@
 ---
 title: "Next.js でコンポーネント単位の CSS を作成する (CSS Modules)"
 linkTitle: "コンポーネント単位の CSS を作成する (CSS Modules)"
-url: "/p/seq2cmw"
+url: "p/seq2cmw/"
 date: "2021-05-06"
 tags: ["Next.js"]
 weight: 2
@@ -87,7 +87,7 @@ declare module '*.scss' {
 この記述により、TypeScript コンパイラに対して、「`styles` オブジェクトは文字列型のパラメーターを持っているよ」ということを知らせることができます。
 ここでは、将来的に [Sass を導入](/p/2n2doyb) したときのために、`.scss` ファイルにも同様の型情報を追加しています。
 
-{{< reference >}}
-- [既存の JavaScript ライブラリに型情報を追加する（.d.ts ファイル）](/p/s7wk5k3)
-{{< /reference >}}
+{{% maku-common/reference %}}
+- [既存の JavaScript ライブラリに型情報を追加する（.d.ts ファイル）](/p/s7wk5k3/)
+{{% /maku-common/reference %}}
 

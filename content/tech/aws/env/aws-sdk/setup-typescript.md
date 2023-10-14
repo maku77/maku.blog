@@ -1,6 +1,6 @@
 ---
 title: "TypeScript で AWS SDK を使う開発環境を整える"
-url: "/p/taiqx6d"
+url: "p/taiqx6d/"
 date: "2021-02-25"
 tags: ["AWS", "TypeScript"]
 weight: 110
@@ -155,7 +155,7 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb';
 今から AWS SDK for JavaScript (Node.js) を使う場合は、余計なオーバーヘッドを防ぐためにも、__Version 3 の方を使い、`XxxxClient` のようなクラスを個別にインポートする__ 方法をお勧めします。
 さらに、デフォルトで TypeScript の型情報が提供されているので、できるだけ TypeScript でコーディングするようにしましょう。
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [DynamoDB を Node.js (AWS SDK) で操作する](/p/5mv5dkt)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 

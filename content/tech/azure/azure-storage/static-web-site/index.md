@@ -1,6 +1,6 @@
 ---
 title: "Azure Storage で静的 Web サイトをホスティングする"
-url: "/p/gkardu9"
+url: "p/gkardu9/"
 date: "2020-03-17"
 tags: ["Azure", "Azure Storage"]
 description: "HTML や CSS、JavaScript といった静的なファイルのみを扱う Web サイトであれば、Azure Storage（BLOB ストレージ）を使って簡単にホスティングすることができます。"
@@ -77,9 +77,9 @@ Web ブラウザから、プライマリエンドポイント（`https://xxx.yyy
 
 {{< image border="true" src="img-003.png" >}}
 
-{{< reference >}}
-- [逆引き Azure CLI: BLOB ストレージにファイルをアップロードする (storage blob upload)](/p/ptx36ue)
-{{< /reference >}}
+{{% maku-common/reference %}}
+- [逆引き Azure CLI: BLOB ストレージにファイルをアップロードする (storage blob upload)](/p/ptx36ue/)
+{{% /maku-common/reference %}}
 
 
 ### AzCopy で複数のファイルをまとめてアップロードする
@@ -105,9 +105,9 @@ $ az storage container generate-sas
 "se=2020-07-07T00%3A00%3A00Z&sp=racwdl&sv=2018-11-09&sr=c&sig=c7bapOBvLkHVlebBIEQFQc2bGd%2BjmfScqKCbkLUzzoo%3D"
 {{< /code >}}
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [逆引き Azure CLI: Azure ストレージの SAS トークンを生成する (storage container generate-sas)](/p/n4yqdys)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 
 標準出力に表示された `"se=..."` という文字列が SAS トークンです。
 

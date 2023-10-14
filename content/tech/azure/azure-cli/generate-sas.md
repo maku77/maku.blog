@@ -1,6 +1,6 @@
 ---
 title: "逆引き Azure CLI: Azure ストレージの SAS トークンを生成する (storage container generate-sas)"
-url: "/p/n4yqdys"
+url: "p/n4yqdys/"
 date: "2020-03-17"
 tags: ["Azure", "Azure CLI", "Azure Storage"]
 weight: 201
@@ -22,9 +22,7 @@ $ az storage container generate-sas
 
 SAS トークン生成時に指定するオプションの詳細は下記のコマンドリファレンスを参照してください。
 
-{{< reference >}}
-- [az storage container generate-sas コマンド](https://docs.microsoft.com/en-us/cli/azure/storage/container?view=azure-cli-latest#az-storage-container-generate-sas)
-{{< /reference >}}
+- 参考: [az storage container generate-sas コマンド](https://docs.microsoft.com/en-us/cli/azure/storage/container?view=azure-cli-latest#az-storage-container-generate-sas)
 
 実行に成功すると、次のような文字列が標準出力に出力されます。
 これが SAS トークンです。

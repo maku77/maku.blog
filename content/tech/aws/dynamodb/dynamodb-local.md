@@ -210,10 +210,8 @@ $ export NO_PROXY=localhost
 $ setx NO_PROXY localhost
 {{< /code >}}
 
-
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Amazon DynamoDB — AWS SDK for JavaScript](https://docs.aws.amazon.com/ja_jp/sdk-for-javascript/v3/developer-guide/dynamodb-examples.html)
 - [Amazon DynamoDB — Boto3 Docs documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/dynamodb.html)
-{{% /reference %}}
-
+{{% /maku-common/reference %}}
 

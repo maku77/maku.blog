@@ -1,6 +1,6 @@
 ---
 title: "Java/Kotlin で ISO 3166 国コードの一覧を取得する"
-url: "/p/5weufam"
+url: "p/5weufam/"
 date: "2020-05-11"
 tags: ["Java", "Kotlin"]
 ---
@@ -11,13 +11,13 @@ Locale クラスで国コードのリストを取得する
 [Locale クラスの getISOCountries() メソッド](https://docs.oracle.com/javase/10/docs/api/java/util/Locale.html#getISOCountries()) を使用すると、ISO 3166 で定義されている国コードの一覧を取得することができます。
 
 - `String[] Locale.getISOCountries()`
-    - ISO3166-1 alpha-2（2桁のアルファベット）
+  - ISO3166-1 alpha-2（2桁のアルファベット）
 - `Set<String> Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA2)`
-    - ISO3166-1 alpha-2（2桁のアルファベット）
+  - ISO3166-1 alpha-2（2桁のアルファベット）
 - `Set<String> Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA3)`
-    - ISO3166-1 alpha-3（3桁のアルファベット）
+  - ISO3166-1 alpha-3（3桁のアルファベット）
 - `Set<String> Locale.getISOCountries(Locale.IsoCountryCode.PART3)`
-    - ISO3166-3（4桁のアルファベット）
+  - ISO3166-3（4桁のアルファベット）
 
 
 サンプルコード
@@ -59,8 +59,8 @@ ZW  ZWE  Zimbabwe
 
 - {{< file src="countries.txt" caption="実行結果 (countires.txt)" >}}
 
-{{< reference >}}
-- [国コードや言語コードのまとめ (ISO 3166, ISO 639)](/p/tfs5gr3)
-- [Java/Kotlin で ISO 639 言語コードの一覧を取得する](/p/wjxanza)
-{{< /reference >}}
+{{% maku-common/reference %}}
+- [国コードや言語コードのまとめ (ISO 3166, ISO 639)](/p/tfs5gr3/)
+- [Java/Kotlin で ISO 639 言語コードの一覧を取得する](/p/wjxanza/)
+{{% /maku-common/reference %}}
 

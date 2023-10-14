@@ -1,6 +1,6 @@
 ---
 title: "Bot Framework: Web チャットの表示をカスタマイズする"
-url: "/p/oitn3a3"
+url: "p/oitn3a3/"
 date: "2020-02-19"
 tags: ["Azure", "Chatbot", "Bot Framework"]
 ---
@@ -63,6 +63,6 @@ Bot Framework が提供している `WebChat.renderWebChat()` 関数を呼び出
 </html>
 {{< /code >}}
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [GitHub: microsoft/BotFramework-WebChat](https://github.com/microsoft/BotFramework-WebChat/blob/master/README.md)
-{{< /reference >}}
+{{% /maku-common/reference %}}

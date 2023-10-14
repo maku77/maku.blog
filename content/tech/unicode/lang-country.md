@@ -1,6 +1,6 @@
 ---
 title: "国コードや言語コードのまとめ (ISO 3166, ISO 639)"
-url: "/p/tfs5gr3"
+url: "p/tfs5gr3/"
 date: "2020-05-11"
 tags: ["ISO", "Java"]
 ---
@@ -37,9 +37,7 @@ __ISO 3166-2__ では、国より細かい行政区画名（県や州）のコ�
 
 ### プログラムから国コードを扱う
 
-{{< reference >}}
 - [Java/Kotlin で ISO3166 国コードの一覧を取得する](/p/5weufam)
-{{< /reference >}}
 
 
 言語コード
@@ -96,7 +94,7 @@ frm,,,"French, Middle (ca.1400-1600)",français moyen (1400-1600)
 
 - [SIL - ISO 639 Code Tables](https://iso639-3.sil.org/code_tables/639/data)
 
-{{< reference >}}
-- [Java/Kotlin で ISO 639 言語コードの一覧を取得する](/p/wjxanza)
-{{< /reference >}}
+{{% maku-common/reference %}}
+- [Java/Kotlin で ISO 639 言語コードの一覧を取得する](/p/wjxanza/)
+{{% /maku-common/reference %}}
 

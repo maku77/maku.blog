@@ -1,7 +1,7 @@
 ---
 title: "TypeScriptの型: 列挙型を定義する (enum)"
 linkTitle: "列挙型を定義する (enum)"
-url: "/p/fdjk4hh"
+url: "p/fdjk4hh/"
 date: "2019-09-26"
 tags: ["TypeScript"]
 weight: 200
@@ -68,7 +68,7 @@ console.log(0 /* A */);
 
 `ConstEnum.A` という部分は、0 という値でハードコードされているのが分かります。
 
-{{< reference >}}
-- [TypeScript: リテラル型を定義する (Literal types)](/p/6iuo8aj)
-{{< /reference >}}
+{{% maku-common/reference %}}
+- [TypeScript: リテラル型を定義する (Literal types)](/p/6iuo8aj/)
+{{% /maku-common/reference %}}
 

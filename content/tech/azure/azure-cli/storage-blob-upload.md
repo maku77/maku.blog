@@ -1,6 +1,6 @@
 ---
 title: "逆引き Azure CLI: BLOB ストレージにファイルをアップロードする (storage blob upload)"
-url: "/p/ptx36ue"
+url: "p/ptx36ue/"
 date: "2020-03-17"
 tags: ["Azure", "Azure CLI", "Azure Storage"]
 weight: 201
@@ -24,7 +24,7 @@ Finished[#############################################################]  100.000
 
 アップロード時にストレージアカウントのキーを指定するので、あらかじめ `az login` で Azure にログインしておく必要はありません。
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [逆引き Azure CLI: ストレージアカウントのキーを確認する (storage account keys list)](/p/3wk5vnw)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 

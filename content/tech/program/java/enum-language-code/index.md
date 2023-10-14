@@ -1,6 +1,6 @@
 ---
 title: "Java/Kotlin で ISO 639 言語コードの一覧を取得する"
-url: "/p/wjxanza"
+url: "p/wjxanza/"
 date: "2020-05-11"
 tags: ["Java", "Kotlin"]
 ---
@@ -127,7 +127,7 @@ fun main() {
 - {{< file src="languages.html" caption="実行結果 (languages.html)" >}}
 
 
-{{< reference >}}
-- [国コードや言語コードのまとめ (ISO 3166, ISO 639)](/p/tfs5gr3)
-- [Java/Kotlin で ISO3166 国コードの一覧を取得する](/p/5weufam)
-{{< /reference >}}
+{{% maku-common/reference %}}
+- [国コードや言語コードのまとめ (ISO 3166, ISO 639)](/p/tfs5gr3/)
+- [Java/Kotlin で ISO3166 国コードの一覧を取得する](/p/5weufam/)
+{{% /maku-common/reference %}}

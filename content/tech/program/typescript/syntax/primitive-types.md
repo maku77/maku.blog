@@ -1,7 +1,7 @@
 ---
 title: "TypeScriptの型: 基本型（プリミティブタイプ）の一覧"
 linkTitle: "基本型（プリミティブタイプ）の一覧"
-url: "/p/2uds9o4"
+url: "p/2uds9o4/"
 date: "2020-04-28"
 tags: ["TypeScript"]
 weight: 1
@@ -85,7 +85,7 @@ function throwError(msg: string): never {
 {{< /code >}}
 
 
-{{< reference >}}
+{{% maku-common/reference %}}
 - [typeof で型情報を調べる](/p/ods6iv8)
-{{< /reference >}}
+{{% /maku-common/reference %}}
 

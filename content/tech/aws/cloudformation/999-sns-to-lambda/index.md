@@ -1,7 +1,7 @@
 ---
 title: "AWS CloudFormation の設定例: SNS トピックを Lambda 関数からサブスクライブする"
 linkTitle: "CloudFormation の設定例: SNS トピックを Lambda 関数からサブスクライブする"
-url: "/p/5q4epyb"
+url: "p/5q4epyb/"
 date: "2021-04-19"
 tags: ["AWS", "AWS/CloudFormation"]
 weight: 999
@@ -22,10 +22,10 @@ arn:aws:sns:ap-northeast-1:123456789012:mytopic
 
 上記のような CloudFormation スタックが完成すると、マネージメントコンソールや CLI で SNS トピックのメッセージを発行して、Lambda 関数にイベントが届くことを確認できます。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [CloudFormation で SNS トピックの作成](/p/ymzbmx9)
 - [CloudFormation の設定例: S3 通知を SNS トピックに Publish する](/p/3o2dpyb)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
 
 テンプレートの記述例

@@ -181,7 +181,7 @@ $ protoc --go_out=gen \
 
 `=` が 2 回出てくるのでちょっと分かりにくいですが、`proto/person.proto` ファイルのパッケージ名を `example.com/myapp` に設定しています。
 
-{{% reference %}}
+{{% maku-common/reference %}}
 - [Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）](/p/ij4jv9k/)
-{{% /reference %}}
+{{% /maku-common/reference %}}
 
