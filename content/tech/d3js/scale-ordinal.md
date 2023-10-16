@@ -135,26 +135,161 @@ console.log(colorScale("E"));  //=> gray
     <th colspan="3">デフォルトで使用できるカラースキーム</th>
   </tr>
   <tr>
-    <td>schemeCategory10</td>
-    <td>schemeAccent</td>
-    <td>schemeDark2</td>
+    <td>schemeCategory10<br/>
+      <svg width="150" height="15">
+        <rect x="0" y="0" width="15" height="15"   fill="#1f77b4" />
+        <rect x="15" y="0" width="15" height="15"  fill="#ff7f0e" />
+        <rect x="30" y="0" width="15" height="15"  fill="#2ca02c" />
+        <rect x="45" y="0" width="15" height="15"  fill="#d62728" />
+        <rect x="60" y="0" width="15" height="15"  fill="#9467bd" />
+        <rect x="75" y="0" width="15" height="15"  fill="#8c564b" />
+        <rect x="90" y="0" width="15" height="15"  fill="#e377c2" />
+        <rect x="105" y="0" width="15" height="15" fill="#7f7f7f" />
+        <rect x="120" y="0" width="15" height="15" fill="#bcbd22" />
+        <rect x="135" y="0" width="15" height="15" fill="#17becf" />
+      </svg>
+    </td>
+    <td>schemeAccent<br/>
+      <svg width="120" height="15">
+        <rect x="0" y="0" width="15" height="15"   fill="#7fc97f" />
+        <rect x="15" y="0" width="15" height="15"  fill="#beaed4" />
+        <rect x="30" y="0" width="15" height="15"  fill="#fdc086" />
+        <rect x="45" y="0" width="15" height="15"  fill="#ffff99" />
+        <rect x="60" y="0" width="15" height="15"  fill="#386cb0" />
+        <rect x="75" y="0" width="15" height="15"  fill="#f0027f" />
+        <rect x="90" y="0" width="15" height="15"  fill="#bf5b17" />
+        <rect x="105" y="0" width="15" height="15" fill="#666666" />
+      </svg>
+    </td>
+    <td>schemeDark2<br/>
+      <svg width="120" height="15">
+        <rect x="0" y="0" width="15" height="15"   fill="#1b9e77" />
+        <rect x="15" y="0" width="15" height="15"  fill="#d95f02" />
+        <rect x="30" y="0" width="15" height="15"  fill="#7570b3" />
+        <rect x="45" y="0" width="15" height="15"  fill="#e7298a" />
+        <rect x="60" y="0" width="15" height="15"  fill="#66a61e" />
+        <rect x="75" y="0" width="15" height="15"  fill="#e6ab02" />
+        <rect x="90" y="0" width="15" height="15"  fill="#a6761d" />
+        <rect x="105" y="0" width="15" height="15" fill="#666666" />
+      </svg>
+    </td>
   </tr>
   <tr>
-    <td>schemePaired</td>
-    <td>schemePastel1</td>
-    <td>schemePastel2</td>
+    <td>schemePaired<br/>
+      <svg width="180" height="15">
+        <rect x="0" y="0" width="15" height="15"   fill="#a6cee3" />
+        <rect x="15" y="0" width="15" height="15"  fill="#1f78b4" />
+        <rect x="30" y="0" width="15" height="15"  fill="#b2df8a" />
+        <rect x="45" y="0" width="15" height="15"  fill="#33a02c" />
+        <rect x="60" y="0" width="15" height="15"  fill="#fb9a99" />
+        <rect x="75" y="0" width="15" height="15"  fill="#e31a1c" />
+        <rect x="90" y="0" width="15" height="15"  fill="#fdbf6f" />
+        <rect x="105" y="0" width="15" height="15" fill="#ff7f00" />
+        <rect x="120" y="0" width="15" height="15" fill="#cab2d6" />
+        <rect x="135" y="0" width="15" height="15" fill="#6a3d9a" />
+        <rect x="150" y="0" width="15" height="15" fill="#ffff99" />
+        <rect x="165" y="0" width="15" height="15" fill="#b15928" />
+      </svg>
+    </td>
+    <td>schemePastel1<br/>
+      <svg width="135" height="15">
+        <rect x="0" y="0" width="15" height="15"   fill="#fbb4ae" />
+        <rect x="15" y="0" width="15" height="15"  fill="#b3cde3" />
+        <rect x="30" y="0" width="15" height="15"  fill="#ccebc5" />
+        <rect x="45" y="0" width="15" height="15"  fill="#decbe4" />
+        <rect x="60" y="0" width="15" height="15"  fill="#fed9a6" />
+        <rect x="75" y="0" width="15" height="15"  fill="#ffffcc" />
+        <rect x="90" y="0" width="15" height="15"  fill="#e5d8bd" />
+        <rect x="105" y="0" width="15" height="15" fill="#fddaec" />
+        <rect x="120" y="0" width="15" height="15" fill="#f2f2f2" />
+      </svg>
+    </td>
+    <td>schemePastel2<br/>
+      <svg width="120" height="15">
+        <rect x="0" y="0" width="15" height="15"   fill="#b3e2cd" />
+        <rect x="15" y="0" width="15" height="15"  fill="#fdcdac" />
+        <rect x="30" y="0" width="15" height="15"  fill="#cbd5e8" />
+        <rect x="45" y="0" width="15" height="15"  fill="#f4cae4" />
+        <rect x="60" y="0" width="15" height="15"  fill="#e6f5c9" />
+        <rect x="75" y="0" width="15" height="15"  fill="#fff2ae" />
+        <rect x="90" y="0" width="15" height="15"  fill="#f1e2cc" />
+        <rect x="105" y="0" width="15" height="15" fill="#cccccc" />
+      </svg>
+    </td>
   </tr>
   <tr>
-    <td>schemeSet1</td>
-    <td>schemeSet2</td>
-    <td>schemeSet3</td>
+    <td>schemeSet1<br/>
+      <svg width="135" height="15">
+        <rect x="0" y="0" width="15" height="15"   fill="#e41a1c" />
+        <rect x="15" y="0" width="15" height="15"  fill="#377eb8" />
+        <rect x="30" y="0" width="15" height="15"  fill="#4daf4a" />
+        <rect x="45" y="0" width="15" height="15"  fill="#984ea3" />
+        <rect x="60" y="0" width="15" height="15"  fill="#ff7f00" />
+        <rect x="75" y="0" width="15" height="15"  fill="#ffff33" />
+        <rect x="90" y="0" width="15" height="15"  fill="#a65628" />
+        <rect x="105" y="0" width="15" height="15" fill="#f781bf" />
+        <rect x="120" y="0" width="15" height="15" fill="#999999" />
+      </svg>
+    </td>
+    <td>schemeSet2<br/>
+      <svg width="120" height="15">
+        <rect x="0" y="0" width="15" height="15"   fill="#66c2a5" />
+        <rect x="15" y="0" width="15" height="15"  fill="#fc8d62" />
+        <rect x="30" y="0" width="15" height="15"  fill="#8da0cb" />
+        <rect x="45" y="0" width="15" height="15"  fill="#e78ac3" />
+        <rect x="60" y="0" width="15" height="15"  fill="#a6d854" />
+        <rect x="75" y="0" width="15" height="15"  fill="#ffd92f" />
+        <rect x="90" y="0" width="15" height="15"  fill="#e5c494" />
+        <rect x="105" y="0" width="15" height="15" fill="#b3b3b3" />
+      </svg>
+    </td>
+    <td>schemeSet3<br/>
+      <svg width="180" height="15">
+        <rect x="0" y="0" width="15" height="15"   fill="#8dd3c7" />
+        <rect x="15" y="0" width="15" height="15"  fill="#ffffb3" />
+        <rect x="30" y="0" width="15" height="15"  fill="#bebada" />
+        <rect x="45" y="0" width="15" height="15"  fill="#fb8072" />
+        <rect x="60" y="0" width="15" height="15"  fill="#80b1d3" />
+        <rect x="75" y="0" width="15" height="15"  fill="#fdb462" />
+        <rect x="90" y="0" width="15" height="15"  fill="#b3de69" />
+        <rect x="105" y="0" width="15" height="15" fill="#fccde5" />
+        <rect x="120" y="0" width="15" height="15" fill="#d9d9d9" />
+        <rect x="135" y="0" width="15" height="15" fill="#bc80bd" />
+        <rect x="150" y="0" width="15" height="15" fill="#ccebc5" />
+        <rect x="165" y="0" width="15" height="15" fill="#ffed6f" />
+      </svg>
+    </td>
   </tr>
   <tr>
-    <td>schemeTableau10</td>
+    <td>schemeTableau10<br/>
+      <svg width="150" height="15">
+        <rect x="0" y="0" width="15" height="15"   fill="#4e79a7" />
+        <rect x="15" y="0" width="15" height="15"  fill="#f28e2c" />
+        <rect x="30" y="0" width="15" height="15"  fill="#e15759" />
+        <rect x="45" y="0" width="15" height="15"  fill="#76b7b2" />
+        <rect x="60" y="0" width="15" height="15"  fill="#59a14f" />
+        <rect x="75" y="0" width="15" height="15"  fill="#edc949" />
+        <rect x="90" y="0" width="15" height="15"  fill="#af7aa1" />
+        <rect x="105" y="0" width="15" height="15" fill="#ff9da7" />
+        <rect x="120" y="0" width="15" height="15" fill="#9c755f" />
+        <rect x="135" y="0" width="15" height="15" fill="#bab0ab" />
+      </svg>
+    </td>
     <td></td>
     <td></td>
   </tr>
 </table>
+
+<script>
+// 各 rect の fill 属性の値（カラー）をマウスホバーで表示させるために title 要素を各 rect 以下に追加
+window.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("rect").forEach((rect) => {
+    const title = document.createElementNS('http://www.w3.org/2000/svg','title');
+    title.textContent = rect.getAttribute("fill");
+    rect.appendChild(title);
+  });
+});
+</script>
 
 次の例では、__`schemeCategory10`__ というカラースキームを使用しています。
 
