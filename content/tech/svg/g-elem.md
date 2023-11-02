@@ -276,3 +276,4 @@ backLayer.append("rect")
 </script>
 ```
 
+- 参考: [D3.js でレイヤー用の g 要素を作成するユーティリティ関数 (layer)](/p/298nhnq/)
