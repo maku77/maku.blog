@@ -11,7 +11,7 @@ tags: ["SVG"]
 SVG 内に `style` 要素を埋め込んで、ブラウザのダークモードの設定 (ON/OFF) に連動して各描画要素の色を変更する方法を説明します。
 
 <div style="text-align: center">
-  <svg style="width: 300px; max-width: 100%; border: thin solid gray;" viewBox="0 0 93 43">
+  <svg id="div-tds6j4y" style="width: 300px; max-width: 100%; border: thin solid gray;" viewBox="0 0 93 43">
     <rect id="background" x="0" y="0" width="100%" height="100%" fill="#eee" />
     <circle cx="20" cy="15" r="10" fill="blue" />
     <path d="M45,5 l11.5,20 -23,0 Z" fill="red" />
@@ -21,15 +21,19 @@ SVG 内に `style` 要素を埋め込んで、ブラウザのダークモード�
     <text id="text-off" x="65" y="38" font-size="8pt">OFF</text>
     <style>
       @media(prefers-color-scheme: light) {
-        #text-on { display: none; }
+        #div-tds6j4y {
+          & #text-on { display: none; }
+        }
       }
       @media(prefers-color-scheme: dark) {
-        #text-off { display: none; }
-        #background { fill: darkblue; }
-        circle { fill: lightblue; }
-        path { fill: pink; }
-        rect { fill: #bbffbb; }
-        text { fill: white; }
+        #div-tds6j4y {
+          & #text-off { display: none; }
+          & #background { fill: darkblue; }
+          & circle { fill: lightblue; }
+          & path { fill: pink; }
+          & rect { fill: #bbffbb; }
+          & text { fill: white; }
+        }
       }
     </style>
   </svg>
