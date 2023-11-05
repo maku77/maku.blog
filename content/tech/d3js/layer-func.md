@@ -46,10 +46,16 @@ draw(d3.range(3));  // データ変更後の再描画で余計な g 要素が作
  * レイヤーを新たに作成または既存のレイヤーを取得します。
  * @see {@link https://maku.blog/p/298nhnq/}
  */
-function layer(selection, id) {
-  const g = selection.select("#" + id);
-  return !g.empty() ? g : selection.append("g").attr("id", id);
+function layer(parent, id) {
+  const g = parent.select("#" + id);
+  return !g.empty() ? g : parent.append("g").attr("id", id);
 }
+
+// （TypeScript 対応版）
+// function layer(parent: d3.Selection<d3.BaseType, unknown, d3.BaseType, unknown>, id: string) {
+//   const g = parent.select<SVGGElement>('#' + id);
+//   return !g.empty() ? g : parent.append('g').attr('id', id);
+// }
 ```
 
 前述の `draw()` 関数を次のように書き換えると、安心して繰り返し呼び出せるようになります。
@@ -97,9 +103,9 @@ function draw(data) {
       .attr("fill", "#f009")
 }
 
-function layer(selection, id) {
-  const g = selection.select("#" + id);
-  return !g.empty() ? g : selection.append("g").attr("id", id);
+function layer(parent, id) {
+  const g = parent.select("#" + id);
+  return !g.empty() ? g : parent.append("g").attr("id", id);
 }
 {{< /maku-common/d3 >}}
 
@@ -135,9 +141,9 @@ function draw(data) {
  * レイヤーを新たに作成または既存のレイヤーを取得します。
  * @see {@link https://maku.blog/p/298nhnq/}
  */
-function layer(selection, id) {
-  const g = selection.select("#" + id);
-  return !g.empty() ? g : selection.append("g").attr("id", id);
+function layer(parent, id) {
+  const g = parent.select("#" + id);
+  return !g.empty() ? g : parent.append("g").attr("id", id);
 }
 </script>
 ```
@@ -160,4 +166,22 @@ function draw(data) {
   // ... 以下同様 ...
 }
 ```
+
+
+（おまけ）data([null]) を使う方法
+----
+
+前述の説明では、セレクションオブジェクトの `empty()` メソッドを使うことで、`g` 要素が追加済みかどうかを調べていましたが、次のようにデータ結合 (`data()`) の仕組みを利用することでも重複 `append` を避けることができます。
+
+{{< code lang="js" title="別の layer() 実装" >}}
+function layer(parent, id) {
+  return parent.selectAll("#" + id)
+    .data([null])
+    .join("g")
+    .attr("id", id);
+}
+{{< /code >}}
+
+この実装では、サイズ 1 のデータ配列 (`[null]`) をデータ結合することで、それに対応する 1 つの `g` 要素を 1 度だけ追加するように制御しています。
+このイディオムは D3.js の作者である Mike Bostock (mbostock) 氏も使っていたりしますが、コードの意味がわかりにくく気持ち悪いので、個人的には `empty()` メソッドを使うコードを推奨します。
 
