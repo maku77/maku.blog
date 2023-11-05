@@ -1,42 +1,26 @@
 ---
-title: "D3.js チートシート／未分類メモ"
+title: "D3.js チートシート"
 url: "p/456eght/"
 date: "2023-09-08"
-tags: ["D3.js"]
-draft: true
+tags: ["D3.js", "cheatsheet"]
 ---
 
 
-D3 セレクションオブジェクト
+D3 セレクションオブジェクトの取得
 ----
-
-### セレクションオブジェクトの取得
 
 | コード | 説明 |
 | ---- | ---- |
 | `d3.select("#foo")` | 先頭要素のセレクションオブジェクトを取得 |
 | `d3.selectAll("rect")` | すべての要素のセレクションオブジェクトを取得 |
 | `d3.selectAll("#foo rect)` | 入れ子構造でのクエリも可能 |
-| `section.select("#foo")` | セレクション以下から先頭要素のセレクションオブジェクトを取得 |
-| `section.select("rect")` | セレクション以下からすべての要素のセレクションオブジェクトを取得 |
+| `selection.select("#foo")` | セレクション以下から先頭要素のセレクションオブジェクトを取得 |
+| `selection.select("rect")` | セレクション以下からすべての要素のセレクションオブジェクトを取得 |
+| `selection.node()`/`nodes()` | セレクションから DOM 要素を取り出す |
 
-### セレクションオブジェクトと DOM 要素
 
-DOM 要素を D3.js のメソッドで操作したいときは、__`d3.select()`__ 関数などで DOM 要素に対応する __D3 セレクションオブジェクト__ を取得する必要があります。
-
-```js
-const svg = d3.select("#mysvg")  // D3 セレクションオブジェクトを取得（単一要素）
-const svgs = d3.selectAll("svg")  // D3 セレクションオブジェクトを取得（複数要素）
-```
-
-逆に、D3 セレクションオブジェクトから DOM 要素を取り出すには、__`node()`__ メソッドや __`nodes()`__ メソッドを使用します。
-
-```js
-const svgElem = svg.node()
-const svgElems = svgs.nodes()
-```
-
-### 属性・クラス・CSS スタイルの設定
+属性・クラス・CSS スタイルの設定
+----
 
 | コード | 説明 |
 | ---- | ---- |
@@ -63,24 +47,9 @@ d3.selectAll(".city").attr("r", (d) => d.population);
 d3.selectAll("table td").classed("warn", (d) => d.warnings > 10);
 ```
 
-### テキスト、HTML の設定
 
-| コード | 説明 |
-| ---- | ---- |
-| `selection.text()` | テキストを取得する |
-| `selection.text("Hello")` | テキストを設定する |
-| `selection.html()` | HTML を取得する |
-| `selection.html("<b>Hello</b>")` | HTML を設定する |
-
-### 要素の追加・削除
-
-| コード | 説明 |
-| ---- | ---- |
-| `selection.append(name)` | 末尾に要素を追加する |
-| `selection.insert(name [, before])` | 指定した要素の前に要素を追加 |
-| `selection.remove()` | この要素を取り除く |
-
-### データ配列の割り当てと参照
+データ配列の割り当てと参照
+----
 
 | コード | 説明 |
 | ---- | ---- |
@@ -91,32 +60,23 @@ d3.selectAll("table td").classed("warn", (d) => d.warnings > 10);
 | `selection.datum(value)` | （通常は単一要素のセレクションに）データを割り当てる |
 
 
-その他
+要素の追加・削除
 ----
 
-- アニメーションさせたいときは __`transition()`__ メソッドで属性値を指定します。
-- Simulation オブジェクトからノードデータを取り出す
-  ```js
-  const nodes = simulation.nodes()
-  ```
+| コード | 説明 |
+| ---- | ---- |
+| `selection.append(name)` | 末尾に要素を追加する |
+| `selection.insert(name [, before])` | 指定した要素の前に要素を追加 |
+| `selection.remove()` | この要素を取り除く |
 
-{{< maku-common/d3 id="mysvg3" w="100" h="70" >}}
-const svg = d3.select("#mysvg3")
-const width = svg.attr("width")
-const height = svg.attr("height")
-const data = [10, 30, 60, 40, 90, 20, 50, 70, 10, 40]
-const scaleX = d3.scaleLinear().domain([0, data.length]).range([0, width])
-const scaleY = d3.scaleLinear().domain([0, 100]).range([0, height])
-svg
-  .style("background", "#ffe")
-  .style("max-width", "100%")
-  .selectAll("rect")
-  .data(data)
-  .join("rect")
-  .attr("x", (_d, i) => scaleX(i))
-  .attr("y", (d) => height - scaleY(d))
-  .attr("width", width / data.length)
-  .attr("height", scaleY)
-  .attr("fill", "steelblue")
-{{< /maku-common/d3 >}}
+
+テキスト、HTML の設定
+----
+
+| コード | 説明 |
+| ---- | ---- |
+| `selection.text()` | テキストを取得する |
+| `selection.text("Hello")` | テキストを設定する |
+| `selection.html()` | HTML を取得する |
+| `selection.html("<b>Hello</b>")` | HTML を設定する |
 
