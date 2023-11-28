@@ -2,7 +2,7 @@
 title: "VS Code のショートカットキーを使いこなす（ウィンドウ操作編）"
 url: "/p/as4cmu4"
 date: "2020-06-10"
-tags: ["VS Code", "リファレンス"]
+tags: ["cheatsheet", "VS Code"]
 description: "Visual Studio Code で快適・爆速な開発をするために、主要なショートカットキーを覚えましょう。"
 weight: 200
 ---

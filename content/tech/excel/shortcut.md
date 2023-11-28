@@ -2,7 +2,7 @@
 title: "Excel でよく使うショートカット"
 url: "/p/h45duja"
 date: "2010-05-31"
-tags: ["Excel", "リファレンス"]
+tags: ["cheatsheet", "Excel"]
 ---
 
 ウィンドウ制御

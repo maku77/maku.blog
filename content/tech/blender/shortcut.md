@@ -3,7 +3,7 @@ title: "Blender: ショートカットキーまとめ"
 linkTitle: "ショートカットキーまとめ"
 url: "/p/uq9w7yv"
 date: "2019-10-15"
-tags: ["Blender", "リファレンス"]
+tags: ["Blender", "cheatsheet"]
 draft: true
 ---
 
