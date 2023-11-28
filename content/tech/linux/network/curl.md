@@ -1,13 +1,15 @@
 ---
-title: "Linuxコマンド: curl コマンドの使い方メモ（GET/POST リクエスト、ファイルのダウンロード）"
+title: "Linuxコマンド: curl コマンドの使用例（GET/POST リクエスト、ファイルのダウンロード）"
 url: "/p/phdp2do"
 date: "2015-04-03"
-tags: ["Linux"]
+tags: ["curl", "linux"]
 ---
 
 `curl` コマンドは URL を指定してサーバー上のリソースにアクセスするためのコマンドで、Web API のテストや、ファイルのダウンロードに使用できます。
 昔は `curl` コマンドは Linux 用のコマンドという認識でしたが、Windows 10 には標準搭載されるようになりました。
 `curl` は様々なプロトコルで通信できますが、主に HTTP/HTTPS が使用されます。
+
+- 参考: [curl コマンドのチートシート](/p/2sv4bqw/)
 
 
 curl コマンドでファイルをダウンロードする
@@ -15,22 +17,22 @@ curl コマンドでファイルをダウンロードする
 
 curl コマンドはデフォルトではダウンロードしたファイルを標準出力に出力します。
 __`-o`__（小文字のオー）オプションや、__`-O`__（大文字のオー）オプションを指定することで、__ファイルに保存する__ ことができます。
+同時に __`-L`__ オプションを指定しておくと、リダイレクトレスポンスを自動処理してくれます。
 
-### 指定したファイル名で保存 (-o)
-
-{{< code lang="console" >}}
-# カレントディレクトリに sample.zip という名前で保存（この場合は後述の -O を使うと楽）
-$ curl -L http://example.com/sample.zip -o sample.zip
-
-# 保存先を絶対パスで指定
-$ curl -L http://example.com/sample.zip -o /tmp/sample.zip
-{{< /code >}}
-
-
-### ダウンロード元と同じファイル名で保存 (-O)
+### ダウンロード元と同名で保存 (-O)
 
 {{< code lang="console" title="sample.zip という名前で保存" >}}
 $ curl -L -O http://example.com/sample.zip
+{{< /code >}}
+
+### 別名で保存 (-o)
+
+{{< code lang="console" >}}
+# カレントディレクトリに foo.zip という名前で保存
+$ curl -L -o foo.zip http://example.com/sample.zip
+
+# 保存先を絶対パスで指定することも可能
+$ curl -L -o /tmp/foo.zip http://example.com/sample.zip
 {{< /code >}}
 
 
@@ -50,10 +52,11 @@ $ curl https://pokeapi.co/api/v2/pokemon/ditto
 
 ### POST リクエスト
 
-HTTP POST リクエストを送るには、__`--request POST`__ オプションでメソッドを明示するか、__`-d (--data)`__ オプションで Body 部分で送るデータを指定します（両方指定しても OK です）。
+HTTP POST リクエストを送るには、__`-X POST (--request POST)`__ オプションを指定します。
+ただし、__`-d (--data)`__ オプションで本体部分で送るデータ（ペイロード）を指定すると、デフォルトで POST メソッドが使用されるので、多くの場合は `-X POST` は省略できます。
 
 {{< code lang="console" title="POST リクエストの例" >}}
-$ curl http://localhost:3000/books -d {}
+$ curl -d "param1=value1&param2=value2" http://localhost:3000/books
 {{< /code >}}
 
 下記はより複雑なオプションを指定したリクエストの例です。
