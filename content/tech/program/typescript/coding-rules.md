@@ -58,7 +58,3 @@ TypeScript のコーディングスタイルは下記のサイトが参考にな
     - standard/starndard: 25,509 stars
     - google/eslint-config-google: 1,510 stars
 
-下記のサイトでは、ESLint の設定でどのスタイルがよく使われているかをもう少し詳しく比較しています。
-
-- [Comparing eslint-config-airbnb vs. eslint-config-google vs. standard](https://npmcompare.com/compare/eslint-config-airbnb,eslint-config-google,standard)
-

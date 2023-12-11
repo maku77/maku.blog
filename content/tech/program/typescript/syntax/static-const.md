@@ -10,7 +10,7 @@ weight: 102
 static readonly プロパティを定義する
 ----
 
-TypeScript 2.0 移行では、クラス内の `static` プロパティに **`readonly`** キーワードを付けて読み取り専用であることを示すことができます。
+TypeScript 2.0 以降では、クラス内の `static` プロパティに **`readonly`** キーワードを付けて読み取り専用であることを示すことができます。
 
 {{< code lang="ts" >}}
 class SiteInfo {

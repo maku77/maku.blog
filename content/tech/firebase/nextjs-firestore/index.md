@@ -129,7 +129,7 @@ firebase パッケージのインストールや、`FirebaseApp` インスタン
 
 {{< code lang="ts" title="utils/firebase/books.ts" >}}
 import { collection, getDocs, getFirestore } from 'firebase/firestore'
-// import '../utils/firebase/init' // Initialize FirebaseApp
+// import './init' // Initialize FirebaseApp
 
 export type Book = {
   id: string
