@@ -307,3 +307,26 @@ $ npm run lint   # すべての静的解析ツールによる解析
 $ npm run fix    # すべての静的解析ツールによる自動修正
 ```
 
+
+（おまけ）設定例
+----
+
+{{< code lang="yaml" title=".stylelintrc.yaml" >}}
+extends:
+  - stylelint-config-standard-scss
+
+rules:
+  color-function-notation: [modern, { disableFix: true }]
+  media-feature-range-notation: [context, { disableFix: true }]
+{{< /code >}}
+
+- [color-function-notation](https://stylelint.io/user-guide/rules/color-function-notation)
+  - `modern` にすると、`rgb(12 122 231 / 0.2)` のようなカンマなしの記述を強制します。
+  - `legacy` にすると、`rgba(12, 122, 231, 0.2)` のようなカンマありの記述を強制します。
+  - 上記の例では、モダンな書き方の `modern` を設定しつつ、自動 fix だけを無効化しています。
+
+- [media-feature-range-notation](https://stylelint.io/user-guide/rules/media-feature-range-notation/)
+  - `context` にすると、`@media (1px <= width <= 2px) {}` という形式での記述を強制します
+  - `prefix` にすると、`@media (min-width: 1px) and (max-width: 2px) {}` という形式での記述を強制します
+  - 上記の例では、モダンな書き方の `context` を設定しつつ、自動 fix だけを無効化しています。
+
