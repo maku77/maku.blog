@@ -2,8 +2,16 @@
 title: "React の JSX 記述のコツ"
 url: "/p/xjv6gqy"
 date: "2021-06-17"
+lastmod: "2023-12-12"
+changes:
+  - 2023-12-12: 辞書要素のループ方法
 tags: ["React"]
 ---
+
+React アプリケーションでは、コンポーネントの UI を JSX 構文を用いて記述します。
+下記は、JSX コードを記述するときのポイントのまとめです。
+通常の JavaScript コードとは異なる記述方法が必要になるため慣れが必要ですが、ここに挙げたポイントをおさえておけば大体対応できます。
+
 
 JSX の最上位要素はひとつ
 ----
@@ -31,7 +39,7 @@ return (
 )
 {{< /code >}}
 
-もちろん、これはこれで動作するのですが、ルートに余計な `div` 要素が作られてしまうのを防ぎたいときは、次のように `<>...</>` で囲います（これは `<React.Fragment>` の省略記法です）。
+もちろん、これはこれで動作するのですが、ルートに余計な `div` 要素が作られてしまうのを防ぎたいときは、次のように __`<>...</>`__ で囲います（これは `<React.Fragment>` の省略記法です）。
 
 {{< code lang="jsx" >}}
 return (
@@ -108,6 +116,37 @@ const FoodList: React.FC = () => {
 このように要素を繰り返し出力する場合は、React が効率的な差分出力を行えるように、各要素に一意な __`key`__ プロパティ値を指定しなければいけないことに注意してください（参考: [リストと key](https://ja.reactjs.org/docs/lists-and-keys.html)）。
 これを忘れると、`Each child in a list should have a unique "key" prop.` といった警告が出ます。
 
+
+辞書要素のループ出力
+----
+
+辞書（ディクショナリ）要素を繰り返し出力する場合は、__`Object.keys()`__ でキーの配列を取り出し、それを __`map`__ メソッドで処理します。
+
+{{< code lang="jsx" >}}
+const myDict = {
+  key1: 'value1',
+  key2: 'value2',
+  key3: 'value3',
+}
+
+function MyComponent() {
+  return (
+    <ul>
+      {Object.keys(myDict).map((key) => (
+        <li key={key}>{`${key}: ${myDict[key]}`}</li>
+      ))}
+    </ul>
+  )
+}
+{{< /code >}}
+
+キー順にソートして出力したいときは、`Object.key()` で取り出したキー配列に対して `sort()` をかけます。
+
+```jsx
+{Object.keys(myDict).sort().map((key) => ( /* ... */ ))}
+```
+
+
 n 回のループ出力
 ----
 
@@ -120,8 +159,6 @@ n 回のループ出力
 {{< /code >}}
 
 `[...Array(3)]` という部分で、`[undefined, undefined, undefined]` というサイズ 3 の配列を作っておいて、各要素を `map` でループ処理してます。
-
-こんな書き方しかできないの？そうですか・・・
 
 
 コメントを記述する
