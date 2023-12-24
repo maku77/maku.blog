@@ -121,3 +121,10 @@ const books: BookSchema[] = await booksCollection
 
 その他のメソッドは、[公式サイト](https://deno.land/x/mongo) を参考にしてください。
 
+
+関連リンク
+----
+
+- [Golang で MongoDB を扱う (go.mongodb.org/mongo-driver)](https://maku77.github.io/p/uft7jv9/)
+- [Rust で MongoDB を扱う (mongodb)](https://maku77.github.io/p/nzi6xbm/)
+

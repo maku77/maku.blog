@@ -50,7 +50,7 @@ title: Title 3, author: Unknown
 
 この方法では JSON ファイルが静的に読み込まれるため、次のような恩恵があります。
 
-- JSON データから TypeScript の型情報を推測してくれるので、VB Code などで入力補完が効きます。
+- JSON データから TypeScript の型情報を推測してくれるので、VS Code などで入力補完が効きます。
 - `deno run` でのプログラム実行時に、`--allow-read` を付加する必要がありません。
 
 ### import 関数で動的インポート
