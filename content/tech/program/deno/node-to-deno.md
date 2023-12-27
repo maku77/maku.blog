@@ -2,6 +2,8 @@
 title: "Node.js と Deno のコーディング方法の違いまとめ"
 url: "p/zbaga2z/"
 date: "2022-12-21"
+changes:
+  - 2023-12-26: std/node が削除されたことを追記
 tags: ["Deno"]
 weight: 2
 ---
@@ -69,12 +71,12 @@ Deno ランタイムに組み込まれていないモジュールは、deno.land
     ```ts
     import { copy } from "https://deno.land/std@0.168.0/fs/copy.ts";
     ```
-- [deno.land/std/node](https://deno.land/std/node)
-  - 従来の Node API をエミュレートするためのモジュールが、標準ライブラリとして提供されています。
-  - 例えば、[std/node/global.ts](https://deno.land/std/node/global.ts) は、Node のグローバル変数 `process` を提供します。
 - [deno.land/x](https://deno.land/x)
   - 3rd パーティモジュールはここで管理されています。
   - 実際には、コードがある場所にリダイレクトしているだけです。
+- <s>[deno.land/std/node](https://deno.land/std/node)</s>
+  - <s>従来の Node API をエミュレートするためのモジュールが、標準ライブラリとして提供されています。例えば、[std/node/global.ts](https://deno.land/std/node/global.ts) は、Node のグローバル変数 `process` を提供します。</s>
+  - （2023-12 追記）__`node:...`__ 形式によるインポートがサポートされたことにより、Node.js 互換レイヤーである `std/node` ライブラリは削除されました。
 
 
 mod.ts と deps.ts

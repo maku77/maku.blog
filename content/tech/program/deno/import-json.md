@@ -10,17 +10,9 @@ Deno で JSON ファイルを読み込んで、JavaScript のオブジェクト�
 
 {{< code lang="json" title="books.json" >}}
 [
-  {
-    "title": "Title 1",
-    "author": "Author 1"
-  },
-  {
-    "title": "Title 2",
-    "author": "Author 2"
-  },
-  {
-    "title": "Title 3"
-  }
+  {"title": "Title 1", "author": "Author 1"},
+  {"title": "Title 2", "author": "Author 2"},
+  {"title": "Title 3"}
 ]
 {{< /code >}}
 

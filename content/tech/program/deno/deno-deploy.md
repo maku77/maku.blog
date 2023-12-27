@@ -93,7 +93,7 @@ export ddp_3MkWxJK9NLRkbOZjObTDO1VWotofhR3xbGPz
 
 ```console
 $ deployctl deploy --project=hello mod.ts
- ✔ Project: maku-temp
+ ✔ Project: hello
  ℹ Uploading all files from the current dir (/Users/maku/hello-server)
  ✔ Found 2 assets.
  ✔ Uploaded 2 new assets.
