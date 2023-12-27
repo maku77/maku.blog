@@ -26,20 +26,33 @@ await client.connect("mongodb://127.0.0.1:27017");
 // 後は client インスタンスを使って MongoDB を操作する
 ```
 
-実運用を考えると、__`MONGO_URI`__ のような環境変数で接続先の MongoDB サーバーを指定できるようにしておいた方がよいでしょう。
-例えば、MongoDB Atlas サービスを使用している場合は、次のような接続文字列 (SRV URI) が発行されますが、ここには接続パスワードなどが含まれるので、この URI をハードコーディングすることはできません。
+実運用を考えると、__`MONGODB_URI_MYAPP`__ のような環境変数で接続先の MongoDB サーバー（およびユーザー ID とパスワード）を指定できるようにしておいた方がよいでしょう。
+例えば、MongoDB Atlas サービスを使用している場合は、次のような構成の接続文字列 (SRV URI) が発行されますが、ここには接続パスワードなどが含まれるので、この URI をハードコーディングすることはできません。
 
-```
-mongodb+srv://<user>:<password>@cluster-name.abcde.mongodb.net/?retryWrites=true&w=majority
-```
+{{< code title="MongoDB 接続文字列 (SRV URI) の基本構成" >}}
+mongodb+srv://<user>:<password>@<cluster-url>/
+{{< /code >}}
 
-次の `client.ts` モジュールは、`MongoClient` インスタンスを `MONGO_URI` 環境変数が示す MongoDB サーバーに接続し、`export` しています。
-`MONGO_URI` 環境変数がセットされていない場合は、代わりに `127.0.0.1:27017` へ接続するようにしています。
+{{% note title="SRV URI で authentication failed になる場合" %}}
+SRV URI を使って MongoDB サーバーにアクセスしようとしたときに認証系のエラーが出る場合は、まずはユーザー ID とパスワードを確認してください。
+正しく指定しているのにも関わらずエラーが出る場合は、使用する認証メカニズムの食い違いが発生している可能性があります。
+[MongoDB はいくつかの認証メカニズム](https://www.mongodb.com/docs/drivers/node/current/fundamentals/authentication/mechanisms/) を備えており、MongoDB のバージョンによってどれを使うかが異なっています。
+URL の末尾のクエリパラメーターで、__`?authMechanism=SCRAM-SHA-1`__ のように認証メカニズムを指定できます。
+{{% /note %}}
+
+次の `client.ts` モジュールは、`MongoClient` インスタンスを `MONGODB_URI_MYAPP` 環境変数が示す MongoDB サーバーに接続し、`export` しています。
 
 {{< code lang="ts" title="client.ts" >}}
 import { MongoClient } from "https://deno.land/x/mongo@v0.31.1/mod.ts";
 
-const uri = Deno.env.get("MONGO_URI") ?? "mongodb://127.0.0.1:27017";
+const uri = Deno.env.get("MONGODB_URI_MYAPP");
+if (!uri) {
+  console.error("ERROR: MONGODB_URI_MYAPP environment variable is not set.");
+  Deno.exit(1);
+}
+// あるいは環境変数がセットされていない場合に代替の URI をセットする
+// const uri = Deno.env.get("MONGODB_URI_MYAPP") ?? "mongodb://127.0.0.1:27017";
+
 export const client = new MongoClient();
 await client.connect(uri);
 {{< /code >}}
@@ -63,6 +76,16 @@ $ deno run --allow-env --allow-net main.ts
   { name: "local", sizeOnDisk: 40960, empty: false }
 ]
 ```
+
+次のように Deno のコンフィグファイルを作成しておけば、__`deno task main`__ とするだけで実行できるようになります。
+
+{{< code lang="json" title="deno.jsonc" >}}
+{
+  "tasks": {
+    "main": "deno run --allow-env --allow-net main.ts"
+  }
+}
+{{< /code >}}
 
 
 コレクションを参照する
