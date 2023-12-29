@@ -74,6 +74,8 @@ Gimp を使いこなす上での最初の関門は、おそらく「選択」に
 | {{< image-inline w="30" src="img/gimp-swap-colors.svg" >}} | `X` | 描画色と背景色の入れ替え (Swap Colors) | |
 | {{< image-inline w="30" src="img/gimp-default-colors.svg" >}} | `D` | 描画色と背景色をデフォルトに戻す (<strong>D</strong>efault Colors) | デフォルト色は黒と白 |
 | {{< image-inline w="30" src="img/gimp-tool-color-picker.svg" >}} | `O` | 「スポイト」ツール (C<strong>o</strong>lor Picker) | `クリック` で描画色を設定<br/>`Cmd + クリック` で背景色を設定 |
+| | `[` / `]` | ブラシサイズを -1/+1 (Decrease/Increase size by 1) |
+| | `{` / `}` | ブラシサイズを -1/+1 (Decrease/Increase size by 10) |
 
 - 多くの描画系ツールでは、__`Cmd + クリック`__ でクリック位置の色を描画色に設定できます（スポイト）。「消しゴム」ツールを選択中の場合は、背景色の設定になります。
 - 多くの描画系ツールでは、__`Shift + クリック`__ で直線の描画が可能です。
@@ -171,3 +173,4 @@ Gimp を使いこなす上での最初の関門は、おそらく「選択」に
 | {{< image-inline w="30" src="img/gimp-tool-path.svg" >}} | `B` | 「パス」ツール (Path) (<strong>B</strong>ezier?) | |
 | {{< image-inline w="30" src="img/gimp-tool-text.svg" >}} | `T` | 「テキスト」ツール (<strong>T</strong>ext) | 自動でテキストレイヤーが作成されるので後から編集可能 |
 | {{< image-inline w="30" src="img/gimp-tool-measure.svg" >}} | <code style="white-space: nowrap">Shift + M</code> | 「定規」ツール (<strong>M</strong>easure) | 1 本目の線の端をさらに `Shift + ドラッグ` すると任意の角度で計測可能 |
+
