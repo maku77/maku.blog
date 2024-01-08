@@ -58,7 +58,7 @@ db.<coll>.find({}, { _id: 0, title: 1, genres: 1 })
 
 ### フィルターの指定方法 `find()`
 
-| フィルター | 説明 |
+| find の第 1 引数 | 説明 |
 | ---- | ---- |
 | `{ age: 10 }` | `age` フィールド（数値）が `10` に完全一致 |
 | `{ age: { $gt: 10 } }` | `age` フィールド（数値）が `10` より大きい |
@@ -76,8 +76,8 @@ db.<coll>.find({}, { _id: 0, title: 1, genres: 1 })
 | `{ genres: { $in: ["ACT", "RPG"] } }` | `genres` フィールド（配列）に少なくとも `ACT` か `RPG` が含まれる |
 | `{ genres: { $all: ["ACT", "RPG"] } }` | `genres` フィールド（配列）に `ACT` と `RPG` の両方が含まれる |
 | `{ genres: { $size: 2 } }` | `genres` フィールド（配列）のサイズが 2 |
-| `{ $and: [{ key1: val1 }, { key2: val2 }] }` | AND 条件 |
-| `{ $or: [{ key1: val1 }, { key2: val2 }] }` | OR 条件 |
+| `{ $and: [{ k1: v1 }, { k2: v2 }] }` | AND 条件 |
+| `{ $or: [{ k1: v1 }, { k2: v2 }] }` | OR 条件 |
 | `{ key: null }` | `key` フィールドが `null` か `undefined`、あるいは存在しない |
 | `{ key: { $type: "null" } }` | `key` フィールドが `null` （＝データ型が Null） |
 | `{ key: { $exists: true }` | `key` フィールドが存在する |
@@ -85,11 +85,35 @@ db.<coll>.find({}, { _id: 0, title: 1, genres: 1 })
 
 ### ソート `sort()`
 
-| コマンド | 説明 |
-| ---- | ---- |
-| `db.<coll>.find().sort({ price: 1 })` | `price` フィールドで昇順ソート |
-| `db.<coll>.find().sort({ date: -1 })` | `date` フィールドで降順ソート |
-| `db.<coll>.find().sort({ price: 1, date: -1 })` | `price` フィールドで昇順ソートして、同じなら `date` フィールドで降順ソート |
+<table>
+  <tr>
+    <td>
+{{< code lang="js" >}}
+db.<coll>.find().sort({ price: 1 })
+{{< /code >}}
+    </td>
+    <td>price フィールドで昇順ソート</td>
+  </tr>
+  <tr>
+    <td>
+{{< code lang="js" >}}
+db.<coll>.find().sort({ date: -1 })
+{{< /code >}}
+    </td>
+    <td>date フィールドで降順ソート</td>
+  </tr>
+  <tr>
+    <td>
+{{< code lang="js" >}}
+db.<coll>.find().sort({
+  price: 1,
+  date: -1
+})
+{{< /code >}}
+    </td>
+    <td>price フィールドで昇順ソート。<br/>price フィールドの値が同じ場合は、さらに date フィールドで降順ソート。</td>
+  </tr>
+</table>
 
 ### 取得件数を制限 `limit()`
 
@@ -141,29 +165,101 @@ db.books.insertMany([
 
 | コマンド | 説明 |
 | ---- | ---- |
-| `db.<coll>.remove({ 検索条件 })` | 検索条件に一致したドキュメントを削除 |
+| `db.<coll>.deleteOne({ 検索条件 })` | 検索条件に一致するドキュメントを 1 件削除 |
+| `db.<coll>.deleteMany({ 検索条件 })` | 検索条件に一致するドキュメントを全件削除 |
+| `db.<coll>.deleteMany({})` | すべてのドキュメントを削除（危険） |
+| <s>`db.<coll>.remove({ 検索条件 })`</s> | `remove()` は MongoDB 4.0 で deprecated |
 
-### 実行例
+### ドキュメント削除の例
 
-{{< code lang="js" title="books コレクション内の指定した ID のドキュメントを削除" >}}
-db.books.remove({ _id: "..." })
-{{< /code >}}
+```js
+// 指定した ID のドキュメントを削除
+db.books.deleteOne({ _id: ObjectId('6595345d07c7966c20e44b5d') })
+
+// 指定した価格以上のドキュメントをすべて削除
+db.books.deleteMany({ price: { $gte: 3000 } })
+
+// すべてのドキュメントを削除（危険）
+db.books.deleteMany({})
+```
 
 
 ドキュメントの更新 (Update)
 ----
 
-| コマンド | 説明 |
-| ---- | ---- |
-| `db.<coll>.updateOne({ 検索条件 }, { $set: { 更新内容 } })` | 見つかったドキュメントを 1 件更新 |
-| `db.<coll>.updateMany({ 検索条件 }, { $set: { 更新内容 } })` | 見つかったドキュメントをすべて更新 |
-| `db.<coll>.updateMany({}, { $set: { 更新内容 } })` | すべてのドキュメントを更新（検索条件なし） |
-| `db.<coll>.updateMany({}, { $rename: { key: "newkey" } })` | フィールド名を更新 |
-| `db.<coll>.replaceOne({ 検索条件 }, { 更新内容 } })` | 見つかったドキュメントの内容を丸々置き換える（削除して追加するのと同じ） |
-| `db.<coll>.updateOne({ 検索条件 }, { $set: { 更新内容 } }, { upsert: true })` | upsert 処理。ドキュメントが見つかったらその内容を更新。 見つからなかったら新規追加（検索条件と更新内容に指定されているフィールドが登録される） |
-| `db.<coll>.findAndModify()` | |
+<table>
+  <tr><th>コマンド</th><th>説明</th></tr>
+  <tr>
+    <td>
+{{< code >}}
+db.<coll>.updateOne(
+  { 検索条件 },
+  { $set: { 更新内容 } }
+)
+{{< /code >}}
+    </td>
+    <td>見つかったドキュメントを 1 件更新</td>
+  </tr>
+  <tr>
+    <td>
+{{< code >}}
+db.<coll>.updateOne(
+  { 検索条件 },
+  { $set: { 更新内容 } },
+  { upsert: true }
+)
+{{< /code >}}
+    </td>
+    <td>upsert 処理。ドキュメントが見つかったらその内容を更新。 見つからなかったら新規追加（検索条件と更新内容に指定されているフィールドが登録される）</td>
+  </tr>
+  <tr>
+    <td>
+{{< code >}}
+db.<coll>.updateMany(
+  { 検索条件 },
+  { $set: { 更新内容 } }
+)
+{{< /code >}}
+    </td>
+    <td>見つかったドキュメントをすべて更新</td>
+  </tr>
+  <tr>
+    <td>
+{{< code >}}
+db.<coll>.updateMany(
+  {},
+  { $set: { 更新内容 } }
+)
+{{< /code >}}
+    </td>
+    <td>すべてのドキュメントを更新（検索条件なし）</td>
+  </tr>
+  <tr>
+    <td>
+{{< code >}}
+db.<coll>.updateMany(
+  {},
+  { $set: { "myArrayField.$[elem]": "置換後" } },
+  { arrayFilters: [{ "elem": { $eq: "置換前" } }] }
+)
+{{< /code >}}
+    </td>
+    <td><a href="#array-filters">配列フィールド内の値を置換</a></td>
+  </tr>
+  <tr>
+    <td>
+{{< code >}}
+db.<coll>.replaceOne(
+  { 検索条件 },
+  { 更新内容 } }
+)
+{{< /code >}}
+    </td>
+    <td>見つかったドキュメントの内容を丸々置き換える（削除して追加するのと同じ）</td>
+  </tr>
+</table>
 
-### 実行例
+### 見つかったドキュメントを 1 件更新
 
 {{< code lang="js" title="title が Title-1 の status を closed に更新" >}}
 db.issues.updateOne(
@@ -172,9 +268,11 @@ db.issues.updateOne(
 )
 {{< /code >}}
 
-`$set` で指定したフィールドの値のみ更新されます。
+__`$set`__ で指定したフィールドの値のみ更新されます。
 `$set` で指定しなかったフィールドは元の値が維持されます。
 元のドキュメントに存在しないフィールドを指定すると、フィールドが追加されます。
+
+### すべてのドキュメントを更新
 
 {{< code lang="js" title="すべてのドキュメントの stars をインクリメント (+1)" >}}
 db.books.updateMany(
@@ -186,6 +284,53 @@ db.books.updateMany(
 検索条件に空オブジェクト (`{}`) を指定することで、すべてのドキュメントを更新対象としています。
 `$set` の代わりに __`$inc`__ を使用すると、既存の値に対して値を加算できます。
 
+### 配列フィールド内の値を置換 {#array-filters}
+
+`genres` 配列フィールド内の `OTHER` という要素をまとめて `ETC` に置換する例です。
+
+{{< code lang="js" title="テスト用 JavaScript コード" >}}
+// test コレクションの準備
+db.test.deleteMany({})
+db.test.insertMany([
+  { _id: 1, genres: ["ACT", "RPG"] },
+  { _id: 2, genres: ["STG", "OTHER"] },
+  { _id: 3, genres: ["OTHER", "ACT"] },
+])
+
+// genres 配列フィールド内の OTHER を ETC に置換
+db.test.updateMany(
+  { "genres": { $exists: true } },
+  { $set: { "genres.$[elem]": "ETC" } },
+  { arrayFilters: [{ "elem": { $eq: "OTHER" } }] }
+)
+
+// 結果確認
+db.test.find()
+{{< /code >}}
+
+{{< code lang="js" title="実行結果" >}}
+[
+  { _id: 1, genres: [ 'ACT', 'RPG' ] },
+  { _id: 2, genres: [ 'STG', 'ETC' ] },
+  { _id: 3, genres: [ 'ETC', 'ACT' ] }
+]
+{{< /code >}}
+
+`updateMany()` の検索条件（第 1 引数）には `{}` を渡すことも可能ですが、これだと `genres` フィールドが存在しないドキュメントがある場合にエラーになってしまうので、上記では `{ "genres": { $exists: true } }` として、`genres` フィールドが存在するドキュメントに対してのみ置換処理するようにしています。
+
+
+スキーマの更新
+----
+
+| コマンド | 説明 |
+| ---- | ---- |
+| `db.<coll>.updateMany({}, { $rename: { oldKey: "newKey" } })` | フィールド名を変更 |
+
+### フィールド名を変更
+
+次の例では、1 つのフィールド名をリネームしています（複数のフィールド名をまとめて変更することも可能です）。
+検索条件に空オブジェクト (`{}`) を指定することで、すべてのドキュメントを更新対象としています。
+
 {{< code lang="js" title="categories フィールドの名前を genres に変更" >}}
 db.books.updateMany(
   {},
@@ -193,8 +338,14 @@ db.books.updateMany(
 )
 {{< /code >}}
 
-検索条件に空オブジェクト ({}) を指定することで、すべてのドキュメントを更新対象としています。
-上記の例では、1 つのフィールド名だけをリネームしていますが、複数のフィールド名をまとめて変更することも可能です。
+すべてのドキュメントが `categories` フィールドを持つことが保証されていない場合は、次のように絞り込んで置換します。
+
+{{< code lang="js" >}}
+db.books.updateMany(
+  { "categories": { $exists: true } },
+  { $rename: { categories: "genres" } }
+)
+{{< /code >}}
 
 
 集計操作 (Aggregation Operations)
@@ -248,5 +399,5 @@ $ mongoimport --uri mongodb+srv://<user>:<pass>@<cluster-url>/<db> --collection 
 - `db.<coll>.createIndex({...})`
   - インデックスを生成します。
 - `db.createView()`
-  - ビュー作成します。
+  - ビューを作成します。
 
