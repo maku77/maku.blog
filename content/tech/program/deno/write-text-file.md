@@ -11,7 +11,7 @@ tags: ["Deno"]
 Deno でファイルへの出力を行うには、次のような File System API を使用します。
 
 | API | 渡せるデータ | 同期 |
-| ---- | ---- | ---- |
+| ---- | ---- | :--: |
 | [`Deno.writeFile`](https://deno.land/api?s=Deno.writeFile) | バイナリ (`Uint8Array`/`ReadableStream<Uint8Array>`) | |
 | [`Deno.writeFileSync`](https://deno.land/api?s=Deno.writeFileSync) |  バイナリ (`Uint8Array`) | ✅ |
 | [`Deno.writeTextFile`](https://deno.land/api?s=Deno.writeTextFile) | テキスト (`string`/`ReadableStream<string>`) | |
