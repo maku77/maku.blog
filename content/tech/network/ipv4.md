@@ -52,6 +52,21 @@ draft: true
   <label>二進数表記: <div id="ipv4-display-w6oyd5f"></div></label>
 </div>
 
+
+メモ
+----
+
+- プライベート IP アドレス
+  - 10.0.0.0/8
+  - 172.16.0.0/12
+  - 192.168.0.0/16
+- 例示用 IP アドレス (RFC 5737)
+  - 192.0.2.0/24
+  - 198.51.100.0/24
+  - 203.0.113.0/24
+- CLI コマンド
+  - 例: `ipcalc 203.0.133.0/24`
+
 <script>
 function main() {
   const ipv4Input = document.getElementById("ipv4-input-w6oyd5f");
