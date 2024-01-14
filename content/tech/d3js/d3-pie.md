@@ -2,6 +2,9 @@
 title: "D3.js で円グラフを描画する (d3.pie)"
 url: "p/v3g55wz/"
 date: "2023-11-30"
+lastmod: "2024-01-14"
+changes:
+  - 2024-01-14: 半径を動的に求めるように変更。
 tags: ["d3js"]
 ---
 
@@ -16,14 +19,14 @@ D3.js を使って円グラフを描画するには、`d3.pie()` と `d3.arc()` 
 d3.pie() 関数で扇形の角度を計算する
 ----
 
-D3.js の __`d3.pie()`__ 関数を使うと、円グラフ (pie chart) やドーナツチャート (donut chart) を描画するための角度を計算する関数オブジェクトを生成できます。
+D3.js の __`d3.pie()`__ 関数を使うと、円グラフ (pie chart) やドーナツチャート (donut chart) を描画するための __角度を計算する関数オブジェクトを生成__ できます。
 生成した関数にデータ配列を渡すと、各データに対応する扇形部分の開始角度 (`startAngle`) と終了角度 (`endAngle`) を計算してくれます。
 角度はラジアンで表現されるので、180° は 3.1415 になります。
 
 ```js
-const data = [5, 3, 2]
+const data = [5, 3, 2]  // 任意のデータ配列
 const pie = d3.pie()    // pie 関数の生成
-const arcs = pie(data)  // データ配列から角度情報を求める
+const arcs = pie(data)  // データ配列に角度情報を付加する
 
 console.log(args);
 ```
@@ -45,6 +48,34 @@ console.log(args);
 ]
 ```
 
+任意のデータ配列を `pie()` 関数に渡すと、上記のように `startAngle`、`endAngle` といった角度情報付きデータ配列を返してくれます。
+元のデータ配列の各要素は `data` プロパティに格納されているので、これ以降は元のデータ配列の代わりにこの角度情報付きのデータ配列だけを使えばよいことになります（例えば、D3.js のコンポーネントの `data()` メソッドにはこの配列を渡せばよい）。
+
+{{% note title="TypeScript を使う場合" %}}
+TypeScript を使って、`pie()` 関数に渡すデータ配列の型を指定するには次のようにします。
+配列型ではなく、個々の要素の型を指定することに注意してください。
+単一のデータであることを強調するために、data の単数系である datum という単語を使っています。
+
+```ts
+/** 円グラフ内の各セグメントの値と装飾情報を表します。 */
+type PieDatum = {
+  value: number
+  color: string
+}
+
+const data: PieDatum[] = [
+  { value: 30, color: "red" },
+  { value: 20, color: "blue" },
+  { value: 10, color: "yellow" },
+  // ...
+]
+
+// value() メソッドに角度計算用のプロパティを取り出すための関数を渡します
+const pie = d3.pie<PieDatum>().value((d) => d.value)
+const arcs = pie(data)  // 角度計算
+```
+{{% /note %}}
+
 
 d3.arc() 関数で SVG の path 情報に変換する
 ----
@@ -55,7 +86,7 @@ D3.js の __`d3.arc()`__ 関数を使用すると、扇形用の `path` 要素�
 
 {{< code lang="js" title="arc ジェネレーターで扇形用のパス情報を取得する" >}}
 // 内側の半径 (innerRadius) を 0 より大きくするとドーナツチャートになる
-const arc = d3.arc().innerRadius(0).outerRadius(100)
+const arc = d3.arc().innerRadius(0).outerRadius(radius)
 
 // path 要素の d 属性用の値を求める
 console.log(arc({ startAngle: 0, endAngle: 3.1415 }))
@@ -69,6 +100,17 @@ M0.009,100A100,100,0,0,1,-95.107,-30.897L0,0Z
 M-95.107,-30.897A100,100,0,0,1,-0.009,-100L0,0Z
 {{< /code >}}
 
+{{% note title="TypeScript を使う場合" %}}
+TypeScript を使用している場合は次のように型指定すると、生成された `arc()` 関数に正しく型情報が設定されます。
+これは、`arc()` 関数の引数として、前述の `pie()` 関数で生成した角度情報付きデータ配列の各要素を渡すということを表しています（`pie()` 関数の戻り値は `d3.PieArcDatum<PieDatum>` の配列です）。
+
+```ts
+const arc = d3.arc<d3.PieArcDatum<PieDatum>>()
+  .innerRadius(0)
+  .outerRadius(radius)
+```
+{{% /note %}}
+
 
 d3.pie() と d3.arc() を組み合わせて円グラフを描画する
 ----
@@ -77,11 +119,12 @@ d3.pie() と d3.arc() を組み合わせて円グラフを描画する
 const svg = d3.select("#svg-7wvnsew")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
+const radius = Math.min(width, height) / 2
 
 const data = [5, 3, 2]  // データ配列
 const pie = d3.pie()  // 扇形の角度を求める関数
-const arc = d3.arc().innerRadius(0).outerRadius(100)  // 角度からパスを生成する関数
-const color = d3.scaleOrdinal(d3.schemeCategory10)  // インデックスから色を生成する関数
+const arc = d3.arc().innerRadius(0).outerRadius(radius)  // 角度からパスを生成する関数
+const color = d3.scaleOrdinal(d3.schemeCategory10)  // 色を生成する関数
 
 // 円グラフ用の g 要素を作って SVG の中央に表示するよう位置調整
 const pieChart = svg.append("g")
@@ -91,13 +134,13 @@ pieChart
   .selectAll("path")
   .data(pie(data))
   .join("path")
-    .attr("d", arc)
-    .attr("fill", (_, i) => color(i))
+    .attr("d", arc)  // 円グラフのお決まり
+    .attr("fill", (_, i) => color(i.toString()))
 {{< /maku-common/d3 >}}
 
 上記で説明した関数を利用すれば、次のような手順でデータ配列を円グラフとして描画できます。
 
-1. `d3.pie()` を使って、データ配列を角度情報（`startAngle` と `endAngle`）に変換する。
+1. `d3.pie()` を使って、データ配列から角度情報（`startAngle` と `endAngle`）を生成する。
 2. `d3.arc()` を使って、角度情報を `path` 要素用の `d` 属性の値に変換する。
 3. 上記のように作成したデータをもとに `path` 要素を生成する。
 
@@ -110,11 +153,12 @@ pieChart
 const svg = d3.select("#svg-7wvnsew")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
+const radius = Math.min(width, height) / 2
 
 const data = [5, 3, 2]  // データ配列
 const pie = d3.pie()  // 扇形の角度を求める関数
-const arc = d3.arc().innerRadius(0).outerRadius(100)  // 角度からパスを生成する関数
-const color = d3.scaleOrdinal(d3.schemeCategory10)  // インデックスから色を生成する関数
+const arc = d3.arc().innerRadius(0).outerRadius(radius)  // 角度からパスを生成する関数
+const color = d3.scaleOrdinal(d3.schemeCategory10)  // 色を生成する関数
 
 // 円グラフ用の g 要素を作って SVG の中央に表示するよう位置調整
 const pieChart = svg.append("g")
@@ -125,8 +169,8 @@ pieChart
   .selectAll("path")
   .data(pie(data))
   .join("path")
-    .attr("d", arc)
-    .attr("fill", (_, i) => color(i))
+    .attr("d", arc)  // 円グラフのお決まり
+    .attr("fill", (_, i) => color(i.toString()))
 </script>
 ```
 
@@ -140,21 +184,23 @@ pieChart
 const svg = d3.select("#svg-ng6veie")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
+const radius = Math.min(width, height) / 2
 
 const data = [5, 3, 2]
 const pie = d3.pie()
-const arc = d3.arc().innerRadius(50).outerRadius(100)
+const arc = d3.arc().innerRadius(radius / 2).outerRadius(radius)
 const color = d3.scaleOrdinal(d3.schemeCategory10)
 const pieChart = svg.append("g")
   .attr("transform", `translate(${width/2}, ${height/2}) scale(0.8)`)
 pieChart.selectAll("path").data(pie(data)).join("path")
-  .attr("d", arc).attr("fill", (_, i) => color(i))
+  .attr("d", arc)  // 円グラフのお決まり
+  .attr("fill", (_, i) => color(i.toString()))
 {{< /maku-common/d3 >}}
 
 arc ジェネレーターの __`innerRadius()`__ メソッドで、内側の半径を設定すると、ドーナツチャートを描画することができます。
 
 ```js
-const arc = d3.arc().innerRadius(50).outerRadius(100)
+const arc = d3.arc().innerRadius(radius / 2).outerRadius(radius)
 ```
 
 ### 扇形の隙間
@@ -163,15 +209,17 @@ const arc = d3.arc().innerRadius(50).outerRadius(100)
 const svg = d3.select("#svg-zhxbqzj")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
+const radius = Math.min(width, height) / 2
 
 const data = [5, 3, 2]
 const pie = d3.pie()
-const arc = d3.arc().innerRadius(1).outerRadius(100).padAngle(0.02)
+const arc = d3.arc().innerRadius(1).outerRadius(radius).padAngle(0.02)
 const color = d3.scaleOrdinal(d3.schemeCategory10)
 const pieChart = svg.append("g")
   .attr("transform", `translate(${width/2}, ${height/2}) scale(0.8)`)
 pieChart.selectAll("path").data(pie(data)).join("path")
-  .attr("d", arc).attr("fill", (_, i) => color(i))
+  .attr("d", arc)  // 円グラフのお決まり
+  .attr("fill", (_, i) => color(i.toString()))
 {{< /maku-common/d3 >}}
 
 arc ジェネレーターの __`padAngle()`__ メソッドで、各扇形の間の隙間を指定することができます。
@@ -179,7 +227,7 @@ arc ジェネレーターの __`padAngle()`__ メソッドで、各扇形の間�
 
 ```js
 // padAngle() を設定するときは innerRadius() も調整する
-const arc = d3.arc().innerRadius(1).outerRadius(100).padAngle(0.02)
+const arc = d3.arc().innerRadius(1).outerRadius(radius).padAngle(0.02)
 ```
 
 扇形の境界を表現する方法としては、各扇形の `path` 要素に `stroke` スタイルを設定する方法もあります。
@@ -190,15 +238,17 @@ const arc = d3.arc().innerRadius(1).outerRadius(100).padAngle(0.02)
 const svg = d3.select("#svg-pqcngha")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
+const radius = Math.min(width, height) / 2
 
 const data = [5, 3, 2]
 const pie = d3.pie()
-const arc = d3.arc().innerRadius(0).outerRadius(100)
+const arc = d3.arc().innerRadius(0).outerRadius(radius)
 const color = d3.scaleOrdinal(d3.schemeCategory10)
 const pieChart = svg.append("g")
   .attr("transform", `translate(${width/2}, ${height/2}) scale(0.8)`)
 pieChart.selectAll("path").data(pie(data)).join("path")
-  .attr("d", arc).attr("fill", (_, i) => color(i))
+  .attr("d", arc)  // 円グラフのお決まり
+  .attr("fill", (_, i) => color(i.toString()))
   .attr("stroke", "yellow")
   .attr("stroke-width", 2)
 {{< /maku-common/d3 >}}
@@ -208,8 +258,8 @@ pieChart
   .selectAll("path")
   .data(pie(data))
   .join("path")
-    .attr("d", arc)
-    .attr("fill", (_, i) => color(i))
+    .attr("d", arc)  // 円グラフのお決まり
+    .attr("fill", (_, i) => color(i.toString()))
     .attr("stroke", "yellow")
     .attr("stroke-width", 2)
 {{< /code >}}
@@ -220,15 +270,17 @@ pieChart
 const svg = d3.select("#svg-2se7uux")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
+const radius = Math.min(width, height) / 2
 
 const data = [5, 3, 2]
 const pie = d3.pie()
-const arc = d3.arc().innerRadius(50).outerRadius(100)
+const arc = d3.arc().innerRadius(radius / 2).outerRadius(radius)
 const color = d3.scaleOrdinal(d3.schemeCategory10)
 const pieChart = svg.append("g")
   .attr("transform", `translate(${width/2}, ${height/2}) scale(0.8)`)
 pieChart.selectAll("path").data(pie(data)).join("path")
-  .attr("d", arc).attr("fill", (_, i) => color(i))
+  .attr("d", arc)  // 円グラフのお決まり
+  .attr("fill", (_, i) => color(i.toString()))
   .attr("stroke", "white")
   .attr("stroke-width", 2)
 pieChart.append("text")
@@ -262,10 +314,11 @@ pieChart.append("text")
 const svg = d3.select("#svg-t2om9my")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
+const radius = Math.min(width, height) / 2
 
 const data = [5, 3, 2]
 const pie = d3.pie()
-const arc = d3.arc().innerRadius(50).outerRadius(100)
+const arc = d3.arc().innerRadius(radius / 2).outerRadius(radius)
 const color = d3.scaleOrdinal(d3.schemeCategory10)
 
 // 円グラフ全体の g 要素
@@ -282,7 +335,8 @@ const pieElems = pieChart.selectAll(".pie-elems")
 // 各扇形の path 要素を作成
 pieElems
   .append("path")
-  .attr("d", arc).attr("fill", (_, i) => color(i))
+  .attr("d", arc)  // 円グラフのお決まり
+  .attr("fill", (_, i) => color(i.toString()))
   .attr("stroke", "white")
   .attr("stroke-width", 2)
 
@@ -307,10 +361,11 @@ pieElems
 const svg = d3.select("#svg-t2om9my")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
+const radius = Math.min(width, height) / 2
 
 const data = [5, 3, 2]
 const pie = d3.pie()
-const arc = d3.arc().innerRadius(50).outerRadius(100)
+const arc = d3.arc().innerRadius(radius / 2).outerRadius(radius)
 const color = d3.scaleOrdinal(d3.schemeCategory10)
 
 // 円グラフ全体の g 要素
@@ -327,7 +382,8 @@ const pieElems = pieChart.selectAll(".pie-elems")
 // 各扇形の path 要素を作成
 pieElems
   .append("path")
-  .attr("d", arc).attr("fill", (_, i) => color(i))
+  .attr("d", arc)  // 円グラフのお決まり
+  .attr("fill", (_, i) => color(i.toString()))
   .attr("stroke", "white")
   .attr("stroke-width", 2)
 

@@ -46,7 +46,7 @@ React アプリは作成済みであるとし、D3.js を使って描画を行�
 `useRef` フックで `svg` 要素の参照を取得し、D3.js の描画先として設定しています。
 
 {{< code lang="tsx" title="src/components/HelloChart.tsx" >}}
-import { FC, useEffect, useRef } from 'react'
+import React, { FC, useEffect, useRef } from 'react'
 import * as d3 from 'd3'
 
 export const HelloChart: FC = () => {
