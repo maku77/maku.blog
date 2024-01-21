@@ -12,7 +12,7 @@ OpenSSH の [`ssh-keygen` コマンド](/p/ftducs9/) で生成した SSH キー�
 このコメントは、公開鍵ファイル (`~/.ssh/id_XXX.pub`) の末尾を見ると確認できます。
 
 {{< code title="~/.ssh/id_ed25519.pub" >}}
-ssh-ed25519 AAA3NzaC1AA...省略...COst+87ciWFY maku@macobook.local
+ssh-ed25519 AAA3NzaC1AA...省略...COst+87ciWFY maku@macbook.local
 {{< /code >}}
 
 あるいは、__`ssh-keygen -l`__ コマンドで確認することもできます。
@@ -28,7 +28,7 @@ SSH 鍵ファイルのコメントを設定する
 
 SSH キーのコメントは、キーの作成時に __`-C`__ オプションで自由に設定できます。
 
-{{< code lang="console" title="コメントを指定して SSH キーを生成" >}}
+{{< code lang="console" title="SSH キーの作成時にコメントを設定" >}}
 $ ssh-keygen -t ed25519 -C "your_email@example.com"
 {{< /code >}}
 

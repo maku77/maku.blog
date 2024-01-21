@@ -5,7 +5,7 @@ date: "2022-01-23"
 lastmod: "2023-03-28"
 changes:
   - GitHub の SBOM 出力について
-tags: ["セキュリティ"]
+tags: ["sbom", "security"]
 ---
 
 ソフトウェア開発の世界で、__SBOM__ という用語がよく出てくるようになったので簡単にまとめておきます。

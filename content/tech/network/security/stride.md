@@ -2,7 +2,7 @@
 title: "セキュリティ雑多メモ: STRIDE による脅威分類"
 url: "p/p7ngweu/"
 date: "2023-10-08"
-tags: ["セキュリティ"]
+tags: ["security"]
 ---
 
 __STRIDE__ は Microsoft が提唱した脅威分類で、情報セキュリティにおける主要な攻撃を示すための頭字語です。

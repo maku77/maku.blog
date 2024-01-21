@@ -2,7 +2,7 @@
 title: "(DRAFT) SAML まわりの動きの図"
 url: "p/jsrdeie/"
 date: "2023-07-19"
-tags: ["SAML"]
+tags: ["saml", "security"]
 draft: true
 ---
 

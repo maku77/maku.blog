@@ -2,7 +2,7 @@
 title: "(DRAFT) JWT 関連メモ"
 url: "p/xx73pk7/"
 date: "2023-07-19"
-tags: ["JWT"]
+tags: ["jwt", "security"]
 draft: true
 ---
 
