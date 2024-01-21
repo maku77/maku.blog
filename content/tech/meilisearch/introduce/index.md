@@ -2,6 +2,9 @@
 title: "Meilisearch サーチエンジンを使ってみる"
 url: "p/bo8q8p7/"
 date: "2023-01-24"
+lastmod: "2024-01-21"
+changes:
+  - 2024-01-21: Meilisearch のバージョンを更新
 tags: ["Meilisearch"]
 ---
 
@@ -40,7 +43,7 @@ Docker Hub に [getmeili/meilisearch](https://hub.docker.com/r/getmeili/meilisea
 {{< code title="meilisearch サーバーの起動" >}}
 docker run --rm -it -p 7700:7700 \
     -v $(pwd)/meili_data:/meili_data \
-    getmeili/meilisearch:v0.30
+    getmeili/meilisearch:v1.6
 {{< /code >}}
 
 - `docker run` のオプションの意味:
@@ -48,6 +51,7 @@ docker run --rm -it -p 7700:7700 \
   - __`-it`__ ... ターミナルとコンテナの標準入出力を連動させます。
   - __`-p 7700:7700`__ ... `localhost:7700` へのアクセスをコンテナの 7700 番ポート（Meilisearch サービス）へ転送します。
   - __`-v $(pwd)/meili_data:/meili_data`__ ... カレントディレクトリの `meili_data` ディレクトリを、Meilisearch のデータ格納先として使用します。ディレクトリが存在しない場合は、自動で作成されます。
+  - __`getmeili/meilisearch:v1.6`__ ... 使用する Meilisearch イメージを指定しています。最新バージョンのタグは [Docker Hub](https://hub.docker.com/r/getmeili/meilisearch/tags) 上で確認してください。
 
 Meilisearch はデフォルトで development モード (`--env=development`) で起動し、プレビュー用の UI を提供します。
 コンテナが起動したら、ブラウザで __`http://localhost:7700/`__ にアクセスすると、Meilisearch のダッシュボードを表示できます。

@@ -114,9 +114,26 @@ DETR が End-to-End と呼ばれているのは、複数の段階を持つ従来
 XGBoost / LightGBM
 ----
 
-- https://xgboost.readthedocs.io/
-- https://lightgbm.readthedocs.io/
-- https://catboost.ai/
+### XGBoost
+
+- Website: https://xgboost.readthedocs.io/
+- 2014 年にリリース
+- 決定木アルゴリズムに基づいた勾配ブースティング (Gradient Boosting)
+
+### LightGBM
+
+- Website: https://lightgbm.readthedocs.io/
+- 2016 年にリリース
+- 決定木アルゴリズムに基づいた勾配ブースティング (Gradient Boosting)
+- マイクロソフト社がスポンサー
+- モデルの訓練が高速
+- ハイパーパラメーターを調整しないと過学習（オーバーフィッティング）しやすい
+
+### CatBoost
+
+- Website: https://catboost.ai/
+
+### 比較
 
 > XGBoost（XGBClassifier）とLightGBM（LGBMClassifier）の基本的な違いを表形式でまとめたものです。これらのモデルは、機械学習で広く使用される勾配ブースティングアルゴリズムです。
 

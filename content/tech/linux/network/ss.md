@@ -29,6 +29,6 @@ ss サブコマンド
 | コマンド | 説明 | 対応する旧コマンド |
 | ---- | ---- | ---- |
 | __`ss -nat`__ | TCP ポートの通信状態を確認 | `netstat -nat` |
-| __`ss -nlt`__ | LISTEN（待ち受け）状態の TCP ポートを確認 | `netsta -nlt` |
+| __`ss -nlt`__ | LISTEN（待ち受け）状態の TCP ポートを確認 | `netstat -nlt` |
 | __`ss -nau`__ | UDP ポートの通信状態を確認<br/>UDP ソケットの `State` カラムは `UNCONN` と表示される | `netstat -nau` |
 

@@ -66,10 +66,10 @@ all:
 {{% /private %}}
 
 インベントリファイルに SSH のユーザー名や秘密鍵のパスを記述するのが煩わしいときは、SSH クライアントの設定ファイル (`~/.ssh/config`) で、接続先ごとに使用する SSH ユーザーや秘密鍵を定義してしまう方法があります。
-次の例では、`maku-example.com` という名前で、SSH 接続設定を定義しています（この名前は何でもよいですが、ここでは、`maku` というユーザー名で `example.com` に接続するという意味でこう付けています）。
+次の例では、`example.com-maku` という名前で、SSH 接続設定を定義しています（この名前は何でもよいですが、ここでは、`example.com` というホストに `maku` というユーザー名で接続するという意味でこう付けています）。
 
 {{< code lang="ini" title="~/.ssh/config" >}}
-Host maku-example.com
+Host example.com-maku
     Hostname example.com
     User maku
     Port 22
@@ -79,12 +79,12 @@ Host maku-example.com
 これで、次のようにするだけで、指定した「ユーザー」、「アドレス」、「秘密鍵」を使って SSH 接続されるようになります。
 
 ```console
-$ ssh maku-example.com
+$ ssh example.com-maku
 ```
 
 この設定は、内部で ssh を使用しているプロダクトにも有効なので、Ansible のインベントリファイルは次のようにシンプルに記述できるようになります。
 
 {{< code lang="ini" title="hosts.ini" >}}
-maku-example.com
+example.com-maku
 {{< /code >}}
 

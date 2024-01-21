@@ -52,10 +52,10 @@ $ ssh -i ~/.ssh/conoha-maku/id_rsa maku@xxx.xxx.xxx.xxx
 ----
 
 ここまでの設定で、SSH キーを使った接続はできるようになっているのですが、毎回秘密鍵のパスやユーザー名などを入力するのは面倒です。
-このような場合は、__`~/.ssh/config`__ ファイルを作って、任意のエイリアス名を使って SSH 接続できるようにしておくと便利です。
+このような場合は、__`~/.ssh/config`__ ファイルを作って、エイリアス名を使って SSH 接続できるようにしておくと便利です。
 
 {{< code title="~/.ssh/config" >}}
-Host conoha
+Host conoha-maku
     Hostname xxx.xxx.xxx.xxx
     User maku
     Port 22
@@ -65,11 +65,22 @@ Host conoha
 上記のように設定しておくと、次のようなコマンドで簡単に SSH 接続できるようになります。
 
 ```console
-$ ssh conoha
+$ ssh conoha-maku
 ```
 
 あとは、同様の手順を接続先の SSH サーバーごとに繰り返せば OK です。
 `~/.ssh/config` の設定方法の詳細は、`man ssh_config` で確認できます。
+
+{{% note title="おすすめのエイリアス名" %}}
+`Host` 行のエイリアス名には任意の名前を設定できますが、__`<ホスト名>-<ユーザー名>`__ のような感じにしておくと分かりやすいです。
+ここでは `conoha-maku` という名前を付けました。
+
+次のように、スペース区切りで複数のエイリアス名を設定しておくこともできます。
+
+```
+Host conoha-maku conoha
+```
+{{% /note %}}
 
 {{% note title="Dropbox で SSH キーを共有" %}}
 セキュリティ的に微妙かもしれませんが、Dropbox などで SSH キーを管理しておくと、いろんな環境から SSH 接続できるようになるので便利です。
@@ -93,16 +104,16 @@ alias ssh-conoha='ssh -i ~/.ssh/conoha-maku/id_rsa maku@xxx.xxx.xxx.xxx'
 例えば、下記の `config` ファイルは GitHub 用の接続設定です（GitHub に SSH 接続するときのユーザー名は必ず `git` になることに注意）。
 
 {{< code title="~/.ssh/config" >}}
-Host github
+Host github-maku77
     HostName github.com
     User git
-    IdentityFile ~/.ssh/github-maku/id_rsa
+    IdentityFile ~/.ssh/github-maku77/id_rsa
 {{< /code >}}
 
 この設定を、Git の設定ファイルから次のように参照することができます。
 
-{{< code lang="ini" title="<REPO>/.git/config（抜粋）" >}}
+{{< code lang="ini" title="example-repo/.git/config（抜粋）" >}}
 [remote "origin"]
-    url = github:<GITHUB_USER>/<REPO>.git
+    url = github-maku77:maku77/example-repo.git
 {{< /code >}}
 
