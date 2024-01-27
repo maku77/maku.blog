@@ -17,7 +17,7 @@ Ansible コマンド（`ansible` や `ansible-playbook`）でマネージドノ�
 コマンドライン引数で SSH ユーザーを指定する方法 {#cmd-line}
 ----
 
-`ansible-playbook` コマンドの、__`-u (--user)`__ オプションと __`--private-key`__ オプションで、SSH 接続に使用するユーザー名と秘密鍵を指定することができます。
+`ansible-playbook` コマンドの、__`-u (--user)`__ オプションで SSH 接続に使用するユーザー名、__`--private-key`__ オプションで秘密鍵を指定することができます。
 
 ```console
 $ ansible-playbook -i hosts.ini site.yml -u maku --private-key ~/.ssh/maku/id_rsa
@@ -76,13 +76,13 @@ Host example.com-maku
     IdentityFile ~/.ssh/maku/id_rsa
 {{< /code >}}
 
-これで、次のようにするだけで、指定した「ユーザー」、「アドレス」、「秘密鍵」を使って SSH 接続されるようになります。
+これで、次のようにするだけで、指定した「ホスト」「ユーザー」「秘密鍵」で SSH 接続することができます。
 
 ```console
 $ ssh example.com-maku
 ```
 
-この設定は、内部で ssh を使用しているプロダクトにも有効なので、Ansible のインベントリファイルは次のようにシンプルに記述できるようになります。
+この設定は、内部で SSH を使用しているプロダクトにも有効なので、Ansible のインベントリファイルは次のようにシンプルに記述できるようになります。
 
 {{< code lang="ini" title="hosts.ini" >}}
 example.com-maku

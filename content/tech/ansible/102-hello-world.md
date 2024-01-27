@@ -22,39 +22,54 @@ host.example.com
 
 インベントリーファイル内では、上記のように「ホスト名」や「IP アドレス」で制御対象のホスト (managed node) を列挙します。
 ここでは、3 つのホストを Ansible のコマンド（`ansible` や `ansible-playbook`）で制御できるようにしています。
-`localhost` 以外のホストは、SSH で接続できる状態になっている必要があります。
+`localhost` 以外のホストは、SSH で接続できる状態になっている必要があります（参考: [SSH 関連記事](/p/gwnatcs/)）。
 
 
 ansible コマンドで ping モジュールを実行してみる
 ----
 
-インベントリーファイルを用意したら、まずは制御対象のホストに `ping` を実行してみます。
-`ping` は Ansible の組み込みモジュールとして提供されており、ターゲットホストへの接続確認のために使われます。
+最初のステップとして、`ansible` コマンドで __`ping`__ モジュールを実行してみます。
+`ping` モジュールは Ansible の組み込みモジュールとして提供されており、ターゲットホストへの接続確認のために使われます。
 いわゆる Linux の `ping` コマンド (ICMP ping) ではないことに注意してください。
+
+準備として、次のようなインベントリーファイル (`hosts.ini`) をカレントディレクトリに作成しておきます。
+
+{{< code lang="ini" title="hosts.ini（インベントリーファイル）" >}}
+localhost
+192.168.1.20
+{{< /code >}}
 
 ### ローカルホストを制御する
 
-まずは、`localhost` に対して（自分自身を制御対象として）、`ping` を実行してみます。
-制御対象とするホスト名は、`ansible` コマンドの第 1 パラメータで指定します。
-次のように SUCCESS 表示が出れば成功です。
+まずは、`localhost` に対して（自分自身を制御対象として）、`ping` モジュールを実行してみます。
+`ansible` コマンドを実行するときは、第 1 パラメータで制御対象とするホスト名を指定します。
+前述の通り、指定するホスト名はインベントリーファイル内に列挙されているものの中から選びます。
+次のように実行して SUCCESS 表示が出れば成功です（`python` コマンドのパスに関する警告が出るかもしれませんが、ひとまず無視しておいて大丈夫です）。
 
 {{< code lang="console" title="例: localhost に対して ping を実行" >}}
-$ ansible localhost -c local -m ping
+$ ansible localhost -i hosts.ini -m ping -c local
 localhost | SUCCESS => {
     "changed": false,
     "ping": "pong"
 }
 {{< /code >}}
 
-Ansible はデフォルトで SSH 接続しようとするので、ローカルホストを制御対象とするときは __`-c local`__ オプションを指定します。
-__`-m ping`__ オプションは、ping モジュールを使用してタスクを実行することを示しています。
+`ansible` コマンドの各オプションは次のような意味を持っています。
 
-イベントリーファイルで、ホスト変数として __`ansible_connection=local`__ を指定しておくと、`ansible` コマンド実行時の `-c local` の指定を省略できます。
+- __`-i hosts.ini`__ ... インベントリーファイルとして、カレントディレクトリの `hosts.ini` を使用します。
+- __`-m ping`__ ... 組み込みの `ping` モジュールを使用してタスクを実行します。
+- __`-c local`__ ... ローカルホストを制御対象とするときはこのオプションを指定します。Ansible はデフォルトで SSH 接続しようとするので、その振る舞いを抑制するためのオプションです。
 
-{{< code title="/etc/ansible/hosts（接続方式をホスト変数で指定）" >}}
+{{% note title="-c local オプションを省略したいとき" %}}
+イベントリーファイル内で、ホスト名 (`localhost`) の後ろに __`ansible_connection=local`__ と記述しておくと、`ansible` コマンド実行時の `-c local` オプションの指定を省略できます。
+
+{{< code title="hosts.ini（接続方式の指定）" >}}
 localhost  ansible_connection=local
 192.168.1.20
 {{< /code >}}
+
+ちなみに、このようにホスト名の後ろに指定したもの「ホスト変数」と呼びます。
+{{% /note %}}
 
 インベントリーファイルに定義されていないホスト名を指定すると、`ansible` コマンドは次のような警告メッセージを出力して終了します。
 
@@ -87,7 +102,7 @@ Enter passphrase for key '/Users/maku/.ssh/id_rsa': （SSH鍵のパスワード�
 
 上の例では、接続ユーザー名を `-u` オプションで指定していますが、インベントリーファイルの中で次のようにユーザー名を設定しておくこともできます。
 
-{{< code lang="inf" title="/etc/ansible/hosts" >}}
+{{< code lang="inf" title="hosts.ini" >}}
 localhost  ansible_connection=local
 192.168.1.20  ansible_ssh_user=maku
 {{< /code >}}
