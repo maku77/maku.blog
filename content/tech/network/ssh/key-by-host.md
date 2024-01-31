@@ -52,7 +52,7 @@ $ ssh -i ~/.ssh/conoha-maku/id_rsa maku@xxx.xxx.xxx.xxx
 ----
 
 ここまでの設定で、SSH キーを使った接続はできるようになっているのですが、毎回秘密鍵のパスやユーザー名などを入力するのは面倒です。
-このような場合は、__`~/.ssh/config`__ ファイルを作って、エイリアス名を使って SSH 接続できるようにしておくと便利です。
+このような場合は、__`~/.ssh/config`__ ファイルを作って、エイリアス名を使って SSH 接続できるようにしておくと便利です（Windows の場合は __`%USERPROFILE%\.ssh\config`__ です）。
 
 {{< code title="~/.ssh/config" >}}
 Host conoha-maku

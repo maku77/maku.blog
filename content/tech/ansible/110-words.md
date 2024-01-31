@@ -42,8 +42,11 @@ INI ファイル用の `ansible.builtin.ini` や、YAML ファイル用の `ansi
 : Ansible 本体に対して機能を追加する仕組み。
 参考: [Indexes of all modules and plugins — Ansible Documentation](https://docs.ansible.com/ansible/latest/collections/all_plugins.html)
 
-ホスト / Host
-: Ansible のコントロール対象となるリモートマシン。
+コントロールノード (control node)、コントローラーノード (controller node)
+: `ansible` コマンドや `ansible-playbook` コマンドを実行するホスト、つまり Ansible を使って対象のシステムの制御を行うマシンを指します。
+
+管理対象ノード (managed node)、ターゲットホスト (target host)
+: Ansible のコントロール対象となるホストのこと。コントロールノード側で Inventory として管理されます。
 
 ansible.cfg
 : Ansible 本体に対する設定ファイルで、INI 形式で記述します。
