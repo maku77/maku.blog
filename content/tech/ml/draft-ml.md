@@ -6,6 +6,18 @@ tags: ["ml"]
 draft: true
 ---
 
+
+データ分割・検証
+----
+
+- データセットを学習用データと検証用データに分割するための関数は、[sklearn.model_selection](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.model_selection) パッケージにまとまっています。
+
+- KFold（K-分割交差検証）
+- StratifiedKFold (Stratified K-Fold cross-validator)（層状 K 分割）
+  - [sklearn.model_selection.StratifiedKFold](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedKFold.html#sklearn.model_selection.StratifiedKFold)
+  - 正解ラベルの数に偏りがあるときに使います。例えば、陽性と陰性の正解ラベル比が 1:9 の場合、うまくデータ分割 (train, test) しないと、test データが陰性ばかりになってしまう可能性があります。このようなケースでは　StratifiedKFold を使うことで、分割後のデータ (train, test) にも、同じ比率の目的変数が含まれるように分割してくれます。
+
+
 画像認識モデル
 ----
 
