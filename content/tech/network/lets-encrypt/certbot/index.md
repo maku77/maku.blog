@@ -2,7 +2,7 @@
 title: "Certbot で Let's Encrypt の SSL 証明書を取得する（Web サーバーの HTTPS 対応）"
 url: "p/io4gs6h/"
 date: "2022-12-03"
-tags: ["Let's Encrypt", "Certbot"]
+tags: ["Let's Encrypt", "Certbot", "ssl"]
 weight: 1
 ---
 
