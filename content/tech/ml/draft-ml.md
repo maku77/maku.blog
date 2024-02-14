@@ -123,8 +123,10 @@ DETR が End-to-End と呼ばれているのは、複数の段階を持つ従来
   - 入力 → Deep Learning → 出力
 
 
-XGBoost / LightGBM
+XGBoost / LightGBM / CatBoost
 ----
+
+勾配ブースティング系のパッケージ。
 
 ### XGBoost
 
@@ -132,13 +134,16 @@ XGBoost / LightGBM
 - 2014 年にリリース
 - 決定木アルゴリズムに基づいた勾配ブースティング (Gradient Boosting)
 
-### LightGBM
+### LightGBM (Light Gradient Boosting Machine)
 
 - Website: https://lightgbm.readthedocs.io/
 - 2016 年にリリース
-- 決定木アルゴリズムに基づいた勾配ブースティング (Gradient Boosting)
 - マイクロソフト社がスポンサー
+- 決定木アルゴリズムに基づいた勾配ブースティング (Gradient Boosting) で、大量の決定木を作成しながら学習を進める
+- 特徴量の標準化が不要（決定木ベースの手法なので）
 - モデルの訓練が高速
+- 欠損値を含む入力を受け付けてくれる
+- カテゴリ変数を扱ってくれる
 - ハイパーパラメーターを調整しないと過学習（オーバーフィッティング）しやすい
 
 ### CatBoost
@@ -177,4 +182,8 @@ XGBoost / LightGBM
   - LabelBox
 - 物体検知モデルの性能評価
   - mAP (mean Average Precision) ... 各物体の検出制度の平均値。
+- 線形回帰アルゴリズムの 3 つの予測モデル
+  - 単回帰 ... 特徴量は 1 つ。特徴量が x として、ax + b のような一次関数として表現される。
+  - 重回帰 ... 特徴量は複数。ax<sub>1</sub> + bx<sub>2</sub> + cx<sub>3</sub> + d のような式で表現される。
+  - 多項式回帰 ... ax<sub>1</sub> + bx<sub>1</sub><sup>2</sup> + cx<sub>2</sub> + dx<sub>2</sub><sup>2</sup> + ... のような式で表現される（特徴量 x<sub>i</sub> の n 乗という項が出てくる）。説明変数と目的変数の関係が線形ではなく、より複雑な曲線や曲面を表現できます。
 

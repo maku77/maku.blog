@@ -92,7 +92,7 @@ db.<coll>.find({}, { _id: 0, title: 1, genres: 1 })
 db.<coll>.find().sort({ price: 1 })
 {{< /code >}}
     </td>
-    <td>price フィールドで昇順ソート</td>
+    <td><code>price</code> フィールドで昇順ソート</td>
   </tr>
   <tr>
     <td>
@@ -100,7 +100,7 @@ db.<coll>.find().sort({ price: 1 })
 db.<coll>.find().sort({ date: -1 })
 {{< /code >}}
     </td>
-    <td>date フィールドで降順ソート</td>
+    <td><code>date</code> フィールドで降順ソート</td>
   </tr>
   <tr>
     <td>
@@ -111,7 +111,7 @@ db.<coll>.find().sort({
 })
 {{< /code >}}
     </td>
-    <td>price フィールドで昇順ソート。<br/>price フィールドの値が同じ場合は、さらに date フィールドで降順ソート。</td>
+    <td><code>price</code> フィールドで昇順ソート。<br/><code>price</code> フィールドの値が同じ場合は、さらに <code>date</code> フィールドで降順ソート。<code>price</code> と <code>date</code> の<a href="#index">複合インデックス</a>を張っておくと高速なソートが可能です。</td>
   </tr>
 </table>
 
@@ -393,11 +393,50 @@ $ mongoimport --uri mongodb+srv://<user>:<pass>@<cluster-url>/<db> --collection 
 ユーザーに Database の書き込み権限が必要です。
 
 
-その他
+インデックス {#index}
 ----
 
-- `db.<coll>.createIndex({...})`
-  - インデックスを生成します。
-- `db.createView()`
-  - ビューを作成します。
+<table>
+  <tr><th>コマンド</th><th>説明</th></tr>
+  <tr>
+    <td>
+{{< code >}}
+db.<coll>.createIndex({ field: 1 })
+{{< /code >}}
+    </td>
+    <td>score フィールド用のインデックスを作成</td>
+  </tr>
+  <tr>
+    <td>
+{{< code >}}
+db.<coll>.createIndex({
+  genre: 1,
+  price: -1
+})
+{{< /code >}}
+    </td>
+    <td>genre と price フィールドの複合インデックスを作成（昇順＋降順）</td>
+  </tr>
+  <tr>
+    <td>
+{{< code >}}
+db.<coll>.createIndex({
+  title: "text",
+  comment: "text"
+})
+{{< /code >}}
+    </td>
+    <td>title と comment フィールド用にテキストインデックスを作成</td>
+  </tr>
+  <tr>
+    <td>
+{{< code >}}
+db.<coll>.createIndex({ "$**": "text" })
+{{< /code >}}
+    </td>
+    <td>全フィールド用のテキストインデックスを作成（ワイルドカードテキストインデックス）</td>
+  </tr>
+</table>
+
+MongoDB のインデックスの詳細ついては[こちらを参照](/p/gii3wtb/)。
 
