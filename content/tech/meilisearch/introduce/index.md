@@ -6,6 +6,7 @@ lastmod: "2024-01-21"
 changes:
   - 2024-01-21: Meilisearch のバージョンを更新
 tags: ["Meilisearch"]
+weight: 1
 ---
 
 Meilisearch とは？
@@ -175,11 +176,17 @@ $ curl http://localhost:7700/indexes/books/documents/1
 
 __`/indexes/{index_uid}/search`__ に GET あるいは POST 要求を送ると、任意の検索文字列（`q` パラメーター）でドキュメントを検索できます。
 この API が Meilisearch による検索のキモとなる API です。
-API キーを使用したアクセス制御を行う場合は、POST メソッドの方を使う必要があります。
-なので、実運用では POST を使うことになりますが、ここではお試しのため GET メソッドを使っています。
 
-{{< code lang="console" title="「Meili」で検索" >}}
+{{< code lang="console" title="Meili で検索（GET リクエスト）" >}}
 $ curl http://localhost:7700/indexes/books/search?q=Meili
+{{< /code >}}
+
+実運用上は、検索速度の向上のため GET リクエストではなく、__POST リクエストを使用する__ 必要があります（HTTP のプリフライト・リクエストのキャッシュが有効になる）。
+
+{{< code title="Meili で検索（POST リクエスト）" >}}
+$ curl -X POST 'http://localhost:7700/indexes/books/search' \
+    -H 'Content-Type: application/json' \
+    --data-binary '{ "q": "Meili" }'
 {{< /code >}}
 
 ちょっと綴りを間違えて、「Meilli」と入力してもうまく検索してくれます。
@@ -199,6 +206,7 @@ $ curl http://localhost:7700/indexes/books/search?q=%E3%81%8B%E3%82%8F%E3%81%84%
 ----
 
 インデックスに登録されたドキュメントは、`http://localhost:7700` で表示されるダッシュボード (Mini Dashboard) からも検索できるようになっています。
+ちなみにこれはテスト用の UI で、開発モード (`--env=development`) として起動した場合だけ有効になっています（デフォルトは開発モードです）。
 
 {{< image border="true" src="img-002.png" title="Mini Dashboard で books インデックスを検索" >}}
 
