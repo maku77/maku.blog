@@ -10,7 +10,7 @@ tags: ["Linux", "lsof", "ネットワーク"]
 
 次のように実行すると、TCP でポートを開いて LISTEN 状態になっているプロセスのコマンド名や PID の一覧を表示できます。
 
-```console
+{{< code lang="console" title="開いている TCP ポートの一覧を表示" >}}
 $ lsof -i tcp -s tcp:listen -P
 COMMAND     PID USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
 ControlCe   604 maku   24u  IPv4 0xbf4647db74c55935      0t0  TCP *:7000 (LISTEN)
@@ -25,7 +25,13 @@ ruby      52070 maku   12u  IPv4 0xbd38681374c55935      0t0  TCP localhost:3572
 node      65924 maku   38u  IPv6 0x27a9356374c5592c      0t0  TCP localhost:5173 (LISTEN)
 Dropbox   68519 maku  114u  IPv4 0xbc67e81374c55935      0t0  TCP *:17500 (LISTEN)
 Dropbox   68519 maku  115u  IPv6 0x27a8836374c5592c      0t0  TCP *:17500 (LISTEN)
-```
+{{< /code >}}
+
+サーバー系の開発をしていると、開いているポートがどんどん増えていくので、次のような __`ports`__ エイリアスを定義しておくと便利です。
+
+{{< code lang="sh" title="~/.zshrc や ~/.bashrc で" >}}
+alias ports="lsof -i tcp -s tcp:listen -P"
+{{< /code >}}
 
 
 lsof -i の使い方
