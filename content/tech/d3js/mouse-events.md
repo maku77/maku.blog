@@ -11,7 +11,7 @@ D3.js でマウスイベントを扱うコードのサンプルです。
 click イベント
 ----
 
-{{< maku-common/d3 id="svg-vwuifrt" w="200" h="100" title="click イベントをハンドルする" >}}
+{{< mm/d3 id="svg-vwuifrt" w="200" h="100" title="click イベントをハンドルする" >}}
 const svg = d3.select("#svg-vwuifrt");  // D3 Selection オブジェクトを取得
 
 svg.on("click", (event) => {
@@ -23,7 +23,7 @@ svg.on("click", (event) => {
     .attr("fill", "deeppink")
     .style("fill-opacity", 0.5)
 })
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 D3.js でマウスのクリックイベントをハンドルするには、D3 Selection オブジェクトに __`click`__ イベントハンドラを追加します。
 上記の svg 要素内でクリックすると、その座標にピンク色の円が表示されます。
@@ -51,7 +51,7 @@ svg.on("click", (event) => {
 mousemove イベント
 ----
 
-{{< maku-common/d3 id="svg-mousemove" w="200" h="100" title="mousemove イベントをハンドルする" >}}
+{{< mm/d3 id="svg-mousemove" w="200" h="100" title="mousemove イベントをハンドルする" >}}
 const svg = d3.select("#svg-mousemove");
 
 // 座標値を表示するための text 要素を追加しておく
@@ -72,7 +72,7 @@ svg.on("mousemove", (event) => {
   text.text(`x=${Math.floor(x)}, y=${Math.floor(y)}`)
   circle.attr("cx", x).attr("cy", y)
 })
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 D3.js でマウスカーソルを動かしたときのイベントをハンドルするには、D3 Selection オブジェクトに __`mousemove`__ イベントハンドラを追加します。
 上記の svg 要素内でマウスカーソルを動かすと、現在の座標値を表示します。
@@ -108,7 +108,7 @@ svg.on("mousemove", (event) => {
 mouseover / mouseout イベント
 ----
 
-{{< maku-common/d3 id="svg-mouseover" w="200" h="100" title="mouseover/mouseout イベントをハンドルする" >}}
+{{< mm/d3 id="svg-mouseover" w="200" h="100" title="mouseover/mouseout イベントをハンドルする" >}}
 const svg = d3.select("#svg-mouseover");
 
 // 矩形を追加
@@ -143,7 +143,7 @@ function handleMouseOut(event) {
   d3.select(event.currentTarget).attr("fill", "transparent")
   // d3.select(this).attr("fill", "transparent")
 }
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 マウスカーソルが、特定の要素内に入った／出たタイミングを知るには、__`mouseover`__ / __`mouseout`__ イベントをハンドルします。
 上の `svg` 要素内の矩形と円の中にマウスカーソルが入ると、背景色が変化します。

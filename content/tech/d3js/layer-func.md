@@ -78,7 +78,7 @@ layer 関数の使用例
 
 下記は、このユーティリティ関数 (`layer`) の具体的な使用例です。
 
-{{< maku-common/d3 id="svg-af2nv6q" w="200" h="70" title="layer() で作成したレイヤーに描画" >}}
+{{< mm/d3 id="svg-af2nv6q" w="200" h="70" title="layer() で作成したレイヤーに描画" >}}
 draw(d3.range(3));
 
 function draw(data) {
@@ -107,7 +107,7 @@ function layer(parent, id) {
   const g = parent.select("#" + id);
   return !g.empty() ? g : parent.append("g").attr("id", id);
 }
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 ```html
 <svg id="svg-af2nv6q" width="200" height="70"></svg>

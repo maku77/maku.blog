@@ -30,7 +30,7 @@ d3-zoom の簡単な使用例
 
 下記の `svg` 画像の中で、ドラッグやホイール操作を行うと、矩形のズームや移動を行うことができます。
 
-{{< maku-common/d3 id="svg-gh4oas2" w="200" h="100" title="d3-zoom によるズーム／パン操作" >}}
+{{< mm/d3 id="svg-gh4oas2" w="200" h="100" title="d3-zoom によるズーム／パン操作" >}}
 const svg = d3.select("#svg-gh4oas2")
 const topLayer = svg.append("g")
 
@@ -47,7 +47,7 @@ svg.call(d3.zoom().on("zoom", zoomed))
 function zoomed(event) {
   topLayer.attr("transform", event.transform);
 }
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 {{< code lang="html" title="実装コード" >}}
 <svg id="svg-gh4oas2" width="200" height="100"></svg>
@@ -112,7 +112,7 @@ function zoomed(event) {
 
 パン範囲 (`translateExtent`) の方は、現在のズーム倍率などによって調整が必要で難しかったりするので、とりあえずズーム倍率 (`scaleExtent`) の制限だけしておくのがよいかもしれません。
 
-{{< maku-common/d3 id="svg-agsdno7" w="200" h="100" title="d3-zoom によるズーム／パン操作" >}}
+{{< mm/d3 id="svg-agsdno7" w="200" h="100" title="d3-zoom によるズーム／パン操作" >}}
 const svg = d3.select("#svg-agsdno7")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
@@ -139,7 +139,7 @@ svg
 function zoomed(event) {
   topLayer.attr("transform", event.transform);
 }
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 {{< code lang="html" title="実装コード" hl_lines="14-24" >}}
 <svg id="svg-agsdno7" width="200" height="100"></svg>

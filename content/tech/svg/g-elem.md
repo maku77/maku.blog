@@ -146,7 +146,7 @@ nodes.attr('transform', (d) => `translate(${d.x} ${d.y})`);
 </script>
 {{< /code >}}
 
-{{< maku-common/d3 id="svg-5a4n9yy" w="200" h="80" title="上記 D3.js コードの実行結果" >}}
+{{< mm/d3 id="svg-5a4n9yy" w="200" h="80" title="上記 D3.js コードの実行結果" >}}
 const nodesData = [
   { label: 'AAA', x: 20, y: 20 },
   { label: 'BBB', x: 40, y: 40 },
@@ -173,7 +173,7 @@ d3.select('#svg-5a4n9yy')
     .text((d) => d.label)
   )
   .call((g) => g.attr('transform', (d) => `translate(${d.x} ${d.y})`))
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 あるいは、D3 セレクションオブジェクトの __`call`__ メソッドを使えば、次のようにメソッドチェーンですべて繋いで記述することも可能です。
 どちらかというと、こちらの方が D3.js っぽい書き方なのかもしれません。
@@ -232,7 +232,7 @@ D3.js を使った JavaScript コードなどで SVG を動的に構築する場
 次の例では、2 つの `g` 要素（`backLayer` と `frontLayer`）を作成し、その子要素として `circle` や `rect` 要素を配置しています。
 `backLayer`、`frontLayer` の順番で `g` 要素を追加しているので、`frontLayer` に配置した子要素（この場合は `circle`）の方が、手前に表示されることが保証されます。
 
-{{< maku-common/d3 id="svg-rub6v9m" w="120" h="80" title="レイヤー構造による表示順序の制御" >}}
+{{< mm/d3 id="svg-rub6v9m" w="120" h="80" title="レイヤー構造による表示順序の制御" >}}
 const svg = d3.select("#svg-rub6v9m")
 const backLayer = svg.append("g");
 const frontLayer = svg.append("g");
@@ -249,7 +249,7 @@ backLayer.append("rect")
   .attr("width", 50)
   .attr("height", 50)
   .attr("fill", "blue");
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 ```html
 <svg id="svg-rub6v9m" width="120" height="80" />

@@ -39,7 +39,7 @@ Docker コンテナイメージの [nginx-proxy](https://github.com/nginx-proxy/
 ### サブドメインの DNS 設定
 
 独自ドメインの DNS 設定で、サブドメイン用の A レコードを追加して IP アドレスに関連づけておきます。
-下記は {{< ad/conoha-vps-text >}} での DNS 設定例ですが、だいたい同じような感じで設定できるはずです。
+下記は {{< mm/ad/conoha-vps-text >}} での DNS 設定例ですが、だいたい同じような感じで設定できるはずです。
 
 {{< image w="600" border="true" src="img-002.png" title="A レコードの追加（IP アドレスは偽物です）" >}}
 

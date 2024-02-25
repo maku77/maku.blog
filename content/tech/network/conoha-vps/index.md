@@ -9,10 +9,10 @@ tags: ["VPS"]
 何をするか？
 ----
 
-{{< ad/conoha-vps-text "ConoHa の VPS" >}} を借りたので、そのときの設定手順をメモしておきます。
+{{< mm/ad/conoha-vps-text "ConoHa の VPS" >}} を借りたので、そのときの設定手順をメモしておきます。
 大体こんな感じのことをしています。
 
-1. {{< ad/conoha-vps-text "ConoHa VPS を契約" >}} して Ubuntu 22.04 を起動
+1. {{< mm/ad/conoha-vps-text "ConoHa VPS を契約" >}} して Ubuntu 22.04 を起動
 2. {{< ad/onamae-domain-text "お名前.com で独自ドメインを取得" >}}
 3. 独自ドメインで ConoHa VPS にアクセスできるようにする（IPv6 も有効化）
 
@@ -27,7 +27,7 @@ VPS にはグローバル IP アドレスが割り当てられるので独自ド
 ConoHa のアカウントを作って VPS を契約
 ----
 
-何はともあれ、まずは ConoHa のアカウントを作って {{< ad/conoha-vps-text "ConoHa VPS" >}} を借ります。
+何はともあれ、まずは ConoHa のアカウントを作って {{< mm/ad/conoha-vps-text "ConoHa VPS" >}} を借ります。
 ポチポチやってけば終わります。
 
 {{< image border="true" src="img-001.png" title="ConoHa VPS での OS の選択" >}}
@@ -210,6 +210,6 @@ ConoHa VPS 広告
 
 最後に、お得な広告を貼っておきます（＾＾
 
-- __ConoHa VPS__ の申し込みはこちらから → {{< ad/conoha-vps-banner >}}
+- __ConoHa VPS__ の申し込みはこちらから → {{< mm/ad/conoha-vps-banner >}}
 - お名前.com での __ドメイン取得__ はこちらから → {{< ad/onamae-domain-banner >}}
 

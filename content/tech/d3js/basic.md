@@ -20,7 +20,7 @@ D3.js で矩形を描画するには、__`d3.select()`__ で svg 要素を選択
 次の例では、svg 要素に緑色の矩形を 1 つ追加しています。
 `rect` 要素の塗り潰し色は `fill` 属性で指定することに注意してください（CSS の "background" プロパティとは名前が異なります）。
 
-{{< maku-common/d3 id="svg-wp3vzdr" w="200" h="100" title="矩形の表示" >}}
+{{< mm/d3 id="svg-wp3vzdr" w="200" h="100" title="矩形の表示" >}}
 d3.select("#svg-wp3vzdr")
   .append("rect")  // svg 内に rect 要素を追加
     .attr("x", 10)  // rect 要素の属性値を設定
@@ -28,7 +28,7 @@ d3.select("#svg-wp3vzdr")
     .attr("width", 100)
     .attr("height", 50)
     .attr("fill", "green")
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 ```html
 <svg id="svg-wp3vzdr" width="200" height="100"></svg>
@@ -63,7 +63,7 @@ D3.js プログラミングの慣例では、選択した要素（D3 セレク�
 配列に格納された複数の値をまとめてプロットするには、D3 セレクションオブジェクトの __`data()`__ メソッドに配列データをセットします。
 これを「データ結合」といいます。
 
-{{< maku-common/d3 id="svg-tdpqpgb" w="200" h="100" title="配列データをプロット" >}}
+{{< mm/d3 id="svg-tdpqpgb" w="200" h="100" title="配列データをプロット" >}}
 const arr = [25, 50, 75]
 
 d3.select("#svg-tdpqpgb")
@@ -75,7 +75,7 @@ d3.select("#svg-tdpqpgb")
     .attr("width", 40)
     .attr("height", (d) => d)
     .attr("fill", "darkred")
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 ```html
 <svg id="svg-tdpqpgb" width="200" height="100"></svg>

@@ -5,7 +5,7 @@ date: "2023-09-10"
 tags: ["D3.js"]
 ---
 
-{{< maku-common/d3 id="svg-vmhww5v" w="200" h="100" title="D3 セレクションのデータを参照する" >}}
+{{< mm/d3 id="svg-vmhww5v" w="200" h="100" title="D3 セレクションのデータを参照する" >}}
 const svg = d3.select("#svg-vmhww5v");
 
 // 3 つの circle 要素に紐づけるデータ
@@ -42,7 +42,7 @@ function handleMouseOver(event) {
 function handleMouseOut() {
   text.text("")
 }
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 D3 セレクションオブジェクトの __`datum()`__ メソッドを使うと、任意のデータ（オブジェクト）を紐づけて、後から自由に参照できるようになります。
 例えば、任意の要素上でマウスイベントが発生した場合に、その要素のデータを参照するというのが典型的な使用方法です。

@@ -51,7 +51,7 @@ Certbot は、基本的に HTTPS (SSL) 対応したい Web サーバー上で実
 前提条件:
 
 1. Web サーバーにグローバル IP アドレスが割り当てられていること
-   - 参考: 固定アドレスを使える VPS → {{< ad/conoha-vps-text >}} / {{< ad/onamae-vps-text >}} / {{< ad/sakura-vps-text >}}
+   - 参考: 固定アドレスを使える VPS → {{< mm/ad/conoha-vps-text >}} / {{< ad/onamae-vps-text >}} / {{< ad/sakura-vps-text >}}
 1. 独自ドメインを取得済みであること
    - 参考: 独自ドメインの取得 → {{< ad/onamae-domain-text >}} / {{< ad/valuedomain-domain-text >}}
 1. DNS の A レコードで、ドメイン名から IP アドレスを正引きできるよう設定されていること

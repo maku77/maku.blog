@@ -143,7 +143,7 @@ Certificate Request:
 ### SSL 証明書の申請
 
 CSR ファイルの作成ができたら、任意の CA 認証局から電子証明書（SSL 証明書）を発行してもらいます。
-例えば、{{< ad/conoha-vps-text "ConoHa の VPS" >}} を使っている場合は、アルファ SSL の電子証明書を無料で発行してもらえたりします。
+例えば、{{< mm/ad/conoha-vps-text "ConoHa の VPS" >}} を使っている場合は、アルファ SSL の電子証明書を無料で発行してもらえたりします。
 [Web サイト上の手順](https://support.conoha.jp/v/vps-alphassl/) に従って CSR ファイルの内容を貼り付けるだけですぐに証明書が発行されます。
 
 発行された SSL 証明書は `example.com-2024.crt` などの名前で保存して、Web サーバーに設定します。

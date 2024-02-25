@@ -19,7 +19,7 @@ D3.js の [Force Simulation (`d3-force`)](https://d3js.org/d3-force) モジュ�
 
 次の例では、`d3-force` を使って 5 つのノードの座標値を計算して、SVG の `circle` 要素として描画しています。
 
-{{< maku-common/d3 id="svg-gi3ajww" w="300" h="200" title="d3-force によるレイアウト" >}}
+{{< mm/d3 id="svg-gi3ajww" w="300" h="200" title="d3-force によるレイアウト" >}}
 const svg = d3.select("#svg-gi3ajww")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
@@ -47,7 +47,7 @@ function tickHandler() {
     .attr("cx", (d) => d.x)
     .attr("cy", (d) => d.y)
 }
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 {{< code lang="html" title="実装コード" >}}
 <svg id="#svg-gi3ajww" width="300" height="200"></svg>

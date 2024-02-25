@@ -22,7 +22,7 @@ link force の基本的な使い方
 
 次の例では、4 つのノードに環状に繋がるような link force を設定しています（ここではリンクの可視化はしていません）。
 
-{{< maku-common/d3 id="svg-a2f28wm" w="300" h="200" title="link force を設定したフォースシミュレーション" >}}
+{{< mm/d3 id="svg-a2f28wm" w="300" h="200" title="link force を設定したフォースシミュレーション" >}}
 const svg = d3.select("#svg-a2f28wm")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
@@ -61,7 +61,7 @@ function tickHandler() {
     .attr("cx", (d) => d.x)
     .attr("cy", (d) => d.y)
 }
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 {{< code lang="html" title="ソースコード" >}}
 <svg id="svg-a2f28wm" width="300" height="200"></svg>
@@ -161,7 +161,7 @@ simulation.force("link").links(linksData)
 ノード間のリンク情報を可視化するには、明示的に `svg` の `line` 要素などを作成して描画する必要があります。
 次の例では、リンク情報を赤色の線で表現しています。
 
-{{< maku-common/d3 id="svg-qne6apk" w="300" h="200" title="ノード間のリンクを line 要素で描画する" >}}
+{{< mm/d3 id="svg-qne6apk" w="300" h="200" title="ノード間のリンクを line 要素で描画する" >}}
 const svg = d3.select("#svg-qne6apk")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
@@ -211,7 +211,7 @@ function tickHandler() {
     .attr("x2", (d) => d.target.x)
     .attr("y2", (d) => d.target.y)
 }
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 {{< code lang="html" title="ソースコード" >}}
 <svg id="svg-qne6apk" width="300" height="200"></svg>
@@ -302,7 +302,7 @@ function tickHandler() {
 （応用）リンクを表す線にテキストラベルを表示する
 ----
 
-{{< maku-common/d3 id="svg-4hsdfud" w="300" h="200" title="ノード間のリンクの上にラベルを表示する" >}}
+{{< mm/d3 id="svg-4hsdfud" w="300" h="200" title="ノード間のリンクの上にラベルを表示する" >}}
 const svg = d3.select("#svg-4hsdfud")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
@@ -368,7 +368,7 @@ function tickHandler() {
     .attr("x", (d) => (d.source.x + d.target.x) / 2)
     .attr("y", (d) => (d.source.y + d.target.y) / 2)
 }
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 リンクを表す線の上に、そのリンクの意味などをテキストで表示したいときは、リンク配列データ (`linksData`) のサイズだけ `text` 要素を作成してやれば OK です。
 `text` 要素で表示する文字列は、`linksData` 配列などに次のような感じで追加しておきます。

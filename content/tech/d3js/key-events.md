@@ -7,7 +7,7 @@ tags: ["D3.js"]
 
 D3.js でキーボードからの入力イベントを扱うコードのサンプルです。
 
-{{< maku-common/d3 id="svg-z5a3fzu" w="200" h="100" title="クリックしてから上下左右キーで動かす" >}}
+{{< mm/d3 id="svg-z5a3fzu" w="200" h="100" title="クリックしてから上下左右キーで動かす" >}}
 const svg = d3.select("#svg-z5a3fzu");  // D3 Selection オブジェクトを取得
 
 svg
@@ -42,7 +42,7 @@ function handleKeyDown(event) {
       break;
   }
 }
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 次の例では、`svg` 要素でキーボードイベントをハンドルしています。
 `svg` 要素がフォーカスされた状態でカーソルキー（上下左右）を入力すると、丸印 (`circle`) が上下左右に動きます。

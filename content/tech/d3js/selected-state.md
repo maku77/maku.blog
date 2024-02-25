@@ -30,7 +30,7 @@ D3.js で描画した要素（`rect` や `circle` など）をマウスクリッ
 次の例では、並んでいる丸をクリックすると見た目が変化します（選択状態を表現しています）。
 逆に、別の丸の見た目はリセットされます。
 
-{{< maku-common/d3 id="svg-uh6jd9p" w="200" h="50" title="丸をクリックして選択状態にする" >}}
+{{< mm/d3 id="svg-uh6jd9p" w="200" h="50" title="丸をクリックして選択状態にする" >}}
 const svg = d3.select("#svg-uh6jd9p")
 const data = [{}, {}, {}]
 
@@ -51,7 +51,7 @@ circles.on("click", (event) => {
   d3.select(event.currentTarget)
     .classed("selected-qpi7j9n", true)
 })
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 {{< code lang="html" title="実装コード" >}}
 <style>
@@ -122,7 +122,7 @@ circle {
 
 次のサンプルでは、クリックされた要素のデータから `name` プロパティを取り出して、`text` 要素で表示しています。
 
-{{< maku-common/d3 id="svg-8bakmnb" w="200" h="80" title="クリックした要素のデータを表示" >}}
+{{< mm/d3 id="svg-8bakmnb" w="200" h="80" title="クリックした要素のデータを表示" >}}
 const svg = d3.select("#svg-8bakmnb")
 const data = [
   { name: "Node-1" },
@@ -156,7 +156,7 @@ circles.on("click", (event, d) => {
 
   text.text(d.name);
 })
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 {{< code lang="html" title="実装コード" >}}
 <svg id="svg-8bakmnb" w="200" h="80"></svg>

@@ -50,7 +50,7 @@ D3.js のデータ結合では、次のような 3 種類のセレクション�
 
 ### enter セクション
 
-{{< maku-common/d3 id="svg-okmyid7" w="220" h="70" title="enter セレクションのイメージ" >}}
+{{< mm/d3 id="svg-okmyid7" w="220" h="70" title="enter セレクションのイメージ" >}}
 const dataBefore = [1, 2];
 const dataAfter = [1, 2, 3, 4, 5];
 const svg = d3.select("#svg-okmyid7");
@@ -89,7 +89,7 @@ const startAnim = () => {
 }
 
 startAnim();
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 enter セレクションは、データ数の方が既存の描画要素数よりも多いときに、追加すべき要素を参照するためのセレクションです。
 要は、enter セレクションに対して、__新しい描画要素を追加する処理__ を定義すれば OK です。
@@ -109,7 +109,7 @@ svg.selectAll("circle")
 
 ### exit セレクション
 
-{{< maku-common/d3 id="svg-tstjsb9" w="220" h="70" title="exit セレクションのイメージ" >}}
+{{< mm/d3 id="svg-tstjsb9" w="220" h="70" title="exit セレクションのイメージ" >}}
 const dataBefore = [1, 2, 3, 4, 5]
 const dataAfter = [1, 2]
 const svg = d3.select("#svg-tstjsb9")
@@ -148,7 +148,7 @@ const startAnim = () => {
   setTimeout(startAnim, 3000) // 繰り返し
 }
 startAnim()
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 exit セレクションは、enter セレクションとは逆に、データ数が描画要素数よりも少ない場合に、その超過分の描画要素を選択するための D3 セレクションです。
 exit セレクションに対して、__描画要素を削除する処理__ を定義するようにします。
@@ -179,7 +179,7 @@ circles.exit()
 
 ### update セレクション
 
-{{< maku-common/d3 id="svg-sxbs8e3" w="172" h="40" title="update セレクションのイメージ（赤色→青色）" >}}
+{{< mm/d3 id="svg-sxbs8e3" w="172" h="40" title="update セレクションのイメージ（赤色→青色）" >}}
 const svg = d3.select("#svg-sxbs8e3")
 
 svg.append("text").attr("x", 10).attr("y", 25).attr("fill", "crimson").text("Elements")
@@ -238,7 +238,7 @@ const startAnim = () => {
   setTimeout(startAnim, 3000) // 繰り返し
 }
 startAnim()
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 update セレクションは、データに対応する描画要素はすでに作成済みだけど、データの内容が変化したので描画内容も更新しなければいけない要素群を選択するためのセレクションオブジェクトです。
 __`data()`__ メソッドの戻り値が update セレクションです。

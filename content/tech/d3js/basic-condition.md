@@ -16,7 +16,7 @@ D3.js でデータ配列の内容をプロットするとき、各要素の値�
 次の例では、データ配列 (`data`) の `enabled` プロパティを見て、描画要素の表示／非表示を制御しています。
 とはいっても、データ配列の要素を `filter()` メソッドで先にフィルタしているだけです。
 
-{{< maku-common/d3 id="svg-6y3q" w="120" h="40" title="表示の on/off 制御" >}}
+{{< mm/d3 id="svg-6y3q" w="120" h="40" title="表示の on/off 制御" >}}
 const data = [
   { pos: 1, color: "#f00", enabled: true },
   { pos: 2, color: "#0f0", enabled: false },
@@ -34,7 +34,7 @@ d3.select("#svg-6y3q")
     .attr("cy", 20)
     .attr("r", 10)
     .attr("fill", (d) => d.color)
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 {{< code lang="js" hl_lines="7-8" >}}
 const data = [
@@ -59,7 +59,7 @@ d3.select("#svg-6y3q")
 次の例では、この方法がうまく動作することを示すために、1 秒ごとにデータ配列の `enable` フラグをランダムに入れ替えています。
 `enabled=true` になったデータはアニメーションしながら表示され、`enabled=false` になったデータはアニメーションしながら非表示になります。
 
-{{< maku-common/d3 id="svg-wwhf" w="120" h="40" >}}
+{{< mm/d3 id="svg-wwhf" w="120" h="40" >}}
 const data = [
   { pos: 1, color: "#f00", enabled: true },
   { pos: 2, color: "#0f0", enabled: true },
@@ -98,7 +98,7 @@ setInterval(() => {
   const filteredData = data.filter((d) => d.enabled)
   render(filteredData)
 }, 1000)
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 ```js
 const data = [

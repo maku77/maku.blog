@@ -115,7 +115,7 @@ const arc = d3.arc<d3.PieArcDatum<PieDatum>>()
 d3.pie() と d3.arc() を組み合わせて円グラフを描画する
 ----
 
-{{< maku-common/d3 id="svg-7wvnsew" w="300" h="200" title="d3.pie() と d3.arc() による円グラフの描画" >}}
+{{< mm/d3 id="svg-7wvnsew" w="300" h="200" title="d3.pie() と d3.arc() による円グラフの描画" >}}
 const svg = d3.select("#svg-7wvnsew")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
@@ -136,7 +136,7 @@ pieChart
   .join("path")
     .attr("d", arc)  // 円グラフのお決まり
     .attr("fill", (_, i) => color(i.toString()))
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 上記で説明した関数を利用すれば、次のような手順でデータ配列を円グラフとして描画できます。
 
@@ -180,7 +180,7 @@ pieChart
 
 ### ドーナツチャート
 
-{{< maku-common/d3 id="svg-ng6veie" w="300" h="200" title="ドーナツチャートの描画" >}}
+{{< mm/d3 id="svg-ng6veie" w="300" h="200" title="ドーナツチャートの描画" >}}
 const svg = d3.select("#svg-ng6veie")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
@@ -195,7 +195,7 @@ const pieChart = svg.append("g")
 pieChart.selectAll("path").data(pie(data)).join("path")
   .attr("d", arc)  // 円グラフのお決まり
   .attr("fill", (_, i) => color(i.toString()))
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 arc ジェネレーターの __`innerRadius()`__ メソッドで、内側の半径を設定すると、ドーナツチャートを描画することができます。
 
@@ -205,7 +205,7 @@ const arc = d3.arc().innerRadius(radius / 2).outerRadius(radius)
 
 ### 扇形の隙間
 
-{{< maku-common/d3 id="svg-zhxbqzj" w="300" h="200" title="扇形の境界線 (arc.padAngle() を使う方法）" >}}
+{{< mm/d3 id="svg-zhxbqzj" w="300" h="200" title="扇形の境界線 (arc.padAngle() を使う方法）" >}}
 const svg = d3.select("#svg-zhxbqzj")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
@@ -220,7 +220,7 @@ const pieChart = svg.append("g")
 pieChart.selectAll("path").data(pie(data)).join("path")
   .attr("d", arc)  // 円グラフのお決まり
   .attr("fill", (_, i) => color(i.toString()))
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 arc ジェネレーターの __`padAngle()`__ メソッドで、各扇形の間の隙間を指定することができます。
 この隙間は、ラジアン単位の角度で指定するので、かなり小さい値を指定する必要があります（1 度は 0.017453 ラジアンです）。
@@ -234,7 +234,7 @@ const arc = d3.arc().innerRadius(1).outerRadius(radius).padAngle(0.02)
 むしろこちらの方がシンプルでよいかもしれません。
 下記では分かりやすいように黄色で境界線を描画しています。
 
-{{< maku-common/d3 id="svg-pqcngha" w="300" h="200" title="扇形の境界線（path の stroke 属性を使う方法）" >}}
+{{< mm/d3 id="svg-pqcngha" w="300" h="200" title="扇形の境界線（path の stroke 属性を使う方法）" >}}
 const svg = d3.select("#svg-pqcngha")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
@@ -251,7 +251,7 @@ pieChart.selectAll("path").data(pie(data)).join("path")
   .attr("fill", (_, i) => color(i.toString()))
   .attr("stroke", "yellow")
   .attr("stroke-width", 2)
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 {{< code lang="js" hl_lines="7 8" >}}
 pieChart
@@ -266,7 +266,7 @@ pieChart
 
 ### ドーナツチャートの中心にテキストを表示
 
-{{< maku-common/d3 id="svg-2se7uux" w="300" h="200" title="中央にテキスト表示" >}}
+{{< mm/d3 id="svg-2se7uux" w="300" h="200" title="中央にテキスト表示" >}}
 const svg = d3.select("#svg-2se7uux")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
@@ -292,7 +292,7 @@ pieChart.append("text")
   .attr("font-weight", 600)
   .attr("fill", "#666")
   .text("合計:" + d3.sum(data))
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 ドーナツチャートの中心の隙間にテキストを表示するには、単純に SVG の `text` 要素を追加するだけです。
 
@@ -310,7 +310,7 @@ pieChart.append("text")
 
 ### 扇形（円弧）の中にテキストを表示
 
-{{< maku-common/d3 id="svg-t2om9my" w="300" h="200" title="各データの値を表示" >}}
+{{< mm/d3 id="svg-t2om9my" w="300" h="200" title="各データの値を表示" >}}
 const svg = d3.select("#svg-t2om9my")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
@@ -349,7 +349,7 @@ pieElems
   .attr("font-size", 20)
   .attr("fill", "white")
   .text((d) => d.value)
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 `pie(data)` で生成した各データを __`arc.centroid()`__ メソッドに渡すと、扇形の領域の中央座標（重心）を返してくれます。
 これを利用して、各扇形（あるいは円弧）の中央にテキストを配置することができます。

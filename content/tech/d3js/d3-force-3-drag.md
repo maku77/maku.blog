@@ -20,7 +20,7 @@ d3-drag の基本的な使い方
 
 次のサンプルでは、`svg` 内の `circle` 要素をドラッグして動かせるようにしています。
 
-{{< maku-common/d3 id="svg-p4vddjh" w="300" h="200" title="d3-drag によるノードのドラッグ" >}}
+{{< mm/d3 id="svg-p4vddjh" w="300" h="200" title="d3-drag によるノードのドラッグ" >}}
 const svg = d3.select("#svg-p4vddjh")
 const width = +svg.attr("width")
 const height = +svg.attr("height")
@@ -75,7 +75,7 @@ function tickHandler() {
     .attr("cx", (d) => d.x)
     .attr("cy", (d) => d.y)
 }
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 {{< code lang="html" title="ソースコード" >}}
 <svg id="svg-p4vddjh" width="300" height="200"></svg>

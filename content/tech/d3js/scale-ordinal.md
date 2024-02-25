@@ -34,7 +34,7 @@ console.log(colorScale("GCP"));    //=> "#db4437"
 上記の例では、入力値をカラーコードの文字列にマッピングしていますが、描画要素の座標値やサイズなど、任意の型の値にマッピングできます。
 次の例では、実際に 2 つのスケール関数を作成して、SVG の描画に使用しています。
 
-{{< maku-common/d3 id="svg-hfuouiw" w="200" h="80" title="scaleOrdinal による色のマッピング" >}}
+{{< mm/d3 id="svg-hfuouiw" w="200" h="80" title="scaleOrdinal による色のマッピング" >}}
 const svg = d3.select("#svg-hfuouiw")
 
 const data = [
@@ -58,7 +58,7 @@ svg.selectAll("circle")
   .attr("cy", 40)
   .attr("r", 20)
   .attr("fill", (d) => colorScale(d.brand))
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 {{< code lang="html" title="上記の実装コード" hl_lines="11 15" >}}
 <svg id="svg-hfuouiw" width="200" height="80"></svg>

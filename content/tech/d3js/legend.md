@@ -43,7 +43,7 @@ console.log(color.domain());  //=> ['A', 'B', 'C']
 実装例
 ----
 
-{{< maku-common/d3 id="svg-u25y" w="280" h="90" title="scaleOrdinal を使った凡例描画" >}}
+{{< mm/d3 id="svg-u25y" w="280" h="90" title="scaleOrdinal を使った凡例描画" >}}
 /* 右上に凡例を描画する */
 function drawLegend(selection, colorScaler) {
   const legendLayer = selection.append('g')
@@ -84,7 +84,7 @@ svg.selectAll('circle')
     .attr('opacity', 0.7);
 
 drawLegend(svg, color);
-{{< /maku-common/d3 >}}
+{{< /mm/d3 >}}
 
 下記の関数は、与えられた D3.js セレクションに対して、凡例を描画するための描画要素を追加します。
 ポイントは、カラースケールの `domain()` メソッドを使って、凡例に表示すべき項目のリストを取り出しているところです。
