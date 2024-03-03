@@ -2,7 +2,10 @@
 title: "Meilisearch を本番環境で使用する（マスターキーと API キーを理解する）"
 url: "p/iuvuyzd/"
 date: "2024-02-15"
+lastmod: "2024-03-04"
 tags: ["Meilisearch"]
+changes:
+  - 2024-03-04: ボリュームマウントを使う方法を追記。
 ---
 
 {{% private %}}
@@ -134,6 +137,34 @@ services:
         bind:
           create_host_path: true
 {{< /code >}}
+
+{{< accordion title="bind ではなく volume マウントを使う場合" >}}
+{{< code lang="yaml" hl_lines="9-12" >}}
+version: "3.9"
+
+services:
+  meilisearch:
+    image: "getmeili/meilisearch:v1.6"
+    container_name: meilisearch
+    ports:
+      - "7700:7700"
+    environment:
+      - MEILI_ENV=production  # 本番環境として起動する
+      - MEILI_NO_ANALYTICS=true  # テレメトリデーターは送らない
+      - MEILI_MASTER_KEY  # マスターキーはシェルの環境変数をそのまま渡す
+    volumes:
+      - type: volume
+        source: meili_data
+        target: /meili_data
+        volume:
+          nocopy: true
+
+# 作成するボリュームの定義
+volumes:
+  meili_data:
+    # name: meili_data  # プロジェクト名のプレフィックスを付けたくないとき
+{{< /code >}}
+{{< /accordion >}}
 
 このファイルがあるディレクトリで、次のように Meilisearch コンテナーを起動・停止できます。
 

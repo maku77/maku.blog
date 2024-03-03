@@ -2,7 +2,10 @@
 title: "nginx-proxy コンテナで簡単にリバースプロキシを立ち上げる"
 url: "p/kos367z/"
 date: "2024-02-12"
+lastmod: "2024-03-04"
 tags: ["Docker", "nginx"]
+changes:
+  - 2024-03-04: Meilisearch コンテナに繋ぐ例を追加。
 ---
 
 nginx-proxy は Docker コンテナ用のリバースプロキシ
@@ -61,8 +64,11 @@ $ dig A aaa.example.com | grep status
 対象のサーバー（VPS など）のファイアウォール設定で、外部からの __80__ 番ポート (http) および __443__ 番ポート (https) へのアクセスを許可しておきます。
 
 
-まずは http ベースで設定してみる
+まずは http 接続で試してみる
 ----
+
+まずは `nginx-proxy` の基本的な動かし方を理解しましょう。
+SSL を使わない http ベースの接続であれば簡単に試せます。
 
 下記は、`nginx-proxy` コンテナーを起動するための Docker Compose ファイルです。
 `volumes:` プロパティで `docker.sock` ファイルをマウントしているのは、`nginx-proxy` が他のコンテナーの起動を監視して情報を取得するためです。
@@ -98,7 +104,7 @@ $ docker compose up -d
 このとき、バーチャルホスト名をコンテナー側の __VIRTUAL_HOST__ 環境変数で設定することで、`nginx-proxy` が自動的にその情報をリバースプロキシ設定に反映してくれます。
 
 例えば、簡単な Web サーバーを起動する場合は次のようにします。
-リバースプロキシと同じ `nginx-proxy` ネットワークに接続することに注意してください（これを忘れると、アクセス時に 502 Bad Gateway エラーになります）。
+__リバースプロキシと同じ `nginx-proxy` ネットワークに接続する__ ことに注意してください（これを忘れると、アクセス時に 502 Bad Gateway エラーになります）。
 ここでは接続確認だけしたいので、`Ctrl-C` で停止できる形でコンテナを起動します（`-d` オプションをつけません）。
 
 {{< code title="テスト用に Web サーバーを起動" >}}
@@ -121,7 +127,7 @@ services:
 
 networks:
   nginx-proxy:
-    external: true
+    external: true  # 既存の nginx-proxy ネットワークを参照する
 {{< /code >}}
 {{< /accordion >}}
 
@@ -135,10 +141,10 @@ $ docker compose down
 ```
 
 
-https 通信 (SSL) に対応する
+本番用の設定（SSL/TSL 対応）
 ----
 
-`nginx-proxy` と合わせて [`acme-companion`](https://github.com/nginx-proxy/acme-companion) という Docker コンテナイメージを使うと、SSL 証明書の設定まで自動化できます（https によるアクセスが可能になります）。
+`nginx-proxy` と合わせて [`acme-companion`](https://github.com/nginx-proxy/acme-companion) という Docker コンテナイメージを使うと、__SSL 証明書の設定まで自動化できます（https によるアクセスが可能になります）__。
 Let's Encrypt による SSL 証明書発行処理のために、`nginx-proxy` コンテナーの方にもいくつかボリューム設定を追加する必要があります（本家サイトの説明通りに設定しています）。
 
 {{< code lang="yaml" title="nginx-proxy/docker-compose.yml" >}}
@@ -186,10 +192,19 @@ volumes:
 ボリューム設定が若干ややこしいですが、接続先のコンテナーの情報がまったく出てこないのが素晴らしいです。
 つまり、この `docker-compose.yml` ファイルは、みなさんの環境でもそのまま使い回すことができます。
 
+先ほどと同様に、`nginx-proxy` コンテナーを起動します。
+今回は https 対応版になっています。
+
 {{< code lang="console" title="nginx-proxy コンテナを起動" >}}
 $ cd nginx-proxy
 $ docker compose up -d
 {{< /code >}}
+
+
+中継先のコンテナーを立ち上げる
+----
+
+### 例: Web サーバー (nginx)
 
 中継先のコンテナー（ここでは Web サーバー）を立ち上げるときは、Let's Encrypt 用の設定値として __`LETSENCRYPT_HOST`__ と __`LETSENCRYPT_EMAIL`__ を指定します。
 これらは、SSL 証明書の発行時に使用されます。
@@ -208,6 +223,7 @@ services:
     networks:
       - nginx-proxy
 
+# 使用するネットワークの一覧
 networks:
   nginx-proxy:
     external: true  # 既存のネットワークに乗っかる
@@ -221,8 +237,64 @@ $ docker compose up -d
 このコンテナを起動すると、自動的に Let's Encrypt から SSL 証明書が発行されてリバースプロキシサーバーに設定されます。
 これで、Web ブラウザから `https://aaa.example.com` というアドレスでアクセスできるようになります。
 
+### 例: Meilisearch サーバー
+
+もうひとつ例として、インクリメンタルサーチエンジンの Milisearch サーバーを立ち上げる例を示しておきます。
+こちらは、ドメイン名（バーチャルホスト）として `bbb.example.com` を設定しています。
+下記の例では `environment` プロパティをリスト形式で設定していますが、前述のマップ形式での指定方法と意味は同じです。
+
+{{< code lang="yaml" itle="meilisearch/docker-compose.yml" hl_lines="13-15" >}}
+version: "3.9"
+
+services:
+  meilisearch:
+    image: "getmeili/meilisearch:v1.6"
+    container_name: meilisearch
+    ports:
+      - "7700:7700"
+    environment:
+      - MEILI_ENV=production  # 本番環境として起動する
+      - MEILI_NO_ANALYTICS=true  # テレメトリデーターは送らない
+      - MEILI_MASTER_KEY  # マスターキーはコントローラー側の環境変数をそのまま渡す
+      - VIRTUAL_HOST=bbb.example.com
+      - LETSENCRYPT_HOST=bbb.example.com
+      - LETSENCRYPT_EMAIL=yourname@example.com
+    volumes:
+      - type: volume  # ボリュームマウントを使う
+        source: meili_data
+        target: /meili_data
+        volume:
+          nocopy: true  # ボリューム生成時にコンテナから内容をコピーしない
+    networks:
+      - nginx-proxy
+
+# 使用するボリュームの一覧
+volumes:
+  meili_data:
+    # name: meili_data  # プロジェクト名のプレフィックスを付けたくないとき
+
+# 使用するネットワークの一覧
+networks:
+  nginx-proxy:
+    external: true  # 既存のネットワークに乗っかる
+{{< /code >}}
+
+ポートフォワードの設定 (`ports`) で `7700:7700` と指定していますが、バーチャルホストを使った URL アクセス時には、80 番ポートの URL でアクセスすることができます。
+つまり、`https://bbb.example.com/` というアドレスで、コンテナー内の Meilisearch サーバーにアクセスすることができます。
+このあたりのデフォルトのポートフォワード処理は `nginx-proxy` がやってくれるので、実は `ports` プロパティの設定は省略できたりします（Docker ホスト上で `localhost:7700` のようにアクセスしたい場合は必要）。
+
+
+まとめ
+----
+
 長々と説明してきましたが、結局のところ __`nginx-proxy` を一度導入してしまえば、あとは中継先のコンテナーを起動するときに、`VIRTUAL_HOST` や `LETSENCRYPT_HOST` を指定するだけでインターネットから https (SSL) でアクセスできるようになる__ ということですね。
-これで、Docker コンテナーを使ったサービスを簡単に公開できるようになります。
+これで、Docker コンテナーを使ったサービスをいくつでも簡単に公開できるようになります。
 
 ٩(๑❛ᴗ❛๑)۶ わーぃ
+
+みんなも VPS を借りて遊んでみよー（これは宣伝です(￣∇￣) → {{< mm/ad/conoha-vps-text "ConoHa の VPS" >}}）
+
+<center>
+{{< mm/ad/conoha-vps-banner >}}
+</center>
 
