@@ -113,3 +113,29 @@ $ npm run preview -- --open
 
 できたー ٩(๑❛ᴗ❛๑)۶ わーぃ
 
+
+動的ルートでの SSG ビルド
+----
+
+SSG で Svelte アプリを静的サイトとしてビルドする場合、SvelteKit はサイトのビルド時にすべてのページの URL を把握しなければいけません。
+例えば、`src/routes/blog/[slug]/+page.svelte` というルートが定義されている場合、ビルドの時点で、`[slug]` 部分に入ってくる可能性がある値をすべて把握した上でページを生成しなければいけません。
+そのために、SvelteKit は各ページに記述されたリンク情報 (`<a href="/blog/foo">` など) を回収し、`[slug]` 位置に相当する値（この例だと `foo`）を把握し、ページを生成します。
+
+ほとんどのケースではこの仕組みだけでうまくいきますが、`<a>` 要素でリンクされていないページを生成したい場合は、特殊な対応が必要です。
+次のように、__`entries`__ という名前のエントリージェネレーター関数を `export` することで、どのページからもリンクされていない動的ルートのページを生成できます（参考: [Page options • Docs • SvelteKit](https://kit.svelte.dev/docs/page-options#entries)）。
+
+{{< code lang="ts" title="src/routes/blog/[slug]/+page.server.ts" >}}
+import type { EntryGenerator } from './$types';
+
+export const entries: EntryGenerator = () => {
+	return [
+		{ slug: 'hello-world' },
+		{ slug: 'another-blog-post' }
+	];
+};
+
+export const prerender = true;
+{{< /code >}}
+
+外部データを利用するために内部で非同期関数を呼び出す場合は、エントリージェネレーター関数を `async` 関数として定義します。
+

@@ -82,8 +82,8 @@ SvelteKit はファイルベースのルーティングの仕組みを採用し�
 | ---- | ---- |
 | <code>src/routes<strong>/</strong>+page.svelte</code> | __`/`__ |
 | <code>src/routes<strong>/about/</strong>+page.svelte</code> | __`/about`__ |
-| <code>src/routes<strong>/foo/bar/</strong>+page.svelte` | __`/foo/bar`__ |
-| <code>src/routes<strong>/blog/[slug]/</strong>+page.svelte` | __`/blog/[slug]`__（`[slug]` は任意のパス） |
+| <code>src/routes<strong>/foo/bar/</strong>+page.svelte</code> | __`/foo/bar`__ |
+| <code>src/routes<strong>/blog/[slug]/</strong>+page.svelte</code> | __`/blog/[slug]`__（`[slug]` は任意のパス） |
 
 例えば、雛形として生成される `+page.svelte` ファイルの内容は次のようになっています。
 `.svelte` という拡張子からも分かるように、これが Svelte コンポーネントです。

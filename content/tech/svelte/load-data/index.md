@@ -9,10 +9,19 @@ load 関数の基本
 ----
 
 SvelteKit には、__`+pages.ts`__ や __`+pages.server.ts`__ といった、特殊なルートファイルにデータのロード処理を定義する仕組みが用意されています。
-これをうまく利用すると、ページコンポーネント (`+page.svelte`) の UI 実装からデータ取得処理をきれいに分離することができ、データの取得タイミングを細かく制御することができます。
+ページコンポーネント (`+page.svelte`) の UI 実装からデータのロード処理を分離することで、データの取得タイミングを細かく制御できるようになり、以下のような恩恵を得られます。
 
-データのロード処理は、決められた名前のルートファイルに、__`load`__ という名前の関数として定義する必要があります（`Promise` を返す `async` 関数として定義することも可能です）。
-`load` 関数の戻り値は、ページコンポーネント内から __`data`__ という変数で参照することができます。
+- サーバーサイドレンダリング (SSR)
+  - ビルド時に外部データを使ってページを生成することができます。
+    静的な HTML を配信することは、SEO の観点で有利に働く可能性があります。
+    外部 API の呼び出しにアクセストークンが必要な場合は、サーバーサイドでのみ呼び出すようにすることで、アクセストークンを公開せずに済みます。
+- プリロード
+  - SvelteKit は、リンクホバーなどをトリガーにして、ページ遷移前にデータをプリロードすることができます。
+- ロード処理の使い回し
+  - `layout.js(.ts`) や `layout.server.js(.ts)` にデータのロード処理を記述することで、そのレイアウトが適用される複数のページから同じデータを参照できます。
+
+データのロード処理は、決められた名前のルートファイルで、__`load`__ という名前の関数を `export` することで定義します（`Promise` を返す `async` 関数として定義することも可能です）。
+`load` 関数から `return` した値は、ページコンポーネント内から __`data`__ という変数で参照することができます。
 この対応付けは SvelteKit のルールであり、慣れるしかありません（逆にこの作法を知らないとコードを読めません）。
 
 {{< image src="img-001.drawio.svg" title="data 変数と load 関数の関係" >}}
@@ -171,9 +180,10 @@ export const load: PageLoad = async ({ fetch }) => {
 load 関数についての雑多メモ
 ----
 
-### 特定の URL パス (slug) 以外が指定されたら 404 エラーにする
+### ページアクセス時に 404 エラーを発生させる
 
 SvelteKit が提供する __`error`__ 関数を使って作成したオブジェクトを、`load` 関数から `throw` することで、明示的に 404 エラーを発生させることができます。
+次の例では、URL の `[slug]` 部分で特定のパス以外が指定されたときに 404 エラーを発生させています。
 
 {{< code lang="ts" title="src/routes/blog/[slug]/+page.ts" hl_lines="1 12" >}}
 import { error } from '@sveltejs/kit';
@@ -192,27 +202,4 @@ export const load: PageLoad = ({ params }) => {
 {{< /code >}}
 
 上記のように実装した場合、`/blog/hello-world` にはアクセスできますが、それ以外の `/blog/aaa` などにアクセスすると 404 エラーページが表示されます。
-
-### 静的サイトとしてビルドするときの振る舞い
-
-[SSG: Static Site Generation により、Svelte アプリを静的サイトとしてビルド](/p/4oudmxy/) する場合、SvelteKit はサイトのビルド時にすべてのページの URL を把握しなければいけません。
-
-例えば、`src/routes/blog/[slug]/+page.server.ts` というルートが定義されている場合、ビルドの時点で、`[slug]` 部分に入ってくる可能性がある値をすべて把握した上でページを生成しなければいけません。
-そのために、SvelteKit は各ページに記述されたリンク情報 (`<a href="/blog/foo">` など) を回収し、`[slug]` 位置に相当する値（この例だと `foo`）を把握し、ページを生成します。
-
-ほとんどのケースではこの仕組みだけでうまくいきますが、`<a>` 要素でリンクされていないページを生成したい場合は、特殊な対応が必要です。
-次のように、__`entries`__ という名前のジェネレーター関数を `export` することで、どのページからもリンクされていない動的ルートのページを生成できます（参考: [Page options • Docs • SvelteKit](https://kit.svelte.dev/docs/page-options#entries)）。
-
-{{< code lang="ts" title="src/routes/blog/[slug]/+page.server.ts" >}}
-import type { EntryGenerator } from './$types';
-
-export const entries: EntryGenerator = () => {
-	return [
-		{ slug: 'hello-world' },
-		{ slug: 'another-blog-post' }
-	];
-};
-
-export const prerender = true;
-{{< /code >}}
 

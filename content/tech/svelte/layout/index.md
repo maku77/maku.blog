@@ -47,6 +47,7 @@ Svelte のフレームワークである SvelteKit は、複数のページで�
 {{< image w="700" src="img-001.drawio.svg" title="Svelte の +layout.svelte ファイルの仕組み" >}}
 
 `+layout.svelte` ファイルが存在しない場合は、`<slot />` とだけ記述されたファイルが存在するかのように振る舞います。
+ようするに、`+page.svelte` の内容がそのまま `%sveltekit.body%` の位置に展開されます。
 
 
 レイアウトファイルをネストする
@@ -64,5 +65,5 @@ Svelte のフレームワークである SvelteKit は、複数のページで�
 
 {{< image w="700" src="img-002.drawio.svg" title="レイアウトの継承" >}}
 
-スロットの連鎖だー！ ٩(๑❛ᴗ❛๑)۶
+スロットの連チャンだー！ ٩(๑❛ᴗ❛๑)۶
 
