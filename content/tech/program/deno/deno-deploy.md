@@ -2,8 +2,11 @@
 title: "Deno Deploy で Deno のサーバープログラムを公開する"
 url: "p/phz7fo3/"
 date: "2022-12-24"
+lastmod: "2024-03-08"
 tags: ["Deno"]
 weight: 100
+changes:
+  - 2024-03-08: deployctl コマンドのインストール方法を更新。
 ---
 
 Deno Deploy とは？
@@ -26,17 +29,17 @@ deployctl のインストール
 ローカルにある `.ts` ファイルを Deno Deploy へデプロイするには、CLI コマンドの [deployctl](https://github.com/denoland/deployctl) を使用します。
 このコマンドは、`deno` コマンドでインストールできます。
 
-{{< code title="deployctl のインストール" >}}
-$ deno install \
-    --allow-read --allow-write --allow-env --allow-net --allow-run \
-    --no-check -r -f https://deno.land/x/deploy/deployctl.ts
+{{< code title="deployctl のインストール（deno 1.41 で確認済）" >}}
+$ deno install -Arf jsr:@deno/deployctl
 {{< /code >}}
+
+インストールに失敗する場合は、`deno upgrade` で `deno` 自体を更新してから実行してみてください。
 
 `~/.deno/bin/` に `deployctl` コマンドが配置されれば成功です。
 
 ```console
 $ deployctl --version
-deployctl 1.4.0
+deployctl 1.11.0
 ```
 
 
@@ -47,15 +50,13 @@ Deno Deploy にデプロイするための、簡単なサーバープログラ�
 Deno の標準ライブラリ [std/http](https://deno.land/std/http) を使うと、簡単に Web サーバーをプログラムを作成できます。
 
 {{< code lang="ts" title="mod.ts" >}}
-import { serve } from "https://deno.land/std@0.170.0/http/server.ts";
-
 function handler(_req: Request): Response {
   return new Response("Hello, World!", {
     headers: { "content-type": "text/plain" },
   });
 }
 
-serve(handler);
+Deno.serve(handler);
 {{< /code >}}
 
 {{< code lang="console" title="動作確認" >}}
