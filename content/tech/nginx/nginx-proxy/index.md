@@ -284,6 +284,47 @@ networks:
 このあたりのデフォルトのポートフォワード処理は `nginx-proxy` がやってくれるので、実は `ports` プロパティの設定は省略できたりします（Docker ホスト上で `localhost:7700` のようにアクセスしたい場合は必要）。
 
 
+（おまけ）nginx の設定を変更する
+----
+
+nginx 自体の設定を変更したいときは、Docker ホスト上に設定ファイルを作成しておいて Docker コンテナにバインドマウントします（参考: [nginx-proxy/docs](https://github.com/nginx-proxy/nginx-proxy/tree/main/docs#proxy-wide)）。
+ファイルの配置方法はいくつかありますが、__`/etc/nginx/conf.d`__ ディレクトリ以下に __`.conf`__ ファイルを配置するのが簡単です。
+
+下記は、nginx サーバーの `client_max_body_size` 値をカスタマイズする設定ファイルの例です。
+この値のデフォルト値は 1M になっているため、POST リクエストで大きなデータを送りたい場合はこのように大きめのサイズを指定しておく必要があります。
+
+{{< code lang="inf" title="nginx-proxy.conf" >}}
+# POST で大きいデータを送れるようにしておく
+client_max_body_size 20M;
+{{< /code >}}
+
+設定ファイルを用意したら、あとは `docker-compose.yml` の `volumes` セクションにバインドマウントの設定を追加するだけです。
+
+{{< code lang="yaml" title="nginx-proxy/docker-compose.yml" hl_lines="16" >}}
+version: "3.8"
+
+services:
+  # リバースプロキシ
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:1.5
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - certs:/etc/nginx/certs
+      - html:/usr/share/nginx/html
+      - vhost:/etc/nginx/vhost.d
+      - ./nginx-proxy.conf:/etc/nginx/conf.d/nginx-proxy.conf:ro
+    restart: always
+
+  # ...省略...
+{{< /code >}}
+
+__`docker compose up -d`__ を再実行すれば、`nginx-proxy` コンテナーを新しい設定で起動できます。
+
+
 まとめ
 ----
 
