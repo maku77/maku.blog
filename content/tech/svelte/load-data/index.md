@@ -1,5 +1,5 @@
 ---
-title: "SvelteKit の load 関数でデータのロード処理を定義する"
+title: "Svelte 応用: SvelteKit の load 関数でデータのロード処理を定義する"
 url: "p/wqt76qw/"
 date: "2023-10-31"
 tags: ["Svelte"]

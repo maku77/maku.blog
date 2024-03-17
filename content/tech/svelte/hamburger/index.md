@@ -1,5 +1,5 @@
 ---
-title: "Svelte 応用: Hamburger ボタンを作る"
+title: "Svelte 実装例: Hamburger ボタンを作る"
 url: "p/z5cwfjm/"
 date: "2023-09-01"
 tags: ["Svelte"]

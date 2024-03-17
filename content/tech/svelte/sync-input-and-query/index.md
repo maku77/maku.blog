@@ -19,7 +19,7 @@ Svelte での実装例
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { pushState } from '$app/navigation';
+	import { replaceState } from '$app/navigation';
 
 	/** 入力フィールドのテキスト */
 	let query = '';
@@ -38,7 +38,7 @@ Svelte での実装例
 		} else {
 			url.searchParams.delete('q');
 		}
-		pushState(url, {});
+		replaceState(url, {});
 	}
 </script>
 
@@ -50,7 +50,8 @@ __`onMount()`__ でセットしたコールバック関数は、このコンポ�
 
 `input` 要素の __`on:input`__ プロパティには、ユーザーがテキスト入力したときに呼び出されるイベントハンドラーを設定します。
 このタイミングで URL 末尾のクエリパラメーターを同期させています。
-URL の動的な変更には、`$app/navigation` が提供する __`pushState()`__ 関数を使用できます。
+ページ遷移を発生させずに URL だけ書き換えるには、`$app/navigation` が提供する __`pushState()`__ か __`replaceState()`__ 関数を使用できます。
+`pushState()` を使うと呼び出しごとにブラウザの履歴に積まれてしまうので、今回のケースでは `replaceState()` を使った方がよさそうです。
 
 これら実装により、ブックマークやリンクの URL に検索文字列を含めることができるようになります。
 もちろん、ブラウザ上で URL を直接入力した場合も、`input` 要素に検索文字列が入力された状態でページを開くことができます。

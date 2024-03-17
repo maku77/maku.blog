@@ -1,5 +1,5 @@
 ---
-title: "Svelte 応用: ページ遷移用のナビゲーションメニューを作成する"
+title: "Svelte 実装例: ページ遷移用のナビゲーションメニューを作成する"
 url: "p/2nrgf2m/"
 date: "2023-08-30"
 tags: ["Svelte"]
