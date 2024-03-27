@@ -113,6 +113,8 @@ __`[window]`__ セクションでウィンドウの表示をカスタマイズ�
 
 {{< code lang="toml" title="~/.config/alacritty/alacritty.toml" >}}
 [window]
+# ウィンドウサイズ
+dimensions = { columns = 100, lines = 30 }
 # 画面端のパディング
 padding = { x = 4, y = 2 }
 # 背景を透過させる
@@ -180,6 +182,59 @@ binding = [
 ### カラーテーマ
 
 [カラーテーマ](https://github.com/alacritty/alacritty-theme) をインポートすることで、まとめて色の設定を行うこともできます。
+
+
+Windows 用の設定
+----
+
+### WSL の Ubuntu を使う
+
+Windows で Alacritty を起動したときに WSL 側のシェルを使いたいときは、**`[shell]`** セクションで以下のように設定しておきます。
+起動時のワーキングディレクトリを移動したいときは `--cd` オプションで指定できます（Windows 形式の `C:/aaa` や、Linux 形式の `/mnt/x`、`~/gitwork` といったパスを指定できます）。
+
+{{< code lang="toml" title="~/.config/alacritty/alacritty.toml" >}}
+[shell]
+program = "wsl"
+args = ["--cd", "D:/y/gitwork"]
+{{< /code >}}
+
+通常はデフォルトの Ubuntu ディストリビューションが起動するはずですが、他のディストリビューションを起動したいときは `-d <dist>` オプションで指定できます。
+WSL にどのようなディストリビューションがインストールされているかは、**`wsl -l`** で確認できます。
+
+```
+C:\> wsl -l
+Linux 用 Windows サブシステム ディストリビューション:
+Ubuntu (既定)
+podman-machine-default
+```
+
+### Windows と macOS 用の設定ファイルを分ける
+
+Alacritty はクロスプラットフォームなアプリですが、shell 設定などは OS 別の設定をしたくなります。
+そのようなケースでは、次のように共通部分の設定ファイルと OS ごとの設定ファイルを分けて作っておいて、**`import`** で読み込むようにすれば OK です。
+
+- `alacritty-common.toml` ... 共通の設定
+- `alacritty-mac.toml` ... macOS 用の設定
+- `alacritty-win.toml` ... Windows 用の設定
+
+後から読み込んだ設定ファイルで設定が上書きされるので、OS ごとの設定ファイルは後ろに来るように並べてください。
+
+下記は、各 OS 用の `alacritty.toml` の記述例です。
+ここでは、`dotfiles` という Git リポジトリで設定ファイルを管理していることを想定しています。
+
+{{< code lang="macOS 用の alacritty.toml" >}}
+import = [
+  "~/gitwork/dotfiles/alacritty/alacritty-common.toml",
+  "~/gitwork/dotfiles/alacritty/alacritty-mac.toml",
+]
+{{< /code >}}
+
+{{< code lang="Windows 用の alacritty.toml" >}}
+import = [
+  "D:/gitwork/dotfiles/alacritty/alacritty-common.toml",
+  "D:/gitwork/dotfiles/alacritty/alacritty-win.toml",
+]
+{{< /code >}}
 
 
 その他
