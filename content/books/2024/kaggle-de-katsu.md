@@ -172,15 +172,22 @@ Public LB (Leader Board) と Private LB の順位が大きく入れ替わるこ�
   - ErrorRate = 1 - Accuracy
   - scikit-learn の metrics モジュールの **`accuracy_score`** 関数を使う
 - **適合率** (Precision) と **再現率** (Recall)
-  - Precision = TP / (TP + FP)
-  - Recall = TP / (TP + FN)
+  - Precision（適合率） = TP / (TP + FP)
+    - 陽性と予測したもののうち、正しく陽性と予測できた割合
+    - ▼陽性適合率 (PPV: Positive Predict Value) とも
+  - Recall（再現率） = TP / (TP + FN)
+    - すべての陽性データのうち、正しく陽性と予測できた割合
+    - ▼感度 (sensitivity) とも
   - 0 からの 1 の値をとり、1 に近いほど良いスコア
   - Precision と Recall はトレードオフの関係
-  - 誤検知を少なくしたいときは Precision を重視するとよい
-  - 正例の見逃しを避けたいときは Recall を重視するとよい
+  - 誤検知を少なくしたいときは Precision を重視するとよい（間違えて陽性と判断すると困るケース）
+  - 正例の見逃しを避けたいときは Recall を重視するとよい（陽性を見逃しては困るケース：例として病気の検出）
   - scikit-learn の metrics モジュールの **`precision_score`**、**`recall_score`** 関数を使う
 - **F1-score（F値）** と **Fβ-score**
-  - F1-score は Precision と Recall の調和平均を取ったもので、実務でもよく使われる
+  - 二値分類のモデルの精度を測るための評価指標
+  - F1-score は Precision と Recall の調和平均
+  - F1-score は実務でもよく使われる
+  - 二値分類タスクで正しく分類できたか (accuracy) だけではなく、A（陽）と B（陰）のどちらに分類するかが大きく意味を持つケースなどで使う（例えば、病気かどうかの判断など）
   - F1 = 2TP / (2TP + FP + FN)
   - Fβ-score は F1-score から Recall と Precision のバランスを係数βで調整したもの
   - Fβ = (1 + β<sup>2</sup>)・Recall・Precision / (Recall + β<sup>2</sup>Presision)
@@ -218,6 +225,15 @@ Public LB (Leader Board) と Private LB の順位が大きく入れ替わるこ�
   - 各レコードが 1 つまたは複数のクラスに属しているときに、属している可能性が高いと予測する順に K 個のクラスを予測値とする
 
 ### 評価指標と目的関数
+
+- **Objective function（目的関数）**
+  - モデルの学習において最適化される関数。
+  - 学習では目的関数の値を最小化するように係数などを更新していく。
+  - 目的関数は **微分可能でなければいけない**。
+  - 主な目的関数
+    - 回帰タスク ... RMSE
+    - 分類タスク ... logloss
+- 評価指標と目的関数が一致していない場合、そのモデルは評価指標に対して最適化されていない可能性がある。
 
 ### 評価指標の最適化
 
