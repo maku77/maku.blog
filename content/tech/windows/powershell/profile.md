@@ -64,9 +64,11 @@ PS C:\> Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 プロファイルの設定例
 ----
 
+### ディレクトリ移動用のコマンドを定義
+
 下記は、ディレクトリ移動のための関数（`cd-gitwork` や `u`）を定義する例です。
 ついでに PowerShell の起動時にその関数を呼び出して、ディレクトリを移動しています。
-よく使う作業ディレクトリに自動的に移動するようにしておくと便利です。
+よく使う作業ディレクトリに自動的に移動するようにしておくと便利です（Windows ターミナルの設定でも初期ディレクトリは設定できますが）。
 
 {{< code lang="powershell" title="Microsoft.PowerShell_profile.ps1" >}}
 Function cd-gitwork {
@@ -74,10 +76,20 @@ Function cd-gitwork {
 }
 Function u { cd ..  }
 Function uu { cd ..\..  }
+Function uuu { cd ..\..\..  }
 
 # PowerShell 起動時にディレクトリを移動
 cd-gitwork
 {{< /code >}}
 
 独自コマンドの定義方法としては、`Set-Alias` コマンドレットによるエイリアス定義もありますが、`Set-Alias` は柔軟なパラメーター設定ができないので、`Function` を使って関数として定義するのがよいです。
+
+### 他のスクリプトを読み込む
+
+複数の PC で設定を共有したいときは、Dropbox などに共通スクリプトを置いておいて、__`.`__ で読み込むようにします。
+各 PC のプロファイル (`$profile`) には、次のような 1 行だけを記述しておきます。
+
+{{< code lang="powershell" title="Microsoft.PowerShell_profile.ps1" >}}
+. D:\Dropbox\share\config\powershell\profile.ps1
+{{< /code >}}
 
