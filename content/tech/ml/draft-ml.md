@@ -6,7 +6,6 @@ tags: ["ml"]
 draft: true
 ---
 
-
 データ分割・検証
 ----
 
@@ -186,4 +185,23 @@ XGBoost / LightGBM / CatBoost
   - 単回帰 ... 特徴量は 1 つ。特徴量が x として、ax + b のような一次関数として表現される。
   - 重回帰 ... 特徴量は複数。ax<sub>1</sub> + bx<sub>2</sub> + cx<sub>3</sub> + d のような式で表現される。
   - 多項式回帰 ... ax<sub>1</sub> + bx<sub>1</sub><sup>2</sup> + cx<sub>2</sub> + dx<sub>2</sub><sup>2</sup> + ... のような式で表現される（特徴量 x<sub>i</sub> の n 乗という項が出てくる）。説明変数と目的変数の関係が線形ではなく、より複雑な曲線や曲面を表現できます。
+
+
+特徴量の作成
+----
+
+### 交互作用特徴量 (Polynomial Features)
+
+```python
+from sklearn.preprocessing import PolynomialFeatures
+
+df2 = PolynomialFeatures(include_bias=False).fit_transform(df1)
+```
+
+
+評価指標／評価関数
+----
+
+- 交差エントロピー誤差 (CE: Cross Entropy)
+  - 分類問題のように決まったラベルの推測を行う場合に使用します。
 

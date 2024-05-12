@@ -1,5 +1,5 @@
 ---
-title: "機械学習メモ: ROC カーブと AUC"
+title: "機械学習メモ: 分類タスクの評価 ─ ROC カーブと AUC"
 url: "p/ha99p76/"
 date: "2024-04-29"
 tags: ["ml", "数学"]
