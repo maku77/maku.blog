@@ -14,6 +14,8 @@ tags: ["読書"]
   imageUrl="https://images-na.ssl-images-amazon.com/images/I/8109bfE7iTL.jpg"
 >}}
 
+- [ドミニック・ローホー氏の書籍](https://www.amazon.co.jp/stores/author/B00IJ8KLPE/allbooks?ingress=0&tag=maku04-22)
+
 いろいろなリストを作ることによって、たくさんの小さな幸せに気付くためのヒント集のようなものです。
 そのようなリストを集めていくことで、自分の本質が見えてきます。
 物事を豊かにとらえることができるようになります。
@@ -149,4 +151,14 @@ tags: ["読書"]
     - いつか実現したいこと
 - 神秘を信じなくなったとき、人は死ぬのだ。── アルベルト・アインシュタイン
 - 自分がどうしたいかを知っている人は、ほかの人よりもずっと早く目的を達成できる。それは、自分がどこへ向かっているかを知っているから。まず何から始めればよいかをわかっているから。
+
+{{< amazon
+  itemId="4062816245"
+  title="シンプルリスト"
+  author="ドミニック・ローホー"
+  publisher="講談社"
+  imageUrl="https://images-na.ssl-images-amazon.com/images/I/8109bfE7iTL.jpg"
+>}}
+
+- [ドミニック・ローホー氏の書籍](https://www.amazon.co.jp/stores/author/B00IJ8KLPE/allbooks?ingress=0&tag=maku04-22)
 
