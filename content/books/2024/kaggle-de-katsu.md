@@ -455,6 +455,44 @@ GBDT などの決定木ベースのモデルでは効果がないことに注意
 
 - pandas の `merge()` メソッドを使う。
 
+### 時系列データ
+
+- リークさせないようにするポイント:
+  - 予測する時点より過去の情報のみを使って特徴量の作成やバリデーションを行う。
+  - ある時点のレコードの特徴量を作るときに、将来の情報を使わない。
+  - 学習データにバリデーションデータより将来のレコードを含めない。
+- ラグ特徴量
+  - 周期性があるときは、「1週間前の売り上げ」「2週間前の売り上げ」のようなラグ特徴量を作ることができる。`DataFrame` の `shift()` メソッドを使う。
+- 移動平均
+  - 周期的な影響を軽減するには、移動平均が使える。
+  - 例: 1期前から3期間の移動平均
+    ```python
+    x_ma3 = x.shift(1).rolling(window=3).mean()  # mean 以外 (max, median) でも可
+    ```
+
+### 次元削減
+
+- 主成分分析 (PCA: Principal Component Analysis)
+  - 特徴量が正規分布であることが前提。画像には向いてない。
+  - 特異値分解 (SVD: Singular Value Decomposition) も同様に使える。
+  - `sklearn.decomposition` モジュールの `PCA` や `TruncatedSVD` クラスを使う。
+- 非負値行列因子分解 (NMF: Non-negative Matrix Factorization)
+  - 非負の行列データを、より少数の要素の非負の行列の積で近似する。
+- LDA: Latent Dirichlet Allocation
+  - ベイズ推論を用いて、各文書を確率的にトピックに分類する。
+- 線形判別分析 (LDA: Linear Discriminant Analysis)
+  - 分類タスクについて教師ありで次元削減を行う。
+- t-SNE
+  - 2次元平面上に圧縮して可視化する目的でよく使われる。
+- UMAP
+  - 2018年に提案。`pip install umap-learn` でインストール。
+  - t-SNE より高速で、2次元や3次元を超える圧縮が可能。
+- オートエンコーダ
+  - ニューラルネットを用いた次元圧縮。
+- クラスタリング
+  - データをいくつかのグループに分ける教師なし学習。
+  - K-Means (Mini-Batch K-Means)、DBSCAN、Agglomerative Clustering など。
+  - `sklearn.cluster` モジュールを参照。
 
 ## 4. モデルの作成
 
