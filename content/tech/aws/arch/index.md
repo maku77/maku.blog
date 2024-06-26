@@ -6,6 +6,13 @@ tags: ["AWS"]
 draft: true
 ---
 
+<h3>{{< image-inline w="38" src="img-az.drawio.svg" >}} AZ (Availability Zone)</h3>
+
+- リージョン内には AZ: Availability Zone が複数ある(東京リージョンには 4 つの AZ がある）。
+- AZ は __100km 圏内__ で繋がるように配置されている。
+- AZ 間の通信は __1～2ms__ 程度（参考値）。
+- AZ はユーザーが特に意識することなく裏で勝手に決まる（ただし、VPC を作るときは意識する必要がある）。
+
 <h3>{{< image-inline w="38" src="Arch_Amazon-EC2_16.svg" >}} Amazon EC2 (Elastic Compute Cloud)</h3>
 
 - 仮想サーバーを提供するコンピューティングサービス。
@@ -37,7 +44,7 @@ draft: true
   - __EC2 Instance Savings Plans__ ... リザーブド・インスタンスと同様に、リージョンやインスタンスファミリーを指定する。
   - __Compute Savings Plans__ ... すべての EC2 インスタンスを対象に単位時間あたりの利用料を指定する。
   - スケジュールされたリ
-
+- {{< image-inline w="26" src="Res_Amazon-EC2_Elastic-IP-Address_48.svg" >}} __EC2 Elastic IP (EIP) アドレス__ ... AWS の固定のグローバル IP アドレス。
 
 <h3>{{< image-inline w="38" src="Arch_Amazon-Elastic-Container-Service_16.svg" >}} Amazon ECS (Elastic Container Service)</h3>
 
@@ -59,7 +66,21 @@ draft: true
 
 <h3>{{< image-inline w="38" src="Arch_Amazon-Virtual-Private-Cloud_16.svg" >}} Amazon VPC (Virtual Private Cloud)</h3>
 
-- データセンター内の仮想的な閉域ネットワーク。
+{{< image w="400" src="img-vpc.drawio.svg" >}}
+
+{{< image w="400" src="https://docs.aws.amazon.com/ja_jp/vpc/latest/userguide/images/security-group-overview.png" >}}
+
+- VPC はクラウド内の仮想的な閉域ネットワーク。
+- __リージョンの下に VPC__ を作成できる。
+- __VPC の下に Public/Private サブネット__ を作成できる（VPC CIDR ブロックのサブネット）。__各サブネットは AZ (Availability Zone) 内__ に配置される。
+  - __EC2 インスタンスに対して、セキュリティグループ__ を設定してインターネット側からの通信を遮断できる。許可する通信をホワイトリスト形式で設定する。
+  - __サブネットに対しては、ネットワーク ACL（アクセスコントロールリスト）__ を設定することでファイアウォールとして機能させられる。主に DDoS 攻撃を受けたときの拒否リスト。
+  - 通常はセキュリティグループの方だけ使えば OK。
+- VPC のアドレス空間内でプライベート IP アドレスを EC2 などに割り当てられる。
+- VPC とインターネットの境界には __インターネットゲートウェイ__ を配置する。
+- Public サブネットは、インターネット通信できるようになったサブネットのこと。インターネットゲートウェイに加え、「__ルートテーブル__」と「__パブリック IP アドレス__」が必要。
+- Private サブネット内の EC2 からインターネットにアクセスするには、Public サブネットに配置した __NAT ゲートウェイ__ 経由になる。
+- NAT ゲートウェイは、外向けの IP アドレスを固定したいときにも使用する。
 
 <h3>{{< image-inline w="38" src="Arch_AWS-Lambda_16.svg" >}} AWS Lambda</h3>
 
@@ -108,6 +129,15 @@ draft: true
   - ELB + Auto Scaling 導入時のポイント:
     - EC2 サーバーはステートレスになるよう設計する。
     - 複数の AZ にまたがるように EC2 サーバーを配置する。
+- Web サーバー (EC2) のセキュリティグループでは、ELB が属するサブネットに送信元を限定する（10.0.0.0/24 など）。サブネットで指定するのは、__ELB の IP アドレスが固定ではない__ から。
+- ELB の「__スティッキーセッション__」機能
+  - ELB が作成する Cookie をもとにクライアントからのアクセスを同一サーバーに振り分ける。
+- ELB の「__SSL ターミネーション__」機能
+  - 個々の Web サーバーで SSL 証明書を管理しなくてもよくなる。
+- ELB の「__ヘルスチェック__」機能
+  - デフォルトでは、間隔: 30 秒、応答タイムアウト: 5 秒、非正常の閾値: 2 回。
+- ELB の「__アイドルタイムアウト__」
+  - Web サーバーがこの時間応答しないと（デフォルトは 60 秒）、ELB は Web サーバーを切り離して HTTP 504 レスポンスを返す。
 
 <h3>{{< image-inline w="38" src="Arch_AWS-Auto-Scaling_16.svg" >}} AWS Auto Scaling</h3>
 
@@ -298,6 +328,43 @@ draft: true
     2. ボールトロックが InProgress になり、ロック ID が返される。
     3. ロック ID を使ってボールトロックを開始する。
 
+<h3>{{< image-inline w="38" src="Arch_AWS-Storage-Gateway_16.svg" >}} AWS Storage Gateway</h3>
+
+- オンプレミスにあるデータをクラウドと連携する。
+- __ストレージとしては S3 や S3 Glacier__、__キャッシュには EBS__ を使う。
+- 参照頻度の高いデータはオンプレミスに置くという使い分けも可能。
+- Storage Gateway の 3 種類のタイプ
+  1. __ファイルゲートウェイ__
+     - S3 を NFS マウントして使う。
+     - 保存したファイルは S3 API で参照できる利点があるが、単に NFS サーバーが欲しいのであれば EFS を使った方が高速。
+  2. __ボリュームゲートウェイ__
+     - S3 のデータ保存領域全体を 1 つのボリュームとして管理する。
+     - S3 API でファイルを参照することは __できない__。
+     - 接続方式は NFS ではなく __iSCSI 接続__ になる。
+     - ボリュームのスナップショットから EBS を作成できる。
+     - __ボリューム型のボリュームゲートウェイ__
+       - 参照頻度の高いデータはオンプレミスのキャッシュボリュームに格納する。
+     - __保管型のボリュームゲートウェイ__
+       - オンプレミスのプライマリストレージにすべてのデータを保存し、定期的にスナップショットを S3 へ転送する。
+       - オンプレミスのデータのバックアップ用途に使える。
+  3. __テープゲートウェイ__
+     - テープデバイスの代替として S3 や S3 Glacier にバックアップ。
+- Storage Gateway のセキュリティ
+  1. __CHAP 認証__ ... iSCSI 接続時。クライアントのなりすましや盗聴を防ぐ。
+  2. __データ暗号化__ ... S3 への保存時に AWS KMS で暗号化。
+  3. __通信の暗号化__ ... S3 に送信するときは HTTPS で送られる。
+
+<h3>{{< image-inline w="38" src="Arch_Amazon-FSx_16.svg" >}} Amazon FSx</h3>
+
+- フルマネージドなファイルストレージ。
+- 2 種類の FSx ストレージ
+  1. FSx for Windows ファイルサーバー
+     - 単一のサブネットにエンドポイントとなる ENI (Elastic Network Interface) を配置し、SMB プロトコルでアクセス。
+  2. FSx for Lustre
+     - Linux 用のサービスで、専用のクライアントをインストールする。
+     - その後は通常の NAS のようにマウントできる。
+     - ファイルシステムを S3 のバケットと関連付ける。
+
 
 運用支援サービス
 ----
@@ -355,7 +422,7 @@ draft: true
 <h3>{{< image-inline w="38" src="Arch_AWS-WAF_16.svg" >}} AWS WAF</h3>
 
 - WAF (Web Application Firewall) は Web アプリに特化したファイアウォールのことで、SQL インジェクションや XSS などの脅威からアプリを保護するもの。
-- AWS WAF は、__API Gateway__、__CloudFront__、__ELB__ へのアクセスを保護する。
+- AWS WAF は、__CloudFront__、__ALB: Load Balancer (ELB)__、__API Gateway__ へのアクセスを保護する。
   - 例: Internet → ELB __(+WAF)__ → EC2群
   - 例: Internet → CloudFront __(+WAF)__ → ELB → EC2群（この構成の方が上記より高速）
   - 例: Internet → CloudFront __(+WAF)__ → オンプレミス
@@ -374,4 +441,19 @@ draft: true
   - WAF のログを S3 バケットに出力
   - S3 バケット上の WAF ログを Amazon Athena で分析
   - WAF メトリクスを CloudWatch で集約して 3rd パーティサービスへ通知
+
+<h3>AWS セキュリティグループ</h3>
+
+- __インスタンスに対して__ ファイアウォールを導入する仕組み。OS レベルのネットワークのフィルタリングルールを設定する。
+- 1 つのセキュリティグループを __複数のインスタンスに適用可能__。
+- デフォルトで __すべてのインバウンド通信を遮断する__。
+  - ただし、SSH アクセスはすべての接続元からのアクセスが許可されている。
+- 通信のインバウンドルール（__許可ルール__）を設定する（拒否ルールというものは存在しない）。
+- セキュリティグループは __ステートフル__ であり、応答（アウトバウンド通信）は常に許可される。
+- セキュリティグループの「送受信先」としてセキュリティグループを指定することができる。
+- （比較）ネットワーク ACL
+  - ネットワーク ACL は __サブネット__ に設定する（個々の EC2 インスタンスに設定する必要がない）。
+  - ネットワーク ACL はステートレスで、デフォルトでインバウンドもアウトバウンドも許可。
+    - 応答トラフィック（アウトバウンド）も明示的に設定する必要あり（エフェメラルポート 1025～65535 を許可しておく）。
+  - ネットワーク ACL の「送受信先」としてはセキュリティグループは指定できない。
 
