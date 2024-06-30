@@ -13,6 +13,13 @@ draft: true
 - AZ 間の通信は __1～2ms__ 程度（参考値）。
 - AZ はユーザーが特に意識することなく裏で勝手に決まる（ただし、VPC を作るときは意識する必要がある）。
 
+<h3>{{< image-inline w="38" src="Arch_Amazon-ElastiCache_16.svg" >}} Amazon ElastiCache</h3>
+
+- インメモリーキャッシュ。Redis や Memcached をサービス化したもの。
+- 小さなマスターデータや、セッション管理用のデータなどに適している。
+- Redis は 1 台のプライマリーと、複数のリードレプリカでクラスターを構成する。
+- ElastiCache のパッチ適用中はダウンタイムが発生する可能性がある。
+
 <h3>{{< image-inline w="38" src="Arch_Amazon-EC2_16.svg" >}} Amazon EC2 (Elastic Compute Cloud)</h3>
 
 - 仮想サーバーを提供するコンピューティングサービス。
@@ -50,8 +57,8 @@ draft: true
 
 - Docker コンテナの実行環境。
 - ECS 用語:
-  - __Task__ ... EC2 インスタンス上で実行される __コンテナ__。
   - __Cluster__ ... EC2 インスタンスのこと。1 つの Cluster 上で複数の Task を実行可能。
+  - __Task__ ... EC2 インスタンス上で実行される __コンテナ__。
   - __Task Definition__ ... Task の定義。
   - __Service__ ... __同じ Task を複数用意して__ ELB に紐付けるときなど。Task のブルー・グリーン・デプロイメントにも使える。
 - Task ごとに IAM ロールを割り当て可能。
@@ -143,16 +150,26 @@ draft: true
 
 - サーバー負荷に応じて自動でスケールアウトするサービス。
 - CloudWatch で EC2 のインスタンスを監視することで Auto Scaling にアラーム通知する。
+- {{< image-inline w="26" src="Arch_Amazon-CloudWatch_16.svg" >}} <b>CloudWatch</b><br>
+  &nbsp;↓ アラーム通知<br>
+  {{< image-inline w="26" src="Arch_AWS-Auto-Scaling_16.svg" >}} <b>Auto Scaling</b><br>
+  &nbsp;↓ インスタンス起動<br>
+  {{< image-inline w="26" src="Auto-Scaling-group_32.svg" >}} <b>Auto Scaling グループ</b>（EC2 群）
 
 <h3>{{< image-inline w="38" src="Arch_Amazon-RDS_16.svg" >}} Amazon RDS</h3>
 
 - {{< image-inline w="26" src="Res_Amazon-RDS_Multi-AZ_48.svg" >}} __Multi-AZ 機能__:
   - DB サブネットグループを作成 ... 2 つの AZ (Availability Zone) のサブネットをグループ化したもの。
   - マスターとスレーブの 2 台分のコストがかかる。
+  - RDS の SLA (Service Level Agreement) は、Multi-AZ の利用が前提条件（EC2 も同様）。
 - 自動バックアップ
   - データの保持期間 ... デフォルト 1 日、最大 35 日間。
 - スナップショット
   - システムバックアップとして恒久的に保管したいとき。
+- {{< image-inline w="26" src="Arch_Amazon-Aurora_16.svg" >}} RDS for __Aurora__
+  - MySQL をベースに高速化の仕組みを取り入れたもの。
+  - __Log-Structured Storage__ と呼ばれる追記型のストレージシステムを採用しており、MySQL のような更新時のロックが発生しない。
+  - プライマリーとリードレプリカで同じストレージを使用するため、MySQL のようなトランザクションログ（バイナリーログ）の生成や転送が不要。つまり、リードレプリカを増やすとき（レプリケーション）の負荷が少ない。
 
 
 ストレージサービス
