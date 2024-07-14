@@ -3,16 +3,18 @@ title: "読書メモ『外国語上達法』千野栄一"
 linkTitle: "『外国語上達法』千野栄一"
 url: "/p/crfin42"
 date: "2011-05-27"
-tags: ["読書"]
+tags: ["読書", "英語"]
 ---
 
-{{% amazon
+{{< amazon
   itemId="4004203295"
   title="外国語上達法"
   author="千野栄一"
   publisher="岩波書店"
   imageUrl="https://images-na.ssl-images-amazon.com/images/I/41G-qbB9p1L.jpg"
-%}}
+>}}
+
+→ [英語学のベストセラー](https://amzn.to/3WjGAts")
 
 ポイントメモ
 ----
@@ -69,4 +71,14 @@ tags: ["読書"]
     * 繰り返しは忘却の特効薬。
     * たとえ短い時間でも毎日することが大切で、減食やジョギングと同じように少しずつでも毎日する方がいい。
     * 2つの原語より3つの言語、3つの言語より4つの言語と進むにつれて、その人の視野は複眼的になり、物事の違った面が見えてくる。ただ、その言語が使い物になることがその条件。
+
+{{< amazon
+  itemId="4004203295"
+  title="外国語上達法"
+  author="千野栄一"
+  publisher="岩波書店"
+  imageUrl="https://images-na.ssl-images-amazon.com/images/I/41G-qbB9p1L.jpg"
+>}}
+
+→ [英語学の売れ筋ランキング](https://amzn.to/3WjGAts")
 

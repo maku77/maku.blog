@@ -3,16 +3,18 @@ title: "読書メモ『わたしの外国語学習法』ロンブ・カトー"
 linkTitle: "『わたしの外国語学習法』ロンブ・カトー"
 url: "/p/t6nqgcj"
 date: "2016-09-01"
-tags: ["読書"]
+tags: ["読書", "英語"]
 ---
 
-{{% amazon
+{{< amazon
   itemId="4480085432"
   title="わたしの外国語学習法"
   author="ロンブ・カトー"
   publisher="筑摩書房"
   imageUrl="https://images-na.ssl-images-amazon.com/images/I/513Z50GF88L.jpg"
-%}}
+>}}
+
+→ [英語学のベストセラー](https://amzn.to/3WjGAts")
 
 * 外国語を学習するのは、それ自体が面白いからでもある。
 * 外国語学習に必要な**最低限の時間は週10〜12時間**。まず何よりも、時間の割り振りのバランスをとること。不可能ならば始める前によく考える。
@@ -48,5 +50,12 @@ tags: ["読書"]
 * 誰にでもわかるような簡単な部分に分解し、解釈を組み立てていくようにすればよい。
 * 演説の通訳は参考になる。使っていけない言い回しはしないし、言葉をつなぐ手法に長けている。
 
-<table><tr><td><a href="http://hb.afl.rakuten.co.jp/hgc/144180a1.9ac213ee.144180a2.e4d0f394/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fbook%2F1137276&m=http%3A%2F%2Fm.rakuten.co.jp%2Fbook%2Fi%2F10832928%2F&scid=af_item_tbl&link_type=picttext&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0dGV4dCIsInNpemUiOiIzMDB4MzAwIiwibmFtIjoxLCJuYW1wIjoicmlnaHQiLCJjb20iOjAsImNvbXAiOiJkb3duIiwicHJpY2UiOjEsImJvciI6MCwiY29sIjowLCJ0YXIiOjF9" target="_blank" style="word-wrap:break-word;"  ><img src="http://hbb.afl.rakuten.co.jp/hgb/144180a1.9ac213ee.144180a2.e4d0f394/?me_id=1213310&item_id=10832928&m=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fbook%2Fcabinet%2F4800%2F48008543.jpg%3F_ex%3D80x80&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fbook%2Fcabinet%2F4800%2F48008543.jpg%3F_ex%3D300x300&s=300x300&t=picttext" border="0" style="margin:2px" alt="商品価格に関しましては、リンクが作成された時点と現時点で情報が変更されている場合がございます。お買い物される際には、必ず商品ページの情報を確認いただきますようお願いいたします。また商品ページが削除された場合は、「最新の情報が表示できませんでした」と表示されます。" title="商品価格に関しましては、リンクが作成された時点と現時点で情報が変更されている場合がございます。お買い物される際には、必ず商品ページの情報を確認いただきますようお願いいたします。また商品ページが削除された場合は、「最新の情報が表示できませんでした」と表示されます。"></a></td><td style="vertical-align:top;width:310px;"><p style="font-size:12px;line-height:1.4em;text-align:left;margin:0px;padding:2px 6px;word-wrap:break-word"><a href="http://hb.afl.rakuten.co.jp/hgc/144180a1.9ac213ee.144180a2.e4d0f394/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fbook%2F1137276&m=http%3A%2F%2Fm.rakuten.co.jp%2Fbook%2Fi%2F10832928%2F&scid=af_item_tbl&link_type=picttext&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0dGV4dCIsInNpemUiOiIzMDB4MzAwIiwibmFtIjoxLCJuYW1wIjoicmlnaHQiLCJjb20iOjAsImNvbXAiOiJkb3duIiwicHJpY2UiOjEsImJvciI6MCwiY29sIjowLCJ0YXIiOjF9" target="_blank" style="word-wrap:break-word;"  >わたしの外国語学習法 [ カトー・ロンブ ]</a><br><span >価格：1026円（税込、送料無料)</span> <span style="color:#BBB">(2016/9/5時点)</span></p></td><tr></table>
+{{< amazon
+  itemId="4480085432"
+  title="わたしの外国語学習法"
+  author="ロンブ・カトー"
+  publisher="筑摩書房"
+  imageUrl="https://images-na.ssl-images-amazon.com/images/I/513Z50GF88L.jpg"
+>}}
 
+→ [英語学の売れ筋ランキング](https://amzn.to/3WjGAts")
