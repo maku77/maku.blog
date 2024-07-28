@@ -1,6 +1,6 @@
 ---
 title: "『世界樹の迷宮』やってる"
-url: "/p/weow6dm"
+url: "p/weow6dm/"
 date: "2021-08-22"
 tags: ["日記", "ゲーム"]
 ---
