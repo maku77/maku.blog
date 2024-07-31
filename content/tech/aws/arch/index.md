@@ -1,6 +1,6 @@
 ---
 title: "AWS ソリューションアーキテクト復習シート"
-url: "p/tqmr4od/"
+url: "p/3vedvwg/"
 date: "2024-06-21"
 tags: ["AWS"]
 draft: true
