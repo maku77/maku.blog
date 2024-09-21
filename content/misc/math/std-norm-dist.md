@@ -10,13 +10,26 @@ useMath: true
   #table-u3confr {
     font-size: 10pt;
     line-height: 0.8;
-    max-height: 400px; /* テーブル全体の高さを制限 */
+    max-height: 300px; /* テーブル全体の高さを制限 */
     overflow-y: auto; /* 必要に応じて縦スクロールバーを表示 */
     border: solid 1px #ccc;
+  }
+  #z-label-wytrqnr {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    background: #ccc;
   }
   #table-u3confr thead {
     position: sticky;
     top: 0;
+    z-index: 2;
+  }
+  #table-u3confr tbody th {
+    position: sticky;
+    left: 0;
+    z-index: 1;
   }
   #table-u3confr th {
     border: none;
@@ -40,10 +53,10 @@ useMath: true
   <figcaption>図: 標準正規分布の上側確率 \( P(z \geq \) <span id="zval-f6cnepx"></span>\( ) = \) <span id="prob-q6z9rjv" style="color: #f38; font-weight: bolder;"></span></figcaption>
 </figure>
 
-<table id="table-u3confr" style="margin: 1em auto">
+<table id="table-u3confr">
   <thead>
     <tr>
-      <th>z 値</th>
+      <th id="z-label-wytrqnr">z</th>
       <th>.00</th><th>.01</th><th>.02</th><th>.03</th><th>.04</th>
       <th>.05</th><th>.06</th><th>.07</th><th>.08</th><th>.09</th>
     </tr>
