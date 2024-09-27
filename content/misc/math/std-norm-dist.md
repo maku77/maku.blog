@@ -78,6 +78,8 @@ useMath: true
 
 ٩(๑❛ᴗ❛๑)۶ 便利っ
 
+- 参考: [標準正規分布を使った計算問題の例](/p/zfgia97/)
+
 <script type="module">
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
