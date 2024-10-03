@@ -11,7 +11,7 @@ tags: ["TypeScript"]
 {{< image w="300" src="img-001.drawio.svg" title="複数の .ts/.css/.svg ファイルを 1 つの JavaScript ファイルに結合" >}}
 
 [Vite](https://vitejs.dev/) は TypeScript ビルドや、開発用サーバー、バンドリングなどの機能を備えた統合的なフロントエンド開発ツールです。
-ここでは、Vite で複数の TypeScript ファイルを 1 つの JavaScript ファイルの形にビルドしてみます。
+ここでは、Vite で複数の TypeScript ファイルを 1 つの JavaScript ファイルの形にビルドしてみます（この作業をバンドルと呼びます）。
 用途としては、複数の Web サイトから `<script>` 要素で読み込み可能な JavaScript ライブラリを作成することを想定しています。
 画像ファイルやスタイルシート (CSS) などのリソースファイルも、JavaScript に埋め込む形でバンドルできます。
 
@@ -139,7 +139,7 @@ $ npm run dev -- --open
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Test</title>
-    <script src="./dist/bundle.js" async></script>
+    <script src="./dist/bundle.js" defer></script>
   </head>
   <body>
     <div id="app"></div>
