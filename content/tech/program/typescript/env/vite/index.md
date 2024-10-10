@@ -255,9 +255,9 @@ export default defineConfig({
 </style>
 {{< /code >}}
 
-エントリーポイントとなる `src/index.ts` では、上記の `App.svelte` を読み込んで `document.body` にマウントするようにしておきます。
+エントリーポイントとなる `src/main.ts` では、上記の `App.svelte` を読み込んで `document.body` にマウントするようにしておきます。
 
-{{< code lang="ts" title="src/index.ts" >}}
+{{< code lang="ts" title="src/main.ts" >}}
 import App from "./App.svelte";
 
 new App({ target: document.body });
