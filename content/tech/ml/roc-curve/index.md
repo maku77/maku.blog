@@ -12,9 +12,7 @@ ROC カーブとは
 __ROC (Receiver Operating Characteristic) カーブ（曲線）__ は、二値分類モデルの性能を評価するためのグラフです。
 陽性と陰性を判断するための閾値を変換させたときに、__真陽性率 (TPR: True Positive Rate)__ と __偽陽性率 (FPR: False Positive Rate)__ がどのように変化するかプロットしたものです。
 
-{{< reference >}}
-- TP/TN/FP/FN などの用語について → [混同行列と関連指標](/p/9dveh3m/)
-{{< /reference >}}
+- （参考）TP/TN/FP/FN などの用語について → [混同行列と関連指標](/p/9dveh3m/)
 
 
 真陽性率 (TPR) と 偽陽性率 (FPR)

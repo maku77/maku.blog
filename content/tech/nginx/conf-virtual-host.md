@@ -1,13 +1,11 @@
 ---
 title: "Nginx の設定: Nginx でバーチャルホストを設定する（リバースプロキシ）"
-url: "/p/q8tw6c4"
+url: "p/q8tw6c4/"
 date: "2013-12-03"
 tags: ["nginx"]
 ---
 
-{{% reference %}}
-- [nginx-proxy コンテナで簡単にリバースプロキシを立ち上げる](/p/kos367z/)
-{{% /reference %}}
+- （参考）[nginx-proxy コンテナで簡単にリバースプロキシを立ち上げる](/p/kos367z/)
 
 アクセス時のドメイン名により別の Web サーバに処理をフォワードする
 ----

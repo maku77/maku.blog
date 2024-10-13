@@ -169,7 +169,5 @@ services:
 $ docker compose up -d
 ```
 
-{{% reference %}}
-- [nginx-proxy コンテナで簡単にリバースプロキシを立ち上げる](/p/kos367z/)
-{{% /reference %}}
+- （参考）[nginx-proxy コンテナで簡単にリバースプロキシを立ち上げる](/p/kos367z/)
 
