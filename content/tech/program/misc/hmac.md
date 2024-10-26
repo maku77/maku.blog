@@ -1,7 +1,7 @@
 ---
 title: "HMAC-SHA256 コードを生成する"
 url: "/p/uqhbb5p"
-date: "2013-08-2"
+date: "2013-08-02"
 lastmod: "2023-06-09"
 changes:
   - 2023-06-09: Python の hashlib の使い方ページへのリンクを追加
