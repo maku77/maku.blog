@@ -201,6 +201,7 @@ app.get("/pokemon/:id", async (c) => {
   const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${safeId}`);
   if (!res.ok) {
     const errorText = await res.text();
+    console.log(`Pokemon API error: ${errorText}`);
     return c.json({ message: errorText }, 500);
   }
 
@@ -215,7 +216,7 @@ app.get("/pokemon/:id", async (c) => {
 c.header("X-Message", "Hello!");
 ```
 
-### シークレット情報を設定＆参照する
+### シークレット情報を設定＆参照する {#secret}
 
 Cloudflare Workers では、Bindings という仕組みでシークレット情報（外部 API のキーなど）を参照できるようになっています。
 下記は、`HOGE_API_KEY` というシークレット情報を定義して、Hono アプリからその値を参照する方法です。
@@ -236,7 +237,7 @@ Enter a secret value: **********************
 {{< /code >}}
 
 シークレット情報は下記のように **`c.env.変数名`** で参照できます。
-ここでは、シークレット情報が取得できない場合に 503 エラーを返すようにミドルウェア実装を追加しています。
+ここでは、シークレット情報が取得できない場合に 500 エラーを返すようにミドルウェア実装を追加しています。
 
 {{< code lang="ts" hl_lines="12 20" >}}
 import { Hono } from "hono";
@@ -248,10 +249,11 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-// 必要な環境変数が設定されていない場合は 503 エラーを返すミドルウェア
+// 必要な環境変数が設定されていない場合は 500 エラーを返すミドルウェア
 app.use(async (c, next) => {
   if (!c.env.HOGE_API_KEY) {
-    return c.json({ message: "API key is undefined" }, 503);
+    console.error("HOGE_API_KEY is not set");
+    return c.json({ message: "The server setup is not complete" }, 500);
   }
   await next();
 });
@@ -296,10 +298,11 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-// 必要な環境変数が設定されていない場合は 503 エラーを返すミドルウェア
+// 必要な環境変数が設定されていない場合は 500 エラーを返すミドルウェア
 app.use(async (c, next) => {
   if (!c.env.API_BASE_URL) {
-    return c.json({ message: "API_BASE_URL is undefined" }, 503);
+    console.error("API_BASE_URL is not set");
+    return c.json({ message: "The server setup is not complete" }, 500);
   }
   await next();
 });

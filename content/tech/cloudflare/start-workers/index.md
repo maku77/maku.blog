@@ -3,6 +3,7 @@ title: "Cloudflare Workers をはじめる (wrangler)"
 url: "p/rn7p7n5/"
 date: "2022-12-11"
 tags: ["Cloudflare"]
+weight: 1
 ---
 
 Workers とは？
