@@ -170,11 +170,40 @@ WORLD
 できたっ！ ٩(๑❛ᴗ❛๑)۶ わーぃ
 
 
-応用）プレビュー用の KV namespace を用意する
+開発サーバーはローカルの KV にアクセスする
 ----
 
-KV namespace は、デフォルトでは開発環境（`wrangler dev`）と本番環境（`wrangler deploy`）で共有されます。
-開発環境用にデータ保存先を分けたい場合は、KV namespace を作成するときに、次のように **`--preview`** オプションを指定します。
+`wrangler dev`（あるいは `npm run dev`）で起動した開発サーバーは、**デフォルトではローカル環境の KV ストレージ** にアクセスするようになっています。
+実体は、**`.wrangler/state/v3/kv/{namespace_id}`** というディレクトリのファイルです。
+`wrangler deploy`（あるいは `npm run deploy`）でデプロイした本番環境の Worker が参照する KV ストレージとは別のものを参照しているので注意してください。
+
+KV 内に格納された key & value ペアを扱うためのコマンドとして **`wrangler kv key`** コマンドがありますが、このコマンドでローカル環境の KV ストレージを参照したいときは、**`--local`** オプションを指定する必要があります。
+
+{{< code lang="console" title="ローカル環境の KV ストレージの参照" >}}
+# ローカル KV のネームスペース "KV" 内のキーを列挙
+$ wrangler kv key list --local --binding KV
+
+# ローカル KV のネームスペース "KV" 内のキー "KEY" の値を取得
+$ wrangler kv key get --local --binding KV "KEY"
+
+# ローカル KV のネームスペース "KV" 内のキー "KEY" に値 "VALUE" を設定
+$ wrangler kv key put --local --binding KV "KEY" "VALUE"
+{{< /code >}}
+
+逆に `--local` オプションを指定せずに `wrangler kv key` コマンドを実行した場合は、本番環境のグローバルな KV ストレージを参照することになります。
+
+{{< code lang="console" title="本番環境の KV ストレージの参照" >}}
+$ wrangler kv key list --binding KV
+$ wrangler kv key get --binding KV "aaa"
+$ wrangler kv key put --binding KV "aaa" "bbb"
+{{< /code >}}
+
+
+プレビュー用の KV namespace を用意する
+----
+
+KV namespace の ID は、デフォルトでは開発環境（`wrangler dev`）と本番環境（`wrangler deploy`）で同じものが使用されます。
+開発環境用に KV namespace を分けたい場合は、KV namespace を作成するときに **`--preview`** オプションを指定します。
 
 {{< code lang="console" title="プレビュー用の KV namespace の作成" >}}
 $ wrangler kv namespace create KV --preview
@@ -215,8 +244,25 @@ preview_id = "6ab74fcf66d84b7da978e5410ec1261d"
 }
 {{< /code >}}
 
-これで、開発サーバー (`wrangler dev` / `npm run dev`) での KV アクセス先と、本番環境 (`wrangler deploy` / `npm run deploy`) での KV アクセス先が分かれるようになります。
+これで、開発サーバー (`wrangler dev` / `npm run dev`) が参照する KV namespace と、本番環境 (`wrangler deploy` / `npm run deploy`) が参照する KV namespace が分かれるようになります。
 Worker コード内からの参照方法は、`env.KV` で共通です。
+
+さらに、プレビュー用の KV namespace を作成した後は、開発サーバーを Cloudflare 側の KV ストレージに接続できるようになります（開発サーバーの起動時に **`--remote`** オプション）。
+この場合は、Cloudflare 側に作成されたプレビュー用の KV namespace が参照されます。
+
+{{< code lang="console" title="開発サーバーから Cloudflare 側のプレビュー用 KV namespace を参照" >}}
+$ wrangler dev --remote
+{{< /code >}}
+
+ローカルやらプレビューやらで混乱するのでまとめておきます。
+
+|  | プレビュー用の<br>KV namespace なし | プレビュー用の<br>KV namespace あり |
+| ---- | ---- | ---- |
+| 開発サーバー<br>(`wrangler dev`) | ローカル KV が参照される<br>（本番用 KV namespace） | ローカル KV が参照される<br>（プレビュー KV namespace） |
+| 開発サーバー<br>(`wrangler dev --remote`) | ─ | リモート KV が参照される<br>（プレビュー KV namespace） |
+| 本番環境<br>(`wrangler deploy`) | リモート KV が参照される<br>（本番用 KV namespace） | ─ |
+
+プレビュー用の KV namespace を作成すると、振る舞いが変わるところがポイントですね。
 
 
 応用）Hono フレームワークと組み合わせ KV を使用する
