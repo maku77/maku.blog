@@ -259,10 +259,18 @@ $ wrangler dev --remote
 |  | プレビュー用の<br>KV namespace なし | プレビュー用の<br>KV namespace あり |
 | ---- | ---- | ---- |
 | 開発サーバー<br>(`wrangler dev`) | ローカル KV が参照される<br>（本番用 KV namespace） | ローカル KV が参照される<br>（プレビュー KV namespace） |
-| 開発サーバー<br>(`wrangler dev --remote`) | ─ | リモート KV が参照される<br>（プレビュー KV namespace） |
+| 開発サーバー<br>(`wrangler dev --remote`) | （起動できず） | リモート KV が参照される<br>（プレビュー KV namespace） |
 | 本番環境<br>(`wrangler deploy`) | リモート KV が参照される<br>（本番用 KV namespace） | ─ |
 
-プレビュー用の KV namespace を作成すると、振る舞いが変わるところがポイントですね。
+プレビュー用の KV namespace の Binding を設定しておくと、振る舞いが変わるところがポイントですね。
+おすすめはしませんが、`wrangler dev --remote` で開発サーバーを起動したときに、Cloudflare 側の本番用の KV namespace に接続したいときは、設定ファイル (`wrangler.toml`) 内の `preview_id` の参照先を `id` と同じものに設定します。
+
+{{< code lang="toml" title="wrangler.toml" hl_lines="4" >}}
+[[kv_namespaces]]
+binding = "KV"
+id = "2161175c318445cfa3d1dac2f20ee660"
+preview_id = "2161175c318445cfa3d1dac2f20ee660"
+{{< /code >}}
 
 
 応用）Hono フレームワークと組み合わせ KV を使用する
