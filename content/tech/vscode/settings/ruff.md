@@ -55,3 +55,20 @@ Python コードのフォーマットをかけるには、コマンドパレッ�
 },
 {{< /code >}}
 
+
+（おまけ）型チェッカーの Mypy は別途インストールする
+----
+
+Ruff は Lint チェックとフォーマットを行ってくれますが、**型チェックを行うためのツール (type checker) は別途インストールする** 必要があります。
+これは、Ruff の公式サイトの FAQ でも以下のように明記されています。
+
+- 参考: [How does Ruff compare to Mypy, or Pyright, or Pyre?](https://docs.astral.sh/ruff/faq/#how-does-ruffs-linter-compare-to-pylint)
+  > **Ruff is a linter, not a type checker.**
+  > ...
+  > It's recommended that you use Ruff in conjunction with a type checker, like **Mypy**, **Pyright**, or **Pyre**, with Ruff providing faster feedback on lint violations and the type checker providing more detailed feedback on type errors.
+
+Microsoft が VS Code 用の Mypy 拡張 (`ms-python.mypy-type-checker`) を公開しているのでこれをインストールしておけばよいです。
+ポチッとインストールするだけで、VS Code 上で Python コードの型チェックが有効になります。
+
+- [Mypy Type Checker](https://marketplace.visualstudio.com/items?itemName=ms-python.mypy-type-checker)
+
