@@ -1,9 +1,8 @@
 ---
 title: "Cloudflare Workers からの fetch 呼び出しをキャッシュする"
 url: "p/d5mqo6c/"
-date: "2025-01-30"
+date: "2025-02-02"
 tags: ["Cloudflare"]
-draft: true
 ---
 
 {{% private %}}
@@ -23,14 +22,15 @@ Cloudflare Workers にデプロイされた JavaScript 関数は、単一のオ�
 つまり、Cloudflare Workers 上でキャッシュメカニズムを動作させるということは、実質的にはクライアントに近いエッジサーバーからキャッシュを返すことを意味します（つまり、どこからでも速い）。
 
 {{< mermaid >}}
+%%{init:{'flowchart':{'nodeSpacing':15, 'rankSpacing':30}}}%%
 flowchart LR
-  A[Client] --> B["Worker (Edge)"]
-  subgraph Cloudflare
+  A[Client] --> B[Worker]
+  subgraph "Cloudflare (Edge)"
     B
     C[(Cache)]
   end
   B --> A
-  B -->|fetch| D["3rd Party API (Origin)"]
+  B -->|fetch| D["3rd Party API<br>(Origin)"]
   D -->|response| B
 {{< /mermaid >}}
 
@@ -70,8 +70,12 @@ console.log(await res.text());
 {{< /code >}}
 
 `fetch` 関数がキャッシュされたレスポンスを返したかどうかは、レスポンスヘッダーの **`CF-Cache-Status:`** の値で判断できます。
-上記のコードを 2 回動かすと、このヘッダーの値が **`HIT`** になり、キャッシュされていることを確認できます。
-逆に、前述のような条件を満たさないバックエンド API のレスポンスをキャッシュするには、`Cache` API を明示的に呼び出すことでキャッシュを制御する必要があります。
+上記のコードを 2 回動かすと、このヘッダーの値が **`HIT`** になり、キャッシュされたレスポンスであることを確認できます。
+
+一方で、前述のような条件を満たさないバックエンド API のレスポンスをキャッシュするには、Cache API を明示的に呼び出してキャッシュする必要があります。
+オリジンサーバー（サードパーティ API）の立場としては CDN などにキャッシュされることを意図していない API レスポンス (`Cache-Control: private`) であったとしても、そのレスポンスをキャッシュしたいシチュエーションはあります。
+例えば、企業で契約した API キーを使ってサードパーティ API を呼び出すようなケースでは、取得したデータは企業内ではキャッシュして共有しても問題ないかもしれません。
+以下、Cloudflare Workers 上での `fetch` レスポンスを Cache API でキャッシュする方法を説明します。
 
 
 Cloudflare Workers での fetch キャッシュ実装例
@@ -84,77 +88,59 @@ Cache オブジェクトの以下のメソッドを使用しています（参�
 - `cache.match(request, options)` -- キャッシュの参照
 - `cache.delete(request, options)` -- キャッシュの削除 (Purge)
 
-{{< code lang="ts" title="src/cache.ts" hl_lines="28 37 44" >}}
-import { Context } from "hono";
+{{< code lang="ts" title="src/cache.ts" hl_lines="14 19 24" >}}
+/** Default cache TTL in seconds. */
+const CACHE_MAX_AGE = 60 * 10;  // 10 minutes
 
-// Default cache TTL for all responses
-const CACHE_TTL_SECONDS = 60 * 10; // 10 minutes
+type Req = RequestInfo | URL;
 
-/**
- * Store a response object in the cache.
- */
-export function putCache(
-  c: Context,
-  url: URL | string,
-  res: Response,
-  ttl: number = CACHE_TTL_SECONDS
-): void {
-  // Add "Cache-Control" header to enable caching
-  const newHeaders = new Headers(res.headers);
-  newHeaders.append("Cache-Control", `public, s-maxage=${ttl}`);
+/** Store a response object in the cache. */
+function putCache(c: ExecutionContext, req: Req, res: Response): void {
+  // To enable caching, add a "Cache-Control" header to the response.
+  const clone = res.clone();
+  const newRes = new Response(clone.body, clone);
+  newRes.headers.set('Cache-Control', `public, s-maxage=${CACHE_MAX_AGE}`);
 
-  // Create a new response object with the modified headers
-  const newResponse = new Response(res.clone().body, {
-    headers: newHeaders,
-    status: res.status,
-    statusText: res.statusText,
-  });
-
-  // Save the response object to the cache. Use waitUntil to
-  // prevent the worker from being killed before the cache is updated.
-  c.executionCtx.waitUntil(caches.default.put(url, newResponse));
+  // Use waitUntil to prevent the worker from being killed.
+  c.waitUntil(caches.default.put(req, newRes));
 }
 
-/**
- * Retrieve a response object from the cache.
- *
- * "Cf-Cache-Status" header is set to "HIT" when the response is cached.
- */
-export async function getCache(url: URL | string): Promise<Response | undefined> {
-  return await caches.default.match(url);
+/** Retrieve a response object from the cache. */
+export async function getCache(req: Req): Promise<Response | undefined> {
+  return await caches.default.match(req);
 }
 
-/**
- * Purge the cache for a given URL.
- */
-export function deleteCache(c: Context, url: URL | string): void {
-  c.executionCtx.waitUntil(caches.default.delete(url));
+/** Purge the cache for the specified request. */
+export function deleteCache(c: ExecutionContext, req: Req): void {
+  c.waitUntil(caches.default.delete(req));
 }
 {{< /code >}}
 
-ポイントは、キャッシュの保存時には `await` ではなく、Worker のハンドラー関数に渡される `ExecutionContext` の **`waitUntil()`** メソッドを使用するところです。
-Hono フレームワークを使っているときは、上記のように Hono の `Context` オブジェクトから `executionCtx` プロパティを参照します。
-
+ポイントは、キャッシュの保存時には `await` ではなく、Worker のハンドラー関数に渡される `ExecutionContext` の **`waitUntil()`** メソッドを使用するところです（Hono フレームワークを使っているときは、Hono の `Context` オブジェクトから `executionCtx` プロパティを参照します）。
 `waitUntil()` メソッドに `Promise` オブジェクトを渡すと、Worker の処理をそこでブロックせずに、すぐにレスポンスを返すことができます。
 Worker インスタンスはレスポンスを返し終わると、通常はすぐに破棄されてしまいますが、`waitUntil()` に渡された `Promise` 処理（ここではキャッシュへの保存処理）は、最後まで実行してくれます。
 `waitUntil()` ではなく `await` を使ってしまうと、キャッシュの保存処理が終わるまで Worker からレスポンスを返せなくなってしまいます。
 
 ここで実装した、`putCache()` と `getCache()` は次のような感じで使用します。
+キャッシュが存在すればそれを使い、存在しなければオリジンサーバーからデータを取得してキャッシュするというシンプルなロジックです。
 
-{{< code lang="ts" hl_lines="3 11" >}}
-async function fetchWithCache(c: Context<Env>, url: string): Promise<Response> {
-  // キャッシュに Response オブジェクトがあればそれを返す
-  let res = await getCache(url);
-  if (res) return res;
+{{< code lang="ts" hl_lines="6 14" >}}
+export default class extends WorkerEntrypoint<Env> {
+  // ...
 
-  // アクセストークンの必要な 3rd Party API の呼び出し
-  const token = await getToken(c);
-  res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  async #fetchWithCache(url: string): Promise<Response> {
+    // キャッシュに Response オブジェクトがあればそれを返す
+    let res = await getCache(url);
+    if (res) return res;
 
-  // キャッシュに Response オブジェクトを保存
-  if (res.ok) putCache(c, url, res);
+    // アクセストークンの必要なサードパーティ API の呼び出し
+    const token = await this.#getToken();
+    res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
 
-  return res;
+    // キャッシュに Response オブジェクトを保存
+    if (res.ok) putCache(this.ctx, url, res);
+    return res;
+  }
 }
 {{< /code >}}
 
@@ -183,10 +169,68 @@ env.KV.put(urlStr, jsonData, { expirationTtl: 600 });
 const jsonData = await env.KV.get(urlStr, { type: "json" });
 {{< /code >}}
 
-`Response` オブジェクトをキャッシュする Cache API と比べ、KV には任意の JSON オブジェクトを保存することができます。
+`Response` オブジェクトをそのままキャッシュする Cache API と比べ、KV には任意の JSON オブジェクトを保存することができます。
 Cache API のような複雑なキャッシュ条件も絡まないので、特定のデータのみをキャッシュする用途では KV の方が扱いやすいかもしれません。
+ただし、KV を使う場合は、KV の Namespace を作成してバインド設定をするというひと手間が必要です。
 
-### 3rd Party API 呼び出しのキャッシュ専用 Worker を作る方法
+### サードパーティ API 用のプロキシ Worker を作る方法
 
-TODO: 書く
+サードパーティ API の呼び出しをプロキシする Worker を別途作成して、その Worker 自体のレスポンスをキャッシュする方法もあります。
+Worker 同士の連携は、[Service Bindings の仕組み](/p/mba7gp6/)で簡単に実現できます。
+
+{{< mermaid >}}
+%%{init:{'flowchart':{'nodeSpacing':15, 'rankSpacing':30}}}%%
+flowchart LR
+  Client --> Worker1["Main<br>Worker"]
+  subgraph " "
+    Worker1
+    subgraph subworker[" "]
+      direction TB
+      Worker2["Proxy<br>Worker"]
+      Cache[(Cache)]
+    end
+  end
+  Worker1 --> Worker2
+  Worker2 --> D["3rd Party API<br>(Origin)"]
+  Worker2 --> Worker1
+
+  style subworker fill:transparent
+{{< /mermaid >}}
+
+このような構成にすると、キャッシュに関する処理を専用のプロキシ Worker に集約することができるので、メインの Worker はキャッシュのことを気にせずにサードパーティ API を（間接的に）呼び出せるようになります。
+Service Bindings による Worker 連携にはオーバヘッドがほとんどないので、このような責務分離は効果的です。
+
+{{< code lang="ts" title="プロキシ Worker の実装例（抜粋）" >}}
+export default class extends WorkerEntrypoint<Env> {
+  // Endpoint is a last part of the URL to call JQuants API.
+  // - e.g. "/v1/fins/statements?code=86970&date=20230130"
+  async get(endpoint: string): Promise<Response> {
+    return this.#fetchWithCache(JQUANTS_BASE_URL + endpoint);
+  }
+
+  // ...
+}
+{{< /code >}}
+
+{{< code lang="ts" title="呼び出し側の Worker 実装例" >}}
+import { Hono } from "hono";
+import { JQuantsProxy } from "./types";
+
+interface Env {
+  JQUANTS_PROXY: Service<JQuantsProxy>;
+}
+
+const app = new Hono<{ Bindings: Env }>();
+
+app.get("/", async (c) => {
+  const res = await c.env.JQUANTS_PROXY.get("/v1/listed/info");
+  const json = await res.json();
+  console.log(JSON.stringify(json, undefined, 2));
+  return c.text("Hello");
+});
+
+export default app;
+{{< /code >}}
+
+やっぱり、キャッシュは奥が深いです。
 
