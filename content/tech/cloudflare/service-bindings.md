@@ -1,13 +1,12 @@
 ---
 title: "Cloudflare Workers で別の Worker と連携する (Service Bindings)"
 url: "p/mba7gp6/"
+lastmod: "2025-02-01"
 date: "2025-01-29"
 tags: ["Cloudflare"]
+changes:
+  - 2025-02-01: TypeScript の型定義方法を追記
 ---
-
-{{% private %}}
-- https://developers.cloudflare.com/workers/runtime-apis/bindings/service-bindings/
-{{% /private %}}
 
 Service Bindings とは
 ----
@@ -27,8 +26,8 @@ Cloudflare Workers の **Service Bindings** という仕組みを利用すると
 まずはそれぞれの Worker 用のプロジェクトを作成しておきます。
 
 {{< code lang="console" title="2 つの Worker プロジェクトを作成" >}}
-$ wrangler init worker-a
-$ wrangler init worker-b
+$ pnpm create cloudflare@latest worker-a
+$ pnpm create cloudflare@latest worker-b
 {{< /code >}}
 
 Service Bindings では、Worker 名を使って Bindings の設定を行うことになるので、ここで指定した名前は重要です。
@@ -52,7 +51,7 @@ export default {
 
 次の例では、簡単なテキストレスポンスを返す `fetch()` ハンドラーと、足し算を行う `add()` メソッドを実装しています。
 
-{{< code lang="ts" title="src/main.ts" >}}
+{{< code lang="ts" title="src/index.ts" >}}
 import { WorkerEntrypoint } from "cloudflare:workers";
 
 export default class extends WorkerEntrypoint {
@@ -60,15 +59,22 @@ export default class extends WorkerEntrypoint {
     return new Response("Hello from B");
   }
 
-  add(a: number, b: number): number {
+  async add(a: number, b: number): Promise<number> {
     return a + b;
   }
 }
 {{< /code >}}
 
-この実装では使っていませんが、`ExecutionContext` オブジェクトを参照したくなったら、任意の場所から **`this.ctx`** で参照できます。
+{{% note title="Env、ExecutionContext の参照方法" %}}
+上記の実装では使っていませんが、`Env` オブジェクトや `ExecutionContext` オブジェクトを参照したくなったら、`WorkerEntrypoint` のプロパティ経由で参照できます。
 
-Worker B を public な URL として公開する必要がない場合は、`wrangler.toml` の中で以下のように設定しておきます。
+- `Env` オブジェクト
+  - `WorkerEntrypoint<Env>` のように型定義しておいて、**`this.env.<BINDING名>`** で参照。
+- `ExecutionContext` オブジェクト
+  - **`this.ctx.waitUntil()`** のように参照。
+{{% /note %}}
+
+Worker B をインターネット上で公開する必要がない場合は、`wrangler.toml` の中で以下のように設定しておきます。
 また、開発時に混乱しないように、ポート番号をデフォルトの `8787` から変えておくとよいです。
 
 {{< code lang="toml" title="wrangler.toml（抜粋）" >}}
@@ -95,55 +101,56 @@ service = "worker-b"
 
 すると、Worker A の中から、`Env` オブジェクト経由で **`env.WORKER_B.fetch()`** や **`env.WORKER_B.add()`** のように Worker B のメソッドを呼び出せるようになります。
 
-{{% note title="TypeScript 用の型定義" %}}
-TypeScript を使っているときは、`wrangler types` コマンドで `Env` の型情報を生成できます。
-また、`env.WORKER_B` の型は、今回は次のように手動で定義しました（いずれ自動生成できるようになりそう）。
+TypeScript を使っている場合は、Worker B 側のメソッドを呼び出すための型定義が必要です。
+モノレポで開発している場合は、Worker B 側の `WorkerEntrypoint` を継承したクラスをそのまま `import` して参照すればよいのですが、ここでは別のリポジトリで開発しているという前提で、次のような型定義ファイルを作成しておきます。
 
-{{< code lang="ts" title="src/worker-b.d.ts" >}}
-export interface WorkerB {
-  fetch(request: Request): Promise<Response>;
-  add(a: number, b: number): number;
+{{< code lang="ts" title="src/types.d.ts" >}}
+import { WorkerEntrypoint } from 'cloudflare:workers';
+
+export declare class WorkerB extends WorkerEntrypoint {
+  async fetch(req: Request): Promise<Response>;
+  async add(a: number, b: number): Promise<number>;
 }
 {{< /code >}}
-{{% /note %}}
 
-{{< code lang="ts" title="src/main.ts" hl_lines="9 13" >}}
-import type { WorkerB } from "./worker-b";
+{{< code lang="ts" title="src/index.ts" hl_lines="10 14" >}}
+import { WorkerB } from './types';
+
+interface Env {
+  WORKER_B: Service<WorkerB>;
+}
 
 export default {
   async fetch(request, env, ctx): Promise<Response> {
-    // TypeScript 用の型付けのため
-    const workerB = env.WORKER_B as unknown as WorkerB;
-
     // fetch の呼び出し
-    const res = await workerB.fetch(request);
+    const res = await env.WORKER_B.fetch(request);
     const text = await res.text(); // "Hello from B"
 
     // add の呼び出し
-    const sum = await workerB.add(1, 2); // 3
+    const sum = await env.WORKER_B.add(1, 2); // 3
 
-    return new Response(text + ", " + sum);
+    return new Response(text + ', ' + sum);
   },
 } satisfies ExportedHandler<Env>;
 {{< /code >}}
 
-簡単スギィィィ！
+お手軽スギィィィ！
 
 
 動作確認
 ----
 
-ローカルで Service Bindings のテストを行うときは、Worker A と Worker B それぞれのプロジェクト下で開発サーバー (`wrangler dev`) を起動します。
+ローカルで Service Bindings のテストを行うときは、Worker A と Worker B それぞれのプロジェクト下で開発サーバー (**`wrangler dev`**) を起動します。
 どちらから起動してもうまく連携してくれますが、Worker B から起動するのが自然です。
 
 {{< code lang="console" title="Worker B の起動" >}}
-$ ~/worker-b
-$ pnpm dev
+$ cd ~/worker-b
+$ pnpm dev  # wrangler dev
 {{< /code >}}
 
 {{< code lang="console" title="Worker A の起動" >}}
-$ ~/worker-a
-$ pnpm dev
+$ cd ~/worker-a
+$ pnpm dev  # wrangler dev
 {{< /code >}}
 
 Worker A 側のコンソールで、`b` キーを押してブラウザを開いて、以下のように表示されれば成功です！
@@ -156,14 +163,17 @@ Hello from B, 3
 デプロイ
 ----
 
-Cloudflare Workers にデプロイする場合は、依存関係の問題が発生しないように Worker B の方からデプロイします。
+Cloudflare Workers にデプロイする場合は、依存関係の問題が発生しないように Worker B の方から **`wrangler deploy`** コマンドでデプロイします。
 
 ```console
 $ cd ~/worker-b
-$ pnpm run deploy
+$ pnpm run deploy  # wrangler deploy
 $ cd ~/worker-a
-$ pnpm run deploy
+$ pnpm run deploy  # wrangler deploy
 ```
+
+Worker B の方は `wrangler.toml` で `workers_dev = false` と設定したので、公開 URL は生成されません。
+Worker A のデプロイが完了すると公開 URL が表示されるので、ブラウザでアクセスして動作確認してください。
 
 できた〜 ٩(๑❛ᴗ❛๑)۶ わーぃ
 
