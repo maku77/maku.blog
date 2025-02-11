@@ -49,19 +49,18 @@ SvelteKit には、__`+pages.ts`__ や __`+pages.server.ts`__ といった、特
   - 両サイドで実行しても OK なら → __`+layout.js(.ts)`__
 
 {{< mermaid title="どのファイルで load 関数を実装すればよいか" >}}
-graph TB
-    Start([start])-->Branch1{単一のページ用？}
-    Branch1--Yes<br/>（単一のページに適用）-->Branch2{サーバーサイド<br/>のみで実行？}
-    Branch2--Yes-->End2_Yes[<strong><code>+page.server.js/.ts</code></strong>]
-    Branch2--"No"-->Branch3{クライアントサイド<br/>のみで実行？}
-    Branch3--Yes-->End3_Yes["<strong><code>+page.js/.ts</code><br/>(<code>export const ssr = false</code>)</strong>"]
-    Branch3--"No"-->End3_No["<strong><code>+page.js/.ts</code></strong>"]
-
-    Branch1--No<br/>（レイアウト全体に適用）-->Branch4{サーバーサイド<br/>のみで実行？}
-    Branch4--Yes-->End4_Yes[<strong><code>+layout.server.js/.ts</code></strong>]
-    Branch4--"No"-->Branch5{クライアントサイド<br/>のみで実行？}
-    Branch5--Yes-->End5_Yes["<strong><code>+layout.js/.ts</code><br/>(<code>export const ssr = false</code>)</strong>"]
-    Branch5--"No"-->End5_No["<strong><code>+layout.js/.ts</code></strong>"]
+graph TD
+  Start([start]) --> Branch1{"単一のページ用？"}
+  Branch1 --"Yes<br/>（単一のページに適用）"--> Branch2{"サーバーサイド<br/>のみで実行？"}
+  Branch2 --"Yes"--> End2_Yes["<strong><code>+page.server.js/.ts</code></strong>"]
+  Branch2 --"No"--> Branch3{"クライアントサイド<br/>のみで実行？"}
+  Branch3 --"Yes"--> End3_Yes["<strong><code>+page.js/.ts</code><br/>(<code>ssr = false</code>)</strong>"]
+  Branch3 --"No"--> End3_No["<strong><code>+page.js/.ts</code></strong>"]
+  Branch1 --"No<br/>（レイアウト全体に適用）"--> Branch4{"サーバーサイド<br/>のみで実行？"}
+  Branch4 --"Yes"--> End4_Yes["<strong><code>+layout.server.js/.ts</code></strong>"]
+  Branch4 --"No"--> Branch5{"クライアントサイド<br/>のみで実行？"}
+  Branch5 --"Yes"--> End5_Yes["<strong><code>+layout.js/.ts</code><br/>(<code>ssr = false</code>)</strong>"]
+  Branch5 --"No"--> End5_No["<strong><code>+layout.js/.ts</code></strong>"]
 {{< /mermaid >}}
 
 
