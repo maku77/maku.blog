@@ -1,5 +1,5 @@
 ---
-title: "Svelte 応用: MediaPipe で Web カメラ映像をジェスチャー認識する"
+title: "Svelte 実装例: MediaPipe で Web カメラ映像をジェスチャー認識する"
 url: "p/pqmxxqz/"
 date: "2024-06-30"
 tags: ["MediaPipe", "Svelte"]

@@ -1,5 +1,5 @@
 ---
-title: "VSCode の textlint プラグインで文章を校正する (vscode-textlint)"
+title: "VS Code の textlint プラグインで文章を校正する (vscode-textlint)"
 url: "/p/d3fs5gs"
 date: "2020-05-20"
 tags: ["textlint", "VS Code"]
@@ -10,7 +10,7 @@ weight: 2
 ----
 
 __vscode-textlint__ は、Visual Studio Code でテキスト校正ツールの textlint を実行するためのプラグインです。
-プレーンテキスト (.txt) や、Markdown ファイル (.md) の校正を VSCode 上で実行できるようになります。
+プレーンテキスト (.txt) や、Markdown ファイル (.md) の校正を VS Code 上で実行できるようになります。
 textlint の本体の方は、Node.js の `npm` コマンドを使ってあらかじめインストールしておく必要があります。
 
 - 参考: [textlint のインストールと基本的な使い方](/p/3veuap5)

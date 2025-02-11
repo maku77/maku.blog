@@ -1,5 +1,5 @@
 ---
-title: "Svelte 応用: Svelte アプリを完全な静的サイトとしてビルドする (SSG: Static Site Generation)"
+title: "Svelte 入門: Svelte アプリを完全な静的サイトとしてビルドする (SSG: Static Site Generation)"
 url: "p/4oudmxy/"
 date: "2023-09-05"
 tags: ["Svelte"]

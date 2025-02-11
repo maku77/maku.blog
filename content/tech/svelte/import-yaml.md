@@ -1,5 +1,5 @@
 ---
-title: "Svelte 応用: YAML ファイルをインポートして使う"
+title: "Svelte 入門: YAML ファイルをインポートして使う"
 url: "p/umhwooq/"
 date: "2023-09-25"
 tags: ["Svelte", "YAML"]

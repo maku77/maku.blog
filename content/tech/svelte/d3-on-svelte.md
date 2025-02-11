@@ -1,5 +1,5 @@
 ---
-title: "Svelte 応用: Svelte アプリから D3.js を使う"
+title: "Svelte 実装例: Svelte アプリから D3.js を使う"
 url: "p/7acxmwo/"
 date: "2023-09-04"
 tags: ["D3.js", "Svelte"]

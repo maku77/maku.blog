@@ -1,5 +1,5 @@
 ---
-title: "Svelte 応用: JSON ファイルをインポートして使う"
+title: "Svelte 入門: JSON ファイルをインポートして使う"
 url: "p/pzrza7m/"
 date: "2023-09-19"
 tags: ["JSON", "Svelte"]

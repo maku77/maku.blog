@@ -1,5 +1,5 @@
 ---
-title: "Svelte 応用: SvelteKit の load 関数でデータのロード処理を定義する"
+title: "Svelte 入門: SvelteKit の load 関数でデータのロード処理を定義する"
 url: "p/wqt76qw/"
 date: "2023-10-31"
 tags: ["Svelte"]
@@ -181,8 +181,9 @@ load 関数についての雑多メモ
 
 ### ページアクセス時に 404 エラーを発生させる
 
-SvelteKit が提供する __`error`__ 関数を使って作成したオブジェクトを、`load` 関数から `throw` することで、明示的に 404 エラーを発生させることができます。
 次の例では、URL の `[slug]` 部分で特定のパス以外が指定されたときに 404 エラーを発生させています。
+`load` 関数から HTTP エラーを返すには、SvelteKit が提供する __`error()`__ 関数を使います。
+第一引数で渡すステータスコードは、400 番台あるいは 500 番台である必要があります。
 
 {{< code lang="ts" title="src/routes/blog/[slug]/+page.ts" hl_lines="1 12" >}}
 import { error } from '@sveltejs/kit';
@@ -196,7 +197,7 @@ export const load: PageLoad = ({ params }) => {
 		};
 	}
 
-	throw error(404, 'Not found');
+	error(404, 'Not found');  // 内部で HttpError が throw される
 };
 {{< /code >}}
 

@@ -1,5 +1,5 @@
 ---
-title: "Svelte 応用: インクリメンタルサーチによる頻繁な API 呼び出しを防ぐ debounce 処理"
+title: "Svelte 実装例: インクリメンタルサーチによる頻繁な API 呼び出しを防ぐ debounce 処理"
 url: "p/c3ckhdf/"
 date: "2023-10-30"
 tags: ["Svelte"]

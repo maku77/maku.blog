@@ -1,5 +1,5 @@
 ---
-title: "Svelte 応用: テキストフィールドと URL のクエリ文字列を同期させる"
+title: "Svelte 実装例: テキストフィールドと URL のクエリ文字列を同期させる"
 url: "p/uy89x6s/"
 date: "2024-03-12"
 tags: ["Svelte"]
