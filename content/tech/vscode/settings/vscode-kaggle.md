@@ -2,7 +2,10 @@
 title: "VS Code で Kaggle 用の勉強環境を作る（Jupyter 拡張）"
 url: "p/ma86izp/"
 date: "2025-02-10"
+lastmod: "2025-02-15"
 tags: ["Jupyter", "Kaggle", "VSCode"]
+changes:
+  - 2025-02-15: Python インタープリターの詳しい設定方法を追記
 ---
 
 何をするか？
@@ -25,61 +28,105 @@ Jupyter 拡張のインストール
 - [Jupyter - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter)
 
 
-Kaggle 用の venv 環境
+Kaggle 用の仮想環境 (venv)
 ----
 
 ### venv の作成
 
 VS Code 上の Jupyter Notebook で Python コードを実行するには、`pip` コマンドで Python カーネル (**`ipykernel`**) をインストールしておく必要があります。
 また、機械学習系の実装では **`numpy`** や **`pandas`** などのライブラリも必要になってきます。
-ここでは、ホームディレクトリに **`~/.venv/kaggle`** というディレクトリとして Python の仮想環境 (venv) を作成し、そこに各ライブラリをインストールすることにします。
-こうしておくと、システムの Python 環境を汚さずに Kaggle 用の実行環境を作ることができます。
+ここでは、ホームディレクトリに Python の仮想環境ディレクトリ (**`~/.venv/kaggle`**) を作成し、そこに各ライブラリをインストールすることにします。
 
 {{< code lang="console" title="Kaggle 用の venv 環境を作成" >}}
 $ python -m venv ~/.venv/kaggle
 {{< /code >}}
 
-### ライブラリのインストール
+プロジェクトのルートディレクトリに `.venv` ディレクトリを作る方法も一般的ですが、上記のようにホームディレクトリに作っておくと、他のプロジェクトからも使いまわせて便利です。
+
+### venv へのライブラリインストール
 
 仮想環境を作成したら、仮想環境をアクティベートして、必要になりそうなライブラリをインストールしておきます。
 少なくとも `ipykernel` は Jupyter Notebook 上での Python 実行のために必須です。
 
 {{< code lang="console" title="Kaggle 環境用のライブラリをインストール" >}}
+# venv をアクティベート
 $ source ~/.venv/kaggle/bin/activate
-$ pip install ipykernel numpy pandas matplotlib scikit-learn
+
+# Jupyter で必須のライブラリ
+$ pip install ipykernel
+
+# あとは必要に応じて
+$ pip install numpy pandas matplotlib scikit-learn
 {{< /code >}}
 
-### venv のパスを VS Code に設定
+{{% note title="activate 用エイリアス" %}}
+毎回 `source ~/.venv/kaggle/bin/activate` と入力するのが面倒な場合は、シェルの設定ファイル（`.zshrc` など）にエイリアスを設定しておくと便利です。
 
-前述のように、プロジェクトの外に venv 環境を作成した場合は、Python 拡張が見つけられるように検索パスを追加しておく必要があります。
-**<kbd><kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></kbd> ⇨ <samp>Preferences: Open User Settings (JSON)</samp>** で設定ファイルを開いて、次のような行を追加しておきます。
+{{< code lang="bash" >}}
+alias venv-kaggle="source ~/.venv/kaggle/bin/activate"
+{{< /code >}}
+{{% /note %}}
+
+### venv の検索パスを追加
+
+前述のように、プロジェクトの外に venv 環境を作成した場合は、VS Code の Python 拡張が見つけられるように検索パスを追加しておく必要があります。
+**<kbd><kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></kbd> ⇨ <samp>Preferences: Open User Settings (JSON)</samp>** で設定ファイルを開いて、次のような行を追加しておきます（参考: [Where the extension looks for environment](https://code.visualstudio.com/docs/python/environments#_where-the-extension-looks-for-environments)）。
 
 {{< code lang="js" title="settings.json" >}}
 {
+  // Python の venv 検索パスを追加（~/.venv/kaggle などを検索するため）
+  "python.venvPath": "~/.venv",
+
+  // あるいは下記でも可能（ホームディレクトリ以下のディレクトリ名を列挙）
+  // "python.venvFolders": [".venv"],
+{{< /code >}}
+
+**`python.venvPath`** あるいは **`python.venvFolders`** のいずれかで設定すれば大丈夫です。
+プロジェクト（ワークスペース）のルートディレクトリ内に `.venv` ディレクトリを配置する場合は、この設定は不要です。
+
+
+Python 拡張に venv を認識させる
+----
+
+VS Code 上の Python 拡張は、デフォルトではシステムにインストールされた Python インタープリター（`python` コマンド）を使おうとするので、上記で作成した仮想環境 (venv) 内の Python インタープリターを使うように設定しておきます。
+この作業は、プロジェクト内で一度だけ実行すれば OK です。
+
+まず、適当にプロジェクト用のディレクトリを作成して、VS Code を起動します。
+
+{{< code lang="console" title="VS Code の起動" >}}
+$ mkdir ~/kaggle
+$ code ~/kaggle
+{{< /code >}}
+
+VS Code 上で Python ファイルを開いて、右下に表示された Python バージョンをクリックするか、コマンドパレット (**<kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>**) から **`Python: Select Interpreter`** を選択し、先ほど作成した Python 仮想環境 (`~/.venv/kaggle`) を選択します。
+これで、このプロジェクトでは仮想環境内の Python インタープリターが使われるようになります。
+
+{{% note title="Python インタープリター設定はどこに保存されるか？" %}}
+`Python: Select Interpreter` で選択した Python インタープリターの設定は、VS Code 内部の保存領域に保存されるため、JSON 形式の設定ファイルとしては確認できないようです（参考: [Setting descriptions](https://github.com/microsoft/vscode-python/wiki/Setting-descriptions)）。
+この情報をクリアするには、コマンドパレットから **`Python: Clear Workspace Interpreter Setting`** を実行します（システムの Python を使う状態に戻ります）。
+次のように、デフォルトの Python インタープリターを設定しておくこともできます。
+
+{{< code lang="js" >}}
+{
   // ...
-  // Python の仮想環境の検索パスを設定（~/.venv/aaa や ~/.venv/bbb が認識される）
-  "python.venvPath": "~/.venv"
+  "python.defaultInterpreterPath": "~/.venv/kaggle/bin/python",
+  // ...
 }
 {{< /code >}}
 
-各プロジェクトのディレクトリ内に venv ディレクトリを作成する場合は、この設定は不要です。
+この設定は、プロジェクト内でまだ一度も Python インタープリターを選択していないときに使われます（あるいは、前述の方法で設定をクリアした場合）。
+ただ、Python インタープリターの設定はプロジェクト内で一度だけ行えばよいので、この設定はあまり使わないかもしれません。
+{{% /note %}}
 
-- 参考: [Where the extension looks for environment | Visual Studio Code](https://code.visualstudio.com/docs/python/environments#_where-the-extension-looks-for-environments)
 
-
-VS Code で Jupyter Notebook を起動する
+Jupyter Notebook を起動する
 ----
 
-プロジェクト用のディレクトリを適当に作成して、VS Code で開きます。
+**<kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>** でコマンドパレットを開いて、**`Create: New Jupyter Notebook`** を選択すると、新しい Jupyter Notebook (`Untitled-1.ipynb`) ファイルが作成されます。
 
-{{< code lang="console" title="VS Code の起動" >}}
-$ mkdir -p ~/sandbox/kaggle
-$ code ~/sandbox/kaggle
-{{< /code >}}
-
-<kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> でコマンドパレットを開いて、**`Create: New Jupyter Notebook`** を選択すると、新しい Jupyter Notebook (`Untitled-1.ipynb`) ファイルが作成されます。
-
-画面上の<samp>カーネル選択</samp>ボタンを押すか、コマンドパレットから **`Notebook: Select Notebook Kernel`** を選択し、先ほど作成した Python 仮想環境 (`~/.venv/kaggle`) を選択します。
+こちらも、どの Python 実行環境を使うかを選択しておく必要があります。
+Jupyter Notebook では「カーネル」と呼ばれ、Python 拡張が参照する「Python インタープリター」とは別に設定する必要があります。
+Jupyter Notebook 画面上の **<samp>カーネル選択</samp>** ボタンを押すか、コマンドパレットから **`Notebook: Select Notebook Kernel`** を選択し、使用する Python 仮想環境 (`~/.venv/kaggle`) を選択します。
 
 これで、Jupyter Notebook 上で Python コードを実行する準備が整いました。
 `pandas` などのライブラリもインポートできるようになっているはずです。
@@ -99,7 +146,7 @@ $ pip install kaggle
 
 `kaggle` コマンドを実行するには、Kaggle のサイトで API トークンを取得して、**`~/.kaggle/kaggle.json`** に保存しておく必要があります。
 [Kaggle のアカウント設定](https://www.kaggle.com/settings/account) を開き、**`Create New Token`** ボタンをクリックすると、`kaggle.json` ファイルをダウンロードできます。
-OS によって保存先が異なるので注意してください（`kaggle` コマンドのエラー表示を見れば分かりますが）。
+OS によって保存先が異なるので注意してください（`kaggle` コマンドのエラー表示を見て確認するのでもよいです）。
 
 | OS | 保存先 |
 | ---- | ---- |
@@ -112,7 +159,7 @@ OS によって保存先が異なるので注意してください（`kaggle` �
 #### 開催中のコンペティションの一覧 (kaggle competitions list)
 
 ```console
-$ kaggle c list
+$ kaggle c list                            # 基本的な使い方
 $ kaggle c list --help                     # ヘルプ
 $ kaggle c list --search titanic           # 検索 (Titanic)
 $ kaggle c list --category gettingStarted  # カテゴリ (Getting Started)
@@ -153,9 +200,9 @@ https://www.kaggle.com/competitions/titanic                                     
 上記のコマンドで各コンペティションの URL が分かったら、その URL の末尾部分（最後の `/` 以降）を使ってデータセットをダウンロードできます。
 次の例では、コンペティション名 `playground-series-s5e2` のデータセットをダウンロードしています（先に [Kaggle のサイト](https://www.kaggle.com/competitions)で対象のコンペに参加しておく必要があります）。
 
-```console
+{{< code lang="console" title="コンペのデータセットをダウンロード" >}}
 $ kaggle c download playground-series-s5e2
-```
+{{< /code >}}
 
 zip 形式でダウンロードされるので、`unzip` コマンドなどで展開すればコーディングの準備完了です。
 
