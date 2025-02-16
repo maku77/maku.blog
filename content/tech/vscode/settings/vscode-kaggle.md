@@ -158,6 +158,9 @@ OS によって保存先が異なるので注意してください（`kaggle` �
 
 #### 開催中のコンペティションの一覧 (kaggle competitions list)
 
+現在開催中のコンペの情報を調べるには、**`kaggle competitions list`** コマンドを使います。
+ここで表示された URL 情報は、後述のコマンドでデータセットをダウンロードする際などに必要になります。
+
 ```console
 $ kaggle c list                            # 基本的な使い方
 $ kaggle c list --help                     # ヘルプ
@@ -197,7 +200,7 @@ https://www.kaggle.com/competitions/titanic                                     
 
 #### データセットのダウンロード (kaggle competitions download)
 
-上記のコマンドで各コンペティションの URL が分かったら、その URL の末尾部分（最後の `/` 以降）を使ってデータセットをダウンロードできます。
+上記のコマンドで各コンペティションの URL が分かったら、その URL の末尾部分（最後の `/` 以降）を **`kaggle competitions download`** コマンドに渡すことでデータセットをダウンロードできます。
 次の例では、コンペティション名 `playground-series-s5e2` のデータセットをダウンロードしています（先に [Kaggle のサイト](https://www.kaggle.com/competitions)で対象のコンペに参加しておく必要があります）。
 
 {{< code lang="console" title="コンペのデータセットをダウンロード" >}}
@@ -213,6 +216,20 @@ Archive:  playground-series-s5e2.zip
   inflating: data/test.csv
   inflating: data/train.csv
   inflating: data/training_extra.csv
+{{< /code >}}
+
+#### サブミット／提出 (kaggle competitions submit)
+
+コンペティションに予測結果 (`submission.csv`) を提出するには、**`kaggle competitions submit`** コマンドを使います。
+
+{{< code lang="console" title="提出" >}}
+$ kaggle c submit playground-series-s5e2 -f submission.csv -m "Submission message"
+{{< /code >}}
+
+これまでの提出履歴とその Public スコアを確認するには、**`kaggle competitions submissions`** コマンドを使います。
+
+{{< code lang="console" title="これまでの提出履歴を表示" >}}
+$ kaggle c submissions playground-series-s5e2
 {{< /code >}}
 
 できたー ٩(๑❛ᴗ❛๑)۶ わーぃ
