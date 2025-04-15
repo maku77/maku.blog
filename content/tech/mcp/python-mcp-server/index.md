@@ -74,7 +74,7 @@ if __name__ == "__main__":
 Claude Desktop からの使用
 ----
 
-AI アプリ（= MCP ホスト）としては、まずは本家 Authropic の [Claude Desktop](https://claude.ai/download) を使ってみるのがよいでしょう。
+AI アプリ（= MCP ホスト）としては、まずは本家 Anthropic の [Claude Desktop](https://claude.ai/download) を使ってみるのがよいでしょう。
 Claude Desktop の設定ファイル **`claude_desktop_config.json`** を開いて、上記の MCP サーバーの起動方法を記述するだけでツール連携できるようになります。
 設定ファイルは下記のパスを直接エディタで開くか、Claude Desktop の「設定」メニューから開きます。
 
