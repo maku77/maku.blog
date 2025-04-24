@@ -12,7 +12,10 @@ MCP とは
 この標準化されたプロトコルに従って MCP サーバーを作っておくと、Claude Desktop や VS Code（GitHub Copilot 拡張）などの AI アプリケーション (MCP host) から簡単に接続できるようになります。
 2025 年に入った頃から MCP はエージェント連携のためのプロトコルとしてデファクトスタンダードとみなされており、今後はさまざまな MCP サーバー、およびそれらをサポートする AI アプリケーションが登場してくると思われます。
 
-有名どころの MCP サーバー実装は、[Awesome MCP Servers](https://github.com/punkpeye/awesome-mcp-servers) などのサイトで紹介されています。
+有名どころの MCP サーバー実装は、下記リンク先にまとめられていたりします。
+
+- [modelcontextprotocol/servers: Model Context Protocol Servers](https://github.com/modelcontextprotocol/servers)
+- [punkpeye/awesome-mcp-servers: A collection of MCP servers](https://github.com/punkpeye/awesome-mcp-servers)
 
 MCP サーバーは Python や Typescript 用のライブラリを使うと簡単に実装することができます。
 MCP がどのような仕組みで動いているのかを理解するには、**Hello World 的な MCP サーバーを作ってしまうのが一番早いです**。
