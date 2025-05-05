@@ -1,8 +1,8 @@
 ---
-title: "小指だけで IME ON/OFF できるようにする"
+title: "左手小指だけで IME 操作"
 url: "p/s3subpp/"
 date: "2025-05-01"
-tags: ["PC設定"]
+tags: ["PC設定", "Karabiner-Elements", "AutoHotkey"]
 ---
 
 何をやるか？
