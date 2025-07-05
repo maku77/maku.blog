@@ -184,6 +184,21 @@ Linux の `cp` コマンドで `-RT` オプションを指定することで、`
   run: cp hugo-files/public/sitemap.xml _site/sitemap-hugo.xml
 ```
 
+あるいは、Hugo と Jekyll が出力した sitemap.xml を以下のようにマージしてしまった方がよいかもしれません。
+
+```yaml
+- name: Merge sitemap.xml files
+  run: |
+    SITEMAP_JEKYLL="_site/sitemap.xml"
+    SITEMAP_HUGO="hugo-files/public/sitemap.xml"
+    SITEMAP_MERGED="sitemap-merged.xml"
+    echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' > $SITEMAP_MERGED
+    perl -0777 -ne 'print "$1\n" while /(<url>.*?<\/url>)/gs' $SITEMAP_JEKYLL >> $SITEMAP_MERGED
+    perl -0777 -ne 'print "$1\n" while /(<url>.*?<\/url>)/gs' $SITEMAP_HUGO >> $SITEMAP_MERGED
+    echo '</urlset>' >> $SITEMAP_MERGED
+    mv $SITEMAP_MERGED $SITEMAP_JEKYLL
+```
+
 これで、Hugo と Jekyll の共存環境は完成です。
 GitHub リポジトリに Markdown コンテンツをプッシュするたびに、両方のビルド結果がマージされてホスティングされるようになります。
 最終的な [Workflow ファイルはこちら](https://github.com/maku77/jekyll-with-hugo/blob/main/.github/workflows/github-pages.yml) を参照してください。
