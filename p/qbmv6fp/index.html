@@ -102,6 +102,16 @@ Hugo プロジェクトがまだ存在しない場合は、次のような感じ
 おそらく、トップページ用の <code>index.html</code> は両方のビルド結果として出力されていますが、今回は Jekyll の方のファイルを採用することになります（Hugo の方のトップページを使わないのであれば、最初から <a href=https://gohugo.io/commands/hugo/><code>hugo</code> コマンドのオプション</a> で <code>--disableKinds home</code> を指定して出力しないのがよいかもしれません）。</p><p>サイトマップファイル (<code>sitemap.xml</code>) を両方のプロジェクトで生成している場合は、どちらのファイルもデプロイしたいので、次のような感じで Hugo 側のファイルをリネームしてコピーしておきます。
 サイトマップファイルが 2 つに分かれるので、Google Search Console などでサイトマップを送信する場合は、2 つの XML ファイル（<code>sitemap.xml</code> と <code>sitemap-hugo.xml</code>）を指定することになります。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Rename and copy Hugo&#39;s sitemap.xml</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>cp hugo-files/public/sitemap.xml _site/sitemap-hugo.xml</span><span class=w>
+</span></span></span></code></pre></div><p>あるいは、Hugo と Jekyll が出力した sitemap.xml を以下のようにマージしてしまった方がよいかもしれません。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Merge sitemap.xml files</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=p>|</span><span class=sd>
+</span></span></span><span class=line><span class=cl><span class=sd>    SITEMAP_JEKYLL=&#34;_site/sitemap.xml&#34;
+</span></span></span><span class=line><span class=cl><span class=sd>    SITEMAP_HUGO=&#34;hugo-files/public/sitemap.xml&#34;
+</span></span></span><span class=line><span class=cl><span class=sd>    SITEMAP_MERGED=&#34;sitemap-merged.xml&#34;
+</span></span></span><span class=line><span class=cl><span class=sd>    echo &#39;&lt;urlset xmlns=&#34;http://www.sitemaps.org/schemas/sitemap/0.9&#34;&gt;&#39; &gt; $SITEMAP_MERGED
+</span></span></span><span class=line><span class=cl><span class=sd>    perl -0777 -ne &#39;print &#34;$1\n&#34; while /(&lt;url&gt;.*?&lt;\/url&gt;)/gs&#39; $SITEMAP_JEKYLL &gt;&gt; $SITEMAP_MERGED
+</span></span></span><span class=line><span class=cl><span class=sd>    perl -0777 -ne &#39;print &#34;$1\n&#34; while /(&lt;url&gt;.*?&lt;\/url&gt;)/gs&#39; $SITEMAP_HUGO &gt;&gt; $SITEMAP_MERGED
+</span></span></span><span class=line><span class=cl><span class=sd>    echo &#39;&lt;/urlset&gt;&#39; &gt;&gt; $SITEMAP_MERGED
+</span></span></span><span class=line><span class=cl><span class=sd>    mv $SITEMAP_MERGED $SITEMAP_JEKYLL</span><span class=w>    
 </span></span></span></code></pre></div><p>これで、Hugo と Jekyll の共存環境は完成です。
 GitHub リポジトリに Markdown コンテンツをプッシュするたびに、両方のビルド結果がマージされてホスティングされるようになります。
 最終的な <a href=https://github.com/maku77/jekyll-with-hugo/blob/main/.github/workflows/github-pages.yml>Workflow ファイルはこちら</a> を参照してください。</p><h2 id=おまけ普段の記事の執筆中はどうするか>（おまけ）普段の記事の執筆中はどうするか？</h2><p>GitHub Actions で Jekyll と Hugo を同時にビルドするときはよいのですが、ローカルサーバーを起動して記事を執筆しているときはどうやって共存させればよいでしょうか？
