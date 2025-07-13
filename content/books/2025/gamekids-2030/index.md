@@ -10,7 +10,7 @@ tags: ["読書"]
   title="2030年のゲーム・キッズ"
   author="渡辺浩弐"
   publisher="講談社・星海社"
-  imageUrl="https://m.media-amazon.com/images/W/MEDIAX_1215821-T1/images/I/71qkSs-ZFNL._SL1405_.jpg"
+  imageUrl="https://m.media-amazon.com/images/I/71qkSs-ZFNL._SY522_.jpg"
 >}}
 
 渡辺浩弐さん (kozysan) のゲーム・キッズシリーズが好きです。
@@ -220,6 +220,6 @@ DNA診断によって余命まで正確に予測できるようになった。
   title="2030年のゲーム・キッズ"
   author="渡辺浩弐"
   publisher="講談社・星海社"
-  imageUrl="https://m.media-amazon.com/images/W/MEDIAX_1215821-T1/images/I/71qkSs-ZFNL._SL1405_.jpg"
+  imageUrl="https://m.media-amazon.com/images/I/71qkSs-ZFNL._SY522_.jpg"
 >}}
 
