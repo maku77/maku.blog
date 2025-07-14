@@ -2,7 +2,10 @@
 title: "Claude Code を辞書にするスラッシュコマンドを定義する (/m-en, /m-ja)"
 url: "p/52v9k2v/"
 date: "2025-07-13"
+lastmod: "2025-07-14"
 tags: ["Claude"]
+changes:
+  - 2025-07-14: Windows (PowerShell) でのコマンドエイリアス設定方法を追記
 ---
 
 Claude Code では、よく使うプロンプトを独自のスラッシュコマンドとして定義しておくことができます。
@@ -111,13 +114,23 @@ $ claude -p "/m-en 延期する"    # 英語への翻訳
 $ claude -p "/m-ja withdrawk"   # 日本語への翻訳
 {{< /code >}}
 
-さらに、上記のエイリアスなどを定義しておけば、もっと簡単に起動できるようになります。
-次の例では、zsh の設定ファイルで **`m-en`** 関数と **`m-ja`** 関数を定義しています。
+さらに、上記コマンドのエイリアスなどを定義しておけば、もっと簡単に起動できるようになります。
+例えば、macOS や Linux で zsh を使っている場合は、次のように **`m-en`** 関数と **`m-ja`** 関数を定義できます。
 
 {{< code lang="zsh" title="~/.zshrc" >}}
 m-en() { claude -p "/m-en $*" }
 m-ja() { claude -p "/m-ja $*" }
 {{< /code >}}
+
+Windows の PowerShell を使っている場合は、**`notepad $profile`** などで設定ファイルを開いて、下記のような感じで `Function` を定義します。
+ちなみに、`$input |` で標準入力を扱えるようにし、`$($args)` で全ての引数をスペースで結合して渡すようにしています。
+
+{{< code lang="powershell" title="PowerShell プロファイル" >}}
+Function m-en { $input | claude -p "/m-en $($args)" }
+Function m-ja { $input | claude -p "/m-ja $($args)" }
+{{< /code >}}
+
+- 参考: [PowerShell のプロファイルを作成して独自コマンドを定義する](/p/v7bkitw/)
 
 これで、ターミナルから直接 **`m-en`** や **`m-ja`** と入力するだけで、翻訳できるようになります。
 
@@ -129,16 +142,12 @@ $ m-ja withdraw   # 日本語への翻訳
 標準入力も扱えるので、下記のように他のコマンドの出力をパイプでつなげて翻訳することができます。
 
 {{< code lang="console" title="標準入力を翻訳する" >}}
-$ echo "いけそうですね。" | m-en
-**English Translations:**
-1. It looks doable. /ɪt lʊks ˈduəbəl/
-2. It seems feasible. /ɪt simz ˈfizəbəl/
-3. I think it'll work. /aɪ θɪŋk ɪtəl wɜrk/
+$ echo "To be or not to be, that is the question." | m-ja
+**English:** To be or not to be, that is the question.
+**Japanese:** 生きるべきか死ぬべきか、それが問題だ。
 
-**Usage Examples:**
-1. "It looks doable, let's give it a try." - やってみる価値がありそうですね、試してみましょう。
-2. "The project timeline seems feasible with our current resources." - 現在のリソースでプロジェクトのスケジュールは実現可能そうです。
-3. "I think it'll work if we adjust the approach slightly." - アプローチを少し調整すれば上手くいくと思います。
+This is a famous quote from Shakespeare's Hamlet. The Japanese translation
+captures the philosophical meaning of contemplating existence versus non-existence.
 {{< /code >}}
 
 便利っ ٩(๑❛ᴗ❛๑)۶
