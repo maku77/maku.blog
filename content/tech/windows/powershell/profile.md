@@ -64,7 +64,7 @@ PS C:\> Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 プロファイルの設定例
 ----
 
-### ディレクトリ移動用のコマンドを定義
+### 例）ディレクトリ移動用のコマンドを定義
 
 下記は、ディレクトリ移動のための関数（`cd-gitwork` や `u`）を定義する例です。
 ついでに PowerShell の起動時にその関数を呼び出して、ディレクトリを移動しています。
@@ -84,12 +84,25 @@ cd-gitwork
 
 独自コマンドの定義方法としては、`Set-Alias` コマンドレットによるエイリアス定義もありますが、`Set-Alias` は柔軟なパラメーター設定ができないので、`Function` を使って関数として定義するのがよいです。
 
-### 他のスクリプトを読み込む
+### 例）他のスクリプトを読み込む
 
 複数の PC で設定を共有したいときは、Dropbox などに共通スクリプトを置いておいて、__`.`__ で読み込むようにします。
 各 PC のプロファイル (`$profile`) には、次のような 1 行だけを記述しておきます。
 
 {{< code lang="powershell" title="Microsoft.PowerShell_profile.ps1" >}}
-. D:\Dropbox\share\config\powershell\profile.ps1
+. D:\Dropbox\share\config\powershell\alias.ps1
 {{< /code >}}
+
+### 例）プロファイル設定ファイルを簡単に開けるようにする
+
+プロファイル設定ファイルのパスは PowerShell の中で `$profile` で簡単に参照できる（例: `notepad $profile`）のですが、`.ps1` ファイルの中で下記のようなコマンドエイリアスを設定しておくと、その `.ps1` ファイル自身を簡単に開いて編集できるようになります。
+前述のように別の `.ps1` ファイルをインクルードしているようなケースでは、`$profile` が指すファイルを開いて、さらに別の `.ps1` ファイルを辿る (Vim の `gt` など）といった操作が必要になってくるので、このようなショートカットを用意しておくと便利です。
+
+{{< code lang="powershell" title="D:\Dropbox\share\config\powershell\alias.ps1" >}}
+# 自分自身の .ps1 ファイルをエディタで開く
+Function m-edit-alias { nvim-qt $PSCommandPath }
+{{< /code >}}
+
+ちなみに、**`m-`** というプレフィックスは、標準コマンドと自分で定義したコマンドが混ざらないようにするために付けてます。
+`my` とか `maku` の略です ٩(๑❛ᴗ❛๑)۶
 
