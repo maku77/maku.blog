@@ -7,7 +7,7 @@ tags: ["Azure", "Azure Pipelines"]
 
 Azure Pipelines の設定で、次のような感じで Npm タスクを追加したとき、
 
-{{< code lang="yml" title="azure-pipelines.yml" >}}
+{{< code lang="yaml" title="azure-pipelines.yml" >}}
 steps:
 - task: Npm@1
   inputs:
@@ -29,7 +29,7 @@ No agent found in pool Default which satisfies the specified demands: npm, Agent
 
 そのような場合は、`steps` の先頭で、次のように __NodeTool__ (Node.js Tool Installer) タスクを実行しておくと、うまく動作するようになります 。
 
-{{< code lang="yml" title="azure-pipelines.yml" >}}
+{{< code lang="yaml" title="azure-pipelines.yml" >}}
 steps:
 # これで npm コマンドを認識するようになる
 - task: NodeTool@0
@@ -46,7 +46,7 @@ NodeTool タスクは実行のたびに Node.js をダウンロード＆イン�
 
 `npm` コマンドにパスが通るので、次のようにスクリプトで直接 `npm` コマンドを実行することも可能です。
 
-{{< code lang="yml" >}}
+{{< code lang="yaml" >}}
 - script: |
     npm install
     npm run build

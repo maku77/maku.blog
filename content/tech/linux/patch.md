@@ -38,7 +38,7 @@ $ diff -u sample.cpp new/sample.cpp > sample.patch
 
 これで、次のようなパッチファイルが生成されます。
 
-{{< code lang="patch" title="sample.patch" >}}
+{{< code lang="diff" title="sample.patch" >}}
 --- sample.cpp  2007-05-11 20:36:13.265625000 +0900
 +++ new/sample.cpp      2007-05-11 20:26:31.875000000 +0900
 @@ -1,6 +1,6 @@

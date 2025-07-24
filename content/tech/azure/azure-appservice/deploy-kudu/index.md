@@ -122,7 +122,7 @@ command = deploy.cmd
 
 自動生成された `deploy.cmd` の中身を見てみると、例えば下記のような感じで記述されています。
 
-{{< code lang="cmd" title="deploy.cmd（抜粋）" >}}
+{{< code lang="bat" title="deploy.cmd（抜粋）" >}}
 :Deployment
 echo Handling node.js deployment.
 
@@ -152,7 +152,7 @@ IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
 大まかには、リポジトリのコードをデプロイ先にコピーしておいて、`npm install --production` で必要な NPM パッケージをインストールするという流れになっています。
 上記の後ろあたりに、
 
-{{< code lang="cmd" >}}
+{{< code lang="bat" >}}
 echo Hellooooooooooooooooooooooo
 {{< /code >}}
 
@@ -162,7 +162,7 @@ echo Hellooooooooooooooooooooooo
 この場合は `npm install --production` となっていた部分を、`npm install` に変更しておかなければいけません。
 `tsc` などの開発ツールをインストールするためです。
 
-{{< code lang="cmd" title="deploy.cmd（抜粋）" >}}
+{{< code lang="bat" title="deploy.cmd（抜粋）" >}}
 :: 3. Install npm packages AND transpile TypeScript files
 IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
   pushd "%DEPLOYMENT_TARGET%"
@@ -182,7 +182,7 @@ IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
 Kudu のカスタムデプロイスクリプト（`.deployment` と `deploy.cmd`）は、**`kuduscript`** コマンドを使って簡単に生成することができます。
 下記の例では、Node.js アプリ用のデプロイスクリプトを生成しています。
 
-{{< code title="Node.js アプリ用の Kudu デプロイスクリプトの作成" >}}
+{{< code lang="console" title="Node.js アプリ用の Kudu デプロイスクリプトの作成" >}}
 $ npm install -g kuduscript
 $ kuduscript --node -y
 Generating deployment script for node.js Web Site

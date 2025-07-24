@@ -41,7 +41,7 @@ $ parcel build src/index.html -d build --public-url "/project名/"
 NPM スクリプト内に GitHub のプロジェクト名を含めるのが嫌なときは、CI/CD サーバー上のビルド設定でパラメータ指定するのがよいかもしれません。
 例えば、GitHub Actions を使っている場合は、次のような感じで NPM スクリプトに追加パラメータを指定することができます。
 
-{{< code lang="yml" title=".github/workflows/main.yml（抜粋）" >}}
+{{< code lang="yaml" title=".github/workflows/main.yml（抜粋）" >}}
 jobs:
   build:
     runs-on: ubuntu-latest

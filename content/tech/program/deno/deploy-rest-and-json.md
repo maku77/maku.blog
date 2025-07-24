@@ -87,7 +87,7 @@ export function getBook(id: string | undefined): Book | undefined {
 - `/books` ... すべての書籍情報を返す。
 - `/books/1` ... 指定された ID (=1) に対応する書籍情報を返す。
 
-{{< code lang="main.ts" >}}
+{{< code lang="ts" title="main.ts" >}}
 import { Application, Router } from "https://deno.land/x/oak@v11.1.0/mod.ts";
 import { getAllBooks, getBook } from "./booksDb.ts";
 

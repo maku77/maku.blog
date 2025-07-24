@@ -45,7 +45,7 @@ Terraform のエントリーポイントとなるファイルは、__`main.tf`__
 `main.tf` では、使用するプロバイダー（Azure や AWS）の設定や、作成するリソースの定義を行います。
 次の例では、S3 バケットを 1 つ定義しています。
 
-{{< code lang="tf" title="main.tf" >}}
+{{< code lang="terraform" title="main.tf" >}}
 # AWS プロバイダーの設定
 provider "aws" {
   region = "ap-northeast-1"  # 使用する AWS リージョン
@@ -124,7 +124,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 最後に、今回作成したリソースをまとめて削除するには __`terraform destory`__ コマンドを実行します。
 
-{{< code lang="code" title="お片付け" >}}
+{{< code lang="console" title="お片付け" >}}
 $ terraform destroy
 {{< /code >}}
 

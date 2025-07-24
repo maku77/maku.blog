@@ -293,7 +293,7 @@ nginx 自体の設定を変更したいときは、Docker ホスト上に設定�
 下記は、nginx サーバーの `client_max_body_size` 値をカスタマイズする設定ファイルの例です。
 この値のデフォルト値は 1M になっているため、POST リクエストで大きなデータを送りたい場合はこのように大きめのサイズを指定しておく必要があります。
 
-{{< code lang="inf" title="nginx-proxy.conf" >}}
+{{< code lang="nginx" title="nginx-proxy.conf" >}}
 # POST で大きいデータを送れるようにしておく
 client_max_body_size 20M;
 {{< /code >}}

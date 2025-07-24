@@ -75,7 +75,7 @@ jira = JIRA(JIRA_SERVER, token_auth=JIRA_TOKEN)
 実用上は、Jira のアクセストークンは環境変数や [`.env` ファイルで設定](https://maku77.github.io/p/gzo8d7y/) できるようにしておくのがよいです。
 こうしておけば、CI 環境（GitHub Actions など）のシークレット変数としてトークンを設定できます。
 
-{{< code lang="inf" title=".env" >}}
+{{< code lang="ini" title=".env" >}}
 JIRA_SERVER=https://your-jira-server
 JIRA_TOKEN=your-access-token
 {{< /code >}}

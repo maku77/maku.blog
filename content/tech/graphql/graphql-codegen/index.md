@@ -146,7 +146,7 @@ GraphQL Code Generator（`graphql-codegen` コマンド）のセットアップ�
 React + Apollo Client のアプリのコードは次のような感じになっていると思います。
 GraphQL API を呼び出すための、`useQuery` フックに渡す `Games` 型をマニュアル定義しています。
 
-{{< code lang="src/components/MyComponent.tsx" hl_lines="27" >}}
+{{< code lang="tsx" title="src/components/MyComponent.tsx" hl_lines="27" >}}
 import { FC } from 'react'
 import { gql, useQuery } from '@apollo/client'
 

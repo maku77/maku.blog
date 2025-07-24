@@ -26,14 +26,14 @@ Svelte アプリでは、**`PUBLIC_`** というプレフィックスが付い�
 
 本番環境用の環境変数は、デプロイ先のサービス上（Cloudflare Pages や Vercel）で設定する必要がありますが、開発サーバーで使用する環境変数は、**`.env`** ファイルで定義しておくことができます。
 
-{{< code lang="env" title=".env" >}}
+{{< code lang="ini" title=".env" >}}
 MY_API_KEY="c3ytex9bsyed9zjgnbxhk2hninmd"
 {{< /code >}}
 
 `.env` ファイルには、API キーなどの機密情報を記述することになるため、Git などのバージョン管理ツールにコミットしてはいけません（おそらく `.gitignore` に `.env` ファイルが登録されているはずです）。
 Git にコミットするのは、次のような参考ファイルだけにしておきます。
 
-{{< code lang="env" title=".env.example" >}}
+{{< code lang="ini" title=".env.example" >}}
 MY_API_KEY="XXXXX"
 {{< /code >}}
 
@@ -71,7 +71,7 @@ This could leak sensitive information.
 以下のサンプルコードでは、API キーが必要な REST API の題材として [News API](https://newsapi.org/) を使用しています（1 日 100 リクエストまでは無料です）。
 News API の API キーを取得して、プロジェクトのルートの `.env` ファイルに次のように記述しておきます。
 
-{{< code lang="env" title=".env" >}}
+{{< code lang="ini" title=".env" >}}
 NEWS_API_KEY="XXXXXXXXXXXXXXXXXXXXXXXX"
 {{< /code >}}
 

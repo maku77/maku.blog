@@ -1,6 +1,6 @@
 ---
 title: "Ansible で Hello World"
-url: "/p/uhu7hs4"
+url: "p/uhu7hs4/"
 date: "2022-02-17"
 weight: 102
 tags: ["Ansible"]
@@ -102,7 +102,7 @@ Enter passphrase for key '/Users/maku/.ssh/id_rsa': （SSH鍵のパスワード�
 
 上の例では、接続ユーザー名を `-u` オプションで指定していますが、インベントリーファイルの中で次のようにユーザー名を設定しておくこともできます。
 
-{{< code lang="inf" title="hosts.ini" >}}
+{{< code lang="ini" title="hosts.ini" >}}
 localhost  ansible_connection=local
 192.168.1.20  ansible_ssh_user=maku
 {{< /code >}}
@@ -135,7 +135,7 @@ Enter passphrase for key '/Users/maku/.ssh/id_rsa': （SSH鍵のパスワード�
 
 接続方法 (local or ssh) や接続ユーザー名は、インベントリーファイルなどで指定しておく必要があります。
 
-{{< code lang="inf" title="/etc/ansible/hosts" >}}
+{{< code lang="ini" title="/etc/ansible/hosts" >}}
 localhost  ansible_connection=local
 192.168.1.20  ansible_ssh_user=maku
 {{< /code >}}
@@ -151,7 +151,7 @@ Ansible のバージョンによっては、`ansible` コマンドの実行時�
 これは、ターゲットホスト上の Python 実行環境としてどれを使えばよいか判別できないということを示しています。
 [Ansible の設定ファイル](/p/pamv6gq) に次のような感じで Python の実行ファイルパスを指定すれば警告は消えます。
 
-{{< code lang="inf" title="ansible.cfg" >}}
+{{< code lang="ini" title="ansible.cfg" >}}
 [defaults]
 interpreter_python = /usr/bin/python3
 

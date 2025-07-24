@@ -19,7 +19,7 @@ CentOS 6 の頃は `iptables` が使われていました。
 firewalld のインストール
 ----
 
-{{< code lang="code" title="apt でのインストール" >}}
+{{< code lang="console" title="apt でのインストール" >}}
 $ sudo apt install firewalld
 {{< /code >}}
 

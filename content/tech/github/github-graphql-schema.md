@@ -64,7 +64,7 @@ GraphQL サーバーから直接取得する方法
 GitHub の GraphQL API サーバーに HTTP GET リクエストを送ることで、スキーマ定義を直接取得することができます。
 [パーソナルアクセストークンはこちら](https://github.com/settings/tokens) から生成してください。
 
-{{< code lang="sh" >}}
+{{< code lang="console" >}}
 $ token=<YOUR_PERSONAL_ACCESS_TOKEN>
 $ curl -H "Authorization: bearer $token" https://api.github.com/graphql
 {{< /code >}}

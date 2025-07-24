@@ -224,7 +224,7 @@ Cloudflare Workers では、Bindings という仕組みでシークレット情�
 開発環境 (`wrangler dev`) で使うシークレット情報は、**`.dev.vars`** というファイルで定義しておきます。
 このファイルは `.gitignore` に登録されていて Git にコミットされないようになっています。
 
-{{< code lang="conf" title=".dev.vars" >}}
+{{< code lang="ini" title=".dev.vars" >}}
 HOGE_API_KEY="NI6IkpXeiI...省略...leiOiJUzI1"
 {{< /code >}}
 

@@ -120,7 +120,7 @@ Basic 認証の仕組みはとてもシンプルで、次のような流れで�
 管理者アクセス用のクレデンシャル情報（ユーザー名とパスワード）は、Private な環境変数として、`.env` ファイル（開発用）、あるいはサーバーの環境変数（本番用）で設定しておきます。
 Private な環境変数の扱い方はこちらの記事を参考にしてください → [Svelte 入門: 外部 API 用のキーを Private な環境変数で定義する ($env)](/p/nmdte68/)
 
-{{< code lang="env" title=".env" >}}
+{{< code lang="ini" title=".env" >}}
 ADMIN_CREDENTIALS="user:pass"
 {{< /code >}}
 

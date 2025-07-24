@@ -52,7 +52,7 @@ __`.env`__ ファイルを作成し、Confluence のサーバーアドレスと�
 このファイルは Git にコミットしないように注意してください。
 OS の環境変数に設定するのでも OK です。
 
-{{< code lang="inf" title=".env" >}}
+{{< code lang="ini" title=".env" >}}
 CONFLUENCE_URL = "https://<server>"
 CONFLUENCE_TOKEN = "NTc3MTI2...（省略）...L6Haih/B"
 {{< /code >}}

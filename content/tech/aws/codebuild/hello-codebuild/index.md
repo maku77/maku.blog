@@ -76,7 +76,7 @@ CodeBuild にビルドプロジェクトを作成する
 そこで、次のような内容の `buildspec.yml` ファイルを作成して GitHub へプッシュします。
 あるいは、GitHub サイト上で直接ファイルを作っちゃっても OK です。
 
-{{< code lang="yml" title="buildspec.yml" >}}
+{{< code lang="yaml" title="buildspec.yml" >}}
 version: 0.2
 
 phases:

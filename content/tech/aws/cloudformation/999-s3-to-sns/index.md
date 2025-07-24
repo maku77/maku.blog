@@ -214,7 +214,7 @@ Resources:
 これは、CloudFormation によって __自動で割り当てられる S3 バケット名 (Physical ID) を使用できない__ ということを意味します。
 例えば、トピックポリシーの定義で `!Ref MyBucket` のように S3 バケット名を参照しようとすると、そんなバケットはまだ定義されていないというエラーになります。
 
-{{< code lang="S3バケットが参照できないエラー" >}}
+{{< code title="S3バケットが参照できないエラー" >}}
 ResourceStatus: CREATE_FAILED
 ResourceStatusReason: 'Unable to validate the following destination configurations
   (Service: Amazon S3; Status Code: 400; Error Code: InvalidArgument; Request ID:

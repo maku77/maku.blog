@@ -123,7 +123,7 @@ Vim 用の EditorConfig プラグインをインストール方法はいくつ�
 
 例えば、プラグイン管理に Vundle を使用しているのであれば、`.vimrc` に次のような行を追加し、
 
-{{< code lang="vimrc" title=".vimrc" >}}
+{{< code lang="vim" title=".vimrc" >}}
 Plugin 'editorconfig/editorconfig-vim'
 {{< /code >}}
 

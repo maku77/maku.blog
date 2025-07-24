@@ -47,7 +47,7 @@ MCP サーバーの実装
 
 下記は、2つの整数の足し算を行うだけの簡単なツール (`add`) を提供する MCP サーバーの実装例です。
 
-{{< code lang="main.py" >}}
+{{< code lang="python" title="main.py" >}}
 from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("Demo")

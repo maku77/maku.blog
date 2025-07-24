@@ -39,7 +39,7 @@ mmdkR+mMvBUnYeu2sn1kMqlXjK9Q4A0Os3I4M4aiMQs=
 用意した API キーは、サーバー側の **`API_KEY`** という環境変数にセットすることにします。
 開発サーバー用の環境変数は **`.dev.vars`** ファイル、本番環境用の環境変数は **`wrangler secret`** コマンドで設定します。
 
-{{< code lang="inf" title=".dev.vars（ローカル環境用のシークレット設定）" >}}
+{{< code lang="ini" title=".dev.vars（ローカル環境用のシークレット設定）" >}}
 API_KEY="mmdkR+mMvBUnYeu2sn1kMqlXjK9Q4A0Os3I4M4aiMQs="
 {{< /code >}}
 

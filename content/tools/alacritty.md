@@ -222,14 +222,14 @@ Alacritty はクロスプラットフォームなアプリですが、shell 設�
 下記は、各 OS 用の `alacritty.toml` の記述例です。
 ここでは、`dotfiles` という Git リポジトリで設定ファイルを管理していることを想定しています。
 
-{{< code lang="macOS 用の alacritty.toml" >}}
+{{< code lang="toml" title="macOS 用の alacritty.toml" >}}
 import = [
   "~/gitwork/dotfiles/alacritty/alacritty-common.toml",
   "~/gitwork/dotfiles/alacritty/alacritty-mac.toml",
 ]
 {{< /code >}}
 
-{{< code lang="Windows 用の alacritty.toml" >}}
+{{< code lang="toml" title="Windows 用の alacritty.toml" >}}
 import = [
   "D:/gitwork/dotfiles/alacritty/alacritty-common.toml",
   "D:/gitwork/dotfiles/alacritty/alacritty-win.toml",

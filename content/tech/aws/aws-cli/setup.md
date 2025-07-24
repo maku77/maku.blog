@@ -86,13 +86,13 @@ AWS CLI の出力フォーマットは、`yaml` や `json`、`table`、`text` �
 
 設定が完了すると、`~/.aws` ディレクトリ以下に次のようなファイルとして保存されます。
 
-{{< code lang="inf" title="~/.aws/config" >}}
+{{< code lang="ini" title="~/.aws/config" >}}
 [default]
 region = ap-northeast-1
 output = yaml
 {{< /code >}}
 
-{{< code lang="inf" title="~/.aws/credentials" >}}
+{{< code lang="ini" title="~/.aws/credentials" >}}
 [default]
 aws_access_key_id = INMCAKIAQX77PNSXQAGP
 aws_secret_access_key = 2ufOA3Q2KAmpNTo2GHPDXFJK7Jiv9yfZGegIdbCW
@@ -150,7 +150,7 @@ Default output format [None]: yaml
 
 これにより、設定ファイル内にそのプロファイル用の設定が追加されます。
 
-{{< code lang="inf" title="~/.aws/config" >}}
+{{< code lang="ini" title="~/.aws/config" >}}
 [default]
 region = ap-northeast-1
 output = yaml
@@ -160,7 +160,7 @@ region = ap-northeast-1
 output = yaml
 {{< /code >}}
 
-{{< code lang="inf" title="~/.aws/credentials" >}}
+{{< code lang="ini" title="~/.aws/credentials" >}}
 [default]
 aws_access_key_id = INMCAKIAQX77PNSXQAGP
 aws_secret_access_key = 2ufOA3Q2KAmpNTo2GHPDXFJK7Jiv9yfZGegIdbCW
