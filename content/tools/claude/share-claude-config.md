@@ -1,7 +1,7 @@
 ---
 title: "Claude Code のカスタムコマンドを Git や Dropbox で共有する"
 url: "p/xpwvvfz/"
-date: "2025-08-01"
+date: "2025-07-31"
 tags: ["Claude"]
 ---
 
@@ -83,4 +83,7 @@ ln -s ~/gitwork/claude-config/commands ~/.claude/commands/maku
 
 新しいカスタムコマンドを作成したいときは、Git リポジトリで管理している `~/gitwork/claude-config/commands` ディレクトリ以下に `.md` ファイルを追加していけば OK です。
 このようにすれば、GitHub や Dropbox で簡単に Claude Code の設定ファイルを共有できます。
+
+- 参考: 実際の GitHub での管理例
+  - [https://github.com/maku77/claude-config](https://github.com/maku77/claude-config)
 
