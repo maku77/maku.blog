@@ -2,7 +2,7 @@
 title: "Claude Code の使い方（指示の出し方のコツ）"
 url: "p/qj9wydo/"
 date: "2025-08-29"
-tags: ["claude, claude code"]
+tags: ["claude", "claude code"]
 ---
 
 Claude Code のノウハウが溜まってきたので様々なノウハウをメモしていきます。

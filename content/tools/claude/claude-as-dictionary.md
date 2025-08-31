@@ -3,7 +3,7 @@ title: "Claude Code を辞書にするスラッシュコマンドを定義する
 url: "p/52v9k2v/"
 date: "2025-07-13"
 lastmod: "2025-07-14"
-tags: ["Claude"]
+tags: ["claude", "claude code"]
 changes:
   - 2025-07-14: Windows (PowerShell) でのコマンドエイリアス設定方法を追記
 ---

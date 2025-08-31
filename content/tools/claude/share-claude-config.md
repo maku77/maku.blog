@@ -2,7 +2,7 @@
 title: "Claude Code のカスタムコマンドを Git や Dropbox で共有する"
 url: "p/xpwvvfz/"
 date: "2025-07-31"
-tags: ["Claude"]
+tags: ["claude", "claude code"]
 ---
 
 何をするか？
