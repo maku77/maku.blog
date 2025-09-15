@@ -1,6 +1,6 @@
 ---
 title: "textlint のインストールと基本的な使い方"
-url: "/p/3veuap5"
+url: "p/3veuap5/"
 date: "2020-05-20"
 tags: ["textlint"]
 weight: 1

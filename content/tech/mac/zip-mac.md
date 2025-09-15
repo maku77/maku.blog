@@ -2,7 +2,7 @@
 title: "macOS のコマンドラインで ZIP ファイルを作成する"
 url: "/p/2it3bjs"
 date: "2021-04-06"
-tags: ["macOS", "zip", "圧縮・展開"]
+tags: ["mac", "zip", "圧縮・展開"]
 ---
 
 ZIP ファイルを作成する（zip コマンド）
@@ -12,9 +12,9 @@ macOS に標準で付属している `zip` コマンドを使って、ファイ�
 
 ### ファイルを 1 つずつ指定する
 
-{{< code >}}
+```console
 $ zip sample.zip 1.txt 2.txt 3.txt
-{{< /code >}}
+```
 
 {{< code title="作成される ZIP ファイル" >}}
 sample.zip
@@ -23,11 +23,11 @@ sample.zip
   +-- 3.txt
 {{< /code >}}
 
-### ディレクトリごとまとめて ZIP 化する
+### ディレクトリごとまとめて ZIP 化する (-r)
 
-{{< code >}}
+```console
 $ zip -r sample.zip dir1 dir2
-{{< /code >}}
+```
 
 {{< code title="作成される ZIP ファイル" >}}
 sample.zip
@@ -43,7 +43,7 @@ sample.zip
 
 ### トップディレクトリを含めずに ZIP 化する
 
-{{< code title="例: src ディレクトリ以下のファイルだけ圧縮" >}}
+{{< code lang="console" title="例: src ディレクトリ以下のファイルだけ圧縮" >}}
 $ (cd src && zip -r ../src.zip ./*)
 {{< /code >}}
 
@@ -56,9 +56,9 @@ src.zip
   +-- 3.txt
 {{< /code >}}
 
-### 除外するファイルを指定する
+### 除外するファイルを指定する (-x)
 
-{{< code title="例: ドットで始まるファイルを含めない" >}}
+{{< code lang="console" title="例: ドットで始まるファイルを含めない" >}}
 $ zip -r sample.zip src -x ".*"
 {{< /code >}}
 
