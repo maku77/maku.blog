@@ -58,9 +58,13 @@ src.zip
 
 ### 除外するファイルを指定する (-x)
 
-{{< code lang="console" title="例: ドットで始まるファイルを含めない" >}}
-$ zip -r sample.zip src -x ".*"
+{{< code lang="console" title="例: ドットで始まるファイルやディレクトリを含めない" >}}
+$ zip -r src.zip src -x "*/.*"
 {{< /code >}}
 
 `-x` オプションは複数指定することができます。
+
+```console
+$ zip -r src.zip src -x "*/.*" -x "*/__pycache__/*"
+```
 

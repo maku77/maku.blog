@@ -1,5 +1,5 @@
 ---
-title: "左手小指だけで IME 操作"
+title: "左手小指だけで IME 操作 (AutoHotkey, Karabiner-Elements)"
 url: "p/s3subpp/"
 date: "2025-05-01"
 tags: ["PC設定", "Karabiner-Elements", "AutoHotkey"]
