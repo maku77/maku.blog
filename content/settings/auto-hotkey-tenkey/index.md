@@ -23,9 +23,9 @@ tags: ["AutoHotkey", "PC設定"]
 OpenUrl(url) {
     Run url
     if WinExist("ahk_exe msedge.exe")
-        WinActivate "ahk_exe msedge.exe"
+        WinActivate
     else if WinExist("ahk_exe chrome.exe")
-        WinActivate "ahk_exe chrome.exe"
+        WinActivate
 }
 
 Numpad1::OpenUrl "https://www.perplexity.ai"
@@ -42,4 +42,16 @@ Numpad9::OpenUrl "https://..."
 例えば、Perplexity に何か聞いてみようと思ったら、おもむろにテンキーの `1` キーを押せば、ブラウザで Perplexity のページが開いて入力欄がアクティブになるので、すぐに質問を入力できます。
 
 ٩(๑❛ᴗ❛๑)۶ 最強最速！わーぃ
+
+{{% note title="別のキーコンビネーションでも起動できるようにする" %}}
+上記のスクリプトでは、テンキーの `1`〜`9` キーに URL を割り当てていますが、テンキーがない場合にも使えるように、他のキーコンビネーションにも同じ処理を割り当てておくと便利です。
+次の例では、`Windows + 1` あるいは `Windows + F1` キーでも Perplexity を開くようにしています。
+`#` は `Windows` キーを表します。
+
+{{< code lang="ahk" title="maku-keyconfig.ahk" >}}
+#1::
+#F1::
+Numpad1::OpenUrl "https://www.perplexity.ai"
+{{< /code >}}
+{{% /note %}}
 
