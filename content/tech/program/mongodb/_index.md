@@ -1,7 +1,7 @@
 ---
 title: "MongoDB 関連記事"
 linkTitle: "MongoDB"
-url: "/p/qikq9o8"
+url: "p/qikq9o8/"
 categoryIcon: _index.svg
 ---
 
