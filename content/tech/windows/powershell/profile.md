@@ -1,5 +1,5 @@
 ---
-title: "PowerShell のプロファイルを作成して独自コマンドを定義する"
+title: "PowerShell のプロファイルを作成して独自コマンドを定義する ($profile)"
 url: "p/v7bkitw/"
 date: "2024-05-08"
 tags: ["PowerShell"]
@@ -70,13 +70,13 @@ PS C:\> Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ついでに PowerShell の起動時にその関数を呼び出して、ディレクトリを移動しています。
 よく使う作業ディレクトリに自動的に移動するようにしておくと便利です（Windows ターミナルの設定でも初期ディレクトリは設定できますが）。
 
-{{< code lang="powershell" title="Microsoft.PowerShell_profile.ps1" >}}
+{{< code lang="powershell" title="Microsoft.PowerShell_profile.ps1 ($profile)" >}}
 Function cd-gitwork {
-  cd D:\y\gitwork  # Set-Location -Path D:\y\gitwork でも OK
+  cd D:/y/gitwork  # Set-Location -Path D:/y/gitwork でも OK
 }
 Function u { cd ..  }
-Function uu { cd ..\..  }
-Function uuu { cd ..\..\..  }
+Function uu { cd ../..  }
+Function uuu { cd ../../..  }
 
 # PowerShell 起動時にディレクトリを移動
 cd-gitwork
@@ -89,20 +89,43 @@ cd-gitwork
 複数の PC で設定を共有したいときは、Dropbox などに共通スクリプトを置いておいて、__`.`__ で読み込むようにします。
 各 PC のプロファイル (`$profile`) には、次のような 1 行だけを記述しておきます。
 
-{{< code lang="powershell" title="Microsoft.PowerShell_profile.ps1" >}}
-. D:\Dropbox\share\config\powershell\alias.ps1
+{{< code lang="powershell" title="Microsoft.PowerShell_profile.ps1 ($profile)" >}}
+. D:/Dropbox/share/config/powershell/profile.ps1
 {{< /code >}}
+
+{{% note %}}
+パスの区切り文字としては、スラッシュ (`/`) とバックスラッシュ (`\`) の両方が使えます。
+クロスプラットフォームなスラッシュ (`/`) の方を使うことをお勧めします。
+例えば、Vim の `gf` でカーソル下のパスを開くときに、バックスラッシュだと正しく認識されなかったりします。
+{{% /note %}}
 
 ### 例）プロファイル設定ファイルを簡単に開けるようにする
 
 プロファイル設定ファイルのパスは PowerShell の中で `$profile` で簡単に参照できる（例: `notepad $profile`）のですが、`.ps1` ファイルの中で下記のようなコマンドエイリアスを設定しておくと、その `.ps1` ファイル自身を簡単に開いて編集できるようになります。
 前述のように別の `.ps1` ファイルをインクルードしているようなケースでは、`$profile` が指すファイルを開いて、さらに別の `.ps1` ファイルを辿る (Vim の `gt` など）といった操作が必要になってくるので、このようなショートカットを用意しておくと便利です。
 
-{{< code lang="powershell" title="D:\Dropbox\share\config\powershell\alias.ps1" >}}
-# 自分自身の .ps1 ファイルをエディタで開く
-Function m-edit-alias { nvim-qt $PSCommandPath }
+{{< code lang="powershell" title="D:\Dropbox\share\config\powershell\profile.ps1" >}}
+# この .ps1 ファイルをエディタで開く
+Function m-edit-profile { nvim $PSCommandPath }
 {{< /code >}}
 
 ちなみに、**`m-`** というプレフィックスは、標準コマンドと自分で定義したコマンドが混ざらないようにするために付けてます。
 `my` とか `maku` の略です ٩(๑❛ᴗ❛๑)۶
+
+### 例）変数に格納したコマンドを実行する
+
+例えば、普段使用するエディタのコマンドを **`$EDITOR`** 変数に格納しておき、エイリアスや関数を定義するときにその変数経由でエディタを呼び出すようにしておくと便利です。
+こうしておくと、エディタを変更したいときに関数の中身を全部書き換える必要がなくなります。
+
+{{< code lang="powershell" title="Microsoft.PowerShell_profile.ps1 ($profile)" >}}
+# エディタコマンドを変数に格納
+$EDITOR = "nvim"  # Neovim を使う場合
+
+# EDITOR 変数に設定したエディタで CLAUDE.md を開く
+Function m-edit-claude { & $EDITOR $env:USERPROFILE/.claude/CLAUDE.md }
+{{< /code >}}
+
+先頭に **`&`** 演算子を付けているのは、変数に格納されたコマンド名をコマンドとして実行するためです。
+
+便利っ ٩(๑❛ᴗ❛๑)۶
 
