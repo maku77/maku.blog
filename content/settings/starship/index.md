@@ -71,15 +71,30 @@ winget install Starship.Starship
 次に、各シェルの設定ファイルで **`starship init`** を実行するように設定します。
 
 {{< code lang="zsh" title="~/.zshrc（zsh の場合）" >}}
-eval "$(starship init zsh)"
+# Starship によるプロンプトのカスタマイズ（インストール済みの場合のみ）
+if command -v starship &> /dev/null; then
+  eval "$(starship init zsh)"
+else
+  echo "⚠️ starship is not installed. See: https://starship.rs/"
+fi
 {{< /code >}}
 
 {{< code lang="bash" title="~/.bashrc（bash の場合）" >}}
-eval "$(starship init bash)"
+# Starship によるプロンプトのカスタマイズ（インストール済みの場合のみ）
+if command -v starship &> /dev/null; then
+  eval "$(starship init bash)"
+else
+  echo "⚠️ starship is not installed. See: https://starship.rs/"
+fi
 {{< /code >}}
 
 {{< code lang="powershell" title="$PROFILE（PowerShell の場合）" >}}
-Invoke-Expression (&starship init powershell)
+# Starship によるプロンプトのカスタマイズ（インストール済みの場合のみ）
+if (Get-Command starship -ErrorAction SilentlyContinue) {
+    Invoke-Expression (&starship init powershell)
+} else {
+    Write-Warning "starship is not installed. See: https://starship.rs/"
+}
 {{< /code >}}
 
 上記のように `starship init` コマンドを実行すると、内部的に `$PS1` 変数（bash/zsh）や `prompt` 関数（PowerShell）が書き換えられ、プロンプトがこんな感じの表示に切り替わります。
