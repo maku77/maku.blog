@@ -2,7 +2,7 @@
 title: "macOS で JAVA_HOME に設定すべきパスを調べる（java_home コマンド）"
 url: "/p/7jkgzd4"
 date: "2014-07-19"
-tags: ["Java", "mac"]
+tags: ["java", "mac"]
 ---
 
 複数の JDK がインストールされている場合にバージョンを切り替えて `java` (`javac`) コマンドを使用するには、`JAVA_HOME` 環境変数を設定します。

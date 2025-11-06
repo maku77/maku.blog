@@ -2,7 +2,7 @@
 title: "Android Studio の IdeaVim プラグインで快適コーディング"
 url: "/p/f4ugxri"
 date: "2021-06-08"
-tags: ["設定"]
+tags: ["android", "vim", "設定"]
 ---
 
 {{% private %}}
