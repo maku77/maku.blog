@@ -3,13 +3,12 @@ title: "WezTerm を使いこなすためのメモ"
 url: "p/adcz2mf/"
 date: "2025-11-08"
 tags: ["PC設定"]
-draft: true
 ---
 
 [WezTerm](https://wezterm.org) は、クロスプラットフォームのターミナルエミュレーターです。
 Windows でも macOS でも Linux でも使えるので、使いこなせるようになるととても便利です。
-NeoVim と同様に設定を Lua 言語で行うことができ、高度なカスタマイズが可能です。
-不慣れなうちは Lua でどのように設定すればよいか分からないことも多いので、ここにいろんな設定方法をメモしておきます。
+Neovim と同様に設定を Lua 言語で行うことができ、高度なカスタマイズが可能です。
+慣れないうちは Lua でどのように設定すればよいか分からないことも多いので、ここにいろんな設定方法をメモしておきます。
 
 - （参考）まく設定: https://github.com/maku77/dotfiles/tree/master/wezterm
 
@@ -24,14 +23,54 @@ NeoVim と同様に設定を Lua 言語で行うことができ、高度なカ�
   - `Ctrl + Tab` / `Ctrl + Shift + Tab` ... 左右のタブへ移動
   - `Ctrl + Shift + 1-9` / `Cmd + 1-9` ... その番号のタブへ移動
   - `Ctrl + Shift + PageUp/Down` ... カレントタブの位置を左右に移動
-- ペーン
+- ペーン分割
   - `Ctrl + Shift + Alt + %` ... ペーンを左右に分割
   - `Ctrl + Shift + Alt + "` ... ペーンを上下に分割
   - `Ctrl + Shift + ↑↓←→` ... ペーンを移動
   - `Ctrl + Shift + Alt + ↑↓←→` ... ペーンのサイズを変更
 
 
-設定
+設定（見た目）
+----
+
+### インアクティブなペーンの彩度や輝度を調整する
+
+```lua
+config.inactive_pane_hsb = {
+  saturation = 0.9,  -- 彩度（デフォルトは 0.9）
+  brightness = 0.4,  -- 輝度（デフォルトは 0.8）
+}
+```
+
+ペーン分割したときに、アクティブなペーンを判別しにくいときは、インアクティブなペーンの彩度 (saturation) や輝度 (brightness) を下げるとよいです。
+彩度を下げると、グレスケールに近づきます。
+彩度よりも輝度を下げて調整するのがおすすめです。
+一応 hue も設定できますが、色が変わるので気持ち悪いです。
+
+### 背景の透過
+
+```lua
+config.window_background_opacity = 0.9  -- ウィンドウを透過させる (1.0で不透過）
+config.macos_window_background_blur = 10  -- ウィンドウの背景をぼかす（macOSのみ）
+```
+
+背景は少しだけ透過させるとかっこいいです。
+
+次の設定を入れると、Neovim などのエディタの背景色も完全に透過されますが、余計なところ（カーソル行ハイライトなど）も見えなくなってしまうのでこの設定は入れない方がよいです。
+
+```lua
+-- これは副作用が大きいので入れない
+-- config.text_background_opacity = 0
+```
+
+Neovim の背景を透過させたいときは、Neovim の設定の方で highlight グループを指定するのがよいです。
+
+{{< code lang="lua" title="Neovim の透過設定例 (init.lua)" >}}
+vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+{{< /code >}}
+
+
+設定（応用）
 ----
 
 ### Windows かどうかの判断
