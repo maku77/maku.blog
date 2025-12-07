@@ -16,13 +16,15 @@ Neovim と同様に設定を Lua 言語で行うことができ、高度なカ�
 操作
 ----
 
+WezTerm のウィンドウ操作系のショートカットは、`Ctrl + Shift` の組み合わせが多いです。
+
 - `Ctrl + Shift + P` ... コマンドパレットを開く（迷ったらコレ）
 - タブ
   - `Ctrl + Shift + T` / `Cmd + T` ... タブを開く
   - `Ctrl + Shift + W` / `Cmd + W` ... タブを閉じる
-  - `Ctrl + Tab` / `Ctrl + Shift + Tab` ... 左右のタブへ移動
+  - `Ctrl (+ Shift) + Tab` / `Ctrl + Shift + PageUp/Down` ... 左右のタブへ移動
   - `Ctrl + Shift + 1-9` / `Cmd + 1-9` ... その番号のタブへ移動
-  - `Ctrl + Shift + PageUp/Down` ... カレントタブの位置を左右に移動
+  - `Ctrl + Shift + PageUp/Down` ... カレントタブの位置を左右に移動（Chrome も同じ）
 - ペーン分割
   - `Ctrl + Shift + Alt + %` ... ペーンを左右に分割
   - `Ctrl + Shift + Alt + "` ... ペーンを上下に分割

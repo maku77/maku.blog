@@ -166,8 +166,8 @@ $ starship preset gruvbox-rainbow -o ~/.config/starship.toml
 {{< image border="true" w="600" src="img-002.png" title="Gruvbox Rainbow プリセットによるプロンプト表示" >}}
 
 {{% note title="macOS の Terminal で色がおかしくなる場合" %}}
-macOS (Sequoia 15) に標準搭載されている Terminal アプリは True Color 非対応なので、starship の設定で `#a6da95` のような色指定をしてしまうと正しい色で表示されません（全て一色表示などになってしまう）。
-代わりに、パレットのインデックス指定で色を指定するか、True Color 対応のターミナルアプリを使用する必要があります（例: [iTerm2](https://iterm2.com) / [Alacritty](https://alacritty.org/)）。
+macOS (Sequoia 15) に標準搭載されている Terminal アプリは True Color 非対応なので、starship の設定で `#a6da95` のような色指定をしてしまうと正しい色で表示されません（全て一色表示などになってしまいます）。
+代わりに、パレットのインデックス指定で色を指定するか、True Color 対応のターミナルアプリを使用する必要があります（例: [WezTerm](https://wezterm.org) / [iTerm2](https://iterm2.com) / [Alacritty](https://alacritty.org)）。
 Visual Studio Code 内のターミナルなどは正しく True Color 表示されます。
 {{% /note %}}
 
