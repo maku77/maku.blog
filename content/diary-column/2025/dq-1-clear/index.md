@@ -1,5 +1,5 @@
 ---
-title: "ドラクエ I（Switch版）攻略完"
+title: "ドラクエ I リメイク（Switch版）攻略完"
 url: "p/u7wnoq5/"
 date: "2025-11-10"
 tags: ["日記"]
