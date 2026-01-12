@@ -136,6 +136,33 @@ end)
 別のタブで何らかのバックグラウンド処理を実行していて、その処理結果が出力されたときにタブに電球アイコン 💡 を表示するようにしています。
 WezTerm のタブの表示内容をカスタマイズするには、[`format-tab-title` イベント](https://wezterm.org/config/lua/window-events/format-tab-title.html) をハンドルします。
 
+### タブにカレントディレクトリ名を表示する
+
+```lua
+-- タブのタイトル表示用のキャッシュ（「pane_id → ディレクトリ名」のマップ）
+g_tab_titles = {}
+
+-- タブバーの右端にファイルパスを表示
+wezterm.on("update-status", function(window, pane)
+  local cwd_uri = pane:get_current_working_dir()
+  if cwd_uri then
+    local full_path = cwd_uri.file_path
+    local dir_name = full_path:match("([^/]+)$") or full_path
+    g_tab_titles[pane:pane_id()] = dir_name
+  end
+end)
+
+wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
+  local prefix = "【" .. tab.tab_index + 1 .. "】"
+  local title = g_tab_titles[tab.active_pane.pane_id] or tab.active_pane.title
+  return prefix .. title
+end)
+```
+
+これは簡単に実現できそうで意外と難しいです。
+というのも、タブ名を設定するための `format-tab-title` イベントハンドラーは同期関数のみの呼び出しで素早く完了する必要があり、`pane:get_current_working_dir()` を呼び出すことができないからです。
+そのため、`update-status` イベントハンドラーで定期的にカレントディレクトリ名を取得してキャッシュしておき、`format-tab-title` イベントハンドラーではそのキャッシュを参照するようにしています。
+
 ### タブバーの右端に現在時刻を表示する
 
 ```lua
