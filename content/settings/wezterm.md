@@ -2,7 +2,10 @@
 title: "WezTerm を使いこなすためのメモ"
 url: "p/adcz2mf/"
 date: "2025-11-08"
+lastmodSage: "2026-01-12"
 tags: ["PC設定"]
+changes:
+  - "2026-01-12: タブにカレントディレクトリ名を表示する方法を追加"
 ---
 
 [WezTerm](https://wezterm.org) は、クロスプラットフォームのターミナルエミュレーターです。
