@@ -1,9 +1,81 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS IAM のメモ on まくろぐ</title><link>https://maku.blog/p/wn52kog/</link><description>Recent content in AWS IAM のメモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sun, 07 Feb 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/wn52kog/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS の初期設定: 管理者用の IAM ユーザーを作成する</title><link>https://maku.blog/p/xbipv39/</link><pubDate>Sun, 07 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xbipv39/</guid><description>何をするか？ AWS のベストプラクティスでは、管理者であっても普段の作業では AWS アカウントのルートユーザーを直接使うべきではないとされています。
-参考: AWS アカウント、IAM ユーザー、グループ、ポリシーの違い そこで、まずは管理者の普段の作業用に IAM ユーザーを作成します。 この作成作業は、AWS アカウントのルートユーザーで行う必要があります（初期状態ではユーザー作成の権限がルートユーザーにしかないため）。
-ここでは、下記のような名前の IAM ユーザーとグループを作成することにします。
-IAM ユーザー: admin IAM グループ: Admins &amp;hellip; （AdministratorAccess ポリシーを割り当てます） 管理者用 IAM ユーザーの作成 AWS IAM コンソール にサインインし、次のような感じで IAM ユーザーを作成します。
-アクセス管理 → ユーザー → ユーザーを追加 を選択し、次のように入力 ユーザー名: admin アクセスの種類: CLI などで操作するなら プログラムによるアクセス にチェック ユーザーをグループに追加 → グループの作成 を選択し、次のように入力 グループ名: Admins ポリシー: AdministratorAccess を選択 アクセスキーや、シークレットアクセスキーを作成したのであれば、このタイミングで表示されるので、なくさないよう厳重に保存します（後から確認することはできません）。
-これで、管理者用の普段の作業も、ルートユーザーではなく、admin という IAM ユーザーで行えるようになります。
-（応用）開発者用の IAM ユーザーの作成 上記では管理者用の IAM ユーザーを作成しましたが、それ以外の IAM ユーザー（開発者用など）も同様に作成することができます。 AWS は開発者用の IAM ポリシーをいくつか定義しています。 AdministratorAccess ポリシーとの大きな違いは、IAM 関連の操作（つまりユーザー管理）をするための権限を持っていないことです。</description></item><item><title>AWS IAM の設定をコマンドライン (CLI) で行う</title><link>https://maku.blog/p/aov4bho/</link><pubDate>Sun, 07 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/aov4bho/</guid><description>AWS CLI（aws コマンド）を使うと、様々な IAM 系の操作をコマンドラインから実行できるようになります。 ただし、IAM の制御を行えるのは、AdministratorAccess ポリシーなどが割り当てられ、IAM 操作の権限が付いているユーザーに限られます。
-iam -- AWS CLI Command Reference ユーザー関連 IAM ユーザーを作成する (iam create-user) aws iam create-user --user-name &amp;lt;ユーザー名&amp;gt; 実行例 $ aws iam create-user --user-name user-1 --output yaml User: Arn: arn:aws:iam::049957049344:user/user-1 CreateDate: &amp;#39;2021-11-01T08:41:29+00:00&amp;#39; Path: / UserId: AIDAQXINMCQAPJRMFE22H UserName: user-1 iam create-user コマンドを使うと、指定した名前の IAM ユーザーを作成できます。 作成したユーザーの情報は、iam get-user や iam list-users コマンドで取得できます。 作成したユーザー用の API アクセスキーを生成するには、ひきつづき iam create-access-key コマンドを使用します。
-IAM ユーザーを削除する (iam delete-user) aws iam delete-user --user-name &amp;lt;ユーザー名&amp;gt; 指定したユーザーに何らかの設定情報（アクセスキーや SSH キー、MFA など）が設定されている場合は、先にそれらの情報を削除しておく必要があります。 例えば、アクセスキーが設定されている場合は、delete-access-key コマンドで削除してからユーザー自体を削除します。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS IAM のメモ on まくろぐ</title><link>https://maku.blog/p/wn52kog/</link><description>Recent content in AWS IAM のメモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Fri, 01 Oct 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/wn52kog/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS の初期設定: 管理者用の IAM ユーザーを作成する</title><link>https://maku.blog/p/xbipv39/</link><pubDate>Sun, 07 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xbipv39/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>AWS のベストプラクティスでは、管理者であっても普段の作業では AWS アカウントのルートユーザーを直接使うべきではないとされています。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/4c7sdwg">AWS アカウント、IAM ユーザー、グループ、ポリシーの違い&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>そこで、まずは管理者の普段の作業用に IAM ユーザーを作成します。
+この作成作業は、AWS アカウントのルートユーザーで行う必要があります（初期状態ではユーザー作成の権限がルートユーザーにしかないため）。&lt;/p>
+&lt;p>ここでは、下記のような名前の IAM ユーザーとグループを作成することにします。&lt;/p>
+&lt;ul>
+&lt;li>IAM ユーザー: &lt;code>admin&lt;/code>&lt;/li>
+&lt;li>IAM グループ: &lt;code>Admins&lt;/code> &amp;hellip; （&lt;code>AdministratorAccess&lt;/code> ポリシーを割り当てます）&lt;/li>
+&lt;/ul>
+&lt;h2 id="管理者用-iam-ユーザーの作成">管理者用 IAM ユーザーの作成&lt;/h2>
+&lt;p>&lt;a href="https://console.aws.amazon.com/iam/">AWS IAM コンソール&lt;/a> にサインインし、次のような感じで IAM ユーザーを作成します。&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>アクセス管理&lt;/code> → &lt;code>ユーザー&lt;/code> → &lt;strong>&lt;code>ユーザーを追加&lt;/code>&lt;/strong> を選択し、次のように入力
+&lt;ul>
+&lt;li>ユーザー名: &lt;strong>&lt;code>admin&lt;/code>&lt;/strong>&lt;/li>
+&lt;li>アクセスの種類: CLI などで操作するなら &lt;strong>&lt;code>プログラムによるアクセス&lt;/code>&lt;/strong> にチェック&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>ユーザーをグループに追加&lt;/code> → &lt;strong>&lt;code>グループの作成&lt;/code>&lt;/strong> を選択し、次のように入力
+&lt;ul>
+&lt;li>グループ名: &lt;strong>&lt;code>Admins&lt;/code>&lt;/strong>&lt;/li>
+&lt;li>ポリシー: &lt;strong>&lt;code>AdministratorAccess&lt;/code>&lt;/strong> を選択&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;p>アクセスキーや、シークレットアクセスキーを作成したのであれば、このタイミングで表示されるので、なくさないよう厳重に保存します（後から確認することはできません）。&lt;/p>
+&lt;p>これで、管理者用の普段の作業も、ルートユーザーではなく、&lt;code>admin&lt;/code> という IAM ユーザーで行えるようになります。&lt;/p>
+&lt;h2 id="応用開発者用の-iam-ユーザーの作成">（応用）開発者用の IAM ユーザーの作成&lt;/h2>
+&lt;p>上記では管理者用の IAM ユーザーを作成しましたが、それ以外の IAM ユーザー（開発者用など）も同様に作成することができます。
+AWS は開発者用の IAM ポリシーをいくつか定義しています。
+&lt;code>AdministratorAccess&lt;/code> ポリシーとの大きな違いは、IAM 関連の操作（つまりユーザー管理）をするための権限を持っていないことです。&lt;/p></description></item><item><title>AWS IAM の設定をコマンドライン (CLI) で行う</title><link>https://maku.blog/p/aov4bho/</link><pubDate>Sun, 07 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/aov4bho/</guid><description>&lt;p>AWS CLI（&lt;code>aws&lt;/code> コマンド）を使うと、様々な IAM 系の操作をコマンドラインから実行できるようになります。
+ただし、IAM の制御を行えるのは、&lt;code>AdministratorAccess&lt;/code> ポリシーなどが割り当てられ、IAM 操作の権限が付いているユーザーに限られます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/iam/index.html">iam -- AWS CLI Command Reference&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="user">ユーザー関連&lt;/h2>
+&lt;h3 id="iam-ユーザーを作成する-iam-create-user">IAM ユーザーを作成する (iam create-user)&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">aws iam create-user --user-name &amp;lt;ユーザー名&amp;gt;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-685942317" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-685942317">実行例&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="l">$ aws iam create-user --user-name user-1 --output yaml&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">User&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Arn&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">arn:aws:iam::049957049344:user/user-1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">CreateDate&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2021-11-01T08:41:29+00:00&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Path&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">UserId&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AIDAQXINMCQAPJRMFE22H&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">UserName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">user-1&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+&lt;p>&lt;a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/iam/create-user.html">iam create-user&lt;/a> コマンドを使うと、指定した名前の IAM ユーザーを作成できます。
+作成したユーザーの情報は、&lt;a href="#get-user">iam get-user&lt;/a> や &lt;a href="#list-users">iam list-users&lt;/a> コマンドで取得できます。
+作成したユーザー用の API アクセスキーを生成するには、ひきつづき &lt;a href="#create-access-key">iam create-access-key&lt;/a> コマンドを使用します。&lt;/p>
+&lt;h3 id="iam-ユーザーを削除する-iam-delete-user">IAM ユーザーを削除する (iam delete-user)&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">aws iam delete-user --user-name &amp;lt;ユーザー名&amp;gt;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>指定したユーザーに何らかの設定情報（アクセスキーや SSH キー、MFA など）が設定されている場合は、先にそれらの情報を削除しておく必要があります。
+例えば、アクセスキーが設定されている場合は、&lt;a href="#delete-access-key">delete-access-key&lt;/a> コマンドで削除してからユーザー自体を削除します。&lt;/p></description></item></channel></rss>

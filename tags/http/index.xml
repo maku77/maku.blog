@@ -1,12 +1,85 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>HTTP on まくろぐ</title><link>https://maku.blog/tags/http/</link><description>Recent content in HTTP on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Fri, 08 Mar 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/http/index.xml" rel="self" type="application/rss+xml"/><item><title>HTTP/1.1 の Chunked Transfer Encoding を理解する</title><link>https://maku.blog/p/ugkqy8z/</link><pubDate>Fri, 08 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ugkqy8z/</guid><description>Chunked Transfer Encoding (Coding) とは HTTP/1.1 では Transfer-Encoding: chunked というレスポンスヘッダーを返すことにより、本文（ペイロード）部分を少しずつ返すことができるようになっています。 この仕組みを使うと、クライアントが最初のデータを受信するまでの時間 (TTFB: Time To First Byte) を短くすることができます。
-例えば、次の HTTP レスポンスの例では、Hello と World というテキストを分けて送っています（これらをチャンクと呼んでいます）。 各行末は \r\n で終わっていると考えてください。
-Transfer-Encoding: chunked のレスポンス例 HTTP/1.1 200 OK Content-Type: text/plain Transfer-Encoding: chunked 5 Hello 5 World 0 各チャンクは、サイズ（16進数文字列）とデータが &amp;lt;サイズ&amp;gt;\r\n&amp;lt;データ&amp;gt;\r\n というペアの形で送られます。 そして、最後はサイズ 0 のチャンク (0\r\n\r\n) を送ることで、すべてのデータの送信が完了したことを示します。
-HTTP/1.1 のレスポンスには、この Transfer-Encoding: chunked ヘッダーか、Content-Length ヘッダーのいずれか一方を含む必要があります。 本文全体を一度に送る場合は、Content-Length ヘッダーで本文全体のサイズ（オクテット数）を示します。
-☝️ なぜサイズ情報が必要なのか？ Transfer-Encoding: chunked と Content-Length のどちらを使う場合も、本文のデータサイズを送ることが前提となっています。 これは、クライアント側で一連のデータの受信を完了したことを判断できるようにするためです。
-HTTP 接続では半二重通信が行われるため、1 つのリクエストのやりとりがすべて完了するまで、次のリクエストを送ることができません。 クライアントでデータの受信完了タイミングを判断できれば、次のリクエスト用にその接続を使いまわすことができます (Connection: keep-alive)。</description></item><item><title>HTTP/1.1 の認証スキームに関するメモ</title><link>https://maku.blog/p/ufpqqno/</link><pubDate>Sun, 01 May 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ufpqqno/</guid><description>認証スキーム とは、HTTP のリクエストヘッダに指定する Authentication ヘッダーの先頭部分に指定する文字列のこと。
-Basic &amp;hellip; RFC2617 Web ブラウザが標準でサポートしている。 Bearer &amp;hellip; RFC6750 OAuth 2.0 で使われている認証スキームのひとつ。 署名を行う必要はなく、受け取った値をそのまま使える。 Digest &amp;hellip; RFC2617 Web ブラウザが標準でサポートしている。 Negotiate &amp;hellip; RFC4559 OAuth &amp;hellip; RFC5849 OAuth 1.0 で使われていた認証スキーム。 署名のルールが複雑すぎて廃れた。 参考リンク
-RFC7235 - Hypertext Transfer Protocol (HTTP/1.1): Authentication RFC7236 - Initial Hypertext Transfer Protocol (HTTP): Authentication Scheme Registrations</description></item><item><title>HTTP ヘッダに関するメモ</title><link>https://maku.blog/p/3kkchub/</link><pubDate>Sat, 15 Dec 2012 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3kkchub/</guid><description>HTTP1.1 Host 指定 HTTP1.1 では、メッセージヘッダーに Host: &amp;lt;ドメイン&amp;gt; の指定が必須です（これが唯一の必須ヘッダーです）。 これは、1 台の Web サーバーで複数のドメインを運用する、バーチャルホストの機能を実現するために必要とされています。 Web サーバーは、Host ヘッダーで示されたドメイン名と、相対 URI (/index.html など）を組み合わせて、実際のどのリソースを返すかを判断します。 HTTP1.0 を使う場合は、Host: の指定は必要ありません。
-HTTP キープアライブ HTTP1.1 では、最初にスリーウェイハンドシェイクしたら、そのコネクションを一定時間使い続けることで、複数のリソースファイルの取得を効率化しています。 これを HTTP キープアライブ (KeepAlive) といい、HTTP1.1 では標準の振る舞いになっています（HTTP ヘッダーに Connection: keep-alive が付いていると考えるが規定の動作)。 例えば、ブラウザで Web ページを開くと、HTML ファイルだけではなく、CSS ファイルや画像ファイルなどのリソースを取得するために複数のリクエストが発行されますが、そこでは同じコネクションが使用されます。
-コネクションの切断は、サーバーが設定しているタイムアウト時間を過ぎたときに行われますが、クライアントあるいはサーバーが Connection: close ヘッダーを含めることで、切断する意志を伝えることができます。
-プロキシ経由時の「リクエスト行」の URI について プロキシサーバを介する場合は、リクエスト行に 絶対アドレス指定 で URI を指定する必要があります。 これは、リクエストを受け取ったプロキシサーバが、リクエストの転送先サーバを判断するためです。 逆に、プロキシを使わない場合は、リクエスト URI は相対パスで指定します。
-Client ｜ ｜ GET http://target.example.com/index.html HTTP/1.1 ▽ Proxy server ｜ ｜ GET /index.html HTTP/1.1 ▽ target.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>HTTP on まくろぐ</title><link>https://maku.blog/tags/http/</link><description>Recent content in HTTP on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Fri, 08 Mar 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/http/index.xml" rel="self" type="application/rss+xml"/><item><title>HTTP/1.1 の Chunked Transfer Encoding を理解する</title><link>https://maku.blog/p/ugkqy8z/</link><pubDate>Fri, 08 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ugkqy8z/</guid><description>&lt;h2 id="chunked-transfer-encoding-coding-とは">Chunked Transfer Encoding (Coding) とは&lt;/h2>
+&lt;p>HTTP/1.1 では &lt;a href="https://datatracker.ietf.org/doc/html/rfc9112#section-7.1">&lt;code>Transfer-Encoding: chunked&lt;/code>&lt;/a> というレスポンスヘッダーを返すことにより、本文（ペイロード）部分を少しずつ返すことができるようになっています。
+この仕組みを使うと、クライアントが最初のデータを受信するまでの時間 (TTFB: Time To First Byte) を短くすることができます。&lt;/p>
+&lt;p>例えば、次の HTTP レスポンスの例では、&lt;code>Hello&lt;/code> と &lt;code>World&lt;/code> というテキストを分けて送っています（これらをチャンクと呼んでいます）。
+各行末は &lt;code>\r\n&lt;/code> で終わっていると考えてください。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Transfer-Encoding: chunked のレスポンス例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">HTTP/1.1 200 OK
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Content-Type: text/plain
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Transfer-Encoding: chunked
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Hello
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">World
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">　&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>各チャンクは、サイズ（16進数文字列）とデータが &lt;strong>&lt;code>&amp;lt;サイズ&amp;gt;\r\n&amp;lt;データ&amp;gt;\r\n&lt;/code>&lt;/strong> というペアの形で送られます。
+そして、最後はサイズ 0 のチャンク (&lt;code>0\r\n\r\n&lt;/code>) を送ることで、すべてのデータの送信が完了したことを示します。&lt;/p>
+&lt;p>HTTP/1.1 のレスポンスには、この &lt;code>Transfer-Encoding: chunked&lt;/code> ヘッダーか、&lt;a href="https://datatracker.ietf.org/doc/html/rfc9112#name-content-length">&lt;code>Content-Length&lt;/code>&lt;/a> ヘッダーのいずれか一方を含む必要があります。
+本文全体を一度に送る場合は、&lt;code>Content-Length&lt;/code> ヘッダーで本文全体のサイズ（オクテット数）を示します。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ なぜサイズ情報が必要なのか？&lt;/span>
+ &lt;span class="xNote_body">&lt;p>&lt;code>Transfer-Encoding: chunked&lt;/code> と &lt;code>Content-Length&lt;/code> のどちらを使う場合も、本文のデータサイズを送ることが前提となっています。
+これは、クライアント側で一連のデータの受信を完了したことを判断できるようにするためです。&lt;/p>
+&lt;p>HTTP 接続では半二重通信が行われるため、1 つのリクエストのやりとりがすべて完了するまで、次のリクエストを送ることができません。
+クライアントでデータの受信完了タイミングを判断できれば、次のリクエスト用にその接続を使いまわすことができます (&lt;code>Connection: keep-alive&lt;/code>)。&lt;/p></description></item><item><title>HTTP/1.1 の認証スキームに関するメモ</title><link>https://maku.blog/p/ufpqqno/</link><pubDate>Sun, 01 May 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ufpqqno/</guid><description>&lt;p>&lt;strong>認証スキーム&lt;/strong> とは、HTTP のリクエストヘッダに指定する Authentication ヘッダーの先頭部分に指定する文字列のこと。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>Basic&lt;/code> &amp;hellip; &lt;a href="https://datatracker.ietf.org/doc/html/rfc2617">RFC2617&lt;/a>
+&lt;ul>
+&lt;li>Web ブラウザが標準でサポートしている。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Bearer&lt;/code> &amp;hellip; &lt;a href="https://datatracker.ietf.org/doc/html/rfc6750">RFC6750&lt;/a>
+&lt;ul>
+&lt;li>OAuth 2.0 で使われている認証スキームのひとつ。&lt;/li>
+&lt;li>署名を行う必要はなく、受け取った値をそのまま使える。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Digest&lt;/code> &amp;hellip; &lt;a href="https://datatracker.ietf.org/doc/html/rfc2617">RFC2617&lt;/a>
+&lt;ul>
+&lt;li>Web ブラウザが標準でサポートしている。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Negotiate&lt;/code> &amp;hellip; &lt;a href="https://datatracker.ietf.org/doc/html/rfc4559">RFC4559&lt;/a>&lt;/li>
+&lt;li>&lt;code>OAuth&lt;/code> &amp;hellip; &lt;a href="https://datatracker.ietf.org/doc/html/rfc5849">RFC5849&lt;/a>
+&lt;ul>
+&lt;li>OAuth 1.0 で使われていた認証スキーム。&lt;/li>
+&lt;li>署名のルールが複雑すぎて廃れた。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>参考リンク&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://datatracker.ietf.org/doc/html/rfc7235">RFC7235 - Hypertext Transfer Protocol (HTTP/1.1): Authentication&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://datatracker.ietf.org/doc/html/rfc7236">RFC7236 - Initial Hypertext Transfer Protocol (HTTP): Authentication Scheme Registrations&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>HTTP ヘッダに関するメモ</title><link>https://maku.blog/p/3kkchub/</link><pubDate>Sat, 15 Dec 2012 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3kkchub/</guid><description>&lt;h2 id="http11">HTTP1.1&lt;/h2>
+&lt;h3 id="host-指定">Host 指定&lt;/h3>
+&lt;p>HTTP1.1 では、メッセージヘッダーに &lt;strong>&lt;code>Host: &amp;lt;ドメイン&amp;gt;&lt;/code>&lt;/strong> の指定が必須です（これが唯一の必須ヘッダーです）。
+これは、1 台の Web サーバーで複数のドメインを運用する、バーチャルホストの機能を実現するために必要とされています。
+Web サーバーは、&lt;code>Host&lt;/code> ヘッダーで示されたドメイン名と、相対 URI (&lt;code>/index.html&lt;/code> など）を組み合わせて、実際のどのリソースを返すかを判断します。
+HTTP1.0 を使う場合は、&lt;code>Host:&lt;/code> の指定は必要ありません。&lt;/p>
+&lt;h3 id="http-キープアライブ">HTTP キープアライブ&lt;/h3>
+&lt;p>HTTP1.1 では、最初にスリーウェイハンドシェイクしたら、そのコネクションを一定時間使い続けることで、複数のリソースファイルの取得を効率化しています。
+これを HTTP キープアライブ (KeepAlive) といい、HTTP1.1 では標準の振る舞いになっています（HTTP ヘッダーに &lt;strong>&lt;code>Connection: keep-alive&lt;/code>&lt;/strong> が付いていると考えるが規定の動作)。
+例えば、ブラウザで Web ページを開くと、HTML ファイルだけではなく、CSS ファイルや画像ファイルなどのリソースを取得するために複数のリクエストが発行されますが、そこでは同じコネクションが使用されます。&lt;/p>
+&lt;p>コネクションの切断は、サーバーが設定しているタイムアウト時間を過ぎたときに行われますが、クライアントあるいはサーバーが &lt;strong>&lt;code>Connection: close&lt;/code>&lt;/strong> ヘッダーを含めることで、切断する意志を伝えることができます。&lt;/p>
+&lt;h2 id="プロキシ経由時のリクエスト行の-uri-について">プロキシ経由時の「リクエスト行」の URI について&lt;/h2>
+&lt;p>プロキシサーバを介する場合は、リクエスト行に &lt;strong>絶対アドレス指定&lt;/strong> で URI を指定する必要があります。
+これは、リクエストを受け取ったプロキシサーバが、リクエストの転送先サーバを判断するためです。
+逆に、プロキシを使わない場合は、リクエスト URI は相対パスで指定します。&lt;/p>
+&lt;pre tabindex="0">&lt;code>Client
+ ｜
+ ｜ GET http://target.example.com/index.html HTTP/1.1
+ ▽
+Proxy server
+ ｜
+ ｜ GET /index.html HTTP/1.1
+ ▽
+target.example.com
+&lt;/code>&lt;/pre>&lt;h2 id="http-のメッセージヘッダの種類">HTTP のメッセージヘッダの種類&lt;/h2>
+&lt;p>HTTP のメッセージヘッダには、大きく分けて、&lt;/p></description></item></channel></rss>

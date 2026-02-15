@@ -1,29 +1,269 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Azure Pipelines on まくろぐ</title><link>https://maku.blog/tags/azure-pipelines/</link><description>Recent content in Azure Pipelines on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 28 Jul 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/azure-pipelines/index.xml" rel="self" type="application/rss+xml"/><item><title>Azure Pipelines の使い方 (Hello World)</title><link>https://maku.blog/p/vxoctbs/</link><pubDate>Wed, 25 Mar 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vxoctbs/</guid><description>ここでは、Azure Pipelines の Hello World として、任意の GitHub リポジトリへ git push したときのビルド処理を自動化してみます。 ビルド処理は、Hello World らしく、echo Hello, world! を実行するだけにしておきます。
-DevOps organization を作成する Azure Pipelines は、Azure DevOps の中の 1 サービスであり、まず最初に Azure DevOps の organization（組織）を作成する必要があります。 Azure アカウント上でまだ DevOps organization を作成していない場合は、下記 URL にアクセスすることで作成することができます。
-https://dev.azure.com/ DevOps organization の構成は次のようになっており、organization 以下に複数のプロジェクトを作成することができます。 各プロジェクトには、複数の Repos（Gitリポジトリ）や Pipelines (CI/CDの仕組み) を設定することができます。
-+ Azure DevOps organization + Project - Repos (Gitリポジトリ） - Pipelines (CI/CDの仕組み) - Boards（かんばん、バックログ管理など） - ... + Project - Repos - Pipelines - Boards - .</description></item><item><title>Azure Pipelines で Hugo サイトのビルド＆デプロイ</title><link>https://maku.blog/p/kevcr7m/</link><pubDate>Mon, 30 Mar 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/kevcr7m/</guid><description>前提知識 Azure Pipelines の基本的な使い方は下記ページを参考にしてください。
-Azure Pipelines の使い方 (Hello World) hugo deploy コマンドによる Hugo サイトのデプロイについては下記ページを参考にしてください。
-hugo deploy コマンドで Azure などのクラウドサービス上にデプロイする | まくまくHugo/Goノート 事前準備 ここでは、Azure Pipelines の設定の説明をしますので、下記の作成・準備は終わっているものとします。
-Hugo コンテンツ用の Git リポジトリ Azure Repos や GitHub の Git リポジトリに、Hugo サイトのコンテンツをコミットしてください。 hugo deploy コマンドのための設定 Hugo の設定ファイル config.toml に、deployment.targets などの設定をしてください。 Azure Pipelines の作成 Azure DevOps のプロジェクト内に、上記の Git リポジトリと連携する Pipelines を作成してください。 Hugo 自動ビルド＆デプロイのための Azure Pipelines 設定 azure-pipelines.yml trigger: - master variables: hugo_version: &amp;#39;0.68.3&amp;#39; pool: vmImage: &amp;#39;ubuntu-latest&amp;#39; steps: - script: wget -O hugo.</description></item><item><title>Azure Pipelines の Pull Request 時の起動トリガ設定</title><link>https://maku.blog/p/i6549xd/</link><pubDate>Wed, 13 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/i6549xd/</guid><description>ビルドしない azure-pipelines.yml trigger: none # will disable CI builds entirely Azure Pipelines によるビルドを起動しないようにします。
-trigger プロパティを省略すると、デフォルトですべてのブランチへのプッシュ時にビルドが走るので、ビルドしないようにするには、上記のように明示的に none 指定が必要です。 この設定を行うと、pr プロパティの設定（後述）も無効になります（Pull Request 時もビルドは実行されない）。
-master ブランチへのプッシュ or マージでビルド？ azure-pipelines.yml trigger: - master 次のように複数のブランチをビルド対象とすることもできます。
-trigger: - master - release このように記述すると、指定したブランチへのプッシュ or マージ時にのみ Pipelines が起動しそうに見えますが、この指定だけだと、 あらゆる Pull Request の作成時に Pipelines が起動します。 master ブランチや release ブランチをターゲットとしない Pull Request でもビルドが走ります。 なぜなら、Pull Request トリガの設定がデフォルトで次のようになっているからです。
-pr: branches: include: - &amp;#39;*&amp;#39; このため、一連のステップにデプロイ処理まで組み込んでいると、レビュー用に Pull Request を上げただけでデプロイまで実行されてしまうという振る舞いになります。
-Pull Request 時にビルドしない azure-pipelines.yml trigger: - master pr: none # no PR triggers 上記のように設定しておくと、Pull Request を作成したときには Pipelines は起動しなくなります。 つまり、master ブランチへのプッシュ or マージ時のみビルドが実行されます。</description></item><item><title>Azure Pipelines のビルド結果を GitHub にバッジ表示する</title><link>https://maku.blog/p/teq2cmv/</link><pubDate>Fri, 10 Apr 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/teq2cmv/</guid><description>ステータスバッジとは ステータスバッジというのは、GitHub プロジェクトのトップページ (README.md) でよく見かける上のようなアイコンのことです。 ステータスバッジを貼り付けておくことで、最新のソースコードが正しくビルドできていることを一目で確認することができますし、ちゃんと開発しているんだということをアピールすることにもなります。
-Azure Pipelines のビルド結果を示すステータスバッジは、下記のように簡単に追加することができます。
-Azure Pipelines のステータスバッジを表示する ステータスバッジは、画像ファイルの URL の形で提供されているので、GitHub の README.md などにその URL を貼り付けるだけで OK です。
-ステータスバッジの画像 URL を確認するには、Azure Pipelines のページを開き、右上のメニューアイコン → Status badge と選択します。
-画像の URL と一緒に、Markdown ファイルに記述する場合のコード (Sample markdown) も表示してくれるので、GitHub のページに貼り付ける場合はそちらを使えばよいでしょう。 右側のコピーアイコンを押してクリップボードにコピーし、GitHub の README.md ファイルに次のような感じで貼り付ければ OK です。
-これで、GitHub プロジェクトのトップページアクセスしたときに、次のようにステータスバッジが表示されるはずです。
-ステータスバッジの画像が表示されないとき Azure DevOps にサインインしていない状態で、ステータスバッジが表示されない場合は、Pipelines の設定を確認してみてください。
-上記のように、Disable anonymous access to badge という項目を OFF にすれば表示されるようになると思います。</description></item><item><title>Azure Pipelinesメモ: azure-pipelines.yml から別の Yaml をインクルードする (template)</title><link>https://maku.blog/p/36h9xj9/</link><pubDate>Tue, 28 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/36h9xj9/</guid><description>Template 機能 Azure Pipelines の Template 機能を使用すると、別の Yaml ファイルに記述したビルド設定をインクルードすることができます。
-Templates - Azure Pipelines | Microsoft Docs 変数を渡して、部分的に内容を置き換えることができるので、「インクルード」ではなく「テンプレート」と呼んでいるみたいです。
-単純に共通の steps を読み込んで使うこともできるし、逆にテンプレートファイルに対してパラメータで stepList を渡すということもできます。
-使用例（steps の共通化） 例えば、別の Yaml ファイル（テンプレート）に記述した steps 定義を、azure-pipelines.yml から読み込むとします。 テンプレートファイルには次のような感じで、ルートに steps 要素を記述します。
-common-steps.yml（テンプレート） steps: - task: NodeTool@0 inputs: versionSpec: &amp;#39;10.x&amp;#39; displayName: &amp;#39;Install Node.js&amp;#39; - task: Npm@1 inputs: command: &amp;#39;ci&amp;#39; displayName: &amp;#39;npm ci&amp;#39; - task: Npm@1 inputs: command: &amp;#39;custom&amp;#39; customCommand: &amp;#39;run lint&amp;#39; displayName: &amp;#39;npm run lint&amp;#39; # ... azure-pipelines.yml の steps 以下で、上記のテンプレートファイルを読み込むには、template というキーワードを使用します。</description></item><item><title>Azure Pipelines トラブル: npm タスクを実行できないとき</title><link>https://maku.blog/p/7c2kdub/</link><pubDate>Wed, 22 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7c2kdub/</guid><description>Azure Pipelines の設定で、次のような感じで Npm タスクを追加したとき、
-azure-pipelines.yml steps: - task: Npm@1 inputs: command: &amp;#39;ci&amp;#39; displayName: &amp;#39;npm ci&amp;#39; - task: Npm@1 inputs: command: &amp;#39;custom&amp;#39; customCommand: &amp;#39;run lint&amp;#39; displayName: &amp;#39;npm run lint&amp;#39; Node.js 系のコマンドが認識されていないと、エラーが出て Npm タスクを実行できません。
-No agent found in pool Default which satisfies the specified demands: npm, Agent.Version -gtVersion 2.163.1 そのような場合は、steps の先頭で、次のように NodeTool (Node.js Tool Installer) タスクを実行しておくと、うまく動作するようになります 。
-azure-pipelines.yml steps: # これで npm コマンドを認識するようになる - task: NodeTool@0 inputs: versionSpec: &amp;#39;10.x&amp;#39; displayName: &amp;#39;Install Node.</description></item><item><title>Azure: Node.js アプリを App Service へデプロイする（Kudu ビルド編）</title><link>https://maku.blog/p/wx3fvib/</link><pubDate>Wed, 09 Oct 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wx3fvib/</guid><description>Azure App Service には、デプロイセンター という仕組みがあり、そこからソースコードのビルドからデプロイまでの自動化の設定を行うことができます。 簡単に言うと、Azure Repos や GitHub のリポジトリに最新の JavaScript コードをコミットするだけで、最新の Node.js アプリが自動で立ち上がるようになります。
-ビルドの仕組みとしては、クラウド上の Azure Pipelines を使ったり、ローカルでビルドしてしまってからデプロイする方法があります。 App Service には Kudu エンジン が組み込まれており、デプロイ時に自動で実行されるスクリプトを使って簡易的なビルド処理を行うこともできます。
-はじめに（用語定義） Azure ではデプロイ処理を構成するコンポーネントを下記のような名前で呼んでいます。
-デプロイソース GitHub や Azure Repos など。 ソースコードが置いてある場所（リポジトリ）のこと。 Azure App Service は手軽なデプロイソースとして OneDrive や Dropbox などのフォルダ共有サービスを設定することもできますが、本格的な運用で使用することは推奨されていません。 ビルドパイプライン（ビルドプロバイダー） Azure Pipelines など。デプロイソースからソースコードを取得し、一連のビルド処理を行う仕組み。 App Service には組み込みで Kudu エンジンが搭載されており、デフォルトではデプロイ時にこの Kudu エンジンによって npm install などが実行されるようになっています。 また、デプロイ時に実行する カスタムスクリプトを .deployment ファイルで定義する こともできます。 これらの仕組みだけで十分であれば、Azure Pipelines を使う必要はありません。 デプロイメカニズム ビルドしたアプリを Azure App Service などに配置するためのアクション。Kudu エンジンや FTP (SFTP)、WebDeploy などのデプロイメカニズムが提供されています。 リポジトリの準備 (Azure Repos) ここでは、Azure Repos に Git リポジトリを作成し、そこに Node.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Azure Pipelines on まくろぐ</title><link>https://maku.blog/tags/azure-pipelines/</link><description>Recent content in Azure Pipelines on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Tue, 28 Jul 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/azure-pipelines/index.xml" rel="self" type="application/rss+xml"/><item><title>Azure Pipelines の使い方 (Hello World)</title><link>https://maku.blog/p/vxoctbs/</link><pubDate>Wed, 25 Mar 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vxoctbs/</guid><description>&lt;p>ここでは、Azure Pipelines の Hello World として、任意の GitHub リポジトリへ git push したときのビルド処理を自動化してみます。
+ビルド処理は、Hello World らしく、&lt;code>echo Hello, world!&lt;/code> を実行するだけにしておきます。&lt;/p>
+&lt;h2 id="devops-organization-を作成する">DevOps organization を作成する&lt;/h2>
+&lt;p>Azure Pipelines は、Azure DevOps の中の 1 サービスであり、まず最初に Azure DevOps の organization（組織）を作成する必要があります。
+Azure アカウント上でまだ DevOps organization を作成していない場合は、下記 URL にアクセスすることで作成することができます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://dev.azure.com/">https://dev.azure.com/&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>DevOps organization の構成は次のようになっており、organization 以下に複数のプロジェクトを作成することができます。
+各プロジェクトには、複数の Repos（Gitリポジトリ）や Pipelines (CI/CDの仕組み) を設定することができます。&lt;/p>
+&lt;pre tabindex="0">&lt;code>+ Azure DevOps organization
+ + Project
+ - Repos (Gitリポジトリ）
+ - Pipelines (CI/CDの仕組み)
+ - Boards（かんばん、バックログ管理など）
+ - ...
+ + Project
+ - Repos
+ - Pipelines
+ - Boards
+ - ...
+&lt;/code>&lt;/pre>&lt;p>DevOps organization の作成が完了すると、その organization のポータルサイトには、次のような URL でアクセスできるようになります。&lt;/p></description></item><item><title>Azure Pipelines で Hugo サイトのビルド＆デプロイ</title><link>https://maku.blog/p/kevcr7m/</link><pubDate>Mon, 30 Mar 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/kevcr7m/</guid><description>&lt;h2 id="前提知識">前提知識&lt;/h2>
+&lt;p>Azure Pipelines の基本的な使い方は下記ページを参考にしてください。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/vxoctbs">Azure Pipelines の使い方 (Hello World)&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>hugo deploy コマンドによる Hugo サイトのデプロイについては下記ページを参考にしてください。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://maku77.github.io/hugo/advanced/deploy.html">hugo deploy コマンドで Azure などのクラウドサービス上にデプロイする | まくまくHugo/Goノート&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="事前準備">事前準備&lt;/h2>
+&lt;p>ここでは、Azure Pipelines の設定の説明をしますので、下記の作成・準備は終わっているものとします。&lt;/p>
+&lt;ul>
+&lt;li>Hugo コンテンツ用の Git リポジトリ
+&lt;ul>
+&lt;li>Azure Repos や GitHub の Git リポジトリに、Hugo サイトのコンテンツをコミットしてください。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>hugo deploy コマンドのための設定
+&lt;ul>
+&lt;li>Hugo の設定ファイル &lt;code>config.toml&lt;/code> に、&lt;code>deployment.targets&lt;/code> などの設定をしてください。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Azure Pipelines の作成
+&lt;ul>
+&lt;li>Azure DevOps のプロジェクト内に、上記の Git リポジトリと連携する Pipelines を作成してください。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="hugo-自動ビルドデプロイのための-azure-pipelines-設定">Hugo 自動ビルド＆デプロイのための Azure Pipelines 設定&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">azure-pipelines.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">trigger&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="l">master&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">variables&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">hugo_version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;0.68.3&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">pool&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">vmImage&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;ubuntu-latest&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">steps&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">script&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">wget -O hugo.deb https://github.com/gohugoio/hugo/releases/download/v$(hugo_version)/hugo_extended_$(hugo_version)_Linux-64bit.deb&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">displayName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;Download Hugo $(hugo_version)&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">script&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">sudo dpkg -i hugo.deb&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">displayName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;Install Hugo $(hugo_version)&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">script&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">hugo&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">displayName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;Build Hugo site&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">script&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">hugo deploy&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">displayName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;Deploy Hugo site&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">env&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">AZURE_STORAGE_ACCOUNT&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">$(AZURE_STORAGE_ACCOUNT)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">AZURE_STORAGE_KEY&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">$(AZURE_STORAGE_KEY)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この Pipelines 設定では、下記のことを順番にシェルスクリプトで実行しています。&lt;/p></description></item><item><title>Azure Pipelines の Pull Request 時の起動トリガ設定</title><link>https://maku.blog/p/i6549xd/</link><pubDate>Wed, 13 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/i6549xd/</guid><description>&lt;h2 id="ビルドしない">ビルドしない&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">azure-pipelines.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">trigger&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">none &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># will disable CI builds entirely&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Azure Pipelines によるビルドを起動しないようにします。&lt;/p>
+&lt;p>&lt;code>trigger&lt;/code> プロパティを省略すると、デフォルトですべてのブランチへのプッシュ時にビルドが走るので、ビルドしないようにするには、上記のように明示的に &lt;strong>&lt;code>none&lt;/code>&lt;/strong> 指定が必要です。
+この設定を行うと、&lt;code>pr&lt;/code> プロパティの設定（後述）も無効になります（Pull Request 時もビルドは実行されない）。&lt;/p>
+&lt;h2 id="master-ブランチへのプッシュ-or-マージでビルド">master ブランチへのプッシュ or マージでビルド？&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">azure-pipelines.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">trigger&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="l">master&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次のように複数のブランチをビルド対象とすることもできます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">trigger&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="l">master&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="l">release&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このように記述すると、指定したブランチへのプッシュ or マージ時にのみ Pipelines が起動しそうに見えますが、この指定だけだと、 &lt;strong>あらゆる Pull Request の作成時に Pipelines が起動します&lt;/strong>。
+&lt;code>master&lt;/code> ブランチや &lt;code>release&lt;/code> ブランチをターゲットとしない Pull Request でもビルドが走ります。
+なぜなら、Pull Request トリガの設定がデフォルトで次のようになっているからです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">pr&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">branches&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">include&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s1">&amp;#39;*&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このため、一連のステップにデプロイ処理まで組み込んでいると、レビュー用に Pull Request を上げただけでデプロイまで実行されてしまうという振る舞いになります。&lt;/p>
+&lt;h2 id="pull-request-時にビルドしない">Pull Request 時にビルドしない&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">azure-pipelines.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">trigger&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="l">master&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">pr&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">none &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># no PR triggers&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のように設定しておくと、Pull Request を作成したときには Pipelines は起動しなくなります。
+つまり、&lt;code>master&lt;/code> ブランチへのプッシュ or マージ時のみビルドが実行されます。&lt;/p></description></item><item><title>Azure Pipelines のビルド結果を GitHub にバッジ表示する</title><link>https://maku.blog/p/teq2cmv/</link><pubDate>Fri, 10 Apr 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/teq2cmv/</guid><description>&lt;h2 id="ステータスバッジとは">ステータスバッジとは&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1484" height="466" src="../../p/teq2cmv/img-001.png" alt="/p/teq2cmv/img-001.png" />
+&lt;/figure>
+
+&lt;p>ステータスバッジというのは、GitHub プロジェクトのトップページ (&lt;code>README.md&lt;/code>) でよく見かける上のようなアイコンのことです。
+ステータスバッジを貼り付けておくことで、最新のソースコードが正しくビルドできていることを一目で確認することができますし、ちゃんと開発しているんだということをアピールすることにもなります。&lt;/p>
+&lt;p>Azure Pipelines のビルド結果を示すステータスバッジは、下記のように簡単に追加することができます。&lt;/p>
+&lt;h2 id="azure-pipelines-のステータスバッジを表示する">Azure Pipelines のステータスバッジを表示する&lt;/h2>
+&lt;p>ステータスバッジは、画像ファイルの URL の形で提供されているので、GitHub の &lt;code>README.md&lt;/code> などにその URL を貼り付けるだけで OK です。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1440" height="870" src="../../p/teq2cmv/img-002.png" alt="/p/teq2cmv/img-002.png" />
+&lt;/figure>
+
+&lt;p>ステータスバッジの画像 URL を確認するには、Azure Pipelines のページを開き、右上のメニューアイコン → &lt;code>Status badge&lt;/code> と選択します。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1436" height="862" src="../../p/teq2cmv/img-003.png" alt="/p/teq2cmv/img-003.png" />
+&lt;/figure>
+
+&lt;p>画像の URL と一緒に、Markdown ファイルに記述する場合のコード (Sample markdown) も表示してくれるので、GitHub のページに貼り付ける場合はそちらを使えばよいでしょう。
+右側のコピーアイコンを押してクリップボードにコピーし、GitHub の &lt;code>README.md&lt;/code> ファイルに次のような感じで貼り付ければ OK です。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1604" height="548" src="../../p/teq2cmv/img-004.png" alt="/p/teq2cmv/img-004.png" />
+&lt;/figure>
+
+&lt;p>これで、GitHub プロジェクトのトップページアクセスしたときに、次のようにステータスバッジが表示されるはずです。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1484" height="466" src="../../p/teq2cmv/img-001.png" alt="/p/teq2cmv/img-001.png" />
+&lt;/figure>
+
+&lt;h2 id="ステータスバッジの画像が表示されないとき">ステータスバッジの画像が表示されないとき&lt;/h2>
+&lt;p>Azure DevOps にサインインしていない状態で、ステータスバッジが表示されない場合は、Pipelines の設定を確認してみてください。&lt;/p></description></item><item><title>Azure Pipelinesメモ: azure-pipelines.yml から別の Yaml をインクルードする (template)</title><link>https://maku.blog/p/36h9xj9/</link><pubDate>Tue, 28 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/36h9xj9/</guid><description>&lt;h2 id="template-機能">Template 機能&lt;/h2>
+&lt;p>Azure Pipelines の Template 機能を使用すると、別の Yaml ファイルに記述したビルド設定をインクルードすることができます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops">Templates - Azure Pipelines | Microsoft Docs&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>変数を渡して、部分的に内容を置き換えることができるので、「インクルード」ではなく「テンプレート」と呼んでいるみたいです。&lt;/p>
+&lt;p>単純に共通の &lt;code>steps&lt;/code> を読み込んで使うこともできるし、逆にテンプレートファイルに対してパラメータで &lt;code>stepList&lt;/code> を渡すということもできます。&lt;/p>
+&lt;h2 id="使用例steps-の共通化">使用例（steps の共通化）&lt;/h2>
+&lt;p>例えば、別の Yaml ファイル（テンプレート）に記述した &lt;code>steps&lt;/code> 定義を、&lt;code>azure-pipelines.yml&lt;/code> から読み込むとします。
+テンプレートファイルには次のような感じで、ルートに &lt;code>steps&lt;/code> 要素を記述します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">common-steps.yml（テンプレート）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">steps&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">task&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">NodeTool@0&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">inputs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">versionSpec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;10.x&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">displayName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;Install Node.js&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">task&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Npm@1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">inputs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">command&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;ci&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">displayName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;npm ci&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">task&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Npm@1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">inputs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">command&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;custom&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">customCommand&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;run lint&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">displayName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;npm run lint&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># ...&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>azure-pipelines.yml&lt;/code> の &lt;code>steps&lt;/code> 以下で、上記のテンプレートファイルを読み込むには、&lt;strong>&lt;code>template&lt;/code>&lt;/strong> というキーワードを使用します。&lt;/p></description></item><item><title>Azure Pipelines トラブル: npm タスクを実行できないとき</title><link>https://maku.blog/p/7c2kdub/</link><pubDate>Wed, 22 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7c2kdub/</guid><description>&lt;p>Azure Pipelines の設定で、次のような感じで Npm タスクを追加したとき、&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">azure-pipelines.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">steps&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">task&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Npm@1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">inputs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">command&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;ci&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">displayName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;npm ci&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">task&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Npm@1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">inputs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">command&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;custom&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">customCommand&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;run lint&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">displayName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;npm run lint&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Node.js 系のコマンドが認識されていないと、エラーが出て Npm タスクを実行できません。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">No agent found in pool Default which satisfies the specified demands: npm, Agent.Version -gtVersion 2.163.1&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>そのような場合は、&lt;code>steps&lt;/code> の先頭で、次のように &lt;strong>NodeTool&lt;/strong> (Node.js Tool Installer) タスクを実行しておくと、うまく動作するようになります 。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">azure-pipelines.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">steps&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># これで npm コマンドを認識するようになる&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">task&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">NodeTool@0&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">inputs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">versionSpec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;10.x&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">displayName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;Install Node.js&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;aside style="display: flex; border: thin dashed gray;">
+&lt;div style="align-self: stretch; writing-mode: vertical-lr; text-align: center; letter-spacing: 0.2em; color: #666; border-right: thin dashed gray; padding: 0.4em 0; line-height: 1.5;">参考&lt;/div>
+&lt;div style="align-self: center; padding: 0.6em 0; line-height: 1.2 !important;">&lt;ul>
+&lt;li>&lt;a href="https://docs.microsoft.com/ja-jp/azure/devops/pipelines/tasks/tool/node-js?view=azure-devops">Node.js Tool Installer task - Azure Pipelines | Microsoft Docs&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/aside>
+&lt;p>NodeTool タスクは実行のたびに Node.js をダウンロード＆インストールするわけではなく、VM 上に存在するキャッシュなどを使って Node.js の環境をセットアップするため、通常は数秒で実行が完了します。&lt;/p></description></item><item><title>Azure: Node.js アプリを App Service へデプロイする（Kudu ビルド編）</title><link>https://maku.blog/p/wx3fvib/</link><pubDate>Wed, 09 Oct 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wx3fvib/</guid><description>&lt;p>Azure App Service には、&lt;strong>デプロイセンター&lt;/strong> という仕組みがあり、そこからソースコードのビルドからデプロイまでの自動化の設定を行うことができます。
+簡単に言うと、Azure Repos や GitHub のリポジトリに最新の JavaScript コードをコミットするだけで、最新の Node.js アプリが自動で立ち上がるようになります。&lt;/p>
+&lt;p>ビルドの仕組みとしては、クラウド上の Azure Pipelines を使ったり、ローカルでビルドしてしまってからデプロイする方法があります。
+App Service には &lt;a href="https://gihub.com/projectkudu/kudu/wiki">Kudu エンジン&lt;/a> が組み込まれており、デプロイ時に自動で実行されるスクリプトを使って簡易的なビルド処理を行うこともできます。&lt;/p>
+&lt;h2 id="はじめに用語定義">はじめに（用語定義）&lt;/h2>
+&lt;p>Azure ではデプロイ処理を構成するコンポーネントを下記のような名前で呼んでいます。&lt;/p>
+&lt;dl>
+&lt;dt>デプロイソース&lt;/dt>
+&lt;dd>GitHub や Azure Repos など。
+ソースコードが置いてある場所（リポジトリ）のこと。
+Azure App Service は手軽なデプロイソースとして OneDrive や Dropbox などのフォルダ共有サービスを設定することもできますが、本格的な運用で使用することは推奨されていません。&lt;/dd>
+&lt;dt>ビルドパイプライン（ビルドプロバイダー）&lt;/dt>
+&lt;dd>Azure Pipelines など。デプロイソースからソースコードを取得し、一連のビルド処理を行う仕組み。
+App Service には組み込みで Kudu エンジンが搭載されており、デフォルトではデプロイ時にこの Kudu エンジンによって &lt;code>npm install&lt;/code> などが実行されるようになっています。
+また、デプロイ時に実行する &lt;a href="https://github.com/projectkudu/kudu/wiki/Deployment-hooks">カスタムスクリプトを .deployment ファイルで定義する&lt;/a> こともできます。
+これらの仕組みだけで十分であれば、Azure Pipelines を使う必要はありません。&lt;/dd>
+&lt;dt>デプロイメカニズム&lt;/dt>
+&lt;dd>ビルドしたアプリを Azure App Service などに配置するためのアクション。Kudu エンジンや FTP (SFTP)、WebDeploy などのデプロイメカニズムが提供されています。&lt;/dd>
+&lt;/dl>
+&lt;h2 id="リポジトリの準備-azure-repos">リポジトリの準備 (Azure Repos)&lt;/h2>
+&lt;p>ここでは、Azure Repos に Git リポジトリを作成し、そこに Node.js アプリのコードをコミットしてあると想定します。
+GitHub でも大丈夫です。&lt;/p></description></item></channel></rss>

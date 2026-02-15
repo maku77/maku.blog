@@ -1,15 +1,102 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Azure Functions on まくろぐ</title><link>https://maku.blog/tags/azure-functions/</link><description>Recent content in Azure Functions on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 18 Aug 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/azure-functions/index.xml" rel="self" type="application/rss+xml"/><item><title>Azure Functions で簡単な関数を作ってみる</title><link>https://maku.blog/p/vgt5g7f/</link><pubDate>Sun, 16 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vgt5g7f/</guid><description>Azure Functions を使うと、Web API 的なものを、サーバーの存在を意識せずに作成することができます。 ここでは、最初のステップとして、HTTP リクエストで送ったメッセージをオウム返しするだけの簡単な関数を作ってみます。
-Functions アプリを新規作成する 新しい Functions アプリを作成するには、Azure ポータルのリソースの作成画面 から、Functions App（関数アプリ） を選択します。 Azure のアカウントがない場合は先に作成する必要があります。
-画面に従って入力していけば作成できますが、いくつかポイントがあるので説明しておきます。
-基本タブ 関数アプリ名 &amp;hellip; 任意のアプリ名を付けることができますが、&amp;lt;アプリ名&amp;gt;.azurewebsites.net というアドレスが割り当てられるので、世界で一意な名前を指定する必要があります。 ランタイムスタック &amp;hellip; 関数の実装に使用する言語を選択します。JavaScript で記述するなら Node.js、C# で実装するなら .NET Core を選択しておきます。 ホスティングタブ プランの種類 &amp;hellip; 今回のテストのように、ときどき実行するだけなら 消費量（サーバーレス） を選択しておきます。App Service プラン は常時起動型の VM でホスティングするもので、ほとんど関数呼び出ししなくても月額数千円はかかってしまうので、最初は避けておくのが無難です。ただし、すでに他の Web サーバに App Service リソースを使用しているのであれば、そちらに相乗りしてホスティングすることが可能です。 最後に 作成 ボタンを押せば、数分で Functions のリソース作成が完了します。
-Functions アプリに関数を追加する Functions リソースに新しい関数を追加するには、関数 → 追加 と選択します。 ここでは HTTP リクエストにより関数を実行するので、HTTP trigger を選択します。
-関数名はデフォルトのままで HttpTrigger1、Authorization level はキーなしでリクエストできるように Anonymous を選択しておきます。</description></item><item><title>GitHub OAuth トークンを取得する (2) Azure Functions 経由で取得する</title><link>https://maku.blog/p/ar2bjs2/</link><pubDate>Tue, 18 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ar2bjs2/</guid><description>何をするか？ ここでは、静的な Web サイト（の JavaScript) から、GitHub の OAuth トークンを取得できるようにしてみます。 この処理を実装すると、GitHub と連携した Web アプリを、GitHub Pages や Azure Static Web Apps などの、静的サイト用のホスティングサービス上で公開できるようになります。 汎用的な Web サーバー（VPSなど）でホスティングする場合と比べ、非常に安価に運用することができます。
-前提知識として、下記の GitHub の OAuth トークン取得の流れを理解しているものとします。
-参考: GitHub OAuth トークンを取得する (1) 処理の流れを理解する 静的な Web サイトから GitHub のアクセストークンを取得するときにネックになるのが、クロスオリジン通信 (CORS) の制約です。 また、GitHub のアクセストークンリクエストには、クライアントシークレット情報が必須であり（2020年、2021年現在）、これをクライアントサイドの JavaScript にハードコードするわけにはいきません。 よって、ブラウザ上で実行される JavaScript からは、実質アクセストークンの取得ができないので、何らかのバックエンドサーバーを介す形でアクセストークンを取得する必要があります。
-バックエンドサーバーはどのようなものでも構わないのですが、ここではサーバーレス環境である Azure Functions を使ってアクセストークンの取得機能を実装します。
-Azure Functions に関数を追加する Azure Functions に HTTP トリガーで起動する関数を追加し、GitHub の OAuth トークンを取得する処理を実装します。 まずは下記の記事を参考にして、Functions アプリ（プロジェクト）を作成してください。
-参考: Azure Functions で簡単な関数を作ってみる 作成する関数の仕様は次のとおりとします。</description></item><item><title>Azure Functions に npm install で Node モジュールを追加する</title><link>https://maku.blog/p/9t7hs4e/</link><pubDate>Mon, 17 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9t7hs4e/</guid><description>Azure Functions への npm install Azure Functions の関数を Node.js ランタイムで動かしている場合は、通常の Node.js アプリと同様に NPM パッケージを npm コマンドでインストールして使用することができます。 簡単なのは、Azure ポータル の Function App リソースの コンソール 画面から npm install を実行する方法です。
-コンソールを開くと、Function App のルートディレクトリ（通常は D:\home\site\wwwroot）がカレントディレクトリになってプロンプトが表示されます。 ここから次のように package.json の作成と、Node モジュールのインストールを行うことができます。
-D:\home\site\wwwroot&amp;gt; npm init -y D:\home\site\wwwroot&amp;gt; npm install node-fetch --save これで、この Functions プロジェクト内のすべての関数から、インストールした Node モジュールを使用できるようになります。
-npm install を実行するディレクトリ Functions プロジェクトのディレクトリ階層は次のように、関数ごとにディレクトリが分かれています。
-D:\home\site\wwwroot +-- host.json +-- MyFunc1 | +-- function.json | +-- index.js +-- MyFunc2 +-- function.json +-- index.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Azure Functions on まくろぐ</title><link>https://maku.blog/tags/azure-functions/</link><description>Recent content in Azure Functions on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 30 Aug 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/azure-functions/index.xml" rel="self" type="application/rss+xml"/><item><title>Azure Functions で簡単な関数を作ってみる</title><link>https://maku.blog/p/vgt5g7f/</link><pubDate>Sun, 16 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vgt5g7f/</guid><description>&lt;figure class="xImage">
+ &lt;img style="" width="1752" height="576" src="../../p/vgt5g7f/img-001.png" alt="/p/vgt5g7f/img-001.png" />
+&lt;/figure>
+
+&lt;p>Azure Functions を使うと、Web API 的なものを、サーバーの存在を意識せずに作成することができます。
+ここでは、最初のステップとして、HTTP リクエストで送ったメッセージをオウム返しするだけの簡単な関数を作ってみます。&lt;/p>
+&lt;h2 id="functions-アプリを新規作成する">Functions アプリを新規作成する&lt;/h2>
+&lt;p>新しい Functions アプリを作成するには、&lt;a href="https://portal.azure.com/#create/hub">Azure ポータルのリソースの作成画面&lt;/a> から、&lt;strong>Functions App（関数アプリ）&lt;/strong> を選択します。
+Azure のアカウントがない場合は先に作成する必要があります。&lt;/p>
+&lt;p>画面に従って入力していけば作成できますが、いくつかポイントがあるので説明しておきます。&lt;/p>
+&lt;ul>
+&lt;li>基本タブ
+&lt;ul>
+&lt;li>&lt;b>関数アプリ名&lt;/b>
+ &amp;hellip; 任意のアプリ名を付けることができますが、&lt;code>&amp;lt;アプリ名&amp;gt;.azurewebsites.net&lt;/code> というアドレスが割り当てられるので、世界で一意な名前を指定する必要があります。&lt;/li>
+&lt;li>&lt;b>ランタイムスタック&lt;/b>
+ &amp;hellip; 関数の実装に使用する言語を選択します。JavaScript で記述するなら &lt;code>Node.js&lt;/code>、C# で実装するなら &lt;code>.NET Core&lt;/code> を選択しておきます。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ホスティングタブ
+&lt;ul>
+&lt;li>&lt;b>プランの種類&lt;/b>
+ &amp;hellip; 今回のテストのように、ときどき実行するだけなら &lt;code>消費量（サーバーレス）&lt;/code> を選択しておきます。&lt;code>App Service プラン&lt;/code> は常時起動型の VM でホスティングするもので、ほとんど関数呼び出ししなくても月額数千円はかかってしまうので、最初は避けておくのが無難です。ただし、すでに他の Web サーバに App Service リソースを使用しているのであれば、そちらに相乗りしてホスティングすることが可能です。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>最後に &lt;code>作成&lt;/code> ボタンを押せば、数分で Functions のリソース作成が完了します。&lt;/p>
+&lt;h2 id="functions-アプリに関数を追加する">Functions アプリに関数を追加する&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1848" height="928" src="../../p/vgt5g7f/img-002.png" alt="/p/vgt5g7f/img-002.png" />
+&lt;/figure>
+
+&lt;p>Functions リソースに新しい関数を追加するには、&lt;strong>&lt;code>関数&lt;/code>&lt;/strong> → &lt;strong>&lt;code>追加&lt;/code>&lt;/strong> と選択します。
+ここでは HTTP リクエストにより関数を実行するので、&lt;strong>&lt;code>HTTP trigger&lt;/code>&lt;/strong> を選択します。&lt;/p></description></item><item><title>GitHub OAuth トークンを取得する (2) Azure Functions 経由で取得する</title><link>https://maku.blog/p/ar2bjs2/</link><pubDate>Tue, 18 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ar2bjs2/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ここでは、静的な Web サイト（の JavaScript) から、GitHub の OAuth トークンを取得できるようにしてみます。
+この処理を実装すると、GitHub と連携した Web アプリを、GitHub Pages や Azure Static Web Apps などの、静的サイト用のホスティングサービス上で公開できるようになります。
+汎用的な Web サーバー（VPSなど）でホスティングする場合と比べ、非常に安価に運用することができます。&lt;/p>
+&lt;p>前提知識として、下記の GitHub の OAuth トークン取得の流れを理解しているものとします。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/ubkt3ai">GitHub OAuth トークンを取得する (1) 処理の流れを理解する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>静的な Web サイトから GitHub のアクセストークンを取得するときにネックになるのが、クロスオリジン通信 (CORS) の制約です。
+また、GitHub のアクセストークンリクエストには、クライアントシークレット情報が必須であり（2020年、2021年現在）、これをクライアントサイドの JavaScript にハードコードするわけにはいきません。
+よって、ブラウザ上で実行される JavaScript からは、実質アクセストークンの取得ができないので、何らかのバックエンドサーバーを介す形でアクセストークンを取得する必要があります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="660" height="286" src="../../p/ar2bjs2/img-001.png" alt="/p/ar2bjs2/img-001.png" />
+&lt;/figure>
+
+&lt;p>バックエンドサーバーはどのようなものでも構わないのですが、ここではサーバーレス環境である &lt;strong>Azure Functions&lt;/strong> を使ってアクセストークンの取得機能を実装します。&lt;/p>
+&lt;h2 id="azure-functions-に関数を追加する">Azure Functions に関数を追加する&lt;/h2>
+&lt;p>Azure Functions に HTTP トリガーで起動する関数を追加し、GitHub の OAuth トークンを取得する処理を実装します。
+まずは下記の記事を参考にして、Functions アプリ（プロジェクト）を作成してください。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/vgt5g7f">Azure Functions で簡単な関数を作ってみる&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>作成する関数の仕様は次のとおりとします。&lt;/p>
+&lt;ul>
+&lt;li>HTTP GET リクエストのクエリ文字列で、OAuth アプリのクライアント ID (&lt;code>client_id&lt;/code>) と、GitHub から取得した一時コード (&lt;code>code&lt;/code>) を受け取る。&lt;/li>
+&lt;li>OAuth アプリのクライアントシークレット (&lt;code>client_secret&lt;/code>) は Functions アプリの環境変数（アプリケーション設定）で設定しておく（ハードコードしない）。&lt;/li>
+&lt;li>GitHub に対してアクセストークンの取得リクエスト (HTTP POST) を送り、その結果をクライアントへそのまま返す。ただし、クライアントから指定されたクライアント ID (&lt;code>client_id&lt;/code>) がそもそも不正な場合は、アクセストークンの取得は行わず、直ちに 400 (Bad Request) エラーを返す。&lt;/li>
+&lt;/ul>
+&lt;h3 id="環境変数の設定">環境変数の設定&lt;/h3>
+&lt;p>Functions アプリの &lt;strong>&lt;code>環境&lt;/code>&lt;/strong> → &lt;strong>&lt;code>構成&lt;/code>&lt;/strong> を開き、GitHub に登録した OAuth アプリの「クライアントID」と「クライアントシークレット」を登録してください。
+ここでは次のような名前で登録することにします。&lt;/p></description></item><item><title>Azure Functions に npm install で Node モジュールを追加する</title><link>https://maku.blog/p/9t7hs4e/</link><pubDate>Mon, 17 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9t7hs4e/</guid><description>&lt;h2 id="azure-functions-への-npm-install">Azure Functions への npm install&lt;/h2>
+&lt;p>Azure Functions の関数を Node.js ランタイムで動かしている場合は、通常の Node.js アプリと同様に NPM パッケージを &lt;code>npm&lt;/code> コマンドでインストールして使用することができます。
+簡単なのは、&lt;a href="https://portal.azure.com/">Azure ポータル&lt;/a> の Function App リソースの &lt;strong>&lt;code>コンソール&lt;/code>&lt;/strong> 画面から &lt;code>npm install&lt;/code> を実行する方法です。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1584" height="672" src="../../p/9t7hs4e/img-001.png" alt="/p/9t7hs4e/img-001.png" />
+&lt;/figure>
+
+&lt;p>コンソールを開くと、Function App のルートディレクトリ（通常は &lt;code>D:\home\site\wwwroot&lt;/code>）がカレントディレクトリになってプロンプトが表示されます。
+ここから次のように &lt;code>package.json&lt;/code> の作成と、Node モジュールのインストールを行うことができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">D:\home\site\wwwroot&amp;gt; npm init -y
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">D:\home\site\wwwroot&amp;gt; npm install node-fetch --save&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、この Functions プロジェクト内のすべての関数から、インストールした Node モジュールを使用できるようになります。&lt;/p>
+&lt;h2 id="npm-install-を実行するディレクトリ">npm install を実行するディレクトリ&lt;/h2>
+&lt;p>Functions プロジェクトのディレクトリ階層は次のように、関数ごとにディレクトリが分かれています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">D:\home\site\wwwroot
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- host.json
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- MyFunc1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> | +-- function.json
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> | +-- index.js
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- MyFunc2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- function.json
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- index.js&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>npm init&lt;/code> および &lt;code>npm install&lt;/code> を実行するディレクトリは、プロジェクトのルートディレクトリ、あるいは、関数ごとのディレクトリになります。&lt;/p></description></item></channel></rss>

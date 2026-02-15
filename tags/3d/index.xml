@@ -1,32 +1,494 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>3D on まくろぐ</title><link>https://maku.blog/tags/3d/</link><description>Recent content in 3D on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Thu, 19 Sep 2019 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/3d/index.xml" rel="self" type="application/rss+xml"/><item><title>WebGL入門 (1) WebGL コンテキストの取得</title><link>https://maku.blog/p/46jrh68/</link><pubDate>Fri, 16 Aug 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/46jrh68/</guid><description>このブラウザは canvas タグに対応していません。 上記の canvas 要素は、WebGL により描画しています。 サーフェスをクリアしているだけなので、何も表示されていないのは正しいです。
-WebGL のコンテキストを取得する WebGL は、Web ブラウザ上で OpenGL の機能を使用する仕組みです。 HTML の canvas 要素をレンダリング用のサーフェストとして使用します。 canvas 要素から WebGL のコンテキスト WebGLRenderingContext を取得したら、後は OpenGL ES を用いたアプリと同じ感覚で API を呼び出していけます。
-下記は、WebGL でサーフェスをクリアするだけの最低限のコードです。 gl.clearColor() でクリア色を設定しています。
-HTML &amp;lt;canvas id=&amp;#34;canvas&amp;#34; width=&amp;#34;300&amp;#34; height=&amp;#34;200&amp;#34;&amp;gt;&amp;lt;/canvas&amp;gt; JavaScript function main() { const canvas = document.getElementById(&amp;#39;canvas&amp;#39;); const gl = canvas.getContext(&amp;#39;webgl&amp;#39;); if (!gl) { console.error(&amp;#39;Failed to obtain WebGL context&amp;#39;); return; } gl.clearColor(0, 0, 0.5, 1.0); // RGBA（暗い青） gl.clear(gl.COLOR_BUFFER_BIT); } window.</description></item><item><title>WebGL入門 (2) シェーダーを使用する</title><link>https://maku.blog/p/8s4uhzv/</link><pubDate>Sat, 17 Aug 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8s4uhzv/</guid><description>このブラウザは canvas タグに対応していません。 上記の canvas 要素は、WebGL により描画しています。 canvas の中央に 1 つの点を表示しています。
-シェーダーを使うまでの手順 WebGL は OpenGL ES 2.0、WebGL 2.0 は OpenGL ES 3.0 をベースに策定されているため、プリミティブをレンダリングするには、どちらも GLSL ES 言語で記述したシェーダーコード（頂点シェーダー、フラグメントシェーダー）を用意する必要があります。
-シェーダーを使用して描画するまでの流れは下記のようになります。
-シェーダーオブジェクトの準備（頂点シェーダーとフラグメントシェーダー） シェーダーオブジェクトを作成する (gl.CreateShader) シェーダーコードを設定する (gl.ShaderSource) シェーダーコードをコンパイルする (gl.CompileShader) 必要があればコンパイル結果のチェック (gl.getShaderParameter) 必要があればコンパイルエラーの内容を出力 (gl.getShaderInfoLog) プログラムオブジェクトの準備 プラグラムオブジェクトを作成する (gl.CreateProgram) 2 つのシェーダーオブジェクトをアタッチする (gl.AttachShader) 2 つのシェーダーオブジェクトをリンクする (gl.LinkProgram) 必要があればリンク結果のチェック (gl.getProgramParameter) 必要があればリンクエラーの内容を出力 (el.getProgramInfoLog) レンダリング前に使用するプログラムオブジェクトを選択する (gl.UseProgram) 頂点情報などを用意して描画 (gl.drawArrays) ユーティリティ関数の作成 シェーダーオブジェクトの準備 (createShader) 指定したシェーダーコードをコンパイルしてシェーダーオブジェクトを作成する createShader 関数を作成します。
-/** * シェーダーコードをコンパイルしてシェーダーオブジェクトを作成します。 * 作成に失敗した場合は null を返します。 * * @param gl WebGL コンテキスト * @param type gl.</description></item><item><title>WebGL入門 (3) バッファーオブジェクトで頂点座標をシェーダーへ送る (VBO)</title><link>https://maku.blog/p/ogk9ogw/</link><pubDate>Wed, 11 Sep 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ogk9ogw/</guid><description>このブラウザは canvas タグに対応していません。 はじめに WebGL (OpenGL) でアプリケーション側 (CPU) のコードから、シェーダー側 (GPU) へ図形の頂点情報を送るには、バッファーオブジェクト (Buffer Object) の仕組みを使用します。 WebGL 側に確保したバッファーオブジェクトに、頂点座標の配列データをまとめて書き込んでおいて、最後に描画開始要求を送ることで、CPU と GPU 間の通信回数を抑えることができます。 頂点座標を格納するために確保したバッファーオブジェクトのことを、特に VBO (Vertext Buffer Object) と呼んだりします。
-WebGL でバッファーオブジェクトを使って図形を描画するまでの流れは以下のようになります。
-WebGL 側にバッファーオブジェクトを作成する gl.createBuffer() バッファーオブジェクトをターゲットとバインドする gl.bindBuffer() バッファーオブジェクトに頂点情報を転送する gl.bufferData() 頂点シェーダーの attribute 変数でそのデータを1つずつ取り出せるようにする gl.getAttribLocation() gl.vertexAttribPointer() gl.enableVertexAttribArray() 描画要求を送る gl.drawArrays() 以下、単純な三角形を描画するまでの手順を示します。
-バッファーオブジェクトを作成する まず、WebGL 側に頂点情報を格納するためのバッファーオブジェクトを生成します。 これは、gl.createBuffer() をパラメータなしで呼ぶだけなので簡単です。
-const vertexBuffer = gl.createBuffer(); if (!vertexBuffer) { throw Error(&amp;#39;Failed to create the buffer object.&amp;#39;); } バッファーオブジェクトをターゲットにバインドする バッファーオブジェクトを作成したら、gl.bindBuffer() を使って、そのバッファーオブジェクトをターゲットとバインドします。 ターゲットというのは、そのバッファーオブジェクトをどのような用途で使用するかを示すためのもので、頂点属性のために確保したのであれば、gl.ARRAY_BUFFER というターゲットとバインドします。 頂点属性というのは、「頂点座標」、「頂点カラー」、「テクスチャ座標」などのことで、ここでは頂点座標だけを扱います。</description></item><item><title>WebGL入門 (4) 頂点属性をインターリーブしてバッファオブジェクトに格納する</title><link>https://maku.blog/p/wqjqbpi/</link><pubDate>Fri, 13 Sep 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wqjqbpi/</guid><description>このブラウザは canvas タグに対応していません。 インターリーブとは インターリーブ (interleave) とは、一般的なコンピュータ用語で、データを交互に配置していくことを示します。 例えば、3D モデルの各頂点の「XY座標」「RGBカラー」をインターリーブして配列に詰めると、3 つの頂点の情報は、
-X Y R G B X Y Z G B X Y R G B ... のようにレイアウトされることになります。
-WebGL (OpenGL) では、このようにインターリーブされた頂点属性データを扱えるようになっています。 インターリーブする主な頂点属性は、頂点座標 (XYZ)、テクスチャ座標 (UV)、頂点カラー (RGBA) などです。
-ここでは、頂点座標 (XY) と頂点カラー (RGB) をインターリーブした配列を JavaScript 側の Float32Array として作成し、それを WebGL 側のバッファオブジェクトに詰める方法を示します。
-シェーダー側の実装 まずは、頂点シェーダーとフラグメントシェーダーを用意します。
-頂点シェーダー attribute vec4 a_Position; // 入力（XY座標） attribute vec4 a_Color; // 入力（RGAカラー） varying vec4 v_Color; // 出力（RGAカラー） void main() { gl_Position = a_Position; v_Color = a_Color; } 頂点シェーダーでは、バッファオブジェクトから XY 座標を取り出すための attribute 変数 a_Position と、RGB カラーを取り出すための a_Color を定義します。 カラー値は最終的にはフラグメントシェーダー側で必要になるので、varying 変数の v_Color を介して値をフラグメントシェーダーへ渡します。</description></item><item><title>WebGL入門 (5) 三角形の 3 つの描画モード</title><link>https://maku.blog/p/9sxkmma/</link><pubDate>Fri, 13 Sep 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9sxkmma/</guid><description>gl.drawArrays() や gl.drawElements で図形を描画するとき、第1引数で頂点をどのように使用するかの描画モードを指定します。 OpenGL ES では、四角形を描画することはできないので、面を表現するときには、三角形の組み合わせで描画することになります。 三角形の描画モードには、下記の 3 種類があります。
-gl.TRIANGLE - 各三角形は頂点を共有しない gl.TRIANGLE_STRIP - ジグザグに頂点が配置されていると想定 gl.TRIANGLE_FAN - 扇形に頂点が配置されていると想定 gl.TRIANGLE は、隣接する面の描画においても、独立した頂点データが必要です。 よって、基本的には gl.TRIANGLE_STRIP か gl.TRIANGLE_FAN を使うのがよいのですが、多くの環境では gl.TRIANGLE_STRIP の描画効率がよいようです。
-下記は、gl.drawArrays() に gl.TRIANGLE_STRIP を指定して 4 つの三角形を描画した例です。
-このブラウザは canvas タグに対応していません。 コードでは、下記のように頂点座標と頂点カラーを定義しています。
-const vertices = new Float32Array([ -1.0, 0.5, 1.0, 0.0, 0.0, // v0 (XYRGB) 赤 -0.6, -0.5, 0.0, 1.0, 0.0, // v1 (XYRGB) 緑 0.2, 0.5, 0.0, 0.0, 1.0, // v2 (XYRGB) 青 0.</description></item><item><title>WebGL入門 (6) インデックスバッファを使って頂点を使い回す (drawElements)</title><link>https://maku.blog/p/wbvv3ha/</link><pubDate>Thu, 19 Sep 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wbvv3ha/</guid><description>インデックスバッファを用いた描画の概要 gl.drawArrays() による描画には、3 つの三角形の描画モードがあり、連なった三角形を描画するときには、gl.TRIANGLE_STRIP あるいは gl.TRIANGLE_FAN の描画モードを使用すると、頂点情報を使い回しながら効率的に描画することができます。
-ただし、図形が少し複雑になってくると、一度の gl.drawArrays() 呼び出しではうまく描画できなくなってきます。 例えば次のような 3 つの三角形（トライフォース）を描画することを考えてみます。
-面 A、B、C は独立した三角形に見えるので、それぞれに 3 つの頂点（合計 9 頂点）を用意して gl.drawArrays() の gl.TRIANGLES モードでレンダリングすればよさそうですが、頂点 1、2、4 に関しては座標が同じなので、本来であれば上記のように 6 つの頂点情報を用意するだけで足りそうです。 このような場合は、インデックスバッファと gl.drawElements() を使用すると、効率的な描画を行えます。
-頂点バッファオブジェクト (VBO) に座標情報を入れておくのは gl.drawArrays() を使った場合と同様ですが、もう一つ別のバッファオブジェクトとして、インデックスバッファオブジェクト (IBO: Index Buffer Object) を作成します。 IBO には、VBO 内のどの頂点情報を使って図形描画を行うかを示す、頂点インデックスの情報を格納します。
-頂点バッファオブジェクト (VBO) 頂点情報（座標、色など）を重複しないように格納する。 上記の例では、頂点 0～5 の 6 つの頂点情報を格納する。 インデックスバッファオブジェクト (IBO) 図形描画に VBO 内のどの頂点情報を使うかを示すインデックス配列。 上記の例では、面Aは 0,1,2、面Bは 1,3,4、面Cは 2,4,5 の頂点を使用するという情報。一次元で、0,1,2,1,3,4,2,4,5 と格納すればよい。 実装 このブラウザは canvas タグに対応していません。 ここでは、各頂点に異なる色をつけたトライフォースを描画してみます。
-頂点バッファオブジェクト (VBO) を作成する const vertices = new Float32Array([ 0.</description></item><item><title>WebGL で使う Typed Array</title><link>https://maku.blog/p/twmzpfj/</link><pubDate>Wed, 11 Sep 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/twmzpfj/</guid><description>Typed Array とは JavaScript の配列型には、汎用型の Array の他にも、Int32Array のような、特定の型の値だけしか格納できない配列型が用意されています。 このような配列型のことを Typed Array と呼びます。 イメージとしては、C 言語の int 配列や float 配列に近いです。
-例えば、WebGL で頂点属性（座標や色）の配列を用意するようなケースでは、その中の要素の型はすべて float 型に統一されていたりするので、汎用型の Array ではなく、Float32Array を使用することでメモリ効率がよくなります。
-Typed Array には下記のようなものが用意されています。
-型名 バイト数 値の範囲 説明（対応するC言語の型） Int8Array 1 -128 ～ 127 8-bit sined integer (int8_t) Uint8Array 1 0 ～ 255 8-bit unsigned integer (uint8_t) Int16Array 2 -32768 ～ 32767 16-bit signed integer (int16_t) Uint16Array 2 0 ～ 65535 16-bit unsigned integer (uint16_t) Int32Array 4 -2147483648 ～ 2147483647 32-bit signed integer (int32_t) Uint32Array 4 0 ～ 4294967295 32-bit unsinged integer (uint32_t) Float32Array 4 1.</description></item><item><title>WebGL で シェーダーコードを分離する方法</title><link>https://maku.blog/p/itkdix9/</link><pubDate>Sun, 18 Aug 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/itkdix9/</guid><description>解決したいこと WebGL で使用する頂点シェーダーとフラグメントシェーダーの GLSL ES コードは単純な文字列データであればよいので、下記のように JavaScript のコードに埋め込んでしまう方法が最初に思いつきます。
-const VSHADER_CODE = ` void main() { gl_Position = vec4(0.0, 0.0, 0.0, 1.0); gl_PointSize = 10.0; }`; const FSHADER_CODE = ` void main() { gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0); }`; しかし、これだとアプリ側のコードとシェーダーのコードが混ざってしまうので美しくありません。 ここでは、シェーダーコードを分離するいくつかの方法を示します。
-script 要素内にシェーダーコードを埋め込む方法 下記のような感じで、頂点シェーダーとフラグメントシェーダー用の script 要素を用意して、そこにコードを埋め込んでしまう方法です。
-HTML 抜粋 &amp;lt;script id=&amp;#34;vshader&amp;#34; type=&amp;#34;x-shader/x-vertex&amp;#34;&amp;gt; void main() { gl_Position = vec4(0.0, 0.0, 0.0, 1.0); gl_PointSize = 10.0; } &amp;lt;/script&amp;gt; &amp;lt;script id=&amp;#34;fshader&amp;#34; type=&amp;#34;x-shader/x-fragment&amp;#34;&amp;gt; void main() { gl_FragColor = vec4(0.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>3D on まくろぐ</title><link>https://maku.blog/tags/3d/</link><description>Recent content in 3D on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Thu, 19 Sep 2019 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/3d/index.xml" rel="self" type="application/rss+xml"/><item><title>WebGL入門 (1) WebGL コンテキストの取得</title><link>https://maku.blog/p/46jrh68/</link><pubDate>Fri, 16 Aug 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/46jrh68/</guid><description>&lt;center>
+&lt;canvas id="canvas-001" width="300" height="200">
+このブラウザは canvas タグに対応していません。
+&lt;/canvas>
+&lt;/center>
+&lt;p>上記の canvas 要素は、WebGL により描画しています。
+サーフェスをクリアしているだけなので、何も表示されていないのは正しいです。&lt;/p>
+&lt;h2 id="webgl-のコンテキストを取得する">WebGL のコンテキストを取得する&lt;/h2>
+&lt;p>WebGL は、Web ブラウザ上で OpenGL の機能を使用する仕組みです。
+HTML の &lt;code>canvas&lt;/code> 要素をレンダリング用のサーフェストとして使用します。
+&lt;code>canvas&lt;/code> 要素から WebGL のコンテキスト &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext">WebGLRenderingContext&lt;/a> を取得したら、後は OpenGL ES を用いたアプリと同じ感覚で API を呼び出していけます。&lt;/p>
+&lt;p>下記は、WebGL でサーフェスをクリアするだけの最低限のコードです。
+&lt;code>gl.clearColor()&lt;/code> でクリア色を設定しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">HTML&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">canvas&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;canvas&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;300&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;200&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">canvas&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">JavaScript&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">canvas&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getElementById&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;canvas&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">gl&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">canvas&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getContext&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;webgl&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="nx">gl&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Failed to obtain WebGL context&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">clearColor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// RGBA（暗い青）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">clear&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">COLOR_BUFFER_BIT&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">window&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">addEventListener&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;load&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">main&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="webgl-20-を使用する">WebGL 2.0 を使用する&lt;/h2>
+&lt;p>WebGL 2.0 の API を使用したい場合は、&lt;code>canvas.getContext()&lt;/code> のパラメータを &lt;code>webgl&lt;/code> から &lt;code>webgl2&lt;/code> に変更し、&lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext">WebGL2RenderingContext&lt;/a> を取得します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">gl&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">canvas&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getContext&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;webgl&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//=&amp;gt; WebGLRenderingContext
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">gl2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">canvas&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getContext&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;webgl2&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//=&amp;gt; WebGL2RenderingContext
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>WebGL は OpenGL ES 2.0 をベースにしており、WebGL2 は OpenGL ES 3.0 をベースにしています。
+メジャーなブラウザは WebGL 2 に対応しているので、特に理由がなければ WebGL 2 の方を使っていきたいですね。&lt;/p></description></item><item><title>WebGL入門 (2) シェーダーを使用する</title><link>https://maku.blog/p/8s4uhzv/</link><pubDate>Sat, 17 Aug 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8s4uhzv/</guid><description>&lt;center>
+&lt;canvas id="canvas-002" width="300" height="200">
+このブラウザは canvas タグに対応していません。
+&lt;/canvas>
+&lt;/center>
+&lt;p>上記の canvas 要素は、WebGL により描画しています。
+canvas の中央に 1 つの点を表示しています。&lt;/p>
+&lt;h2 id="シェーダーを使うまでの手順">シェーダーを使うまでの手順&lt;/h2>
+&lt;p>WebGL は OpenGL ES 2.0、WebGL 2.0 は OpenGL ES 3.0 をベースに策定されているため、プリミティブをレンダリングするには、どちらも GLSL ES 言語で記述したシェーダーコード（頂点シェーダー、フラグメントシェーダー）を用意する必要があります。&lt;/p>
+&lt;p>シェーダーを使用して描画するまでの流れは下記のようになります。&lt;/p>
+&lt;ol>
+&lt;li>シェーダーオブジェクトの準備（頂点シェーダーとフラグメントシェーダー）
+&lt;ol>
+&lt;li>シェーダーオブジェクトを作成する (&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/createShader">gl.CreateShader&lt;/a>)&lt;/li>
+&lt;li>シェーダーコードを設定する (&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/shaderSource">gl.ShaderSource&lt;/a>)&lt;/li>
+&lt;li>シェーダーコードをコンパイルする (&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/compileShader">gl.CompileShader&lt;/a>)&lt;/li>
+&lt;li>必要があればコンパイル結果のチェック (&lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getShaderParameter">gl.getShaderParameter&lt;/a>)&lt;/li>
+&lt;li>必要があればコンパイルエラーの内容を出力 (&lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getShaderInfoLog">gl.getShaderInfoLog&lt;/a>)&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>プログラムオブジェクトの準備
+&lt;ol>
+&lt;li>プラグラムオブジェクトを作成する (&lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createProgram">gl.CreateProgram&lt;/a>)&lt;/li>
+&lt;li>2 つのシェーダーオブジェクトをアタッチする (&lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/attachShader">gl.AttachShader&lt;/a>)&lt;/li>
+&lt;li>2 つのシェーダーオブジェクトをリンクする (&lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/linkProgram">gl.LinkProgram&lt;/a>)&lt;/li>
+&lt;li>必要があればリンク結果のチェック (&lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getProgramParameter">gl.getProgramParameter&lt;/a>)&lt;/li>
+&lt;li>必要があればリンクエラーの内容を出力 (&lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getProgramInfoLog">el.getProgramInfoLog&lt;/a>)&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>レンダリング前に使用するプログラムオブジェクトを選択する (&lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/useProgram">gl.UseProgram&lt;/a>)&lt;/li>
+&lt;li>頂点情報などを用意して描画 (&lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawArrays">gl.drawArrays&lt;/a>)&lt;/li>
+&lt;/ol>
+&lt;h2 id="ユーティリティ関数の作成">ユーティリティ関数の作成&lt;/h2>
+&lt;h3 id="シェーダーオブジェクトの準備-createshader">シェーダーオブジェクトの準備 (createShader)&lt;/h3>
+&lt;p>指定したシェーダーコードをコンパイルしてシェーダーオブジェクトを作成する &lt;code>createShader&lt;/code> 関数を作成します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * シェーダーコードをコンパイルしてシェーダーオブジェクトを作成します。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * 作成に失敗した場合は null を返します。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> *
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * @param gl WebGL コンテキスト
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * @param type gl.VERTEX_SHADER あるいは gl.FRAGMENT_SHADER
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * @param source シェーダーのソースコード
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">createShader&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">gl&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">type&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">source&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">shader&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">createShader&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">type&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">shader&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="kc">null&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Failed to create a shader&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="kc">null&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">shaderSource&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">shader&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">source&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">compileShader&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">shader&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// コンパイル結果を検査する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">compiled&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getShaderParameter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">shader&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">COMPILE_STATUS&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="nx">compiled&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">var&lt;/span> &lt;span class="nx">log&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getShaderInfoLog&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">shader&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Failed to compile a shader\n&amp;#39;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">log&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">deleteShader&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">shader&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="kc">null&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">shader&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この関数を使って、頂点シェーダーとフラグメントシェーダーをコンパイルします。&lt;/p></description></item><item><title>WebGL入門 (3) バッファーオブジェクトで頂点座標をシェーダーへ送る (VBO)</title><link>https://maku.blog/p/ogk9ogw/</link><pubDate>Wed, 11 Sep 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ogk9ogw/</guid><description>&lt;center>
+&lt;canvas id="canvas-003" width="300" height="200">
+このブラウザは canvas タグに対応していません。
+&lt;/canvas>
+&lt;/center>
+&lt;h2 id="はじめに">はじめに&lt;/h2>
+&lt;p>WebGL (OpenGL) でアプリケーション側 (CPU) のコードから、シェーダー側 (GPU) へ図形の頂点情報を送るには、&lt;strong>バッファーオブジェクト (Buffer Object)&lt;/strong> の仕組みを使用します。
+WebGL 側に確保したバッファーオブジェクトに、頂点座標の配列データをまとめて書き込んでおいて、最後に描画開始要求を送ることで、CPU と GPU 間の通信回数を抑えることができます。
+頂点座標を格納するために確保したバッファーオブジェクトのことを、特に &lt;strong>VBO (Vertext Buffer Object)&lt;/strong> と呼んだりします。&lt;/p>
+&lt;p>WebGL でバッファーオブジェクトを使って図形を描画するまでの流れは以下のようになります。&lt;/p>
+&lt;ol>
+&lt;li>WebGL 側にバッファーオブジェクトを作成する
+&lt;ul>
+&lt;li>&lt;code>gl.createBuffer()&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>バッファーオブジェクトをターゲットとバインドする
+&lt;ul>
+&lt;li>&lt;code>gl.bindBuffer()&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>バッファーオブジェクトに頂点情報を転送する
+&lt;ul>
+&lt;li>&lt;code>gl.bufferData()&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>頂点シェーダーの attribute 変数でそのデータを1つずつ取り出せるようにする
+&lt;ul>
+&lt;li>&lt;code>gl.getAttribLocation()&lt;/code>&lt;/li>
+&lt;li>&lt;code>gl.vertexAttribPointer()&lt;/code>&lt;/li>
+&lt;li>&lt;code>gl.enableVertexAttribArray()&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>描画要求を送る
+&lt;ul>
+&lt;li>&lt;code>gl.drawArrays()&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;p>以下、単純な三角形を描画するまでの手順を示します。&lt;/p>
+&lt;h2 id="バッファーオブジェクトを作成する">バッファーオブジェクトを作成する&lt;/h2>
+&lt;p>まず、WebGL 側に頂点情報を格納するためのバッファーオブジェクトを生成します。
+これは、&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/createBuffer">gl.createBuffer()&lt;/a> をパラメータなしで呼ぶだけなので簡単です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">vertexBuffer&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">createBuffer&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="nx">vertexBuffer&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">throw&lt;/span> &lt;span class="nb">Error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Failed to create the buffer object.&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="バッファーオブジェクトをターゲットにバインドする">バッファーオブジェクトをターゲットにバインドする&lt;/h2>
+&lt;p>バッファーオブジェクトを作成したら、&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/bindBuffer">gl.bindBuffer()&lt;/a> を使って、そのバッファーオブジェクトをターゲットとバインドします。
+ターゲットというのは、そのバッファーオブジェクトをどのような用途で使用するかを示すためのもので、頂点属性のために確保したのであれば、&lt;strong>&lt;code>gl.ARRAY_BUFFER&lt;/code>&lt;/strong> というターゲットとバインドします。
+頂点属性というのは、「頂点座標」、「頂点カラー」、「テクスチャ座標」などのことで、ここでは頂点座標だけを扱います。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">bindBuffer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ARRAY_BUFFER&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">vertexBuffer&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ ワンポイント&lt;/span>
+ &lt;span class="xNote_body">バインドのイメージとしては、&lt;code>gl.ARRAY_BUFFER&lt;/code> というターゲットを、&lt;code>vertexBuffer&lt;/code> が示すバッファーオブジェクトを指すように設定すると考えるのがよいです。
+というのも、この次に実行する &lt;code>gl.bufferData()&lt;/code> は、&lt;code>gl.ARRAY_BUFFER&lt;/code> をパラメータに指定することで、バッファーオブジェクトを操作することになるからです。&lt;/span>
+&lt;/div>
+
+&lt;p>ターゲットには他にも &lt;code>gl.ELEMENT_ARRAY_BUFFER&lt;/code> などがあり、これは、頂点配列の中のどのインデックスのデータを使うかを示すインデックス配列です。
+何らかのオブジェクトを描画する場合、通常は、1 つの頂点が複数の面を構成するために繰り返し使用されます。
+そのような場合に、頂点データを使いまわすことでメモリ効率を上げることができます。
+&lt;code>gl.ELEMENT_ARRAY_BUFFER&lt;/code> を使った描画に関しては、別の記事で説明します。&lt;/p></description></item><item><title>WebGL入門 (4) 頂点属性をインターリーブしてバッファオブジェクトに格納する</title><link>https://maku.blog/p/wqjqbpi/</link><pubDate>Fri, 13 Sep 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wqjqbpi/</guid><description>&lt;center>
+&lt;canvas id="canvas-004" width="300" height="200">
+このブラウザは canvas タグに対応していません。
+&lt;/canvas>
+&lt;/center>
+&lt;h2 id="インターリーブとは">インターリーブとは&lt;/h2>
+&lt;p>インターリーブ (interleave) とは、一般的なコンピュータ用語で、&lt;strong>データを交互に配置していくこと&lt;/strong>を示します。
+例えば、3D モデルの各頂点の「XY座標」「RGBカラー」をインターリーブして配列に詰めると、3 つの頂点の情報は、&lt;/p>
+&lt;div style="text-align:center; font-weight:bold;">X Y R G B X Y Z G B X Y R G B ...&lt;/div>
+
+&lt;p>のようにレイアウトされることになります。&lt;/p>
+&lt;p>WebGL (OpenGL) では、このようにインターリーブされた頂点属性データを扱えるようになっています。
+インターリーブする主な頂点属性は、頂点座標 (XYZ)、テクスチャ座標 (UV)、頂点カラー (RGBA) などです。&lt;/p>
+&lt;p>ここでは、頂点座標 (XY) と頂点カラー (RGB) をインターリーブした配列を JavaScript 側の &lt;code>Float32Array&lt;/code> として作成し、それを WebGL 側のバッファオブジェクトに詰める方法を示します。&lt;/p>
+&lt;h2 id="シェーダー側の実装">シェーダー側の実装&lt;/h2>
+&lt;p>まずは、頂点シェーダーとフラグメントシェーダーを用意します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">頂点シェーダー&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">attribute&lt;/span> &lt;span class="n">vec4&lt;/span> &lt;span class="n">a_Position&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 入力（XY座標）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">attribute&lt;/span> &lt;span class="n">vec4&lt;/span> &lt;span class="n">a_Color&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 入力（RGAカラー）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">varying&lt;/span> &lt;span class="n">vec4&lt;/span> &lt;span class="n">v_Color&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 出力（RGAカラー）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">gl_Position&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">a_Position&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">v_Color&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">a_Color&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>頂点シェーダーでは、バッファオブジェクトから XY 座標を取り出すための attribute 変数 &lt;code>a_Position&lt;/code> と、RGB カラーを取り出すための &lt;code>a_Color&lt;/code> を定義します。
+カラー値は最終的にはフラグメントシェーダー側で必要になるので、varying 変数の &lt;code>v_Color&lt;/code> を介して値をフラグメントシェーダーへ渡します。&lt;/p></description></item><item><title>WebGL入門 (5) 三角形の 3 つの描画モード</title><link>https://maku.blog/p/9sxkmma/</link><pubDate>Fri, 13 Sep 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9sxkmma/</guid><description>&lt;figure class="xImage">
+ &lt;img style="" width="550" height="351" src="../../p/9sxkmma/triangle-mode-001_hu5193269098082304238.png" alt="/p/9sxkmma/triangle-mode-001.png" />
+&lt;/figure>
+
+&lt;p>&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/drawArrays">gl.drawArrays()&lt;/a> や &lt;a href="https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/drawElements">gl.drawElements&lt;/a> で図形を描画するとき、第1引数で頂点をどのように使用するかの描画モードを指定します。
+OpenGL ES では、四角形を描画することはできないので、面を表現するときには、三角形の組み合わせで描画することになります。
+三角形の描画モードには、下記の 3 種類があります。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>gl.TRIANGLE&lt;/code> - 各三角形は頂点を共有しない&lt;/li>
+&lt;li>&lt;code>gl.TRIANGLE_STRIP&lt;/code> - ジグザグに頂点が配置されていると想定&lt;/li>
+&lt;li>&lt;code>gl.TRIANGLE_FAN&lt;/code> - 扇形に頂点が配置されていると想定&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>gl.TRIANGLE&lt;/code> は、隣接する面の描画においても、独立した頂点データが必要です。
+よって、基本的には &lt;code>gl.TRIANGLE_STRIP&lt;/code> か &lt;code>gl.TRIANGLE_FAN&lt;/code> を使うのがよいのですが、多くの環境では &lt;strong>&lt;code>gl.TRIANGLE_STRIP&lt;/code> の描画効率がよい&lt;/strong>ようです。&lt;/p>
+&lt;p>下記は、&lt;code>gl.drawArrays()&lt;/code> に &lt;code>gl.TRIANGLE_STRIP&lt;/code> を指定して 4 つの三角形を描画した例です。&lt;/p>
+&lt;center>
+&lt;canvas id="canvas-005" width="300" height="200">
+このブラウザは canvas タグに対応していません。
+&lt;/canvas>
+&lt;/center>
+&lt;p>コードでは、下記のように頂点座標と頂点カラーを定義しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">vertices&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">Float32Array&lt;/span>&lt;span class="p">([&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span>&lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// v0 (XYRGB) 赤
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.6&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// v1 (XYRGB) 緑
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mf">0.2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// v2 (XYRGB) 青
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mf">0.2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// v3 (XYRGB) 赤
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mf">0.6&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// v4 (XYRGB) 緑
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span> &lt;span class="c1">// v5 (XYRGB) 青
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">drawArrays&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">TRIANGLE_STRIP&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// 頂点を 6 つ使用する
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;script id="vs-005" type="x-shader/x-vertex">
+attribute vec4 a_Position; // 入力（XY座標）
+attribute vec4 a_Color; // 入力（RGAカラー）
+varying vec4 v_Color; // 出力（RGAカラー）
+
+void main() {
+ gl_Position = a_Position;
+ v_Color = a_Color;
+}
+&lt;/script>
+&lt;script id="fs-005" type="x-shader/x-fragment">
+precision mediump float;
+varying vec4 v_Color;
+
+void main() {
+ gl_FragColor = v_Color;
+}
+&lt;/script>
+&lt;script type="module">
+import { initGL } from '/assets/js/webgl_util.js';
+
+window.addEventListener('load', function() {
+ const gl = initGL('canvas-005', 'vs-005', 'fs-005');
+
+ const vertices = new Float32Array([
+ -1.0, 0.5, 1.0, 0.0, 0.0, // v0 (XYRGB) 赤
+ -0.6, -0.5, 0.0, 1.0, 0.0, // v1 (XYRGB) 緑
+ 0.2, 0.5, 0.0, 0.0, 1.0, // v2 (XYRGB) 青
+ 0.2, -0.5, 1.0, 0.0, 0.0, // v3 (XYRGB) 赤
+ 0.6, 0.5, 0.0, 1.0, 0.0, // v4 (XYRGB) 緑
+ 1.0, -0.5, 0.0, 0.0, 1.0 // v5 (XYRGB) 青
+ ]);
+ const ELEM_BYTES = vertices.BYTES_PER_ELEMENT; // = 4
+
+ const vertexBuffer = gl.createBuffer();
+ if (!vertexBuffer) {
+ throw Error('Failed to create the buffer object.');
+ }
+ gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+ gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+ // 頂点座標の attribute 変数を設定
+ const a_Position = gl.getAttribLocation(gl.program, 'a_Position');
+ gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, ELEM_BYTES * 5, 0);
+ gl.enableVertexAttribArray(a_Position);
+
+ // 頂点カラーの attribute 変数を設定
+ const a_Color = gl.getAttribLocation(gl.program, 'a_Color');
+ gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, ELEM_BYTES * 5, ELEM_BYTES * 2);
+ gl.enableVertexAttribArray(a_Color);
+
+ gl.clearColor(0, 0, 0.5, 1.0);
+ gl.clear(gl.COLOR_BUFFER_BIT);
+ gl.drawArrays(gl.TRIANGLE_STRIP, 0, 6);
+});
+&lt;/script></description></item><item><title>WebGL入門 (6) インデックスバッファを使って頂点を使い回す (drawElements)</title><link>https://maku.blog/p/wbvv3ha/</link><pubDate>Thu, 19 Sep 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wbvv3ha/</guid><description>&lt;h2 id="インデックスバッファを用いた描画の概要">インデックスバッファを用いた描画の概要&lt;/h2>
+&lt;p>&lt;code>gl.drawArrays()&lt;/code> による描画には、&lt;a href="../../p/9sxkmma">3 つの三角形の描画モード&lt;/a>があり、連なった三角形を描画するときには、&lt;code>gl.TRIANGLE_STRIP&lt;/code> あるいは &lt;code>gl.TRIANGLE_FAN&lt;/code> の描画モードを使用すると、頂点情報を使い回しながら効率的に描画することができます。&lt;/p>
+&lt;p>ただし、図形が少し複雑になってくると、一度の &lt;code>gl.drawArrays()&lt;/code> 呼び出しではうまく描画できなくなってきます。
+例えば次のような 3 つの三角形（トライフォース）を描画することを考えてみます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="337" height="359" src="../../p/wbvv3ha/index-buffer-001.png" alt="/p/wbvv3ha/index-buffer-001.png" />
+&lt;/figure>
+
+&lt;p>面 A、B、C は独立した三角形に見えるので、それぞれに 3 つの頂点（合計 9 頂点）を用意して &lt;code>gl.drawArrays()&lt;/code> の &lt;code>gl.TRIANGLES&lt;/code> モードでレンダリングすればよさそうですが、頂点 1、2、4 に関しては座標が同じなので、本来であれば上記のように 6 つの頂点情報を用意するだけで足りそうです。
+このような場合は、インデックスバッファと &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements">gl.drawElements()&lt;/a> を使用すると、効率的な描画を行えます。&lt;/p>
+&lt;p>頂点バッファオブジェクト (VBO) に座標情報を入れておくのは &lt;code>gl.drawArrays()&lt;/code> を使った場合と同様ですが、もう一つ別のバッファオブジェクトとして、&lt;strong>インデックスバッファオブジェクト (IBO: Index Buffer Object)&lt;/strong> を作成します。
+IBO には、VBO 内のどの頂点情報を使って図形描画を行うかを示す、頂点インデックスの情報を格納します。&lt;/p>
+&lt;ul>
+&lt;li>&lt;b>頂点バッファオブジェクト (VBO)&lt;/b>
+&lt;ul>
+&lt;li>頂点情報（座標、色など）を重複しないように格納する。&lt;/li>
+&lt;li>上記の例では、頂点 0～5 の 6 つの頂点情報を格納する。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;b>インデックスバッファオブジェクト (IBO)&lt;/b>
+&lt;ul>
+&lt;li>図形描画に VBO 内のどの頂点情報を使うかを示すインデックス配列。&lt;/li>
+&lt;li>上記の例では、面Aは 0,1,2、面Bは 1,3,4、面Cは 2,4,5 の頂点を使用するという情報。一次元で、0,1,2,1,3,4,2,4,5 と格納すればよい。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="実装">実装&lt;/h2>
+&lt;center>
+&lt;canvas id="canvas-006" width="300" height="200">
+このブラウザは canvas タグに対応していません。
+&lt;/canvas>
+&lt;/center>
+&lt;p>ここでは、各頂点に異なる色をつけたトライフォースを描画してみます。&lt;/p>
+&lt;h3 id="頂点バッファオブジェクト-vbo-を作成する">頂点バッファオブジェクト (VBO) を作成する&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">vertices&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">Float32Array&lt;/span>&lt;span class="p">([&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.0&lt;/span> &lt;span class="p">,&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// v0 (XYRGB) 黄
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.25&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// v1 (XYRGB) 緑
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mf">0.25&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// v2 (XYRGB) 赤
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// v3 (XYRGB) 紫
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// v4 (XYRGB) シアン
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span> &lt;span class="c1">// v5 (XYRGB) 白
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">ELEM_BYTES&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">vertices&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">BYTES_PER_ELEMENT&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// = 4
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 頂点バッファオブジェクト (VBO) の作成
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">vertexBuffer&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">createBuffer&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">bindBuffer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ARRAY_BUFFER&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">vertexBuffer&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">bufferData&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ARRAY_BUFFER&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">vertices&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">STATIC_DRAW&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 頂点座標の attribute 変数を設定
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">a_Position&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getAttribLocation&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">program&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;a_Position&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">vertexAttribPointer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">a_Position&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">FLOAT&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ELEM_BYTES&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">enableVertexAttribArray&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">a_Position&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 頂点カラーの attribute 変数を設定
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">a_Color&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getAttribLocation&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">program&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;a_Color&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">vertexAttribPointer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">a_Color&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">FLOAT&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ELEM_BYTES&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ELEM_BYTES&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">gl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">enableVertexAttribArray&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">a_Color&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>頂点バッファオブジェクトの作成方法は、&lt;code>gl.drawArrays()&lt;/code> で描画する場合と同様です。
+ここでは、ひとつのバッファオブジェクト内にインターリーブする形で頂点座標と頂点カラーを格納し、それぞれ &lt;code>a_Position&lt;/code>、&lt;code>a_Color&lt;/code> という attribute 変数で 1 つずつ取り出せるように設定しています。&lt;/p></description></item><item><title>WebGL で使う Typed Array</title><link>https://maku.blog/p/twmzpfj/</link><pubDate>Wed, 11 Sep 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/twmzpfj/</guid><description>&lt;h2 id="typed-array-とは">Typed Array とは&lt;/h2>
+&lt;p>JavaScript の配列型には、汎用型の &lt;code>Array&lt;/code> の他にも、&lt;code>Int32Array&lt;/code> のような、特定の型の値だけしか格納できない配列型が用意されています。
+このような配列型のことを &lt;strong>Typed Array&lt;/strong> と呼びます。
+イメージとしては、C 言語の int 配列や float 配列に近いです。&lt;/p>
+&lt;p>例えば、WebGL で頂点属性（座標や色）の配列を用意するようなケースでは、その中の要素の型はすべて float 型に統一されていたりするので、汎用型の &lt;code>Array&lt;/code> ではなく、&lt;code>Float32Array&lt;/code> を使用することでメモリ効率がよくなります。&lt;/p>
+&lt;p>Typed Array には下記のようなものが用意されています。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>型名&lt;/th>
+ &lt;th>バイト数&lt;/th>
+ &lt;th>値の範囲&lt;/th>
+ &lt;th>説明（対応するC言語の型）&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>Int8Array&lt;/td>
+ &lt;td>1&lt;/td>
+ &lt;td>-128 ～ 127&lt;/td>
+ &lt;td>8-bit sined integer (int8_t)&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>Uint8Array&lt;/td>
+ &lt;td>1&lt;/td>
+ &lt;td>0 ～ 255&lt;/td>
+ &lt;td>8-bit unsigned integer (uint8_t)&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>Int16Array&lt;/td>
+ &lt;td>2&lt;/td>
+ &lt;td>-32768 ～ 32767&lt;/td>
+ &lt;td>16-bit signed integer (int16_t)&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>Uint16Array&lt;/td>
+ &lt;td>2&lt;/td>
+ &lt;td>0 ～ 65535&lt;/td>
+ &lt;td>16-bit unsigned integer (uint16_t)&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>Int32Array&lt;/td>
+ &lt;td>4&lt;/td>
+ &lt;td>-2147483648 ～ 2147483647&lt;/td>
+ &lt;td>32-bit signed integer (int32_t)&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>Uint32Array&lt;/td>
+ &lt;td>4&lt;/td>
+ &lt;td>0 ～ 4294967295&lt;/td>
+ &lt;td>32-bit unsinged integer (uint32_t)&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>Float32Array&lt;/td>
+ &lt;td>4&lt;/td>
+ &lt;td>1.2x10-38 ～ 3.4x1038&lt;/td>
+ &lt;td>32-bit floating point number (float)&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>Float64Array&lt;/td>
+ &lt;td>8&lt;/td>
+ &lt;td>5.0x10-324 ～ 1.8x10308&lt;/td>
+ &lt;td>64-bit floating point number (double)&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="typed-array-の使い方">Typed Array の使い方&lt;/h2>
+&lt;p>Typed Array インスタンスは、型名をコンストラクタとして呼び出すことで生成することができます。
+配列リテラルの形で初期値を指定することもできるし、サイズだけ指定してすべての要素が 0 に初期化された Typed Array を作成することもできます。&lt;/p></description></item><item><title>WebGL で シェーダーコードを分離する方法</title><link>https://maku.blog/p/itkdix9/</link><pubDate>Sun, 18 Aug 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/itkdix9/</guid><description>&lt;h2 id="解決したいこと">解決したいこと&lt;/h2>
+&lt;p>WebGL で使用する頂点シェーダーとフラグメントシェーダーの GLSL ES コードは単純な文字列データであればよいので、下記のように JavaScript のコードに埋め込んでしまう方法が最初に思いつきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">VSHADER_CODE&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="sb">`
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> void main() {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> gl_PointSize = 10.0;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> }`&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">FSHADER_CODE&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="sb">`
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> void main() {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> }`&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>しかし、これだとアプリ側のコードとシェーダーのコードが混ざってしまうので美しくありません。
+ここでは、シェーダーコードを分離するいくつかの方法を示します。&lt;/p>
+&lt;h2 id="script-要素内にシェーダーコードを埋め込む方法">script 要素内にシェーダーコードを埋め込む方法&lt;/h2>
+&lt;p>下記のような感じで、頂点シェーダーとフラグメントシェーダー用の script 要素を用意して、そこにコードを埋め込んでしまう方法です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">HTML 抜粋&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;vshader&amp;#34;&lt;/span> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;x-shader/x-vertex&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">void&lt;/span> &lt;span class="nx">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">gl_Position&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">vec4&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">gl_PointSize&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mf">10.0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;fshader&amp;#34;&lt;/span> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;x-shader/x-fragment&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">void&lt;/span> &lt;span class="nx">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">gl_FragColor&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">vec4&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>それぞれのシェーダーコードは、JavaScript コードで下記のようにして取り出すことができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">vsCode&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getElementById&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;vshader&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">textContent&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">fsCode&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getElementById&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;fshader&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">textContent&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="import-でシェーダーファイルを読み込む方法">import でシェーダーファイルを読み込む方法&lt;/h2>
+&lt;p>ECMAScript 2015 (ES6) の &lt;a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/import">import 構文&lt;/a> を使用すると、別ファイルとして保存した JavaScript ファイルを読み込むことができます。&lt;/p></description></item></channel></rss>

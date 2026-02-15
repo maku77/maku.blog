@@ -1,57 +1,555 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Python on まくろぐ</title><link>https://maku.blog/tags/python/</link><description>Recent content in Python on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 14 Apr 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/python/index.xml" rel="self" type="application/rss+xml"/><item><title>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる</title><link>https://maku.blog/p/o8ufwct/</link><pubDate>Wed, 29 Jan 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/o8ufwct/</guid><description>azure-cosmosdb-table パッケージのインストール Python から Azure Table Storage を操作するには、azure-cosmosdb-table というライブラリを使用します。
-azure-cosmosdb-table のインストール $ pip install azure-cosmosdb-table ☝️ ワンポイント Cosmos DB をまったく使わない場合でも cosmosdb と名前のついたライブラリを使わせようとするのは、 Microsoft の策略 Cosmos DB に力を入れているという意思表示でしょう。 正直なところ Cosmos DB はお金がかかりすぎて個人の趣味レベルでは使えないのですが。。。
-（追記: 2021年）CosmosDB に無料枠ができて少しずつ個人利用もできそうな感じになってきました。
-TableService オブジェクトの生成 Azure Storage にアクセスするには、接続情報（ストレージアカウント名とキー）が必要になるので、Azure ポータル で確認しておいてください。
-参考: Azure Storage の接続情報（キー）を確認する Table Storage にアクセスしてごにょごにょするには、TableService クラス のメソッドを使用します。 TableService のコンストラクタには、ストレージアカウント名とキーを渡します。
-from azure.cosmosdb.table.tableservice import TableService STORAGE_NAME = &amp;#39;maku77storage&amp;#39; STORAGE_KEY = &amp;#39;XlgKN4Hv...(省略)...F55o3N9g==&amp;#39; table_service = TableService(account_name=STORAGE_NAME, account_key=STORAGE_KEY) ☝️ URL の指定は必要ない？ 接続先アドレス (URL) の構築は TableService クラスがよろしくやってくれるので、実装コードがとてもスッキリします。 ストレージアカウント名は Azure 内（世界中）で一意になっているので、ストレージアカウント名さえ指定すれば、Web API の URL も自動的に決まるということですね。 ストレージアカウントのキーを環境変数から取得する ストレージアカウントにアクセスするためのキー情報をスクリプト内にハードコーディングするのは望ましくないので、環境変数などから取得するようにしておくとよいでしょう。</description></item><item><title>QnA Maker (4) Python から QnA Maker の API を利用する</title><link>https://maku.blog/p/fwyi2fh/</link><pubDate>Tue, 04 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fwyi2fh/</guid><description>QnA Maker は REST API を提供しているので、HTTP リクエストを発行できるプログラミング言語から簡単に制御することができます。 ここでは、Python に標準で付属している urllib.request モジュールを使って HTTP リクエストを発行し、QnA Maker にアクセスしてみます。
-事前準備（アクセスキーの準備） REST API を使用するには、HTTP リクエストのヘッダ情報としてアクセスキーを付加する必要があります。 こちらの記事 を参考に、下記のどちらかのアクセスキーを確認しておいてください。
-サブスクリプションキー (Subscription Key) &amp;hellip; 管理用 エンドポイントキー (Endpoint Key) &amp;hellip; クエリ用 アクセスキーは 9d16b3e6345489ad4a57a0755eb4f96a のような 16 進数文字列です。 QnA のクエリ実行だけであればエンドポイントキーの方を使えば大丈夫ですが、ナレッジベースの作成や更新などを行う場合は、サブスクリプションキーの方を使う必要があります。
-QnA Maker の REST API を呼び出す Python ライブラリ REST API は HTTP リクエストを送るだけで使用できるので、ここでは自力で QnA Maker の API を使用するライブラリを作ってみます。
-下記の QnaRequest クラスは、ナレッジベースの一覧を取得する getAllKnowledgeBases メソッドと、指定したナレッジベースの情報を取得する getKnowledgeBase メソッドを提供しています。 戻り値は JSON 形式のテキストです。
-mylib/qna.py import urllib.request class QnaRequest: BASE_URL = &amp;#39;https://westus.</description></item><item><title>MCP サーバーを作ってみる</title><link>https://maku.blog/p/5c9y6vt/</link><pubDate>Mon, 14 Apr 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5c9y6vt/</guid><description>MCP とは MCP (Model Context Protocol) は、AI アプリケーションが外部のツールと連携するためのプロトコルで、Anthropic によってオープンソース化されました。 この標準化されたプロトコルに従って MCP サーバーを作っておくと、Claude Desktop や VS Code（GitHub Copilot 拡張）などの AI アプリケーション (MCP host) から簡単に接続できるようになります。 2025 年に入った頃から MCP はエージェント連携のためのプロトコルとしてデファクトスタンダードとみなされており、今後はさまざまな MCP サーバー、およびそれらをサポートする AI アプリケーションが登場してくると思われます。
-有名どころの MCP サーバー実装は、下記リンク先にまとめられていたりします。
-modelcontextprotocol/servers: Model Context Protocol Servers punkpeye/awesome-mcp-servers: A collection of MCP servers MCP サーバーは Python や Typescript 用のライブラリを使うと簡単に実装することができます。 MCP がどのような仕組みで動いているのかを理解するには、Hello World 的な MCP サーバーを作ってしまうのが一番早いです。 ここでは、Python で簡単な MCP サーバーを作って、AI アプリ（Claude Desktop と VS Code）と連携させてみます。
-プロジェクトの作成 まず、Python のプロジェクトを作成します。 ここでは、プロジェクト管理ツールとして uv を使用します。 uv は Python スクリプト実行時に必要なライブラリを自動でインストールしてくれるので、複数の MCP サーバーを立ち上げるようなケースでは特に便利です（MCP サーバーごとに手動で venv 環境に入らなくて済みます）。</description></item><item><title>VS Code で Python 用の Linter ＆フォーマッターの Ruff を使う</title><link>https://maku.blog/p/6hnm4hy/</link><pubDate>Thu, 19 Sep 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6hnm4hy/</guid><description>Ruff とは Ruff は Python 用の Lint &amp;amp; Format ツールで、Rust で記述されているため非常に高速に動作します。 Ruff だけで Lint やフォーマットをまとめてかけることができる ため、次のようなツールを個別にインストールする必要がなくなります。
-Flake8（Linter） Black（フォーマッター） isort（import 文のソート） これまで、Python コードに Lint や Format をかける場合は、複数のツールを組み合わせて使うのが主流で、効率的な処理が行われているとは言いにくい状況でした。 例えば、広く使われている Lint ツールに Flake8 がありますが、これは pyflakes や pycodestyle の組み合わせであり、内部で何度もファイルの読み込みやパースが行われるため処理に時間がかかっていました。 Ruff は様々な処理が一度で済むように実装されています。 同様に広く使われているフォーマットツールとして Black がありますが、よくよく考えると、Black でフォーマット済みのコードを別の Lint ツール (Flake8) でスタイルチェックするのは無駄です。 Ruff で Lint とフォーマットの処理を一括で行うのは理にかなっています。
-ちなみに、Ruff の開発元である Astral 社は、Python 用のパッケージマネージャ（プロジェクト管理ツール）である uv も公開しています。 こちらも Rust で実装されており、高速かつ使いやすいのでオススメです。
-参考: Python プロジェクト用の爆速パッケージマネージャ uv を導入する - まくまく Python ノート VS Code に Ruff 拡張をインストールする Visual Studio Code で Ruff を使うには、下記の公式拡張をインストールするだけです。 ruff コマンドを別途インストールする必要はありません。</description></item><item><title>Python で Confluence の情報を取得する</title><link>https://maku.blog/p/wgsz2wn/</link><pubDate>Mon, 05 Feb 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wgsz2wn/</guid><description>Atlassian のドキュメンテーション管理ツールである Confluence は、REST API を使って様々な操作を自動化することができます。 各言語用にラッパーライブラリが公開されているので、通常は REST API を直接呼び出す必要はありません。 ここでは、Atlassian Python API (atlassian-python-api) を使って、Python から Confluence の情報を取得してみます。
-Atlassian Python API documentation (GitHub) atlassian-api/atlassian-python-api atlassian-python-api のインストール pip コマンドで atlassian-python-api パッケージをインストールします。 システムを汚さないように、venv 環境を作成してインストールする のがおすすめです。
-atlassian-python-api パッケージのインストール ## venv 仮想環境を使う場合（Linux/macOS の場合） $ python3 -m venv venv # 仮想環境の作成 $ source venv/bin/activate # 仮想環境に入る ## venv 仮想環境を使う場合（Windows の場合） $ py -m venv venv # 仮想環境の作成 $ venv\Scripts\activate.bat # 仮想環境に入る ## atlassian-python-api パッケージのインストール $ pip install atlassian-python-api ついでに、python-dotenv を入れて、.</description></item><item><title>Python で Jira の情報を取得する</title><link>https://maku.blog/p/thhqqc7/</link><pubDate>Wed, 13 Dec 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/thhqqc7/</guid><description>プロジェクト管理ツールである Jira は、REST API を使って情報を取得できるようになっています。 ここでは、Python を使って Jira の情報を取得してみます。
-jira パッケージのインストール Python から JIRA の情報を取得するには、PyPI で公開されている jira パッケージ を使用すると簡単です（jira パッケージ内部で REST API を使っています）。
-jira パッケージのインストール $ pip install jira jira パッケージの基本的な使い方 下記は、JIRA プロジェクトの一覧を取得する簡単な例です。 ユーザー ID やパスワードは適切なものに置き換えてください。
-jira-projects.py from jira import JIRA, JIRAError JIRA_SERVER = &amp;#34;https://&amp;lt;server&amp;gt;&amp;#34; JIRA_USER = &amp;#34;&amp;lt;user&amp;gt;&amp;#34; JIRA_PW = &amp;#34;&amp;lt;password&amp;gt;&amp;#34; try: jira = JIRA(JIRA_SERVER, basic_auth=(JIRA_USER, JIRA_PW)) for prj in jira.projects(): print(f&amp;#34;key: {prj.key}, name: {prj.name}&amp;#34;) except JIRAError as e: print(f&amp;#34;Error: {e.</description></item><item><title>VS Code で Python 用のフォーマッター (Black) を使う</title><link>https://maku.blog/p/4oybku6/</link><pubDate>Sat, 13 Nov 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4oybku6/</guid><description>何をするか？ Visual Studio Code に Python 拡張 を入れることで、Python コードの編集（自動補完など）ができるようになりますが、コードの自動フォーマットを行うには、フォーマッターを別途インストールしておく必要があります（いろんなフォーマッターがあるため）。
-Python のフォーマッターとしては、autopep8 や yapf などもありますが、ここでは、最近人気がある Black を VS Code の自動フォーマッターとして設定します。 Facebook や Dropbox、Mozilla などでも導入されており、採用実績としては申し分なさそうです。
-☝️ 頑固なフォーマッター Black は自分自身を The uncompromising code formatter と説明しています。 ようするに、「私が定義する設定に従いなさい」という意味で、ユーザーにほとんど設定の余地を残していません（行の長さ程度は設定できます）。 このようにすることで、チーム内でのフォーマット論争を防ぐ効果があります。 TypeScript (JavaScript) でよく使われている Prettier フォーマッターも同様の思想で作られており、ほとんど設定ができないようになっています（こちらは opinionated という単語を使っています）。
-参考: TypeScript コードを Prettier で自動整形する （2023-06 追記）Python 拡張とは別に、Black Formatter 拡張 が単独で提供されています。 この拡張には black コマンドがバンドルされているため、別途外部コマンドとして black をインストール (pip install black) する必要がありません。 VS Code での開発が前提であれば、Black Formatter 拡張を使うのが手っ取り早いです。 ここでは、下記の 2 種類の方法を説明します。
-方法1: Python 拡張 ＋ Black Formatter 拡張を使う方法 方法2: Python 拡張から外部の black コマンドを使う方法 Python 拡張と Black Formatter 拡張は、両方とも Microsoft 公式の拡張なので、将来的には統合されるかもしれません。</description></item><item><title>Python で OpenGL (1) pyGLFW のインストール</title><link>https://maku.blog/p/sfpwow9/</link><pubDate>Fri, 16 Aug 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/sfpwow9/</guid><description>Python で簡単に Open GL のプログラムを開発できるように、GLFW (pyGLFW) というライブラリを使用するための環境構築をしてみます。
-GLFW とは Khronos グループが作成している OpenGL や OpenGL ES、Vulkan などの API を使用すると、クラスプラットフォームな 3D プログラムを作成することができます。 ただし、OS ごとにウィンドウの作成方法やキーハンドリングの方法は異なっているため、その部分は個別に作成する必要があります。
-GLFW は、そのあたりの OS 依存の処理を抽象化するためラッパーライブラリで、Windows、macOS、Linux などのデスクトップ環境に対応しています。 GLFW 本家は C 言語用のライブラリとして作成していますが、Python 用のラッパーライブラリ (pyGLFW) も公開されています。
-昔は GLUT というライブラリがよく使われていましたが、今はもうメンテナンスされていないので、GLFW を使います。
-pyGLFW (glfw) のインストール ここでは、Python 用の GLFW ラッパーライブラリである、pyGLFW (glfw) パッケージ をインストールします。
-Python 用ライブラリ glfw のインストール Python 用の glfw パッケージは pip コマンドで簡単にインストールできます。 システム全体の環境に影響しないようにするには、virtualenv を使って仮想環境を構築 してからインストールするのがよいでしょう。
-virtualenv で仮想環境に切り替える場合 $ mkdir sample $ virtualenv ENV $ source ENV/bin/activate glfw のインストール $ pip install glfw ランタイムライブラリのインストール glfw を使用したプログラムを実行するには、各 OS ごとに用意されたランタイムライブラリ (Shared library) もインストールしておく必要があります。</description></item><item><title>Python で OpenGL (2) PyOpenGL のインストール</title><link>https://maku.blog/p/665rua3/</link><pubDate>Fri, 16 Aug 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/665rua3/</guid><description>PyOpenGL とは 前回の記事 では、pyGLFW を使ってウィンドウを表示するところまで行きました。 ただし、pyGLFW がやってくれるのは、ウィンドウの作成や、そのサーフェスに描画するための OpenGL コンテキストを生成するところまでです。 実際に OpenGL コンテキストを使ってレンダリングするには、OpenGL の API が必要です。
-そのためのライブラリが PyOpenGL パッケージ です。
-PyOpenGL のインストール PyOpenGL パッケージも pyGLFW と同様、pip コマンドで簡単にインストールすることができます。
-$ pip install PyOpenGL PyOpenGL で Hello World 下記のサンプルコードは、pyGLFW (glfw) パッケージを使ってウィンドウの初期化を行い（main()）、PyOpenGL (OpenGL) パッケージを使って OpenGL の API を呼び出しています（render()）。
-main.py import glfw from OpenGL.GL import * def render(): glClearColor(0, 0, 0.5, 1.0) glClear(GL_COLOR_BUFFER_BIT) def main(): if not glfw.init(): raise RuntimeError(&amp;#39;Could not initialize GLFW3&amp;#39;) glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3) glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3) glfw.</description></item><item><title>Azure Speech Service を使って音声をテキストに変換する (STT)</title><link>https://maku.blog/p/5zx3ozz/</link><pubDate>Wed, 24 Jul 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5zx3ozz/</guid><description>Microsoft の Cognitive Services のひとつとして提供されている Speech Service を使用すると、音声をテキストに変換したり、逆にテキストを音声に変換したりすることができます。
-ここでは、Python から Speech Service の機能を利用してみます（Windows 10 で動作確認済）。 実行するにはマイクのついた PC が必要です マイクのついていない PC で実行すると SPXERR_MIC_NOT_AVAILABLE エラーが発生します。
-準備 Speech Service の準備 Azure Portal から Speech のリソースを作成し、Subscription Key を取得しておいてください。
-Speech SDK のインストール Python の azure-cognitiveservices-speech パッケージをインストールします。
-$ pip install azure-cognitiveservices-speech Visual Studio C++ Redistributable のインストール 必要があれば、Visual Studio C++ の再頒布可能パッケージをインストールします。
-Visual C++ 再頒布可能パッケージ (vc_redist.x64.exe) Python コード 一回だけ変換して終わるバージョン stt.py import azure.cognitiveservices.speech as speechsdk # この設定は適宜変更してください subscription = &amp;#34;e1b5f0964ab743133b7de4f892741c7a&amp;#34; region = &amp;#34;japaneast&amp;#34; language = &amp;#34;ja-JP&amp;#34; # proxy = (&amp;#34;proxy.</description></item><item><title>HMAC-SHA256 コードを生成する</title><link>https://maku.blog/p/uqhbb5p/</link><pubDate>Fri, 02 Aug 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uqhbb5p/</guid><description>Python で HMAC-SHA256 を生成する 下記の siggen.py スクリプトは、コマンドライン引数で渡された「秘密鍵テキスト」と「メッセージ」をもとに HMAC (Hash-based Message Authentication Code) 署名を生成します。
-siggen.py import sys import hashlib import hmac def usage(): print(&amp;#39;python &amp;#39; + sys.argv[0] + &amp;#39; &amp;lt;key&amp;gt; &amp;lt;message&amp;gt;&amp;#39;) sys.exit(1) if __name__ == &amp;#39;__main__&amp;#39;: if len(sys.argv) &amp;lt; 3: usage() key = sys.argv[1] msg = sys.argv[2] sig = hmac.new(key.encode(&amp;#39;ascii&amp;#39;), msg.encode(&amp;#39;ascii&amp;#39;), hashlib.sha256) print(sig.hexdigest()) 使用例 $ python siggen.py &amp;#39;SecretKey&amp;#39; &amp;#39;YourMessage&amp;#39; 8aff2951003c218bd26ee43c99e30527a0c30e06042008a60935ef1ab28891ec ここでは、SHA256 ハッシュ関数を使用していますが (HMAC-SHA256)、hashlib.sha256 の部分を変更すれば、他のハッシュ関数を適用することができます。
-openssl コマンドで HMAC-SHA256 を生成する Linux や macOS などの、openssl コマンドを使用できる環境では、下記のようにして簡単に HMAC-SHA256 を求めることができます。</description></item><item><title>数学メモ: 任意の桁のレプ・ユニット (repeated units) を求める方法</title><link>https://maku.blog/p/29awadj/</link><pubDate>Sun, 26 May 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/29awadj/</guid><description>レプ・ユニット (repeated units) というのは、1 の連続した数字を表します（例: 1, 11, 111, 1111）。
-n 桁のレプ・ユニットは、以下のような計算で求められます。
-$$ R_{n} = \frac{10^n - 1}{9} $$
-下記は Python でこの計算をテストする例です。
-repeated_units.py def repeated_units(n): return (10 ** n - 1) // 9 for i in range(1, 10): print(repeated_units(i)) 実行結果 1 11 111 1111 11111 111111 1111111 11111111 111111111 もちろん、Python のプログラムとしては、単純に繰り返し文字列を作成してから、それを数値に変換することもできます。
-def repeated_units(n): return int(&amp;#39;1&amp;#39; * n)</description></item><item><title>数学メモ: 書籍『はじめての数論（原著第3版）』の練習問題メモ</title><link>https://maku.blog/p/qyohkjh/</link><pubDate>Wed, 22 May 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qyohkjh/</guid><description>練習問題 1.1 問題 平方数でも三角数でもある最初の 2 つの数は 1 と 36 である。次に小さな例を見つけよう。できれば、その次の例も見つけよう。三角数でありかつ平方数でもある数を見つける有効な方法を見つけることはできるだろうか？こうした性質をもつ数は無数にあると考えられるか？
-解答 Python で三角数 (triangle number) ＝ 平方数 (square number) となる数値を見つけてみる。
-#!/usr/bin/env python def triangle(k): return k * (k + 1) // 2 def square(k): return k ** 2 a = 1 b = 1 while True: tri = triangle(a) squ = square(b) if tri == squ: print(&amp;#39;triangle({}) = square({}) = {}&amp;#39;.format(a, b, tri)) a += 1 b += 1 elif tri &amp;lt; squ: a += 1 else: b += 1 if a &amp;gt; 10000000: break 実行結果 triangle(1) = square(1) = 1 triangle(8) = square(6) = 36 triangle(49) = square(35) = 1225 triangle(288) = square(204) = 41616 triangle(1681) = square(1189) = 1413721 triangle(9800) = square(6930) = 48024900 triangle(57121) = square(40391) = 1631432881 triangle(332928) = square(235416) = 55420693056 triangle(1940449) = square(1372105) = 1882672131025 数を大きくすれば、無数に見つかりそうな予感はします。</description></item><item><title>プロコンメモ: Dynamic Programming (2) Top-down DP から Bottom-up DP へ</title><link>https://maku.blog/p/gycxxxm/</link><pubDate>Sun, 21 Apr 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gycxxxm/</guid><description>DP では、問題を解くアプローチとして、大きく分けて
-Top-down approach Bottom-up approach の 2 つのアプローチがあります。
-Top-down DP の考え方 Top-down DP の方は、n 番目の値を求めたいときに、それに必要なより小さな値を再帰で求めます。 例えば、10 番目のフィボナッチ数 fib(10) を Top-down で求める場合、
-fib(10) を求めるには fib(9) と fib(8) が必要だ（再帰呼び出し） fib(9) を求めるには fib(8) と fib(7) が必要だ（再帰呼び出し） &amp;hellip; 繰り返し &amp;hellip; fib(3) を求めるには fib(2) と fib(1) が必要だ（再帰呼び出し） fib(2) の答えは 1 である fib(1) の答えは 1 である と考えていきます。
-Top-down DP によるフィボナッチ関数 #!/usr/bin/env python memo = {} def fib(n): if n in memo: return memo[n] if n &amp;lt;= 2: memo[n] = 1 else: memo[n] = fib(n-2) + fib(n-1) return memo[n] print(fib(2000)) # RuntimeError: maximum recursion depth exceeded in comparison Top-down DP で問題の答えを求める場合、直感的な記述ができる反面、明らかな欠点があります。 それは、関数呼び出しにかかるコストです。また、再帰関数の呼び出し数には限界があるため、あまり大きな値を求めることができないという欠点もあります。</description></item><item><title>プロコンメモ: Dynamic Programming (1) メモ化による高速化 (memoization)</title><link>https://maku.blog/p/pxw2pe2/</link><pubDate>Wed, 17 Apr 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pxw2pe2/</guid><description>メモ化 (Memoization) ある関数が同じ引数で 2 回以上呼ばれる場合は、最初に返した値を記憶しておくことで、高速に結果を返すことができるようになります。 この手法を メモ化 (memoization) といいます。
-例えば、以下のようなフィボナッチ関数 (fibonacci) を考えます。
-Python def fib(n): if n &amp;lt;= 2: return 1 else: return fib(n - 2) + fib(n - 1) このような再帰による実装は、同じ引数での自分自身の呼び出しを何度も発生させてしまいます。 フィボナッチ数列の第 7 項を求めようとすると、以下のように指数関数的に呼び出し回数が増えていきます。
-f(7) | +---------+---------+ | | f(5) + f(6) | | +----+----+ +----+----+ | | | | f(3) + f(4) f(4) + f(5) | | | | +-+-+ +-+-+ +-+-+ +-+-+ | | | | | | | | f(1)+f(2) f(2)+f(3) f(2)+f(3) f(3)+f(4) fib(1) &amp;hellip; 呼び出し回数 1 回 fib(5) &amp;hellip; 呼び出し回数 9 回 fib(10) &amp;hellip; 呼び出し回数 109 回 fib(20) &amp;hellip; 呼び出し回数 13529 回 fib(30) &amp;hellip; 呼び出し回数 1664079 回 fib(35) を求めようとすると、6 秒以上かかります。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Python on まくろぐ</title><link>https://maku.blog/tags/python/</link><description>Recent content in Python on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 14 Apr 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/python/index.xml" rel="self" type="application/rss+xml"/><item><title>Azure Table Strage を使ってみる (3) Python からテーブル操作してみる</title><link>https://maku.blog/p/o8ufwct/</link><pubDate>Wed, 29 Jan 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/o8ufwct/</guid><description>&lt;h2 id="azure-cosmosdb-table-パッケージのインストール">azure-cosmosdb-table パッケージのインストール&lt;/h2>
+&lt;p>Python から Azure Table Storage を操作するには、&lt;a href="https://pypi.org/project/azure-cosmosdb-table/">&lt;code>azure-cosmosdb-table&lt;/code>&lt;/a> というライブラリを使用します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">azure-cosmosdb-table のインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ pip install azure-cosmosdb-table&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ ワンポイント&lt;/span>
+ &lt;span class="xNote_body">&lt;p>Cosmos DB をまったく使わない場合でも cosmosdb と名前のついたライブラリを使わせようとするのは、 &lt;del>Microsoft の策略&lt;/del> Cosmos DB に力を入れているという意思表示でしょう。
+正直なところ Cosmos DB はお金がかかりすぎて個人の趣味レベルでは使えないのですが。。。&lt;/p>
+&lt;p>（追記: 2021年）CosmosDB に無料枠ができて少しずつ個人利用もできそうな感じになってきました。&lt;/p>
+&lt;/span>
+&lt;/div>
+&lt;h2 id="tableservice-オブジェクトの生成">TableService オブジェクトの生成&lt;/h2>
+&lt;p>Azure Storage にアクセスするには、接続情報（ストレージアカウント名とキー）が必要になるので、&lt;a href="https://portal.azure.com/">Azure ポータル&lt;/a> で確認しておいてください。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/dofzeua">Azure Storage の接続情報（キー）を確認する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Table Storage にアクセスしてごにょごにょするには、&lt;a href="https://docs.microsoft.com/ja-jp/python/api/azure-cosmosdb-table/azure.cosmosdb.table.tableservice.tableservice?view=azure-python">TableService クラス&lt;/a> のメソッドを使用します。
+&lt;code>TableService&lt;/code> のコンストラクタには、ストレージアカウント名とキーを渡します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">azure.cosmosdb.table.tableservice&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">TableService&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">STORAGE_NAME&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;maku77storage&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">STORAGE_KEY&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;XlgKN4Hv...(省略)...F55o3N9g==&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">table_service&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">TableService&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">account_name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">STORAGE_NAME&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">account_key&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">STORAGE_KEY&lt;/span>&lt;span class="p">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ URL の指定は必要ない？&lt;/span>
+ &lt;span class="xNote_body">接続先アドレス (URL) の構築は &lt;code>TableService&lt;/code> クラスがよろしくやってくれるので、実装コードがとてもスッキリします。
+ストレージアカウント名は Azure 内（世界中）で一意になっているので、ストレージアカウント名さえ指定すれば、Web API の URL も自動的に決まるということですね。&lt;/span>
+&lt;/div>
+
+&lt;h3 id="ストレージアカウントのキーを環境変数から取得する">ストレージアカウントのキーを環境変数から取得する&lt;/h3>
+&lt;p>ストレージアカウントにアクセスするためのキー情報をスクリプト内にハードコーディングするのは望ましくないので、環境変数などから取得するようにしておくとよいでしょう。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">環境変数から Azure Storage のアクセスキーを取得&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">os&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">sys&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="s1">&amp;#39;AZURE_STORAGE_KEY&amp;#39;&lt;/span> &lt;span class="ow">not&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">os&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">environ&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Error: AZURE_STORAGE_KEY not found&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">file&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">stderr&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">storage_key&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">os&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">getenv&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;AZURE_STORAGE_KEY&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="プロキシ環境からアクセスする場合">プロキシ環境からアクセスする場合&lt;/h3>
+&lt;p>&lt;code>TableService&lt;/code> クラスをプロキシ環境内で使用する場合は、OS の &lt;strong>&lt;code>https_proxy&lt;/code>&lt;/strong> 環境変数で設定してしまうのが簡単です。
+OS の &lt;code>https_proxy&lt;/code> 環境変数を設定するのを避けたいときは、Python スクリプトの中からプロキシを設定してしまうこともできます。&lt;/p></description></item><item><title>QnA Maker (4) Python から QnA Maker の API を利用する</title><link>https://maku.blog/p/fwyi2fh/</link><pubDate>Tue, 04 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fwyi2fh/</guid><description>&lt;p>QnA Maker は REST API を提供しているので、HTTP リクエストを発行できるプログラミング言語から簡単に制御することができます。
+ここでは、Python に標準で付属している &lt;strong>&lt;code>urllib.request&lt;/code>&lt;/strong> モジュールを使って HTTP リクエストを発行し、QnA Maker にアクセスしてみます。&lt;/p>
+&lt;h2 id="事前準備アクセスキーの準備">事前準備（アクセスキーの準備）&lt;/h2>
+&lt;p>REST API を使用するには、HTTP リクエストのヘッダ情報としてアクセスキーを付加する必要があります。
+&lt;a href="../../p/t6n6jc8">こちらの記事&lt;/a> を参考に、下記のどちらかのアクセスキーを確認しておいてください。&lt;/p>
+&lt;ul>
+&lt;li>サブスクリプションキー (Subscription Key) &amp;hellip; 管理用&lt;/li>
+&lt;li>エンドポイントキー (Endpoint Key) &amp;hellip; クエリ用&lt;/li>
+&lt;/ul>
+&lt;p>アクセスキーは &lt;code>9d16b3e6345489ad4a57a0755eb4f96a&lt;/code> のような 16 進数文字列です。
+QnA のクエリ実行だけであればエンドポイントキーの方を使えば大丈夫ですが、ナレッジベースの作成や更新などを行う場合は、サブスクリプションキーの方を使う必要があります。&lt;/p>
+&lt;h2 id="qna-maker-の-rest-api-を呼び出す-python-ライブラリ">QnA Maker の REST API を呼び出す Python ライブラリ&lt;/h2>
+&lt;p>REST API は HTTP リクエストを送るだけで使用できるので、ここでは自力で QnA Maker の API を使用するライブラリを作ってみます。&lt;/p>
+&lt;p>下記の &lt;code>QnaRequest&lt;/code> クラスは、ナレッジベースの一覧を取得する &lt;code>getAllKnowledgeBases&lt;/code> メソッドと、指定したナレッジベースの情報を取得する &lt;code>getKnowledgeBase&lt;/code> メソッドを提供しています。
+戻り値は JSON 形式のテキストです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">mylib/qna.py&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">urllib.request&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">QnaRequest&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BASE_URL&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;https://westus.api.cognitive.microsoft.com/qnamaker/v4.0&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="fm">__init__&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">subscriptionKey&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_subscriptionKey&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">subscriptionKey&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_setup_opener&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">_setup_opener&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_opener&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">urllib&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">request&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">build_opener&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_opener&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">addheaders&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Ocp-Apim-Subscription-Key&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_subscriptionKey&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">_get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">with&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_opener&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QnaRequest&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">BASE_URL&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">res&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">res&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">read&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">decode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;utf-8&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">getAllKnowledgeBases&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;すべてのナレッジベースの情報を取得します。&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;/knowledgebases/&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">getKnowledgeBase&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">id&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;指定したナレッジベースの情報を取得します。&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;/knowledgebases/&lt;/span>&lt;span class="si">{}&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">id&lt;/span>&lt;span class="p">))&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>HTTP リクエストを送るときには、&lt;code>Ocp-Apim-Subscription-Key&lt;/code> ヘッダでアクセス用のキーを付加するようにしています。&lt;/p></description></item><item><title>MCP サーバーを作ってみる</title><link>https://maku.blog/p/5c9y6vt/</link><pubDate>Mon, 14 Apr 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5c9y6vt/</guid><description>&lt;h2 id="mcp-とは">MCP とは&lt;/h2>
+&lt;p>&lt;a href="https://modelcontextprotocol.io/">MCP (Model Context Protocol)&lt;/a> は、AI アプリケーションが外部のツールと連携するためのプロトコルで、Anthropic によってオープンソース化されました。
+この標準化されたプロトコルに従って MCP サーバーを作っておくと、Claude Desktop や VS Code（GitHub Copilot 拡張）などの AI アプリケーション (MCP host) から簡単に接続できるようになります。
+2025 年に入った頃から MCP はエージェント連携のためのプロトコルとしてデファクトスタンダードとみなされており、今後はさまざまな MCP サーバー、およびそれらをサポートする AI アプリケーションが登場してくると思われます。&lt;/p>
+&lt;p>有名どころの MCP サーバー実装は、下記リンク先にまとめられていたりします。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/modelcontextprotocol/servers">modelcontextprotocol/servers: Model Context Protocol Servers&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/punkpeye/awesome-mcp-servers">punkpeye/awesome-mcp-servers: A collection of MCP servers&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>MCP サーバーは Python や Typescript 用のライブラリを使うと簡単に実装することができます。
+MCP がどのような仕組みで動いているのかを理解するには、&lt;strong>Hello World 的な MCP サーバーを作ってしまうのが一番早いです&lt;/strong>。
+ここでは、Python で簡単な MCP サーバーを作って、AI アプリ（Claude Desktop と VS Code）と連携させてみます。&lt;/p>
+&lt;h2 id="プロジェクトの作成">プロジェクトの作成&lt;/h2>
+&lt;p>まず、Python のプロジェクトを作成します。
+ここでは、&lt;a href="https://maku77.github.io/p/fjsfjpw/">プロジェクト管理ツールとして uv を使用します&lt;/a>。
+&lt;code>uv&lt;/code> は Python スクリプト実行時に必要なライブラリを自動でインストールしてくれるので、複数の MCP サーバーを立ち上げるようなケースでは特に便利です（MCP サーバーごとに手動で venv 環境に入らなくて済みます）。&lt;/p></description></item><item><title>VS Code で Python 用の Linter ＆フォーマッターの Ruff を使う</title><link>https://maku.blog/p/6hnm4hy/</link><pubDate>Thu, 19 Sep 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6hnm4hy/</guid><description>&lt;h2 id="ruff-とは">Ruff とは&lt;/h2>
+&lt;p>&lt;a href="https://docs.astral.sh/ruff/">Ruff&lt;/a> は Python 用の Lint &amp;amp; Format ツールで、Rust で記述されているため非常に高速に動作します。
+&lt;strong>Ruff だけで Lint やフォーマットをまとめてかけることができる&lt;/strong> ため、次のようなツールを個別にインストールする必要がなくなります。&lt;/p>
+&lt;ul>
+&lt;li>Flake8（Linter）&lt;/li>
+&lt;li>Black（フォーマッター）&lt;/li>
+&lt;li>isort（import 文のソート）&lt;/li>
+&lt;/ul>
+&lt;p>これまで、Python コードに Lint や Format をかける場合は、複数のツールを組み合わせて使うのが主流で、効率的な処理が行われているとは言いにくい状況でした。
+例えば、広く使われている Lint ツールに Flake8 がありますが、これは &lt;code>pyflakes&lt;/code> や &lt;code>pycodestyle&lt;/code> の組み合わせであり、内部で何度もファイルの読み込みやパースが行われるため処理に時間がかかっていました。
+Ruff は様々な処理が一度で済むように実装されています。
+同様に広く使われているフォーマットツールとして Black がありますが、よくよく考えると、Black でフォーマット済みのコードを別の Lint ツール (Flake8) でスタイルチェックするのは無駄です。
+Ruff で Lint とフォーマットの処理を一括で行うのは理にかなっています。&lt;/p>
+&lt;p>ちなみに、Ruff の開発元である Astral 社は、Python 用のパッケージマネージャ（プロジェクト管理ツール）である &lt;code>uv&lt;/code> も公開しています。
+こちらも Rust で実装されており、高速かつ使いやすいのでオススメです。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="https://maku77.github.io/p/fjsfjpw/">Python プロジェクト用の爆速パッケージマネージャ uv を導入する - まくまく Python ノート&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="vs-code-に-ruff-拡張をインストールする">VS Code に Ruff 拡張をインストールする&lt;/h2>
+&lt;p>Visual Studio Code で Ruff を使うには、下記の公式拡張をインストールするだけです。
+&lt;code>ruff&lt;/code> コマンドを別途インストールする必要はありません。&lt;/p></description></item><item><title>Python で Confluence の情報を取得する</title><link>https://maku.blog/p/wgsz2wn/</link><pubDate>Mon, 05 Feb 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wgsz2wn/</guid><description>&lt;p>Atlassian のドキュメンテーション管理ツールである Confluence は、REST API を使って様々な操作を自動化することができます。
+各言語用にラッパーライブラリが公開されているので、通常は REST API を直接呼び出す必要はありません。
+ここでは、&lt;strong>Atlassian Python API (&lt;code>atlassian-python-api&lt;/code>)&lt;/strong> を使って、Python から Confluence の情報を取得してみます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://atlassian-python-api.readthedocs.io/">Atlassian Python API documentation&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/atlassian-api/atlassian-python-api">(GitHub) atlassian-api/atlassian-python-api&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="atlassian-python-api-のインストール">atlassian-python-api のインストール&lt;/h2>
+&lt;p>&lt;code>pip&lt;/code> コマンドで &lt;strong>&lt;code>atlassian-python-api&lt;/code>&lt;/strong> パッケージをインストールします。
+システムを汚さないように、&lt;a href="https://maku77.github.io/p/wozpogm/">venv 環境を作成してインストールする&lt;/a> のがおすすめです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">atlassian-python-api パッケージのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">#&lt;/span>&lt;span class="c1"># venv 仮想環境を使う場合（Linux/macOS の場合）&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> python3 -m venv venv &lt;span class="c1"># 仮想環境の作成&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> &lt;span class="nb">source&lt;/span> venv/bin/activate &lt;span class="c1"># 仮想環境に入る&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="gp">#&lt;/span>&lt;span class="c1"># venv 仮想環境を使う場合（Windows の場合）&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> py -m venv venv &lt;span class="c1"># 仮想環境の作成&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> venv&lt;span class="se">\S&lt;/span>cripts&lt;span class="se">\a&lt;/span>ctivate.bat &lt;span class="c1"># 仮想環境に入る&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="gp">#&lt;/span>&lt;span class="c1"># atlassian-python-api パッケージのインストール&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> pip install atlassian-python-api
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ついでに、&lt;strong>&lt;code>python-dotenv&lt;/code>&lt;/strong> を入れて、&lt;a href="https://maku77.github.io/p/gzo8d7y/">&lt;code>.env&lt;/code> ファイル&lt;/a> でアクセストークンを設定できるようにしておきます。&lt;/p></description></item><item><title>Python で Jira の情報を取得する</title><link>https://maku.blog/p/thhqqc7/</link><pubDate>Wed, 13 Dec 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/thhqqc7/</guid><description>&lt;p>プロジェクト管理ツールである Jira は、REST API を使って情報を取得できるようになっています。
+ここでは、Python を使って Jira の情報を取得してみます。&lt;/p>
+&lt;h2 id="jira-パッケージのインストール">jira パッケージのインストール&lt;/h2>
+&lt;p>Python から JIRA の情報を取得するには、PyPI で公開されている &lt;a href="https://pypi.org/project/jira/">jira パッケージ&lt;/a> を使用すると簡単です（&lt;code>jira&lt;/code> パッケージ内部で REST API を使っています）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">jira パッケージのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> pip install jira
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="jira-パッケージの基本的な使い方">jira パッケージの基本的な使い方&lt;/h2>
+&lt;p>下記は、JIRA プロジェクトの一覧を取得する簡単な例です。
+ユーザー ID やパスワードは適切なものに置き換えてください。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">jira-projects.py&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">jira&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">JIRA&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">JIRAError&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">JIRA_SERVER&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;https://&amp;lt;server&amp;gt;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">JIRA_USER&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;&amp;lt;user&amp;gt;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">JIRA_PW&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;&amp;lt;password&amp;gt;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">try&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">jira&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">JIRA&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">JIRA_SERVER&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">basic_auth&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">JIRA_USER&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">JIRA_PW&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">prj&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">jira&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">projects&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;key: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">prj&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">, name: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">prj&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="n">JIRAError&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Error: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">status_code&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">url&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行結果&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">Key: TST, Name: A Test Project
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Key: TST2, Name: A Test Project 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Key: ANALYTICS, Name: Analytics
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Key: ANTIABUSETEST, Name: Anti-Abuse Test
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Key: ATLAS, Name: Atlas
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Key: ACCESS, Name: Atlassian Access
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Key: CLOUD, Name: Atlassian Cloud
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Jira Cloud サービスを使用している場合、パスワードをそのまま指定する方法は &lt;a href="https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/">非推奨になった&lt;/a> ので、API トークンを発行してパスワードの代わりに指定します。&lt;/p></description></item><item><title>VS Code で Python 用のフォーマッター (Black) を使う</title><link>https://maku.blog/p/4oybku6/</link><pubDate>Sat, 13 Nov 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4oybku6/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Visual Studio Code に &lt;a href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">Python 拡張&lt;/a> を入れることで、Python コードの編集（自動補完など）ができるようになりますが、コードの自動フォーマットを行うには、フォーマッターを別途インストールしておく必要があります（いろんなフォーマッターがあるため）。&lt;/p>
+&lt;p>Python のフォーマッターとしては、autopep8 や yapf などもありますが、ここでは、最近人気がある &lt;a href="https://black.readthedocs.io/">Black&lt;/a> を VS Code の自動フォーマッターとして設定します。
+Facebook や Dropbox、Mozilla などでも導入されており、採用実績としては申し分なさそうです。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ 頑固なフォーマッター&lt;/span>
+ &lt;span class="xNote_body">&lt;p>Black は自分自身を The &lt;strong>uncompromising&lt;/strong> code formatter と説明しています。
+ようするに、「私が定義する設定に従いなさい」という意味で、ユーザーにほとんど設定の余地を残していません（行の長さ程度は設定できます）。
+このようにすることで、チーム内でのフォーマット論争を防ぐ効果があります。
+TypeScript (JavaScript) でよく使われている Prettier フォーマッターも同様の思想で作られており、ほとんど設定ができないようになっています（こちらは &lt;strong>opinionated&lt;/strong> という単語を使っています）。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/au8iu6u">TypeScript コードを Prettier で自動整形する&lt;/a>&lt;/li>
+&lt;/ul>&lt;/span>
+&lt;/div>
+&lt;p>（2023-06 追記）Python 拡張とは別に、&lt;a href="https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter">Black Formatter 拡張&lt;/a> が単独で提供されています。
+この拡張には &lt;code>black&lt;/code> コマンドがバンドルされているため、別途外部コマンドとして &lt;code>black&lt;/code> をインストール (&lt;code>pip install black&lt;/code>) する必要がありません。
+VS Code での開発が前提であれば、Black Formatter 拡張を使うのが手っ取り早いです。
+ここでは、下記の 2 種類の方法を説明します。&lt;/p>
+&lt;ul>
+&lt;li>方法1: Python 拡張 ＋ Black Formatter 拡張を使う方法&lt;/li>
+&lt;li>方法2: Python 拡張から外部の &lt;code>black&lt;/code> コマンドを使う方法&lt;/li>
+&lt;/ul>
+&lt;p>Python 拡張と Black Formatter 拡張は、両方とも Microsoft 公式の拡張なので、将来的には統合されるかもしれません。&lt;/p></description></item><item><title>Python で OpenGL (1) pyGLFW のインストール</title><link>https://maku.blog/p/sfpwow9/</link><pubDate>Fri, 16 Aug 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/sfpwow9/</guid><description>&lt;p>Python で簡単に Open GL のプログラムを開発できるように、GLFW (pyGLFW) というライブラリを使用するための環境構築をしてみます。&lt;/p>
+&lt;h2 id="glfw-とは">GLFW とは&lt;/h2>
+&lt;p>Khronos グループが作成している OpenGL や OpenGL ES、Vulkan などの API を使用すると、クラスプラットフォームな 3D プログラムを作成することができます。
+ただし、OS ごとにウィンドウの作成方法やキーハンドリングの方法は異なっているため、その部分は個別に作成する必要があります。&lt;/p>
+&lt;p>&lt;a href="https://www.glfw.org/">GLFW&lt;/a> は、そのあたりの OS 依存の処理を抽象化するためラッパーライブラリで、Windows、macOS、Linux などのデスクトップ環境に対応しています。
+GLFW 本家は C 言語用のライブラリとして作成していますが、Python 用のラッパーライブラリ (pyGLFW) も公開されています。&lt;/p>
+&lt;p>昔は GLUT というライブラリがよく使われていましたが、今はもうメンテナンスされていないので、GLFW を使います。&lt;/p>
+&lt;h2 id="pyglfw-glfw-のインストール">pyGLFW (glfw) のインストール&lt;/h2>
+&lt;p>ここでは、Python 用の GLFW ラッパーライブラリである、&lt;a href="https://pypi.org/project/glfw/">pyGLFW (glfw) パッケージ&lt;/a> をインストールします。&lt;/p>
+&lt;h3 id="python-用ライブラリ-glfw-のインストール">Python 用ライブラリ glfw のインストール&lt;/h3>
+&lt;p>Python 用の &lt;code>glfw&lt;/code> パッケージは &lt;code>pip&lt;/code> コマンドで簡単にインストールできます。
+システム全体の環境に影響しないようにするには、&lt;a href="https://maku77.github.io/python/env/virtualenv.html">virtualenv を使って仮想環境を構築&lt;/a> してからインストールするのがよいでしょう。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">virtualenv で仮想環境に切り替える場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ mkdir sample
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ virtualenv ENV
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ source ENV/bin/activate&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">glfw のインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ pip install glfw&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="ランタイムライブラリのインストール">ランタイムライブラリのインストール&lt;/h3>
+&lt;p>&lt;code>glfw&lt;/code> を使用したプログラムを実行するには、各 OS ごとに用意されたランタイムライブラリ (Shared library) もインストールしておく必要があります。&lt;/p></description></item><item><title>Python で OpenGL (2) PyOpenGL のインストール</title><link>https://maku.blog/p/665rua3/</link><pubDate>Fri, 16 Aug 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/665rua3/</guid><description>&lt;h2 id="pyopengl-とは">PyOpenGL とは&lt;/h2>
+&lt;p>&lt;a href="../../p/sfpwow9">前回の記事&lt;/a> では、&lt;code>pyGLFW&lt;/code> を使ってウィンドウを表示するところまで行きました。
+ただし、&lt;code>pyGLFW&lt;/code> がやってくれるのは、ウィンドウの作成や、そのサーフェスに描画するための OpenGL コンテキストを生成するところまでです。
+実際に OpenGL コンテキストを使ってレンダリングするには、OpenGL の API が必要です。&lt;/p>
+&lt;p>そのためのライブラリが &lt;a href="https://pypi.org/project/PyOpenGL/">PyOpenGL パッケージ&lt;/a> です。&lt;/p>
+&lt;h2 id="pyopengl-のインストール">PyOpenGL のインストール&lt;/h2>
+&lt;p>&lt;code>PyOpenGL&lt;/code> パッケージも &lt;code>pyGLFW&lt;/code> と同様、&lt;code>pip&lt;/code> コマンドで簡単にインストールすることができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ pip install PyOpenGL&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="pyopengl-で-hello-world">PyOpenGL で Hello World&lt;/h2>
+&lt;p>下記のサンプルコードは、pyGLFW (glfw) パッケージを使ってウィンドウの初期化を行い（&lt;code>main()&lt;/code>）、PyOpenGL (OpenGL) パッケージを使って OpenGL の API を呼び出しています（&lt;code>render()&lt;/code>）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">main.py&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">glfw&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">OpenGL.GL&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="o">*&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">render&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">glClearColor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">glClear&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">GL_COLOR_BUFFER_BIT&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="ow">not&lt;/span> &lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">init&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">raise&lt;/span> &lt;span class="ne">RuntimeError&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Could not initialize GLFW3&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">window_hint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">CONTEXT_VERSION_MAJOR&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">window_hint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">CONTEXT_VERSION_MINOR&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">window_hint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">OPENGL_FORWARD_COMPAT&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">GL_TRUE&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">window_hint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">OPENGL_PROFILE&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">OPENGL_CORE_PROFILE&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">window&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">create_window&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">320&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">240&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;Hello World&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">None&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">None&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="ow">not&lt;/span> &lt;span class="n">window&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">terminate&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">raise&lt;/span> &lt;span class="ne">RuntimeError&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Could not create an window&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">make_context_current&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">window&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="ow">not&lt;/span> &lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">window_should_close&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">window&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">render&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">swap_buffers&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">window&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">poll_events&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">glfw&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">terminate&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;__main__&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">main&lt;/span>&lt;span class="p">()&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ここでは、&lt;code>glClear()&lt;/code> しているだけなので、背景がクリアされるだけです。
+背景色は &lt;code>glClearColor()&lt;/code> で暗めの青に設定しています。&lt;/p></description></item><item><title>Azure Speech Service を使って音声をテキストに変換する (STT)</title><link>https://maku.blog/p/5zx3ozz/</link><pubDate>Wed, 24 Jul 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5zx3ozz/</guid><description>&lt;p>Microsoft の Cognitive Services のひとつとして提供されている &lt;a href="https://azure.microsoft.com/ja-jp/services/cognitive-services/speech-services/">Speech Service&lt;/a> を使用すると、音声をテキストに変換したり、逆にテキストを音声に変換したりすることができます。&lt;/p>
+&lt;p>ここでは、Python から Speech Service の機能を利用してみます（Windows 10 で動作確認済）。
+実行するにはマイクのついた PC が必要です
+マイクのついていない PC で実行すると &lt;code>SPXERR_MIC_NOT_AVAILABLE&lt;/code> エラーが発生します。&lt;/p>
+&lt;h2 id="準備">準備&lt;/h2>
+&lt;h3 id="speech-service-の準備">Speech Service の準備&lt;/h3>
+&lt;p>&lt;a href="https://portal.azure.com/">Azure Portal&lt;/a> から &lt;samp>Speech&lt;/samp> のリソースを作成し、Subscription Key を取得しておいてください。&lt;/p>
+&lt;h3 id="speech-sdk-のインストール">Speech SDK のインストール&lt;/h3>
+&lt;p>Python の &lt;code>azure-cognitiveservices-speech&lt;/code> パッケージをインストールします。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ pip install azure-cognitiveservices-speech
+&lt;/code>&lt;/pre>&lt;h3 id="visual-studio-c-redistributable-のインストール">Visual Studio C++ Redistributable のインストール&lt;/h3>
+&lt;p>必要があれば、Visual Studio C++ の再頒布可能パッケージをインストールします。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://support.microsoft.com/ja-jp/help/2977003/the-latest-supported-visual-c-downloads">Visual C++ 再頒布可能パッケージ&lt;/a> (&lt;a href="https://aka.ms/vs/16/release/vc_redist.x64.exe">vc_redist.x64.exe&lt;/a>)&lt;/li>
+&lt;/ul>
+&lt;h2 id="python-コード">Python コード&lt;/h2>
+&lt;h3 id="一回だけ変換して終わるバージョン">一回だけ変換して終わるバージョン&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">stt.py&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">azure.cognitiveservices.speech&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">speechsdk&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># この設定は適宜変更してください&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">subscription&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;e1b5f0964ab743133b7de4f892741c7a&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">region&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;japaneast&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">language&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;ja-JP&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># proxy = (&amp;#34;proxy.example.com&amp;#34;, 8888, &amp;#34;&amp;#34;, &amp;#34;&amp;#34;)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># SpeechConfig オブジェクトを生成します&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">speech_config&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">speechsdk&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">SpeechConfig&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">subscription&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">subscription&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">region&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">region&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">speech_recognition_language&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">language&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="s1">&amp;#39;proxy&amp;#39;&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="nb">locals&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">speech_config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">set_proxy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">proxy&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># SpeechRecognizer インスタンスを生成します&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">recognizer&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">speechsdk&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">SpeechRecognizer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">speech_config&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">speech_config&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;何かしゃべってください&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">recognizer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">recognize_once&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="n">result&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">reason&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">speechsdk&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ResultReason&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">RecognizedSpeech&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;「&lt;/span>&lt;span class="si">{}&lt;/span>&lt;span class="s2">」&amp;#34;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">result&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">text&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">elif&lt;/span> &lt;span class="n">result&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">reason&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">speechsdk&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ResultReason&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">NoMatch&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;No speech could be recognized: &lt;/span>&lt;span class="si">{}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">result&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">no_match_details&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">elif&lt;/span> &lt;span class="n">result&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">reason&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">speechsdk&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ResultReason&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Canceled&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">cancellation_details&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">result&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">cancellation_details&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;Speech Recognition canceled: &lt;/span>&lt;span class="si">{}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">cancellation_details&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">reason&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">cancellation_details&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">reason&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">speechsdk&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">CancellationReason&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Error&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;Error details: &lt;/span>&lt;span class="si">{}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">cancellation_details&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">error_details&lt;/span>&lt;span class="p">))&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="繰り返し入力を受け付けるバージョン">繰り返し入力を受け付けるバージョン&lt;/h3>
+&lt;p>こちらのバージョンは、&lt;kbd>Ctrl+C&lt;/kbd> でプログラムを停止するまで、繰り返しユーザーの入力（発話）を受け付けます。&lt;/p></description></item><item><title>HMAC-SHA256 コードを生成する</title><link>https://maku.blog/p/uqhbb5p/</link><pubDate>Fri, 02 Aug 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uqhbb5p/</guid><description>&lt;h2 id="python-で-hmac-sha256-を生成する">Python で HMAC-SHA256 を生成する&lt;/h2>
+&lt;p>下記の &lt;code>siggen.py&lt;/code> スクリプトは、コマンドライン引数で渡された「秘密鍵テキスト」と「メッセージ」をもとに &lt;a href="https://ja.wikipedia.org/wiki/HMAC">HMAC (Hash-based Message Authentication Code)&lt;/a> 署名を生成します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">siggen.py&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">sys&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">hashlib&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">hmac&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">usage&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;python &amp;#39;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s1">&amp;#39; &amp;lt;key&amp;gt; &amp;lt;message&amp;gt;&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s1">&amp;#39;__main__&amp;#39;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">usage&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">key&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">msg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sig&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">hmac&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">new&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">encode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;ascii&amp;#39;&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">msg&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">encode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;ascii&amp;#39;&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">hashlib&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sha256&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">hexdigest&lt;/span>&lt;span class="p">())&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">使用例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ python siggen.py &amp;#39;SecretKey&amp;#39; &amp;#39;YourMessage&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">8aff2951003c218bd26ee43c99e30527a0c30e06042008a60935ef1ab28891ec&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ここでは、SHA256 ハッシュ関数を使用していますが (HMAC-SHA256)、&lt;code>hashlib.sha256&lt;/code> の部分を変更すれば、他のハッシュ関数を適用することができます。&lt;/p>
+&lt;h2 id="openssl-コマンドで-hmac-sha256-を生成する">openssl コマンドで HMAC-SHA256 を生成する&lt;/h2>
+&lt;p>Linux や macOS などの、&lt;code>openssl&lt;/code> コマンドを使用できる環境では、下記のようにして簡単に HMAC-SHA256 を求めることができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ echo -n &amp;#39;YourMessage&amp;#39; | openssl dgst -sha256 -hmac &amp;#39;SecretKey&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">8aff2951003c218bd26ee43c99e30527a0c30e06042008a60935ef1ab28891ec&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="おまけランダムで秘密鍵テキストを生成するスクリプト">おまけ（ランダムで秘密鍵テキストを生成するスクリプト）&lt;/h2>
+&lt;p>下記の &lt;code>random-password.py&lt;/code> スクリプトは、HMAC 計算に使用可能な 20 桁のランダムな文字列（秘密鍵）を生成します。
+上記の &lt;code>siggen.py&lt;/code> スクリプトに入力する秘密鍵として使用することができます。&lt;/p></description></item><item><title>数学メモ: 任意の桁のレプ・ユニット (repeated units) を求める方法</title><link>https://maku.blog/p/29awadj/</link><pubDate>Sun, 26 May 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/29awadj/</guid><description>&lt;p>&lt;strong>レプ・ユニット (repeated units)&lt;/strong> というのは、1 の連続した数字を表します（例: 1, 11, 111, 1111）。&lt;/p>
+&lt;p>n 桁のレプ・ユニットは、以下のような計算で求められます。&lt;/p>
+&lt;p>$$
+R_{n} = \frac{10^n - 1}{9}
+$$&lt;/p>
+&lt;p>下記は Python でこの計算をテストする例です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">repeated_units.py&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">repeated_units&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="mi">10&lt;/span> &lt;span class="o">**&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">//&lt;/span> &lt;span class="mi">9&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">repeated_units&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">))&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行結果&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">11
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">111
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1111
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">11111
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">111111
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">1111111
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">11111111
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">111111111&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>もちろん、Python のプログラムとしては、単純に繰り返し文字列を作成してから、それを数値に変換することもできます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">repeated_units&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nb">int&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;1&amp;#39;&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>数学メモ: 書籍『はじめての数論（原著第3版）』の練習問題メモ</title><link>https://maku.blog/p/qyohkjh/</link><pubDate>Wed, 22 May 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qyohkjh/</guid><description>&lt;h2 id="練習問題-11">練習問題 1.1&lt;/h2>
+&lt;h3 id="問題">問題&lt;/h3>
+&lt;p>平方数でも三角数でもある最初の 2 つの数は 1 と 36 である。次に小さな例を見つけよう。できれば、その次の例も見つけよう。三角数でありかつ平方数でもある数を見つける有効な方法を見つけることはできるだろうか？こうした性質をもつ数は無数にあると考えられるか？&lt;/p>
+&lt;h3 id="解答">解答&lt;/h3>
+&lt;p>Python で三角数 (triangle number) ＝ 平方数 (square number) となる数値を見つけてみる。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="ch">#!/usr/bin/env python&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">triangle&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">k&lt;/span>&lt;span class="p">):&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">k&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">k&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">//&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">square&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">k&lt;/span>&lt;span class="p">):&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">k&lt;/span> &lt;span class="o">**&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">a&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">b&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">while&lt;/span> &lt;span class="kc">True&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">tri&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">triangle&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">a&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">squ&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">square&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">b&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">tri&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">squ&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;triangle(&lt;/span>&lt;span class="si">{}&lt;/span>&lt;span class="s1">) = square(&lt;/span>&lt;span class="si">{}&lt;/span>&lt;span class="s1">) = &lt;/span>&lt;span class="si">{}&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">a&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">tri&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">a&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">b&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">elif&lt;/span> &lt;span class="n">tri&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">squ&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">a&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">b&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">10000000&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行結果&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">triangle(1) = square(1) = 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">triangle(8) = square(6) = 36
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">triangle(49) = square(35) = 1225
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">triangle(288) = square(204) = 41616
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">triangle(1681) = square(1189) = 1413721
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">triangle(9800) = square(6930) = 48024900
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">triangle(57121) = square(40391) = 1631432881
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">triangle(332928) = square(235416) = 55420693056
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">triangle(1940449) = square(1372105) = 1882672131025&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>数を大きくすれば、無数に見つかりそうな予感はします。&lt;/p></description></item><item><title>プロコンメモ: Dynamic Programming (2) Top-down DP から Bottom-up DP へ</title><link>https://maku.blog/p/gycxxxm/</link><pubDate>Sun, 21 Apr 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gycxxxm/</guid><description>&lt;p>DP では、問題を解くアプローチとして、大きく分けて&lt;/p>
+&lt;ul>
+&lt;li>Top-down approach&lt;/li>
+&lt;li>Bottom-up approach&lt;/li>
+&lt;/ul>
+&lt;p>の 2 つのアプローチがあります。&lt;/p>
+&lt;h2 id="top-down-dp-の考え方">Top-down DP の考え方&lt;/h2>
+&lt;p>Top-down DP の方は、n 番目の値を求めたいときに、それに必要なより小さな値を再帰で求めます。
+例えば、10 番目のフィボナッチ数 &lt;code>fib(10)&lt;/code> を Top-down で求める場合、&lt;/p>
+&lt;ul>
+&lt;li>fib(10) を求めるには fib(9) と fib(8) が必要だ（再帰呼び出し）&lt;/li>
+&lt;li>fib(9) を求めるには fib(8) と fib(7) が必要だ（再帰呼び出し）&lt;/li>
+&lt;li>&amp;hellip; 繰り返し &amp;hellip;&lt;/li>
+&lt;li>fib(3) を求めるには fib(2) と fib(1) が必要だ（再帰呼び出し）&lt;/li>
+&lt;li>fib(2) の答えは 1 である&lt;/li>
+&lt;li>fib(1) の答えは 1 である&lt;/li>
+&lt;/ul>
+&lt;p>と考えていきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Top-down DP によるフィボナッチ関数&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="ch">#!/usr/bin/env python&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">memo&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">fib&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">memo&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">memo&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">memo&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">memo&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">fib&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">fib&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">memo&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fib&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">2000&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="c1"># RuntimeError: maximum recursion depth exceeded in comparison&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Top-down DP で問題の答えを求める場合、直感的な記述ができる反面、明らかな欠点があります。
+それは、関数呼び出しにかかるコストです。また、再帰関数の呼び出し数には限界があるため、あまり大きな値を求めることができないという欠点もあります。&lt;/p></description></item><item><title>プロコンメモ: Dynamic Programming (1) メモ化による高速化 (memoization)</title><link>https://maku.blog/p/pxw2pe2/</link><pubDate>Wed, 17 Apr 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pxw2pe2/</guid><description>&lt;h2 id="メモ化-memoization">メモ化 (Memoization)&lt;/h2>
+&lt;p>ある関数が同じ引数で 2 回以上呼ばれる場合は、最初に返した値を記憶しておくことで、高速に結果を返すことができるようになります。
+この手法を &lt;strong>メモ化 (memoization)&lt;/strong> といいます。&lt;/p>
+&lt;p>例えば、以下のようなフィボナッチ関数 (fibonacci) を考えます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Python&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">fib&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">fib&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">fib&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このような再帰による実装は、同じ引数での自分自身の呼び出しを何度も発生させてしまいます。
+フィボナッチ数列の第 7 項を求めようとすると、以下のように指数関数的に呼び出し回数が増えていきます。&lt;/p>
+&lt;pre tabindex="0">&lt;code> f(7)
+ |
+ +---------+---------+
+ | |
+ f(5) + f(6)
+ | |
+ +----+----+ +----+----+
+ | | | |
+ f(3) + f(4) f(4) + f(5)
+ | | | |
+ +-+-+ +-+-+ +-+-+ +-+-+
+ | | | | | | | |
+f(1)+f(2) f(2)+f(3) f(2)+f(3) f(3)+f(4)
+&lt;/code>&lt;/pre>&lt;ul>
+&lt;li>&lt;code>fib(1)&lt;/code> &amp;hellip; 呼び出し回数 1 回&lt;/li>
+&lt;li>&lt;code>fib(5)&lt;/code> &amp;hellip; 呼び出し回数 9 回&lt;/li>
+&lt;li>&lt;code>fib(10)&lt;/code> &amp;hellip; 呼び出し回数 109 回&lt;/li>
+&lt;li>&lt;code>fib(20)&lt;/code> &amp;hellip; 呼び出し回数 13529 回&lt;/li>
+&lt;li>&lt;code>fib(30)&lt;/code> &amp;hellip; 呼び出し回数 1664079 回&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>fib(35)&lt;/code> を求めようとすると、6 秒以上かかります。&lt;/p></description></item></channel></rss>

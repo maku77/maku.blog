@@ -1,6 +1,56 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Next.js の API Routes 機能 on まくろぐ</title><link>https://maku.blog/p/yit3cku/</link><description>Recent content in Next.js の API Routes 機能 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 01 Nov 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/yit3cku/index.xml" rel="self" type="application/rss+xml"/><item><title>Next.js の API Routes 機能で Web API を作成する</title><link>https://maku.blog/p/qcp2coz/</link><pubDate>Wed, 05 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qcp2coz/</guid><description>Next.js の Web API 機能 Next.js では、pages/api ディレクトリ以下に TypeScript (JavaScript) コードを配置するだけで、クライアントサイド JavaScript から呼び出せる API を定義することができます。
-例えば、次のようなファイルを作成します。
-pages/api/hello.ts import type { NextApiRequest, NextApiResponse } from &amp;#39;next&amp;#39; type Response = { name: string } export default (req: NextApiRequest, res: NextApiResponse&amp;lt;Response&amp;gt;) =&amp;gt; { res.status(200).json({ name: &amp;#39;John Doe&amp;#39; }) // チェーン呼び出しせずに次のように記述しても OK // res.statusCode = 200 // res.json({ name: &amp;#39;John Doe&amp;#39;}) } あとは、Next.js サーバーを起動した状態で、/api/hello というエンドポイントにアクセスすると、次のような JSON データを取得できます。
-{&amp;#34;name&amp;#34;:&amp;#34;John Doe&amp;#34;} API 機能は次のような用途に使用することができます。
-フォームに入力された値が POST されたときにサーバーサイドで DB に保存する 3rd パーティ製の Web API の呼び出しを中継する このような機能を実装するには、データベースのパスワードや、3rd パーティ製 Web API のアクセスキーなどが必要になりますが、そういった情報は Next.</description></item><item><title>Next.js から AWS DynamoDB にアクセスする</title><link>https://maku.blog/p/xp8o5k2/</link><pubDate>Tue, 02 Nov 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xp8o5k2/</guid><description>何をするか？ Next.js アプリの API routes (pages/*.ts) や、getServerSideProps などのサーバーサイドで実行される関数では、通常の Node.js モジュールを使うことができるため、AWS の DynamoDB からデータを取得する、といったことも自由に行えます。 ここでは、Next.js の API routes 機能を使って、DynamoDB から情報を取得する Web API を作ってみます。 具体的には次のようなことをします。
-テスト用の DynamoDB テーブル (Books) を作成する Books テーブルを参照するためのアクセスキー（IAM ユーザー）を作成する Next.js の API routes の実装 (pages/api/books.ts) を行う AWS SDK を使って DynamoDB から情報を取得する /api/books/001 のような URL にアクセスすると JSON データを返す アクセスキーは環境変数で設定する ☝️ アクセスキーを使った AWS リソースのアクセスについて AWS のアクセスキーは、IAM ユーザーに設定されるものであり、このアクセスキーが漏洩すると、そのユーザーの権限で何でもできる ということになります。 そのため、アクセスキーを使用するときは、IAM ユーザーの権限を適切に絞ることが大切で、そもそも本当に必要なケースでのみアクセスキーを使うようにすべきです。 アクセスキーが必要になるのは、AWS の外から AWS リソースに直接アクセスするケースです。 例えば、AWS CLI のコマンドで AWS の制御を行う場合や、今回の例のように AWS 外のサーバーから AWS へアクセスするようなケースです。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Next.js の API Routes 機能 on まくろぐ</title><link>https://maku.blog/p/yit3cku/</link><description>Recent content in Next.js の API Routes 機能 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Tue, 02 Nov 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/yit3cku/index.xml" rel="self" type="application/rss+xml"/><item><title>Next.js の API Routes 機能で Web API を作成する</title><link>https://maku.blog/p/qcp2coz/</link><pubDate>Wed, 05 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qcp2coz/</guid><description>&lt;h2 id="nextjs-の-web-api-機能">Next.js の Web API 機能&lt;/h2>
+&lt;p>Next.js では、&lt;strong>&lt;code>pages/api&lt;/code>&lt;/strong> ディレクトリ以下に TypeScript (JavaScript) コードを配置するだけで、クライアントサイド JavaScript から呼び出せる API を定義することができます。&lt;/p>
+&lt;p>例えば、次のようなファイルを作成します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">pages/api/hello.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">NextApiRequest&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">NextApiResponse&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">Response&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>: &lt;span class="kt">string&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">req&lt;/span>: &lt;span class="kt">NextApiRequest&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">res&lt;/span>: &lt;span class="kt">NextApiResponse&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Response&lt;/span>&lt;span class="p">&amp;gt;)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">res&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">status&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">200&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">json&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;John Doe&amp;#39;&lt;/span> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// チェーン呼び出しせずに次のように記述しても OK
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// res.statusCode = 200
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// res.json({ name: &amp;#39;John Doe&amp;#39;})
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>あとは、Next.js サーバーを起動した状態で、&lt;strong>&lt;code>/api/hello&lt;/code>&lt;/strong> というエンドポイントにアクセスすると、次のような JSON データを取得できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>&lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="s2">&amp;#34;John Doe&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>API 機能は次のような用途に使用することができます。&lt;/p>
+&lt;ul>
+&lt;li>フォームに入力された値が POST されたときにサーバーサイドで DB に保存する&lt;/li>
+&lt;li>3rd パーティ製の Web API の呼び出しを中継する&lt;/li>
+&lt;/ul>
+&lt;p>このような機能を実装するには、データベースのパスワードや、3rd パーティ製 Web API のアクセスキーなどが必要になりますが、そういった情報は Next.js サーバ側の環境変数などに保存しておくことができます。
+そうすれば、API の実装コードから &lt;code>process.env.XXX_ACCESS_KEY&lt;/code> のように参照できます。
+&lt;code>pages/api&lt;/code> ディレクトリ以下の実装内容が、クライアントに見られてしまうことはありません。&lt;/p></description></item><item><title>Next.js から AWS DynamoDB にアクセスする</title><link>https://maku.blog/p/xp8o5k2/</link><pubDate>Tue, 02 Nov 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xp8o5k2/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Next.js アプリの API routes (&lt;code>pages/*.ts&lt;/code>) や、&lt;code>getServerSideProps&lt;/code> などのサーバーサイドで実行される関数では、通常の Node.js モジュールを使うことができるため、AWS の DynamoDB からデータを取得する、といったことも自由に行えます。
+ここでは、Next.js の API routes 機能を使って、DynamoDB から情報を取得する Web API を作ってみます。
+具体的には次のようなことをします。&lt;/p>
+&lt;ul>
+&lt;li>テスト用の DynamoDB テーブル (&lt;code>Books&lt;/code>) を作成する&lt;/li>
+&lt;li>&lt;code>Books&lt;/code> テーブルを参照するためのアクセスキー（IAM ユーザー）を作成する&lt;/li>
+&lt;li>Next.js の API routes の実装 (&lt;code>pages/api/books.ts&lt;/code>) を行う
+&lt;ul>
+&lt;li>AWS SDK を使って DynamoDB から情報を取得する&lt;/li>
+&lt;li>&lt;code>/api/books/001&lt;/code> のような URL にアクセスすると JSON データを返す&lt;/li>
+&lt;li>アクセスキーは環境変数で設定する&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ アクセスキーを使った AWS リソースのアクセスについて&lt;/span>
+ &lt;span class="xNote_body">&lt;p>AWS のアクセスキーは、IAM ユーザーに設定されるものであり、このアクセスキーが漏洩すると、&lt;strong>そのユーザーの権限で何でもできる&lt;/strong> ということになります。
+そのため、アクセスキーを使用するときは、IAM ユーザーの権限を適切に絞ることが大切で、そもそも本当に必要なケースでのみアクセスキーを使うようにすべきです。
+アクセスキーが必要になるのは、AWS の外から AWS リソースに直接アクセスするケースです。
+例えば、AWS CLI のコマンドで AWS の制御を行う場合や、今回の例のように AWS 外のサーバーから AWS へアクセスするようなケースです。&lt;/p></description></item></channel></rss>

@@ -1,9 +1,182 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Amazon S3 on まくろぐ</title><link>https://maku.blog/p/q7fov5c/</link><description>Recent content in Amazon S3 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Wed, 16 Jun 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/q7fov5c/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS S3 をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/4ju5eow/</link><pubDate>Tue, 16 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4ju5eow/</guid><description>AWS CLI で S3 バケットの操作を行う場合、大きく分けて以下の 2 種類のコマンドがあります。
-aws s3 &amp;hellip; 高レベルコマンド aws s3api &amp;hellip; API レベルコマンド 基本的には、aws s3 コマンドでカバーできない操作が出てきたときに aws s3api コマンドの方を調べてみるというやり方でいいと思います。 aws s3 コマンドの方は、OS のコマンドラインシェルのファイル操作コマンドのような体系になっています（aws s3 ls とか aws s3 rm とか）。
-S3 バケットの操作を行うには、IAM ユーザーに適切な権限が割り当てられている必要がありますが、AmazonS3FulAccess 管理ポリシーがあればほとんどの操作が可能です。
-S3 バケットを作成する (s3 mb) $ aws s3 mb s3://&amp;lt;バケット名&amp;gt; 実行例 $ aws s3 mb s3://makutemp-123456789012-bucket-1 make_bucket: makutemp-123456789012-bucket-1 ☝️ 同名バケットの再生成でエラー バケットの削除後に、同名のバケットを再生成しようとすると、次のような conflicting conditional operation のエラーになることがあります。 この場合は、バケットの削除処理が完了するまでしばらく待つ必要があります。
-make_bucket failed: s3://makutemp-123456789012-bucket-1 An error occurred (OperationAborted) when calling the CreateBucket operation: A conflicting conditional operation is currently in progress against this resource.</description></item><item><title>Node.js で Amazon S3 を操作する (AWS SDK)</title><link>https://maku.blog/p/m8kv8it/</link><pubDate>Sun, 21 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m8kv8it/</guid><description>ここでは、Node.js 用の AWS SDK を使って Amazon S3 を操作する方法を説明します。 TypeScript の基本的な環境構築 は終わっているものとします。
-S3 用の Node.js SDK をインストールする AWS SDK version 3 の S3 用パッケージをインストールするには次のようにします。
-### npm の場合 $ npm install @aws-sdk/client-s3 ### yarn の場合 $ yarn add @aws-sdk/client-s3 これで、TypeScript コードから次のようにパッケージ内のクラスをインポートできるようになります。
-main.ts import { S3Client, ListBucketsCommand } from &amp;#39;@aws-sdk/client-s3&amp;#39;; S3Client インスタンスの生成 AWS SDK で S3 の操作を行うには、S3Client オブジェクトを使って各種コマンドを送ります。
-new S3Client(configuration: S3ClientConfig): S3Client S3Client コンストラクタには S3ClientConfig オブジェクトを渡すようになっており、接続情報などを指定できます。 空オブジェクト ({}) を渡すと、現在の環境の default プロファイルの設定が使用されます（~/.aws/config と ~/.aws/credentials に設定されたもの）。</description></item><item><title>Amazon S3: 未整理・雑多メモ</title><link>https://maku.blog/p/8cygv9k/</link><pubDate>Wed, 16 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8cygv9k/</guid><description> S3 のストレージクラスの例 汎用ストレージ &amp;hellip; S3 STANDARD アクセス頻度小 &amp;hellip; S3 STANDARD_IA 長期アーカイブ &amp;hellip; S3 Glacier S3 のバケットポリシーでは、プレフィックスとか拡張子などを指定してアクセスコントロールが可能。 S3 へのアクセスは ACL（アクセスコントロールリスト）でもコントロールできるが、古い仕組みなので非推奨。今は IAM を使う。 S3 のバージョニング設定を有効にすると、オブジェクトの複数バージョンを管理できるようになる。 S3 のバケット名は世界で一意になるように命名する。 3～63 文字で、大文字は使えない。 先頭文字は小文字の英数字。 _ 2文字目以降は、小文字の英数字、ハイフン、ドットのいずれかで構成する。ただし、ドットは通常は使わない方がよい（ドメインの区切り文字と混ざるので、HTTPS の証明書検証などに影響が出る）。</description></item><item><title>Amazon S3 バケット用のポリシー設定例</title><link>https://maku.blog/p/r9kv6gq/</link><pubDate>Sun, 21 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/r9kv6gq/</guid><description>S3 用のポリシー設定例 指定したバケット内のオブジェクト一覧を取得できるようにする { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;s3:ListBucket&amp;#34; ], &amp;#34;Resource&amp;#34;: [ &amp;#34;arn:aws:s3:::&amp;lt;バケット名&amp;gt;&amp;#34; ] } ] } 指定したバケット内のオブジェクトの内容を取得できるようにする { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;s3:GetObject&amp;#34; ], &amp;#34;Resource&amp;#34;: [ &amp;#34;arn:aws:s3:::&amp;lt;バケット名&amp;gt;/*&amp;#34; ] } ] } 指定したバケットに対していろいろできるようにする { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;s3:DeleteObject&amp;#34;, &amp;#34;s3:GetObject&amp;#34;, &amp;#34;s3:ListBucket&amp;#34;, &amp;#34;s3:PutObject&amp;#34;, &amp;#34;s3:PutObjectAcl&amp;#34; ], &amp;#34;Resource&amp;#34;: [ &amp;#34;arn:aws:s3:::&amp;lt;バケット名&amp;gt;&amp;#34;, &amp;#34;arn:aws:s3:::&amp;lt;バケット名&amp;gt;/*&amp;#34; ] } ] } すべての S3 リソースに対して何でもできるようにする { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: &amp;#34;s3:*&amp;#34;, &amp;#34;Resource&amp;#34;: &amp;#34;*&amp;#34; } ] } S3 で静的 Web サイトをホストするときは、バケットポリシーで s3:GetObject アクションのみを指定すればよい。ListObject や PutObject アクセス許可しなくても OK。 （おまけ）CORS 設定（JSON 形式） Web サイトの JavaScript などから S3 バケットにアクセスする場合は、バケットの設定で CORS アクセスを有効にしておく必要があります。 設定は次のように JSON 形式で行います。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Amazon S3 on まくろぐ</title><link>https://maku.blog/p/q7fov5c/</link><description>Recent content in Amazon S3 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Wed, 16 Jun 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/q7fov5c/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS S3 をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/4ju5eow/</link><pubDate>Tue, 16 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4ju5eow/</guid><description>&lt;p>AWS CLI で S3 バケットの操作を行う場合、大きく分けて以下の 2 種類のコマンドがあります。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>aws s3&lt;/code>&lt;/strong> &amp;hellip; 高レベルコマンド&lt;/li>
+&lt;li>&lt;strong>&lt;code>aws s3api&lt;/code>&lt;/strong> &amp;hellip; API レベルコマンド&lt;/li>
+&lt;/ul>
+&lt;p>基本的には、&lt;code>aws s3&lt;/code> コマンドでカバーできない操作が出てきたときに &lt;code>aws s3api&lt;/code> コマンドの方を調べてみるというやり方でいいと思います。
+&lt;code>aws s3&lt;/code> コマンドの方は、OS のコマンドラインシェルのファイル操作コマンドのような体系になっています（&lt;code>aws s3 ls&lt;/code> とか &lt;code>aws s3 rm&lt;/code> とか）。&lt;/p>
+&lt;p>S3 バケットの操作を行うには、IAM ユーザーに適切な権限が割り当てられている必要がありますが、&lt;strong>&lt;code>AmazonS3FulAccess&lt;/code>&lt;/strong> 管理ポリシーがあればほとんどの操作が可能です。&lt;/p>
+&lt;h2 id="s3-バケットを作成する-s3-mb">S3 バケットを作成する (s3 mb)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws s3 mb s3://&amp;lt;バケット名&amp;gt;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws s3 mb s3://makutemp-123456789012-bucket-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">make_bucket: makutemp-123456789012-bucket-1&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ 同名バケットの再生成でエラー&lt;/span>
+ &lt;span class="xNote_body">&lt;p>バケットの削除後に、同名のバケットを再生成しようとすると、次のような &lt;strong>conflicting conditional operation&lt;/strong> のエラーになることがあります。
+この場合は、バケットの削除処理が完了するまでしばらく待つ必要があります。&lt;/p>
+&lt;figure class="xCodeBlock">
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">make_bucket failed: s3://makutemp-123456789012-bucket-1 An error occurred (OperationAborted) when calling the CreateBucket operation: A conflicting conditional operation is currently in progress against this resource. Please try again.&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+&lt;p>このような待ち時間を防ぐためには、&lt;code>s3 rb&lt;/code> でバケットを削除した後で再生成するのではなく、&lt;code>s3 rm --recursive&lt;/code> でバケット内のオブジェクトだけをすべて削除します。&lt;/p></description></item><item><title>Node.js で Amazon S3 を操作する (AWS SDK)</title><link>https://maku.blog/p/m8kv8it/</link><pubDate>Sun, 21 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m8kv8it/</guid><description>&lt;p>ここでは、Node.js 用の AWS SDK を使って Amazon S3 を操作する方法を説明します。
+&lt;a href="../../p/taiqx6d">TypeScript の基本的な環境構築&lt;/a> は終わっているものとします。&lt;/p>
+&lt;h2 id="s3-用の-nodejs-sdk-をインストールする">S3 用の Node.js SDK をインストールする&lt;/h2>
+&lt;p>AWS SDK version 3 の S3 用パッケージをインストールするには次のようにします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">### npm の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install @aws-sdk/client-s3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">### yarn の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add @aws-sdk/client-s3&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、TypeScript コードから次のようにパッケージ内のクラスをインポートできるようになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">main.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">S3Client&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ListBucketsCommand&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@aws-sdk/client-s3&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="s3client-インスタンスの生成">S3Client インスタンスの生成&lt;/h2>
+&lt;p>AWS SDK で S3 の操作を行うには、&lt;a href="https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/classes/s3client.html">S3Client&lt;/a> オブジェクトを使って各種コマンドを送ります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="k">new&lt;/span> &lt;span class="nx">S3Client&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">configuration&lt;/span>: &lt;span class="kt">S3ClientConfig&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">S3Client&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>S3Client&lt;/code> コンストラクタには &lt;a href="https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/globals.html#s3clientconfig">S3ClientConfig&lt;/a> オブジェクトを渡すようになっており、接続情報などを指定できます。
+空オブジェクト (&lt;code>{}&lt;/code>) を渡すと、現在の環境の default プロファイルの設定が使用されます（&lt;code>~/.aws/config&lt;/code> と &lt;code>~/.aws/credentials&lt;/code> に設定されたもの）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// default プロファイルで接続する場合
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">s3&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">S3Client&lt;/span>&lt;span class="p">({});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 接続情報をカスタマイズする場合
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">s3&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">S3Client&lt;/span>&lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">region&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;ap-northeast-1&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">credentials&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">accessKeyId&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;QABCSCRHWJAKIAQXINMC&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">secretAccessKey&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;TTey3DVmbrILhTforDDa8kR6+SL+47htmoJ+Vimv&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>一時的にプロファイルを切り替えて実行したいときは、環境変数 &lt;strong>&lt;code>AWS_PROFILE&lt;/code>&lt;/strong> でプロファイル名を指定します。&lt;/p></description></item><item><title>Amazon S3: 未整理・雑多メモ</title><link>https://maku.blog/p/8cygv9k/</link><pubDate>Wed, 16 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8cygv9k/</guid><description>&lt;ul>
+&lt;li>S3 のストレージクラスの例
+&lt;ul>
+&lt;li>汎用ストレージ &amp;hellip; S3 STANDARD&lt;/li>
+&lt;li>アクセス頻度小 &amp;hellip; S3 STANDARD_IA&lt;/li>
+&lt;li>長期アーカイブ &amp;hellip; S3 Glacier&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>S3 のバケットポリシーでは、プレフィックスとか拡張子などを指定してアクセスコントロールが可能。&lt;/li>
+&lt;li>S3 へのアクセスは ACL（アクセスコントロールリスト）でもコントロールできるが、古い仕組みなので非推奨。今は IAM を使う。&lt;/li>
+&lt;li>S3 のバージョニング設定を有効にすると、オブジェクトの複数バージョンを管理できるようになる。&lt;/li>
+&lt;li>S3 のバケット名は世界で一意になるように命名する。
+&lt;ul>
+&lt;li>3～63 文字で、大文字は使えない。&lt;/li>
+&lt;li>先頭文字は小文字の英数字。
+_ 2文字目以降は、小文字の英数字、ハイフン、ドットのいずれかで構成する。ただし、ドットは通常は使わない方がよい（ドメインの区切り文字と混ざるので、HTTPS の証明書検証などに影響が出る）。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item><item><title>Amazon S3 バケット用のポリシー設定例</title><link>https://maku.blog/p/r9kv6gq/</link><pubDate>Sun, 21 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/r9kv6gq/</guid><description>&lt;h2 id="s3-用のポリシー設定例">S3 用のポリシー設定例&lt;/h2>
+&lt;h3 id="指定したバケット内のオブジェクト一覧を取得できるようにする">指定したバケット内のオブジェクト一覧を取得できるようにする&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2012-10-17&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Statement&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;s3:ListBucket&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;arn:aws:s3:::&amp;lt;バケット名&amp;gt;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="指定したバケット内のオブジェクトの内容を取得できるようにする">指定したバケット内のオブジェクトの内容を取得できるようにする&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2012-10-17&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Statement&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;s3:GetObject&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;arn:aws:s3:::&amp;lt;バケット名&amp;gt;/*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="指定したバケットに対していろいろできるようにする">指定したバケットに対していろいろできるようにする&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2012-10-17&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Statement&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;s3:DeleteObject&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;s3:GetObject&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;s3:ListBucket&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;s3:PutObject&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;s3:PutObjectAcl&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;arn:aws:s3:::&amp;lt;バケット名&amp;gt;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;arn:aws:s3:::&amp;lt;バケット名&amp;gt;/*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="すべての-s3-リソースに対して何でもできるようにする">すべての S3 リソースに対して何でもできるようにする&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2012-10-17&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Statement&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;s3:*&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;ul>
+&lt;li>S3 で静的 Web サイトをホストするときは、バケットポリシーで &lt;strong>&lt;code>s3:GetObject&lt;/code>&lt;/strong> アクションのみを指定すればよい。&lt;code>ListObject&lt;/code> や &lt;code>PutObject&lt;/code> アクセス許可しなくても OK。&lt;/li>
+&lt;/ul>
+&lt;h2 id="おまけcors-設定json-形式">（おまけ）CORS 設定（JSON 形式）&lt;/h2>
+&lt;p>Web サイトの JavaScript などから S3 バケットにアクセスする場合は、バケットの設定で CORS アクセスを有効にしておく必要があります。
+設定は次のように JSON 形式で行います。&lt;/p></description></item></channel></rss>

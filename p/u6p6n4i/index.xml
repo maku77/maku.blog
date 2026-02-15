@@ -1,8 +1,75 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ansible の操作／設定 on まくろぐ</title><link>https://maku.blog/p/u6p6n4i/</link><description>Recent content in Ansible の操作／設定 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 18 Jul 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/u6p6n4i/index.xml" rel="self" type="application/rss+xml"/><item><title>Ansible の SSH 接続で使用するユーザーと秘密鍵を指定する</title><link>https://maku.blog/p/n3jygwd/</link><pubDate>Mon, 18 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n3jygwd/</guid><description>Ansible コマンド（ansible や ansible-playbook）でマネージドノードを制御するとき、デフォルトでは SSH ユーザーとしてコントロールノードのカレントユーザーが使用されます。 異なる SSH ユーザー（と秘密鍵）で接続したい場合は、コマンドライン引数やインベントリファイルで指定することができます。
-コマンドライン引数で指定する方法 インベントリファイルで指定する方法 ansible.cfg でデフォルトユーザーを指定する方法 ~/.ssh/config で接続先ごとにユーザーを指定する方法 コマンドライン引数で SSH ユーザーを指定する方法 ansible-playbook コマンドの、-u (--user) オプションで SSH 接続に使用するユーザー名、--private-key オプションで秘密鍵を指定することができます。
-$ ansible-playbook -i hosts.ini site.yml -u maku --private-key ~/.ssh/maku/id_rsa インベントリファイルで SSH ユーザーを指定する方法 インベントリファイルで指定する場合は、ansible_user 変数と ansible_ssh_private_key 変数を使います。
-hosts.ini（ホストごとに指定する場合） [servers] www1.example.com ansible_user=maku ansible_ssh_private_key_file=~/.ssh/maku/id_rsa www2.example.com ansible_user=maku ansible_ssh_private_key_file=~/.ssh/maku/id_rsa hosts.ini（グループ単位で指定する場合） [servers] www1.example.com www2.example.com [servers:vars] ansible_user=maku ansible_ssh_private_key_file=~/.ssh/maku/id_rsa YAML 形式でインベントリファイルを記述する場合も、同様の変数で設定できます。
-hosts.yml all: hosts: www1.example.com: www2.example.com: vars: ansible_user: maku ansible_ssh_private_key_file: ~/.ssh/maku/id_rsa ~/.ssh/config で接続先ごとにユーザーを指定する方法 インベントリファイルに SSH のユーザー名や秘密鍵のパスを記述するのが煩わしいときは、SSH クライアントの設定ファイル (~/.</description></item><item><title>Ansible の ansible.cfg ファイルの検索順序</title><link>https://maku.blog/p/pamv6gq/</link><pubDate>Sun, 23 Oct 2016 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pamv6gq/</guid><description>Ansible の実行環境が参照する設定ファイル (ansible.cfg) は、下記のようなパスから検索されます。
-環境変数 ANSIBLE_CONFIG で指定されたファイル ansible.cfg（カレントディレクトリ以下のファイル） ~/.ansible.cfg（ホームディレクトリ以下のファイル） /etc/ansible/ansible.cfg Git などで管理する場合は、Playbook の近くに一緒に入れておくとわかりやすいです（上記の 2 番目の方法）。</description></item><item><title>Ansible でインベントリーファイルの場所を指定する</title><link>https://maku.blog/p/eycnx9i/</link><pubDate>Sat, 22 Oct 2016 00:00:00 +0900</pubDate><guid>https://maku.blog/p/eycnx9i/</guid><description>Ansible のコマンド（ansible や ansible-playbook）を実行すると、下記の順でインベントリーファイルが検索されます。
-コマンドラインオプション -i で指定したファイル コンフィグファイル ansible.cfg 内の hostfile で指定したファイル（参考: ansible.cfg ファイルの検索パス） /etc/ansible/inventry 以下の例は、いずれもカレントディレクトリ内の hosts というファイルをインベントリファイルとして使用するように指定しています。
-例: コマンドラインオプション (-i) で指定する方法 $ ansible myserver -i hosts -m ping 例: コンフィグファイル (ansible.cfg) で指定する方法 [defaults] hostfile = hosts</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ansible の操作／設定 on まくろぐ</title><link>https://maku.blog/p/u6p6n4i/</link><description>Recent content in Ansible の操作／設定 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 18 Jul 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/u6p6n4i/index.xml" rel="self" type="application/rss+xml"/><item><title>Ansible の SSH 接続で使用するユーザーと秘密鍵を指定する</title><link>https://maku.blog/p/n3jygwd/</link><pubDate>Mon, 18 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n3jygwd/</guid><description>&lt;p>Ansible コマンド（&lt;code>ansible&lt;/code> や &lt;code>ansible-playbook&lt;/code>）でマネージドノードを制御するとき、デフォルトでは SSH ユーザーとしてコントロールノードのカレントユーザーが使用されます。
+異なる SSH ユーザー（と秘密鍵）で接続したい場合は、コマンドライン引数やインベントリファイルで指定することができます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="#cmd-line">コマンドライン引数で指定する方法&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#inventory">インベントリファイルで指定する方法&lt;/a>&lt;/li>
+&lt;li>&lt;code>ansible.cfg&lt;/code> でデフォルトユーザーを指定する方法&lt;/li>
+&lt;li>&lt;a href="#ssh-config">&lt;code>~/.ssh/config&lt;/code> で接続先ごとにユーザーを指定する方法&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="cmd-line">コマンドライン引数で SSH ユーザーを指定する方法&lt;/h2>
+&lt;p>&lt;code>ansible-playbook&lt;/code> コマンドの、&lt;strong>&lt;code>-u (--user)&lt;/code>&lt;/strong> オプションで SSH 接続に使用するユーザー名、&lt;strong>&lt;code>--private-key&lt;/code>&lt;/strong> オプションで秘密鍵を指定することができます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> ansible-playbook -i hosts.ini site.yml -u maku --private-key ~/.ssh/maku/id_rsa
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="inventory">インベントリファイルで SSH ユーザーを指定する方法&lt;/h2>
+&lt;p>インベントリファイルで指定する場合は、&lt;strong>&lt;code>ansible_user&lt;/code>&lt;/strong> 変数と &lt;strong>&lt;code>ansible_ssh_private_key&lt;/code>&lt;/strong> 変数を使います。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">hosts.ini（ホストごとに指定する場合）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="k">[servers]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">www1.example.com ansible_user&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">maku ansible_ssh_private_key_file=~/.ssh/maku/id_rsa&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">www2.example.com ansible_user&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">maku ansible_ssh_private_key_file=~/.ssh/maku/id_rsa&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">hosts.ini（グループ単位で指定する場合）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="k">[servers]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">www1.example.com&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">www2.example.com&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">[servers:vars]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">ansible_user&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">maku&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">ansible_ssh_private_key_file&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">~/.ssh/maku/id_rsa&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>YAML 形式でインベントリファイルを記述する場合も、同様の変数で設定できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">hosts.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">all&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">hosts&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">www1.example.com&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">www2.example.com&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">vars&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible_user&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">maku&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible_ssh_private_key_file&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">~/.ssh/maku/id_rsa&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="ssh-config">~/.ssh/config で接続先ごとにユーザーを指定する方法&lt;/h2>
+&lt;p>インベントリファイルに SSH のユーザー名や秘密鍵のパスを記述するのが煩わしいときは、SSH クライアントの設定ファイル (&lt;code>~/.ssh/config&lt;/code>) で、接続先ごとに使用する SSH ユーザーや秘密鍵を定義してしまう方法があります。
+次の例では、&lt;code>example.com-maku&lt;/code> という名前で、SSH 接続設定を定義しています（この名前は何でもよいですが、ここでは、&lt;code>example.com&lt;/code> というホストに &lt;code>maku&lt;/code> というユーザー名で接続するという意味でこう付けています）。&lt;/p></description></item><item><title>Ansible の ansible.cfg ファイルの検索順序</title><link>https://maku.blog/p/pamv6gq/</link><pubDate>Sun, 23 Oct 2016 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pamv6gq/</guid><description>&lt;p>Ansible の実行環境が参照する設定ファイル (&lt;strong>&lt;code>ansible.cfg&lt;/code>&lt;/strong>) は、下記のようなパスから検索されます。&lt;/p>
+&lt;ol>
+&lt;li>環境変数 &lt;code>ANSIBLE_CONFIG&lt;/code> で指定されたファイル&lt;/li>
+&lt;li>&lt;code>ansible.cfg&lt;/code>（カレントディレクトリ以下のファイル）&lt;/li>
+&lt;li>&lt;code>~/.ansible.cfg&lt;/code>（ホームディレクトリ以下のファイル）&lt;/li>
+&lt;li>&lt;code>/etc/ansible/ansible.cfg&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;p>Git などで管理する場合は、Playbook の近くに一緒に入れておくとわかりやすいです（上記の 2 番目の方法）。&lt;/p></description></item><item><title>Ansible でインベントリーファイルの場所を指定する</title><link>https://maku.blog/p/eycnx9i/</link><pubDate>Sat, 22 Oct 2016 00:00:00 +0900</pubDate><guid>https://maku.blog/p/eycnx9i/</guid><description>&lt;p>Ansible のコマンド（&lt;code>ansible&lt;/code> や &lt;code>ansible-playbook&lt;/code>）を実行すると、下記の順でインベントリーファイルが検索されます。&lt;/p>
+&lt;ol>
+&lt;li>コマンドラインオプション &lt;strong>&lt;code>-i&lt;/code>&lt;/strong> で指定したファイル&lt;/li>
+&lt;li>コンフィグファイル &lt;strong>&lt;code>ansible.cfg&lt;/code>&lt;/strong> 内の &lt;strong>&lt;code>hostfile&lt;/code>&lt;/strong> で指定したファイル（参考: &lt;a href="../../p/pamv6gq">ansible.cfg ファイルの検索パス&lt;/a>）&lt;/li>
+&lt;li>&lt;strong>&lt;code>/etc/ansible/inventry&lt;/code>&lt;/strong>&lt;/li>
+&lt;/ol>
+&lt;p>以下の例は、いずれもカレントディレクトリ内の &lt;code>hosts&lt;/code> というファイルをインベントリファイルとして使用するように指定しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例: コマンドラインオプション (-i) で指定する方法&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> ansible myserver -i hosts -m ping
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例: コンフィグファイル (ansible.cfg) で指定する方法&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="k">[defaults]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">hostfile&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">hosts&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item></channel></rss>

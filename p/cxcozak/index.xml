@@ -1,9 +1,137 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Amazon EC2 関連記事 on まくろぐ</title><link>https://maku.blog/p/cxcozak/</link><description>Recent content in Amazon EC2 関連記事 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 02 Mar 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/cxcozak/index.xml" rel="self" type="application/rss+xml"/><item><title>Amazon EC2 で Hello World (1) キーペアの作成</title><link>https://maku.blog/p/pcp3doy/</link><pubDate>Tue, 02 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pcp3doy/</guid><description>EC2 を使う前に SSH キーペアを作成しておく 立ち上げた EC2 インスタンスは SSH で接続して操作するため、まずはキーペア（公開鍵＋秘密鍵）を作成して、その公開鍵を EC2 に登録しておく必要があります。 一度公開鍵を登録すると、EC2 インスタンスを作成するときに、割り当てる公開鍵をプルダウンから選択できるようになります。
-EC2 コンソールからキーペアを作成する SSH 接続用のキーペアは、ローカルで作成して EC2 に登録することもできますし、EC2 コンソール上で新規作成することもできます。 EC2 上で作成すると、公開鍵が自動的に EC2 に登録された状態になるのでちょっとだけ楽です。 ここでは、次のように EC2 上でキーペアを作成します。
-EC2 マネージメントコンソール を開く サイドバーから キーペア を選択し、キーペアを作成 をクリック キーペアの作成画面で名前とファイル形式を入力し、キーペアを作成 をクリック 名前: ec2key など自由に入力 ファイル形式:（使用する SSH クライアントに合わせて選択） pem 形式 &amp;hellip; OpenSSH を使う場合（主に Linux/macOS） ppk 形式 &amp;hellip; PuTTY を使う場合（主に Windows） すると、自動的に ec2key.pem（秘密鍵）のダウンロードが始まるので、~/.ssh ディレクトリなどに確実に保存します。 この キーファイルを再度ダウンロードすることはできないので注意してください。
-EC2 コンソール上に次のように表示されていれば、今後 EC2 インスタンスを生成するときにこのキーを選択できます。
-秘密鍵ファイルのパーミッションを設定する ローカル PC に保存した秘密鍵ファイル (.pem) には、自分だけを読み取り可能にするよう、適切なパーミッションを設定しておく必要があります。 これをやっておかないと、ssh コマンドを実行するときに、WARNING: UNPROTECTED PRIVATE KEY FILE!</description></item><item><title>Amazon EC2 で Hello World (2) EC2 インスタンスの起動と接続</title><link>https://maku.blog/p/whu7hr3/</link><pubDate>Tue, 02 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/whu7hr3/</guid><description>EC2 インスタンスの起動 EC2 インスタンスに接続するための キーペアを作成 したら、実際に EC2 インスタンスを起動してみます。 ここでは、マシンイメージ (AMI) として EC2 用に最適化された Amazon Linux 2 を選択することにします。
-EC2 マネージメントコンソール を開く サイドバーの インスタンス を選択し、インスタンスを起動 ボタンを押す Amazon マシンイメージ (AMI) の選択画面で、Amazon Linux 2 を選択 インスタンスタイプの選択画面で、一番安い t2.nano や、一年間の無料枠がある t2.micro を選択（料金の参考: EC2Instances.info） 確認と作成 ボタンを押す 使用するキーペアを選択する画面が表示されるので、あらかじめ設定しておいた キーペアを選択して、インスタンスの作成 ボタンを押す 図: キーペアの選択 あとは数分待てば、EC2 インスタンスが起動します。
-EC2 インスタンスへの SSH 接続 EC2 インスタンスが無事起動したら、SSH で接続してみます。 接続用のユーザー名やアドレスは、次のようにして確認することができます。
-EC2 マネージメントコンソール を開く サイドバーの インスタンス を選択し、対象の EC2 インスタンスを選択 接続 ボタンを押す すると、次のような感じで接続先のユーザー名（ec2-user）や DNS アドレス（ec2-XXXXX) を確認することができます。
-図: EC2 インスタンスの接続情報 あとは、この情報を使って ssh コマンドで接続するだけです。 EC2 Instance Connect タブで 接続 ボタンを押すと、ブラウザ上で動作する端末画面から接続することもできます。</description></item><item><title>Amazon EC2 をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/zkx9ju6/</link><pubDate>Mon, 22 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/zkx9ju6/</guid><description>EC2 で使用可能なリージョンの一覧を取得する (ec2 describe-regions) $ aws ec2 describe-regions 実行結果 (YAML形式） Regions: - Endpoint: ec2.eu-north-1.amazonaws.com OptInStatus: opt-in-not-required RegionName: eu-north-1 - Endpoint: ec2.ap-south-1.amazonaws.com OptInStatus: opt-in-not-required RegionName: ap-south-1 - Endpoint: ec2.eu-west-3.amazonaws.com OptInStatus: opt-in-not-required RegionName: eu-west-3 - Endpoint: ec2.eu-west-2.amazonaws.com OptInStatus: opt-in-not-required RegionName: eu-west-2 - Endpoint: ec2.eu-west-1.amazonaws.com OptInStatus: opt-in-not-required RegionName: eu-west-1 - Endpoint: ec2.ap-northeast-3.amazonaws.com OptInStatus: opt-in-not-required RegionName: ap-northeast-3 - Endpoint: ec2.ap-northeast-2.amazonaws.com OptInStatus: opt-in-not-required RegionName: ap-northeast-2 - Endpoint: ec2.ap-northeast-1.amazonaws.com OptInStatus: opt-in-not-required RegionName: ap-northeast-1 - Endpoint: ec2.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Amazon EC2 関連記事 on まくろぐ</title><link>https://maku.blog/p/cxcozak/</link><description>Recent content in Amazon EC2 関連記事 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Tue, 02 Mar 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/cxcozak/index.xml" rel="self" type="application/rss+xml"/><item><title>Amazon EC2 で Hello World (1) キーペアの作成</title><link>https://maku.blog/p/pcp3doy/</link><pubDate>Tue, 02 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pcp3doy/</guid><description>&lt;h2 id="ec2-を使う前に-ssh-キーペアを作成しておく">EC2 を使う前に SSH キーペアを作成しておく&lt;/h2>
+&lt;p>立ち上げた EC2 インスタンスは SSH で接続して操作するため、まずはキーペア（公開鍵＋秘密鍵）を作成して、その公開鍵を EC2 に登録しておく必要があります。
+一度公開鍵を登録すると、EC2 インスタンスを作成するときに、割り当てる公開鍵をプルダウンから選択できるようになります。&lt;/p>
+&lt;h2 id="ec2-コンソールからキーペアを作成する">EC2 コンソールからキーペアを作成する&lt;/h2>
+&lt;p>SSH 接続用のキーペアは、ローカルで作成して EC2 に登録することもできますし、EC2 コンソール上で新規作成することもできます。
+EC2 上で作成すると、公開鍵が自動的に EC2 に登録された状態になるのでちょっとだけ楽です。
+ここでは、次のように EC2 上でキーペアを作成します。&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://console.aws.amazon.com/ec2/v2/home">EC2 マネージメントコンソール&lt;/a> を開く&lt;/li>
+&lt;li>サイドバーから &lt;strong>&lt;code>キーペア&lt;/code>&lt;/strong> を選択し、&lt;strong>&lt;code>キーペアを作成&lt;/code>&lt;/strong> をクリック&lt;/li>
+&lt;li>キーペアの作成画面で名前とファイル形式を入力し、&lt;strong>&lt;code>キーペアを作成&lt;/code>&lt;/strong> をクリック
+&lt;ul>
+&lt;li>名前: &lt;strong>&lt;code>ec2key&lt;/code>&lt;/strong> など自由に入力&lt;/li>
+&lt;li>ファイル形式:（使用する SSH クライアントに合わせて選択）
+&lt;ul>
+&lt;li>&lt;code>pem&lt;/code> 形式 &amp;hellip; OpenSSH を使う場合（主に Linux/macOS）&lt;/li>
+&lt;li>&lt;code>ppk&lt;/code> 形式 &amp;hellip; PuTTY を使う場合（主に Windows）&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;p>すると、自動的に &lt;code>ec2key.pem&lt;/code>（秘密鍵）のダウンロードが始まるので、&lt;code>~/.ssh&lt;/code> ディレクトリなどに確実に保存します。
+この &lt;strong>キーファイルを再度ダウンロードすることはできないので注意してください&lt;/strong>。&lt;/p>
+&lt;p>EC2 コンソール上に次のように表示されていれば、今後 EC2 インスタンスを生成するときにこのキーを選択できます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1910" height="484" src="../../p/pcp3doy/img-001.png" alt="/p/pcp3doy/img-001.png" />
+&lt;/figure>
+
+&lt;h2 id="秘密鍵ファイルのパーミッションを設定する">秘密鍵ファイルのパーミッションを設定する&lt;/h2>
+&lt;p>ローカル PC に保存した秘密鍵ファイル (&lt;code>.pem&lt;/code>) には、自分だけを読み取り可能にするよう、適切なパーミッションを設定しておく必要があります。
+これをやっておかないと、&lt;code>ssh&lt;/code> コマンドを実行するときに、&lt;code>WARNING: UNPROTECTED PRIVATE KEY FILE!&lt;/code> といった警告が出て接続ができません。&lt;/p></description></item><item><title>Amazon EC2 で Hello World (2) EC2 インスタンスの起動と接続</title><link>https://maku.blog/p/whu7hr3/</link><pubDate>Tue, 02 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/whu7hr3/</guid><description>&lt;h2 id="ec2-インスタンスの起動">EC2 インスタンスの起動&lt;/h2>
+&lt;p>EC2 インスタンスに接続するための &lt;a href="../../p/pcp3doy">キーペアを作成&lt;/a> したら、実際に EC2 インスタンスを起動してみます。
+ここでは、マシンイメージ (AMI) として EC2 用に最適化された Amazon Linux 2 を選択することにします。&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://console.aws.amazon.com/ec2/v2/home">EC2 マネージメントコンソール&lt;/a> を開く&lt;/li>
+&lt;li>サイドバーの &lt;code>インスタンス&lt;/code> を選択し、&lt;strong>&lt;code>インスタンスを起動&lt;/code>&lt;/strong> ボタンを押す&lt;/li>
+&lt;li>Amazon マシンイメージ (AMI) の選択画面で、&lt;strong>&lt;code>Amazon Linux 2&lt;/code>&lt;/strong> を選択&lt;/li>
+&lt;li>インスタンスタイプの選択画面で、一番安い &lt;strong>&lt;code>t2.nano&lt;/code>&lt;/strong> や、一年間の無料枠がある &lt;strong>&lt;code>t2.micro&lt;/code>&lt;/strong> を選択（料金の参考: &lt;a href="https://instances.vantage.sh/?selected=t2.nano">EC2Instances.info&lt;/a>）&lt;/li>
+&lt;li>&lt;strong>&lt;code>確認と作成&lt;/code>&lt;/strong> ボタンを押す&lt;/li>
+&lt;li>使用するキーペアを選択する画面が表示されるので、&lt;a href="">あらかじめ設定しておいた&lt;/a> キーペアを選択して、&lt;strong>&lt;code>インスタンスの作成&lt;/code>&lt;/strong> ボタンを押す
+
+ 
+ &lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="500" height="319" src="../../p/whu7hr3/img-001_hu2770963068247443711.png" alt="/p/whu7hr3/img-001.png" />
+ &lt;figcaption>図: キーペアの選択&lt;/figcaption>
+ &lt;/figure>
+&lt;/li>
+&lt;/ol>
+&lt;p>あとは数分待てば、EC2 インスタンスが起動します。&lt;/p>
+&lt;h2 id="ec2-インスタンスへの-ssh-接続">EC2 インスタンスへの SSH 接続&lt;/h2>
+&lt;p>EC2 インスタンスが無事起動したら、SSH で接続してみます。
+接続用のユーザー名やアドレスは、次のようにして確認することができます。&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://console.aws.amazon.com/ec2/v2/home">EC2 マネージメントコンソール&lt;/a> を開く&lt;/li>
+&lt;li>サイドバーの &lt;code>インスタンス&lt;/code> を選択し、対象の EC2 インスタンスを選択&lt;/li>
+&lt;li>&lt;strong>&lt;code>接続&lt;/code>&lt;/strong> ボタンを押す&lt;/li>
+&lt;/ol>
+&lt;p>すると、次のような感じで接続先のユーザー名（&lt;code>ec2-user&lt;/code>）や DNS アドレス（&lt;code>ec2-XXXXX&lt;/code>) を確認することができます。&lt;/p></description></item><item><title>Amazon EC2 をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/zkx9ju6/</link><pubDate>Mon, 22 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/zkx9ju6/</guid><description>&lt;h2 id="ec2-で使用可能なリージョンの一覧を取得する-ec2-describe-regions">EC2 で使用可能なリージョンの一覧を取得する (ec2 describe-regions)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws ec2 describe-regions&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-369481257" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-369481257">実行結果 (YAML形式）&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">Regions&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.eu-north-1.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">eu-north-1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.ap-south-1.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ap-south-1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.eu-west-3.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">eu-west-3&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.eu-west-2.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">eu-west-2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.eu-west-1.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">eu-west-1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.ap-northeast-3.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ap-northeast-3&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.ap-northeast-2.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ap-northeast-2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.ap-northeast-1.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ap-northeast-1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.sa-east-1.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">sa-east-1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.ca-central-1.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ca-central-1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.ap-southeast-1.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ap-southeast-1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.ap-southeast-2.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ap-southeast-2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.eu-central-1.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">eu-central-1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.us-east-1.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">us-east-1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.us-east-2.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">us-east-2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.us-west-1.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">us-west-1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">Endpoint&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ec2.us-west-2.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">OptInStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">opt-in-not-required&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RegionName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">us-west-2&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+&lt;h2 id="ec2-インスタンスの情報を取得する-ec2-describe-instances">EC2 インスタンスの情報を取得する (ec2 describe-instances)&lt;/h2>
+&lt;p>作成済みの EC2 インスタンスの一覧、あるいは指定した EC2 インスタンスの情報を取得します。&lt;/p></description></item></channel></rss>

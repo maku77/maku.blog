@@ -1,29 +1,258 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ネットワーク on まくろぐ</title><link>https://maku.blog/tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF/</link><description>Recent content in ネットワーク on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sat, 19 Aug 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF/index.xml" rel="self" type="application/rss+xml"/><item><title>Linuxコマンド: ポートを開いているプロセスを調べる (lsof)</title><link>https://maku.blog/p/i7zokcv/</link><pubDate>Sat, 19 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/i7zokcv/</guid><description>迷ったらとりあえずコレ 次のように実行すると、TCP でポートを開いて LISTEN 状態になっているプロセスのコマンド名や PID の一覧を表示できます。
-開いている TCP ポートの一覧を表示 $ lsof -i tcp -s tcp:listen -P COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME ControlCe 604 maku 24u IPv4 0xbf4647db74c55935 0t0 TCP *:7000 (LISTEN) ControlCe 604 maku 25u IPv6 0x27a96e6374c5592c 0t0 TCP *:7000 (LISTEN) ControlCe 604 maku 26u IPv4 0xbf46527374c55935 0t0 TCP *:5000 (LISTEN) ControlCe 604 maku 27u IPv6 0x27a9756374c5592c 0t0 TCP *:5000 (LISTEN) deno 8572 maku 14u IPv4 0xbc6a127374c55935 0t0 TCP *:8000 (LISTEN) hugo 10971 maku 6u IPv4 0xbcba127374c55935 0t0 TCP localhost:50001 (LISTEN) hugo 10975 maku 6u IPv4 0xbd35a81374c55935 0t0 TCP localhost:50002 (LISTEN) ruby 52070 maku 9u IPv4 0xbf461d7b74c55935 0t0 TCP localhost:4000 (LISTEN) ruby 52070 maku 12u IPv4 0xbd38681374c55935 0t0 TCP localhost:35729 (LISTEN) node 65924 maku 38u IPv6 0x27a9356374c5592c 0t0 TCP localhost:5173 (LISTEN) Dropbox 68519 maku 114u IPv4 0xbc67e81374c55935 0t0 TCP *:17500 (LISTEN) Dropbox 68519 maku 115u IPv6 0x27a8836374c5592c 0t0 TCP *:17500 (LISTEN) サーバー系の開発をしていると、開いているポートがどんどん増えていくので、次のような ports エイリアスを定義しておくと便利です。</description></item><item><title>Linuxコマンド: TCP/TDP ポートの通信状態を確認する (ss)</title><link>https://maku.blog/p/sg2m6wm/</link><pubDate>Tue, 05 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/sg2m6wm/</guid><description>関連コマンド: ip コマンド
-ss コマンドとは Linux の ss コマンド (socket statistics) は、TCP ポートや UDP ポートの通信状態を確認するためのコマンドで、過去に使われていた net-tools パッケージの netstat コマンドの後継です。 Cent OS 7 ではデフォルトで ss コマンドが採用されています。
-APT の iproute2 パッケージをインストールすると、ss コマンドを使用できるようになります。
-ss コマンドのインストール $ apt update # パッケージリストの更新 $ apt install -y iproute2 iptable2 パッケージをインストールすると、一緒に ip コマンド などもインストールされます。
-ss サブコマンド コマンド 説明 対応する旧コマンド ss -nat TCP ポートの通信状態を確認 netstat -nat ss -nlt LISTEN（待ち受け）状態の TCP ポートを確認 netstat -nlt ss -nau UDP ポートの通信状態を確認UDP ソケットの State カラムは UNCONN と表示される netstat -nau</description></item><item><title>Linuxコマンド: ip コマンドの使い方</title><link>https://maku.blog/p/p7q7n4i/</link><pubDate>Thu, 16 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p7q7n4i/</guid><description>関連コマンド: ss コマンド
-ip コマンドとは Linux の ip コマンドを使うと、ネットワークデバイスやルーティングテーブル、ARP テーブルなどの確認・設定を行うことができます。 過去に net-tools パッケージで提供されていた、ifconfig、route、arp、netstat コマンドは deprecated（非推奨）扱いになっています。
-ip コマンドをインストールする ip コマンドは APT の iproute2 パッケージに含まれています。 Docker の Ubuntu コンテナなどで ip コマンドが見つからない場合は、次のようにインストールできます。
-$ apt update # パッケージリストの更新 $ apt install -y iproute2 iproute2 パッケージには、ip コマンド以外にもいろいろなコマンドが含まれています（参考: iproute2 に含まれるファイルのリスト ─ Debian / archlinux）。
-iproute2 のインストールで使えるようになるコマンド arpd - userspace arp daemon
-bridge - show / manipulate bridge addresses and devices
-devlink - Devlink tool
-ip - show / manipulate routing, devices, policy routing and tunnels</description></item><item><title>Linuxメモ: Netplan で Ubuntu のネットワーク設定を行う</title><link>https://maku.blog/p/7q3dnx8/</link><pubDate>Thu, 20 Jan 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7q3dnx8/</guid><description>Netplan とは Netplan は Linux のネットワーク設定を簡潔な YAML ファイルで行う仕組みで、Ubuntu 18.04 以降（正確には 17 以降）で採用されています。 昔の Ubuntu/Debian で使用されていた /etc/network/interfaces という設定ファイルはもう使われていません。
-実際のネットワーク管理は、バックエンドで動作する NetworkManager や systemd-networkd といったネットワークデーモンが行うのですが、Netplan は YAML 設定ファイルの内容を適切な形に変換して、これらのネットワークデーモンに渡してくれます。 つまり、バックエンドでどのようなネットワークデーモンが動いているかを意識せずに、統一されたわかりやすい YAML ファイルでネットワーク設定を行うことができます。
-Netplan は次のように振る舞います。
-システム起動時に Netplan が設定ファイル (/etc/netplan/*.yaml) を読み込んで、各ネットワークデーモン用の設定値を /run 以下へ書き出す 各ネットワークデーモンが渡された情報に基づいてネットワーク設定を行う 図: netplan.io のサイトより バックエンドのネットワークデーモンとして何を使うかは、設定ファイルの renderer 部分で指定できるようになっていますが、デフォルトでは次のように動作します。
-Wifi や 無線 WAN/LTE の設定 &amp;hellip; NetworkManager に渡される それ以外のネットワーク（有線LANなど）の設定 &amp;hellip; networkd に渡される よって、通常はどのネットワークデーモンを使うかを明示する必要はありません。
-設定ファイルの読み込まれる順序 Netplan はすべての /etc/netplan/*.yaml ファイルを読み込みます。 複数のファイルが存在する場合は、ファイル名のアルファベット順に読み込まれ、後に読み込まれたファイルの設定値が優先的に使用されます。 例えば、
-/etc/netplan/50-cloud-init.yaml /etc/netplan/99-custom.yaml というファイルがある場合、50-cloud-init.yaml で設定された値は 99-custom.yaml の設定値によって上書きされます。</description></item><item><title>ドメイン管理と DNS 管理の違いを理解する</title><link>https://maku.blog/p/bwamwgp/</link><pubDate>Sun, 25 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bwamwgp/</guid><description>ドメイン管理と DNS サーバー 「独自ドメイン＋レンタルサーバー」を契約してブログサイトなどを立ち上げようとすると、どうしてもドメイン管理や DNS 設定を行う必要が出てきます。 同じ会社で一括契約すると、まとめて設定できたりしますが、これらは本来別々のサービスなので、ここで簡単に整理しておきます。
-ドメイン取得・管理は、レジストラ（およびその委託先会社）が行っており、世界で一意なドメインを運用します。 日本では、お名前.com (by GMO) などが有名ですね。 一方で、DNS サービスは、このドメイン名を具体的な IP アドレスに関連づける機能を提供します。
-レジストラ（ドメイン管理会社）が提供するドメイン管理サービスは、あくまでドメイン名を管理しているだけであり、DNS の機能を提供しているわけではありません。 なので、ドメイン管理会社でドメインを取得したら、そのドメインの名前解決に使用する DNS サーバーのアドレスを教えてあげる必要があります。 上の図では、お名前.com のドメイン管理設定で、さくらインターネットの DNS サーバー (ns1/2.dns.ne.jp) のアドレスを設定する例を示しています。
-この設定により、ユーザーが example.com にアクセスしようとすると、DNS サーバー (ns1.dns.ne.jp) によって IP アドレス (12.34.56.78) に変換され、そのアドレスの Web サーバーにアクセスできるという仕組みになっています。
-組み合わせの例 ドメイン取得・管理 DNS サーバー Web サーバー お名前.com お名前.com お名前.com お名前.com さくらインターネット さくらインターネット お名前.com AWS (R53) AWS (EC2) 多くの場合、こんな感じで DNS サーバーと Web サーバーは同じ会社のものを使います。 レンタルサーバーのアドレスなどを自動で設定できたりして便利だからです。 DNS サーバーの使用料金はレンタルサーバーの使用料金に含まれていることが多いですが、AWS の R53 などは個別に使用料金がかかります。
-一方、ドメイン取得・管理会社の方は、年ごとの更新費用などが安い「お名前.com」などを選ぶことが多いです。 Amazon (AWS) などのクラウドサービスでもドメイン取得できたりしますが、ちょっとお値段高めです。</description></item><item><title>Linuxコマンド: scp コマンドでファイルやディレクトリを転送する</title><link>https://maku.blog/p/buvv4fz/</link><pubDate>Sat, 09 Nov 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/buvv4fz/</guid><description>ここでは、scp を使ったファイル転送の方法を示していますが、ディレクトリ単位のファイルコピーやバックアップを行いたい場合は、rsync コマンドを使用したほうが効率的です。
-ファイル送信 $ scp &amp;lt;localFile&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteFile&amp;gt; ファイル受信 $ scp &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteFile&amp;gt; &amp;lt;localFile&amp;gt; 例: リモートのホームディレクトリ内のファイルを取得 $ scp maku@maku.example.com:hello.txt hello.txt remoteFile の指定は、ホームディレクトリからの相対パスで OK です。
-ディレクトリ送信 $ scp -r &amp;lt;localDir&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteDir&amp;gt; ディレクトリ受信 $ scp -r &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteDir&amp;gt; &amp;lt;localDir&amp;gt; 例: ホームディレクトリの sample ディレクトリを丸ごとダウンロード $ scp -r maku@maku.example.com:sample .</description></item><item><title>ネットワークトラブルの調査手順</title><link>https://maku.blog/p/eecgkww/</link><pubDate>Sun, 10 Oct 2010 00:00:00 +0900</pubDate><guid>https://maku.blog/p/eecgkww/</guid><description>ネットワークトラブルはホストに近いところからチェックしていくのがセオリーです。 ソフトウェア的要因よりも、ハードウェア的要因の方を先に調べるのがよいです。
-ハードウェア的要因 ケーブルの断線 NIC の故障 電源の故障 ポートの接触不良 機器の熱暴走 ソフトウェア的要因 IP アドレスの設定ミス デフォルトゲートウェイの設定ミス VLAN の設定ミス ルーティングテーブルの不具合 サーバアプリケーションの設定ミス／不具合 参考: NETWORKWORLD - May 2007
-ping による調査 あるホストに ping が通らないときは、以下の順番で ping を通す確認をしていきます。 テスト結果は正常時の結果と比べなければ意味がないので、正常時の tracert 結果などを定期的にとっておくことが重要です。
-ループバックアドレスに対して ping TCP/IP モジュールの異常の可能性 ホストの IP アドレスへ ping OS が NIC を認識していない可能性 同じスイッチに接続された別の PC へ ping スイッチのポート、ケーブルの故障 VLAN の設定ミス、接続ミス スイッチ自体には IP アドレスは設定されないので、別の PC に ping することで、スイッチまでの接続を確認する。 ルータに ping ルータのダウン、アドレス設定ミス ルータの別のポートへ ping ルーティングプロセスの異常 インタフェースの設定ミス ルータは複数のネットワークにつながっているので、別のネットワーク用のポートにも ping する必要がある。 異なるネットワークの PC へ ping tracert で、通信不能ネットワークを切り分け ターゲットホストに ping ターゲットホストのダウン アプリケーソンレベルの確認 参考: NETWORKWORLD - May 2007</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ネットワーク on まくろぐ</title><link>https://maku.blog/tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF/</link><description>Recent content in ネットワーク on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sat, 19 Aug 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF/index.xml" rel="self" type="application/rss+xml"/><item><title>Linuxコマンド: ポートを開いているプロセスを調べる (lsof)</title><link>https://maku.blog/p/i7zokcv/</link><pubDate>Sat, 19 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/i7zokcv/</guid><description>&lt;h2 id="迷ったらとりあえずコレ">迷ったらとりあえずコレ&lt;/h2>
+&lt;p>次のように実行すると、TCP でポートを開いて LISTEN 状態になっているプロセスのコマンド名や PID の一覧を表示できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">開いている TCP ポートの一覧を表示&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> lsof -i tcp -s tcp:listen -P
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ControlCe 604 maku 24u IPv4 0xbf4647db74c55935 0t0 TCP *:7000 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ControlCe 604 maku 25u IPv6 0x27a96e6374c5592c 0t0 TCP *:7000 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ControlCe 604 maku 26u IPv4 0xbf46527374c55935 0t0 TCP *:5000 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ControlCe 604 maku 27u IPv6 0x27a9756374c5592c 0t0 TCP *:5000 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">deno 8572 maku 14u IPv4 0xbc6a127374c55935 0t0 TCP *:8000 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">hugo 10971 maku 6u IPv4 0xbcba127374c55935 0t0 TCP localhost:50001 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">hugo 10975 maku 6u IPv4 0xbd35a81374c55935 0t0 TCP localhost:50002 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ruby 52070 maku 9u IPv4 0xbf461d7b74c55935 0t0 TCP localhost:4000 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ruby 52070 maku 12u IPv4 0xbd38681374c55935 0t0 TCP localhost:35729 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">node 65924 maku 38u IPv6 0x27a9356374c5592c 0t0 TCP localhost:5173 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">Dropbox 68519 maku 114u IPv4 0xbc67e81374c55935 0t0 TCP *:17500 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">Dropbox 68519 maku 115u IPv6 0x27a8836374c5592c 0t0 TCP *:17500 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>サーバー系の開発をしていると、開いているポートがどんどん増えていくので、次のような &lt;strong>&lt;code>ports&lt;/code>&lt;/strong> エイリアスを定義しておくと便利です。&lt;/p></description></item><item><title>Linuxコマンド: TCP/TDP ポートの通信状態を確認する (ss)</title><link>https://maku.blog/p/sg2m6wm/</link><pubDate>Tue, 05 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/sg2m6wm/</guid><description>&lt;p>関連コマンド: &lt;a href="../../p/p7q7n4i/">ip コマンド&lt;/a>&lt;/p>
+&lt;h2 id="ss-コマンドとは">ss コマンドとは&lt;/h2>
+&lt;p>Linux の &lt;strong>&lt;code>ss&lt;/code>&lt;/strong> コマンド (socket statistics) は、TCP ポートや UDP ポートの通信状態を確認するためのコマンドで、過去に使われていた &lt;code>net-tools&lt;/code> パッケージの &lt;code>netstat&lt;/code> コマンドの後継です。
+Cent OS 7 ではデフォルトで &lt;code>ss&lt;/code> コマンドが採用されています。&lt;/p>
+&lt;p>APT の &lt;code>iproute2&lt;/code> パッケージをインストールすると、&lt;code>ss&lt;/code> コマンドを使用できるようになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ss コマンドのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> apt update &lt;span class="c1"># パッケージリストの更新&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> apt install -y iproute2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>iptable2&lt;/code> パッケージをインストールすると、一緒に &lt;a href="../../p/p7q7n4i/">ip コマンド&lt;/a> などもインストールされます。&lt;/p>
+&lt;h2 id="ss-サブコマンド">ss サブコマンド&lt;/h2>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>コマンド&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;th>対応する旧コマンド&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>ss -nat&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>TCP ポートの通信状態を確認&lt;/td>
+ &lt;td>&lt;code>netstat -nat&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>ss -nlt&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>LISTEN（待ち受け）状態の TCP ポートを確認&lt;/td>
+ &lt;td>&lt;code>netstat -nlt&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>ss -nau&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>UDP ポートの通信状態を確認&lt;br/>UDP ソケットの &lt;code>State&lt;/code> カラムは &lt;code>UNCONN&lt;/code> と表示される&lt;/td>
+ &lt;td>&lt;code>netstat -nau&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table></description></item><item><title>Linuxコマンド: ip コマンドの使い方</title><link>https://maku.blog/p/p7q7n4i/</link><pubDate>Thu, 16 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p7q7n4i/</guid><description>&lt;p>関連コマンド: &lt;a href="../../p/sg2m6wm/">ss コマンド&lt;/a>&lt;/p>
+&lt;h2 id="ip-コマンドとは">ip コマンドとは&lt;/h2>
+&lt;p>Linux の &lt;strong>&lt;code>ip&lt;/code>&lt;/strong> コマンドを使うと、ネットワークデバイスやルーティングテーブル、ARP テーブルなどの確認・設定を行うことができます。
+過去に &lt;code>net-tools&lt;/code> パッケージで提供されていた、&lt;code>ifconfig&lt;/code>、&lt;code>route&lt;/code>、&lt;code>arp&lt;/code>、&lt;code>netstat&lt;/code> コマンドは deprecated（非推奨）扱いになっています。&lt;/p>
+&lt;h2 id="ip-コマンドをインストールする">ip コマンドをインストールする&lt;/h2>
+&lt;p>&lt;strong>&lt;code>ip&lt;/code>&lt;/strong> コマンドは APT の &lt;strong>&lt;code>iproute2&lt;/code>&lt;/strong> パッケージに含まれています。
+Docker の Ubuntu コンテナなどで &lt;code>ip&lt;/code> コマンドが見つからない場合は、次のようにインストールできます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> apt update &lt;span class="c1"># パッケージリストの更新&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> apt install -y iproute2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>iproute2 パッケージには、&lt;code>ip&lt;/code> コマンド以外にもいろいろなコマンドが含まれています（参考: iproute2 に含まれるファイルのリスト ─ &lt;a href="https://packages.debian.org/sid/amd64/iproute2/filelist">Debian&lt;/a> / &lt;a href="https://archlinux.org/packages/core/x86_64/iproute2/files/">archlinux&lt;/a>）。&lt;/p>
+&lt;div class="xAccordion">
+ &lt;input id="id-879615234" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-879615234">iproute2 のインストールで使えるようになるコマンド&lt;/label>
+ &lt;div class="xAccordion_body">
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>arpd&lt;/code> - userspace arp daemon&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>bridge&lt;/code> - show / manipulate bridge addresses and devices&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>devlink&lt;/code> - Devlink tool&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>&lt;code>ip&lt;/code>&lt;/strong> - show / manipulate routing, devices, policy routing and tunnels&lt;/p></description></item><item><title>Linuxメモ: Netplan で Ubuntu のネットワーク設定を行う</title><link>https://maku.blog/p/7q3dnx8/</link><pubDate>Thu, 20 Jan 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7q3dnx8/</guid><description>&lt;h2 id="netplan-とは">Netplan とは&lt;/h2>
+&lt;p>&lt;a href="https://netplan.io">Netplan&lt;/a> は Linux のネットワーク設定を簡潔な YAML ファイルで行う仕組みで、Ubuntu 18.04 以降（正確には 17 以降）で採用されています。
+昔の Ubuntu/Debian で使用されていた &lt;code>/etc/network/interfaces&lt;/code> という設定ファイルはもう使われていません。&lt;/p>
+&lt;p>実際のネットワーク管理は、バックエンドで動作する NetworkManager や systemd-networkd といったネットワークデーモンが行うのですが、Netplan は YAML 設定ファイルの内容を適切な形に変換して、これらのネットワークデーモンに渡してくれます。
+つまり、バックエンドでどのようなネットワークデーモンが動いているかを意識せずに、統一されたわかりやすい YAML ファイルでネットワーク設定を行うことができます。&lt;/p>
+&lt;p>Netplan は次のように振る舞います。&lt;/p>
+&lt;ol>
+&lt;li>システム起動時に Netplan が設定ファイル (&lt;code>/etc/netplan/*.yaml&lt;/code>) を読み込んで、各ネットワークデーモン用の設定値を &lt;code>/run&lt;/code> 以下へ書き出す&lt;/li>
+&lt;li>各ネットワークデーモンが渡された情報に基づいてネットワーク設定を行う&lt;/li>
+&lt;/ol>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="300" height="auto" src="../../p/7q3dnx8/img-001.svg" alt="/p/7q3dnx8/img-001.svg" />
+ &lt;figcaption>図: netplan.io のサイトより&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>バックエンドのネットワークデーモンとして何を使うかは、設定ファイルの &lt;code>renderer&lt;/code> 部分で指定できるようになっていますが、デフォルトでは次のように動作します。&lt;/p>
+&lt;ul>
+&lt;li>Wifi や 無線 WAN/LTE の設定 &amp;hellip; NetworkManager に渡される&lt;/li>
+&lt;li>それ以外のネットワーク（有線LANなど）の設定 &amp;hellip; networkd に渡される&lt;/li>
+&lt;/ul>
+&lt;p>よって、通常はどのネットワークデーモンを使うかを明示する必要はありません。&lt;/p>
+&lt;h2 id="設定ファイルの読み込まれる順序">設定ファイルの読み込まれる順序&lt;/h2>
+&lt;p>Netplan はすべての &lt;strong>&lt;code>/etc/netplan/*.yaml&lt;/code>&lt;/strong> ファイルを読み込みます。
+複数のファイルが存在する場合は、ファイル名のアルファベット順に読み込まれ、後に読み込まれたファイルの設定値が優先的に使用されます。
+例えば、&lt;/p>
+&lt;ul>
+&lt;li>/etc/netplan/50-cloud-init.yaml&lt;/li>
+&lt;li>/etc/netplan/99-custom.yaml&lt;/li>
+&lt;/ul>
+&lt;p>というファイルがある場合、&lt;code>50-cloud-init.yaml&lt;/code> で設定された値は &lt;code>99-custom.yaml&lt;/code> の設定値によって上書きされます。&lt;/p></description></item><item><title>ドメイン管理と DNS 管理の違いを理解する</title><link>https://maku.blog/p/bwamwgp/</link><pubDate>Sun, 25 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bwamwgp/</guid><description>&lt;h2 id="ドメイン管理と-dns-サーバー">ドメイン管理と DNS サーバー&lt;/h2>
+&lt;p>「独自ドメイン＋レンタルサーバー」を契約してブログサイトなどを立ち上げようとすると、どうしてもドメイン管理や DNS 設定を行う必要が出てきます。
+同じ会社で一括契約すると、まとめて設定できたりしますが、これらは本来別々のサービスなので、ここで簡単に整理しておきます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/bwamwgp/img-001.svg" alt="/p/bwamwgp/img-001.svg" />
+&lt;/figure>
+
+&lt;p>ドメイン取得・管理は、レジストラ（およびその委託先会社）が行っており、世界で一意なドメインを運用します。
+日本では、&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8C+EVU582+50+2HHVNM" rel="nofollow">お名前.com (by GMO)&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=3NCT8C+EVU582+50+2HHVNM" alt="">
+ などが有名ですね。
+一方で、DNS サービスは、このドメイン名を具体的な IP アドレスに関連づける機能を提供します。&lt;/p>
+&lt;p>レジストラ（ドメイン管理会社）が提供するドメイン管理サービスは、あくまでドメイン名を管理しているだけであり、DNS の機能を提供しているわけではありません。
+なので、ドメイン管理会社でドメインを取得したら、そのドメインの名前解決に使用する DNS サーバーのアドレスを教えてあげる必要があります。
+上の図では、&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8C+EVU582+50+2HHVNM" rel="nofollow">お名前.com&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=3NCT8C+EVU582+50+2HHVNM" alt="">
+ のドメイン管理設定で、さくらインターネットの DNS サーバー (ns1/2.dns.ne.jp) のアドレスを設定する例を示しています。&lt;/p>
+&lt;p>この設定により、ユーザーが &lt;code>example.com&lt;/code> にアクセスしようとすると、DNS サーバー (ns1.dns.ne.jp) によって IP アドレス (12.34.56.78) に変換され、そのアドレスの Web サーバーにアクセスできるという仕組みになっています。&lt;/p>
+&lt;h2 id="組み合わせの例">組み合わせの例&lt;/h2>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>ドメイン取得・管理&lt;/th>
+ &lt;th>DNS サーバー&lt;/th>
+ &lt;th>Web サーバー&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>お名前.com&lt;/td>
+ &lt;td>お名前.com&lt;/td>
+ &lt;td>お名前.com&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>お名前.com&lt;/td>
+ &lt;td>さくらインターネット&lt;/td>
+ &lt;td>さくらインターネット&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>お名前.com&lt;/td>
+ &lt;td>AWS (R53)&lt;/td>
+ &lt;td>AWS (EC2)&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;p>多くの場合、こんな感じで DNS サーバーと Web サーバーは同じ会社のものを使います。
+レンタルサーバーのアドレスなどを自動で設定できたりして便利だからです。
+DNS サーバーの使用料金はレンタルサーバーの使用料金に含まれていることが多いですが、AWS の R53 などは個別に使用料金がかかります。&lt;/p>
+&lt;p>一方、ドメイン取得・管理会社の方は、年ごとの更新費用などが安い「お名前.com」などを選ぶことが多いです。
+Amazon (AWS) などのクラウドサービスでもドメイン取得できたりしますが、ちょっとお値段高めです。&lt;/p></description></item><item><title>Linuxコマンド: scp コマンドでファイルやディレクトリを転送する</title><link>https://maku.blog/p/buvv4fz/</link><pubDate>Sat, 09 Nov 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/buvv4fz/</guid><description>&lt;p>ここでは、&lt;code>scp&lt;/code> を使ったファイル転送の方法を示していますが、ディレクトリ単位のファイルコピーやバックアップを行いたい場合は、&lt;a href="../../p/c3s7wyx">rsync&lt;/a> コマンドを使用したほうが効率的です。&lt;/p>
+&lt;h2 id="ファイル送信">ファイル送信&lt;/h2>
+&lt;pre tabindex="0">&lt;code>$ scp &amp;lt;localFile&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteFile&amp;gt;
+&lt;/code>&lt;/pre>&lt;h2 id="ファイル受信">ファイル受信&lt;/h2>
+&lt;pre tabindex="0">&lt;code>$ scp &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteFile&amp;gt; &amp;lt;localFile&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例: リモートのホームディレクトリ内のファイルを取得&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ scp maku@maku.example.com:hello.txt hello.txt&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>remoteFile の指定は、ホームディレクトリからの相対パスで OK です。&lt;/p>
+&lt;h2 id="ディレクトリ送信">ディレクトリ送信&lt;/h2>
+&lt;pre tabindex="0">&lt;code>$ scp -r &amp;lt;localDir&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteDir&amp;gt;
+&lt;/code>&lt;/pre>&lt;h2 id="ディレクトリ受信">ディレクトリ受信&lt;/h2>
+&lt;pre tabindex="0">&lt;code>$ scp -r &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteDir&amp;gt; &amp;lt;localDir&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例: ホームディレクトリの sample ディレクトリを丸ごとダウンロード&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ scp -r maku@maku.example.com:sample .&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>ネットワークトラブルの調査手順</title><link>https://maku.blog/p/eecgkww/</link><pubDate>Sun, 10 Oct 2010 00:00:00 +0900</pubDate><guid>https://maku.blog/p/eecgkww/</guid><description>&lt;p>ネットワークトラブルはホストに近いところからチェックしていくのがセオリーです。
+ソフトウェア的要因よりも、ハードウェア的要因の方を先に調べるのがよいです。&lt;/p>
+&lt;ul>
+&lt;li>&lt;b>ハードウェア的要因&lt;/b>
+&lt;ul>
+&lt;li>ケーブルの断線&lt;/li>
+&lt;li>NIC の故障&lt;/li>
+&lt;li>電源の故障&lt;/li>
+&lt;li>ポートの接触不良&lt;/li>
+&lt;li>機器の熱暴走&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;b>ソフトウェア的要因&lt;/b>
+&lt;ul>
+&lt;li>IP アドレスの設定ミス&lt;/li>
+&lt;li>デフォルトゲートウェイの設定ミス&lt;/li>
+&lt;li>VLAN の設定ミス&lt;/li>
+&lt;li>ルーティングテーブルの不具合&lt;/li>
+&lt;li>サーバアプリケーションの設定ミス／不具合&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>参考: NETWORKWORLD - May 2007&lt;/p>
+&lt;h2 id="ping-による調査">ping による調査&lt;/h2>
+&lt;p>あるホストに ping が通らないときは、以下の順番で ping を通す確認をしていきます。
+テスト結果は正常時の結果と比べなければ意味がないので、正常時の tracert 結果などを定期的にとっておくことが重要です。&lt;/p>
+&lt;ol>
+&lt;li>ループバックアドレスに対して ping
+&lt;ul>
+&lt;li>TCP/IP モジュールの異常の可能性&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ホストの IP アドレスへ ping
+&lt;ul>
+&lt;li>OS が NIC を認識していない可能性&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>同じスイッチに接続された別の PC へ ping
+&lt;ul>
+&lt;li>スイッチのポート、ケーブルの故障&lt;/li>
+&lt;li>VLAN の設定ミス、接続ミス&lt;/li>
+&lt;li>スイッチ自体には IP アドレスは設定されないので、別の PC に ping することで、スイッチまでの接続を確認する。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ルータに ping
+&lt;ul>
+&lt;li>ルータのダウン、アドレス設定ミス&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ルータの別のポートへ ping
+&lt;ul>
+&lt;li>ルーティングプロセスの異常&lt;/li>
+&lt;li>インタフェースの設定ミス&lt;/li>
+&lt;li>ルータは複数のネットワークにつながっているので、別のネットワーク用のポートにも ping する必要がある。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>異なるネットワークの PC へ ping
+&lt;ul>
+&lt;li>tracert で、通信不能ネットワークを切り分け&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ターゲットホストに ping
+&lt;ul>
+&lt;li>ターゲットホストのダウン&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>アプリケーソンレベルの確認&lt;/li>
+&lt;/ol>
+&lt;p>参考: NETWORKWORLD - May 2007&lt;/p></description></item></channel></rss>

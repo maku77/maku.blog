@@ -1,23 +1,271 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Amazon Cognito 関連記事 on まくろぐ</title><link>https://maku.blog/p/yz2h95y/</link><description>Recent content in Amazon Cognito 関連記事 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Wed, 14 Jun 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/yz2h95y/index.xml" rel="self" type="application/rss+xml"/><item><title>Amazon Cognito (1) サインイン可能な Web サイトを作る (Cognito User Pool)</title><link>https://maku.blog/p/pufs8kx/</link><pubDate>Fri, 28 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pufs8kx/</guid><description>Cognito とは？ Amazon Cognito は、各種アプリケーションにユーザーの概念を取り入れて、サインアップやサインインなどを行えるようにするサービスです（OpenID Connect 準拠の Identity Provider (IdP) のひとつです）。 Cognito は大きく下記の 2 つの機能から成ります。
-ユーザープール: ユーザーを管理する。任意のアプリに、ユーザー登録（サインアップ）や、認証（サインイン）の機能を付けることができる。 ID プール: 上記の仕組みでサインインしたユーザーに対して、AWS サービスへのアクセス権限を付加する。 単純にユーザー管理だけをしたいのであれば、前者の「ユーザープール」の機能だけを使うことができます。 実際には、認証後に AWS のリソースにアクセスさせることが多いと思いますので、後者の「ID プール」の仕組みを使って IAM の権限割り当てを行うことになります。
-認証の仕組みに関しては、5 万 MAU（月間アクティブユーザー）まで無料で使えるので、個人で作成しているアプリでも使いやすいと思います。 ただし、無料枠を超えると 1 ユーザーあたり 1 円くらいかかり、多要素認証などを使おうとするともう少しお金がかかります。 詳しくは、Cognito の料金）のページを参照してください。
-通常、Web サイトに認証機能を付けたいと思うと、ユーザー管理の仕組みや、サインイン画面などの UI を作成する必要がありますが、Cognito はこれらをまとめて提供してくれます。 ここでは、Cognito のユーザープールの作成から、React アプリでの認証までを説明します。
-Cognito にユーザープールを作成する 準備として、Cognito のユーザープールを作成しておきます。
-Cognito のマネージメントコンソールにアクセス ユーザープールの管理 → ユーザープールを作成する を選択します ユーザー作成時の条件 (Attribute) などを設定して作成ボタンを押します プール名は、適当に myapp-test とでも付けておけば大丈夫です。 本番環境用のユーザープールと、開発／テスト用のユーザープールは分けて作っておくのがよいので、ここではサフィックスとして -test を付けておきました。 デフォルト設定でサクッと作成してしまうこともできるし、いろいろな条件（メールアドレス必須とかパスワード強度とか）を指定することもできます。 ここでは、とりあえずデフォルト設定で適当に作成してしまいましょう。 ユーザー名でなく、メールアドレスでもログインできるようにしたいときは、属性 (Attribte) のタブで、ユーザー名 - 検証済みの E メールアドレスでのサインインも許可 にチェックをいれておきます。</description></item><item><title>Amazon Cognito (2) サインイン後に AWS リソースへのアクセス権限を与える (Cognito Identity Pool)</title><link>https://maku.blog/p/3mx8hr2/</link><pubDate>Mon, 31 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3mx8hr2/</guid><description>何をやるか？ 参考: Amazon Cognito (1) サインイン可能な Web サイトを作る (with React) 上記記事では、Cognito のユーザープール機能を使って、Web サイトにサインイン（サインアップ）機能を付けるところまでを説明しています。 ここでは、さらに Cognito の ID プール機能を使い、認証後のユーザーに AWS リソースへのアクセス権限を割り当てる方法を説明します。
-Amazon Cognito サービスは、大きくわけて下記の 2 つの機能を提供しています。
-User Pool &amp;hellip; 認証 (Authentication) Identity Pool &amp;hellip; 認証後のユーザーに対する 認可 (Authorization) 「認証」の方は、Cognito の User Pool を使う方法以外にも、Amazon、Facebook、Google など、様々な認証サービス（これらを 認証プロバイダー (IdP) と呼びます）を使用することができますが、ここでは Cognito の User Pool でユーザー認証することを前提とします。
-ここから先の説明は、「認可」に関しての説明になります。 Cognito Identity Pool は、何らかの認証プロバイダーによる認証済みユーザーに対して、IAM ロールを割り当てることによって、任意の AWS リソースへのアクセスを許可します。 また、認証していないユーザー（いわゆるゲストユーザー）に対して、リードオンリーな IAM ロールを割り当てたり、User Pool の方でユーザーをグループに登録しておいて、そのグループの IAM ロールをアクセス権限として割り当てるといったことも可能です。
-ID プール（フェデレーティッドアイデンティティ） Cognito の ID プールを使うと、各種認証プロバイダーサービス（Cognito の場合は「ユーザープール」）でサインインしたユーザーに対して、AWS リソース（API Gateway や DynamoDB など）へのアクセス権限を割り当てることができます。 ざっくり言うと、ID プールは、ユーザーに対して IAM ロールを割り当てる仕組み です。</description></item><item><title>Amazon Cognito: Amplify SDK による認証まわりの UI 表示あれこれ</title><link>https://maku.blog/p/24p8jjx/</link><pubDate>Wed, 09 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/24p8jjx/</guid><description>認証済みユーザーが admin グループに属しているか調べて UI を切り替える Cognito ユーザープールの「グループ」機能を使うと、既存のユーザーをグループ単位でまとめて、特別な IAM ロールを割り当てたりすることができます。 例えば、admin グループを作っておいて、そのグループに所属するユーザーに、DynamoDB の書き込み権限 (IAM role) を与える、といったことができます。
-React アプリのレイヤでは、このような IAM ロールの権限うんぬんの前に、カレントユーザーがどのようなグループに所属しているかに応じて UI の表示分けをしたいことがあります。 例えば、admin グループのユーザーが Web ページを表示しているときは、管理者向けのメニュー表示をする、といったケースです。
-幸い、aws-amplify モジュールの Auth オブジェクトが提供する認証情報を参照することで、認証済みのユーザーがどの Cognito グループに属しているかを調べることができます。 具体的には、Auth.currentAuthenticatedUser() などが返すユーザー情報のアクセストークンのペイロードに cognito:groups というプロパティがあり、そこに Cognito グループ名のリストが格納されています。
-参考: Using the Access Token - Amazon Cognito 次のようなカスタムフック useAuthState を定義しておくと、戻り値の isAdmin プロパティを見るだけで、現在のユーザーが admin グループに属しているかを確認できます。
-src/hooks/useAuthState.tsx import { useEffect, useState } from &amp;#39;react&amp;#39; import { Auth } from &amp;#39;aws-amplify&amp;#39; import { AuthState, CognitoUserInterface, onAuthUIStateChange, } from &amp;#39;@aws-amplify/ui-components&amp;#39; // ユーザーがこのグループ名の Cognito グループに所属しているときに、 // useAuthState フックが返す isAdmin プロパティを true にします。 const ADMIN_GROUP_NAME = &amp;#39;admin&amp;#39; /** useAuthState フックの戻り値の型 */ export type UseAuthStateOutput = { isSignedIn: boolean isAdmin: boolean user: CognitoUserInterface | undefined } /** 現在の認証状態を取得するためのフック関数です。 */ export const useAuthState = (): UseAuthStateOutput =&amp;gt; { // Cognito によるサインイン状態やユーザー情報を保持するステート const [authState, setAuthState] = useState&amp;lt;AuthState | undefined&amp;gt;() const [user, setUser] = useState&amp;lt;CognitoUserInterface | undefined&amp;gt;() useEffect(() =&amp;gt; { // 画面遷移時に onAuthUIStateChange が呼ばれないことへの対応 // https://github.</description></item><item><title>Amazon Cognito をコマンドライン (CLI) から操作する</title><link>https://maku.blog/p/yzjj4c7/</link><pubDate>Wed, 06 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yzjj4c7/</guid><description>AWS CLI による Cognito 操作用のコマンドには、cognito-idp と cognito-identity があります。
-aws cognito-idp &amp;hellip; Cognito User Pools の操作（ユーザープール／ID プロバイダー） ユーザープール自体の作成や、ユーザーの追加・削除などを行えます。ユーザープールでの認証に成功すると、ユーザー情報を参照するためのトークンが発行されます。一般的にいうところの ID プロバイダー (IdP) です。 aws cognito-identity &amp;hellip; Cognito Federated Identities の操作（フェデレーテッドアイデンティティー／ID プール） 何らかの ID プロバイダー (IdP) で認証されたユーザーに対して、AWS サービスにアクセスするための一時的なアクセストークンを発行します。ID プロバイダーは上記の Cognito ユーザープールでもよいし、Google や Facebook などのサードパーティ ID プロバイダーでもかまいません。 ユーザープールの操作 (cognito-idp) aws cognito-idp のサブコマンドには、admin- プレフィックスが付くものと付かないバージョンがあったりしますが、プレフィックスがない方は、ユーザー認証後に取得できるトークンの指定 (--access-token) が必要です。
-ユーザープールを作成する (cognito-idp create-user-pool) $ aws cognito-idp create-user-pool --pool-name &amp;#34;Test user pool&amp;#34; ユーザープールの作成に成功すると、初期設定の内容（パスワードのルールなど）が出力されます。
-ユーザープールを削除する (cognito-idp delete-user-pool) $ aws cognito-idp delete-user-pool --user-pool-id ap-northeast-1_5O6lfqrqN --user-pool-id オプションには、ユーザープール名ではなく、ユーザープール ID を指定することに注意してください。 ユーザープール ID は、cognito-idp list-user-pools コマンドで確認できます。</description></item><item><title>Amazon Cognito の ID トークンを使った認証付き API の仕組み</title><link>https://maku.blog/p/p4462y2/</link><pubDate>Wed, 14 Jun 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p4462y2/</guid><description>Amazon Cognito サービスを使うと、アプリケーションにユーザー認証（サインイン）の仕組みを提供し、認証されたユーザーだけが呼び出し可能な Web API などを実現できます。 その際に内部的に使用される ID トークンやアクセストークンなどの関係が若干複雑なのでメモしておきます。
-Cognito で認証が必要な API を実現する仕組み graph LR; browser[Web ブラウザ] --サインイン--> cognito[Cognito
-ユーザープール]; cognito --ID トークン--> browser browser --"認証が必要な API の呼び出し
-（with ID トークン）"--> gateway["API Gateway
-（ユーザープールと連携させておく）"] Web アプリなどで Amazon Cognito の ユーザープール を使って認証（サインイン）すると、Cognito は ID トークン を返します（JWT: JSON Web Token）。 この ID トークンは、サービスの正式なユーザーであるということを証明するものです。 この ID トークンを API 呼び出し時に検証することで、認証が必要な API を実現することができます。
-AWS で何らかの Web API を作成する場合は、API Gateway (REST API) や AppSync (GraphQL API) などを使うことになりますが、これらのリソースには Cognito ユーザープールをオーソライザーとして設定することができます。 これにより、Web ブラウザからの API Gateway アクセスを、Cognito でのサインインが終わったユーザーに限定することができます（認証付き API）。 デフォルトでは、Authorization ヘッダーで ID トークンを送ってもらう設定になっています。 ID トークンはセッション情報として保存されます。</description></item><item><title>Go 言語と AWS SDK V2 で Amazon Cognito を操作する</title><link>https://maku.blog/p/nej9wjb/</link><pubDate>Mon, 11 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nej9wjb/</guid><description>ここでは、AWS SDK for Go V2 を使って、Go 言語から Amazon Cognito を操作するサンプルコードを示します。 Go 言語で AWS SDK を使うための開発環境 は構築済みとします。
-指定したユーザープール内のユーザーリストを取得する (ListUsers) list_users.go package main import ( &amp;#34;context&amp;#34; &amp;#34;fmt&amp;#34; &amp;#34;github.com/aws/aws-sdk-go-v2/aws&amp;#34; &amp;#34;github.com/aws/aws-sdk-go-v2/config&amp;#34; &amp;#34;github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider&amp;#34; ) var userPoolId = &amp;#34;ap-northeast-1_XXXXXXXXX&amp;#34; // ユーザープールの ID func main() { listUsers() } func listUsers() { client := cognitoidentityprovider.NewFromConfig(loadAwsConfig()) input := &amp;amp;cognitoidentityprovider.ListUsersInput { UserPoolId: &amp;amp;userPoolId, } output, err := client.ListUsers(context.TODO(), input) if err != nil { panic(err) } for _, user := range output.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Amazon Cognito 関連記事 on まくろぐ</title><link>https://maku.blog/p/yz2h95y/</link><description>Recent content in Amazon Cognito 関連記事 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Wed, 14 Jun 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/yz2h95y/index.xml" rel="self" type="application/rss+xml"/><item><title>Amazon Cognito (1) サインイン可能な Web サイトを作る (Cognito User Pool)</title><link>https://maku.blog/p/pufs8kx/</link><pubDate>Fri, 28 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pufs8kx/</guid><description>&lt;h2 id="cognito-とは">Cognito とは？&lt;/h2>
+&lt;p>&lt;a href="https://aws.amazon.com/jp/cognito/">Amazon Cognito&lt;/a> は、各種アプリケーションにユーザーの概念を取り入れて、サインアップやサインインなどを行えるようにするサービスです（OpenID Connect 準拠の Identity Provider (IdP) のひとつです）。
+Cognito は大きく下記の 2 つの機能から成ります。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>ユーザープール&lt;/strong>: ユーザーを管理する。任意のアプリに、ユーザー登録（サインアップ）や、認証（サインイン）の機能を付けることができる。&lt;/li>
+&lt;li>&lt;strong>ID プール&lt;/strong>: 上記の仕組みでサインインしたユーザーに対して、AWS サービスへのアクセス権限を付加する。&lt;/li>
+&lt;/ul>
+&lt;p>単純にユーザー管理だけをしたいのであれば、前者の「ユーザープール」の機能だけを使うことができます。
+実際には、認証後に AWS のリソースにアクセスさせることが多いと思いますので、後者の「ID プール」の仕組みを使って IAM の権限割り当てを行うことになります。&lt;/p>
+&lt;p>認証の仕組みに関しては、5 万 MAU（月間アクティブユーザー）まで無料で使えるので、個人で作成しているアプリでも使いやすいと思います。
+ただし、無料枠を超えると 1 ユーザーあたり 1 円くらいかかり、多要素認証などを使おうとするともう少しお金がかかります。
+詳しくは、&lt;a href="https://aws.amazon.com/jp/cognito/pricing/">Cognito の料金&lt;/a>）のページを参照してください。&lt;/p>
+&lt;p>通常、Web サイトに認証機能を付けたいと思うと、ユーザー管理の仕組みや、サインイン画面などの UI を作成する必要がありますが、Cognito はこれらをまとめて提供してくれます。
+ここでは、Cognito のユーザープールの作成から、React アプリでの認証までを説明します。&lt;/p>
+&lt;h2 id="cognito-にユーザープールを作成する">Cognito にユーザープールを作成する&lt;/h2>
+&lt;p>準備として、Cognito のユーザープールを作成しておきます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="600" height="248" src="../../p/pufs8kx/img-001_hu3076329424299191530.png" alt="/p/pufs8kx/img-001.png" />
+&lt;/figure>
+
+&lt;ol>
+&lt;li>&lt;a href="https://console.aws.amazon.com/cognito/home">Cognito のマネージメントコンソール&lt;/a>にアクセス&lt;/li>
+&lt;li>&lt;code>ユーザープールの管理&lt;/code> → &lt;code>ユーザープールを作成する&lt;/code> を選択します&lt;/li>
+&lt;li>ユーザー作成時の条件 (Attribute) などを設定して作成ボタンを押します&lt;/li>
+&lt;/ol>
+&lt;p>プール名は、適当に &lt;strong>&lt;code>myapp-test&lt;/code>&lt;/strong> とでも付けておけば大丈夫です。
+本番環境用のユーザープールと、開発／テスト用のユーザープールは分けて作っておくのがよいので、ここではサフィックスとして &lt;code>-test&lt;/code> を付けておきました。
+デフォルト設定でサクッと作成してしまうこともできるし、いろいろな条件（メールアドレス必須とかパスワード強度とか）を指定することもできます。
+ここでは、とりあえずデフォルト設定で適当に作成してしまいましょう。
+ユーザー名でなく、メールアドレスでもログインできるようにしたいときは、&lt;code>属性 (Attribte)&lt;/code> のタブで、&lt;strong>&lt;code>ユーザー名 - 検証済みの E メールアドレスでのサインインも許可&lt;/code>&lt;/strong> にチェックをいれておきます。&lt;/p></description></item><item><title>Amazon Cognito (2) サインイン後に AWS リソースへのアクセス権限を与える (Cognito Identity Pool)</title><link>https://maku.blog/p/3mx8hr2/</link><pubDate>Mon, 31 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3mx8hr2/</guid><description>&lt;h2 id="何をやるか">何をやるか？&lt;/h2>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/pufs8kx">Amazon Cognito (1) サインイン可能な Web サイトを作る (with React)&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>上記記事では、Cognito のユーザープール機能を使って、Web サイトにサインイン（サインアップ）機能を付けるところまでを説明しています。
+ここでは、さらに Cognito の ID プール機能を使い、認証後のユーザーに AWS リソースへのアクセス権限を割り当てる方法を説明します。&lt;/p>
+&lt;p>Amazon Cognito サービスは、大きくわけて下記の 2 つの機能を提供しています。&lt;/p>
+&lt;ul>
+&lt;li>User Pool &amp;hellip; &lt;strong>認証 (Authentication)&lt;/strong>&lt;/li>
+&lt;li>Identity Pool &amp;hellip; 認証後のユーザーに対する &lt;strong>認可 (Authorization)&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;p>「認証」の方は、Cognito の User Pool を使う方法以外にも、Amazon、Facebook、Google など、様々な認証サービス（これらを &lt;strong>認証プロバイダー (IdP)&lt;/strong> と呼びます）を使用することができますが、ここでは Cognito の User Pool でユーザー認証することを前提とします。&lt;/p>
+&lt;p>ここから先の説明は、「認可」に関しての説明になります。
+Cognito Identity Pool は、何らかの認証プロバイダーによる認証済みユーザーに対して、IAM ロールを割り当てることによって、任意の AWS リソースへのアクセスを許可します。
+また、認証していないユーザー（いわゆるゲストユーザー）に対して、リードオンリーな IAM ロールを割り当てたり、User Pool の方でユーザーをグループに登録しておいて、そのグループの IAM ロールをアクセス権限として割り当てるといったことも可能です。&lt;/p>
+&lt;h2 id="id-プールフェデレーティッドアイデンティティ">ID プール（フェデレーティッドアイデンティティ）&lt;/h2>
+&lt;p>Cognito の ID プールを使うと、各種認証プロバイダーサービス（Cognito の場合は「ユーザープール」）でサインインしたユーザーに対して、AWS リソース（API Gateway や DynamoDB など）へのアクセス権限を割り当てることができます。
+ざっくり言うと、ID プールは、&lt;strong>ユーザーに対して IAM ロールを割り当てる仕組み&lt;/strong> です。&lt;/p></description></item><item><title>Amazon Cognito: Amplify SDK による認証まわりの UI 表示あれこれ</title><link>https://maku.blog/p/24p8jjx/</link><pubDate>Wed, 09 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/24p8jjx/</guid><description>&lt;h2 id="認証済みユーザーが-admin-グループに属しているか調べて-ui-を切り替える">認証済みユーザーが admin グループに属しているか調べて UI を切り替える&lt;/h2>
+&lt;p>Cognito ユーザープールの「グループ」機能を使うと、既存のユーザーをグループ単位でまとめて、特別な IAM ロールを割り当てたりすることができます。
+例えば、&lt;code>admin&lt;/code> グループを作っておいて、そのグループに所属するユーザーに、DynamoDB の書き込み権限 (IAM role) を与える、といったことができます。&lt;/p>
+&lt;p>React アプリのレイヤでは、このような IAM ロールの権限うんぬんの前に、カレントユーザーがどのようなグループに所属しているかに応じて UI の表示分けをしたいことがあります。
+例えば、&lt;code>admin&lt;/code> グループのユーザーが Web ページを表示しているときは、管理者向けのメニュー表示をする、といったケースです。&lt;/p>
+&lt;p>幸い、&lt;code>aws-amplify&lt;/code> モジュールの &lt;code>Auth&lt;/code> オブジェクトが提供する認証情報を参照することで、認証済みのユーザーがどの Cognito グループに属しているかを調べることができます。
+具体的には、&lt;code>Auth.currentAuthenticatedUser()&lt;/code> などが返すユーザー情報のアクセストークンのペイロードに &lt;strong>&lt;code>cognito:groups&lt;/code>&lt;/strong> というプロパティがあり、そこに Cognito グループ名のリストが格納されています。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-the-access-token.html">Using the Access Token - Amazon Cognito&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>次のようなカスタムフック &lt;code>useAuthState&lt;/code> を定義しておくと、戻り値の &lt;code>isAdmin&lt;/code> プロパティを見るだけで、現在のユーザーが admin グループに属しているかを確認できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/hooks/useAuthState.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">useEffect&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">useState&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">Auth&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;aws-amplify&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">AuthState&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">CognitoUserInterface&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">onAuthUIStateChange&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@aws-amplify/ui-components&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ユーザーがこのグループ名の Cognito グループに所属しているときに、
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// useAuthState フックが返す isAdmin プロパティを true にします。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">ADMIN_GROUP_NAME&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;admin&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/** useAuthState フックの戻り値の型 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="nx">UseAuthStateOutput&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">isSignedIn&lt;/span>: &lt;span class="kt">boolean&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">isAdmin&lt;/span>: &lt;span class="kt">boolean&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">user&lt;/span>: &lt;span class="kt">CognitoUserInterface&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="kc">undefined&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/** 現在の認証状態を取得するためのフック関数です。 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">useAuthState&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">UseAuthStateOutput&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Cognito によるサインイン状態やユーザー情報を保持するステート
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">authState&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setAuthState&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useState&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">AuthState&lt;/span> &lt;span class="err">|&lt;/span> &lt;span class="na">undefined&lt;/span>&lt;span class="p">&amp;gt;()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">user&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setUser&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useState&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">CognitoUserInterface&lt;/span> &lt;span class="err">|&lt;/span> &lt;span class="na">undefined&lt;/span>&lt;span class="p">&amp;gt;()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 画面遷移時に onAuthUIStateChange が呼ばれないことへの対応
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// https://github.com/aws-amplify/docs/issues/2895
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">authState&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="kc">undefined&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Auth&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">currentAuthenticatedUser&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">then&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">authData&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">setAuthState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">AuthState&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">SignedIn&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">setUser&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">authData&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="k">catch&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="cm">/* Nothing to do */&lt;/span> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">onAuthUIStateChange&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">nextAuthState&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">authData&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">setAuthState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">nextAuthState&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">setUser&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">authData&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">CognitoUserInterface&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">authState&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">isSignedIn&lt;/span>: &lt;span class="kt">authState&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="nx">AuthState&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">SignedIn&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">isAdmin&lt;/span>: &lt;span class="kt">isAdmin&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">user&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">user&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// アクセストークン内のグループ名リストに &amp;#34;admin&amp;#34; があるかを調べます。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">function&lt;/span> &lt;span class="nx">isAdmin&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">user&lt;/span>: &lt;span class="kt">CognitoUserInterface&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="kc">undefined&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kr">boolean&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">groups&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="o">?&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">signInUserSession&lt;/span>&lt;span class="o">?&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">accessToken&lt;/span>&lt;span class="o">?&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">payload&lt;/span>&lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;cognito:groups&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nb">Array&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">string&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">groups&lt;/span>&lt;span class="o">?&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">includes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">ADMIN_GROUP_NAME&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">??&lt;/span> &lt;span class="kc">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のフック実装では、戻り値の &lt;code>user&lt;/code> プロパティで &lt;code>CognitoUserInterface&lt;/code> 情報を返すようにしていますが、Cognito に依存する情報はできるだけフック内に隠蔽してしまった方がいいですね。
+下記は、このフック関数の使用例です。
+&lt;code>useAuthState()&lt;/code> が返す &lt;code>isAdmin&lt;/code> の値が true のときに、管理者用のメニューを表示するという処理を想定しています。&lt;/p></description></item><item><title>Amazon Cognito をコマンドライン (CLI) から操作する</title><link>https://maku.blog/p/yzjj4c7/</link><pubDate>Wed, 06 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yzjj4c7/</guid><description>&lt;p>AWS CLI による Cognito 操作用のコマンドには、&lt;code>cognito-idp&lt;/code> と &lt;code>cognito-identity&lt;/code> があります。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>aws cognito-idp&lt;/code>&lt;/strong> &amp;hellip; Cognito User Pools の操作（ユーザープール／ID プロバイダー）
+&lt;ul>
+&lt;li>ユーザープール自体の作成や、ユーザーの追加・削除などを行えます。ユーザープールでの認証に成功すると、ユーザー情報を参照するためのトークンが発行されます。一般的にいうところの ID プロバイダー (IdP) です。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>&lt;code>aws cognito-identity&lt;/code>&lt;/strong> &amp;hellip; Cognito Federated Identities の操作（フェデレーテッドアイデンティティー／ID プール）
+&lt;ul>
+&lt;li>何らかの ID プロバイダー (IdP) で認証されたユーザーに対して、AWS サービスにアクセスするための一時的なアクセストークンを発行します。ID プロバイダーは上記の Cognito ユーザープールでもよいし、Google や Facebook などのサードパーティ ID プロバイダーでもかまいません。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="ユーザープールの操作-cognito-idp">ユーザープールの操作 (cognito-idp)&lt;/h2>
+&lt;p>&lt;code>aws cognito-idp&lt;/code> のサブコマンドには、&lt;code>admin-&lt;/code> プレフィックスが付くものと付かないバージョンがあったりしますが、プレフィックスがない方は、ユーザー認証後に取得できるトークンの指定 (&lt;code>--access-token&lt;/code>) が必要です。&lt;/p>
+&lt;h3 id="ユーザープールを作成する-cognito-idp-create-user-pool">ユーザープールを作成する (cognito-idp create-user-pool)&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> aws cognito-idp create-user-pool --pool-name &lt;span class="s2">&amp;#34;Test user pool&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>ユーザープールの作成に成功すると、初期設定の内容（パスワードのルールなど）が出力されます。&lt;/p>
+&lt;h3 id="ユーザープールを削除する-cognito-idp-delete-user-pool">ユーザープールを削除する (cognito-idp delete-user-pool)&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> aws cognito-idp delete-user-pool --user-pool-id ap-northeast-1_5O6lfqrqN
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>--user-pool-id&lt;/code> オプションには、ユーザープール名ではなく、ユーザープール ID を指定することに注意してください。
+ユーザープール ID は、&lt;code>cognito-idp list-user-pools&lt;/code> コマンドで確認できます。&lt;/p></description></item><item><title>Amazon Cognito の ID トークンを使った認証付き API の仕組み</title><link>https://maku.blog/p/p4462y2/</link><pubDate>Wed, 14 Jun 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p4462y2/</guid><description>&lt;p>Amazon Cognito サービスを使うと、アプリケーションにユーザー認証（サインイン）の仕組みを提供し、認証されたユーザーだけが呼び出し可能な Web API などを実現できます。
+その際に内部的に使用される ID トークンやアクセストークンなどの関係が若干複雑なのでメモしておきます。&lt;/p>
+&lt;h2 id="cognito-で認証が必要な-api-を実現する仕組み">Cognito で認証が必要な API を実現する仕組み&lt;/h2>
+&lt;figure style="text-align: center">
+&lt;div class="mermaid">
+graph LR;
+ browser[Web ブラウザ] --サインイン--> cognito[Cognito&lt;br>ユーザープール];
+ cognito --ID トークン--> browser
+ browser --"認証が必要な API の呼び出し&lt;br>（with ID トークン）"--> gateway["API Gateway&lt;br>（ユーザープールと連携させておく）"]
+&lt;/div>
+&lt;/figure>
+
+&lt;script>
+(function() {
+ 
+ if (window.isMermaidLoaded) return;
+ window.isMermaidLoaded = true;
+
+ 
+ const script = document.createElement('script');
+ script.src = 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js';
+ script.onload = () => { mermaid.initialize({startOnLoad: true}); };
+ document.body.appendChild(script);
+})();
+&lt;/script>
+
+
+&lt;p>Web アプリなどで Amazon Cognito の &lt;strong>ユーザープール&lt;/strong> を使って認証（サインイン）すると、Cognito は &lt;strong>ID トークン&lt;/strong> を返します（JWT: JSON Web Token）。
+この ID トークンは、サービスの正式なユーザーであるということを証明するものです。
+この ID トークンを API 呼び出し時に検証することで、認証が必要な API を実現することができます。&lt;/p></description></item><item><title>Go 言語と AWS SDK V2 で Amazon Cognito を操作する</title><link>https://maku.blog/p/nej9wjb/</link><pubDate>Mon, 11 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nej9wjb/</guid><description>&lt;p>ここでは、AWS SDK for Go V2 を使って、Go 言語から Amazon Cognito を操作するサンプルコードを示します。
+&lt;a href="../../p/xnogqgm">Go 言語で AWS SDK を使うための開発環境&lt;/a> は構築済みとします。&lt;/p>
+&lt;h2 id="指定したユーザープール内のユーザーリストを取得する-listusers">指定したユーザープール内のユーザーリストを取得する (ListUsers)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">list_users.go&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;context&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;fmt&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;github.com/aws/aws-sdk-go-v2/aws&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;github.com/aws/aws-sdk-go-v2/config&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="nx">userPoolId&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="s">&amp;#34;ap-northeast-1_XXXXXXXXX&amp;#34;&lt;/span> &lt;span class="c1">// ユーザープールの ID
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nf">listUsers&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">listUsers&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">client&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">cognitoidentityprovider&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">NewFromConfig&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nf">loadAwsConfig&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">input&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">cognitoidentityprovider&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ListUsersInput&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">UserPoolId&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">userPoolId&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">output&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">client&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">ListUsers&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">TODO&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="nx">input&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nb">panic&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="k">for&lt;/span> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">user&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="k">range&lt;/span> &lt;span class="nx">output&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Users&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;%s, %s\n&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">UserCreateDate&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Username&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Found %d users\n&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">output&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Users&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 外部リソース（~/.aws/config など）からコンフィグ情報 (aws.Config) を生成します。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">loadAwsConfig&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="nx">aws&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Config&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">cfg&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">LoadDefaultConfig&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">TODO&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nb">panic&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="k">return&lt;/span> &lt;span class="nx">cfg&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> go run list_users.go
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">2021-11-25 06:37:28.751 +0000 UTC, user-name-1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">2021-10-28 02:34:29.485 +0000 UTC, user-name-2
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">2021-11-30 13:49:28.566 +0000 UTC, user-name-3
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">Found 3 users
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="ユーザーのパスワードを変更する-adminsetuserpassword">ユーザーのパスワードを変更する (AdminSetUserPassword)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;context&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;fmt&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;github.com/aws/aws-sdk-go-v2/aws&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;github.com/aws/aws-sdk-go-v2/config&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="nx">userPoolId&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="s">&amp;#34;ap-northeast-1_XXXXXXXXX&amp;#34;&lt;/span> &lt;span class="c1">// ユーザープールの ID
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nf">adminSetUserPassword&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">adminSetUserPassword&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">client&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">cognitoidentityprovider&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">NewFromConfig&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nf">loadAwsConfig&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">user&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="s">&amp;#34;user1&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">pass&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="s">&amp;#34;Password#123&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">input&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">cognitoidentityprovider&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">AdminSetUserPasswordInput&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">UserPoolId&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">userPoolId&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">Username&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">user&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">Password&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">pass&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">client&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">AdminSetUserPassword&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">TODO&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="nx">input&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nb">panic&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Password changed&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="ユーザー名とパスワードで認証して-id-トークンとアクセストークンを取得する-admininitiateauth">ユーザー名とパスワードで認証して ID トークンとアクセストークンを取得する (AdminInitiateAuth)&lt;/h2>
+&lt;p>下記のように &lt;code>AdminInitiateAuth&lt;/code> API でユーザー認証を行うには、Cognito ユーザープールの設定で対象のクライアントを選択し、&lt;strong>&lt;code>ALLOW_ADMIN_USER_PASSWORD_AUTH&lt;/code>&lt;/strong> にチェックを入れておく必要があります。&lt;/p></description></item></channel></rss>

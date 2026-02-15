@@ -1,45 +1,478 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>nginx on まくろぐ</title><link>https://maku.blog/tags/nginx/</link><description>Recent content in nginx on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 12 Feb 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/nginx/index.xml" rel="self" type="application/rss+xml"/><item><title>nginx-proxy コンテナで簡単にリバースプロキシを立ち上げる</title><link>https://maku.blog/p/kos367z/</link><pubDate>Mon, 12 Feb 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/kos367z/</guid><description>nginx-proxy は Docker コンテナ用のリバースプロキシ Docker コンテナイメージの nginx-proxy を使うと、複数の Docker コンテナ用のリバースプロキシを簡単に立ち上げることができます。
-例えば、1 つの VPS サーバー上で複数の Docker コンテナー（例えば Web サーバー）を立ち上げるような場合は、次のような感じで入り口にリバースプロキシを配置し、そこから各 Web サーバーにアクセスを振り分ける構成にします。 ここでは、aaa.example.com と bbb.example.com というサブドメインにより、プロキシ先を振り分けるようにしていますが、example.com というベースドメインを使うこともできます。
-図: nginx-proxy によるリバースプロキシでコンテナーを繋ぐ もともと Nginx でリバースプロキシを設定するのはそれほど難しくはないのですが、どうしてもその背後にあるコンテナーの設定がリバースプロキシ側の設定に染み出してしまいます。 また、リバースプロキシ用のコンテナーを最後に起動するという手順の複雑さもあります。
-参考: Nginx でバーチャルホストを設定する（リバースプロキシ） 参考: Docker Compose でリバースプロキシを立てて別の Docker Compose 内のコンテナに接続する - まくまく Docker ノート nginx-proxy によるリバースプロキシを起動しておくと、背後でコンテナーを起動するだけで、自動的にリバースプロキシのエントリに追加してくれます。 nginx-proxy には次のような利点があります。
-背後の Docker コンテナの存在を意識しなくてよい（同一の Docker ネットーワーク内のコンテナ起動を検出して、自動的にリバースプロキシ設定に反映してくれます） 各サブドメイン用の SSL 設定（HTTPS 対応）を自動で行ってくれる（acme-companion を組み合わせて使用することで、Let&amp;rsquo;s Encrypt による SSL 証明書の取得を自動化できます） リバースプロキシの設定更新が自動化されているので、Web アプリ用の Docker コンテナーを簡単に追加・削除できます。
-事前準備 nginx-proxy の設定を行う前に、サブドメイン用の DNS 設定や、80/443 ポートの解放などを行っておく必要があります。 ネットワーク的に繋がらないとどうしようもないですからね。</description></item><item><title>Nginx の設定: Web サイトのドメインを移転したときの 301 リダイレクト設定</title><link>https://maku.blog/p/mjs29go/</link><pubDate>Mon, 15 May 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mjs29go/</guid><description>nginx で URL リダイレクト用のレスポンスを返す Web サイトのドメイン（URL プレフィックス）を次のような感じで移転することを考えます。
-旧アドレス: https://old.example.com 新アドレス: https://new.example.com 多くのユーザーが旧アドレスでブックマークしている可能性があるので、しばらくは旧アドレスにアクセスしてきたユーザー（ブラウザ）に対して、リダイレクト用のレスポンスを返すよう nginx を設定しておく必要があります。 下記は、旧アドレスでのアクセス時に 301 (Moved Permanently) リダイレクトレスポンスを返す設定例です。
-/etc/nginx/conf.d/old.example.com.conf # これは http から https へリダイレクトする設定（オプション） server { server_name old.example.com; listen 80; return 301 https://$host$request_uri; } # https://old.example.com から # https://new.example.com へリダイレクトする設定 server { server_name old.example.com; listen 443 ssl http2; ssl_certificate /etc/letsencrypt/live/old.example.com/fullchain.pem; ssl_certificate_key /etc/letsencrypt/live/old.example.com/privkey.pem; return 301 $scheme://new.example.com$request_uri; } ポイントは最後の return ディレクティブです。 1 つ目の引数に 301 を指定することで、301 (Moved Permanently) の HTTP レスポンスコードを返すことができます。 このコードを省略した場合は、302 (Moved Temporarily) になります。</description></item><item><title>Nginx の設定: Nginx の設定内容を確認する (nginx -T)</title><link>https://maku.blog/p/bm6n5k2/</link><pubDate>Sun, 27 Nov 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bm6n5k2/</guid><description>nginx サーバーが読み込む設定情報を確認するには、nginx -T コマンドを使用します。 正確には、このコマンドは設定ファイルの検証 (nginx -t) と、内容の出力を同時に行うコマンドです。
-nginx が実際に読み込む設定を確認 $ nginx -T 下記は、nginx -T コマンドを実行したときの出力例です。 最初の 2 行が設定ファイルの検証結果で、3 行目以降が具体的な設定内容です。
-出力例 nginx: the configuration file /etc/nginx/nginx.conf syntax is ok nginx: configuration file /etc/nginx/nginx.conf test is successful # configuration file /etc/nginx/nginx.conf: user nginx; worker_processes auto; error_log /var/log/nginx/error.log notice; pid /var/run/nginx.pid; events { worker_connections 1024; } http { include /etc/nginx/mime.types; default_type application/octet-stream; log_format main &amp;#39;$remote_addr - $remote_user [$time_local] &amp;#34;$request&amp;#34; &amp;#39; &amp;#39;$status $body_bytes_sent &amp;#34;$http_referer&amp;#34; &amp;#39; &amp;#39;&amp;#34;$http_user_agent&amp;#34; &amp;#34;$http_x_forwarded_for&amp;#34;&amp;#39;; access_log /var/log/nginx/access.</description></item><item><title>Docker コンテナで Nginx サーバーを立ち上げる</title><link>https://maku.blog/p/99qo8zf/</link><pubDate>Wed, 13 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/99qo8zf/</guid><description>何をするか？ VPS などで Web アプリをホスティングする場合、各種サーバーを Docker コンテナとして立ち上げるようにすると OS 環境をクリーンに保てます。 特に、1 つのホスト（VPS サーバー）で複数の Web アプリを提供するような場合は、各アプリをコンテナで構成することで、関係ないアプリの設定が混ざってしまうのを防げます。 もちろん、Azure Container Instances や AWS Fargate といったコンテナ実行用のクラウドサービスを使えば、より独立した環境を構築できるのですが、これらのサービスは個人が趣味で使うにはまだまだ高価なので、VPS などの環境で Docker コンテナを立ち上げることには価値があります。
-ここでは、Nginx サーバーを Docker コンテナとして立ち上げる方法を示します。 Docker Hub で公開されている Nginx イメージ は、デフォルトでコンテナ内の /usr/share/nginx/html ディレクトリに配置されたコンテンツを公開するようになっています。 大きく分けて、次の 2 つのいずれかの方法で簡単にコンテンツを公開できます。
-bind マウントで Docker ホスト側のコンテンツを参照する方法 コンテンツを含んだコンテナイメージを作成する方法 以下、それぞれの方法を順番に見ていきます。
-bind マウントで Docker ホスト側のコンテンツを参照する方法 Nginx のコンテナを起動するときに、Docker ホスト側のコンテンツディレクトリを bind マウントして、コンテナの /usr/share/nginx/html ディレクトリとして参照できるようにする方法です。
-まず、簡単なコンテンツファイルとして次のような HTML ファイルを用意しておきます。
-public/index.html &amp;lt;html&amp;gt;Hello&amp;lt;/html&amp;gt; あとは、docker container run コマンドで nginx コンテナを起動するだけです。
-$ docker container run --rm -d -p 8000:80 -v &amp;#34;$(pwd)/public&amp;#34;:/usr/share/nginx/html --name web nginx 各引数は次のような意味を持っています。</description></item><item><title>Let's Encrypt certificate expiration notice が来たら</title><link>https://maku.blog/p/cniq5vr/</link><pubDate>Thu, 21 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cniq5vr/</guid><description>Let&amp;rsquo;s Encrypt Expiry Bot からの証明書期限切れメール 2 ヶ月ほど前に、Sakura VPS レンタルサーバーを Let&amp;rsquo;s Encrypt で SSL 対応していたら、こんなメールが来ました。
-Your certificate (or certificates) for the names listed below will expire in 20 days (on 10 Apr 19 07:02 +0000). Please make sure to renew your certificate before then, or visitors to your website will encounter errors.
-We recommend renewing certificates automatically when they have a third of their total lifetime left. For Let&amp;rsquo;s Encrypt&amp;rsquo;s current 90-day certificates, that means renewing 30 days before expiration.</description></item><item><title>Nginx で 403 Forbidden エラーが出るときのチェック項目</title><link>https://maku.blog/p/ew5zmmw/</link><pubDate>Thu, 10 Jan 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ew5zmmw/</guid><description>nginx サーバを起動して Web ブラウザでアクセスしたときに、ブラウザ上に 403 Forbidden エラーが表示されるときは、パーミッション系のエラーが発生しています。
-サーバ自体は稼働していますので、下記のあたりを確認すれば無事表示されるようになります。
-ファイルに読み取り権限、ディレクトリに実行権限を付ける html ファイルなどのコンテンツファイル自身には読み取り権限、ディレクトリには実行権限が必要です。
-$ chmod 0755 -R /home/maku/website ドキュメントルートまでのディレクトリに実行権限 (x) を付ける 例えば、ドキュメントルートを /home/maku/website としている場合は、/、/home、/home/maku、/home/maku/website のディレクトリに実行権限が必要です。
-$ chmod +x /home/maku 特定のディレクトリのパーミッションは下記のように確認できます。
-$ ls -ld /home/maku drwx--x--x 5 maku maku 156 1月 10 17:32 /home/maku nginx の設定を再読み込み ファイル群のパーミッションを変更しただけでは nginx の再起動は必要になりませんが、nginx の設定ファイルを変更した場合は、設定ファイルを反映する必要があります。
-$ sudo service nginx reload</description></item><item><title>Nginx の設定: http でアクセスされた場合に https にリダイレクトする</title><link>https://maku.blog/p/jowgstm/</link><pubDate>Thu, 10 Jan 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/jowgstm/</guid><description>nginx サーバの SSL 対応（https 有効化）が終わった後は、http プロトコルによるアクセスは避けてもらいたいですね。 そのような場合は、下記のように設定しておけば、http でアクセスされた場合に、https で再度アクセスしてもらうようにクライアントに応答することができます（301 という値は、Moved Permanently を示す HTTP レスポンスコードです）。
-/etc/nginx/conf.d/xxx.conf # http でアクセスされた場合 server { listen 80; server_name example.com; return 301 https://$host$request_uri; } # https でアクセスされた場合 server { server_name example.com; listen 443 ssl http2; # IPv4 listen [::]:443 ssl http2; # IPv6 ssl_certificate /etc/nginx/ssl/example.com-2024.crt; ssl_certificate_key /etc/nginx/ssl/example.com-2024.key; ssl_prefer_server_ciphers on; # サーバー側の暗号スイートを優先 location / { root /usr/share/nginx/html; index index.html; } } 結果として、Web ブラウザから http://example.com/ にアクセスすると、Web ブラウザは自動的に https://example.com/ という URL でアクセスし直すことになります。</description></item><item><title>Sakura VPS レンタルサーバーを Let's Encrypt で SSL 対応</title><link>https://maku.blog/p/xkpjfcf/</link><pubDate>Thu, 10 Jan 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xkpjfcf/</guid><description>今更ですが、さくらインターネットでレンタルしている Sakura VPS の Web サーバーを SSL (https) に対応しました。 とりあえず今回は無料の Let&amp;rsquo;s Encrypt の証明書を、nginx サーバに設定します。
-使っている OS が CentOS6 だったので、ついでに CentOS7 をクリーンインストールすることにしました。 といっても、さくらインターネットの VPS の設定画面でポチポチとやっていくだけ。 ここで、[public] CentOS_LetsEncrypt というスタートアップスクリプトを選んだら、自動的に SSL の証明書などの対応が完了します。 入力するパラメータはドメイン（example.com など）と連絡用のメールアドレスだけ。
-Web サーバの nginx も自動的にインストールされて、Web サーバにアクセスできる状態で起動するのですが、nginx の設定は少しだけ調整する必要があります（ドキュメントルートなど）。
-数分で OS の再インストールが完了し、下記のような nginx の設定ファイルが自動生成されていました（ドメイン名は example.com に置換してあります）。 SSL の設定も完了した状態になっています。
-/etc/nginx/conf.d/https.conf map $http_upgrade $connection_upgrade { default upgrade; &amp;#39;&amp;#39; close; } server { listen 443 ssl http2; server_name example.com; location / { root /usr/share/nginx/html; index index.</description></item><item><title>Nginx の設定: Nginx の設定ファイルの書き方が正しいか確認する (configtest, nginx -t)</title><link>https://maku.blog/p/3q8uzoo/</link><pubDate>Mon, 21 Sep 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3q8uzoo/</guid><description>nginx の configtest コマンドを使用すると、nginx のコンフィグファイルの記述方法が正しいかを確認することができます。 このコマンドは管理者権限で実行する必要があります。
-$ sudo /etc/init.d/nginx configtest nginx: the configuration file /etc/nginx/nginx.conf syntax is ok nginx: configuration file /etc/nginx/nginx.conf test is successful nginx コマンド (/usr/sbin/nginx) を認識している環境であれば、このコマンドの -t オプションで確認することもできます。
-$ sudo nginx -t nginx: the configuration file /etc/nginx/nginx.conf syntax is ok nginx: configuration file /etc/nginx/nginx.conf test is successful</description></item><item><title>Nginx の設定: Nginx の設定ファイルの変更を反映する (nginx reload)</title><link>https://maku.blog/p/6aazmy3/</link><pubDate>Sun, 20 Sep 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6aazmy3/</guid><description>nginx の設定ファイル (/etc/nginx/nginx.conf や /etc/nginx/conf.d/*.conf) の内容を変更した場合は、次のように nginx reload で再読み込みします。
-$ sudo service nginx reload # 方法 1 $ sudo /etc/init.d/nginx reload # 方法 2 nginx の起動はとても速いので、単純な Web コンテンツだけを提供しているの Web サーバであれば、nginx restart でサービス自体を再起動してしまってもよいでしょう。
-$ sudo service nginx restart # 方法 1 $ sudo /etc/init.d/nginx restart # 方法 2</description></item><item><title>Nginx の設定: Nginx でバーチャルホストを設定する（リバースプロキシ）</title><link>https://maku.blog/p/q8tw6c4/</link><pubDate>Tue, 03 Dec 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/q8tw6c4/</guid><description>（参考）nginx-proxy コンテナで簡単にリバースプロキシを立ち上げる アクセス時のドメイン名により別の Web サーバに処理をフォワードする 例えば、http://test.example.com/ というアドレス（80番ポート）で nginx サーバにアクセスしてきたときに、localhost:7000 で動作している Web サーバに処理を委譲するには、下記のように設定します。
-/etc/nginx/conf.d/test.example.com.conf server { listen 80; server_name test.example.com; location / { proxy_pass http://localhost:7000/; } } この機能を利用することで、一つの PC 内に複数の Web サーバを（異なるポート）で立ち上げておき、アクセスしてきた URL（のドメイン名）によって処理を振り分けることができます。 例えば、次のように Web サーバへのアクセスをフォワードできます。
-http://aaa.example.com/ でアクセスされた場合 → localhost:7000 で処理 http://bbb.example.com/ でアクセスされた場合 → localhost:7100 で処理 http://ccc.example.com/ でアクセスされた場合 → localhost:7200 で処理 それぞれのドメインは同じ IP アドレスにマッピングされており、物理的には 1 つのマシンに対してアクセスが発生するのですが、クライアント（Web ブラウザのユーザ）から見ると、あたかも異なるホストにアクセスしているかのように見えます（ドメイン名が異なるので）。 バーチャルなホストが存在しているような動作をするということで、このような Web サーバの機能をバーチャルホストと呼びます。
-また、このように、サーバ環境側（ここでは 80 ポートのサーバ）でいったんアクセスを受けておいて、アドレス等を見て別の内部サーバ（ここでは 7000 ポートで待ち受けているサーバなど）に処理をフォーワードする仕組みのことを、リバースプロキシと呼びます。
-リバースプロキシというのは Web サーバのためだけの仕組みではなく、より一般的なサーバの仕組みを指す名前です。 nginx や Apache などの Web サーバのバーチャルホスト機能は、リバースプロキシの仕組み（概念）を利用して実現されているということです。</description></item><item><title>Nginx の設定: Nginx の設定ファイル (*.conf) の場所</title><link>https://maku.blog/p/pms426x/</link><pubDate>Mon, 02 Dec 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pms426x/</guid><description>nginx の設定ファイルは、/etc/nginx/nginx.conf です。 ソースからビルドする場合は、./configure の実行時にパスを指定できます。
-この設定ファイルの中で、以下のように include ディレクティブが指定されているため、/etc/nginx/conf.d/ ディレクトリ内にある個別の設定ファイル (*.conf) も読み込まれるようになっています。
-http { ... include /etc/nginx/conf.d/*.conf; } バーチャルホスト機能を利用して複数ドメインのサーバを運用するようなケースでは、ドメインごとに設定ファイルを分けておくと管理しやすいでしょう。 例えば、example.com ドメインのサーバ用には /etc/nginx/conf.d/example.com.conf を作成します。</description></item><item><title>Nginx の基本: Nginx をインストールする</title><link>https://maku.blog/p/wyeboxi/</link><pubDate>Sun, 01 Dec 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wyeboxi/</guid><description>yum で nginx をインストールする ここでは、CentOS などの Linux 環境を想定し、nginx を yum でインストールします。 下記のような yum の設定ファイルを作成しておくことで、最新に近い nginx をインストールできるようになります。
-/etc/yum.repos.d/nginx.repo [nginx] name=nginx repo baseurl=http://nginx.org/packages/centos/$releasever/$basearch/ gpgcheck=0 enabled=1 下記のコマンドで nginx をインストールします（バージョンアップも同じコマンドで実行できます）。
-$ sudo yum install nginx インストールできたか確認するために、バージョンを表示してみましょう。
-$ nginx -v nginx version: nginx/1.4.4 nginx の起動 下記のようにして nginx サーバを起動できます。
-$ sudo service nginx start 動作しているかを確認。
-$ sudo service nginx status nginx (pid 19996) is running... PC 起動時に nginx が自動起動するようにする nginx が無事に起動するようになったら、chkconfig でマシンの立ち上げ時に nginx が自動起動するようにしておきましょう。
-nginx を自動起動するように設定 $ sudo chkconfig nginx on 設定内容の確認 $ chkconfig --list nginx nginx 0:off 1:off 2:on 3:on 4:on 5:on 6:off</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nginx on まくろぐ</title><link>https://maku.blog/tags/nginx/</link><description>Recent content in Nginx on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 04 Mar 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/nginx/index.xml" rel="self" type="application/rss+xml"/><item><title>nginx-proxy コンテナで簡単にリバースプロキシを立ち上げる</title><link>https://maku.blog/p/kos367z/</link><pubDate>Mon, 12 Feb 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/kos367z/</guid><description>&lt;h2 id="nginx-proxy-は-docker-コンテナ用のリバースプロキシ">nginx-proxy は Docker コンテナ用のリバースプロキシ&lt;/h2>
+&lt;p>Docker コンテナイメージの &lt;a href="https://github.com/nginx-proxy/nginx-proxy">nginx-proxy&lt;/a> を使うと、複数の Docker コンテナ用のリバースプロキシを簡単に立ち上げることができます。&lt;/p>
+&lt;p>例えば、1 つの VPS サーバー上で複数の Docker コンテナー（例えば Web サーバー）を立ち上げるような場合は、次のような感じで入り口にリバースプロキシを配置し、そこから各 Web サーバーにアクセスを振り分ける構成にします。
+ここでは、&lt;code>aaa.example.com&lt;/code> と &lt;code>bbb.example.com&lt;/code> というサブドメインにより、プロキシ先を振り分けるようにしていますが、&lt;code>example.com&lt;/code> というベースドメインを使うこともできます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="750" height="auto" src="../../p/kos367z/img-001.drawio.svg" alt="/p/kos367z/img-001.drawio.svg" />
+ &lt;figcaption>図: nginx-proxy によるリバースプロキシでコンテナーを繋ぐ&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>もともと Nginx でリバースプロキシを設定するのはそれほど難しくはないのですが、どうしてもその背後にあるコンテナーの設定がリバースプロキシ側の設定に染み出してしまいます。
+また、リバースプロキシ用のコンテナーを最後に起動するという手順の複雑さもあります。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/q8tw6c4/">Nginx でバーチャルホストを設定する（リバースプロキシ）&lt;/a>&lt;/li>
+&lt;li>参考: &lt;a href="https://maku77.github.io/p/5f2j2hz/">Docker Compose でリバースプロキシを立てて別の Docker Compose 内のコンテナに接続する - まくまく Docker ノート&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>nginx-proxy&lt;/code> によるリバースプロキシを起動しておくと、背後でコンテナーを起動するだけで、自動的にリバースプロキシのエントリに追加してくれます。
+&lt;code>nginx-proxy&lt;/code> には次のような利点があります。&lt;/p>
+&lt;ul>
+&lt;li>背後の Docker コンテナの存在を意識しなくてよい（同一の Docker ネットーワーク内のコンテナ起動を検出して、自動的にリバースプロキシ設定に反映してくれます）&lt;/li>
+&lt;li>各サブドメイン用の SSL 設定（HTTPS 対応）を自動で行ってくれる（&lt;a href="https://github.com/nginx-proxy/acme-companion">acme-companion&lt;/a> を組み合わせて使用することで、Let&amp;rsquo;s Encrypt による SSL 証明書の取得を自動化できます）&lt;/li>
+&lt;/ul>
+&lt;p>リバースプロキシの設定更新が自動化されているので、Web アプリ用の Docker コンテナーを簡単に追加・削除できます。&lt;/p>
+&lt;h2 id="事前準備">事前準備&lt;/h2>
+&lt;p>&lt;code>nginx-proxy&lt;/code> の設定を行う前に、サブドメイン用の DNS 設定や、80/443 ポートの解放などを行っておく必要があります。
+ネットワーク的に繋がらないとどうしようもないですからね。&lt;/p></description></item><item><title>Nginx の設定: Web サイトのドメインを移転したときの 301 リダイレクト設定</title><link>https://maku.blog/p/mjs29go/</link><pubDate>Mon, 15 May 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mjs29go/</guid><description>&lt;h2 id="nginx-で-url-リダイレクト用のレスポンスを返す">nginx で URL リダイレクト用のレスポンスを返す&lt;/h2>
+&lt;p>Web サイトのドメイン（URL プレフィックス）を次のような感じで移転することを考えます。&lt;/p>
+&lt;ul>
+&lt;li>旧アドレス: &lt;code>https://old.example.com&lt;/code>&lt;/li>
+&lt;li>新アドレス: &lt;code>https://new.example.com&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>多くのユーザーが旧アドレスでブックマークしている可能性があるので、しばらくは旧アドレスにアクセスしてきたユーザー（ブラウザ）に対して、リダイレクト用のレスポンスを返すよう nginx を設定しておく必要があります。
+下記は、旧アドレスでのアクセス時に 301 (Moved Permanently) リダイレクトレスポンスを返す設定例です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">/etc/nginx/conf.d/old.example.com.conf&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-nginx" data-lang="nginx">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># これは http から https へリダイレクトする設定（オプション）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">server&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">server_name&lt;/span> &lt;span class="s">old.example.com&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">listen&lt;/span> &lt;span class="mi">80&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">return&lt;/span> &lt;span class="mi">301&lt;/span> &lt;span class="s">https://&lt;/span>&lt;span class="nv">$host$request_uri&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># https://old.example.com から
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># https://new.example.com へリダイレクトする設定
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">server&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="kn">server_name&lt;/span> &lt;span class="s">old.example.com&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">listen&lt;/span> &lt;span class="mi">443&lt;/span> &lt;span class="s">ssl&lt;/span> &lt;span class="s">http2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">ssl_certificate&lt;/span> &lt;span class="s">/etc/letsencrypt/live/old.example.com/fullchain.pem&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">ssl_certificate_key&lt;/span> &lt;span class="s">/etc/letsencrypt/live/old.example.com/privkey.pem&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="kn">return&lt;/span> &lt;span class="mi">301&lt;/span> &lt;span class="nv">$scheme://new.example.com$request_uri&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ポイントは最後の &lt;strong>&lt;code>return&lt;/code>&lt;/strong> ディレクティブです。
+1 つ目の引数に &lt;strong>&lt;code>301&lt;/code>&lt;/strong> を指定することで、301 (Moved Permanently) の HTTP レスポンスコードを返すことができます。
+このコードを省略した場合は、302 (Moved Temporarily) になります。&lt;/p>
+&lt;p>上記のように設定を変更したら、nginx サービスに &lt;a href="../../p/6aazmy3/">設定ファイルをリロード&lt;/a> させて完了です。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo service nginx reload
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>これで、例えば、&lt;code>https://old.example.com/hoge&lt;/code> へのアクセスが、&lt;code>https://new.example.com/hoge&lt;/code> にリダイレクトされ、ブラウザの URL 表示も自動的に新しい URL に変わるようになります。&lt;/p></description></item><item><title>Nginx の設定: Nginx の設定内容を確認する (nginx -T)</title><link>https://maku.blog/p/bm6n5k2/</link><pubDate>Sun, 27 Nov 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bm6n5k2/</guid><description>&lt;p>nginx サーバーが読み込む設定情報を確認するには、&lt;strong>&lt;code>nginx -T&lt;/code>&lt;/strong> コマンドを使用します。
+正確には、このコマンドは設定ファイルの検証 (&lt;code>nginx -t&lt;/code>) と、内容の出力を同時に行うコマンドです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">nginx が実際に読み込む設定を確認&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> nginx -T
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>下記は、&lt;code>nginx -T&lt;/code> コマンドを実行したときの出力例です。
+最初の 2 行が設定ファイルの検証結果で、3 行目以降が具体的な設定内容です。&lt;/p>
+&lt;div class="xAccordion">
+ &lt;input id="id-746528391" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-746528391">出力例&lt;/label>
+ &lt;div class="xAccordion_body">
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">nginx: configuration file /etc/nginx/nginx.conf &lt;span class="nb">test&lt;/span> is successful
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># configuration file /etc/nginx/nginx.conf:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">user nginx&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">worker_processes auto&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">error_log /var/log/nginx/error.log notice&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pid /var/run/nginx.pid&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">events &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> worker_connections 1024&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">http &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> include /etc/nginx/mime.types&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> default_type application/octet-stream&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> log_format main &lt;span class="s1">&amp;#39;$remote_addr - $remote_user [$time_local] &amp;#34;$request&amp;#34; &amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;$status $body_bytes_sent &amp;#34;$http_referer&amp;#34; &amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;&amp;#34;$http_user_agent&amp;#34; &amp;#34;$http_x_forwarded_for&amp;#34;&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> access_log /var/log/nginx/access.log main&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sendfile on&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#tcp_nopush on;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> keepalive_timeout 65&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#gzip on;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> include /etc/nginx/conf.d/*.conf&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># configuration file /etc/nginx/mime.types:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">types &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> text/html html htm shtml&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> text/css css&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> text/xml xml&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> image/gif gif&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> image/jpeg jpeg jpg&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/javascript js&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/atom+xml atom&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/rss+xml rss&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> text/mathml mml&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> text/plain txt&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> text/vnd.sun.j2me.app-descriptor jad&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> text/vnd.wap.wml wml&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> text/x-component htc&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> image/avif avif&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> image/png png&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> image/svg+xml svg svgz&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> image/tiff tif tiff&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> image/vnd.wap.wbmp wbmp&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> image/webp webp&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> image/x-icon ico&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> image/x-jng jng&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> image/x-ms-bmp bmp&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> font/woff woff&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> font/woff2 woff2&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/java-archive jar war ear&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/json json&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/mac-binhex40 hqx&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/msword doc&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/pdf pdf&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/postscript ps eps ai&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/rtf rtf&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.apple.mpegurl m3u8&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.google-earth.kml+xml kml&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.google-earth.kmz kmz&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.ms-excel xls&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.ms-fontobject eot&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.ms-powerpoint ppt&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.oasis.opendocument.graphics odg&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.oasis.opendocument.presentation odp&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.oasis.opendocument.spreadsheet ods&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.oasis.opendocument.text odt&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.openxmlformats-officedocument.presentationml.presentation
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pptx&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> xlsx&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.openxmlformats-officedocument.wordprocessingml.document
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> docx&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/vnd.wap.wmlc wmlc&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/wasm wasm&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-7z-compressed 7z&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-cocoa cco&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-java-archive-diff jardiff&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-java-jnlp-file jnlp&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-makeself run&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-perl pl pm&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-pilot prc pdb&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-rar-compressed rar&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-redhat-package-manager rpm&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-sea sea&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-shockwave-flash swf&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-stuffit sit&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-tcl tcl tk&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-x509-ca-cert der pem crt&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/x-xpinstall xpi&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/xhtml+xml xhtml&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/xspf+xml xspf&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/zip zip&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/octet-stream bin exe dll&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/octet-stream deb&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/octet-stream dmg&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/octet-stream iso img&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> application/octet-stream msi msp msm&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> audio/midi mid midi kar&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> audio/mpeg mp3&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> audio/ogg ogg&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> audio/x-m4a m4a&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> audio/x-realaudio ra&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> video/3gpp 3gpp 3gp&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> video/mp2t ts&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> video/mp4 mp4&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> video/mpeg mpeg mpg&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> video/quicktime mov&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> video/webm webm&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> video/x-flv flv&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> video/x-m4v m4v&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> video/x-mng mng&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> video/x-ms-asf asx asf&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> video/x-ms-wmv wmv&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> video/x-msvideo avi&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># configuration file /etc/nginx/conf.d/default.conf:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">server &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> listen 80&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server_name localhost&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#access_log /var/log/nginx/host.access.log main;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> location / &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> root /usr/share/nginx/html&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> index index.html index.htm&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#error_page 404 /404.html;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># redirect server error pages to the static page /50x.html&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> error_page &lt;span class="m">500&lt;/span> &lt;span class="m">502&lt;/span> &lt;span class="m">503&lt;/span> &lt;span class="m">504&lt;/span> /50x.html&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">location&lt;/span> &lt;span class="o">=&lt;/span> /50x.html &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> root /usr/share/nginx/html&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># proxy the PHP scripts to Apache listening on 127.0.0.1:80&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#location ~ \.php$ {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># proxy_pass http://127.0.0.1;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#location ~ \.php$ {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># root html;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># fastcgi_pass 127.0.0.1:9000;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># fastcgi_index index.php;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># fastcgi_param SCRIPT_FILENAME /scripts$fastcgi_script_name;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># include fastcgi_params;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># deny access to .htaccess files, if Apache&amp;#39;s document root&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># concurs with nginx&amp;#39;s one&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#location ~ /\.ht {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># deny all;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div> &lt;/div>
+&lt;/div>
+&lt;p>Docker がインストールされている環境では、上記の出力は次のような感じで確認できます。&lt;/p></description></item><item><title>Docker コンテナで Nginx サーバーを立ち上げる</title><link>https://maku.blog/p/99qo8zf/</link><pubDate>Wed, 13 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/99qo8zf/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>VPS などで Web アプリをホスティングする場合、各種サーバーを Docker コンテナとして立ち上げるようにすると OS 環境をクリーンに保てます。
+特に、1 つのホスト（VPS サーバー）で複数の Web アプリを提供するような場合は、各アプリをコンテナで構成することで、関係ないアプリの設定が混ざってしまうのを防げます。
+もちろん、Azure Container Instances や AWS Fargate といったコンテナ実行用のクラウドサービスを使えば、より独立した環境を構築できるのですが、これらのサービスは個人が趣味で使うにはまだまだ高価なので、VPS などの環境で Docker コンテナを立ち上げることには価値があります。&lt;/p>
+&lt;p>ここでは、Nginx サーバーを Docker コンテナとして立ち上げる方法を示します。
+Docker Hub で公開されている &lt;a href="https://hub.docker.com/_/nginx">Nginx イメージ&lt;/a> は、デフォルトでコンテナ内の &lt;strong>&lt;code>/usr/share/nginx/html&lt;/code>&lt;/strong> ディレクトリに配置されたコンテンツを公開するようになっています。
+大きく分けて、次の 2 つのいずれかの方法で簡単にコンテンツを公開できます。&lt;/p>
+&lt;ul>
+&lt;li>bind マウントで Docker ホスト側のコンテンツを参照する方法&lt;/li>
+&lt;li>コンテンツを含んだコンテナイメージを作成する方法&lt;/li>
+&lt;/ul>
+&lt;p>以下、それぞれの方法を順番に見ていきます。&lt;/p>
+&lt;h2 id="bind-マウントで-docker-ホスト側のコンテンツを参照する方法">bind マウントで Docker ホスト側のコンテンツを参照する方法&lt;/h2>
+&lt;p>Nginx のコンテナを起動するときに、Docker ホスト側のコンテンツディレクトリを bind マウントして、コンテナの &lt;code>/usr/share/nginx/html&lt;/code> ディレクトリとして参照できるようにする方法です。&lt;/p>
+&lt;p>まず、簡単なコンテンツファイルとして次のような HTML ファイルを用意しておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">public/index.html&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>Hello&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>あとは、&lt;code>docker container run&lt;/code> コマンドで nginx コンテナを起動するだけです。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> docker container run --rm -d -p 8000:80 -v &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="k">$(&lt;/span>&lt;span class="nb">pwd&lt;/span>&lt;span class="k">)&lt;/span>&lt;span class="s2">/public&amp;#34;&lt;/span>:/usr/share/nginx/html --name web nginx
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>各引数は次のような意味を持っています。&lt;/p></description></item><item><title>Let's Encrypt certificate expiration notice が来たら</title><link>https://maku.blog/p/cniq5vr/</link><pubDate>Thu, 21 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cniq5vr/</guid><description>&lt;h2 id="lets-encrypt-expiry-bot-からの証明書期限切れメール">Let&amp;rsquo;s Encrypt Expiry Bot からの証明書期限切れメール&lt;/h2>
+&lt;p>2 ヶ月ほど前に、&lt;a href="../../p/xkpjfcf">Sakura VPS レンタルサーバーを Let&amp;rsquo;s Encrypt で SSL 対応&lt;/a>していたら、こんなメールが来ました。&lt;/p>
+&lt;blockquote>
+&lt;p>Your certificate (or certificates) for the names listed below will expire in 20 days (on 10 Apr 19 07:02 +0000). Please make sure to renew your certificate before then, or visitors to your website will encounter errors.&lt;/p>
+&lt;p>We recommend renewing certificates automatically when they have a third of their
+total lifetime left. For Let&amp;rsquo;s Encrypt&amp;rsquo;s current 90-day certificates, that means
+renewing 30 days before expiration. See
+&lt;a href="https://letsencrypt.org/docs/integration-guide/">https://letsencrypt.org/docs/integration-guide/&lt;/a> for details.&lt;/p></description></item><item><title>Nginx で 403 Forbidden エラーが出るときのチェック項目</title><link>https://maku.blog/p/ew5zmmw/</link><pubDate>Thu, 10 Jan 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ew5zmmw/</guid><description>&lt;p>nginx サーバを起動して Web ブラウザでアクセスしたときに、ブラウザ上に &lt;strong>403 Forbidden&lt;/strong> エラーが表示されるときは、パーミッション系のエラーが発生しています。&lt;/p>
+&lt;p>サーバ自体は稼働していますので、下記のあたりを確認すれば無事表示されるようになります。&lt;/p>
+&lt;h2 id="ファイルに読み取り権限ディレクトリに実行権限を付ける">ファイルに読み取り権限、ディレクトリに実行権限を付ける&lt;/h2>
+&lt;p>html ファイルなどのコンテンツファイル自身には読み取り権限、ディレクトリには実行権限が必要です。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ chmod 0755 -R /home/maku/website
+&lt;/code>&lt;/pre>&lt;h2 id="ドキュメントルートまでのディレクトリに実行権限-x-を付ける">ドキュメントルートまでのディレクトリに実行権限 (x) を付ける&lt;/h2>
+&lt;p>例えば、ドキュメントルートを &lt;code>/home/maku/website&lt;/code> としている場合は、&lt;code>/&lt;/code>、&lt;code>/home&lt;/code>、&lt;code>/home/maku&lt;/code>、&lt;code>/home/maku/website&lt;/code> のディレクトリに実行権限が必要です。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ chmod +x /home/maku
+&lt;/code>&lt;/pre>&lt;p>特定のディレクトリのパーミッションは下記のように確認できます。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ ls -ld /home/maku
+drwx--x--x 5 maku maku 156 1月 10 17:32 /home/maku
+&lt;/code>&lt;/pre>&lt;h2 id="nginx-の設定を再読み込み">nginx の設定を再読み込み&lt;/h2>
+&lt;p>ファイル群のパーミッションを変更しただけでは nginx の再起動は必要になりませんが、nginx の設定ファイルを変更した場合は、設定ファイルを反映する必要があります。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ sudo service nginx reload
+&lt;/code>&lt;/pre></description></item><item><title>Nginx の設定: http でアクセスされた場合に https にリダイレクトする</title><link>https://maku.blog/p/jowgstm/</link><pubDate>Thu, 10 Jan 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/jowgstm/</guid><description>&lt;p>nginx サーバの SSL 対応（https 有効化）が終わった後は、http プロトコルによるアクセスは避けてもらいたいですね。
+そのような場合は、下記のように設定しておけば、http でアクセスされた場合に、https で再度アクセスしてもらうようにクライアントに応答することができます（301 という値は、Moved Permanently を示す HTTP レスポンスコードです）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">/etc/nginx/conf.d/xxx.conf&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-nginx" data-lang="nginx">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># http でアクセスされた場合
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">server&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="kn">listen&lt;/span> &lt;span class="mi">80&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="kn">server_name&lt;/span> &lt;span class="s">example.com&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="kn">return&lt;/span> &lt;span class="mi">301&lt;/span> &lt;span class="s">https://&lt;/span>&lt;span class="nv">$host$request_uri&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># https でアクセスされた場合
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">server&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">server_name&lt;/span> &lt;span class="s">example.com&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">listen&lt;/span> &lt;span class="mi">443&lt;/span> &lt;span class="s">ssl&lt;/span> &lt;span class="s">http2&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1"># IPv4
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kn">listen&lt;/span> &lt;span class="s">[::]:443&lt;/span> &lt;span class="s">ssl&lt;/span> &lt;span class="s">http2&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1"># IPv6
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">ssl_certificate&lt;/span> &lt;span class="s">/etc/nginx/ssl/example.com-2024.crt&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">ssl_certificate_key&lt;/span> &lt;span class="s">/etc/nginx/ssl/example.com-2024.key&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">ssl_prefer_server_ciphers&lt;/span> &lt;span class="no">on&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1"># サーバー側の暗号スイートを優先
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">location&lt;/span> &lt;span class="s">/&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">root&lt;/span> &lt;span class="s">/usr/share/nginx/html&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">index&lt;/span> &lt;span class="s">index.html&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>結果として、Web ブラウザから &lt;code>http://example.com/&lt;/code> にアクセスすると、Web ブラウザは自動的に &lt;code>https://example.com/&lt;/code> という URL でアクセスし直すことになります。&lt;/p></description></item><item><title>Sakura VPS レンタルサーバーを Let's Encrypt で SSL 対応</title><link>https://maku.blog/p/xkpjfcf/</link><pubDate>Thu, 10 Jan 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xkpjfcf/</guid><description>&lt;p>今更ですが、さくらインターネットでレンタルしている &lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8K+4T95TE+D8Y+C9YHU" rel="nofollow">Sakura VPS&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=3NCT8K+4T95TE+D8Y+C9YHU" alt="">
+ の Web サーバーを SSL (https) に対応しました。
+とりあえず今回は無料の Let&amp;rsquo;s Encrypt の証明書を、nginx サーバに設定します。&lt;/p>
+&lt;p>使っている OS が CentOS6 だったので、ついでに CentOS7 をクリーンインストールすることにしました。
+といっても、さくらインターネットの VPS の設定画面でポチポチとやっていくだけ。
+ここで、&lt;strong>[public] CentOS_LetsEncrypt&lt;/strong> というスタートアップスクリプトを選んだら、自動的に SSL の証明書などの対応が完了します。
+入力するパラメータはドメイン（&lt;code>example.com&lt;/code> など）と連絡用のメールアドレスだけ。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="400" height="492" src="../../p/xkpjfcf/sakura-vps-ssl_hu679047552611147805.png" alt="/p/xkpjfcf/sakura-vps-ssl.png" />
+&lt;/figure>
+
+&lt;p>Web サーバの nginx も自動的にインストールされて、Web サーバにアクセスできる状態で起動するのですが、nginx の設定は少しだけ調整する必要があります（ドキュメントルートなど）。&lt;/p>
+&lt;p>数分で OS の再インストールが完了し、下記のような nginx の設定ファイルが自動生成されていました（ドメイン名は &lt;code>example.com&lt;/code> に置換してあります）。
+SSL の設定も完了した状態になっています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">/etc/nginx/conf.d/https.conf&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">map $http_upgrade $connection_upgrade {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> default upgrade;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#39;&amp;#39; close;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">server {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> listen 443 ssl http2;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server_name example.com;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> location / {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> root /usr/share/nginx/html;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> index index.html index.htm;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_protocols TLSv1.2;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_ciphers EECDH+AESGCM:EECDH+AES;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_ecdh_curve prime256v1;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_prefer_server_ciphers on;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_session_cache shared:SSL:10m;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> error_page 500 502 503 504 /50x.html;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> location = /50x.html {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> root /usr/share/nginx/html;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>HTML ファイルの格納ディレクトリ（ドキュメントルート）が、デフォルトでは上記のように &lt;code>/usr/share/nginx/html&lt;/code> になっているので、ここを適切なディレクトリパス（&lt;code>/home/maku/website&lt;/code> など）に置き換えてやれば完了です。&lt;/p></description></item><item><title>Nginx の設定: Nginx の設定ファイルの書き方が正しいか確認する (configtest, nginx -t)</title><link>https://maku.blog/p/3q8uzoo/</link><pubDate>Mon, 21 Sep 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3q8uzoo/</guid><description>&lt;p>nginx の &lt;strong>&lt;code>configtest&lt;/code>&lt;/strong> コマンドを使用すると、nginx のコンフィグファイルの記述方法が正しいかを確認することができます。
+このコマンドは管理者権限で実行する必要があります。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo /etc/init.d/nginx configtest
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">nginx: configuration file /etc/nginx/nginx.conf test is successful
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>nginx&lt;/code> コマンド (&lt;code>/usr/sbin/nginx&lt;/code>) を認識している環境であれば、このコマンドの &lt;strong>&lt;code>-t&lt;/code>&lt;/strong> オプションで確認することもできます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo nginx -t
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">nginx: configuration file /etc/nginx/nginx.conf test is successful
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Nginx の設定: Nginx の設定ファイルの変更を反映する (nginx reload)</title><link>https://maku.blog/p/6aazmy3/</link><pubDate>Sun, 20 Sep 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6aazmy3/</guid><description>&lt;p>nginx の設定ファイル (&lt;code>/etc/nginx/nginx.conf&lt;/code> や &lt;code>/etc/nginx/conf.d/*.conf&lt;/code>) の内容を変更した場合は、次のように &lt;strong>&lt;code>nginx reload&lt;/code>&lt;/strong> で再読み込みします。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo service nginx reload &lt;span class="c1"># 方法 1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo /etc/init.d/nginx reload &lt;span class="c1"># 方法 2&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>nginx の起動はとても速いので、単純な Web コンテンツだけを提供しているの Web サーバであれば、&lt;strong>&lt;code>nginx restart&lt;/code>&lt;/strong> でサービス自体を再起動してしまってもよいでしょう。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo service nginx restart &lt;span class="c1"># 方法 1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo /etc/init.d/nginx restart &lt;span class="c1"># 方法 2&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Nginx の設定: Nginx でバーチャルホストを設定する（リバースプロキシ）</title><link>https://maku.blog/p/q8tw6c4/</link><pubDate>Tue, 03 Dec 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/q8tw6c4/</guid><description>&lt;ul>
+&lt;li>（参考）&lt;a href="../../p/kos367z/">nginx-proxy コンテナで簡単にリバースプロキシを立ち上げる&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="アクセス時のドメイン名により別の-web-サーバに処理をフォワードする">アクセス時のドメイン名により別の Web サーバに処理をフォワードする&lt;/h2>
+&lt;p>例えば、&lt;code>http://test.example.com/&lt;/code> というアドレス（80番ポート）で nginx サーバにアクセスしてきたときに、&lt;code>localhost:7000&lt;/code> で動作している Web サーバに処理を委譲するには、下記のように設定します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">/etc/nginx/conf.d/test.example.com.conf&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-nginx" data-lang="nginx">&lt;span class="line">&lt;span class="cl">&lt;span class="k">server&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">listen&lt;/span> &lt;span class="mi">80&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">server_name&lt;/span> &lt;span class="s">test.example.com&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">location&lt;/span> &lt;span class="s">/&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kn">proxy_pass&lt;/span> &lt;span class="s">http://localhost:7000/&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この機能を利用することで、一つの PC 内に複数の Web サーバを（異なるポート）で立ち上げておき、アクセスしてきた URL（のドメイン名）によって処理を振り分けることができます。
+例えば、次のように Web サーバへのアクセスをフォワードできます。&lt;/p>
+&lt;ul>
+&lt;li>http://&lt;strong>aaa&lt;/strong>.example.com/ でアクセスされた場合 → localhost:&lt;strong>7000&lt;/strong> で処理&lt;/li>
+&lt;li>http://&lt;strong>bbb&lt;/strong>.example.com/ でアクセスされた場合 → localhost:&lt;strong>7100&lt;/strong> で処理&lt;/li>
+&lt;li>http://&lt;strong>ccc&lt;/strong>.example.com/ でアクセスされた場合 → localhost:&lt;strong>7200&lt;/strong> で処理&lt;/li>
+&lt;/ul>
+&lt;p>それぞれのドメインは同じ IP アドレスにマッピングされており、物理的には 1 つのマシンに対してアクセスが発生するのですが、クライアント（Web ブラウザのユーザ）から見ると、あたかも異なるホストにアクセスしているかのように見えます（ドメイン名が異なるので）。
+バーチャルなホストが存在しているような動作をするということで、このような Web サーバの機能を&lt;strong>バーチャルホスト&lt;/strong>と呼びます。&lt;/p>
+&lt;p>また、このように、サーバ環境側（ここでは 80 ポートのサーバ）でいったんアクセスを受けておいて、アドレス等を見て別の内部サーバ（ここでは 7000 ポートで待ち受けているサーバなど）に処理をフォーワードする仕組みのことを、&lt;strong>リバースプロキシ&lt;/strong>と呼びます。&lt;/p>
+&lt;p>リバースプロキシというのは Web サーバのためだけの仕組みではなく、より一般的なサーバの仕組みを指す名前です。
+nginx や Apache などの Web サーバのバーチャルホスト機能は、リバースプロキシの仕組み（概念）を利用して実現されているということです。&lt;/p>
+&lt;h2 id="アクセス時のドメイン名によりドキュメントルートを切り替える">アクセス時のドメイン名によりドキュメントルートを切り替える&lt;/h2>
+&lt;p>上記の例では、クライアントからのアクセスを、別々の Web サーバ（例えば同じ PC 内の別のポートで待ち受けている Web サーバ）に振り分ける例でしたが、Web サーバは 1 つだけで、使用するコンテンツファイルのルートだけを切り替えるという方法もあります。&lt;/p></description></item><item><title>Nginx の設定: Nginx の設定ファイル (*.conf) の場所</title><link>https://maku.blog/p/pms426x/</link><pubDate>Mon, 02 Dec 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pms426x/</guid><description>&lt;p>nginx の設定ファイルは、&lt;strong>&lt;code>/etc/nginx/nginx.conf&lt;/code>&lt;/strong> です。
+ソースからビルドする場合は、&lt;code>./configure&lt;/code> の実行時にパスを指定できます。&lt;/p>
+&lt;p>この設定ファイルの中で、以下のように &lt;code>include&lt;/code> ディレクティブが指定されているため、&lt;strong>&lt;code>/etc/nginx/conf.d/&lt;/code>&lt;/strong> ディレクトリ内にある個別の設定ファイル (&lt;code>*.conf&lt;/code>) も読み込まれるようになっています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">http {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> include /etc/nginx/conf.d/*.conf;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>バーチャルホスト機能を利用して複数ドメインのサーバを運用するようなケースでは、ドメインごとに設定ファイルを分けておくと管理しやすいでしょう。
+例えば、&lt;code>example.com&lt;/code> ドメインのサーバ用には &lt;code>/etc/nginx/conf.d/example.com.conf&lt;/code> を作成します。&lt;/p></description></item><item><title>Nginx の基本: Nginx をインストールする</title><link>https://maku.blog/p/wyeboxi/</link><pubDate>Sun, 01 Dec 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wyeboxi/</guid><description>&lt;h2 id="yum-で-nginx-をインストールする">yum で nginx をインストールする&lt;/h2>
+&lt;p>ここでは、CentOS などの Linux 環境を想定し、nginx を yum でインストールします。
+下記のような yum の設定ファイルを作成しておくことで、最新に近い nginx をインストールできるようになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">/etc/yum.repos.d/nginx.repo&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">[nginx]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">name=nginx repo
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gpgcheck=0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">enabled=1&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>下記のコマンドで nginx をインストールします（&lt;strong>バージョンアップも同じコマンドで実行できます&lt;/strong>）。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ sudo yum install nginx
+&lt;/code>&lt;/pre>&lt;p>インストールできたか確認するために、バージョンを表示してみましょう。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ nginx -v
+nginx version: nginx/1.4.4
+&lt;/code>&lt;/pre>&lt;h2 id="nginx-の起動">nginx の起動&lt;/h2>
+&lt;p>下記のようにして nginx サーバを起動できます。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ sudo service nginx start
+&lt;/code>&lt;/pre>&lt;p>動作しているかを確認。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ sudo service nginx status
+nginx (pid 19996) is running...
+&lt;/code>&lt;/pre>&lt;h2 id="pc-起動時に-nginx-が自動起動するようにする">PC 起動時に nginx が自動起動するようにする&lt;/h2>
+&lt;p>nginx が無事に起動するようになったら、&lt;strong>&lt;code>chkconfig&lt;/code>&lt;/strong> でマシンの立ち上げ時に nginx が自動起動するようにしておきましょう。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">nginx を自動起動するように設定&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ sudo chkconfig nginx on&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">設定内容の確認&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ chkconfig --list nginx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">nginx 0:off 1:off 2:on 3:on 4:on 5:on 6:off&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item></channel></rss>

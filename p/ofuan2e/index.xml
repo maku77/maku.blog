@@ -1,25 +1,328 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>React の基本と環境構築 on まくろぐ</title><link>https://maku.blog/p/ofuan2e/</link><description>Recent content in React の基本と環境構築 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sun, 18 Jul 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/ofuan2e/index.xml" rel="self" type="application/rss+xml"/><item><title>React + TypeScript の環境を整える (1) 自力で webpack 設定する方法</title><link>https://maku.blog/p/m4dmt3a/</link><pubDate>Thu, 02 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m4dmt3a/</guid><description>React とは Web サイトを作成するときに React を採用すると、HTML をフラットな形でゴリゴリ記述していくのではなく、独自コンポーネント（例: &amp;lt;MyButton&amp;gt; コンポーネント）を定義してまとまりのある単位でサイトを構築していくことができます。 Web Components という同様な技術の標準化が進んでいますが、しばらくは React のようなコンポーネントライブラリが使われるでしょう。
-React – ユーザインターフェース構築のための JavaScript ライブラリ ここでは React を使った Web サイト開発用に、下記のようなツールを組み合わた環境を構築します。
-React &amp;hellip; コンポーネントベースで Web サイト構築するためのライブラリ TypeScript &amp;hellip; JavaScript を型付けできるようにした言語 webpack &amp;hellip; Web サイトのリソースをバンドルするためのツール この環境構築方法を理解すれば、React を利用した Web サイトをどんどん作ることができます。 ちなみに、上記のすべてのツールは Node.js 上で動作するため、Node.js がインストールされていない場合は先にインストールしてください。
-TypeScript、React、webpack のインストール チュートリアルなどでは、create-react-app を使って React アプリの雛形を生成する方法がよく載っていますが、よくわからないモジュールが勝手にインストールされるのは気持ち悪いので、ここでは自力で各モジュールをインストールしてきます。
-☝️ create-react-app は使わない方がいい TypeScript ベースの React アプリの雛形を生成するには、create-react-app myapp --template typescript のように実行します。 このコマンドによって作成された雛形をリファレンスにするのがよいかなと思ったのですが、少なくともバージョン 3.4.1 時点で生成される雛形はかなり怪しいです。 例えば、TypeScript の処理系や型定義ファイルが devDependencies ではなく、dependencies でインストールされるようになっていたりします。 最終的に Web サーバーにデプロイするファイル群は webpack で生成（バンドル）することを想定しているので、npm (or yarn) でインストールするモジュールは、 すべて devDependencies（開発用モジュール）としてインストール していきます（Web サーバー側で npm install を実行することはないということです）。</description></item><item><title>React + TypeScript の環境を整える (2) Parcel を使う方法</title><link>https://maku.blog/p/r7fov4b/</link><pubDate>Sat, 15 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/r7fov4b/</guid><description>Parcel とは Parcel は、ゼロ設定 をウリとした Web アプリバンドラーです。 React + TypeScript + SCSS + CSS Modules といった環境を自力でセットアップしようとすると なかなか大変な設定が必要 なのですが、Parcel を使うと、開発環境がサクサクッと完成します。
-React プロジェクトを作成するときは、create-react-app を使って雛形を生成する方法もありますが、余計なファイルがたくさん作られたりして、あまり分かりやすいとは言えません。 そんなときは Parcel を使ってみると、そのシンプルさに驚くと思います。
-Parcel を使うと、次のような機能がほとんど設定なしでいきなり使えます。 コマンドラインオプションの一覧 を見ると、どのような機能があるかをざっと把握することができます。
-開発用の Web サーバー機能（HMR: Hot Module Replacement 対応） TypeScript の自動変換（HTML ファイルから直接ロードする記述が可能） PostCSS による CSS 生成（SCSS、ベンダープレフィックス） CSS ファイルのインポート (CSS Modules) JSON ファイルのインポート PNG ファイルのインポート Pug (Jade) による HTML 生成 リリース用の minify また、Parcel は Node モジュールの自動インストール機能を備えており、parcel コマンドで開発用 Web サーバーを起動すると、自動的に依存モジュールをインストールしてくれます。 例えば、HTML ファイルから TypeScript ファイルを読み込んでいると、typescript モジュールが自動的にインストールされます。</description></item><item><title>React コンポーネント実装の基本（関数コンポーネントとクラスコンポーネント）</title><link>https://maku.blog/p/vfr3cnw/</link><pubDate>Thu, 09 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vfr3cnw/</guid><description>React で独自コンポーネントを作成する方法として、大きく次の 2 種類の方法があります。
-関数コンポーネント (Function Components) クラスコンポーネント (Class Components) 昔は、ステートを持つコンポーネントは「クラスコンポーネント」で作成し、ステートを持たないものは「関数コンポーネント」として作成するという使い分けがありました。 現在は、関数コンポーネントでも Hook の仕組みでステートを管理することができるようになったため、関数コンポーネントの使用が推奨されています。
-関数コンポーネント 関数コンポーネントの基本 下記は、固定のテキストを表示するシンプルな関数コンポーネントの定義例です。 TypeScript (@types/react) では、関数コンポーネントの型は React.FunctionComponent インタフェースとして定義されています。 エイリアスとして React.FC が定義されているので、こちらを使えばより短く記述できます。
-components/Hello.tsx import * as React from &amp;#39;react&amp;#39;; // Hello コンポーネントの定義 export const Hello: React.FC = () =&amp;gt; { return &amp;lt;h1&amp;gt;Hello&amp;lt;/h1&amp;gt; }; HTML ファイルから読み込む JS ファイルでは、ReactDOM.render() で上記の Hello コンポーネントを描画します。 次のコードを実行すると、&amp;lt;div id=&amp;quot;root&amp;quot;&amp;gt; 要素の内容が、Hello コンポーネントの内容に置き換えられます。
-index.tsx（使用例） import * as React from &amp;#39;react&amp;#39;; import * as ReactDOM from &amp;#39;react-dom&amp;#39;; import { Hello } from &amp;#39;.</description></item><item><title>React コンポーネントのプロパティでハンドラメソッドを渡す</title><link>https://maku.blog/p/e2dpycn/</link><pubDate>Sat, 18 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/e2dpycn/</guid><description>ここでは、次のようにプロパティ（属性）でハンドラメソッドを設定可能な React コンポーネントの実装例を示します。
-&amp;lt;MyButton onClick={handleClick} /&amp;gt; ハンドラメソッドを設定可能なコンポーネントを実装する 次の MyButton コンポーネントは、ボタンクリック時に呼び出されるイベントハンドラを、onClick プロパティで設定できるようにしています。 この MyButton コンポーネントは、クリックするたびに内部のカウンタ (state.count) を +1 し、その値を指定されたイベントハンドラへ通知します。
-components/myButton.tsx import * as React from &amp;#39;react&amp;#39;; // MyButton のプロパティ（属性）の型 export interface MyButtonProps { onClick?: (count: number) =&amp;gt; void; } // MyButton の状態（ステート）の型 interface MyButtonState { count: number; } // MyButton コンポーネント export class MyButton extends React.Component&amp;lt;MyButtonProps, MyButtonState&amp;gt; { constructor(props: MyButtonProps) { super(props); this.state = {count: 0}; } public render(): React.ReactNode { const {count} = this.</description></item><item><title>React コンポーネントのプロパティで配列データを渡す</title><link>https://maku.blog/p/av9mxak/</link><pubDate>Thu, 09 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/av9mxak/</guid><description>React コンポーネントのプロパティには、文字列や数値などの単純なスカラ値だけではなく、配列などの複雑なオブジェクトを渡すことができます。 使用イメージは次のような感じです。
-&amp;lt;MyComponent values={配列変数} /&amp;gt; 配列型のプロパティを扱うコンポーネントを作成する 次の Books コンポーネントは、プロパティ titles で文字列配列を受け取り、それぞれの値を li 要素で描画します。 配列の map メソッドを使用すると、複数の li 要素を簡単に生成することができます。
-components/books.tsx（Books コンポーネント） import * as React from &amp;#39;react&amp;#39;; // Books コンポーネントのプロパティの型 export interface BooksProps { titles: string[] } // Books コンポーネントの定義 export const Books: React.FC&amp;lt;BooksProps&amp;gt; = (props) =&amp;gt; { // titles プロパティの要素数が 0 であれば何も描画しない if (props.titles.length == 0) return null; // titles プロパティの値を使って、複数の li 要素を作る const listItems = props.titles.map((title: string) =&amp;gt; &amp;lt;li&amp;gt;{title}&amp;lt;/li&amp;gt; ); // ul 要素の描画 return &amp;lt;ul&amp;gt;{listItems}&amp;lt;/ul&amp;gt;; }; この Books コンポーネントは次のような感じで使用します。</description></item><item><title>React コンポーネントで入力フォームを作成する (1) 自力編</title><link>https://maku.blog/p/tdpybmw/</link><pubDate>Fri, 10 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tdpybmw/</guid><description>制御コンポーネント (controlled components) React コンポーネントでフォームを構成する場合、コンポーネントの状態 (state) に基づいて表示を行うように実装すると、フォームの表示内容を制御しやすくなります。
-このように、コンポーネントの表示内容が、完全にその状態 (state) によって決まるように実装されたものを、制御されたコンポーネント (controlled components) と呼びます。
-このように設計することで、若干コード量は増えますが、表示内容を変更したいときはコンポーネントの state を変更するだけで済むようになります。 例えば、ネットワークから取得したデータをフォームに表示するような場合、そのフォームの構造を知る必要はなく、単純に state を更新するだけでよくなります。 これは、データとビューが分離された設計になっており、アプリ設計におけるベストプラクティスのひとつです。
-input 要素の実装例 下記は、&amp;lt;input type=&amp;quot;text&amp;quot;&amp;gt; 要素と &amp;lt;input type=&amp;quot;submit&amp;quot;&amp;gt; 要素を持つ MessageForm コンポーネントの実装例です。 ユーザーがテキストを入力するたびに handleChange() が呼び出され、コンポーネントの状態 (state) が更新されます。 setState() の呼び出しにより state が変更が変更されると、再度 render() が実行され、表示内容が state の値に基づいて更新されます。
-まずは、クラスコンポーネント形式での実装例。
-components/MessageForm.tsx import * as React from &amp;#39;react&amp;#39;; interface IState { msg: string; } // テキスト入力エリアと、submit ボタンを持つフォームを表示するコンポーネント export class MessageForm extends React.Component&amp;lt;{}, IState&amp;gt; { constructor(props: {}) { super(props); // ステートの初期化（最初は入力エリアは空っぽ） this.</description></item><item><title>React コンポーネントで入力フォームを作成する (2) react-hook-form 編</title><link>https://maku.blog/p/k7it5fp/</link><pubDate>Sun, 06 Feb 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/k7it5fp/</guid><description>React Hook Form とは React アプリで入力フォームを自力で作ろうとすると、各入力エリアのステート管理などが 意外と大変だったりします。 React Hook Form ライブラリ (react-hook-form) を使用すると、そのあたりの定型処理をシンプルに記述することができます。
-React Hook Form / npm / GitHub React Hook Form は次のような特徴を備えています。
-軽量（別のライブラリに依存しない） TypeScript をサポート パフォーマンスがよい（不要なレンダリングを軽減） HTML 標準のフォームバリデーション との互換性 required / min / max / minLength / maxLength / pattern / validate React Native でも使える 2022 年 2 月時点で活発に開発が進められており、npm のダウンロード数は右肩上がりに増えています。 GitHub のスター数も 25,000 を超えているため、しばらくは安心して使えそうなライブラリです。
-React Hook Form を導入する react-hook-form パッケージは、npm あるいは yarn で簡単にインストールできます。 既存の React プロジェクト内で次のように実行してください。
-$ npm install react-hook-form あるいは $ yarn add react-hook-form React Hook Form の基本的な使い方 次の MyForm コンポーネントは、1 つのテキスト入力フィールドと、1 つの数値入力フィールドを持つフォームの実装例です。 ここでは TypeScript を使い、フォームの入力要素の型を FormData と定義しています。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>React の基本と環境構築 on まくろぐ</title><link>https://maku.blog/p/ofuan2e/</link><description>Recent content in React の基本と環境構築 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 06 Feb 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/ofuan2e/index.xml" rel="self" type="application/rss+xml"/><item><title>React + TypeScript の環境を整える (1) 自力で webpack 設定する方法</title><link>https://maku.blog/p/m4dmt3a/</link><pubDate>Thu, 02 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m4dmt3a/</guid><description>&lt;h2 id="react-とは">React とは&lt;/h2>
+&lt;p>Web サイトを作成するときに React を採用すると、HTML をフラットな形でゴリゴリ記述していくのではなく、独自コンポーネント（例: &lt;code>&amp;lt;MyButton&amp;gt;&lt;/code> コンポーネント）を定義してまとまりのある単位でサイトを構築していくことができます。
+Web Components という同様な技術の標準化が進んでいますが、しばらくは React のようなコンポーネントライブラリが使われるでしょう。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://ja.reactjs.org/">React – ユーザインターフェース構築のための JavaScript ライブラリ&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>ここでは React を使った Web サイト開発用に、下記のようなツールを組み合わた環境を構築します。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>React&lt;/strong> &amp;hellip; コンポーネントベースで Web サイト構築するためのライブラリ&lt;/li>
+&lt;li>&lt;strong>TypeScript&lt;/strong> &amp;hellip; JavaScript を型付けできるようにした言語&lt;/li>
+&lt;li>&lt;strong>webpack&lt;/strong> &amp;hellip; Web サイトのリソースをバンドルするためのツール&lt;/li>
+&lt;/ul>
+&lt;p>この環境構築方法を理解すれば、React を利用した Web サイトをどんどん作ることができます。
+ちなみに、上記のすべてのツールは &lt;a href="https://nodejs.org/ja/">Node.js&lt;/a> 上で動作するため、Node.js がインストールされていない場合は先にインストールしてください。&lt;/p>
+&lt;h2 id="typescriptreactwebpack-のインストール">TypeScript、React、webpack のインストール&lt;/h2>
+&lt;p>チュートリアルなどでは、&lt;code>create-react-app&lt;/code> を使って React アプリの雛形を生成する方法がよく載っていますが、よくわからないモジュールが勝手にインストールされるのは気持ち悪いので、ここでは自力で各モジュールをインストールしてきます。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ create-react-app は使わない方がいい&lt;/span>
+ &lt;span class="xNote_body">TypeScript ベースの React アプリの雛形を生成するには、&lt;code>create-react-app myapp --template typescript&lt;/code> のように実行します。
+このコマンドによって作成された雛形をリファレンスにするのがよいかなと思ったのですが、少なくともバージョン 3.4.1 時点で生成される雛形はかなり怪しいです。
+例えば、TypeScript の処理系や型定義ファイルが &lt;code>devDependencies&lt;/code> ではなく、&lt;code>dependencies&lt;/code> でインストールされるようになっていたりします。&lt;/span>
+&lt;/div>
+
+&lt;p>最終的に Web サーバーにデプロイするファイル群は webpack で生成（バンドル）することを想定しているので、&lt;code>npm&lt;/code> (or &lt;code>yarn&lt;/code>) でインストールするモジュールは、 &lt;strong>すべて &lt;code>devDependencies&lt;/code>（開発用モジュール）としてインストール&lt;/strong> していきます（Web サーバー側で &lt;code>npm install&lt;/code> を実行することはないということです）。&lt;/p></description></item><item><title>React + TypeScript の環境を整える (2) Parcel を使う方法</title><link>https://maku.blog/p/r7fov4b/</link><pubDate>Sat, 15 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/r7fov4b/</guid><description>&lt;h2 id="parcel-とは">Parcel とは&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="2284" height="1256" src="../../p/r7fov4b/img-001.png" alt="/p/r7fov4b/img-001.png" />
+&lt;/figure>
+
+&lt;p>&lt;a href="https://parceljs.org/">Parcel&lt;/a> は、&lt;strong>ゼロ設定&lt;/strong> をウリとした Web アプリバンドラーです。
+React + TypeScript + SCSS + CSS Modules といった環境を自力でセットアップしようとすると &lt;a href="../../p/m4dmt3a">なかなか大変な設定が必要&lt;/a> なのですが、Parcel を使うと、開発環境がサクサクッと完成します。&lt;/p>
+&lt;p>React プロジェクトを作成するときは、&lt;a href="https://github.com/facebook/create-react-app">create-react-app&lt;/a> を使って雛形を生成する方法もありますが、余計なファイルがたくさん作られたりして、あまり分かりやすいとは言えません。
+そんなときは Parcel を使ってみると、そのシンプルさに驚くと思います。&lt;/p>
+&lt;p>Parcel を使うと、次のような機能がほとんど設定なしでいきなり使えます。
+&lt;a href="https://parceljs.org/cli.html">コマンドラインオプションの一覧&lt;/a> を見ると、どのような機能があるかをざっと把握することができます。&lt;/p>
+&lt;ul>
+&lt;li>開発用の Web サーバー機能（HMR: Hot Module Replacement 対応）&lt;/li>
+&lt;li>TypeScript の自動変換（HTML ファイルから直接ロードする記述が可能）&lt;/li>
+&lt;li>PostCSS による CSS 生成（SCSS、ベンダープレフィックス）&lt;/li>
+&lt;li>CSS ファイルのインポート (CSS Modules)&lt;/li>
+&lt;li>JSON ファイルのインポート&lt;/li>
+&lt;li>PNG ファイルのインポート&lt;/li>
+&lt;li>Pug (Jade) による HTML 生成&lt;/li>
+&lt;li>リリース用の minify&lt;/li>
+&lt;/ul>
+&lt;p>また、Parcel は Node モジュールの自動インストール機能を備えており、&lt;code>parcel&lt;/code> コマンドで開発用 Web サーバーを起動すると、自動的に依存モジュールをインストールしてくれます。
+例えば、HTML ファイルから TypeScript ファイルを読み込んでいると、&lt;code>typescript&lt;/code> モジュールが自動的にインストールされます。&lt;/p>
+&lt;h2 id="parcel-のインストール">Parcel のインストール&lt;/h2>
+&lt;p>Web サイト用のディレクトリを作成し、&lt;strong>&lt;code>parcel&lt;/code>&lt;/strong> モジュールを開発用にインストールします。&lt;/p></description></item><item><title>React コンポーネント実装の基本（関数コンポーネントとクラスコンポーネント）</title><link>https://maku.blog/p/vfr3cnw/</link><pubDate>Thu, 09 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vfr3cnw/</guid><description>&lt;p>React で独自コンポーネントを作成する方法として、大きく次の 2 種類の方法があります。&lt;/p>
+&lt;ul>
+&lt;li>関数コンポーネント (Function Components)&lt;/li>
+&lt;li>クラスコンポーネント (Class Components)&lt;/li>
+&lt;/ul>
+&lt;p>昔は、ステートを持つコンポーネントは「クラスコンポーネント」で作成し、ステートを持たないものは「関数コンポーネント」として作成するという使い分けがありました。
+現在は、関数コンポーネントでも Hook の仕組みでステートを管理することができるようになったため、関数コンポーネントの使用が推奨されています。&lt;/p>
+&lt;h2 id="関数コンポーネント">関数コンポーネント&lt;/h2>
+&lt;h3 id="関数コンポーネントの基本">関数コンポーネントの基本&lt;/h3>
+&lt;p>下記は、固定のテキストを表示するシンプルな関数コンポーネントの定義例です。
+TypeScript (&lt;code>@types/react&lt;/code>) では、関数コンポーネントの型は &lt;strong>React.FunctionComponent&lt;/strong> インタフェースとして定義されています。
+エイリアスとして &lt;strong>&lt;code>React.FC&lt;/code>&lt;/strong> が定義されているので、こちらを使えばより短く記述できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/Hello.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">as&lt;/span> &lt;span class="nx">React&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Hello コンポーネントの定義
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">Hello&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Hello&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>HTML ファイルから読み込む JS ファイルでは、&lt;code>ReactDOM.render()&lt;/code> で上記の &lt;code>Hello&lt;/code> コンポーネントを描画します。
+次のコードを実行すると、&lt;code>&amp;lt;div id=&amp;quot;root&amp;quot;&amp;gt;&lt;/code> 要素の内容が、&lt;code>Hello&lt;/code> コンポーネントの内容に置き換えられます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">index.tsx（使用例）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">as&lt;/span> &lt;span class="nx">React&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">as&lt;/span> &lt;span class="nx">ReactDOM&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;react-dom&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">Hello&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;./components/Hello&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">ReactDOM&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">render&lt;/span>&lt;span class="p">(&amp;lt;&lt;/span>&lt;span class="nt">Hello&lt;/span> &lt;span class="p">/&amp;gt;,&lt;/span> &lt;span class="nb">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getElementById&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;root&amp;#39;&lt;/span>&lt;span class="p">));&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>一見すると、1 行目の &lt;code>React&lt;/code> モジュールのインポートは必要ないように見えますが、JSX コードが変換されると &lt;code>React&lt;/code> を参照するコードになるので、この行を消してはいけません。&lt;/p>
+&lt;h3 id="プロパティを定義する-props">プロパティを定義する (props)&lt;/h3>
+&lt;p>関数のパラメータとして、表示すべき値（プロパティ: &lt;strong>&lt;code>props&lt;/code>&lt;/strong>）を受け取ることができます。
+このプロパティには、HTML 要素でいうところの「属性」として指定された値が格納されています。
+TypeScript を使っているのであれば、プロパティの型をちゃんと定義して、&lt;code>React.FC&lt;/code> の型パラメータとして指定します。
+次の例では、2 つのプロパティ（&lt;code>name&lt;/code> と &lt;code>age&lt;/code>）を受け取る関数コンポーネントを定義しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/Hello.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">as&lt;/span> &lt;span class="nx">React&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Hello コンポーネントのプロパティ
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">type&lt;/span> &lt;span class="nx">Props&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">age&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">number&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Hello コンポーネントの定義
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">Hello&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">FC&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Props&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">私は&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="nx">です&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">age&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="nx">歳です&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">index.tsx（使用例）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">ReactDOM&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">render&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Hello&lt;/span> &lt;span class="na">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;まく&amp;#34;&lt;/span> &lt;span class="na">age&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="mi">14&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getElementById&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;root&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>私はまくです 14歳です&lt;/code> と表示されれば成功です。&lt;/p></description></item><item><title>React コンポーネントのプロパティでハンドラメソッドを渡す</title><link>https://maku.blog/p/e2dpycn/</link><pubDate>Sat, 18 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/e2dpycn/</guid><description>&lt;p>ここでは、次のようにプロパティ（属性）でハンドラメソッドを設定可能な React コンポーネントの実装例を示します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">MyButton&lt;/span> &lt;span class="na">onClick&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">{handleClick}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="ハンドラメソッドを設定可能なコンポーネントを実装する">ハンドラメソッドを設定可能なコンポーネントを実装する&lt;/h2>
+&lt;p>次の &lt;code>MyButton&lt;/code> コンポーネントは、ボタンクリック時に呼び出されるイベントハンドラを、&lt;code>onClick&lt;/code> プロパティで設定できるようにしています。
+この &lt;code>MyButton&lt;/code> コンポーネントは、クリックするたびに内部のカウンタ (&lt;code>state.count&lt;/code>) を +1 し、その値を指定されたイベントハンドラへ通知します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/myButton.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">React&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// MyButton のプロパティ（属性）の型
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">export&lt;/span> &lt;span class="kr">interface&lt;/span> &lt;span class="nx">MyButtonProps&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">onClick&lt;/span>&lt;span class="o">?:&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">count&lt;/span>: &lt;span class="kt">number&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="k">void&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// MyButton の状態（ステート）の型
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">interface&lt;/span> &lt;span class="nx">MyButtonState&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">count&lt;/span>: &lt;span class="kt">number&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// MyButton コンポーネント
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">export&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">MyButton&lt;/span> &lt;span class="kr">extends&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Component&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">MyButtonProps&lt;/span>&lt;span class="err">,&lt;/span> &lt;span class="na">MyButtonState&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">constructor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">props&lt;/span>: &lt;span class="kt">MyButtonProps&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">super&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">state&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">count&lt;/span>: &lt;span class="kt">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">public&lt;/span> &lt;span class="nx">render&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ReactNode&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">count&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span> &lt;span class="na">onClick&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleClick&lt;/span>&lt;span class="p">}&amp;gt;&lt;/span>&lt;span class="nx">MyButton&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">count&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">private&lt;/span> &lt;span class="nx">handleClick&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// カウンタを +1 して再描画
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">newCount&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">count&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">setState&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">count&lt;/span>: &lt;span class="kt">newCount&lt;/span>&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// onClick 属性でハンドラが指定されていたら呼び出す
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">onClick&lt;/span>&lt;span class="o">?&lt;/span>&lt;span class="p">.(&lt;/span>&lt;span class="nx">newCount&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>MyButton のプロパティの型を定義しているのは次の部分です。
+&lt;code>onClick?&lt;/code> とプロパティ名の末尾に &lt;strong>&lt;code>?&lt;/code>&lt;/strong> を付けることで、属性の指定をオプショナルにしています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">interface&lt;/span> &lt;span class="nx">MyButtonProps&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">onClick&lt;/span>&lt;span class="o">?:&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">count&lt;/span>: &lt;span class="kt">number&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="k">void&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>属性として設定されたハンドラメソッドは、コンポーネント内の &lt;code>handleClick()&lt;/code> メソッドの中で呼び出しています。&lt;/p></description></item><item><title>React コンポーネントのプロパティで配列データを渡す</title><link>https://maku.blog/p/av9mxak/</link><pubDate>Thu, 09 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/av9mxak/</guid><description>&lt;p>React コンポーネントのプロパティには、文字列や数値などの単純なスカラ値だけではなく、配列などの複雑なオブジェクトを渡すことができます。
+使用イメージは次のような感じです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">MyComponent&lt;/span> &lt;span class="na">values&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">{配列変数}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="配列型のプロパティを扱うコンポーネントを作成する">配列型のプロパティを扱うコンポーネントを作成する&lt;/h2>
+&lt;p>次の &lt;code>Books&lt;/code> コンポーネントは、プロパティ &lt;code>titles&lt;/code> で文字列配列を受け取り、それぞれの値を &lt;code>li&lt;/code> 要素で描画します。
+配列の &lt;strong>&lt;code>map&lt;/code>&lt;/strong> メソッドを使用すると、複数の &lt;code>li&lt;/code> 要素を簡単に生成することができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/books.tsx（Books コンポーネント）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">React&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Books コンポーネントのプロパティの型
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">export&lt;/span> &lt;span class="kr">interface&lt;/span> &lt;span class="nx">BooksProps&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">titles&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">[]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Books コンポーネントの定義
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">Books&lt;/span>: &lt;span class="kt">React.FC&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">BooksProps&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// titles プロパティの要素数が 0 であれば何も描画しない
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">titles&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="kc">null&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// titles プロパティの値を使って、複数の li 要素を作る
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">listItems&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">props&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">titles&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">map&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">title&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">li&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">li&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ul 要素の描画
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">ul&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="nx">listItems&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">ul&lt;/span>&lt;span class="p">&amp;gt;;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この &lt;code>Books&lt;/code> コンポーネントは次のような感じで使用します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">index.tsx（使用例）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">React&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">ReactDOM&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react-dom&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">Books&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;./components/books&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">titles&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;タイトル1&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;タイトル2&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;タイトル3&amp;#39;&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">ReactDOM&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">render&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Books&lt;/span> &lt;span class="na">titles&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">titles&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getElementById&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;root&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、次のような HTML 要素が生成されます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">ul&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">li&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>タイトル1&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">li&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">li&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>タイトル2&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">li&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">li&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>タイトル3&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">li&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">ul&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="リスト要素に-key-を与える">リスト要素に key を与える&lt;/h2>
+&lt;p>上記のコードを実行すると、React は次のような警告を出力します。&lt;/p></description></item><item><title>React コンポーネントで入力フォームを作成する (1) 自力編</title><link>https://maku.blog/p/tdpybmw/</link><pubDate>Fri, 10 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tdpybmw/</guid><description>&lt;h2 id="制御コンポーネント-controlled-components">制御コンポーネント (controlled components)&lt;/h2>
+&lt;p>React コンポーネントでフォームを構成する場合、コンポーネントの状態 (&lt;code>state&lt;/code>) に基づいて表示を行うように実装すると、フォームの表示内容を制御しやすくなります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="450" height="199" src="../../p/tdpybmw/img-001_hu1896278964674055954.png" alt="/p/tdpybmw/img-001.png" />
+&lt;/figure>
+
+&lt;p>このように、コンポーネントの表示内容が、完全にその状態 (&lt;code>state&lt;/code>) によって決まるように実装されたものを、&lt;strong>制御されたコンポーネント (controlled components)&lt;/strong> と呼びます。&lt;/p>
+&lt;p>このように設計することで、若干コード量は増えますが、表示内容を変更したいときはコンポーネントの &lt;code>state&lt;/code> を変更するだけで済むようになります。
+例えば、ネットワークから取得したデータをフォームに表示するような場合、そのフォームの構造を知る必要はなく、単純に &lt;code>state&lt;/code> を更新するだけでよくなります。
+これは、データとビューが分離された設計になっており、アプリ設計におけるベストプラクティスのひとつです。&lt;/p>
+&lt;h2 id="input-要素の実装例">input 要素の実装例&lt;/h2>
+&lt;p>下記は、&lt;code>&amp;lt;input type=&amp;quot;text&amp;quot;&amp;gt;&lt;/code> 要素と &lt;code>&amp;lt;input type=&amp;quot;submit&amp;quot;&amp;gt;&lt;/code> 要素を持つ &lt;code>MessageForm&lt;/code> コンポーネントの実装例です。
+ユーザーがテキストを入力するたびに &lt;code>handleChange()&lt;/code> が呼び出され、コンポーネントの状態 (&lt;code>state&lt;/code>) が更新されます。
+&lt;code>setState()&lt;/code> の呼び出しにより &lt;code>state&lt;/code> が変更が変更されると、再度 &lt;code>render()&lt;/code> が実行され、表示内容が &lt;code>state&lt;/code> の値に基づいて更新されます。&lt;/p>
+&lt;p>まずは、クラスコンポーネント形式での実装例。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/MessageForm.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">React&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">interface&lt;/span> &lt;span class="nx">IState&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">msg&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// テキスト入力エリアと、submit ボタンを持つフォームを表示するコンポーネント
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">export&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">MessageForm&lt;/span> &lt;span class="kr">extends&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Component&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="p">{},&lt;/span> &lt;span class="nx">IState&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">constructor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{})&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">super&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ステートの初期化（最初は入力エリアは空っぽ）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">state&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">msg&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// input 要素でのキー入力のたびに呼び出される
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">private&lt;/span> &lt;span class="nx">handleChange&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>: &lt;span class="kt">React.ChangeEvent&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">HTMLInputElement&lt;/span>&lt;span class="p">&amp;gt;)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ステートを変更することで表示を更新する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">setState&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">msg&lt;/span>: &lt;span class="kt">e.target.value&lt;/span>&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// submit ボタンを押したときに呼び出される
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">private&lt;/span> &lt;span class="nx">handleSubmit&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>: &lt;span class="kt">React.FormEvent&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// submit ボタンのデフォルトの振る舞い (GET や POST) を抑制する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">preventDefault&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 実際にはここでメッセージ送信を行う（内容は state から取得する）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">alert&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;次のメッセージが送信されました: &amp;#39;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">msg&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">render() {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">form&lt;/span> &lt;span class="na">onSubmit&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleSubmit&lt;/span>&lt;span class="p">}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">label&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="err">メッセージ：&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">input&lt;/span> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;text&amp;#34;&lt;/span> &lt;span class="na">value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">msg&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="na">onChange&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleChange&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">label&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">input&lt;/span> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;submit&amp;#34;&lt;/span> &lt;span class="na">value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;送信&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">form&lt;/span>&lt;span class="p">&amp;gt;;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>下記は、関数コンポーネントでの実装例です。
+コメントを削ったというのもありますが、やはり関数コンポーネントにするとコードがすっきりしますね。&lt;/p></description></item><item><title>React コンポーネントで入力フォームを作成する (2) react-hook-form 編</title><link>https://maku.blog/p/k7it5fp/</link><pubDate>Sun, 06 Feb 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/k7it5fp/</guid><description>&lt;h2 id="react-hook-form-とは">React Hook Form とは&lt;/h2>
+&lt;p>React アプリで入力フォームを自力で作ろうとすると、各入力エリアのステート管理などが &lt;a href="../../p/tdpybmw">意外と大変だったりします&lt;/a>。
+React Hook Form ライブラリ (&lt;code>react-hook-form&lt;/code>) を使用すると、そのあたりの定型処理をシンプルに記述することができます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://react-hook-form.com/">React Hook Form&lt;/a> / &lt;a href="https://www.npmjs.com/package/react-hook-form">npm&lt;/a> / &lt;a href="https://github.com/react-hook-form/react-hook-form">GitHub&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>React Hook Form は次のような特徴を備えています。&lt;/p>
+&lt;ul>
+&lt;li>軽量（別のライブラリに依存しない）&lt;/li>
+&lt;li>TypeScript をサポート&lt;/li>
+&lt;li>パフォーマンスがよい（不要なレンダリングを軽減）&lt;/li>
+&lt;li>&lt;a href="https://developer.mozilla.org/ja/docs/Learn/Forms/Form_validation">HTML 標準のフォームバリデーション&lt;/a> との互換性
+&lt;ul>
+&lt;li>required / min / max / minLength / maxLength / pattern / validate&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>React Native でも使える&lt;/li>
+&lt;/ul>
+&lt;p>2022 年 2 月時点で活発に開発が進められており、npm のダウンロード数は右肩上がりに増えています。
+GitHub のスター数も 25,000 を超えているため、しばらくは安心して使えそうなライブラリです。&lt;/p>
+&lt;h2 id="react-hook-form-を導入する">React Hook Form を導入する&lt;/h2>
+&lt;p>&lt;code>react-hook-form&lt;/code> パッケージは、&lt;code>npm&lt;/code> あるいは &lt;code>yarn&lt;/code> で簡単にインストールできます。
+既存の React プロジェクト内で次のように実行してください。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install react-hook-form
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">あるいは
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="gp">$&lt;/span> yarn add react-hook-form
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="react-hook-form-の基本的な使い方">React Hook Form の基本的な使い方&lt;/h2>
+&lt;p>次の &lt;code>MyForm&lt;/code> コンポーネントは、1 つのテキスト入力フィールドと、1 つの数値入力フィールドを持つフォームの実装例です。
+ここでは TypeScript を使い、フォームの入力要素の型を &lt;code>FormData&lt;/code> と定義しています。&lt;/p></description></item></channel></rss>

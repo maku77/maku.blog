@@ -1,27 +1,815 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>SVG 関連記事 on まくろぐ</title><link>https://maku.blog/p/fsancxy/</link><description>Recent content in SVG 関連記事 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Wed, 01 Nov 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/fsancxy/index.xml" rel="self" type="application/rss+xml"/><item><title>SVG 画像をダークモードに対応させる</title><link>https://maku.blog/p/shr62rs/</link><pubDate>Wed, 01 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/shr62rs/</guid><description>何をするか SVG 内に style 要素を埋め込んで、ブラウザのダークモードの設定 (ON/OFF) に連動して各描画要素の色を変更する方法を説明します。
-DarkMode: ON OFF 図: ダークモードに対応した SVG 上記の SVG 要素では、ブラウザのダークモード設定に応じて、各描画要素の色 (fill) を切り替えるようにしています。 さらに、現在のダークモード設定を示す ON/OFF というテキストの表示・非表示も切り替えています。
-（ちなみに、この Web サイト『まくろぐ』全体は、ダークモード設定によって配色が変わるようにはなってません）
-CSS のメディアクエリでダークモード用スタイルを定義する CSS のメディアクエリ (@media) を使うと、ブラウザのダークモード設定に応じたスタイル定義を行うことができます。
-CSS のメディアクエリの使い方 /* ここに共通のスタイル定義 */ @media(prefers-color-scheme: light) { /* ここにライトモード時のスタイル定義 */ } @media(prefers-color-scheme: dark) { /* ここにダークモード時のスタイル定義 */ } SVG には style 要素を埋め込むことができるので、そこでメディアクエリを使えば、ダークモード設定に連動する SVG を作成することができます。
-SVG に style 設定を埋め込む例 &amp;lt;svg width=&amp;#34;100&amp;#34; viewBox=&amp;#34;0 0 40 30&amp;#34;&amp;gt; &amp;lt;circle cx=&amp;#34;20&amp;#34; cy=&amp;#34;15&amp;#34; r=&amp;#34;10&amp;#34; fill=&amp;#34;blue&amp;#34; /&amp;gt; &amp;lt;style&amp;gt; @media(prefers-color-scheme: dark) { /* ブラウザのダークモードが ON のときは赤色にする */ circle { fill: red; } } &amp;lt;/style&amp;gt; &amp;lt;/svg&amp;gt; ダークモードに対応した SVG 要素の例 最初に表示した SVG は、次のようなコードで構成されています。 svg 要素内に、メディアクエリを含んだ style 要素が埋め込まれているところがポイントです。</description></item><item><title>SVG の defs 要素で図形を定義して use で使い回す</title><link>https://maku.blog/p/wkrp4mf/</link><pubDate>Sun, 15 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wkrp4mf/</guid><description>defs と use の基本 SVG の defs 要素内で定義した描画要素（rect や path、g など）は、use 要素を使って繰り返し参照することができます。 defs 以下に定義した図形は、use 要素で参照するまで描画されません。
-次の例では、defs 要素内に path 要素を 1 つ定義し、それを 5 つの use 要素から参照しています。
-図: defs と use による図形の使い回し &amp;lt;svg style=&amp;#34;width: 300px;&amp;#34; viewBox=&amp;#34;0 0 200 60&amp;#34;&amp;gt; &amp;lt;defs&amp;gt; &amp;lt;path id=&amp;#34;tri&amp;#34; d=&amp;#34;M0,-10 L9,5 -9,5 Z&amp;#34; fill=&amp;#34;magenta&amp;#34; /&amp;gt; &amp;lt;/defs&amp;gt; &amp;lt;use href=&amp;#34;#tri&amp;#34; transform=&amp;#34;translate(20 30)&amp;#34; /&amp;gt; &amp;lt;use href=&amp;#34;#tri&amp;#34; transform=&amp;#34;translate(50 30)&amp;#34; /&amp;gt; &amp;lt;use href=&amp;#34;#tri&amp;#34; transform=&amp;#34;translate(85 30) scale(1.5)&amp;#34; /&amp;gt; &amp;lt;use href=&amp;#34;#tri&amp;#34; transform=&amp;#34;translate(129 30) scale(2)&amp;#34; /&amp;gt; &amp;lt;use href=&amp;#34;#tri&amp;#34; transform=&amp;#34;translate(170 30) rotate(90) scale(2)&amp;#34; /&amp;gt; &amp;lt;/svg&amp;gt; use 要素には transform 属性を指定できるので、上記のように、表示位置 (translate) や拡大率 (scale)、回転角度 (rotate) などの指定が可能です。</description></item><item><title>SVG の path 要素による円弧の描画例（A コマンド）</title><link>https://maku.blog/p/rpp2z3w/</link><pubDate>Wed, 11 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rpp2z3w/</guid><description>A コマンドのパラメーター SVG の path 要素の d 属性に A/a コマンドを指定すると、様々な形状の円弧（楕円の一部）を描画することができます（参考: path 要素のチートシート）。 パラメーターが多くて分かりにくいのでまとめておきます。
-図: path 要素による円弧の描画
-具体例 &amp;lt;svg width=&amp;#34;200&amp;#34; viewBox=&amp;#34;-20 -65 140 85&amp;#34;&amp;gt; &amp;lt;path d=&amp;#34;M0,0 A50 50 0 0 1 100 0&amp;#34; stroke=&amp;#34;black&amp;#34; fill=&amp;#34;none&amp;#34; /&amp;gt; &amp;lt;/svg&amp;gt; A/a コマンドは、円弧の始点として「現在の座標」を使うので、通常は上記のように、先行する M コマンドなどで始点座標を移動しておきします。 円弧の線だけを表示するには、stroke に線の色を指定し、fill に none（塗りつぶしなし）を指定しておく必要があります。
-A コマンドには次の 7 つの数値パラメーターを指定します。 a コマンドの場合は、最後の終点座標 (x, y) の指定が、相対位置 (dx, dy) の指定に変わります。
-A コマンドのパラメーター &amp;lt;rx&amp;gt; &amp;lt;ry&amp;gt; &amp;lt;x-axis-rotation&amp;gt; &amp;lt;large-arc-flag&amp;gt; &amp;lt;sweep-flag&amp;gt; &amp;lt;x&amp;gt; &amp;lt;y&amp;gt; パラメーター 説明 rx 円弧の X 軸半径 ry 円弧の Y 軸半径 x-axis-rotation X 軸からの傾き (radian) large-arch-flag 1: 大きな弧の部分を描画0: 小さな弧の部分を描画 sweep-flag 1: 時計回り (clockwise) になる弧の部分を描画0: 反時計回り (counterclockwise) になる弧の部分を描画 x (dx) 円弧の終点 X 座標（A コマンドなら絶対座標、a コマンドなら相対座標） y (dy) 円弧の終点 Y 座標（A コマンドなら絶対座標、a コマンドなら相対座標） 下記のギャラリーを見ると、具体的な指定方法を理解できると思います。</description></item><item><title>SVG 要素の上に別の HTML 要素を重ねて表示する</title><link>https://maku.blog/p/fmxdrcp/</link><pubDate>Wed, 04 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fmxdrcp/</guid><description>多数のデータを svg 要素を使用してプロットする場合、ブラウザの画面全体に svg 要素を広げて表示したいケースがあります。 このような場合、別の HTML 要素（ページタイトルや操作パネルなど）は、svg 要素の上に重ねて表示する必要があります。 ここでは、その方法として、svg 要素を背景として表示する方法と、他の要素を相対的に配置する方法の 2 つを紹介します。
-svg 要素を背景として表示する方法 (position: fixed) デモ1（別ページで開く） この例では、svg 要素を position: fixed スタイルを用いて、画面全体に固定表示しています。 通常、position: fixed スタイルは、ウェブサイトのヘッダーを画面上部に固定する用途などで使用されますが、これを svg 要素に適用することで、背景画像のような効果を得ることができます。 svg 以外の要素は、まるで svg 要素が存在しないかのようにレイアウトされます。 position: fixed スタイルが適用された svg 要素は、デフォルトでは他の要素よりも前面に表示されてしまうため、これを背面に配置するために z-index: -1 を指定しています。
-HTML &amp;lt;svg&amp;gt; &amp;lt;circle cx=&amp;#34;40&amp;#34; cy=&amp;#34;40&amp;#34; r=&amp;#34;25&amp;#34; fill=&amp;#34;royalblue&amp;#34; /&amp;gt; &amp;lt;circle cx=&amp;#34;100&amp;#34; cy=&amp;#34;40&amp;#34; r=&amp;#34;25&amp;#34; fill=&amp;#34;indigo&amp;#34; /&amp;gt; &amp;lt;circle cx=&amp;#34;160&amp;#34; cy=&amp;#34;40&amp;#34; r=&amp;#34;25&amp;#34; fill=&amp;#34;darkslateblue&amp;#34; /&amp;gt; &amp;lt;circle cx=&amp;#34;220&amp;#34; cy=&amp;#34;40&amp;#34; r=&amp;#34;25&amp;#34; fill=&amp;#34;darkmagenta&amp;#34; /&amp;gt; &amp;lt;/svg&amp;gt; &amp;lt;p&amp;gt; この p 要素の後ろに、svg 要素がページ全体に表示されています。 &amp;lt;/p&amp;gt; CSS * { margin: 0; box-sizing: border-box; } svg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: midnightblue; z-index: -1; /* 他の要素より奥に表示 */ } ☝️ マウスイベントを透過させる svg 要素の上に重なった p 要素上でのマウスイベントを svg 要素に伝播するには、p 要素に pointer-events: none を指定します。</description></item><item><title>SVG の marker 要素で矢印（マーカー）を描画する</title><link>https://maku.blog/p/hoiytvm/</link><pubDate>Mon, 25 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/hoiytvm/</guid><description>SVG の marker 要素を使うと、line 要素などの線の先端に表示するマーカー形状を定義することができます。 多くの場合、矢印を表す三角形を使いますが、丸や四角など、任意の形状のマーカーを定義できます。
-marker による矢印描画の基本 実装例 次の例では、line 要素の先端に marker で定義した三角形を割り当てています。 マーカー形状を分かりやすくするために、半透明の赤色で表示しています（通常は line の色と合わせます）。
-図: marker 要素による矢印の描画 svg のコード &amp;lt;svg width=&amp;#34;480&amp;#34; height=&amp;#34;140&amp;#34; viewBox=&amp;#34;0 0 240 70&amp;#34; xmlns=&amp;#34;http://www.w3.org/2000/svg&amp;#34; style=&amp;#34;border: thin solid gray&amp;#34;&amp;gt; &amp;lt;!-- marker で矢印の形を定義する --&amp;gt; &amp;lt;defs&amp;gt; &amp;lt;marker id=&amp;#34;arrow&amp;#34; viewBox=&amp;#34;0 0 10 10&amp;#34; refX=&amp;#34;5&amp;#34; refY=&amp;#34;5&amp;#34; markerWidth=&amp;#34;16&amp;#34; markerHeight=&amp;#34;16&amp;#34; orient=&amp;#34;auto-start-reverse&amp;#34;&amp;gt; &amp;lt;path d=&amp;#34;M0,0 L10,5 L0,10 Z&amp;#34; fill=&amp;#34;red&amp;#34; opacity=&amp;#34;0.5&amp;#34; /&amp;gt; &amp;lt;/marker&amp;gt; &amp;lt;/defs&amp;gt; &amp;lt;!-- marker を割り当てる --&amp;gt; &amp;lt;line x1=&amp;#34;20&amp;#34; y1=&amp;#34;20&amp;#34; x2=&amp;#34;100&amp;#34; y2=&amp;#34;20&amp;#34; stroke=&amp;#34;green&amp;#34; stroke-width=&amp;#34;1&amp;#34; marker-end=&amp;#34;url(#arrow)&amp;#34; /&amp;gt; &amp;lt;line x1=&amp;#34;80&amp;#34; y1=&amp;#34;50&amp;#34; x2=&amp;#34;160&amp;#34; y2=&amp;#34;20&amp;#34; stroke=&amp;#34;red&amp;#34; stroke-width=&amp;#34;1&amp;#34; marker-start=&amp;#34;url(#arrow)&amp;#34; marker-end=&amp;#34;url(#arrow)&amp;#34; /&amp;gt; &amp;lt;line x1=&amp;#34;140&amp;#34; y1=&amp;#34;50&amp;#34; x2=&amp;#34;220&amp;#34; y2=&amp;#34;50&amp;#34; stroke=&amp;#34;blue&amp;#34; stroke-width=&amp;#34;1&amp;#34; marker-start=&amp;#34;url(#arrow)&amp;#34; /&amp;gt; &amp;lt;/svg&amp;gt; 解説 marker で矢印の形を定義する &amp;lt;defs&amp;gt; &amp;lt;marker id=&amp;#34;arrow&amp;#34; viewBox=&amp;#34;0 0 10 10&amp;#34; refX=&amp;#34;5&amp;#34; refY=&amp;#34;5&amp;#34; markerWidth=&amp;#34;16&amp;#34; markerHeight=&amp;#34;16&amp;#34; orient=&amp;#34;auto-start-reverse&amp;#34;&amp;gt; &amp;lt;path d=&amp;#34;M0,0 L10,5 L0,10 Z&amp;#34; fill=&amp;#34;red&amp;#34; opacity=&amp;#34;0.</description></item><item><title>SVG の path 要素によるベジェ曲線の描画例（C/S/Q/T コマンド）</title><link>https://maku.blog/p/ka6xumg/</link><pubDate>Sat, 23 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ka6xumg/</guid><description>svg の path 要素を使用すると、直線と曲線を組み合わせて多様な図形を描画できます。 図形の形状は、path 要素の d 属性に一連のコマンドを指定することで定義されます（参考: path 要素のチートシート）。
-しかし、ベジェ曲線の制御点をどのように指定すれば、どのような曲線が描かれるのかが直感的に理解しにくいことがあります。 ここではさまざまな曲線の描画例を紹介します。
-C / S コマンドによる 3 次ベジェ曲線 C コマンド は、2 つの制御点と終点を指定することで、始点（現在座標）と終点を曲線で繋ぎます。 path の d 属性の内容は、M始点 C制御点1 制御点2 終点 のような形で指定することになります。
-(0, 0) (5, 70) (95, 70) (100, 0) 始点 制御点1 制御点2 終点 &amp;lt;path d="M0,0 C5,70 95,70 100,0" stroke="black" stroke-width="2" fill="none" /> (0, 50) (50, 150) (50, -50) (100, 50) 始点 制御点1 制御点2 終点 &amp;lt;path d="M0,50 C50,150 50,-50 100,50" stroke="black" stroke-width="2" fill="</description></item><item><title>SVG の viewBox の使い方とレスポンシブ対応</title><link>https://maku.blog/p/563uibg/</link><pubDate>Fri, 22 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/563uibg/</guid><description>svg 要素の viewBox 属性について svg 要素内の各描画要素に設定する座標値のデフォルト単位はピクセル (px) ですが、上位の svg 要素に viewBox 属性が設定されている場合は、その論理的な座標系（ユーザー座標系）の座標値を指定することになります。 例えば、次のように viewBox を設定すると、画面上での svg 要素の表示サイズは 800px x 600px となりますが、svg 要素内に配置する各描画要素 (rect など）は、40x30 という仮想的なサイズの中で座標指定することになります。
-viewBox の指定 &amp;lt;svg width=&amp;#34;800&amp;#34; height=&amp;#34;600&amp;#34; viewBox=&amp;#34;0 0 40 30&amp;#34;&amp;gt; viewBox 属性を指定してある場合は、width 属性と height 属性の一方を省略して記述できるようになります。 その場合は、viewBox のアスペクト比を考慮した width あるいは height が自動的に設定されます。 よって、上記の svg タグは次のように省略して記述することが可能です。
-height の省略 &amp;lt;svg width=&amp;#34;800&amp;#34; viewBox=&amp;#34;0 0 40 30&amp;#34;&amp;gt; 下記の例では 1 つの rect 要素を配置していますが、これは svg 要素の左上 4 分の 1 を占める矩形を描画します。
-&amp;lt;svg width=&amp;#34;200&amp;#34; viewBox=&amp;#34;0 0 40 20&amp;#34;&amp;gt; &amp;lt;rect x=&amp;#34;0&amp;#34; y=&amp;#34;0&amp;#34; width=&amp;#34;20&amp;#34; height=&amp;#34;10&amp;#34; fill=&amp;#34;steelblue&amp;#34; /&amp;gt; &amp;lt;/svg&amp;gt; 表示例 svg 要素のレスポンシブ対応 svg 要素も img 要素と同様に、CSS で max-width: 100%; と指定しておけば、横幅が足りなくなった場合に縮小して表示することができます。</description></item><item><title>SVG の g 要素の使い方</title><link>https://maku.blog/p/rx9hdei/</link><pubDate>Thu, 21 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rx9hdei/</guid><description>SVG の g 要素は、子要素をグループ化して操作を行うための要素です。 ここでは、g 要素をどのような用途で利用できるのかをまとめておきます。
-子要素に共通のスタイル（色、太さなど）をセットする &amp;lt;svg width=&amp;#34;195&amp;#34; height=&amp;#34;60&amp;#34; style=&amp;#34;border: solid 1px gray;&amp;#34;&amp;gt; &amp;lt;g fill=&amp;#34;#cef&amp;#34; stroke=&amp;#34;blue&amp;#34; stroke-width=&amp;#34;1.5&amp;#34;&amp;gt; &amp;lt;rect x=&amp;#34;15&amp;#34; y=&amp;#34;15&amp;#34; width=&amp;#34;30&amp;#34; height=&amp;#34;30&amp;#34; /&amp;gt; &amp;lt;circle cx=&amp;#34;75&amp;#34; cy=&amp;#34;30&amp;#34; r=&amp;#34;15&amp;#34; /&amp;gt; &amp;lt;/g&amp;gt; &amp;lt;g fill=&amp;#34;#ffc&amp;#34; stroke=&amp;#34;darkorange&amp;#34; stroke-width=&amp;#34;1.5&amp;#34;&amp;gt; &amp;lt;rect x=&amp;#34;105&amp;#34; y=&amp;#34;15&amp;#34; width=&amp;#34;30&amp;#34; height=&amp;#34;30&amp;#34; /&amp;gt; &amp;lt;circle cx=&amp;#34;165&amp;#34; cy=&amp;#34;30&amp;#34; r=&amp;#34;15&amp;#34; /&amp;gt; &amp;lt;/g&amp;gt; &amp;lt;/svg&amp;gt; この例では、2 つの g 要素の下に、rect と circle を 1 つずつ配置しています。 それらの塗りつぶし色 (fill) や枠線の色 (stroke) は、親の g 要素にセットしたものが使用されます。
-多数の描画要素に同じスタイルを割り当てたいときは、g 要素でまとめてスタイル設定すると効率がよいです。
-子要素の座標をまとめて移動する (transform) Hello! &amp;lt;svg width=&amp;#34;180&amp;#34; height=&amp;#34;60&amp;#34; style=&amp;#34;border: thin solid gray;&amp;#34;&amp;gt; &amp;lt;g transform=&amp;#34;translate(50 30)&amp;#34;&amp;gt; &amp;lt;circle cx=&amp;#34;0&amp;#34; cy=&amp;#34;0&amp;#34; r=&amp;#34;10&amp;#34; fill=&amp;#34;red&amp;#34; /&amp;gt; &amp;lt;text x=&amp;#34;15&amp;#34; y=&amp;#34;2&amp;#34; dominant-baseline=&amp;#34;middle&amp;#34; font-size=&amp;#34;20&amp;#34; font-weight=&amp;#34;800&amp;#34; fill=&amp;#34;blue&amp;#34;&amp;gt; Hello!</description></item><item><title>SVG チートシート</title><link>https://maku.blog/p/kq6gwfn/</link><pubDate>Sat, 09 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/kq6gwfn/</guid><description>svg 要素内に配置できる描画要素のまとめです。 座標値のデフォルトの単位はピクセル (px) ですが、svg 要素に viewBox が設定されている場合は viewBox 内の座標系で座標値を指定します。
-text 要素（テキスト） text 要素の例 &amp;lt;text x=&amp;#34;20&amp;#34; y=&amp;#34;55&amp;#34; font-size=&amp;#34;20&amp;#34; fill=&amp;#34;red&amp;#34;&amp;gt; 表示するテキスト &amp;lt;/text&amp;gt; 表示するテキスト 属性 説明 設定例 x テキストアンカーポイントの X 座標 100, 50% y テキストアンカーポイントの Y 座標 100, 50% text-anchor 水平方向のアンカーポイント * start &amp;hellip; テキスト先頭（ltr 言語なら左端）
-* middle &amp;hellip; 中央* end &amp;hellip; テキスト末尾（ltr 言語なら右端） dominant-baseline 垂直方向のベースライン * auto &amp;hellip; 通常は下端* middle &amp;hellip; 中央* hanging &amp;hellip; 通常は上端 font-size フォントサイズ 30 font-weight 文字の太さ 600 fill テキスト内部の色 red, rgb(255, 0, 0),rgba(255, 0, 0, 0.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>SVG 関連記事 on まくろぐ</title><link>https://maku.blog/p/fsancxy/</link><description>Recent content in SVG 関連記事 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Wed, 01 Nov 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/fsancxy/index.xml" rel="self" type="application/rss+xml"/><item><title>SVG 画像をダークモードに対応させる</title><link>https://maku.blog/p/shr62rs/</link><pubDate>Wed, 01 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/shr62rs/</guid><description>&lt;h2 id="何をするか">何をするか&lt;/h2>
+&lt;p>SVG 内に &lt;code>style&lt;/code> 要素を埋め込んで、ブラウザのダークモードの設定 (ON/OFF) に連動して各描画要素の色を変更する方法を説明します。&lt;/p>
+&lt;div style="text-align: center">
+ &lt;svg id="div-tds6j4y" style="width: 300px; max-width: 100%; border: thin solid gray;" viewBox="0 0 93 43">
+ &lt;rect id="background" x="0" y="0" width="100%" height="100%" fill="#eee" />
+ &lt;circle cx="20" cy="15" r="10" fill="blue" />
+ &lt;path d="M45,5 l11.5,20 -23,0 Z" fill="red" />
+ &lt;rect x="62" y="5" width="20" height="20" fill="green" />
+ &lt;text x="5" y="38" font-size="8pt">DarkMode:&lt;/text>
+ &lt;text id="text-on" x="65" y="38" font-size="8pt">ON&lt;/text>
+ &lt;text id="text-off" x="65" y="38" font-size="8pt">OFF&lt;/text>
+ &lt;style>
+ @media(prefers-color-scheme: light) {
+ #div-tds6j4y {
+ &amp; #text-on { display: none; }
+ }
+ }
+ @media(prefers-color-scheme: dark) {
+ #div-tds6j4y {
+ &amp; #text-off { display: none; }
+ &amp; #background { fill: darkblue; }
+ &amp; circle { fill: lightblue; }
+ &amp; path { fill: pink; }
+ &amp; rect { fill: #bbffbb; }
+ &amp; text { fill: white; }
+ }
+ }
+ &lt;/style>
+ &lt;/svg>
+ &lt;div>図: ダークモードに対応した SVG&lt;/div>
+&lt;/div>
+&lt;p>上記の SVG 要素では、ブラウザのダークモード設定に応じて、各描画要素の色 (&lt;code>fill&lt;/code>) を切り替えるようにしています。
+さらに、現在のダークモード設定を示す &lt;code>ON&lt;/code>/&lt;code>OFF&lt;/code> というテキストの表示・非表示も切り替えています。&lt;/p></description></item><item><title>SVG の defs 要素で図形を定義して use で使い回す</title><link>https://maku.blog/p/wkrp4mf/</link><pubDate>Sun, 15 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wkrp4mf/</guid><description>&lt;h2 id="defs-と-use-の基本">defs と use の基本&lt;/h2>
+&lt;p>SVG の &lt;a href="https://developer.mozilla.org/ja/docs/Web/SVG/Element/defs">&lt;strong>&lt;code>defs&lt;/code>&lt;/strong>&lt;/a> 要素内で定義した描画要素（&lt;code>rect&lt;/code> や &lt;code>path&lt;/code>、&lt;code>g&lt;/code> など）は、&lt;a href="https://developer.mozilla.org/ja/docs/Web/SVG/Element/use">&lt;strong>&lt;code>use&lt;/code>&lt;/strong>&lt;/a> 要素を使って繰り返し参照することができます。
+&lt;code>defs&lt;/code> 以下に定義した図形は、&lt;code>use&lt;/code> 要素で参照するまで描画されません。&lt;/p>
+&lt;p>次の例では、&lt;code>defs&lt;/code> 要素内に &lt;code>path&lt;/code> 要素を 1 つ定義し、それを 5 つの &lt;code>use&lt;/code> 要素から参照しています。&lt;/p>
+&lt;center>
+&lt;svg style="width: 300px; max-width: 100%; border: thin solid gray;" viewBox="0 0 200 60">
+ &lt;defs>
+ &lt;path id="tri" d="M0,-10 L9,5 -9,5 Z" fill="magenta" />
+ &lt;/defs>
+ &lt;use href="#tri" transform="translate(20 30)" />
+ &lt;use href="#tri" transform="translate(50 30)" />
+ &lt;use href="#tri" transform="translate(85 30) scale(1.5)" />
+ &lt;use href="#tri" transform="translate(129 30) scale(2)" />
+ &lt;use href="#tri" transform="translate(170 30) rotate(90) scale(2)" />
+&lt;/svg>
+&lt;div>図: defs と use による図形の使い回し&lt;/div>
+&lt;/center>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-xml" data-lang="xml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;svg&lt;/span> &lt;span class="na">style=&lt;/span>&lt;span class="s">&amp;#34;width: 300px;&amp;#34;&lt;/span> &lt;span class="na">viewBox=&lt;/span>&lt;span class="s">&amp;#34;0 0 200 60&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;defs&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;path&lt;/span> &lt;span class="na">id=&lt;/span>&lt;span class="s">&amp;#34;tri&amp;#34;&lt;/span> &lt;span class="na">d=&lt;/span>&lt;span class="s">&amp;#34;M0,-10 L9,5 -9,5 Z&amp;#34;&lt;/span> &lt;span class="na">fill=&lt;/span>&lt;span class="s">&amp;#34;magenta&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/defs&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;use&lt;/span> &lt;span class="na">href=&lt;/span>&lt;span class="s">&amp;#34;#tri&amp;#34;&lt;/span> &lt;span class="na">transform=&lt;/span>&lt;span class="s">&amp;#34;translate(20 30)&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;use&lt;/span> &lt;span class="na">href=&lt;/span>&lt;span class="s">&amp;#34;#tri&amp;#34;&lt;/span> &lt;span class="na">transform=&lt;/span>&lt;span class="s">&amp;#34;translate(50 30)&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;use&lt;/span> &lt;span class="na">href=&lt;/span>&lt;span class="s">&amp;#34;#tri&amp;#34;&lt;/span> &lt;span class="na">transform=&lt;/span>&lt;span class="s">&amp;#34;translate(85 30) scale(1.5)&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;use&lt;/span> &lt;span class="na">href=&lt;/span>&lt;span class="s">&amp;#34;#tri&amp;#34;&lt;/span> &lt;span class="na">transform=&lt;/span>&lt;span class="s">&amp;#34;translate(129 30) scale(2)&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;use&lt;/span> &lt;span class="na">href=&lt;/span>&lt;span class="s">&amp;#34;#tri&amp;#34;&lt;/span> &lt;span class="na">transform=&lt;/span>&lt;span class="s">&amp;#34;translate(170 30) rotate(90) scale(2)&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;/svg&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>use&lt;/code> 要素には &lt;strong>&lt;code>transform&lt;/code>&lt;/strong> 属性を指定できるので、上記のように、表示位置 (&lt;code>translate&lt;/code>) や拡大率 (&lt;code>scale&lt;/code>)、回転角度 (&lt;code>rotate&lt;/code>) などの指定が可能です。&lt;/p></description></item><item><title>SVG の path 要素による円弧の描画例（A コマンド）</title><link>https://maku.blog/p/rpp2z3w/</link><pubDate>Wed, 11 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rpp2z3w/</guid><description>&lt;h2 id="a-コマンドのパラメーター">A コマンドのパラメーター&lt;/h2>
+&lt;p>SVG の &lt;strong>&lt;code>path&lt;/code>&lt;/strong> 要素の &lt;strong>&lt;code>d&lt;/code>&lt;/strong> 属性に &lt;strong>&lt;code>A&lt;/code>&lt;/strong>/&lt;strong>&lt;code>a&lt;/code>&lt;/strong> コマンドを指定すると、様々な形状の円弧（楕円の一部）を描画することができます（参考: &lt;a href="../../p/kq6gwfn/#path">path 要素のチートシート&lt;/a>）。
+パラメーターが多くて分かりにくいのでまとめておきます。&lt;/p>
+&lt;center>
+ &lt;svg width="160" viewBox="-20 -65 140 85" style="border: thin solid gray">
+ &lt;path d="M0,0 A50 50 0 0 1 100 0" stroke="black" fill="none" />
+ &lt;/svg>
+ &lt;p>図: path 要素による円弧の描画&lt;/p>
+&lt;/center>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">具体例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-xml" data-lang="xml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;svg&lt;/span> &lt;span class="na">width=&lt;/span>&lt;span class="s">&amp;#34;200&amp;#34;&lt;/span> &lt;span class="na">viewBox=&lt;/span>&lt;span class="s">&amp;#34;-20 -65 140 85&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;path&lt;/span> &lt;span class="na">d=&lt;/span>&lt;span class="s">&amp;#34;M0,0 A50 50 0 0 1 100 0&amp;#34;&lt;/span> &lt;span class="na">stroke=&lt;/span>&lt;span class="s">&amp;#34;black&amp;#34;&lt;/span> &lt;span class="na">fill=&lt;/span>&lt;span class="s">&amp;#34;none&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;/svg&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>A&lt;/code>/&lt;code>a&lt;/code> コマンドは、円弧の始点として「現在の座標」を使うので、通常は上記のように、先行する &lt;code>M&lt;/code> コマンドなどで始点座標を移動しておきします。
+円弧の線だけを表示するには、&lt;code>stroke&lt;/code> に線の色を指定し、&lt;code>fill&lt;/code> に &lt;code>none&lt;/code>（塗りつぶしなし）を指定しておく必要があります。&lt;/p>
+&lt;p>&lt;code>A&lt;/code> コマンドには次の 7 つの数値パラメーターを指定します。
+&lt;code>a&lt;/code> コマンドの場合は、最後の終点座標 (&lt;code>x&lt;/code>, &lt;code>y&lt;/code>) の指定が、相対位置 (&lt;code>dx&lt;/code>, &lt;code>dy&lt;/code>) の指定に変わります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">A コマンドのパラメーター&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">rx&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">ry&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">x-axis-rotation&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">large-arc-flag&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">sweep-flag&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">x&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">y&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>パラメーター&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>rx&lt;/code>&lt;/td>
+ &lt;td>円弧の X 軸半径&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ry&lt;/code>&lt;/td>
+ &lt;td>円弧の Y 軸半径&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>x-axis-rotation&lt;/code>&lt;/td>
+ &lt;td>X 軸からの傾き (radian)&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>large-arch-flag&lt;/code>&lt;/td>
+ &lt;td>&lt;code>1&lt;/code>: 大きな弧の部分を描画&lt;br/>&lt;code>0&lt;/code>: 小さな弧の部分を描画&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>sweep-flag&lt;/code>&lt;/td>
+ &lt;td>&lt;code>1&lt;/code>: 時計回り (clockwise) になる弧の部分を描画&lt;br/>&lt;code>0&lt;/code>: 反時計回り (counterclockwise) になる弧の部分を描画&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>x&lt;/code> (&lt;code>dx&lt;/code>)&lt;/td>
+ &lt;td>円弧の終点 X 座標（&lt;code>A&lt;/code> コマンドなら絶対座標、&lt;code>a&lt;/code> コマンドなら相対座標）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>y&lt;/code> (&lt;code>dy&lt;/code>)&lt;/td>
+ &lt;td>円弧の終点 Y 座標（&lt;code>A&lt;/code> コマンドなら絶対座標、&lt;code>a&lt;/code> コマンドなら相対座標）&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;p>下記のギャラリーを見ると、具体的な指定方法を理解できると思います。&lt;/p></description></item><item><title>SVG 要素の上に別の HTML 要素を重ねて表示する</title><link>https://maku.blog/p/fmxdrcp/</link><pubDate>Wed, 04 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fmxdrcp/</guid><description>&lt;p>多数のデータを &lt;code>svg&lt;/code> 要素を使用してプロットする場合、ブラウザの画面全体に &lt;code>svg&lt;/code> 要素を広げて表示したいケースがあります。
+このような場合、別の HTML 要素（ページタイトルや操作パネルなど）は、&lt;code>svg&lt;/code> 要素の上に重ねて表示する必要があります。
+ここでは、その方法として、&lt;code>svg&lt;/code> 要素を背景として表示する方法と、他の要素を相対的に配置する方法の 2 つを紹介します。&lt;/p>
+&lt;h2 id="svg-要素を背景として表示する方法-position-fixed">svg 要素を背景として表示する方法 (position: fixed)&lt;/h2>
+&lt;center>
+ &lt;iframe width="260" height="80" src="demo.html" style="resize: both; overflow: auto;">&lt;/iframe>
+ &lt;div>デモ1（&lt;a href="../../p/fmxdrcp/demo.html">別ページで開く&lt;/a>）&lt;/div>
+&lt;/center>
+&lt;p>この例では、&lt;code>svg&lt;/code> 要素を &lt;strong>&lt;code>position: fixed&lt;/code>&lt;/strong> スタイルを用いて、画面全体に固定表示しています。
+通常、&lt;code>position: fixed&lt;/code> スタイルは、ウェブサイトのヘッダーを画面上部に固定する用途などで使用されますが、これを &lt;code>svg&lt;/code> 要素に適用することで、背景画像のような効果を得ることができます。
+&lt;code>svg&lt;/code> 以外の要素は、まるで &lt;code>svg&lt;/code> 要素が存在しないかのようにレイアウトされます。
+&lt;code>position: fixed&lt;/code> スタイルが適用された &lt;code>svg&lt;/code> 要素は、デフォルトでは他の要素よりも前面に表示されてしまうため、これを背面に配置するために &lt;strong>&lt;code>z-index: -1&lt;/code>&lt;/strong> を指定しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">HTML&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">circle&lt;/span> &lt;span class="na">cx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;40&amp;#34;&lt;/span> &lt;span class="na">cy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;40&amp;#34;&lt;/span> &lt;span class="na">r&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;25&amp;#34;&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;royalblue&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">circle&lt;/span> &lt;span class="na">cx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;100&amp;#34;&lt;/span> &lt;span class="na">cy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;40&amp;#34;&lt;/span> &lt;span class="na">r&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;25&amp;#34;&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;indigo&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">circle&lt;/span> &lt;span class="na">cx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;160&amp;#34;&lt;/span> &lt;span class="na">cy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;40&amp;#34;&lt;/span> &lt;span class="na">r&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;25&amp;#34;&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;darkslateblue&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">circle&lt;/span> &lt;span class="na">cx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;220&amp;#34;&lt;/span> &lt;span class="na">cy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;40&amp;#34;&lt;/span> &lt;span class="na">r&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;25&amp;#34;&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;darkmagenta&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> この p 要素の後ろに、svg 要素がページ全体に表示されています。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">CSS&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-css" data-lang="css">&lt;span class="line">&lt;span class="cl">&lt;span class="o">*&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">margin&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">box-sizing&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">border-box&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">svg&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="k">position&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">fixed&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">top&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">left&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">width&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">100&lt;/span>&lt;span class="kt">vw&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">height&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">100&lt;/span>&lt;span class="kt">vh&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">background&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">midnightblue&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="k">z-index&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">-1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c">/* 他の要素より奥に表示 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ マウスイベントを透過させる&lt;/span>
+ &lt;span class="xNote_body">&lt;p>&lt;code>svg&lt;/code> 要素の上に重なった &lt;code>p&lt;/code> 要素上でのマウスイベントを &lt;code>svg&lt;/code> 要素に伝播するには、&lt;code>p&lt;/code> 要素に &lt;strong>&lt;code>pointer-events: none&lt;/code>&lt;/strong> を指定します。&lt;/p></description></item><item><title>SVG の marker 要素で矢印（マーカー）を描画する</title><link>https://maku.blog/p/hoiytvm/</link><pubDate>Mon, 25 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/hoiytvm/</guid><description>&lt;p>SVG の &lt;strong>&lt;code>marker&lt;/code>&lt;/strong> 要素を使うと、&lt;code>line&lt;/code> 要素などの線の先端に表示するマーカー形状を定義することができます。
+多くの場合、矢印を表す三角形を使いますが、丸や四角など、任意の形状のマーカーを定義できます。&lt;/p>
+&lt;h2 id="marker-による矢印描画の基本">marker による矢印描画の基本&lt;/h2>
+&lt;h3 id="実装例">実装例&lt;/h3>
+&lt;p>次の例では、&lt;code>line&lt;/code> 要素の先端に &lt;code>marker&lt;/code> で定義した三角形を割り当てています。
+マーカー形状を分かりやすくするために、半透明の赤色で表示しています（通常は &lt;code>line&lt;/code> の色と合わせます）。&lt;/p>
+&lt;center>
+&lt;svg width="480" height="140" viewBox="0 0 240 70"
+ xmlns="http://www.w3.org/2000/svg" style="border: thin solid gray">
+ &lt;defs>
+ &lt;marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5"
+ markerWidth="16" markerHeight="16" orient="auto-start-reverse">
+ &lt;path d="M0,0 L10,5 L0,10 Z" fill="red" opacity="0.5" />
+ &lt;/marker>
+ &lt;/defs>
+ &lt;line x1="20" y1="20" x2="100" y2="20" stroke="green" stroke-width="1"
+ marker-end="url(#arrow)" />
+ &lt;line x1="80" y1="50" x2="160" y2="20" stroke="red" stroke-width="1"
+ marker-start="url(#arrow)" marker-end="url(#arrow)" />
+ &lt;line x1="140" y1="50" x2="220" y2="50" stroke="blue" stroke-width="1"
+ marker-start="url(#arrow)" />
+&lt;/svg>
+&lt;div>図: marker 要素による矢印の描画&lt;/div>
+&lt;/center>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">svg のコード&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;480&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;140&amp;#34;&lt;/span> &lt;span class="na">viewBox&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0 0 240 70&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">xmlns&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;http://www.w3.org/2000/svg&amp;#34;&lt;/span> &lt;span class="na">style&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;border: thin solid gray&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c">&amp;lt;!-- marker で矢印の形を定義する --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">defs&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">marker&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;arrow&amp;#34;&lt;/span> &lt;span class="na">viewBox&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0 0 10 10&amp;#34;&lt;/span> &lt;span class="na">refX&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;5&amp;#34;&lt;/span> &lt;span class="na">refY&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;5&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">markerWidth&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;16&amp;#34;&lt;/span> &lt;span class="na">markerHeight&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;16&amp;#34;&lt;/span> &lt;span class="na">orient&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;auto-start-reverse&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">path&lt;/span> &lt;span class="na">d&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;M0,0 L10,5 L0,10 Z&amp;#34;&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;red&amp;#34;&lt;/span> &lt;span class="na">opacity&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0.5&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">marker&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">defs&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c">&amp;lt;!-- marker を割り当てる --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">line&lt;/span> &lt;span class="na">x1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20&amp;#34;&lt;/span> &lt;span class="na">y1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20&amp;#34;&lt;/span> &lt;span class="na">x2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;100&amp;#34;&lt;/span> &lt;span class="na">y2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;green&amp;#34;&lt;/span> &lt;span class="na">stroke-width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;1&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">marker-end&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;url(#arrow)&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">line&lt;/span> &lt;span class="na">x1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;80&amp;#34;&lt;/span> &lt;span class="na">y1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;50&amp;#34;&lt;/span> &lt;span class="na">x2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;160&amp;#34;&lt;/span> &lt;span class="na">y2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;red&amp;#34;&lt;/span> &lt;span class="na">stroke-width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;1&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">marker-start&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;url(#arrow)&amp;#34;&lt;/span> &lt;span class="na">marker-end&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;url(#arrow)&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">line&lt;/span> &lt;span class="na">x1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;140&amp;#34;&lt;/span> &lt;span class="na">y1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;50&amp;#34;&lt;/span> &lt;span class="na">x2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;220&amp;#34;&lt;/span> &lt;span class="na">y2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;50&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;blue&amp;#34;&lt;/span> &lt;span class="na">stroke-width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;1&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">marker-start&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;url(#arrow)&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="解説">解説&lt;/h3>
+&lt;h4 id="marker-で矢印の形を定義する">marker で矢印の形を定義する&lt;/h4>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">defs&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">marker&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;arrow&amp;#34;&lt;/span> &lt;span class="na">viewBox&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0 0 10 10&amp;#34;&lt;/span> &lt;span class="na">refX&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;5&amp;#34;&lt;/span> &lt;span class="na">refY&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;5&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">markerWidth&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;16&amp;#34;&lt;/span> &lt;span class="na">markerHeight&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;16&amp;#34;&lt;/span> &lt;span class="na">orient&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;auto-start-reverse&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">path&lt;/span> &lt;span class="na">d&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;M0,0 L10,5 L0,10 Z&amp;#34;&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;red&amp;#34;&lt;/span> &lt;span class="na">opacity&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0.5&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">marker&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">defs&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>marker&lt;/code> 要素は &lt;strong>&lt;code>defs&lt;/code>&lt;/strong> 要素の子要素として定義し、他の要素（&lt;code>line&lt;/code> など）から参照できるようにしておきます。
+それぞれの属性は次のような意味を持っています。&lt;/p></description></item><item><title>SVG の path 要素によるベジェ曲線の描画例（C/S/Q/T コマンド）</title><link>https://maku.blog/p/ka6xumg/</link><pubDate>Sat, 23 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ka6xumg/</guid><description>&lt;p>&lt;code>svg&lt;/code> の &lt;strong>&lt;code>path&lt;/code>&lt;/strong> 要素を使用すると、直線と曲線を組み合わせて多様な図形を描画できます。
+図形の形状は、&lt;code>path&lt;/code> 要素の &lt;strong>&lt;code>d&lt;/code>&lt;/strong> 属性に一連のコマンドを指定することで定義されます（参考: &lt;a href="../../p/kq6gwfn/#path">path 要素のチートシート&lt;/a>）。&lt;/p>
+&lt;p>しかし、ベジェ曲線の制御点をどのように指定すれば、どのような曲線が描かれるのかが直感的に理解しにくいことがあります。
+ここではさまざまな曲線の描画例を紹介します。&lt;/p>
+&lt;h2 id="c--s-コマンドによる-3-次ベジェ曲線">C / S コマンドによる 3 次ベジェ曲線&lt;/h2>
+&lt;p>&lt;strong>&lt;code>C&lt;/code> コマンド&lt;/strong> は、2 つの制御点と終点を指定することで、始点（現在座標）と終点を曲線で繋ぎます。
+&lt;code>path&lt;/code> の &lt;code>d&lt;/code> 属性の内容は、&lt;code>M始点 C制御点1 制御点2 終点&lt;/code> のような形で指定することになります。&lt;/p>
+&lt;table>
+&lt;tr>
+ &lt;td>
+ &lt;svg width="210" height="110" viewBox="-20 -20 210 110" style="border: 3px double gray;">
+ &lt;path d="M0,0 C5,70 95,70 100,0" stroke="black" stroke-width="2" fill="none"/>
+ &lt;g transform="translate(0 0)">
+ &lt;circle r="6" fill="blue" />
+ &lt;text x="10" y="5">(0, 0)&lt;/text>
+ &lt;/g>
+ &lt;g transform="translate(5 70)">
+ &lt;circle r="6" fill="red" />
+ &lt;text x="10" y="5">(5, 70)&lt;/text>
+ &lt;/g>
+ &lt;g transform="translate(95 70)">
+ &lt;circle r="6" fill="orange" />
+ &lt;text x="10" y="5">(95, 70)&lt;/text>
+ &lt;/g>
+ &lt;g transform="translate(100 0)">
+ &lt;circle r="6" fill="cyan" />
+ &lt;text x="10" y="5">(100, 0)&lt;/text>
+ &lt;/g>
+ &lt;/svg>
+ &lt;div>
+ &lt;svg width="17" height="14">&lt;circle cx="8" cy="8" r="6" fill="blue" />&lt;/svg>始点
+ &lt;svg width="17" height="14">&lt;circle cx="8" cy="8" r="6" fill="red" />&lt;/svg>制御点1&lt;br/>
+ &lt;svg width="17" height="14">&lt;circle cx="8" cy="8" r="6" fill="orange" />&lt;/svg>制御点2
+ &lt;svg width="17" height="14">&lt;circle cx="8" cy="8" r="6" fill="cyan" />&lt;/svg>終点
+ &lt;/div>
+ &lt;/td>
+ &lt;td>
+ &lt;code>&amp;lt;path d="M0,0 C5,70 95,70 100,0" stroke="black" stroke-width="2" fill="none" />&lt;/code>
+ &lt;/td>
+&lt;/tr>
+&lt;tr>
+ &lt;td>
+ &lt;svg width="210" height="240" viewBox="-20 -70 210 240" style="border: 3px double gray;">
+ &lt;path d="M0,50 C50,150 50,-50 100,50" stroke="black" stroke-width="2" fill="none"/>
+ &lt;g transform="translate(0 50)">
+ &lt;circle r="6" fill="blue" />
+ &lt;text x="10" y="5">(0, 50)&lt;/text>
+ &lt;/g>
+ &lt;g transform="translate(50 150)">
+ &lt;circle r="6" fill="red" />
+ &lt;text x="10" y="5">(50, 150)&lt;/text>
+ &lt;/g>
+ &lt;g transform="translate(50 -50)">
+ &lt;circle r="6" fill="orange" />
+ &lt;text x="10" y="5">(50, -50)&lt;/text>
+ &lt;/g>
+ &lt;g transform="translate(100 50)">
+ &lt;circle r="6" fill="cyan" />
+ &lt;text x="10" y="5">(100, 50)&lt;/text>
+ &lt;/g>
+ &lt;/svg>
+ &lt;div>
+ &lt;svg width="17" height="14">&lt;circle cx="8" cy="8" r="6" fill="blue" />&lt;/svg>始点
+ &lt;svg width="17" height="14">&lt;circle cx="8" cy="8" r="6" fill="red" />&lt;/svg>制御点1&lt;br/>
+ &lt;svg width="17" height="14">&lt;circle cx="8" cy="8" r="6" fill="orange" />&lt;/svg>制御点2
+ &lt;svg width="17" height="14">&lt;circle cx="8" cy="8" r="6" fill="cyan" />&lt;/svg>終点
+ &lt;/div>
+ &lt;/td>
+ &lt;td>
+ &lt;code>&amp;lt;path d="M0,50 C50,150 50,-50 100,50" stroke="black" stroke-width="2" fill="none"/>&lt;/code>
+ &lt;/td>
+&lt;/tr>
+&lt;/table>
+&lt;p>&lt;code>C&lt;/code> コマンドによる 3 次ベジェ曲線に続けて次の曲線を描く場合、&lt;strong>&lt;code>S&lt;/code> コマンド&lt;/strong> を使用すると 1 つ目の制御点を省略してなめらかに繋ぐことができます。
+この場合、先行する曲線の 2 つ目の制御点の反対側に 1 つ目の制御点を指定したのと同様に振る舞います。
+&lt;code>S&lt;/code> コマンドの引数としては、2 つの座標値を &lt;code>S制御点2 終点&lt;/code> の形で渡します（&lt;code>C&lt;/code> コマンドと異なり、制御点 1 の座標値を省略します）。&lt;/p></description></item><item><title>SVG の viewBox の使い方とレスポンシブ対応</title><link>https://maku.blog/p/563uibg/</link><pubDate>Fri, 22 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/563uibg/</guid><description>&lt;h2 id="svg-要素の-viewbox-属性について">svg 要素の viewBox 属性について&lt;/h2>
+&lt;p>&lt;code>svg&lt;/code> 要素内の各描画要素に設定する座標値のデフォルト単位はピクセル (&lt;code>px&lt;/code>) ですが、上位の &lt;code>svg&lt;/code> 要素に &lt;strong>&lt;code>viewBox&lt;/code>&lt;/strong> 属性が設定されている場合は、その論理的な座標系（&lt;strong>ユーザー座標系&lt;/strong>）の座標値を指定することになります。
+例えば、次のように &lt;code>viewBox&lt;/code> を設定すると、画面上での &lt;code>svg&lt;/code> 要素の表示サイズは 800px x 600px となりますが、&lt;code>svg&lt;/code> 要素内に配置する各描画要素 (&lt;code>rect&lt;/code> など）は、40x30 という仮想的なサイズの中で座標指定することになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">viewBox の指定&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;800&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;600&amp;#34;&lt;/span> &lt;span class="na">viewBox&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0 0 40 30&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>viewBox&lt;/code> 属性を指定してある場合は、&lt;code>width&lt;/code> 属性と &lt;code>height&lt;/code> 属性の一方を省略して記述できるようになります。
+その場合は、&lt;code>viewBox&lt;/code> のアスペクト比を考慮した &lt;code>width&lt;/code> あるいは &lt;code>height&lt;/code> が自動的に設定されます。
+よって、上記の &lt;code>svg&lt;/code> タグは次のように省略して記述することが可能です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">height の省略&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;800&amp;#34;&lt;/span> &lt;span class="na">viewBox&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0 0 40 30&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>下記の例では 1 つの &lt;code>rect&lt;/code> 要素を配置していますが、これは &lt;code>svg&lt;/code> 要素の左上 4 分の 1 を占める矩形を描画します。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;200&amp;#34;&lt;/span> &lt;span class="na">viewBox&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0 0 40 20&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">rect&lt;/span> &lt;span class="na">x&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0&amp;#34;&lt;/span> &lt;span class="na">y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;10&amp;#34;&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;steelblue&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;center>
+ &lt;svg width="200" viewBox="0 0 40 20" style="border: thin solid gray">
+ &lt;rect x="0" y="0" width="20" height="10" fill="steelblue" />
+ &lt;/svg>
+ &lt;div>表示例&lt;/div>
+&lt;/center>
+&lt;h2 id="svg-要素のレスポンシブ対応">svg 要素のレスポンシブ対応&lt;/h2>
+&lt;p>&lt;code>svg&lt;/code> 要素も &lt;code>img&lt;/code> 要素と同様に、CSS で &lt;strong>&lt;code>max-width: 100%;&lt;/code>&lt;/strong> と指定しておけば、横幅が足りなくなった場合に縮小して表示することができます。&lt;/p></description></item><item><title>SVG の g 要素の使い方</title><link>https://maku.blog/p/rx9hdei/</link><pubDate>Thu, 21 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rx9hdei/</guid><description>&lt;p>SVG の &lt;strong>&lt;code>g&lt;/code>&lt;/strong> 要素は、子要素をグループ化して操作を行うための要素です。
+ここでは、&lt;code>g&lt;/code> 要素をどのような用途で利用できるのかをまとめておきます。&lt;/p>
+&lt;h2 id="子要素に共通のスタイル色太さなどをセットする">子要素に共通のスタイル（色、太さなど）をセットする&lt;/h2>
+&lt;center>
+&lt;svg width="195" height="60" style="border: thin solid gray;">
+ &lt;g fill="#cef" stroke="blue" stroke-width="1.5">
+ &lt;rect x="15" y="15" width="30" height="30" />
+ &lt;circle cx="75" cy="30" r="15" />
+ &lt;/g>
+ &lt;g fill="#ffc" stroke="darkorange" stroke-width="1.5">
+ &lt;rect x="105" y="15" width="30" height="30" />
+ &lt;circle cx="165" cy="30" r="15" />
+ &lt;/g>
+&lt;/svg>
+&lt;/center>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;195&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;60&amp;#34;&lt;/span> &lt;span class="na">style&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;border: solid 1px gray;&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">g&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;#cef&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;blue&amp;#34;&lt;/span> &lt;span class="na">stroke-width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;1.5&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">rect&lt;/span> &lt;span class="na">x&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;15&amp;#34;&lt;/span> &lt;span class="na">y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;15&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">circle&lt;/span> &lt;span class="na">cx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;75&amp;#34;&lt;/span> &lt;span class="na">cy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="na">r&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;15&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">g&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">g&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;#ffc&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;darkorange&amp;#34;&lt;/span> &lt;span class="na">stroke-width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;1.5&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">rect&lt;/span> &lt;span class="na">x&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;105&amp;#34;&lt;/span> &lt;span class="na">y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;15&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">circle&lt;/span> &lt;span class="na">cx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;165&amp;#34;&lt;/span> &lt;span class="na">cy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="na">r&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;15&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">g&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>この例では、2 つの &lt;code>g&lt;/code> 要素の下に、&lt;code>rect&lt;/code> と &lt;code>circle&lt;/code> を 1 つずつ配置しています。
+それらの塗りつぶし色 (&lt;code>fill&lt;/code>) や枠線の色 (&lt;code>stroke&lt;/code>) は、親の &lt;code>g&lt;/code> 要素にセットしたものが使用されます。&lt;/p>
+&lt;p>多数の描画要素に同じスタイルを割り当てたいときは、&lt;code>g&lt;/code> 要素でまとめてスタイル設定すると効率がよいです。&lt;/p>
+&lt;h2 id="子要素の座標をまとめて移動する-transform">子要素の座標をまとめて移動する (transform)&lt;/h2>
+&lt;center>
+&lt;svg width="180" height="60" style="border: thin solid gray;">
+ &lt;g transform="translate(50 30)">
+ &lt;circle cx="0" cy="0" r="10" fill="red" />
+ &lt;text x="15" y="2" dominant-baseline="middle"
+ font-size="20" font-weight="800" fill="blue">
+ Hello!
+ &lt;/text>
+ &lt;/g>
+&lt;/svg>
+&lt;/center>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;180&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;60&amp;#34;&lt;/span> &lt;span class="na">style&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;border: thin solid gray;&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">g&lt;/span> &lt;span class="na">transform&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;translate(50 30)&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">circle&lt;/span> &lt;span class="na">cx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0&amp;#34;&lt;/span> &lt;span class="na">cy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;0&amp;#34;&lt;/span> &lt;span class="na">r&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;10&amp;#34;&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;red&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">text&lt;/span> &lt;span class="na">x&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;15&amp;#34;&lt;/span> &lt;span class="na">y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;2&amp;#34;&lt;/span> &lt;span class="na">dominant-baseline&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;middle&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">font-size&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20&amp;#34;&lt;/span> &lt;span class="na">font-weight&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;800&amp;#34;&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;blue&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Hello!
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">text&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">g&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>g&lt;/code> 要素の下に配置した子要素は、&lt;code>g&lt;/code> 要素の &lt;a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform">&lt;strong>&lt;code>transform&lt;/code>&lt;/strong>&lt;/a> 属性を使ってまとめて移動させることができます。
+上記のサンプルコードでは、&lt;code>transform&lt;/code> 属性の値として &lt;code>translate(50, 30)&lt;/code> を指定しており、&lt;code>g&lt;/code> 要素でグルーピングされたすべての子要素が x 軸方向へ 50、y 軸方向へ 30 だけ平行移動しています。
+&lt;code>g&lt;/code> 要素をどこに配置するかは &lt;code>transform&lt;/code> 属性で制御できるので、&lt;code>g&lt;/code> 要素でグルーピングされた部分は、自分の座標系だけを意識したコンポーネントのように記述できます。&lt;/p></description></item><item><title>SVG チートシート</title><link>https://maku.blog/p/kq6gwfn/</link><pubDate>Sat, 09 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/kq6gwfn/</guid><description>&lt;style>
+ svg { box-sizing: content-box; }
+&lt;/style>
+&lt;p>&lt;code>svg&lt;/code> 要素内に配置できる描画要素のまとめです。
+座標値のデフォルトの単位はピクセル (&lt;code>px&lt;/code>) ですが、&lt;code>svg&lt;/code> 要素に &lt;a href="../../p/563uibg/">&lt;code>viewBox&lt;/code>&lt;/a> が設定されている場合は &lt;code>viewBox&lt;/code> 内の座標系で座標値を指定します。&lt;/p>
+&lt;h2 id="text-要素テキスト">text 要素（テキスト）&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">text 要素の例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">text&lt;/span> &lt;span class="na">x&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20&amp;#34;&lt;/span> &lt;span class="na">y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;55&amp;#34;&lt;/span> &lt;span class="na">font-size&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20&amp;#34;&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;red&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 表示するテキスト
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">text&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;center>
+ &lt;svg width="200" height="100" style="border: 3px double gray">
+ &lt;text x="20" y="55" font-size="20" fill="red">
+ 表示するテキスト
+ &lt;/text>
+ &lt;/svg>
+&lt;/center>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>属性&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;th>設定例&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>x&lt;/code>&lt;/td>
+ &lt;td>テキストアンカーポイントの X 座標&lt;/td>
+ &lt;td>&lt;code>100&lt;/code>, &lt;code>50%&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>y&lt;/code>&lt;/td>
+ &lt;td>テキストアンカーポイントの Y 座標&lt;/td>
+ &lt;td>&lt;code>100&lt;/code>, &lt;code>50%&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-anchor">&lt;code>text-anchor&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>水平方向のアンカーポイント&lt;/td>
+ &lt;td>* &lt;code>start&lt;/code> &amp;hellip; テキスト先頭（ltr 言語なら左端）&lt;br>* &lt;code>middle&lt;/code> &amp;hellip; 中央&lt;br/>* &lt;code>end&lt;/code> &amp;hellip; テキスト末尾（ltr 言語なら右端）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline">&lt;code>dominant-baseline&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>垂直方向のベースライン&lt;/td>
+ &lt;td>* &lt;code>auto&lt;/code> &amp;hellip; 通常は下端&lt;br/>* &lt;code>middle&lt;/code> &amp;hellip; 中央&lt;br/>* &lt;code>hanging&lt;/code> &amp;hellip; 通常は上端&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>font-size&lt;/code>&lt;/td>
+ &lt;td>フォントサイズ&lt;/td>
+ &lt;td>&lt;code>30&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>font-weight&lt;/code>&lt;/td>
+ &lt;td>文字の太さ&lt;/td>
+ &lt;td>&lt;code>600&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>fill&lt;/code>&lt;/td>
+ &lt;td>テキスト内部の色&lt;/td>
+ &lt;td>&lt;code>red&lt;/code>, &lt;code style="white-space:nowrap">rgb(255, 0, 0)&lt;/code>,&lt;code style="white-space:nowrap">rgba(255, 0, 0, 0.7)&lt;/code> &lt;code>#ff0033&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>fill-opacity&lt;/code>&lt;/td>
+ &lt;td>テキスト内部の色の透明度。&lt;code>fill&lt;/code> 属性で &lt;code>rgba&lt;/code> を使って透明度を指定することも可能。&lt;/td>
+ &lt;td>&lt;code>0&lt;/code>（完全透過）〜 &lt;code>1.0&lt;/code>（非透過）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke&lt;/code>&lt;/td>
+ &lt;td>テキスト周囲の線の色&lt;/td>
+ &lt;td>&lt;code>red&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke-width&lt;/code>&lt;/td>
+ &lt;td>テキスト周囲の線の太さ&lt;/td>
+ &lt;td>&lt;code>2&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke-opacity&lt;/code>&lt;/td>
+ &lt;td>テキスト周囲の線の透明度。&lt;code>stroke&lt;/code> 属性で &lt;code>rgba&lt;/code> を使って透明度を指定することも可能。&lt;/td>
+ &lt;td>&lt;code>0&lt;/code>（完全透過）〜 &lt;code>1.0&lt;/code>（非透過）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-decoration">&lt;code>text-decoration&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>テキストの装飾&lt;/td>
+ &lt;td>* &lt;code>none&lt;/code> &amp;hellip; デフォルト&lt;br/>* &lt;code>underline&lt;/code> &amp;hellip; 下線&lt;br/>* &lt;code>line-through&lt;/code> &amp;hellip; 取消線&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>opacity&lt;/code>&lt;/td>
+ &lt;td>要素全体の透明度&lt;/td>
+ &lt;td>&lt;code>0&lt;/code>（完全透過）〜 &lt;code>1.0&lt;/code>（非透過）&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h3 id="text-要素のメモ">text 要素のメモ&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>viewBox&lt;/code> 内で水平方向に中央寄せする &amp;hellip; &lt;code>x=&amp;quot;50%&amp;quot; text-anchor=&amp;quot;middle&amp;quot;&lt;/code>&lt;/li>
+&lt;li>&lt;code>viewBox&lt;/code> 内で垂直方向に中央寄せする &amp;hellip; &lt;code>y=&amp;quot;50%&amp;quot; dominant-baseline=&amp;quot;middle&amp;quot;&lt;/code>&lt;/li>
+&lt;li>部分テキストの装飾 &amp;hellip; &lt;code>text&lt;/code> 要素の子要素として &lt;a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/tspan">&lt;code>tspan&lt;/code>&lt;/a> を配置すると、部分テキストごとにスタイルや位置を設定できます。&lt;/li>
+&lt;/ul>
+&lt;h2 id="line-要素直線">line 要素（直線）&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">line 要素の例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">line&lt;/span> &lt;span class="na">x1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="na">y1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20&amp;#34;&lt;/span> &lt;span class="na">x2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;170&amp;#34;&lt;/span> &lt;span class="na">y2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;red&amp;#34;&lt;/span> &lt;span class="na">stroke-width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;10&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">line&lt;/span> &lt;span class="na">x1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="na">y1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;40&amp;#34;&lt;/span> &lt;span class="na">x2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;170&amp;#34;&lt;/span> &lt;span class="na">y2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;40&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;red&amp;#34;&lt;/span> &lt;span class="na">stroke-width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;10&amp;#34;&lt;/span> &lt;span class="na">stroke-linecap&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;square&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">line&lt;/span> &lt;span class="na">x1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="na">y1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;60&amp;#34;&lt;/span> &lt;span class="na">x2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;170&amp;#34;&lt;/span> &lt;span class="na">y2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;60&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;red&amp;#34;&lt;/span> &lt;span class="na">stroke-width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;10&amp;#34;&lt;/span> &lt;span class="na">stroke-linecap&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;round&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">line&lt;/span> &lt;span class="na">x1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="na">y1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;80&amp;#34;&lt;/span> &lt;span class="na">x2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;170&amp;#34;&lt;/span> &lt;span class="na">y2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;80&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;blue&amp;#34;&lt;/span> &lt;span class="na">stroke-width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;3&amp;#34;&lt;/span> &lt;span class="na">stroke-dasharray&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;5,5&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">line&lt;/span> &lt;span class="na">x1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="na">y1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;100&amp;#34;&lt;/span> &lt;span class="na">x2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;170&amp;#34;&lt;/span> &lt;span class="na">y2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;100&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;blue&amp;#34;&lt;/span> &lt;span class="na">stroke-width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;3&amp;#34;&lt;/span> &lt;span class="na">stroke-dasharray&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;5,10,5&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;center>
+ &lt;svg width="200" height="120" style="border: 3px double gray">
+ &lt;line x1="30" y1="20" x2="170" y2="20" stroke="red" stroke-width="10" />
+ &lt;line x1="30" y1="40" x2="170" y2="40" stroke="red" stroke-width="10" stroke-linecap="square" />
+ &lt;line x1="30" y1="60" x2="170" y2="60" stroke="red" stroke-width="10" stroke-linecap="round" />
+ &lt;line x1="30" y1="80" x2="170" y2="80" stroke="blue" stroke-width="3" stroke-dasharray="5,5" />
+ &lt;line x1="30" y1="100" x2="170" y2="100" stroke="blue" stroke-width="3" stroke-dasharray="5,10,5" />
+ &lt;/svg>
+&lt;/center>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>属性&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;th>設定例&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>x1&lt;/code>&lt;/td>
+ &lt;td>線の始点 X 座標&lt;/td>
+ &lt;td>&lt;code>30&lt;/code>, &lt;code>10%&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>y1&lt;/code>&lt;/td>
+ &lt;td>線の始点 Y 座標&lt;/td>
+ &lt;td>&lt;code>70&lt;/code>, &lt;code>20%&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>x2&lt;/code>&lt;/td>
+ &lt;td>線の終点 X 座標&lt;/td>
+ &lt;td>&lt;code>170&lt;/code>, &lt;code>100%&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>y2&lt;/code>&lt;/td>
+ &lt;td>線の終点 Y 座標&lt;/td>
+ &lt;td>&lt;code>30&lt;/code>, &lt;code>60%&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke&lt;/code>&lt;/td>
+ &lt;td>線の色&lt;/td>
+ &lt;td>&lt;code>red&lt;/code>, &lt;code>rgba(255, 255, 0, 0.5)&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke-width&lt;/code>&lt;/td>
+ &lt;td>線の太さ&lt;/td>
+ &lt;td>&lt;code>3&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke-linecap&lt;/code>&lt;/td>
+ &lt;td>両端の形&lt;/td>
+ &lt;td>* &lt;code>butt&lt;/code> &amp;hellip; デフォルト&lt;br/>* &lt;code>square&lt;/code> &amp;hellip; 四角（&lt;code>stroke-width&lt;/code> の半分だけ長くなる）&lt;br/>* &lt;code>round&lt;/code> &amp;hellip; 丸&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke-dasharray&lt;/code>&lt;/td>
+ &lt;td>破線にする&lt;/td>
+ &lt;td>* &lt;code>5,5&lt;/code> &amp;hellip; 5 の線、5 の空白を繰り返す&lt;br/>* &lt;code>5,10,5&lt;/code> &amp;hellip; 5 の線、10 の空白、5 の線、5 の空白、10 の線、5 の空白を繰り返す&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke-opacity&lt;/code>&lt;/td>
+ &lt;td>線の透明度（&lt;code>line&lt;/code> 要素の場合 &lt;code>opacity&lt;/code> と同じ？）&lt;/td>
+ &lt;td>&lt;code>0&lt;/code>（完全透過）〜 &lt;code>1.0&lt;/code>（非透過）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>opacity&lt;/code>&lt;/td>
+ &lt;td>要素全体の透明度&lt;/td>
+ &lt;td>&lt;code>0&lt;/code>（完全透過）〜 &lt;code>1.0&lt;/code>（非透過）&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="rect-要素矩形">rect 要素（矩形）&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">rect 要素の例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">rect&lt;/span> &lt;span class="na">x&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;40&amp;#34;&lt;/span> &lt;span class="na">y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;100&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;50&amp;#34;&lt;/span> &lt;span class="na">rx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;10&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;cyan&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;blue&amp;#34;&lt;/span> &lt;span class="na">stroke-width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;4&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;center>
+ &lt;svg width="200" height="100" style="border: 3px double gray">
+ &lt;rect x="40" y="20" width="100" height="50" rx="10"
+ fill="cyan" stroke="blue" stroke-width="4" />
+ &lt;/svg>
+&lt;/center>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>属性&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;th>設定例&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>x&lt;/code>&lt;/td>
+ &lt;td>矩形左上の X 座標&lt;/td>
+ &lt;td>&lt;code>100&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>y&lt;/code>&lt;/td>
+ &lt;td>矩形左上の Y 座標&lt;/td>
+ &lt;td>&lt;code>200&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>width&lt;/code>&lt;/td>
+ &lt;td>矩形の幅&lt;/td>
+ &lt;td>&lt;code>100&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>height&lt;/code>&lt;/td>
+ &lt;td>矩形の高さ&lt;/td>
+ &lt;td>&lt;code>200&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>fill&lt;/code>&lt;/td>
+ &lt;td>塗りつぶし色。塗りつぶしを行わない場合、&lt;code>none&lt;/code> あるいは &lt;code>transparent&lt;/code> を指定できます。&lt;code>none&lt;/code> の場合は場合はそこに何も存在しないかのように扱われます。&lt;code>mouseover&lt;/code> などのイベントをハンドルする場合は、&lt;code>transparent&lt;/code> の方を指定する必要があります。&lt;/td>
+ &lt;td>&lt;code>none&lt;/code>, &lt;code>transparent&lt;/code>, &lt;code>green&lt;/code>, &lt;code style="white-space:nowrap">rgb(0, 255, 0)&lt;/code>, &lt;code>#00ff00&lt;/code>, &lt;code>#0f0&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>fill-opacity&lt;/code>&lt;/td>
+ &lt;td>塗りつぶしの透明度。&lt;code>fill&lt;/code> 属性で &lt;code>rgba&lt;/code> を使って透過度を指定することも可能。&lt;/td>
+ &lt;td>&lt;code>0&lt;/code>（完全透過）〜 &lt;code>1.0&lt;/code>（非透過）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke&lt;/code>&lt;/td>
+ &lt;td>枠線の色&lt;/td>
+ &lt;td>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke-width&lt;/code>&lt;/td>
+ &lt;td>枠線の太さ。デフォルトは &lt;code>1&lt;/code>。&lt;code>0&lt;/code> が設定されると見えなくなります。&lt;/td>
+ &lt;td>&lt;code>1&lt;/code>, &lt;code>1.5&lt;/code>, &lt;code>2&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke-opacity&lt;/code>&lt;/td>
+ &lt;td>線の透明度。&lt;code>stroke&lt;/code> 属性で &lt;code>rgba&lt;/code> を使って透明度を指定することも可能。線の半分の領域は塗りつぶし色の上に重なることに注意。&lt;/td>
+ &lt;td>&lt;code>0&lt;/code>（完全透過）〜 &lt;code>1.0&lt;/code>（非透過）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>rx&lt;/code>&lt;/td>
+ &lt;td>角を丸くするときの半径（水平方向）。省略した場合は &lt;code>ry&lt;/code> と同じ値が使われます。通常は &lt;code>rx&lt;/code> だけ指定すれば OK です。&lt;/td>
+ &lt;td>&lt;code>5&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ry&lt;/code>&lt;/td>
+ &lt;td>角を丸くするときの半径（垂直方向）。省略した場合は &lt;code>rx&lt;/code> と同じ値が使われます。通常は &lt;code>rx&lt;/code> だけ指定すれば OK です。&lt;/td>
+ &lt;td>&lt;code>5&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>opacity&lt;/code>&lt;/td>
+ &lt;td>要素全体の透明度&lt;/td>
+ &lt;td>&lt;code>0&lt;/code>（完全透過）〜 &lt;code>1.0&lt;/code>（非透過）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>cursor&lt;/code>&lt;/td>
+ &lt;td>マウスカーソルの形状&lt;/td>
+ &lt;td>&lt;code>default&lt;/code>, &lt;code>pointer&lt;/code>, &lt;code>grab&lt;/code>, &lt;code>grabbing&lt;/code>, &amp;hellip;&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="circle-要素円">circle 要素（円）&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">circle 要素の例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">circle&lt;/span> &lt;span class="na">cx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;80&amp;#34;&lt;/span> &lt;span class="na">cy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;50&amp;#34;&lt;/span> &lt;span class="na">r&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;lightgreen&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;green&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;center>
+ &lt;svg width="200" height="100" style="border: 3px double gray">
+ &lt;circle cx="80" cy="50" r="30" fill="lightgreen" stroke="green" />
+ &lt;/svg>
+&lt;/center>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>属性&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>cx&lt;/code>&lt;/td>
+ &lt;td>円の中央の X 座標&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>cy&lt;/code>&lt;/td>
+ &lt;td>円の中央の Y 座標&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>r&lt;/code>&lt;/td>
+ &lt;td>円の半径&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>fill&lt;/code>&lt;/td>
+ &lt;td>円の塗りつぶし色&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke&lt;/code>&lt;/td>
+ &lt;td>円周の線の色&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke-width&lt;/code>&lt;/td>
+ &lt;td>円周の線の太さ&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="ellipse-要素楕円">ellipse 要素（楕円）&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ellipse 要素の例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">ellipse&lt;/span> &lt;span class="na">cx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;100&amp;#34;&lt;/span> &lt;span class="na">cy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;50&amp;#34;&lt;/span> &lt;span class="na">rx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;50&amp;#34;&lt;/span> &lt;span class="na">ry&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;15&amp;#34;&lt;/span> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;yellow&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;orange&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;center>
+ &lt;svg width="200" height="100" style="border: 3px double gray">
+ &lt;ellipse cx="100" cy="50" rx="50" ry="15" fill="yellow" stroke="orange" />
+ &lt;/svg>
+&lt;/center>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>属性&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>cx&lt;/code>&lt;/td>
+ &lt;td>楕円の中央の X 座標&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>cy&lt;/code>&lt;/td>
+ &lt;td>楕円の中央の Y 座標&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>rx&lt;/code>&lt;/td>
+ &lt;td>楕円の水平方向の半径&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ry&lt;/code>&lt;/td>
+ &lt;td>楕円の垂直方向の半径&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>fill&lt;/code>&lt;/td>
+ &lt;td>塗りつぶし色&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke&lt;/code>&lt;/td>
+ &lt;td>円周の線の色&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke-width&lt;/code>&lt;/td>
+ &lt;td>円周の線の太さ&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="polyline">plyline 要素（連続線）&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">polyline 要素の例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">polyline&lt;/span> &lt;span class="na">points&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20,10 40,60 60,40 80,90&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;aqua&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">polyline&lt;/span> &lt;span class="na">points&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;90,10 110,60 130,40 150,90&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;none&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;blue&amp;#34;&lt;/span> &lt;span class="na">stroke-width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;2&amp;#34;&lt;/span> &lt;span class="na">stroke-linecap&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;round&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">polyline&lt;/span> &lt;span class="na">points&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;160,10 180,60 200,40 220,90&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">fill&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;aqua&amp;#34;&lt;/span> &lt;span class="na">stroke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;blue&amp;#34;&lt;/span> &lt;span class="na">stroke-width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;2&amp;#34;&lt;/span> &lt;span class="na">stroke-linecap&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;round&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;center>
+ &lt;svg width="240" height="100" style="border: 3px double gray">
+ &lt;polyline points="20,10 40,60 60,40 80,90"
+ fill="aqua" />
+ &lt;polyline points="90,10 110,60 130,40 150,90"
+ fill="none" stroke="blue" stroke-width="2" stroke-linecap="round" />
+ &lt;polyline points="160,10 180,60 200,40 220,90"
+ fill="aqua" stroke="blue" stroke-width="2" stroke-linecap="round" />
+ &lt;/svg>
+&lt;/center>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>属性&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;th>設定例&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>points&lt;/code>&lt;/td>
+ &lt;td>点のリスト。&lt;code>x,y&lt;/code> のペアをスペース区切りで並べます&lt;/td>
+ &lt;td>&lt;code style="white-space:nowrap">10,10 80,60 25,15&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>fill&lt;/code>&lt;/td>
+ &lt;td>塗りつぶし色。始点と終点を結ぶラインと、他のラインで囲まれる領域が塗りつぶされます。線だけを引きたい場合は、明示的に &lt;code>none&lt;/code> を指定する必要があります&lt;/td>
+ &lt;td>&lt;code>red&lt;/code>, &lt;code>none&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke&lt;/code>&lt;/td>
+ &lt;td>線の色&lt;/td>
+ &lt;td>&lt;code>black&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke-width&lt;/code>&lt;/td>
+ &lt;td>線の太さ&lt;/td>
+ &lt;td>&lt;code>4&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke-linecap&lt;/code>&lt;/td>
+ &lt;td>両端の形&lt;/td>
+ &lt;td>* &lt;code>butt&lt;/code> &amp;hellip; デフォルト&lt;br/>* &lt;code>square&lt;/code> &amp;hellip; 四角&lt;br/>* &lt;code>round&lt;/code> &amp;hellip; 丸&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>stroke-linejoin&lt;/code>&lt;/td>
+ &lt;td>線の接続部の形&lt;/td>
+ &lt;td>* &lt;code>miter&lt;/code> &amp;hellip; デフォルト&lt;br/>* &lt;code>bevel&lt;/code> &amp;hellip; 斜めに削る&lt;br/>* &lt;code>round&lt;/code> &amp;hellip; 丸&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;p>始点と終点を自動的に接続するには、&lt;code>polyline&lt;/code> の代わりに &lt;a href="#polygon">&lt;code>polygon&lt;/code>&lt;/a> 要素を使用します。&lt;/p></description></item></channel></rss>

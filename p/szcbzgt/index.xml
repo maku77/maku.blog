@@ -1,4 +1,86 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS のトラブルシューティング on まくろぐ</title><link>https://maku.blog/p/szcbzgt/</link><description>Recent content in AWS のトラブルシューティング on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 26 Apr 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/szcbzgt/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS CLI でアクセスできるのに AWS SDK で Access Denied (403) になるとき</title><link>https://maku.blog/p/7tds7bw/</link><pubDate>Mon, 26 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7tds7bw/</guid><description>認証情報の食い違いを調べる 例えば、ローカルで AWS CLI を使って S3 の情報にアクセスできているのに、AWS SDK 使った Node.js プログラムで S3 にアクセスしたときに Access Denied (403) になるときは、異なる認証情報 (credentials) を使ってアクセスしている可能性 があります。
-AWS CLI が、どのようなユーザーでアクセスしているかは、下記のようにして確認できます。
-$ aws sts get-caller-identity Account: &amp;#39;123456789012&amp;#39; Arn: arn:aws:sts::123456789012:assumed-role/MyDeveloperRole/botocore-session-9876543210 UserId: A6B3EVWX58AR9AVTXAP5T:botocore-session-9876543210 次に、Node.js のプログラムなどで、AWS SDK を使って上記と同様の情報を取得します。 Node.js 用の SDK ver.2 では、AWS.STS.getCallerIdentity()、SDK ver.3 では STSClient.send() を使います。
-参考: AWS.STS.getCallerIdentity() - AWS SDK v2 参考: GetCallerIdentityCommand() - AWS SDK v3 printCallerIdentity.ts（SDK ver.2 の場合） import { STS } from &amp;#39;aws-sdk&amp;#39;; async function printCallerIdentity() { try { const sts = new STS(); const result = await sts.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS のトラブルシューティング on まくろぐ</title><link>https://maku.blog/p/szcbzgt/</link><description>Recent content in AWS のトラブルシューティング on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 26 Apr 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/szcbzgt/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS CLI でアクセスできるのに AWS SDK で Access Denied (403) になるとき</title><link>https://maku.blog/p/7tds7bw/</link><pubDate>Mon, 26 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7tds7bw/</guid><description>&lt;h2 id="認証情報の食い違いを調べる">認証情報の食い違いを調べる&lt;/h2>
+&lt;p>例えば、ローカルで AWS CLI を使って S3 の情報にアクセスできているのに、AWS SDK 使った Node.js プログラムで S3 にアクセスしたときに Access Denied (403) になるときは、&lt;strong>異なる認証情報 (credentials) を使ってアクセスしている可能性&lt;/strong> があります。&lt;/p>
+&lt;p>AWS CLI が、どのようなユーザーでアクセスしているかは、下記のようにして確認できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws sts get-caller-identity
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Account: &amp;#39;123456789012&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Arn: arn:aws:sts::123456789012:assumed-role/MyDeveloperRole/botocore-session-9876543210
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">UserId: A6B3EVWX58AR9AVTXAP5T:botocore-session-9876543210&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次に、Node.js のプログラムなどで、AWS SDK を使って上記と同様の情報を取得します。
+Node.js 用の SDK ver.2 では、&lt;code>AWS.STS.getCallerIdentity()&lt;/code>、SDK ver.3 では &lt;code>STSClient.send()&lt;/code> を使います。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/STS.html#getCallerIdentity-property">AWS.STS.getCallerIdentity() - AWS SDK v2&lt;/a>&lt;/li>
+&lt;li>参考: &lt;a href="https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-sts/classes/getcalleridentitycommand.html">GetCallerIdentityCommand() - AWS SDK v3&lt;/a>&lt;/li>
+&lt;/ul>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">printCallerIdentity.ts（SDK ver.2 の場合）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">STS&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;aws-sdk&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">async&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">printCallerIdentity() {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">try&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">sts&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">STS&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">sts&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getCallerIdentity&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="nx">promise&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">result&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">catch&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">printCallerIdentity&lt;/span>&lt;span class="p">();&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-296543178" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-296543178">SDK ver.3 の場合&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">STSClient&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">GetCallerIdentityCommand&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">GetCallerIdentityCommandInput&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">GetCallerIdentityCommandOutput&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s2">&amp;#34;@aws-sdk/client-sts&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">async&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">printCallerIdentity() {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">client&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">STSClient&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">region&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;ap-northeast-1&amp;#34;&lt;/span> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">input&lt;/span>: &lt;span class="kt">GetCallerIdentityCommandInput&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">command&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">GetCallerIdentityCommand&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">input&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">try&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">output&lt;/span>: &lt;span class="kt">GetCallerIdentityCommandOutput&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">client&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">send&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">command&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">output&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">catch&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">printCallerIdentity&lt;/span>&lt;span class="p">();&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行結果&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ ts-node printCallerIdentity.ts
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">{
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ResponseMetadata: { RequestId: &amp;#39;2ce10620-9158-4e5e-8bca-8258bfd02927&amp;#39; },
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> UserId: &amp;#39;MWUCVBID75KAC5PB68LSP&amp;#39;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Account: &amp;#39;777888999000&amp;#39;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Arn: &amp;#39;arn:aws:iam::777888999000:user/your-user-name&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記の結果と &lt;code>aws sts get-caller-identity&lt;/code> の結果を比べると、別のユーザー (credential) でアクセスしていることが分かります。
+つまり、AWS SDK 対して、正しく認証情報 (credentails) を設定してやれば問題は解決するはずです。&lt;/p></description></item></channel></rss>

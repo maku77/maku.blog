@@ -1,60 +1,614 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Electron 関連記事 on まくろぐ</title><link>https://maku.blog/p/zkw9ju6/</link><description>Recent content in Electron 関連記事 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 03 Aug 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/zkw9ju6/index.xml" rel="self" type="application/rss+xml"/><item><title>Electron で Hello World (1) 最小構成で作る</title><link>https://maku.blog/p/ter4eq2/</link><pubDate>Mon, 08 Jun 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ter4eq2/</guid><description>Electron とは Electron | Build cross-platform desktop apps with JavaScript, HTML, and CSS.
-Electron は GitHub が開発した、デスクトップアプリを開発するためのプラットフォームで、2020 年現在も活発な開発が続けられています。 Node.js や HTML5 技術を利用しており、 様々な OS (Windows, macOS, Linux) で動作するデスクトップアプリ を作成することができます。
-フロントエンド（UI 表示部分）に Chromium (HTML/CSS) を使用し、バックエンド（OSとの連携部分）に Node.js を使用するという構成になっています。 Electron で作成されている有名なアプリケーションに Visual Studio Code や Slack などがあります。 これらのアプリケーションの完成度を見れば、大規模なアプリケーション開発にも使用できるプラットフォームだということが分かります。
-Node.js さえ入っていれば、簡単にデスクトップアプリの開発を始められる ので、下記の Hello World だけでも試してみてください。
-Electron で Hello World アプリを作成する package.json の作成 Electron アプリは Node.js アプリとして作成するので、プロジェクトのルートディレクトリに package.json を作成します。 npm init コマンドなどでベースとなる package.json ファイルをサクッと生成し、
-$ npm init -y 次のような内容を含むように修正します。</description></item><item><title>Electron で Hello World (2) TypeScript で開発できるようにする</title><link>https://maku.blog/p/78whxix/</link><pubDate>Sun, 28 Jun 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/78whxix/</guid><description>概要 前回の記事（Electron で Hello World (1) 最小構成で作る）では、プレーンな JavaScript を使用して簡単な Electron アプリを作成しましたが、本格的な開発を始めるときは TypeScript の環境を導入しておいた方がよいでしょう。
-ここでは、上記のプレーンな JavaScript による Hello World ができているとして、TypeScript の環境を追加でセットアップします。 次のように、src ディレクトリ内に .ts ファイルを作成し、トランスパイルされた .js ファイルを build ディレクトリに出力するように設定することにします。
-myapp/ +-- build/ # トランスパイル後の .js ファイルを格納 +-- src/ # .ts ファイルを格納 +-- public/ # そのままパッケージングするもの | +-- index.html +-- package.json # Node.js 用設定ファイル +-- tsconfig.json # TypeScript 用設定ファイル ビルド設定 TypeScript をインストールします。
-$ npm install typescript --save-dev Node.js ライブラリ用の型宣言ファイル (node.d.ts) をインストールします。
-$ npm install @types/node --save-dev ☝️ ワンポイント Electron の型定義については、Electron パッケージにデフォルトで含まれているので、型定義ファイルを別途インストールする必要はありません。 TypeScript の設定ファイル (tsconfig.</description></item><item><title>Electron で Hello World (3) React を使えるようにする</title><link>https://maku.blog/p/6pybmv6/</link><pubDate>Fri, 03 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6pybmv6/</guid><description>概要 ここでは、Electron アプリの開発に React を導入する手順を示します。 React を導入すると、HTML をフラットな形でゴリゴリ記述していくのではなく、独自コンポーネント（例: &amp;lt;MyButton&amp;gt; コンポーネント）を定義して、まとまりのある単位でコンテンツを構築していくことができます。
-下記の手順により、Electron + TypeScript による開発環境が構築できていることを前提とします。
-Electron で Hello World (1) 最小構成で作る Electron で Hello World (2) TypeScript で開発できるようにする この記事の手順が完了すると、Electron + TypeScript + React による開発環境が整います。 一応 webpack などのバンドルツールを使わなくても開発を始められるので、Electron と React の開発環境としての相性はよさそうです。
-React のセットアップ React モジュールのインストール React モジュールおよび、TypeScript 用の型定義ファイルをインストールします。
-$ npm install --save react react-dom $ npm install --save-dev @types/react @types/react-dom package.json の内容は次のような感じになります。
-package.json { &amp;#34;name&amp;#34;: &amp;#34;myapp&amp;#34;, &amp;#34;version&amp;#34;: &amp;#34;0.0.1&amp;#34;, &amp;#34;main&amp;#34;: &amp;#34;build/main.js&amp;#34;, &amp;#34;scripts&amp;#34;: { &amp;#34;build&amp;#34;: &amp;#34;tsc&amp;#34;, &amp;#34;start&amp;#34;: &amp;#34;tsc &amp;amp;&amp;amp; electron .</description></item><item><title>プロキシ環境から Electron をインストールできない場合の対処方法</title><link>https://maku.blog/p/t7gqxyf/</link><pubDate>Wed, 24 Jun 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t7gqxyf/</guid><description>問題 プロキシ環境下で、Electron (9.0.5) をインストールしようとしたら、まぁいろいろとエラーになってハマりました。 どうも、node install.js の実行がうまくいっていないようです。
-D:\sandbox&amp;gt; npm install electron --save-dev &amp;gt; core-js@3.6.5 postinstall D:\sandbox\node_modules\core-js &amp;gt; node -e &amp;#34;try{require(&amp;#39;./postinstall&amp;#39;)}catch(e){}&amp;#34; &amp;gt; electron@9.0.5 postinstall D:\sandbox\node_modules\electron &amp;gt; node install.js RequestError: read ECONNRESET at ClientRequest.&amp;lt;anonymous&amp;gt; (D:\sandbox\node_modules\got\source\request-as-event-emitter.js:178:14) at Object.onceWrapper (events.js:422:26) at ClientRequest.emit (events.js:327:22) at ClientRequest.origin.emit (D:\sandbox\node_modules\@szmarczak\http-timer\source\index.js:37:11) at TLSSocket.socketErrorListener (_http_client.js:467:9) ... ECONNRESET ってことはプロキシの設定かなぁと思ったけど、プロキシは npm config set proxy ... でちゃんとセットしているし、なんだろう。。。
-解決方法 と調べていたら、下記の Electron のチュートリアルに書いてありました。
-Installation - Proxies | Electron If you need to use an HTTP proxy, you need to set the ELECTRON_GET_USE_PROXY variable to any value, plus additional environment variables depending on your host system&amp;rsquo;s Node version.</description></item><item><title>Electron アプリで OS のプロキシ設定をメインプロセスに反映する</title><link>https://maku.blog/p/t7ekrx4/</link><pubDate>Mon, 03 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t7ekrx4/</guid><description>Electron アプリは「メインプロセス」と「レンダラープロセス」の 2 種類を扱わないといけないので、プロキシの設定でハマりがちです。 ここでは、システム (OS) のプロキシ設定を、自動的に両プロセスに反映する方法を説明します。 この仕組みを入れておけば、ユーザーにわざわざプロキシの設定をしてもらわなくて済むようになります。
-レンダラープロセスの HTTP 通信 レンダラープロセス側は、Chromium の仕組みで システムのプロキシ設定が自動的に反映される ようになっています。 例えば、Web ブラウザ上の JavaScript で使用する XMLHttpRequest 関数や fetch 関数による HTTP 通信は、自動的にプロキシ経由で実行されます。 この振る舞いで問題なければ、特に設定を行う必要はありません。
-BrowserWindow で扱うプロキシを明示的に指定するには、session オブジェクトの setProxy メソッド を使用します。
-メインプロセスの HTTP 通信 Electron のメインプロセスはいわゆる Node.js アプリケーションと同様の仕組みで動作するので、Web ブラウザ側のプロキシ設定が自動的に反映されるようなことはありません。 しかし、electron モジュールが提供する session オブジェクトには、Chromium 側のプロキシ設定を参照する機能が備わっています。 この情報を利用すれば、メインプロセス側のプロキシ設定も自動的に行うことができます。
-下記の autoProxy() 関数をメインプロセス起動直後に呼び出しておけば、メインプロセス側で実行する HTTP 通信に対してシステムのプロキシ設定が反映されます。
-import {app, session} from &amp;#39;electron&amp;#39;; import {bootstrap} from &amp;#39;global-agent&amp;#39;; /** * システムのプロキシ設定情報をメインプロセスの HTTP 通信に反映します。 */ export function autoProxy() { app.</description></item><item><title>Electron で設定情報を扱う (electron-store)</title><link>https://maku.blog/p/ev6env5/</link><pubDate>Mon, 03 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ev6env5/</guid><description>electron-store パッケージ を使用すると、Electron アプリ用の設定を簡単にローカルファイルとして保存できます。
-electron-store のインストール $ npm install --save electron-store electron-store パッケージには TypeScript 用の型定義も含まれているため、別途型定義ファイルをインストールする必要はありません。
-electron-store の使い方 簡単な使い方 electron-store モジュールは、キー＆バリューの形で設定値を保存する簡単な API (get/set) を提供しています。 下記の例では、color というキーで色情報を取得・保存しています。
-main.ts import ElectronStore from &amp;#39;electron-store&amp;#39;; const store = new ElectronStore(); // 設定情報を取得する（第2パラメーターはデフォルト値） const color = store.get(&amp;#39;color&amp;#39;, &amp;#39;unknown&amp;#39;); console.log(color); // 設定情報の保存する store.set(&amp;#39;color&amp;#39;, &amp;#39;blue&amp;#39;); 1度目の実行では、設定情報が保存されていないので、get メソッドは第2引数で指定した unknown を返します。 2度目の実行では、前回保存した blue という値を取得できます。
-設定値の型を定義する TypeScript を使っている場合は、get() で取得した値を特定の型の変数で受け取ることになると思います。 ElectronStore はジェネリクスクラスとして定義されており、各設定キーの型をあらかじめ指定しておくことができます。 次の例では、color 設定を文字列型として宣言しています。
-import ElectronStore from &amp;#39;electron-store&amp;#39;; type StoreType = { color: string; } const store = new ElectronStore&amp;lt;StoreType&amp;gt;(); const color: string = store.</description></item><item><title>Electron アプリがパッケージングされた環境 (production) で動作しているか調べる</title><link>https://maku.blog/p/5ku5dmt/</link><pubDate>Sun, 02 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5ku5dmt/</guid><description>Electron の app モジュールの isPackaged プロパティ を参照すると、アプリが electron-builder などでパッケージングされた状態で動作しているかどうかを調べることができます。 一般的に、app.isPackaged が true となる場合、production モードで動作していると考えられます。
-次の例では、アプリが開発中の場合のみ Chromium の DevTools を開くようにしています。
-// const win = new BrowserWindow(this.options); // 開発中のみ起動時に DevTools を開く if (!app.isPackaged) { win.webContents.openDevTools() }</description></item><item><title>Electron アプリ内のリンクをOSのデフォルトブラウザで開く</title><link>https://maku.blog/p/7yhwcr7/</link><pubDate>Sat, 25 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7yhwcr7/</guid><description>BrowserWindow 内で表示した HTML のリンクをクリックすると、デフォルトではそのウィンドウ内でリンク先のページへ遷移します。 リンククリック時に発生する will-navigate イベント と new-window イベント をハンドルすることで、OS のデフォルトブラウザでリンクを開くことができます。 リンククリック時には通常 will-navigate イベントが発生するのですが、&amp;lt;a target=&amp;quot;_blank&amp;quot; href=&amp;quot;...&amp;quot;&amp;gt; のように別ウィンドウで開くようなリンクをクリックした場合は new-window イベントが発生するので、両方のイベントをハンドルする必要があります。
-// リンククリック時に OS のデフォルトブラウザで開く const handleUrlOpen = (event: Event, url: string) =&amp;gt; { event.preventDefault(); shell.openExternal(url); }; // リンククリック時のイベントハンドラを登録 win.webContents.on(&amp;#39;will-navigate&amp;#39;, handleUrlOpen); win.webContents.on(&amp;#39;new-window&amp;#39;, handleUrlOpen); 下記はメインプロセス全体のコードです。
-main.ts import { app, BrowserWindow, shell } from &amp;#39;electron&amp;#39;; class MainWindow { private options: Electron.BrowserWindowConstructorOptions = { width: 800, height: 400, webPreferences: { nodeIntegration: true } } // リンククリック時に OS のデフォルトブラウザで開く private handleUrlOpen = (event: Event, url: string) =&amp;gt; { event.</description></item><item><title>Electron のメインプロセスとレンダラープロセスの関係</title><link>https://maku.blog/p/mkisgqb/</link><pubDate>Thu, 02 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mkisgqb/</guid><description>メインプロセスとレンダラープロセス Electron アプリを作成するときは、メインプロセスとレンダラープロセスを意識して使い分ける必要があります。
-レンダラープロセス側で呼び出し可能な Electron モジュール（他の Node モジュールも含む）は制限されていて、実行できる JavaScript ライブラリは、Web ブラウザ上で実行可能な JavaScript に毛が生えたものくらいものと考えておくのがよいです。
-ipcRenderer モジュールは例外的にレンダラープロセスから使ってもよいとされているモジュールのひとつで、これ経由でメインプロセスに対して要求（メッセージ）を送ることができます。 逆にメインプロセスからのメッセージをハンドルすることもできます。
-通知先のレンダラープロセスの指定 メインプロセスに対して、レンダラープロセスは複数存在することがあるので、メインプロセスからメッセージを送るときは、どのレンダラープロセスへのメッセージなのかを意識する必要があります。
-レンダラープロセスからのメッセージに応答する レンダラープロセスからのイベントを ipcMain.on() でハンドルする場合、コールバック関数の第1パラメータとして渡される event: Electron.IpcMainEvent オブジェクトから送信元のレンダラープロセス (sender: Electron.WebContents) を参照することができます。
-下記のメインプロセスは、my-add イベントとしてレンダラープロセスから 2 つの数値を受け取り、IpcMainEvent.reply() を使って送信元のレンダラープロセスに応答メッセージ（数値を足した結果）を返しています。
-main.ts（メインプロセス） // レンダラープロセスからメッセージを受信して、応答メッセージを返す ipcMain.on(&amp;#39;my-add&amp;#39;, (evt: Electron.IpcMainEvent, num1: number, num2: number) =&amp;gt; { evt.reply(&amp;#39;my-add-reply&amp;#39;, num1 + num2); //evt.sender.send(&amp;#39;my-add-reply&amp;#39;, num1 + num2); }); レンダラープロセス側では、ipcRenderer.send() でメインプロセスにメッセージを送り、その応答を ipcRenderer.on() でハンドルするように実装します。
-renderer.ts（レンダラープロセス） import { ipcRenderer } from &amp;#39;electron&amp;#39;; // メインプロセスへメッセージを送信 ipcRenderer.send(&amp;#39;my-add&amp;#39;, 100, 200); // メインプロセスからメッセージを受信 ipcRenderer.</description></item><item><title>Electron アプリの配布パッケージを作る (electron-builder)</title><link>https://maku.blog/p/2tcs8n2/</link><pubDate>Wed, 01 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2tcs8n2/</guid><description>概要 electron-builder を使用すると、Electron アプリを Windows、macOS、Linux 用の配布用バイナリとしてパッケージングすることができます。 各 OS 用のインストーラはもちろん、ポータブルな zip パッケージを作成することもできます。
-electron-builder 公式サイトのドメイン名が electron.build っていうのがかっこいいですね。
-electron-builder のインストール Node.js のパッケージ管理ツールとして、npm よりも yarn を使うことが strongly recommended されているので、まず yarn をインストールしてから yarn で electron-builder をインストールすることにします。
-$ npm install -g yarn $ yarn add electron-builder --dev 下記のように実行して、ヘルプを表示できればインストール完了です。
-$ npx electron-builder --help ビルド設定 electron-builder 用の設定は、package.json の build プロパティで行うことができます。 ポイントは、files の指定で、パッケージングする html ファイルや js ファイル、画像ファイルなどをすべてカバーするように指定しておく必要があります。
-package.json { &amp;#34;name&amp;#34;: &amp;#34;myapp&amp;#34;, &amp;#34;version&amp;#34;: &amp;#34;0.0.1&amp;#34;, &amp;#34;main&amp;#34;: &amp;#34;build/main.js&amp;#34;, &amp;#34;scripts&amp;#34;: { &amp;#34;start&amp;#34;: &amp;#34;tsc &amp;amp;&amp;amp; electron .</description></item><item><title>Electron の app.getData() で取得できる特殊ディレクトリパスの一覧</title><link>https://maku.blog/p/77sas8m/</link><pubDate>Wed, 01 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/77sas8m/</guid><description>app.getPath について electron モジュールの app.getPath(name) 関数を使用すると、OS 固有の特殊フォルダパスを取得することができます。 例えば、getPath('userData') とすると、ユーザーの設定ファイルなどを格納するディレクトリを取得することができます。
-下記は、いろんな特殊フォルダのパスを取得するテストコードです。
-import { app } from &amp;#39;electron&amp;#39;; export function showSpecialDirs() { console.log(`app.getAppPath() = ${app.getAppPath()}`); console.log(&amp;#39;\n==== Application data&amp;#39;); console.log(`app.getPath(&amp;#39;home&amp;#39;) = ${app.getPath(&amp;#39;home&amp;#39;)}`); console.log(`app.getPath(&amp;#39;temp&amp;#39;) = ${app.getPath(&amp;#39;temp&amp;#39;)}`); console.log(`app.getPath(&amp;#39;appData&amp;#39;) = ${app.getPath(&amp;#39;appData&amp;#39;)}`); console.log(`app.getPath(&amp;#39;cache&amp;#39;) = ${app.getPath(&amp;#39;cache&amp;#39;)}`); console.log(`app.getPath(&amp;#39;userData&amp;#39;) = ${app.getPath(&amp;#39;userData&amp;#39;)}`); console.log(`app.getPath(&amp;#39;logs&amp;#39;) = ${app.getPath(&amp;#39;logs&amp;#39;)}`); console.log(`app.getPath(&amp;#39;crashDumps&amp;#39;) = ${app.getPath(&amp;#39;crashDumps&amp;#39;)}`); console.log(&amp;#39;\n==== OS multimedia&amp;#39;) console.log(`app.getPath(&amp;#39;desktop&amp;#39;) = ${app.getPath(&amp;#39;desktop&amp;#39;)}`); console.log(`app.getPath(&amp;#39;documents&amp;#39;) = ${app.getPath(&amp;#39;documents&amp;#39;)}`); console.log(`app.getPath(&amp;#39;downloads&amp;#39;) = ${app.getPath(&amp;#39;downloads&amp;#39;)}`); console.log(`app.getPath(&amp;#39;music&amp;#39;) = ${app.getPath(&amp;#39;music&amp;#39;)}`); console.log(`app.getPath(&amp;#39;pictures&amp;#39;) = ${app.getPath(&amp;#39;pictures&amp;#39;)}`); console.log(`app.getPath(&amp;#39;videos&amp;#39;) = ${app.getPath(&amp;#39;videos&amp;#39;)}`); console.log(&amp;#39;\n==== Executables&amp;#39;) console.</description></item><item><title>Electron: レンダラーからの要求でメインプロセスでファイルを読み込んで返す</title><link>https://maku.blog/p/aq2airz/</link><pubDate>Mon, 29 Jun 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/aq2airz/</guid><description>Electron アプリのメインプロセスで使用できる ipcMain.handle を使うと、レンダラーから呼び出せる関数のようなものを定義できます。 正確には、特定の名前のチャネル (channel) へのメッセージをハンドルするコールバック関数を設定します。 次の例では、メインプロセスで read-textfile メッセージを受診したときに、指定されたファイルを読み込んでその内容を返すように実装しています。
-main.js（メインプロセス） import { app, ipcMain, BrowserWindow } from &amp;#39;electron&amp;#39;; import * as fs from &amp;#39;fs&amp;#39;; // ... // 指定されたテキストファイルを読みこんで、その内容を返します。 ipcMain.handle(&amp;#39;read-textfile&amp;#39;, async (event, filename) =&amp;gt; { const buf = await fs.promises.readFile(filename); return buf.toString(); }); 一方、レンダラー側では ipcRenderer.invoke を使って、あたかも関数呼び出しのようにメインプロセス側の処理を呼び出すことができます。 次の例では、画面上のボタンを押した時にメインプロセスに read-textfile メッセージを送り、その戻り値を表示しています。
-renderer.js import { ipcRenderer } from &amp;#39;electron&amp;#39;; const btn = document.querySelector(&amp;#39;#btn&amp;#39;)!; const output = document.querySelector(&amp;#39;#output&amp;#39;)!; btn.addEventListener(&amp;#39;click&amp;#39;, () =&amp;gt; { ipcRenderer.invoke(&amp;#39;read-textfile&amp;#39;, &amp;#39;./hoge.txt&amp;#39;) .</description></item><item><title>Electron: 処理が終わるまでボタンを無効状態 (disabled) にする</title><link>https://maku.blog/p/xkxbnza/</link><pubDate>Mon, 29 Jun 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xkxbnza/</guid><description>button 要素の disabled プロパティ JavaScript で button 要素の disabled プロパティを true に設定すると、ボタンを無効状態 (disabled) にすることができます。 TypeScript を使っている場合は、document.querySelector() の戻り値を HTMLButtonElement にキャストすることで disabled プロパティを参照できるようになります。
-button 要素を disabled にする const btn = document.querySelector(&amp;#39;#btn&amp;#39;) as HTMLButtonElement; btn.disabled = true; ボタンを押したときに重い処理（データ取得など）を実行する場合、処理中にボタンを無効化することで、ユーザーによるボタンの連打を防ぐことができます。
-より実践的なサンプル 下記は Electron アプリの実装サンプル（レンダラープロセスの抜粋）です。 ボタンを押したときにボタンを無効化すると同時に Web からデータ取得します。 そして、データ取得が完了するか、エラーが発生したときにボタンを有効化します。
-ここでは、HTTP GET リクエストを送るために superagent モジュールを使用しています。
-superagent のインストール $ npm install --save superagent $ npm install --save @types/superagent renderer.ts import * as superagent from &amp;#39;superagent&amp;#39;; const btn = document.</description></item><item><title>Electron で各種ダイアログを表示する (dialog)</title><link>https://maku.blog/p/ihwanyc/</link><pubDate>Mon, 29 Jun 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ihwanyc/</guid><description>electron モジュールが提供する dialog を使用すると、いろいろなダイアログを表示することができます。 ダイアログの表示は、メインプロセスからしか行えません。
-参考: Electron Documentation - dialog エラーボックス (showErrorBox) 一番簡単に使えそうなエラーボックスから。 ダイアログのタイトルと、メッセージの内容を指定するだけで表示できます。
-dialog.showErrorBox(title, content) import { dialog } from &amp;#39;electron&amp;#39;; dialog.showErrorBox(&amp;#39;File Not Found&amp;#39;,&amp;#39;指定されたファイルが見つかりませんでした。&amp;#39;); このエラーボックスが表示されている間は、他の全てのウィンドウが操作できなくなるようです（つまり、モーダルダイアログとして振る舞います）。
-ドキュメントによると、この dialog.showErrorBox は、「app モジュールが ready イベントを emit する前に呼び出すことができる」とされています。 つまり、アプリケーションの起動時に行うエラーチェックなどで使用できるということです（メインウィンドウ表示前に設定ファイルの内容が正しいか調べたり）。
-レンダラープロセス側では alert() を使っちゃうことが多いかもしれません。
-メッセージボックス (showMessageBox, showMessageBoxSync) メッセージボックスを表示するには、次のような関数を使用します。
-dialog.showMessageBox(options) dialog.showMessageBox(browserWindow, options) dialog.showMessageBoxSync(options) dialog.showMessageBoxSync(browserWindow, options) 表示内容を options パラメータでいろいろ制御できます（下記に例を示します）。
-メッセージボックスが表示されている間は、基本的には他のウィンドウを操作できなくなります。 browserWindow パラメーターで、親ウィンドウとなる BrowserWindow インスタンスを指定すると、その親ウィンドウのモーダレスダイアログとなり、その親ウィンドウだけ操作できなくなります。
-☝️ ワンポイント showMessageBoxSync() にも親ウィンドウを指定するバージョンがありますが、この関数を呼び出すと結局他のウィンドウも操作できなくなります。 いまいち使いどころが分かりませんが、親ウィンドウを指定することで、親ウィンドウの表示位置に近いところにダイアログが表示されるという効果は得られます。 例: OK ボタンだけあるダイアログ const options: Electron.MessageBoxOptions = { type: &amp;#39;info&amp;#39;, // none/info/error/quetion/warning title: &amp;#39;タイトル&amp;#39;, message: &amp;#39;メッセージ&amp;#39;, detail: &amp;#39;説明文&amp;#39; }; dialog.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Electron 関連記事 on まくろぐ</title><link>https://maku.blog/p/zkw9ju6/</link><description>Recent content in Electron 関連記事 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 03 Aug 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/zkw9ju6/index.xml" rel="self" type="application/rss+xml"/><item><title>Electron で Hello World (1) 最小構成で作る</title><link>https://maku.blog/p/ter4eq2/</link><pubDate>Mon, 08 Jun 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ter4eq2/</guid><description>&lt;h2 id="electron-とは">Electron とは&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="256" height="auto" src="../../p/ter4eq2/electron-logo.svg" alt="/p/ter4eq2/electron-logo.svg" />
+&lt;/figure>
+
+&lt;p>&lt;a href="https://www.electronjs.org/">Electron | Build cross-platform desktop apps with JavaScript, HTML, and CSS.&lt;/a>&lt;/p>
+&lt;p>Electron は GitHub が開発した、デスクトップアプリを開発するためのプラットフォームで、2020 年現在も活発な開発が続けられています。
+Node.js や HTML5 技術を利用しており、 &lt;strong>様々な OS (Windows, macOS, Linux) で動作するデスクトップアプリ&lt;/strong> を作成することができます。&lt;/p>
+&lt;p>フロントエンド（UI 表示部分）に Chromium (HTML/CSS) を使用し、バックエンド（OSとの連携部分）に Node.js を使用するという構成になっています。
+Electron で作成されている有名なアプリケーションに Visual Studio Code や Slack などがあります。
+これらのアプリケーションの完成度を見れば、大規模なアプリケーション開発にも使用できるプラットフォームだということが分かります。&lt;/p>
+&lt;p>&lt;strong>Node.js さえ入っていれば、簡単にデスクトップアプリの開発を始められる&lt;/strong> ので、下記の Hello World だけでも試してみてください。&lt;/p>
+&lt;h2 id="electron-で-hello-world-アプリを作成する">Electron で Hello World アプリを作成する&lt;/h2>
+&lt;h3 id="packagejson-の作成">package.json の作成&lt;/h3>
+&lt;p>Electron アプリは Node.js アプリとして作成するので、プロジェクトのルートディレクトリに &lt;strong>&lt;code>package.json&lt;/code>&lt;/strong> を作成します。
+&lt;strong>&lt;code>npm init&lt;/code>&lt;/strong> コマンドなどでベースとなる &lt;code>package.json&lt;/code> ファイルをサクッと生成し、&lt;/p></description></item><item><title>Electron で Hello World (2) TypeScript で開発できるようにする</title><link>https://maku.blog/p/78whxix/</link><pubDate>Sun, 28 Jun 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/78whxix/</guid><description>&lt;h2 id="概要">概要&lt;/h2>
+&lt;p>前回の記事（&lt;a href="../../p/ter4eq2">Electron で Hello World (1) 最小構成で作る&lt;/a>）では、プレーンな JavaScript を使用して簡単な Electron アプリを作成しましたが、本格的な開発を始めるときは TypeScript の環境を導入しておいた方がよいでしょう。&lt;/p>
+&lt;p>ここでは、上記のプレーンな JavaScript による Hello World ができているとして、TypeScript の環境を追加でセットアップします。
+次のように、&lt;code>src&lt;/code> ディレクトリ内に &lt;code>.ts&lt;/code> ファイルを作成し、トランスパイルされた &lt;code>.js&lt;/code> ファイルを &lt;code>build&lt;/code> ディレクトリに出力するように設定することにします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">myapp/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- build/ # トランスパイル後の .js ファイルを格納
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- src/ # .ts ファイルを格納
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- public/ # そのままパッケージングするもの
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> | +-- index.html
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- package.json # Node.js 用設定ファイル
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- tsconfig.json # TypeScript 用設定ファイル&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="ビルド設定">ビルド設定&lt;/h2>
+&lt;p>TypeScript をインストールします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install typescript --save-dev&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Node.js ライブラリ用の型宣言ファイル (&lt;code>node.d.ts&lt;/code>) をインストールします。&lt;/p></description></item><item><title>Electron で Hello World (3) React を使えるようにする</title><link>https://maku.blog/p/6pybmv6/</link><pubDate>Fri, 03 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6pybmv6/</guid><description>&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="500" height="200" src="../../p/6pybmv6/img-001_hu8334620658328692556.png" alt="/p/6pybmv6/img-001.png" />
+&lt;/figure>
+
+&lt;h2 id="概要">概要&lt;/h2>
+&lt;p>ここでは、Electron アプリの開発に React を導入する手順を示します。
+React を導入すると、HTML をフラットな形でゴリゴリ記述していくのではなく、独自コンポーネント（例: &lt;code>&amp;lt;MyButton&amp;gt;&lt;/code> コンポーネント）を定義して、まとまりのある単位でコンテンツを構築していくことができます。&lt;/p>
+&lt;p>下記の手順により、Electron + TypeScript による開発環境が構築できていることを前提とします。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/ter4eq2">Electron で Hello World (1) 最小構成で作る&lt;/a>&lt;/li>
+&lt;li>&lt;a href="../../p/78whxix">Electron で Hello World (2) TypeScript で開発できるようにする&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>この記事の手順が完了すると、Electron + TypeScript + React による開発環境が整います。
+一応 webpack などのバンドルツールを使わなくても開発を始められるので、Electron と React の開発環境としての相性はよさそうです。&lt;/p>
+&lt;h2 id="react-のセットアップ">React のセットアップ&lt;/h2>
+&lt;h3 id="react-モジュールのインストール">React モジュールのインストール&lt;/h3>
+&lt;p>React モジュールおよび、TypeScript 用の型定義ファイルをインストールします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install --save react react-dom
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install --save-dev @types/react @types/react-dom&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>package.json&lt;/code> の内容は次のような感じになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">package.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;myapp&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;0.0.1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;main&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;build/main.js&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;scripts&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;tsc&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;start&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;tsc &amp;amp;&amp;amp; electron .&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;devDependencies&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;@types/node&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^14.0.14&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;@types/react&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^16.9.41&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;@types/react-dom&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^16.9.8&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;electron&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^9.0.5&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;typescript&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^3.9.6&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;dependencies&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;react&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^16.13.1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;react-dom&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^16.13.1&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="jsx-コードの有効化">JSX コードの有効化&lt;/h3>
+&lt;p>TypeScript の設定ファイル (&lt;code>tsconfig.json&lt;/code>) を編集し、 &lt;strong>&lt;code>.tsx&lt;/code>&lt;/strong> ファイル内に記述した JSX コードを認識できるようにします。
+JSX コードはトランスパイルによって、通常の JavaScript コードに変換されます。&lt;/p></description></item><item><title>プロキシ環境から Electron をインストールできない場合の対処方法</title><link>https://maku.blog/p/t7gqxyf/</link><pubDate>Wed, 24 Jun 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t7gqxyf/</guid><description>&lt;h2 id="問題">問題&lt;/h2>
+&lt;p>プロキシ環境下で、Electron (9.0.5) をインストールしようとしたら、まぁいろいろとエラーになってハマりました。
+どうも、&lt;code>node install.js&lt;/code> の実行がうまくいっていないようです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">D:\sandbox&amp;gt; npm install electron --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;gt; core-js@3.6.5 postinstall D:\sandbox\node_modules\core-js
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;gt; node -e &amp;#34;try{require(&amp;#39;./postinstall&amp;#39;)}catch(e){}&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;gt; electron@9.0.5 postinstall D:\sandbox\node_modules\electron
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;gt; node install.js
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">RequestError: read ECONNRESET
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> at ClientRequest.&amp;lt;anonymous&amp;gt; (D:\sandbox\node_modules\got\source\request-as-event-emitter.js:178:14)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> at Object.onceWrapper (events.js:422:26)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> at ClientRequest.emit (events.js:327:22)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> at ClientRequest.origin.emit (D:\sandbox\node_modules\@szmarczak\http-timer\source\index.js:37:11)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> at TLSSocket.socketErrorListener (_http_client.js:467:9)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ...&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>ECONNRESET&lt;/code> ってことはプロキシの設定かなぁと思ったけど、プロキシは &lt;code>npm config set proxy ...&lt;/code> でちゃんとセットしているし、なんだろう。。。&lt;/p>
+&lt;h2 id="解決方法">解決方法&lt;/h2>
+&lt;p>と調べていたら、下記の Electron のチュートリアルに書いてありました。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://www.electronjs.org/docs/tutorial/installation#proxies">Installation - Proxies | Electron&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>If you need to use an HTTP proxy, you need to set the ELECTRON_GET_USE_PROXY variable to any value, plus additional environment variables depending on your host system&amp;rsquo;s Node version.&lt;/p></description></item><item><title>Electron アプリで OS のプロキシ設定をメインプロセスに反映する</title><link>https://maku.blog/p/t7ekrx4/</link><pubDate>Mon, 03 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t7ekrx4/</guid><description>&lt;p>Electron アプリは「メインプロセス」と「レンダラープロセス」の 2 種類を扱わないといけないので、プロキシの設定でハマりがちです。
+ここでは、システム (OS) のプロキシ設定を、自動的に両プロセスに反映する方法を説明します。
+この仕組みを入れておけば、ユーザーにわざわざプロキシの設定をしてもらわなくて済むようになります。&lt;/p>
+&lt;h2 id="レンダラープロセスの-http-通信">レンダラープロセスの HTTP 通信&lt;/h2>
+&lt;p>レンダラープロセス側は、Chromium の仕組みで &lt;strong>システムのプロキシ設定が自動的に反映される&lt;/strong> ようになっています。
+例えば、Web ブラウザ上の JavaScript で使用する &lt;code>XMLHttpRequest&lt;/code> 関数や &lt;code>fetch&lt;/code> 関数による HTTP 通信は、自動的にプロキシ経由で実行されます。
+この振る舞いで問題なければ、特に設定を行う必要はありません。&lt;/p>
+&lt;p>&lt;code>BrowserWindow&lt;/code> で扱うプロキシを明示的に指定するには、&lt;a href="https://www.electronjs.org/docs/api/session#sessetproxyconfig">session オブジェクトの setProxy メソッド&lt;/a> を使用します。&lt;/p>
+&lt;h2 id="メインプロセスの-http-通信">メインプロセスの HTTP 通信&lt;/h2>
+&lt;p>Electron のメインプロセスはいわゆる Node.js アプリケーションと同様の仕組みで動作するので、Web ブラウザ側のプロキシ設定が自動的に反映されるようなことはありません。
+しかし、&lt;code>electron&lt;/code> モジュールが提供する &lt;code>session&lt;/code> オブジェクトには、Chromium 側のプロキシ設定を参照する機能が備わっています。
+この情報を利用すれば、メインプロセス側のプロキシ設定も自動的に行うことができます。&lt;/p>
+&lt;p>下記の &lt;code>autoProxy()&lt;/code> 関数をメインプロセス起動直後に呼び出しておけば、メインプロセス側で実行する HTTP 通信に対してシステムのプロキシ設定が反映されます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-autoProxy.ts" data-lang="autoProxy.ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">session&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;electron&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">bootstrap&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;global-agent&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * システムのプロキシ設定情報をメインプロセスの HTTP 通信に反映します。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">autoProxy() {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">once&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;ready&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// このアドレスは有名どころであれば何でもよい
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">TARGET&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;https://www.google.com&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">session&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">defaultSession&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">resolveProxy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">TARGET&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">then&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">info&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// システムにプロキシが設定されていない場合はなにもしない
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">info&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;DIRECT&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// &amp;#39;PROXY proxy.example.com:8080&amp;#39; のような文字列から URL 部分を抽出
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">url&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">info&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">replace&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sr">/^PROXY /&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">setGlobalAgent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">url&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">function&lt;/span> &lt;span class="nx">setGlobalAgent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">proxy&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">//console.log(`Proxy settings detected: ${proxy}`);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="nx">proxy&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">startsWith&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;http&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">proxy&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;http://&amp;#39;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">proxy&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// デフォルトの HTTP 通信をプロキシ経由にする
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">process&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">env&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">GLOBAL_AGENT_HTTP_PROXY&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">proxy&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">bootstrap&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>処理の流れは次の通りです。&lt;/p></description></item><item><title>Electron で設定情報を扱う (electron-store)</title><link>https://maku.blog/p/ev6env5/</link><pubDate>Mon, 03 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ev6env5/</guid><description>&lt;p>&lt;a href="https://github.com/sindresorhus/electron-store">electron-store パッケージ&lt;/a> を使用すると、Electron アプリ用の設定を簡単にローカルファイルとして保存できます。&lt;/p>
+&lt;h2 id="electron-store-のインストール">electron-store のインストール&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install --save electron-store&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>electron-store&lt;/code> パッケージには TypeScript 用の型定義も含まれているため、別途型定義ファイルをインストールする必要はありません。&lt;/p>
+&lt;h2 id="electron-store-の使い方">electron-store の使い方&lt;/h2>
+&lt;h3 id="簡単な使い方">簡単な使い方&lt;/h3>
+&lt;p>&lt;code>electron-store&lt;/code> モジュールは、キー＆バリューの形で設定値を保存する簡単な API (&lt;code>get&lt;/code>/&lt;code>set&lt;/code>) を提供しています。
+下記の例では、&lt;code>color&lt;/code> というキーで色情報を取得・保存しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">main.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">ElectronStore&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;electron-store&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">store&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">ElectronStore&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 設定情報を取得する（第2パラメーターはデフォルト値）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">color&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">store&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;color&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;unknown&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">color&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 設定情報の保存する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">store&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;color&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;blue&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>1度目の実行では、設定情報が保存されていないので、&lt;code>get&lt;/code> メソッドは第2引数で指定した &lt;code>unknown&lt;/code> を返します。
+2度目の実行では、前回保存した &lt;code>blue&lt;/code> という値を取得できます。&lt;/p>
+&lt;h3 id="設定値の型を定義する">設定値の型を定義する&lt;/h3>
+&lt;p>TypeScript を使っている場合は、&lt;code>get()&lt;/code> で取得した値を特定の型の変数で受け取ることになると思います。
+&lt;code>ElectronStore&lt;/code> はジェネリクスクラスとして定義されており、各設定キーの型をあらかじめ指定しておくことができます。
+次の例では、&lt;code>color&lt;/code> 設定を文字列型として宣言しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">ElectronStore&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;electron-store&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">StoreType&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">color&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">store&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">ElectronStore&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">StoreType&lt;/span>&lt;span class="p">&amp;gt;();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">color&lt;/span>: &lt;span class="kt">string&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">store&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;color&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;yellow&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>設定が保存されていないことを &lt;code>undefined&lt;/code> で表したい場合は、次のように &lt;code>undefined&lt;/code> 許容型で扱うことを明示しておく必要があります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">StoreType&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">color&lt;/span>: &lt;span class="kt">string&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="kc">undefined&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">store&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">ElectronStore&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">StoreType&lt;/span>&lt;span class="p">&amp;gt;();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">color&lt;/span>: &lt;span class="kt">string&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="kc">undefined&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">store&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;color&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="nx">color&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;設定値が見つかりません&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="settings-モジュールを作成する">Settings モジュールを作成する&lt;/h3>
+&lt;p>アプリの設定情報をモジュールの形で参照できるようにしておくと便利です。
+下記の &lt;code>settings&lt;/code> モジュールは、&lt;code>name&lt;/code> 設定と &lt;code>age&lt;/code> 設定を扱うための &lt;code>Settings&lt;/code> オブジェクトを公開します。&lt;/p></description></item><item><title>Electron アプリがパッケージングされた環境 (production) で動作しているか調べる</title><link>https://maku.blog/p/5ku5dmt/</link><pubDate>Sun, 02 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5ku5dmt/</guid><description>&lt;p>Electron の &lt;a href="https://www.electronjs.org/docs/api/app#appispackaged-readonly">app モジュールの isPackaged プロパティ&lt;/a> を参照すると、アプリが &lt;code>electron-builder&lt;/code> などでパッケージングされた状態で動作しているかどうかを調べることができます。
+一般的に、&lt;code>app.isPackaged&lt;/code> が &lt;code>true&lt;/code> となる場合、production モードで動作していると考えられます。&lt;/p>
+&lt;p>次の例では、アプリが開発中の場合のみ Chromium の DevTools を開くようにしています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// const win = new BrowserWindow(this.options);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 開発中のみ起動時に DevTools を開く
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">isPackaged&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">win&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">webContents&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">openDevTools&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>Electron アプリ内のリンクをOSのデフォルトブラウザで開く</title><link>https://maku.blog/p/7yhwcr7/</link><pubDate>Sat, 25 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7yhwcr7/</guid><description>&lt;p>BrowserWindow 内で表示した HTML のリンクをクリックすると、デフォルトではそのウィンドウ内でリンク先のページへ遷移します。
+リンククリック時に発生する &lt;a href="https://www.electronjs.org/docs/api/web-contents#event-will-navigate">will-navigate イベント&lt;/a> と &lt;a href="https://www.electronjs.org/docs/api/web-contents#event-new-window">new-window イベント&lt;/a> をハンドルすることで、OS のデフォルトブラウザでリンクを開くことができます。
+リンククリック時には通常 &lt;code>will-navigate&lt;/code> イベントが発生するのですが、&lt;code>&amp;lt;a target=&amp;quot;_blank&amp;quot; href=&amp;quot;...&amp;quot;&amp;gt;&lt;/code> のように別ウィンドウで開くようなリンクをクリックした場合は &lt;code>new-window&lt;/code> イベントが発生するので、両方のイベントをハンドルする必要があります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// リンククリック時に OS のデフォルトブラウザで開く
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">handleUrlOpen&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>: &lt;span class="kt">Event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">url&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">preventDefault&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">shell&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">openExternal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">url&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// リンククリック時のイベントハンドラを登録
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">win&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">webContents&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;will-navigate&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">handleUrlOpen&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">win&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">webContents&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;new-window&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">handleUrlOpen&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>下記はメインプロセス全体のコードです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">main.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">app&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">BrowserWindow&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">shell&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;electron&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">class&lt;/span> &lt;span class="nx">MainWindow&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">private&lt;/span> &lt;span class="nx">options&lt;/span>: &lt;span class="kt">Electron.BrowserWindowConstructorOptions&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">width&lt;/span>: &lt;span class="kt">800&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">height&lt;/span>: &lt;span class="kt">400&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">webPreferences&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">nodeIntegration&lt;/span>: &lt;span class="kt">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// リンククリック時に OS のデフォルトブラウザで開く
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">private&lt;/span> &lt;span class="nx">handleUrlOpen&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>: &lt;span class="kt">Event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">url&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">preventDefault&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">shell&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">openExternal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">url&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">constructor&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">win&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">BrowserWindow&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">options&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// リンククリック時のイベントハンドラを登録
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">win&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">webContents&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;will-navigate&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleUrlOpen&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">win&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">webContents&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;new-window&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleUrlOpen&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">win&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">loadFile&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;public/index.html&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Electron の初期化が完了したらウィンドウを作成
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">whenReady&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="nx">then&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">MainWindow&lt;/span>&lt;span class="p">())&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>Electron のメインプロセスとレンダラープロセスの関係</title><link>https://maku.blog/p/mkisgqb/</link><pubDate>Thu, 02 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mkisgqb/</guid><description>&lt;h2 id="メインプロセスとレンダラープロセス">メインプロセスとレンダラープロセス&lt;/h2>
+&lt;p>Electron アプリを作成するときは、メインプロセスとレンダラープロセスを意識して使い分ける必要があります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="600" height="349" src="../../p/mkisgqb/img-001_hu8785088253775243326.png" alt="/p/mkisgqb/img-001.png" />
+&lt;/figure>
+
+&lt;p>レンダラープロセス側で呼び出し可能な Electron モジュール（他の Node モジュールも含む）は制限されていて、実行できる JavaScript ライブラリは、Web ブラウザ上で実行可能な JavaScript に毛が生えたものくらいものと考えておくのがよいです。&lt;/p>
+&lt;p>&lt;strong>&lt;code>ipcRenderer&lt;/code>&lt;/strong> モジュールは例外的にレンダラープロセスから使ってもよいとされているモジュールのひとつで、これ経由でメインプロセスに対して要求（メッセージ）を送ることができます。
+逆にメインプロセスからのメッセージをハンドルすることもできます。&lt;/p>
+&lt;h2 id="通知先のレンダラープロセスの指定">通知先のレンダラープロセスの指定&lt;/h2>
+&lt;p>メインプロセスに対して、レンダラープロセスは複数存在することがあるので、メインプロセスからメッセージを送るときは、どのレンダラープロセスへのメッセージなのかを意識する必要があります。&lt;/p>
+&lt;h3 id="レンダラープロセスからのメッセージに応答する">レンダラープロセスからのメッセージに応答する&lt;/h3>
+&lt;p>レンダラープロセスからのイベントを &lt;strong>&lt;code>ipcMain.on()&lt;/code>&lt;/strong> でハンドルする場合、コールバック関数の第1パラメータとして渡される &lt;strong>&lt;code>event: Electron.IpcMainEvent&lt;/code>&lt;/strong> オブジェクトから送信元のレンダラープロセス (&lt;code>sender: Electron.WebContents&lt;/code>) を参照することができます。&lt;/p>
+&lt;p>下記のメインプロセスは、&lt;code>my-add&lt;/code> イベントとしてレンダラープロセスから 2 つの数値を受け取り、&lt;strong>&lt;code>IpcMainEvent.reply()&lt;/code>&lt;/strong> を使って送信元のレンダラープロセスに応答メッセージ（数値を足した結果）を返しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">main.ts（メインプロセス）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// レンダラープロセスからメッセージを受信して、応答メッセージを返す
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">ipcMain&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;my-add&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">evt&lt;/span>: &lt;span class="kt">Electron.IpcMainEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">num1&lt;/span>: &lt;span class="kt">number&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">num2&lt;/span>: &lt;span class="kt">number&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">evt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">reply&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;my-add-reply&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">num1&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">num2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">//evt.sender.send(&amp;#39;my-add-reply&amp;#39;, num1 + num2);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>レンダラープロセス側では、&lt;strong>&lt;code>ipcRenderer.send()&lt;/code>&lt;/strong> でメインプロセスにメッセージを送り、その応答を &lt;strong>&lt;code>ipcRenderer.on()&lt;/code>&lt;/strong> でハンドルするように実装します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">renderer.ts（レンダラープロセス）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">ipcRenderer&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;electron&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// メインプロセスへメッセージを送信
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">ipcRenderer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">send&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;my-add&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">100&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">200&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// メインプロセスからメッセージを受信
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">ipcRenderer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;my-add-reply&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">evt&lt;/span>: &lt;span class="kt">Electron.Event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">result&lt;/span>: &lt;span class="kt">number&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">alert&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">result&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//=&amp;gt; 300
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="ある-browserwindow-のレンダラープロセスにメッセージを送る">ある BrowserWindow のレンダラープロセスにメッセージを送る&lt;/h3>
+&lt;p>&lt;code>BrowserWindow&lt;/code> のインスタンスがあれば、そのウィンドウのレンダラープロセスに対してメッセージを送ることができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">main.ts（メインプロセス）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">win&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">BrowserWindow&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">options&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">win&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">webContents&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">once&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;did-finish-load&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">win&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">webContents&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">send&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;message-from-main&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;Hello!&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">win&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">loadFile&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;public/index.html&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>メインプロセス側から能動的にメッセージを送る場合は、レンダラープロセス側のコンテンツが準備できてから送らないといけないことに注意してください。
+上記の例では、レンダラープロセスから最初に &lt;a href="https://www.electronjs.org/docs/api/web-contents#event-did-finish-load">did-finish-load イベント&lt;/a> を受診したときに、メッセージを送信するようにしています。&lt;/p></description></item><item><title>Electron アプリの配布パッケージを作る (electron-builder)</title><link>https://maku.blog/p/2tcs8n2/</link><pubDate>Wed, 01 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2tcs8n2/</guid><description>&lt;h2 id="概要">概要&lt;/h2>
+&lt;p>electron-builder を使用すると、Electron アプリを Windows、macOS、Linux 用の配布用バイナリとしてパッケージングすることができます。
+各 OS 用のインストーラはもちろん、ポータブルな zip パッケージを作成することもできます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://www.electron.build/">electron-builder&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>公式サイトのドメイン名が &lt;code>electron.build&lt;/code> っていうのがかっこいいですね。&lt;/p>
+&lt;h2 id="electron-builder-のインストール">electron-builder のインストール&lt;/h2>
+&lt;p>Node.js のパッケージ管理ツールとして、&lt;code>npm&lt;/code> よりも &lt;code>yarn&lt;/code> を使うことが strongly recommended されているので、まず &lt;code>yarn&lt;/code> をインストールしてから &lt;code>yarn&lt;/code> で &lt;code>electron-builder&lt;/code> をインストールすることにします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install -g yarn
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add electron-builder --dev&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>下記のように実行して、ヘルプを表示できればインストール完了です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npx electron-builder --help&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="ビルド設定">ビルド設定&lt;/h2>
+&lt;p>&lt;code>electron-builder&lt;/code> 用の設定は、&lt;code>package.json&lt;/code> の &lt;strong>&lt;code>build&lt;/code>&lt;/strong> プロパティで行うことができます。
+ポイントは、&lt;code>files&lt;/code> の指定で、パッケージングする html ファイルや js ファイル、画像ファイルなどをすべてカバーするように指定しておく必要があります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">package.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;myapp&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;0.0.1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;main&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;build/main.js&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;scripts&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;start&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;tsc &amp;amp;&amp;amp; electron .&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;appId&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;com.example.myapp&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;productName&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;MyApp&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;files&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;build/**/*&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;public/**/*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;devDependencies&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;@types/node&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;^14.0.14&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;electron&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;^9.0.5&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;electron-builder&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;^22.7.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;typescript&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;^3.9.5&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="パッケージの作成">パッケージの作成&lt;/h2>
+&lt;p>上記のビルド設定に従ってパッケージを作成するには、&lt;strong>&lt;code>electron-builder&lt;/code>&lt;/strong> コマンドを使用します。
+各種オプションにより、どの OS 用のパッケージを作成するかを指定することができます。
+オプションは &lt;code>npx electron-builder --help&lt;/code> で確認できますが、次のようにオプションを組み合わせてパッケージを作成できます。&lt;/p></description></item><item><title>Electron の app.getData() で取得できる特殊ディレクトリパスの一覧</title><link>https://maku.blog/p/77sas8m/</link><pubDate>Wed, 01 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/77sas8m/</guid><description>&lt;h2 id="appgetpath-について">app.getPath について&lt;/h2>
+&lt;p>&lt;code>electron&lt;/code> モジュールの &lt;a href="https://www.electronjs.org/docs/api/app#appgetpathname">app.getPath(name)&lt;/a> 関数を使用すると、OS 固有の特殊フォルダパスを取得することができます。
+例えば、&lt;strong>&lt;code>getPath('userData')&lt;/code>&lt;/strong> とすると、ユーザーの設定ファイルなどを格納するディレクトリを取得することができます。&lt;/p>
+&lt;p>下記は、いろんな特殊フォルダのパスを取得するテストコードです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">app&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;electron&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">showSpecialDirs() {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getAppPath() = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getAppPath&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;\n==== Application data&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;home&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;home&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;temp&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;temp&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;appData&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;appData&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;cache&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;cache&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;userData&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;userData&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;logs&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;logs&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;crashDumps&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;crashDumps&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;\n==== OS multimedia&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;desktop&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;desktop&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;documents&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;documents&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;downloads&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;downloads&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;music&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;music&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;pictures&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;pictures&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;videos&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;videos&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;\n==== Executables&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;exe&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;exe&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`app.getPath(&amp;#39;module&amp;#39;) = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getPath&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;module&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>逆に特殊フォルダのパスを設定するための &lt;a href="https://www.electronjs.org/docs/api/app#appsetpathname-path">app.setPath(name, path)&lt;/a> 関数も提供されています。
+アプリ起動時に、この関数を使って特殊フォルダのパスをカスタマイズすれば、各モジュールが使用するフォルダのパスを切り替えることができます（そのモジュールが &lt;code>app.getPath()&lt;/code> でパスを取得していることが前提ですが）。
+例えば、ユーザーデータを扱うテストコードを実行する場合は、&lt;code>app.setPath('userData', `${__dirname}/test-data`)&lt;/code> のようにテスト用のデータフォルダに切り替えることができます。&lt;/p></description></item><item><title>Electron: レンダラーからの要求でメインプロセスでファイルを読み込んで返す</title><link>https://maku.blog/p/aq2airz/</link><pubDate>Mon, 29 Jun 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/aq2airz/</guid><description>&lt;p>Electron アプリのメインプロセスで使用できる &lt;strong>&lt;code>ipcMain.handle&lt;/code>&lt;/strong> を使うと、レンダラーから呼び出せる関数のようなものを定義できます。
+正確には、特定の名前のチャネル (channel) へのメッセージをハンドルするコールバック関数を設定します。
+次の例では、メインプロセスで &lt;code>read-textfile&lt;/code> メッセージを受診したときに、指定されたファイルを読み込んでその内容を返すように実装しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">main.js（メインプロセス）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">app&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ipcMain&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">BrowserWindow&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;electron&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">fs&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;fs&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 指定されたテキストファイルを読みこんで、その内容を返します。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">ipcMain&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handle&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;read-textfile&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">filename&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">buf&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">fs&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">promises&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">readFile&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">filename&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">buf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">toString&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>一方、レンダラー側では &lt;strong>&lt;code>ipcRenderer.invoke&lt;/code>&lt;/strong> を使って、あたかも関数呼び出しのようにメインプロセス側の処理を呼び出すことができます。
+次の例では、画面上のボタンを押した時にメインプロセスに &lt;code>read-textfile&lt;/code> メッセージを送り、その戻り値を表示しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">renderer.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">ipcRenderer&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;electron&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">btn&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">querySelector&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;#btn&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">output&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">querySelector&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;#output&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">btn&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">addEventListener&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;click&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ipcRenderer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">invoke&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;read-textfile&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;./hoge.txt&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">then&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">output&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">innerHTML&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">text&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="k">catch&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">alert&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>HTML コンテンツの内容は次のような感じになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">index.html&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&amp;lt;!DOCTYPE html&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">head&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">meta&lt;/span> &lt;span class="na">charset&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;UTF-8&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>Hello Electron!&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c">&amp;lt;!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">meta&lt;/span> &lt;span class="na">http-equiv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;Content-Security-Policy&amp;#34;&lt;/span> &lt;span class="na">content&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;script-src &amp;#39;self&amp;#39; &amp;#39;unsafe-inline&amp;#39;;&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">head&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">body&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;btn&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>ファイル読み込み&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;output&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">require&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;./build/renderer&amp;#39;&lt;/span>&lt;span class="p">)&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">body&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>Electron: 処理が終わるまでボタンを無効状態 (disabled) にする</title><link>https://maku.blog/p/xkxbnza/</link><pubDate>Mon, 29 Jun 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xkxbnza/</guid><description>&lt;h2 id="button-要素の-disabled-プロパティ">button 要素の disabled プロパティ&lt;/h2>
+&lt;p>JavaScript で &lt;code>button&lt;/code> 要素の &lt;strong>&lt;code>disabled&lt;/code>&lt;/strong> プロパティを true に設定すると、ボタンを無効状態 (disabled) にすることができます。
+TypeScript を使っている場合は、&lt;code>document.querySelector()&lt;/code> の戻り値を &lt;strong>&lt;code>HTMLButtonElement&lt;/code>&lt;/strong> にキャストすることで &lt;code>disabled&lt;/code> プロパティを参照できるようになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">button 要素を disabled にする&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">btn&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">querySelector&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;#btn&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">HTMLButtonElement&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">btn&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">disabled&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ボタンを押したときに重い処理（データ取得など）を実行する場合、処理中にボタンを無効化することで、ユーザーによるボタンの連打を防ぐことができます。&lt;/p>
+&lt;h2 id="より実践的なサンプル">より実践的なサンプル&lt;/h2>
+&lt;p>下記は Electron アプリの実装サンプル（レンダラープロセスの抜粋）です。
+ボタンを押したときにボタンを無効化すると同時に Web からデータ取得します。
+そして、データ取得が完了するか、エラーが発生したときにボタンを有効化します。&lt;/p>
+&lt;p>ここでは、HTTP GET リクエストを送るために &lt;code>superagent&lt;/code> モジュールを使用しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">superagent のインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install --save superagent
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install --save @types/superagent&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">renderer.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">superagent&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;superagent&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">btn&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">querySelector&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;#btn&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">HTMLButtonElement&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">btn&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">addEventListener&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;click&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">btn&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">disabled&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// データ取得前にボタンを無効化
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">try&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">res&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">superagent&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;https://example.com/&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">res&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">catch&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">alert&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">finally&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">btn&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">disabled&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// データ取得後にボタンを有効化
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>HTML ファイルの方にはボタンだけ配置しておけば OK です。&lt;/p></description></item><item><title>Electron で各種ダイアログを表示する (dialog)</title><link>https://maku.blog/p/ihwanyc/</link><pubDate>Mon, 29 Jun 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ihwanyc/</guid><description>&lt;p>&lt;code>electron&lt;/code> モジュールが提供する &lt;strong>&lt;code>dialog&lt;/code>&lt;/strong> を使用すると、いろいろなダイアログを表示することができます。
+ダイアログの表示は、メインプロセスからしか行えません。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="https://www.electronjs.org/docs/api/dialog">Electron Documentation - dialog&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="エラーボックス-showerrorbox">エラーボックス (showErrorBox)&lt;/h2>
+&lt;p>一番簡単に使えそうなエラーボックスから。
+ダイアログのタイトルと、メッセージの内容を指定するだけで表示できます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>dialog.showErrorBox(title, content)&lt;/code>&lt;/li>
+&lt;/ul>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="400" height="144" src="../../p/ihwanyc/img-error-box_hu10906429335010186682.png" alt="/p/ihwanyc/img-error-box.png" />
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">dialog&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;electron&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">dialog&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">showErrorBox&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;File Not Found&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s1">&amp;#39;指定されたファイルが見つかりませんでした。&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このエラーボックスが表示されている間は、他の全てのウィンドウが操作できなくなるようです（つまり、モーダルダイアログとして振る舞います）。&lt;/p>
+&lt;p>ドキュメントによると、この &lt;code>dialog.showErrorBox&lt;/code> は、「&lt;code>app&lt;/code> モジュールが &lt;code>ready&lt;/code> イベントを emit する前に呼び出すことができる」とされています。
+つまり、アプリケーションの起動時に行うエラーチェックなどで使用できるということです（メインウィンドウ表示前に設定ファイルの内容が正しいか調べたり）。&lt;/p>
+&lt;p>レンダラープロセス側では &lt;code>alert()&lt;/code> を使っちゃうことが多いかもしれません。&lt;/p>
+&lt;h2 id="メッセージボックス-showmessagebox-showmessageboxsync">メッセージボックス (showMessageBox, showMessageBoxSync)&lt;/h2>
+&lt;p>メッセージボックスを表示するには、次のような関数を使用します。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>dialog.showMessageBox(options)&lt;/code>&lt;/li>
+&lt;li>&lt;code>dialog.showMessageBox(browserWindow, options)&lt;/code>&lt;/li>
+&lt;li>&lt;code>dialog.showMessageBoxSync(options)&lt;/code>&lt;/li>
+&lt;li>&lt;code>dialog.showMessageBoxSync(browserWindow, options)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>表示内容を &lt;code>options&lt;/code> パラメータでいろいろ制御できます（下記に例を示します）。&lt;/p>
+&lt;p>メッセージボックスが表示されている間は、基本的には他のウィンドウを操作できなくなります。
+&lt;code>browserWindow&lt;/code> パラメーターで、親ウィンドウとなる &lt;code>BrowserWindow&lt;/code> インスタンスを指定すると、その親ウィンドウのモーダレスダイアログとなり、その親ウィンドウだけ操作できなくなります。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ ワンポイント&lt;/span>
+ &lt;span class="xNote_body">&lt;code>showMessageBoxSync()&lt;/code> にも親ウィンドウを指定するバージョンがありますが、この関数を呼び出すと結局他のウィンドウも操作できなくなります。
+いまいち使いどころが分かりませんが、親ウィンドウを指定することで、親ウィンドウの表示位置に近いところにダイアログが表示されるという効果は得られます。&lt;/span>
+&lt;/div>
+
+&lt;h3 id="例-ok-ボタンだけあるダイアログ">例: OK ボタンだけあるダイアログ&lt;/h3>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="400" height="144" src="../../p/ihwanyc/img-message-box1_hu14070586231494680347.png" alt="/p/ihwanyc/img-message-box1.png" />
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">options&lt;/span>: &lt;span class="kt">Electron.MessageBoxOptions&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;info&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// none/info/error/quetion/warning
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;タイトル&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">message&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;メッセージ&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">detail&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;説明文&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">dialog&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">showMessageBox&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">options&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>オプションで &lt;code>buttons&lt;/code> の指定を省略すると、デフォルトで OK ボタンがひとつだけあるダイアログが表示されます。
+&lt;code>type&lt;/code> オプションの指定により表示されるアイコンが変化したりします。&lt;/p></description></item></channel></rss>

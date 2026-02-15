@@ -1,17 +1,170 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>PowerShell on まくろぐ</title><link>https://maku.blog/tags/powershell/</link><description>Recent content in PowerShell on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Wed, 08 May 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/powershell/index.xml" rel="self" type="application/rss+xml"/><item><title>PowerShell のプロファイルを作成して独自コマンドを定義する ($profile)</title><link>https://maku.blog/p/v7bkitw/</link><pubDate>Wed, 08 May 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/v7bkitw/</guid><description>プロファイルとは PowerShell は起動時に $PROFILE のパスに格納されたプロファイルファイルを読み込むようになっています。 このファイルで関数の定義や初期化処理を行うことで、PowerShell を便利に使えるようになります。 $PROFILE には次のようなパスが格納されています。
-PS C:\&amp;gt; $profile C:\Users\maku\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1 プロファイルの作成 デフォルトでは $PROFILE が示すファイルは存在しない可能性があるので、New-Item コマンドレットなどを使って、エディタで開く前にファイルを生成しておく必要があります。
-プロファイルを作成してエディタで開く New-Item -Path $profile -ItemType file -Force notepad $profile このファイルを作成したあとに新しく PowerShell を開こうとすると、実行ポリシー 関連のセキュリティエラーが発生します。 これは、デフォルトで ps1 ファイルの実行が許可されていないからです。
-セキュリティエラー . : ファイル C:\Users\maku\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1 を読み込めません。 ファイル C:\Users\maku\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1 はデジタル署名されていません。 このスクリプトは現在のシステムでは実行できません。 スクリプトの実行および実行ポリシーの設定の詳細については、「about_Execution_Policies」(https://go.microsoft.com/fwlink/?LinkID=135170) を参照してください。 現在の実行ポリシーの一覧は、Get-ExecutionPolicy コマンドレットで確認できます。
-PS C:\&amp;gt; Get-ExecutionPolicy -List Scope ExecutionPolicy ----- --------------- MachinePolicy Undefined UserPolicy Undefined Process Undefined CurrentUser Undefined LocalMachine AllSigned カレントユーザーによるスクリプトの実行を許可するには、次のように Set-ExecutionPolicy コマンドレットを実行します。
-PS C:\&amp;gt; Set-ExecutionPolicy RemoteSigned -Scope CurrentUser ここで指定している RemoteSigned ポリシーは、「インターネット上の署名されたスクリプト」および「ローカルコンピューター上のスクリプト」の実行を許可するポリシーです。</description></item><item><title>PowerShell で環境変数を扱う</title><link>https://maku.blog/p/jodtbr8/</link><pubDate>Thu, 19 Mar 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/jodtbr8/</guid><description>環境変数の値を参照する PowerShell スクリプトの中から環境変数の値を取得するには、$env:変数名 を参照します。
-sample.ps1 echo $env:USERPROFILE 環境変数が設定されているかどうかを調べる 環境変数が定義されているかどうかを調べるには、以下のような条件分岐を使用します。
-sample.ps1 if ($env:HOME -eq $null) { Write-Host &amp;#39;HOME is not set&amp;#39; } if ($env:HOME -ne $null) { Write-Host &amp;#39;HOME is set&amp;#39; } 値が空である場合も「定義されていない」とみなしたいのであれば、IsNullOrEmpty() でチェックします。
-if ([string]::IsNullOrEmpty($env:HOME)) { Write-Host &amp;#39;HOME is not set&amp;#39; exit }</description></item><item><title>PowerShell: 現在の日時を ISO 8601 (YYYY-MM-DD) フォーマットで取得する (Get-Date)</title><link>https://maku.blog/p/9a9n6se/</link><pubDate>Thu, 19 Mar 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9a9n6se/</guid><description>PowerShell の Get-Date コマンドレットを使用すると、現在の日時を表す文字列を取得することができます。
-Format、UFormat パラメータで日時の書式を指定する Format Get-Date の Format パラメータを指定することで、任意の書式で日時文字列を取得することができます。
-PS&amp;gt; Get-Date -Format &amp;#34;yyyy-MM-dd HH:mm:ss&amp;#34; 2020-03-19 15:23:09 PS&amp;gt; Get-Date -Format &amp;#34;yyyy-MM-ddTHH:mm:ssK&amp;#34; # ISO 8601 2020-03-19T15:23:09+09:00 UFormat UFormat パラメータを使うと、もう少しシンプルに記述できたりします（指定できる記号の一覧はこちら）。
-PS&amp;gt; Get-Date -UFormat &amp;#34;%F %T&amp;#34; 2020-03-19 15:26:42 PS&amp;gt; Get-Date -UFormat &amp;#34;%Y-%m-%d %H:%M:%S&amp;#34; # 同上 2020-03-19 15:26:42 PS&amp;gt; Get-Date -UFormat &amp;#34;%FT%T%Z&amp;#34; # ISO 8601 2020-03-19T15:26:42+09 DateTime オブジェクトの ToString メソッドを使用する Get-Date で先に DateTime オブジェクトを取得しておいて、ToString 関数で日時を表す文字列に変換するという方法もあります。
-PS&amp;gt; (Get-Date).ToString(&amp;#34;yyyy-MM-dd HH:mm:ss&amp;#34;) 2020-03-19 15:11:37 この方法を使うと、DateTime オブジェクトで日時データを編集してから文字列に変換することができます。 例えば、次の例では、現在から 10 日後の日時を取得しています。</description></item><item><title>PowerShell: バッチファイルから PowerShell を呼び出して結果を変数に格納する</title><link>https://maku.blog/p/372dx46/</link><pubDate>Wed, 18 Mar 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/372dx46/</guid><description>Linux や mac では、外部コマンドをバッククォート () で囲んでやるだけで実行結果を取得できますが、バッチファイルで同じようなことをするには FOR /F` コマンドを使用します。 本来は、コマンドの出力結果を一行ずつ処理するためのコマンドですが、次のようにすれば、コマンドの実行結果を一行だけ変数に格納できます。
-FOR /F &amp;#34;usebackq delims=&amp;#34; %%A IN (`外部コマンド`) DO set 変数名=%%A FOR ループのパラメータの意味 /F: コマンドの出力結果をループ処理する usebackq: バッククォートで囲まれた文字列全体を外部コマンドとみなす delims=: コマンド実行結果にスペースが含まれていても分割せずに取得（ここではデリミタ文字をなくしている） 上記の 外部コマンド のところで、powershell コマンドを実行すれば、PowerShell で実行した結果をバッチファイル内の変数で受け取ることができます。
-例えば、次のバッチファイル (next-month.bat) では、1か月後の日時を PowerShell で求めて、その結果をバッチファイル内の next_month 変数に取得しています。
-next-month.bat @echo off setlocal FOR /F &amp;#34;usebackq delims=&amp;#34; %%A IN (`powershell &amp;#34;(Get-Date).AddMonths(1).ToString(&amp;#39;yyyy-MM-dd&amp;#39;)&amp;#34;`) DO set next_month=%%A echo %next_month% 次のように PowerShell で実行するコマンドを分離しておくと見やすいかもしれません。 ps_command 変数の内容を置き換えるだけで、別のコマンドに対応できます。
-set ps_command=`powershell &amp;#34;(Get-Date).AddMonths(1).ToString(&amp;#39;yyyy-MM-dd&amp;#39;)&amp;#34;` FOR /F &amp;#34;usebackq delims=&amp;#34; %%A IN (%ps_command%) DO set result=%%A echo %result% 実行結果 C:\&amp;gt; next-month 2020-04-19</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>PowerShell on まくろぐ</title><link>https://maku.blog/tags/powershell/</link><description>Recent content in PowerShell on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Wed, 08 May 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/powershell/index.xml" rel="self" type="application/rss+xml"/><item><title>PowerShell のプロファイルを作成して独自コマンドを定義する ($profile)</title><link>https://maku.blog/p/v7bkitw/</link><pubDate>Wed, 08 May 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/v7bkitw/</guid><description>&lt;h2 id="プロファイルとは">プロファイルとは&lt;/h2>
+&lt;p>PowerShell は起動時に &lt;strong>&lt;code>$PROFILE&lt;/code>&lt;/strong> のパスに格納されたプロファイルファイルを読み込むようになっています。
+このファイルで関数の定義や初期化処理を行うことで、PowerShell を便利に使えるようになります。
+&lt;code>$PROFILE&lt;/code> には次のようなパスが格納されています。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">PS &lt;/span>&lt;span class="n">C:&lt;/span>&lt;span class="p">\&amp;gt;&lt;/span> &lt;span class="nv">$profile&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">C:&lt;/span>&lt;span class="p">\&lt;/span>&lt;span class="n">Users&lt;/span>&lt;span class="p">\&lt;/span>&lt;span class="n">maku&lt;/span>&lt;span class="p">\&lt;/span>&lt;span class="n">Documents&lt;/span>&lt;span class="p">\&lt;/span>&lt;span class="n">WindowsPowerShell&lt;/span>&lt;span class="p">\&lt;/span>&lt;span class="n">Microsoft&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="py">PowerShell_profile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="py">ps1&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="プロファイルの作成">プロファイルの作成&lt;/h2>
+&lt;p>デフォルトでは &lt;code>$PROFILE&lt;/code> が示すファイルは存在しない可能性があるので、&lt;strong>&lt;code>New-Item&lt;/code>&lt;/strong> コマンドレットなどを使って、エディタで開く前にファイルを生成しておく必要があります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">プロファイルを作成してエディタで開く&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">New-Item&lt;/span> &lt;span class="n">-Path&lt;/span> &lt;span class="nv">$profile&lt;/span> &lt;span class="n">-ItemType&lt;/span> &lt;span class="n">file&lt;/span> &lt;span class="n">-Force&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">notepad&lt;/span> &lt;span class="nv">$profile&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このファイルを作成したあとに新しく PowerShell を開こうとすると、&lt;a href="https://go.microsoft.com/fwlink/?LinkID=135170">実行ポリシー&lt;/a> 関連のセキュリティエラーが発生します。
+これは、デフォルトで &lt;code>ps1&lt;/code> ファイルの実行が許可されていないからです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">セキュリティエラー&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">. : ファイル C:\Users\maku\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1 を読み込めません。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ファイル C:\Users\maku\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1 はデジタル署名されていません。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">このスクリプトは現在のシステムでは実行できません。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">スクリプトの実行および実行ポリシーの設定の詳細については、「about_Execution_Policies」(https://go.microsoft.com/fwlink/?LinkID=135170) を参照してください。&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>現在の実行ポリシーの一覧は、&lt;strong>&lt;code>Get-ExecutionPolicy&lt;/code>&lt;/strong> コマンドレットで確認できます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">PS &lt;/span>&lt;span class="n">C:&lt;/span>&lt;span class="p">\&amp;gt;&lt;/span> &lt;span class="nb">Get-ExecutionPolicy&lt;/span> &lt;span class="n">-List&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Scope&lt;/span> &lt;span class="n">ExecutionPolicy&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">-----&lt;/span> &lt;span class="p">---------------&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">MachinePolicy&lt;/span> &lt;span class="n">Undefined&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UserPolicy&lt;/span> &lt;span class="n">Undefined&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">Process&lt;/span> &lt;span class="n">Undefined&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">CurrentUser&lt;/span> &lt;span class="n">Undefined&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LocalMachine&lt;/span> &lt;span class="n">AllSigned&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>カレントユーザーによるスクリプトの実行を許可するには、次のように &lt;strong>&lt;code>Set-ExecutionPolicy&lt;/code>&lt;/strong> コマンドレットを実行します。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">PS &lt;/span>&lt;span class="n">C:&lt;/span>&lt;span class="p">\&amp;gt;&lt;/span> &lt;span class="nb">Set-ExecutionPolicy&lt;/span> &lt;span class="n">RemoteSigned&lt;/span> &lt;span class="n">-Scope&lt;/span> &lt;span class="n">CurrentUser&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>ここで指定している &lt;code>RemoteSigned&lt;/code> ポリシーは、「インターネット上の署名されたスクリプト」および「ローカルコンピューター上のスクリプト」の実行を許可するポリシーです。&lt;/p>
+&lt;h2 id="プロファイルの設定例">プロファイルの設定例&lt;/h2>
+&lt;h3 id="例ディレクトリ移動用のコマンドを定義">例）ディレクトリ移動用のコマンドを定義&lt;/h3>
+&lt;p>下記は、ディレクトリ移動のための関数（&lt;code>cd-gitwork&lt;/code> や &lt;code>u&lt;/code>）を定義する例です。
+ついでに PowerShell の起動時にその関数を呼び出して、ディレクトリを移動しています。
+よく使う作業ディレクトリに自動的に移動するようにしておくと便利です（Windows ターミナルの設定でも初期ディレクトリは設定できますが）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Microsoft.PowerShell_profile.ps1 ($profile)&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">Function&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">cd-gitwork&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">cd &lt;/span>&lt;span class="n">D:&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">y&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">gitwork&lt;/span> &lt;span class="c"># Set-Location -Path D:/y/gitwork でも OK&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">Function&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">u&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nb">cd &lt;/span>&lt;span class="p">..&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">Function&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">uu&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nb">cd &lt;/span>&lt;span class="p">../..&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">Function&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">uuu&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nb">cd &lt;/span>&lt;span class="p">../../..&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c"># PowerShell 起動時にディレクトリを移動&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd-gitwork&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>独自コマンドの定義方法としては、&lt;code>Set-Alias&lt;/code> コマンドレットによるエイリアス定義もありますが、&lt;code>Set-Alias&lt;/code> は柔軟なパラメーター設定ができないので、&lt;code>Function&lt;/code> を使って関数として定義するのがよいです。&lt;/p></description></item><item><title>PowerShell で環境変数を扱う</title><link>https://maku.blog/p/jodtbr8/</link><pubDate>Thu, 19 Mar 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/jodtbr8/</guid><description>&lt;h2 id="環境変数の値を参照する">環境変数の値を参照する&lt;/h2>
+&lt;p>PowerShell スクリプトの中から環境変数の値を取得するには、&lt;strong>&lt;code>$env:変数名&lt;/code>&lt;/strong> を参照します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">sample.ps1&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo &lt;/span>&lt;span class="nv">$env:USERPROFILE&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="環境変数が設定されているかどうかを調べる">環境変数が設定されているかどうかを調べる&lt;/h2>
+&lt;p>環境変数が定義されているかどうかを調べるには、以下のような条件分岐を使用します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">sample.ps1&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">$env:HOME&lt;/span> &lt;span class="o">-eq&lt;/span> &lt;span class="vm">$null&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">Write-Host&lt;/span> &lt;span class="s1">&amp;#39;HOME is not set&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">$env:HOME&lt;/span> &lt;span class="o">-ne&lt;/span> &lt;span class="vm">$null&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">Write-Host&lt;/span> &lt;span class="s1">&amp;#39;HOME is set&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>値が空である場合も「定義されていない」とみなしたいのであれば、&lt;code>IsNullOrEmpty()&lt;/code> でチェックします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">([&lt;/span>&lt;span class="no">string&lt;/span>&lt;span class="p">]::&lt;/span>&lt;span class="n">IsNullOrEmpty&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nv">$env:HOME&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">Write-Host&lt;/span> &lt;span class="s1">&amp;#39;HOME is not set&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">exit&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>PowerShell: 現在の日時を ISO 8601 (YYYY-MM-DD) フォーマットで取得する (Get-Date)</title><link>https://maku.blog/p/9a9n6se/</link><pubDate>Thu, 19 Mar 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9a9n6se/</guid><description>&lt;p>PowerShell の &lt;a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-date">Get-Date&lt;/a> コマンドレットを使用すると、現在の日時を表す文字列を取得することができます。&lt;/p>
+&lt;h2 id="formatuformat-パラメータで日時の書式を指定する">Format、UFormat パラメータで日時の書式を指定する&lt;/h2>
+&lt;h3 id="format">Format&lt;/h3>
+&lt;p>&lt;code>Get-Date&lt;/code> の &lt;code>Format&lt;/code> パラメータを指定することで、任意の書式で日時文字列を取得することができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">PS&amp;gt; Get-Date -Format &amp;#34;yyyy-MM-dd HH:mm:ss&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2020-03-19 15:23:09
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PS&amp;gt; Get-Date -Format &amp;#34;yyyy-MM-ddTHH:mm:ssK&amp;#34; # ISO 8601
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2020-03-19T15:23:09+09:00&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="uformat">UFormat&lt;/h3>
+&lt;p>&lt;code>UFormat&lt;/code> パラメータを使うと、もう少しシンプルに記述できたりします（&lt;a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-date?view=powershell-7#notes">指定できる記号の一覧はこちら&lt;/a>）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">PS&amp;gt; Get-Date -UFormat &amp;#34;%F %T&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2020-03-19 15:26:42
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PS&amp;gt; Get-Date -UFormat &amp;#34;%Y-%m-%d %H:%M:%S&amp;#34; # 同上
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2020-03-19 15:26:42
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PS&amp;gt; Get-Date -UFormat &amp;#34;%FT%T%Z&amp;#34; # ISO 8601
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2020-03-19T15:26:42+09&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="datetime-オブジェクトの-tostring-メソッドを使用する">DateTime オブジェクトの ToString メソッドを使用する&lt;/h2>
+&lt;p>&lt;code>Get-Date&lt;/code> で先に &lt;code>DateTime&lt;/code> オブジェクトを取得しておいて、&lt;code>ToString&lt;/code> 関数で日時を表す文字列に変換するという方法もあります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">PS&amp;gt; (Get-Date).ToString(&amp;#34;yyyy-MM-dd HH:mm:ss&amp;#34;)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2020-03-19 15:11:37&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この方法を使うと、&lt;code>DateTime&lt;/code> オブジェクトで日時データを編集してから文字列に変換することができます。
+例えば、次の例では、現在から 10 日後の日時を取得しています。&lt;/p></description></item><item><title>PowerShell: バッチファイルから PowerShell を呼び出して結果を変数に格納する</title><link>https://maku.blog/p/372dx46/</link><pubDate>Wed, 18 Mar 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/372dx46/</guid><description>&lt;p>Linux や mac では、外部コマンドをバッククォート (&lt;code>) で囲んでやるだけで実行結果を取得できますが、バッチファイルで同じようなことをするには &lt;/code>FOR /F` コマンドを使用します。
+本来は、コマンドの出力結果を一行ずつ処理するためのコマンドですが、次のようにすれば、コマンドの実行結果を一行だけ変数に格納できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="k">FOR&lt;/span> &lt;span class="k">/F&lt;/span> &lt;span class="s2">&amp;#34;usebackq delims=&amp;#34;&lt;/span> &lt;span class="se">%%&lt;/span>A &lt;span class="k">IN&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="sb">`外部コマンド`&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">DO&lt;/span> &lt;span class="k">set&lt;/span> &lt;span class="nv">変数名&lt;/span>&lt;span class="p">=&lt;/span>&lt;span class="se">%%&lt;/span>A&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;ul>
+&lt;li>FOR ループのパラメータの意味
+&lt;ul>
+&lt;li>&lt;code>/F&lt;/code>: コマンドの出力結果をループ処理する&lt;/li>
+&lt;li>&lt;code>usebackq&lt;/code>: バッククォートで囲まれた文字列全体を外部コマンドとみなす&lt;/li>
+&lt;li>&lt;code>delims=&lt;/code>: コマンド実行結果にスペースが含まれていても分割せずに取得（ここではデリミタ文字をなくしている）&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>上記の &lt;code>外部コマンド&lt;/code> のところで、&lt;strong>&lt;code>powershell&lt;/code>&lt;/strong> コマンドを実行すれば、PowerShell で実行した結果をバッチファイル内の変数で受け取ることができます。&lt;/p>
+&lt;p>例えば、次のバッチファイル (&lt;code>next-month.bat&lt;/code>) では、1か月後の日時を PowerShell で求めて、その結果をバッチファイル内の &lt;code>next_month&lt;/code> 変数に取得しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">next-month.bat&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="p">@&lt;/span>&lt;span class="k">echo&lt;/span> off
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">setlocal&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">FOR&lt;/span> &lt;span class="k">/F&lt;/span> &lt;span class="s2">&amp;#34;usebackq delims=&amp;#34;&lt;/span> &lt;span class="se">%%&lt;/span>A &lt;span class="k">IN&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="sb">`powershell &amp;#34;(Get-Date).AddMonths(1).ToString(&amp;#39;yyyy-MM-dd&amp;#39;)&amp;#34;`&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">DO&lt;/span> &lt;span class="k">set&lt;/span> &lt;span class="nv">next_month&lt;/span>&lt;span class="p">=&lt;/span>&lt;span class="se">%%&lt;/span>A
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">echo&lt;/span> &lt;span class="nv">%next_month%&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次のように PowerShell で実行するコマンドを分離しておくと見やすいかもしれません。
+&lt;code>ps_command&lt;/code> 変数の内容を置き換えるだけで、別のコマンドに対応できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-batch" data-lang="batch">&lt;span class="line">&lt;span class="cl">&lt;span class="k">set&lt;/span> &lt;span class="nv">ps_command&lt;/span>&lt;span class="p">=&lt;/span>`powershell &lt;span class="s2">&amp;#34;(Get-Date).AddMonths(1).ToString(&amp;#39;yyyy-MM-dd&amp;#39;)&amp;#34;&lt;/span>`
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">FOR&lt;/span> &lt;span class="k">/F&lt;/span> &lt;span class="s2">&amp;#34;usebackq delims=&amp;#34;&lt;/span> &lt;span class="se">%%&lt;/span>A &lt;span class="k">IN&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">%ps_command%&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">DO&lt;/span> &lt;span class="k">set&lt;/span> &lt;span class="nv">result&lt;/span>&lt;span class="p">=&lt;/span>&lt;span class="se">%%&lt;/span>A
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">echo&lt;/span> &lt;span class="nv">%result%&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行結果&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">C:\&amp;gt; next-month
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2020-04-19&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item></channel></rss>

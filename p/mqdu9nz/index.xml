@@ -1,12 +1,131 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>GraphQL クエリ仕様 on まくろぐ</title><link>https://maku.blog/p/mqdu9nz/</link><description>Recent content in GraphQL クエリ仕様 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Wed, 28 Sep 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/mqdu9nz/index.xml" rel="self" type="application/rss+xml"/><item><title>GraphQL クエリ仕様: クエリで変数を使用する</title><link>https://maku.blog/p/dtwtpzj/</link><pubDate>Wed, 28 Sep 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dtwtpzj/</guid><description>変数定義と変数値の指定 特定のパラメーターのみ値を変えて複数の GraphQL のクエリを発行したい場合は、ドキュメント内で query や mutation を定義するときに、変数定義 (variable definitions) を追加します。
-次の GetBook クエリでは、$id: String! という変数定義を行っています。 これは、クエリ実行時に id という名前の文字列変数を参照することを示しています。 そして、型名に ! が付いているので、変数値の指定は必須です。
-変数を参照するクエリの例 query GetBook($id: String!) { book(id: $id) { id title price } } 指定された id 変数の値は、book フィールドの id 引数として渡され、対応する書籍を取得するリクエストとして処理されます。
-肝心の変数の値は、query や mutation などのドキュメントとは異なる variables という HTTP ペイロード・フィールドで GraphQL サーバーへ送ります（HTTP POST 経由での GraphQL API 呼び出しの場合）。 ただ、このあたりの variables フィールドの送信に関しては、通常は各種言語用の GraphQL ライブラリに隠蔽されているため、明示的に HTTP POST リクエストのペイロードを設定することはありません。 例えば、React 用の Apollo Client ライブラリは、次のような感じで変数を設定するインタフェースを提供しています。
-const { loading, error, data } = useQuery&amp;lt;QueryType, VarType&amp;gt;(query, { variables: { id: &amp;#34;book-123&amp;#34; } }) Web ブラウザ上で GraphQL API のテストを行える GraphiQL（グラフィカル） の UI では、次のようにドキュメントと変数を別々に記述できるようになっています。</description></item><item><title>GraphQL クエリ仕様: ディレクティブによる条件分岐 (@include, @skip)</title><link>https://maku.blog/p/dcdv7rv/</link><pubDate>Wed, 14 Sep 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dcdv7rv/</guid><description>GraphQL クエリで、各フィールド名（あるいはフラグメント）の後ろに @include ディレクティブや @skip ディレクティブを配置すると、if 引数で指定した条件によってそのフィールドを取得するかどうかを制御できます。
-fieldName @include(if: $someTest) fieldName @skip(if: $someTest) @include ディレクティブと @skip ディレクティブの違いは、if 引数の判定が逆転しているだけです。
-@include(if: Boolean) ディレクティブ if 引数の値が true のときにのみフィールドを取得します @skip(if: Boolean) ディレクティブ if 引数の値が false のときにのみフィールドを取得します クエリ内での @include ディレクティブによる条件分岐 query QueryOrganization($org: String!, $details: Boolean = false) { organization(login: $org) { name description websiteUrl @include(if: $details) { } } variables { &amp;#34;org&amp;#34;: &amp;#34;graphql&amp;#34;, &amp;#34;details&amp;#34;: true }</description></item><item><title>GraphQL クエリ仕様: フィールド名にエイリアスを付ける</title><link>https://maku.blog/p/vnkd4ur/</link><pubDate>Wed, 14 Sep 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vnkd4ur/</guid><description>GraphQL クエリ言語の フィールド・エイリアス 機能を使うと、取得したフィールド値を参照するときに、任意の別名を付けて参照することができます。 例えば、GraphQL スキーマとしては company というフィールド名で定義されているものを、companyName という JSON プロパティ名で返して欲しいときは、次のようにフィールド・エイリアスを使用します。
-GraphQL クエリ query ProfileInfoWithAlias { user(login: &amp;#34;maku77&amp;#34;) { name companyName: company bio } } レスポンス { &amp;#34;data&amp;#34;: { &amp;#34;user&amp;#34;: { &amp;#34;name&amp;#34;: &amp;#34;Makkuma&amp;#34;, &amp;#34;companyName&amp;#34;: &amp;#34;maku maku company&amp;#34;, &amp;#34;bio&amp;#34;: &amp;#34;すーぱーぷにぐらまー&amp;#34; } } } フィールド・エイリアスは、同名のフィールドを異なる引数で取得するときに役立ちます。
-GraphQL クエリ query { maku77: user(login: &amp;#34;maku77&amp;#34;) { ...basicUserInfo } puni: user(login: &amp;#34;puni&amp;#34;) { ...basicUserInfo } } fragment basicUserInfo on User { name bio } 上記のように 1 つのクエリの中で同名のフィールド（ここでは user）を要求する場合に、フィールド・エイリアス（ここでは maku と puni）を付けることで、レスポンスのプロパティ名がコンフリクトしないようにします。 というより、このケースではエイリアスを設定しないと、リクエスト時にエラーになります。</description></item><item><title>GraphQL クエリ仕様: フラグメント (Fragments) とインラインフラグメント (Inline Fragments)</title><link>https://maku.blog/p/wiv7it5/</link><pubDate>Tue, 19 Jan 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wiv7it5/</guid><description>GraphQL フラグメントでクエリをパーツ化する フラグメントの基本 GraphQL クエリの中で、同じようなフィールドの指定（選択セット）を複数回使用する場合、それを フラグメント (Fragments) という再利用可能な選択セットとして切り出して定義しておくことができます。
-例えば次の GraphQL クエリは、GitHub から自分のユーザー情報 (viewer) と、特定のユーザーの情報 (user) を一度に取得しています。
-GraphQL クエリ query QueryTwoUsers { viewer { login # ログインID name # ユーザー名 url # ユーザーの GitHub ホームページ websiteUrl # ユーザーの Web サイト avatarUrl # ユーザーのアバター画像 } user(login: &amp;#34;ログインID&amp;#34;) { login name url websiteUrl avatarUrl } } viewer フィールドと user フィールドは、両方とも User 型 のフィールドで、しかも、上記の例では User オブジェクトの中の同じフィールドを参照しています。 明らかに冗長な書き方です。
-このようなケースでは、あるオブジェクトの特定のフィールドを参照するための選択セット (selection set) を、フラグメントの形で定義することができます。 次の例では、User オブジェクトの特定のフィールドを選択するための userFragment というフラグメントを定義し、クエリ内で参照しています。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>GraphQL クエリ仕様 on まくろぐ</title><link>https://maku.blog/p/mqdu9nz/</link><description>Recent content in GraphQL クエリ仕様 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Wed, 28 Sep 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/mqdu9nz/index.xml" rel="self" type="application/rss+xml"/><item><title>GraphQL クエリ仕様: クエリで変数を使用する</title><link>https://maku.blog/p/dtwtpzj/</link><pubDate>Wed, 28 Sep 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dtwtpzj/</guid><description>&lt;h2 id="変数定義と変数値の指定">変数定義と変数値の指定&lt;/h2>
+&lt;p>特定のパラメーターのみ値を変えて複数の GraphQL のクエリを発行したい場合は、ドキュメント内で &lt;code>query&lt;/code> や &lt;code>mutation&lt;/code> を定義するときに、&lt;strong>変数定義 (variable definitions)&lt;/strong> を追加します。&lt;/p>
+&lt;p>次の &lt;code>GetBook&lt;/code> クエリでは、&lt;code>$id: String!&lt;/code> という変数定義を行っています。
+これは、クエリ実行時に &lt;code>id&lt;/code> という名前の文字列変数を参照することを示しています。
+そして、型名に &lt;code>!&lt;/code> が付いているので、変数値の指定は必須です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">変数を参照するクエリの例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-graphql" data-lang="graphql">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">query&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">GetBook&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nv">$id&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">String&lt;/span>&lt;span class="p">!)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">book&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="py">id&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nv">$id&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nc">id&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">title&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">price&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>指定された &lt;code>id&lt;/code> 変数の値は、&lt;code>book&lt;/code> フィールドの &lt;code>id&lt;/code> 引数として渡され、対応する書籍を取得するリクエストとして処理されます。&lt;/p>
+&lt;p>肝心の変数の値は、&lt;code>query&lt;/code> や &lt;code>mutation&lt;/code> などのドキュメントとは異なる &lt;strong>&lt;code>variables&lt;/code>&lt;/strong> という HTTP ペイロード・フィールドで GraphQL サーバーへ送ります（HTTP POST 経由での GraphQL API 呼び出しの場合）。
+ただ、このあたりの &lt;code>variables&lt;/code> フィールドの送信に関しては、通常は各種言語用の GraphQL ライブラリに隠蔽されているため、明示的に HTTP POST リクエストのペイロードを設定することはありません。
+例えば、React 用の Apollo Client ライブラリは、次のような感じで変数を設定するインタフェースを提供しています。&lt;/p></description></item><item><title>GraphQL クエリ仕様: ディレクティブによる条件分岐 (@include, @skip)</title><link>https://maku.blog/p/dcdv7rv/</link><pubDate>Wed, 14 Sep 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dcdv7rv/</guid><description>&lt;p>GraphQL クエリで、各フィールド名（あるいはフラグメント）の後ろに &lt;strong>&lt;code>@include&lt;/code>&lt;/strong> ディレクティブや &lt;strong>&lt;code>@skip&lt;/code>&lt;/strong> ディレクティブを配置すると、&lt;code>if&lt;/code> 引数で指定した条件によってそのフィールドを取得するかどうかを制御できます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-graphql" data-lang="graphql">&lt;span class="line">&lt;span class="cl">&lt;span class="py">fieldName&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nd">@include&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="py">if&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nv">$someTest&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nc">fieldName&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nd">@skip&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="py">if&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nv">$someTest&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>@include&lt;/code> ディレクティブと &lt;code>@skip&lt;/code> ディレクティブの違いは、&lt;code>if&lt;/code> 引数の判定が逆転しているだけです。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>@include(if: Boolean)&lt;/code>&lt;/strong> ディレクティブ
+&lt;ul>
+&lt;li>&lt;code>if&lt;/code> 引数の値が &lt;code>true&lt;/code> のときにのみフィールドを取得します&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>&lt;code>@skip(if: Boolean)&lt;/code>&lt;/strong> ディレクティブ
+&lt;ul>
+&lt;li>&lt;code>if&lt;/code> 引数の値が &lt;code>false&lt;/code> のときにのみフィールドを取得します&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">クエリ内での @include ディレクティブによる条件分岐&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-graphql" data-lang="graphql">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">query&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">QueryOrganization&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nv">$org&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">String&lt;/span>&lt;span class="p">!,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nv">$details&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">Boolean&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="py">false&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">organization&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="py">login&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nv">$org&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nc">name&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">description&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">websiteUrl&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nd">@include&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="py">if&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nv">$details&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">variables&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;org&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;graphql&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;details&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>GraphQL クエリ仕様: フィールド名にエイリアスを付ける</title><link>https://maku.blog/p/vnkd4ur/</link><pubDate>Wed, 14 Sep 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vnkd4ur/</guid><description>&lt;p>GraphQL クエリ言語の &lt;strong>フィールド・エイリアス&lt;/strong> 機能を使うと、取得したフィールド値を参照するときに、任意の別名を付けて参照することができます。
+例えば、GraphQL スキーマとしては &lt;code>company&lt;/code> というフィールド名で定義されているものを、&lt;code>companyName&lt;/code> という JSON プロパティ名で返して欲しいときは、次のようにフィールド・エイリアスを使用します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">GraphQL クエリ&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-graphql" data-lang="graphql">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">query&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">ProfileInfoWithAlias&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">user&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="py">login&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;maku77&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nc">name&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">companyName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">company&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">bio&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">レスポンス&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;data&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;user&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Makkuma&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="nt">&amp;#34;companyName&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;maku maku company&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;bio&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;すーぱーぷにぐらまー&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>フィールド・エイリアスは、同名のフィールドを異なる引数で取得するときに役立ちます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">GraphQL クエリ&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-graphql" data-lang="graphql">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">query&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nc">maku77&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">user&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="py">login&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;maku77&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">...&lt;/span>&lt;span class="nc">basicUserInfo&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">puni&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">user&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="py">login&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;puni&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">...&lt;/span>&lt;span class="nc">basicUserInfo&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">fragment&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">basicUserInfo&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">on&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="py">User&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">name&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">bio&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のように 1 つのクエリの中で同名のフィールド（ここでは &lt;code>user&lt;/code>）を要求する場合に、フィールド・エイリアス（ここでは &lt;code>maku&lt;/code> と &lt;code>puni&lt;/code>）を付けることで、レスポンスのプロパティ名がコンフリクトしないようにします。
+というより、このケースではエイリアスを設定しないと、リクエスト時にエラーになります。&lt;/p></description></item><item><title>GraphQL クエリ仕様: フラグメント (Fragments) とインラインフラグメント (Inline Fragments)</title><link>https://maku.blog/p/wiv7it5/</link><pubDate>Tue, 19 Jan 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wiv7it5/</guid><description>&lt;h2 id="graphql-フラグメントでクエリをパーツ化する">GraphQL フラグメントでクエリをパーツ化する&lt;/h2>
+&lt;h3 id="フラグメントの基本">フラグメントの基本&lt;/h3>
+&lt;p>GraphQL クエリの中で、同じようなフィールドの指定（選択セット）を複数回使用する場合、それを &lt;a href="https://graphql.org/learn/queries/#fragments">フラグメント (Fragments)&lt;/a> という再利用可能な選択セットとして切り出して定義しておくことができます。&lt;/p>
+&lt;p>例えば次の GraphQL クエリは、GitHub から自分のユーザー情報 (&lt;code>viewer&lt;/code>) と、特定のユーザーの情報 (&lt;code>user&lt;/code>) を一度に取得しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">GraphQL クエリ&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-graphql" data-lang="graphql">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">query&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">QueryTwoUsers&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">viewer&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">login&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># ログインID&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">name&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># ユーザー名&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">url&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># ユーザーの GitHub ホームページ&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">websiteUrl&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># ユーザーの Web サイト&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">avatarUrl&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># ユーザーのアバター画像&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">user&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="py">login&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;ログインID&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nc">login&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">name&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">url&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">websiteUrl&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">avatarUrl&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>viewer&lt;/code> フィールドと &lt;code>user&lt;/code> フィールドは、両方とも &lt;a href="https://docs.github.com/en/graphql/reference/objects#user">User 型&lt;/a> のフィールドで、しかも、上記の例では &lt;code>User&lt;/code> オブジェクトの中の同じフィールドを参照しています。
+明らかに冗長な書き方です。&lt;/p></description></item></channel></rss>

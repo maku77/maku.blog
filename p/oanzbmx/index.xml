@@ -1,12 +1,286 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MongoDB クライアント (mongo シェル) on まくろぐ</title><link>https://maku.blog/p/oanzbmx/</link><description>Recent content in MongoDB クライアント (mongo シェル) on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Thu, 28 Dec 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/oanzbmx/index.xml" rel="self" type="application/rss+xml"/><item><title>mongo シェルの基本的な使い方</title><link>https://maku.blog/p/pwx5kf7/</link><pubDate>Mon, 13 Apr 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pwx5kf7/</guid><description>MongoDB サーバーへの接続 mongo シェルで MongoDB サーバーへ接続するには次の用に実行します。 先に MongoDB サーバーを起動 しておく必要があります）。
-$ mongo # 単純に接続する場合 $ mongo mydb # 使用するデータベース名を指定する場合 ポート番号（デフォルトは 27017）や接続先の IP アドレスを指定することもできます。 下記はすべて正しい接続方法です。
-$ mongo --port 40001 $ mongo --port 40001 mydb $ mongo localhost:40001 $ mongo localhost:40001/mydb $ mongo 192.168.0.100 $ mongo 192.168.0.100/mydb $ mongo 192.168.0.100:40001/mydb ヘルプの表示 (help) mongo シェルを起動したあとに、help コマンドを実行するとヘルプを表示することができます。
-&amp;gt; help db.help() help on db methods db.mycoll.help() help on collection methods sh.help() sharding helpers rs.help() replica set helpers help admin administrative help help connect connecting to a db help help keys key shortcuts help misc misc things to know help mr mapreduce show dbs show database names show collections show collections in current database show users show users in current database show profile show most recent system.</description></item><item><title>mongo シェルで JavaScript ファイル（スクリプト）を実行する</title><link>https://maku.blog/p/2thipwb/</link><pubDate>Mon, 31 Mar 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2thipwb/</guid><description>例えば、input.js というスクリプトを mongo シェルで実行するには以下のようにします。 ここでは、mydb という名前のデータベースの books コレクションに、テスト用のドキュメントを追加しています。
-$ mongo mydb input.js input.js db.books.insert({title: &amp;#39;Title 1&amp;#39;}); db.books.insert({title: &amp;#39;Title 2&amp;#39;}); db.books.insert({title: &amp;#39;Title 3&amp;#39;}); ドキュメントには書いてありませんが、標準入力から読み込ませることもできるようです。 この方法を使うと、mongo コマンドのオプションのフォーマット的に、データベース名を省略してスクリプトファイル名を指定できるようになるので、スクリプトの中でデータベースを切り替えることができます。
-$ mongo &amp;lt; input2.js $ mongo --port 40001 &amp;lt; input2.js $ mongo localhost:40001 &amp;lt; input2.js input2.js use testdb; db.books.insert({title: &amp;#39;Title 1&amp;#39;, tags: [&amp;#39;AAA&amp;#39;, &amp;#39;BBB&amp;#39;]}); db.books.insert({title: &amp;#39;Title 2&amp;#39;, tags: [&amp;#39;BBB&amp;#39;, &amp;#39;CCC&amp;#39;]}); db.books.insert({title: &amp;#39;Title 3&amp;#39;, tags: [&amp;#39;CCC&amp;#39;, &amp;#39;AAA&amp;#39;]});</description></item><item><title>MongoDB と mongosh のチートシート</title><link>https://maku.blog/p/j4c4vnq/</link><pubDate>Thu, 28 Dec 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j4c4vnq/</guid><description>全般（mongosh で接続した後のコマンド） コマンド 説明 db 現在のデータベース名を表示 use &amp;lt;db&amp;gt; 現在のデータベースを切り替える show databases (dbs) データベースの一覧を表示 show collections (tables) コレクションの一覧を表示 show users ユーザーの一覧を表示 show log ログの出力 db.stats() データベースの統計情報を表示 db.&amp;lt;coll&amp;gt;.stats() コレクションの統計情報を表示 db.createCollection(&amp;quot;&amp;lt;coll&amp;gt;&amp;quot;) コレクションを作成（オプション指定付きで作成したいとき） db.getCollectionInfos() コレクション情報を JS 配列として取得 db.getCollectionNames() コレクション名の一覧を JS 配列として取得 ドキュメントの検索 (Find) find の基本 コレクション内のドキュメントを検索するには、find() メソッドの第 1 引数に検索フィルターを指定します。
-すべてのドキュメントを取得する db.&amp;lt;coll&amp;gt;.find() db.&amp;lt;coll&amp;gt;.find({}) name フィールドの値が value に一致するドキュメントを検索する db.&amp;lt;coll&amp;gt;.find({ name: &amp;#34;value&amp;#34; }) awards.wins フィールドが 100 より大きいドキュメントを検索する db.&amp;lt;coll&amp;gt;.find({ &amp;#34;awards.wins&amp;#34;: { $gt: 100 } }) languages フィールドに jp あるいは en を含むドキュメントを検索する db.</description></item><item><title>mongo シェルで find の結果をインデントして見やすく表示する (pretty)</title><link>https://maku.blog/p/uvusqb7/</link><pubDate>Mon, 31 Mar 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uvusqb7/</guid><description>mongo シェルで find() を実行した結果を見やすいように整形するには、実行結果に対して pretty() を適用します。
-&amp;gt; db.books.find().pretty() { &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;533973de50b35840de2dda25&amp;#34;), &amp;#34;title&amp;#34; : &amp;#34;Title 1&amp;#34;, &amp;#34;tags&amp;#34; : [ &amp;#34;AAA&amp;#34;, &amp;#34;BBB&amp;#34; ] } { &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;533973de50b35840de2dda26&amp;#34;), &amp;#34;title&amp;#34; : &amp;#34;Title 2&amp;#34;, &amp;#34;tags&amp;#34; : [ &amp;#34;BBB&amp;#34;, &amp;#34;CCC&amp;#34; ] } { &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;533973de50b35840de2dda27&amp;#34;), &amp;#34;title&amp;#34; : &amp;#34;Title 3&amp;#34;, &amp;#34;tags&amp;#34; : [ &amp;#34;CCC&amp;#34;, &amp;#34;AAA&amp;#34; ] }</description></item><item><title>mongo シェルで MapReduce を実行する</title><link>https://maku.blog/p/qvkkcuj/</link><pubDate>Mon, 31 Mar 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qvkkcuj/</guid><description>mongo シェルを使って、下記のような books コレクションに対して MapReduce をかけて、タグ情報のリスト（tags コレクション）を生成する方法を示します。
-{ title: &amp;#39;Title 1&amp;#39;, tags: [&amp;#39;AAA&amp;#39;, &amp;#39;BBB&amp;#39;] } { title: &amp;#39;Title 2&amp;#39;, tags: [&amp;#39;BBB&amp;#39;, &amp;#39;CCC&amp;#39;] } { title: &amp;#39;Title 3&amp;#39;, tags: [&amp;#39;CCC&amp;#39;, &amp;#39;AAA&amp;#39;] } 作成される tags コレクションは、以下のようになることを想定しています。
-{ &amp;#34;_id&amp;#34; : &amp;#34;AAA&amp;#34;, &amp;#34;value&amp;#34; : 2 } { &amp;#34;_id&amp;#34; : &amp;#34;BBB&amp;#34;, &amp;#34;value&amp;#34; : 2 } { &amp;#34;_id&amp;#34; : &amp;#34;CCC&amp;#34;, &amp;#34;value&amp;#34; : 2 } まずは、サンプルデータとなる books コレクションを作成します。
-books.js use testdb; // books コレクションの初期化 db.books.drop(); db.books.save({title: &amp;#39;Title 1&amp;#39;, tags: [&amp;#39;AAA&amp;#39;, &amp;#39;BBB&amp;#39;]}); db.</description></item><item><title>mongo シェルで各フィールドの型を調べる (typeof, instanceof)</title><link>https://maku.blog/p/yejmu4v/</link><pubDate>Tue, 22 Oct 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yejmu4v/</guid><description>mongo シェルで、各フィールドの型（タイプ）を調べたいときは、typeof や instanceof を使用します。
-フィールドの型を調べる typeof mydoc._id 指定した型のフィールドかどうか調べる mydoc._id instanceof ObjectId 参考 Data Types in the mongo Shell — MongoDB Manual</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MongoDB クライアント (mongo シェル) on まくろぐ</title><link>https://maku.blog/p/oanzbmx/</link><description>Recent content in MongoDB クライアント (mongo シェル) on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Thu, 28 Dec 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/oanzbmx/index.xml" rel="self" type="application/rss+xml"/><item><title>mongo シェルの基本的な使い方</title><link>https://maku.blog/p/pwx5kf7/</link><pubDate>Mon, 13 Apr 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pwx5kf7/</guid><description>&lt;h2 id="mongodb-サーバーへの接続">MongoDB サーバーへの接続&lt;/h2>
+&lt;p>&lt;code>mongo&lt;/code> シェルで MongoDB サーバーへ接続するには次の用に実行します。
+先に &lt;a href="../../p/3ucs8n3">MongoDB サーバーを起動&lt;/a> しておく必要があります）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo &lt;span class="c1"># 単純に接続する場合&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo mydb &lt;span class="c1"># 使用するデータベース名を指定する場合&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ポート番号（デフォルトは &lt;code>27017&lt;/code>）や接続先の IP アドレスを指定することもできます。
+下記はすべて正しい接続方法です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo --port &lt;span class="m">40001&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo --port &lt;span class="m">40001&lt;/span> mydb
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="gp">$&lt;/span> mongo localhost:40001
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo localhost:40001/mydb
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="gp">$&lt;/span> mongo 192.168.0.100
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo 192.168.0.100/mydb
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo 192.168.0.100:40001/mydb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="ヘルプの表示-help">ヘルプの表示 (help)&lt;/h2>
+&lt;p>&lt;code>mongo&lt;/code> シェルを起動したあとに、&lt;strong>&lt;code>help&lt;/code>&lt;/strong> コマンドを実行するとヘルプを表示することができます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> &lt;span class="nb">help&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">db.help() help on db methods
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">db.mycoll.help() help on collection methods
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">sh.help() sharding helpers
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">rs.help() replica set helpers
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">help admin administrative help
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">help connect connecting to a db help
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">help keys key shortcuts
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">help misc misc things to know
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">help mr mapreduce
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">show dbs show database names
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">show collections show collections in current database
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">show users show users in current database
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">show profile show most recent system.profile entries with time &amp;gt;= 1ms
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">show logs show the accessible logger names
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">show log [name] prints out the last segment of log in memory, &amp;#39;global&amp;#39; is default
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">use &amp;lt;db_name&amp;gt; set current database
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">db.mycoll.find() list objects in collection mycoll
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">db.mycoll.find( { a : 1 } ) list objects in mycoll where a == 1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">it result of the last line evaluated; use to further iterate
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">DBQuery.shellBatchSize = x set default number of items to display on shell
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">exit quit the mongo shell
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="コレクションにドキュメントを追加する-dbcollinsert">コレクションにドキュメントを追加する (db.coll.insert)&lt;/h2>
+&lt;p>まず、データベース名を指定して MongoDB サーバーに接続してください。
+ここでは、&lt;code>mydb&lt;/code> という名前のデータベースを使うことにします（実体は必要に応じて自動的に作成されます）。&lt;/p></description></item><item><title>mongo シェルで JavaScript ファイル（スクリプト）を実行する</title><link>https://maku.blog/p/2thipwb/</link><pubDate>Mon, 31 Mar 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2thipwb/</guid><description>&lt;p>例えば、&lt;code>input.js&lt;/code> というスクリプトを &lt;code>mongo&lt;/code> シェルで実行するには以下のようにします。
+ここでは、&lt;code>mydb&lt;/code> という名前のデータベースの &lt;code>books&lt;/code> コレクションに、テスト用のドキュメントを追加しています。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo mydb input.js
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">input.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">insert&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 1&amp;#39;&lt;/span>&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">insert&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 2&amp;#39;&lt;/span>&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">insert&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 3&amp;#39;&lt;/span>&lt;span class="p">});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ドキュメントには書いてありませんが、標準入力から読み込ませることもできるようです。
+この方法を使うと、&lt;code>mongo&lt;/code> コマンドのオプションのフォーマット的に、データベース名を省略してスクリプトファイル名を指定できるようになるので、&lt;strong>スクリプトの中でデータベースを切り替えることができます&lt;/strong>。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo &amp;lt; input2.js
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo --port &lt;span class="m">40001&lt;/span> &amp;lt; input2.js
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo localhost:40001 &amp;lt; input2.js
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">input2.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">use&lt;/span> &lt;span class="nx">testdb&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">insert&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 1&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;AAA&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;BBB&amp;#39;&lt;/span>&lt;span class="p">]});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">insert&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 2&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;BBB&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;CCC&amp;#39;&lt;/span>&lt;span class="p">]});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">insert&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 3&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;CCC&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;AAA&amp;#39;&lt;/span>&lt;span class="p">]});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>MongoDB と mongosh のチートシート</title><link>https://maku.blog/p/j4c4vnq/</link><pubDate>Thu, 28 Dec 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j4c4vnq/</guid><description>&lt;h2 id="全般mongosh-で接続した後のコマンド">全般（mongosh で接続した後のコマンド）&lt;/h2>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>コマンド&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>db&lt;/code>&lt;/td>
+ &lt;td>現在のデータベース名を表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>use &amp;lt;db&amp;gt;&lt;/code>&lt;/td>
+ &lt;td>現在のデータベースを切り替える&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>show databases (dbs)&lt;/code>&lt;/td>
+ &lt;td>データベースの一覧を表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>show collections (tables)&lt;/code>&lt;/td>
+ &lt;td>コレクションの一覧を表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>show users&lt;/code>&lt;/td>
+ &lt;td>ユーザーの一覧を表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>show log&lt;/code>&lt;/td>
+ &lt;td>ログの出力&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>db.stats()&lt;/code>&lt;/td>
+ &lt;td>データベースの統計情報を表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>db.&amp;lt;coll&amp;gt;.stats()&lt;/code>&lt;/td>
+ &lt;td>コレクションの統計情報を表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>db.createCollection(&amp;quot;&amp;lt;coll&amp;gt;&amp;quot;)&lt;/code>&lt;/td>
+ &lt;td>コレクションを作成（オプション指定付きで作成したいとき）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>db.getCollectionInfos()&lt;/code>&lt;/td>
+ &lt;td>コレクション情報を JS 配列として取得&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>db.getCollectionNames()&lt;/code>&lt;/td>
+ &lt;td>コレクション名の一覧を JS 配列として取得&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="ドキュメントの検索-find">ドキュメントの検索 (Find)&lt;/h2>
+&lt;h3 id="find-の基本">find の基本&lt;/h3>
+&lt;p>コレクション内のドキュメントを検索するには、&lt;strong>&lt;code>find()&lt;/code>&lt;/strong> メソッドの第 1 引数に検索フィルターを指定します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">すべてのドキュメントを取得する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&amp;lt;&lt;/span>&lt;span class="nt">coll&lt;/span>&lt;span class="p">&amp;gt;.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&amp;lt;&lt;/span>&lt;span class="nt">coll&lt;/span>&lt;span class="p">&amp;gt;.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({})&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">name フィールドの値が value に一致するドキュメントを検索する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&amp;lt;&lt;/span>&lt;span class="nt">coll&lt;/span>&lt;span class="p">&amp;gt;.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span> &lt;span class="p">})&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">awards.wins フィールドが 100 より大きいドキュメントを検索する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&amp;lt;&lt;/span>&lt;span class="nt">coll&lt;/span>&lt;span class="p">&amp;gt;.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="s2">&amp;#34;awards.wins&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">$gt&lt;/span>: &lt;span class="kt">100&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="p">})&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">languages フィールドに jp あるいは en を含むドキュメントを検索する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&amp;lt;&lt;/span>&lt;span class="nt">coll&lt;/span>&lt;span class="p">&amp;gt;.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">languages&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">$in&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;jp&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;en&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="p">})&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>find()&lt;/code> の第 2 引数 (project fields) では、取得するフィールドを指定できます。
+基本的には取得したいフィールドに &lt;code>1&lt;/code> を指定すれば OK ですが、&lt;code>_id&lt;/code> フィールドだけはデフォルトで取得するようになっているので、&lt;code>_id&lt;/code> フィールドが必要ない場合は明示的に &lt;code>0&lt;/code> を指定する必要があります。&lt;/p></description></item><item><title>mongo シェルで find の結果をインデントして見やすく表示する (pretty)</title><link>https://maku.blog/p/uvusqb7/</link><pubDate>Mon, 31 Mar 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uvusqb7/</guid><description>&lt;p>&lt;code>mongo&lt;/code> シェルで &lt;code>find()&lt;/code> を実行した結果を見やすいように整形するには、実行結果に対して &lt;strong>&lt;code>pretty()&lt;/code>&lt;/strong> を適用します。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> db.books.find&lt;span class="o">()&lt;/span>.pretty&lt;span class="o">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">{
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;533973de50b35840de2dda25&amp;#34;),
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;title&amp;#34; : &amp;#34;Title 1&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;tags&amp;#34; : [
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;AAA&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;BBB&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">{
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;533973de50b35840de2dda26&amp;#34;),
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;title&amp;#34; : &amp;#34;Title 2&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;tags&amp;#34; : [
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;BBB&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;CCC&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">{
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;533973de50b35840de2dda27&amp;#34;),
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;title&amp;#34; : &amp;#34;Title 3&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;tags&amp;#34; : [
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;CCC&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;AAA&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">}
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>mongo シェルで MapReduce を実行する</title><link>https://maku.blog/p/qvkkcuj/</link><pubDate>Mon, 31 Mar 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qvkkcuj/</guid><description>&lt;p>&lt;code>mongo&lt;/code> シェルを使って、下記のような &lt;code>books&lt;/code> コレクションに対して &lt;strong>MapReduce&lt;/strong> をかけて、タグ情報のリスト（&lt;code>tags&lt;/code> コレクション）を生成する方法を示します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 1&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;AAA&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;BBB&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 2&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;BBB&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;CCC&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 3&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;CCC&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;AAA&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>作成される &lt;code>tags&lt;/code> コレクションは、以下のようになることを想定しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="s2">&amp;#34;_id&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;AAA&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="s2">&amp;#34;_id&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;BBB&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="s2">&amp;#34;_id&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;CCC&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>まずは、サンプルデータとなる &lt;code>books&lt;/code> コレクションを作成します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">books.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">use&lt;/span> &lt;span class="nx">testdb&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// books コレクションの初期化
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">drop&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">save&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 1&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;AAA&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;BBB&amp;#39;&lt;/span>&lt;span class="p">]});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">save&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 2&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;BBB&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;CCC&amp;#39;&lt;/span>&lt;span class="p">]});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">save&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 3&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;CCC&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;AAA&amp;#39;&lt;/span>&lt;span class="p">]});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 確認
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;books collection has been created&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">();&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ mongo &amp;lt; books.js&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次に、&lt;code>books&lt;/code> コレクションに MapReduce をかけて、&lt;code>tags&lt;/code> コレクションを生成します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">mapreduce.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">use&lt;/span> &lt;span class="nx">testdb&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="nx">map&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kd">function&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">tags&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">tags&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forEach&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kd">function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">tag&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">emit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">tag&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="nx">reduce&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kd">function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">key&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">values&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">var&lt;/span> &lt;span class="nx">sum&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">values&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forEach&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kd">function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">val&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">sum&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="nx">val&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">sum&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">runCommand&lt;/span>&lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">mapReduce&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;books&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// MapReduce をかけるコレクション
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">map&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">map&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// Map 関数
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">reduce&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">reduce&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// Reduce 関数
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">out&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;tags&amp;#39;&lt;/span> &lt;span class="c1">// MapReduce の結果を格納するコレクション
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ mongo &amp;lt; mapreduce.js&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>実際に &lt;code>tags&lt;/code> コレクションが生成されているか確認してみます。&lt;/p></description></item><item><title>mongo シェルで各フィールドの型を調べる (typeof, instanceof)</title><link>https://maku.blog/p/yejmu4v/</link><pubDate>Tue, 22 Oct 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yejmu4v/</guid><description>&lt;p>&lt;code>mongo&lt;/code> シェルで、各フィールドの型（タイプ）を調べたいときは、&lt;strong>&lt;code>typeof&lt;/code>&lt;/strong> や &lt;strong>&lt;code>instanceof&lt;/code>&lt;/strong> を使用します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">フィールドの型を調べる&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">typeof mydoc._id&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">指定した型のフィールドかどうか調べる&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">mydoc._id instanceof ObjectId&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;aside style="display: flex; border: thin dashed gray;">
+&lt;div style="align-self: stretch; writing-mode: vertical-lr; text-align: center; letter-spacing: 0.2em; color: #666; border-right: thin dashed gray; padding: 0.4em 0; line-height: 1.5;">参考&lt;/div>
+&lt;div style="align-self: center; padding: 0.6em 0; line-height: 1.2 !important;">&lt;ul>
+&lt;li>&lt;a href="http://docs.mongodb.org/manual/core/shell-types/#check-types-in-shell">Data Types in the mongo Shell — MongoDB Manual&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/aside></description></item></channel></rss>

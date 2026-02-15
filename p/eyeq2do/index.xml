@@ -1,10 +1,126 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS Lambda のメモ on まくろぐ</title><link>https://maku.blog/p/eyeq2do/</link><description>Recent content in AWS Lambda のメモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sun, 06 Jun 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/eyeq2do/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS Lambda のポリシーステートメントの記述例</title><link>https://maku.blog/p/yn7hqx8/</link><pubDate>Sun, 06 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yn7hqx8/</guid><description>参考: AppSync / SSM
-Lambda 関数の呼び出しを許可する { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;lambda:invokeFunction&amp;#34; ], &amp;#34;Resource&amp;#34;: [ &amp;#34;arn:aws:lambda:us-west-2:123456789012:function:my-function&amp;#34;, &amp;#34;arn:aws:lambda:us-west-2:123456789012:function:my-function:*&amp;#34; ] } ] }</description></item><item><title>Lambda 実装例: S3 へのアップロードを SNS で通知して Lambda から読み込む</title><link>https://maku.blog/p/f2fq2cn/</link><pubDate>Mon, 19 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/f2fq2cn/</guid><description>何をするか？ ここでは Lambda 関数の実装例として、SNS トピックから S3 バケットの PutObject イベント通知を受けて、アップロードされたファイルを読み込む例を示します。 S3 バケット、および SNS トピックの作成と、S3 → SNS の通知設定は完了していると想定します。
-参考 CloudFormation の設定例: S3 通知を SNS トピックに Publish する CloudFormation の設定例: SNS トピックを Lambda 関数からサブスクライブする Lambda 関数の実装 AWS SDK のインストール ここでは、Node.js 用の AWS SDK ver.2 を使っているので、先にインストールしておく必要があります。 AWS 側の Lambda 実行環境には標準でインストールされているので、--save-dev（開発用）でインストールしておけば OK です。 ついでに TypeScript 用の型定義もインストールしておくと、Lambda ハンドラのパラメータを any 型ではなく、SNSEvent 型などで参照できて便利です。
-$ npm install aws-sdk --save-dev $ npm install @types/aws-lambda --save-dev Lambda ハンドラの実装 先に、S3 バケット内のオブジェクトの内容を取得するユーティリティ関数を用意しておきます（AWS SDK ver.</description></item><item><title>AWS Lambda にデプロイするための ZIP パッケージを npm で作成する (npm-pack-zip)</title><link>https://maku.blog/p/zmydq3f/</link><pubDate>Sat, 20 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/zmydq3f/</guid><description>何をするか？ AWS Lambda で実行する関数は、ZIP ファイルの形でデプロイすることになります。 ここでは、Node.js で関数を実装しているという前提で、npm スクリプトで簡単にデプロイ用の ZIP パッケージを作成する方法を説明します。
-Lambda 関数用の ZIP パッケージを作成するときは、次のようなことを考慮する必要があります。
-実行時に必要な node_modules 以下のモジュールを含める（逆に devDependencies で指定したモジュールは含めない。例えば typescript とか eslint とかは含めない） AWS SDK (aws-sdk) は含めない（Lambda の実行環境にインストールされている） TypeScript を使っているのであれば、ビルド後の .js ファイルのみを含める（例えば、src/*.ts は含めず、build/*.js を含める） ☝️ AWS Lambda レイヤー Lambda の「レイヤー」という機能を使うと、関数の実行に必要な node_modules を ZIP パッケージとは別に管理して、Lambda 関数から参照するということができます。 でも設定にひと手間かかります。AWS のこういうところは嫌いです。
-ここでは、レイヤーの機能は使わずに、ZIP パッケージに全部入れちゃう方法を説明しています。
-npm-pack-zip で ZIP ファイルを作成する npm-pack-zip とは ここでは、npm-pack-zip パッケージを使って、Lambda 関数のデプロイ用 ZIP パッケージを作ってみます。
-npm-pack-zip - npm NPM には、もともと標準で npm pack というデプロイ用の NPM パッケージを作成する仕組みが搭載されています。 Lambda 用にもこれが使えると楽なのですが、残念ながら npm pack は .</description></item><item><title>AWS Lambda をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/n9nydjc/</link><pubDate>Fri, 12 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n9nydjc/</guid><description>Lambda 関数の一覧を取得する (lambda list-functions) $ aws lambda list-functions --max-items 10 関数名だけ取り出す $ aws lambda list-functions --max-items 10 --query &amp;#34;Functions[].FunctionName&amp;#34; Node.js 10 を使ってる関数の ARN を調べる $ aws lambda list-functions --function-version ALL --output text --query &amp;#34;Functions[?Runtime==&amp;#39;nodejs10.x&amp;#39;].FunctionArn AWS から来た「Node.js 10 のサポート切れるから乗り換えてね」というメール (2021-06-04) に書かれていたやり方です。
-Lambda 関数の情報を取得する (lambda get-function) $ aws lambda get-function --function-name my-function 実行結果 { &amp;#34;Configuration&amp;#34;: { &amp;#34;FunctionName&amp;#34;: &amp;#34;my-function&amp;#34;, &amp;#34;FunctionArn&amp;#34;: &amp;#34;arn:aws:lambda:ap-northeast-1:123456789012:function:my-function&amp;#34;, &amp;#34;Runtime&amp;#34;: &amp;#34;nodejs12.x&amp;#34;, &amp;#34;Role&amp;#34;: &amp;#34;arn:aws:iam::123456789012:role/lambda-ex&amp;#34;, &amp;#34;CodeSha256&amp;#34;: &amp;#34;FpFMvUhayLkOoVBpNuNiIVML/tuGv2iJQ7t0yWVTU8c=&amp;#34;, &amp;#34;Version&amp;#34;: &amp;#34;$LATEST&amp;#34;, &amp;#34;TracingConfig&amp;#34;: { &amp;#34;Mode&amp;#34;: &amp;#34;PassThrough&amp;#34; }, &amp;#34;RevisionId&amp;#34;: &amp;#34;88ebe1e1-bfdf-4dc3-84de-3017268fa1ff&amp;#34;, .</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS Lambda のメモ on まくろぐ</title><link>https://maku.blog/p/eyeq2do/</link><description>Recent content in AWS Lambda のメモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 06 Jun 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/eyeq2do/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS Lambda のポリシーステートメントの記述例</title><link>https://maku.blog/p/yn7hqx8/</link><pubDate>Sun, 06 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yn7hqx8/</guid><description>&lt;p>参考: &lt;a href="../../p/cexcpyc/">AppSync&lt;/a> / &lt;a href="../../p/s3o57jv/">SSM&lt;/a>&lt;/p>
+&lt;h2 id="lambda-関数の呼び出しを許可する">Lambda 関数の呼び出しを許可する&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2012-10-17&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Statement&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="s2">&amp;#34;lambda:invokeFunction&amp;#34;&lt;/span> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;arn:aws:lambda:us-west-2:123456789012:function:my-function&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;arn:aws:lambda:us-west-2:123456789012:function:my-function:*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Lambda 実装例: S3 へのアップロードを SNS で通知して Lambda から読み込む</title><link>https://maku.blog/p/f2fq2cn/</link><pubDate>Mon, 19 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/f2fq2cn/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/f2fq2cn/img-s3-sns-lambda.svg" alt="/p/f2fq2cn/img-s3-sns-lambda.svg" />
+&lt;/figure>
+
+&lt;p>ここでは Lambda 関数の実装例として、SNS トピックから S3 バケットの PutObject イベント通知を受けて、アップロードされたファイルを読み込む例を示します。
+S3 バケット、および SNS トピックの作成と、S3 → SNS の通知設定は完了していると想定します。&lt;/p>
+&lt;aside style="display: flex; border: thin dashed gray;">
+&lt;div style="align-self: stretch; writing-mode: vertical-lr; text-align: center; letter-spacing: 0.2em; color: #666; border-right: thin dashed gray; padding: 0.4em 0; line-height: 1.5;">参考&lt;/div>
+&lt;div style="align-self: center; padding: 0.6em 0; line-height: 1.2 !important;">&lt;ul>
+&lt;li>&lt;a href="../../p/3o2dpyb">CloudFormation の設定例: S3 通知を SNS トピックに Publish する&lt;/a>&lt;/li>
+&lt;li>&lt;a href="../../p/5q4epyb">CloudFormation の設定例: SNS トピックを Lambda 関数からサブスクライブする&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/aside>
+&lt;h2 id="lambda-関数の実装">Lambda 関数の実装&lt;/h2>
+&lt;h3 id="aws-sdk-のインストール">AWS SDK のインストール&lt;/h3>
+&lt;p>ここでは、Node.js 用の AWS SDK ver.2 を使っているので、先にインストールしておく必要があります。
+AWS 側の Lambda 実行環境には標準でインストールされているので、&lt;code>--save-dev&lt;/code>（開発用）でインストールしておけば OK です。
+ついでに TypeScript 用の型定義もインストールしておくと、Lambda ハンドラのパラメータを &lt;code>any&lt;/code> 型ではなく、&lt;code>SNSEvent&lt;/code> 型などで参照できて便利です。&lt;/p></description></item><item><title>AWS Lambda にデプロイするための ZIP パッケージを npm で作成する (npm-pack-zip)</title><link>https://maku.blog/p/zmydq3f/</link><pubDate>Sat, 20 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/zmydq3f/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>AWS Lambda で実行する関数は、ZIP ファイルの形でデプロイすることになります。
+ここでは、Node.js で関数を実装しているという前提で、&lt;code>npm&lt;/code> スクリプトで簡単にデプロイ用の ZIP パッケージを作成する方法を説明します。&lt;/p>
+&lt;p>Lambda 関数用の ZIP パッケージを作成するときは、次のようなことを考慮する必要があります。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>実行時に必要な &lt;code>node_modules&lt;/code> 以下のモジュールを含める&lt;/strong>（逆に &lt;code>devDependencies&lt;/code> で指定したモジュールは含めない。例えば &lt;code>typescript&lt;/code> とか &lt;code>eslint&lt;/code> とかは含めない）&lt;/li>
+&lt;li>AWS SDK (&lt;code>aws-sdk&lt;/code>) は含めない（Lambda の実行環境にインストールされている）&lt;/li>
+&lt;li>TypeScript を使っているのであれば、ビルド後の &lt;code>.js&lt;/code> ファイルのみを含める（例えば、&lt;code>src/*.ts&lt;/code> は含めず、&lt;code>build/*.js&lt;/code> を含める）&lt;/li>
+&lt;/ul>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ AWS Lambda レイヤー&lt;/span>
+ &lt;span class="xNote_body">&lt;p>Lambda の「レイヤー」という機能を使うと、関数の実行に必要な &lt;code>node_modules&lt;/code> を ZIP パッケージとは別に管理して、Lambda 関数から参照するということができます。
+でも設定にひと手間かかります。AWS のこういうところは嫌いです。&lt;/p>
+&lt;p>ここでは、レイヤーの機能は使わずに、ZIP パッケージに全部入れちゃう方法を説明しています。&lt;/p>
+&lt;/span>
+&lt;/div>
+
+&lt;h2 id="npm-pack-zip-で-zip-ファイルを作成する">npm-pack-zip で ZIP ファイルを作成する&lt;/h2>
+&lt;h3 id="npm-pack-zip-とは">npm-pack-zip とは&lt;/h3>
+&lt;p>ここでは、&lt;strong>&lt;code>npm-pack-zip&lt;/code>&lt;/strong> パッケージを使って、Lambda 関数のデプロイ用 ZIP パッケージを作ってみます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://www.npmjs.com/package/npm-pack-zip">npm-pack-zip - npm&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>NPM には、もともと標準で &lt;code>npm pack&lt;/code> というデプロイ用の NPM パッケージを作成する仕組みが搭載されています。
+Lambda 用にもこれが使えると楽なのですが、残念ながら &lt;code>npm pack&lt;/code> は &lt;code>.tgz&lt;/code> 形式のパッケージしか作成できません。
+&lt;code>npm-pack-zip&lt;/code> をインストールすると、&lt;code>npm pack&lt;/code> の仕組みをそのまま使い、&lt;code>.zip&lt;/code> 形式のパッケージを作成することができます。&lt;/p></description></item><item><title>AWS Lambda をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/n9nydjc/</link><pubDate>Fri, 12 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n9nydjc/</guid><description>&lt;h2 id="lambda-関数の一覧を取得する-lambda-list-functions">Lambda 関数の一覧を取得する (lambda list-functions)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws lambda list-functions --max-items 10&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">関数名だけ取り出す&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws lambda list-functions --max-items 10
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --query &amp;#34;Functions[].FunctionName&amp;#34;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Node.js 10 を使ってる関数の ARN を調べる&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws lambda list-functions --function-version ALL --output text
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --query &amp;#34;Functions[?Runtime==&amp;#39;nodejs10.x&amp;#39;].FunctionArn&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>AWS から来た「Node.js 10 のサポート切れるから乗り換えてね」というメール (2021-06-04) に書かれていたやり方です。&lt;/p>
+&lt;h2 id="lambda-関数の情報を取得する-lambda-get-function">Lambda 関数の情報を取得する (lambda get-function)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws lambda get-function --function-name my-function&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-958317264" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-958317264">実行結果&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">{
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Configuration&amp;#34;: {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;FunctionName&amp;#34;: &amp;#34;my-function&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;FunctionArn&amp;#34;: &amp;#34;arn:aws:lambda:ap-northeast-1:123456789012:function:my-function&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Runtime&amp;#34;: &amp;#34;nodejs12.x&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Role&amp;#34;: &amp;#34;arn:aws:iam::123456789012:role/lambda-ex&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;CodeSha256&amp;#34;: &amp;#34;FpFMvUhayLkOoVBpNuNiIVML/tuGv2iJQ7t0yWVTU8c=&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Version&amp;#34;: &amp;#34;$LATEST&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;TracingConfig&amp;#34;: {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Mode&amp;#34;: &amp;#34;PassThrough&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> },
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;RevisionId&amp;#34;: &amp;#34;88ebe1e1-bfdf-4dc3-84de-3017268fa1ff&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> },
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Code&amp;#34;: {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;RepositoryType&amp;#34;: &amp;#34;S3&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Location&amp;#34;: &amp;#34;https://awslambda-ap-northeast-1-tasks.s3.ap-northeast-1.amazonaws.com/snapshots/123456789012/my-function-4203078a-b7c9-4f35-...&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+&lt;p>Lambda 関数のデプロイパッケージをダウンロードするために使用できる、Lambda 関数メタデータと署名付き URL が含まれています。&lt;/p></description></item></channel></rss>

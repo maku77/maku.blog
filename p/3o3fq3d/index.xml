@@ -1,26 +1,326 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Next.js のプリレンダリングとルーティング on まくろぐ</title><link>https://maku.blog/p/3o3fq3d/</link><description>Recent content in Next.js のプリレンダリングとルーティング on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Wed, 05 May 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/3o3fq3d/index.xml" rel="self" type="application/rss+xml"/><item><title>Next.js のプリレンダリング機能を使用する (getStaticProps)</title><link>https://maku.blog/p/iv4agnt/</link><pubDate>Tue, 04 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/iv4agnt/</guid><description>Pre-rendering とは ブログの記事一覧ページなどを生成する場合、なんらかの API で取得した値をもとにページのコンテンツを生成する必要があります。 例えば、次のように取得した値を使ってページを生成することになります。
-Web API で取得した値 データベースのクエリ結果 ローカルファイルの内容や、ファイルの一覧情報 Next.js には、Web サイトのビルド時や、Web サーバーへのアクセス時にこういった API を呼び出して、HTML コンテンツを生成する Pre-rendering 機能が備わっています。 Pre-rendering 機能は次の 2 種類があり、どちらか一方を使うこともできますし、両方を組み合わせて使うこともできます。
-SSG: Static Generation（静的サイトジェネレーション） Web サイトのビルド時に HTML ファイルを生成します。Web サーバーは静的な HTML ファイルを返すだけでよいので、パフォーマンスが非常に高くなります。すべてのページを事前に列挙できるのであれば、できるだけこの SSG を使って静的に HTML 生成してしまうことが推奨されています。静的な HTML ファイルをホスト可能なサーバー（GitHub Pages など）があれば、Web サイトを公開できます。 SSR: Server-side Rendering（サーバーサイドレンダリング） クライアントが Web サーバーにアクセスしたときに、サーバーサイドで動的に HTML を生成します。この仕組みを使うと、日々増減するデータを扱いやすくなりますが、Web サーバーとして Next.js サーバーを稼働させておく必要があります。感覚的には、PHP サーバーなどが動作しているイメージに近いです。 ちなみに、純粋に React.js のみを使用した場合とはどう違うのでしょうか？ React.js 自体には Pre-rendering 機能は備わっておらず、主に SPA (Single Page Application) を作成するライブラリとして使用されています。 React.js のみを使って上記の例のような記事一覧ページを生成する場合、Web ブラウザ上で JavaScript を実行してコンテンツを動的に生成する必要があります。 これを SSG や SSR と区別するために、CSR: Client-side rendering（クライアントサイドレンダリング） と呼びます。</description></item><item><title>Next.js のダイナミックルーティング機能を利用する (getStaticPaths, getStaticProps, getServerSideProps)</title><link>https://maku.blog/p/rdq3ep2/</link><pubDate>Wed, 05 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rdq3ep2/</guid><description>ダイナミックルーティングとは Next.js では、pages/books/[id].tsx のようなファイル名でページを作成すると、1 つのファイルで、
-/books/001 /books/002 /books/003 のようなパス (URL) によるアクセスをハンドルできます。 これを ダイナミックルーティング (Dynamic Routes) 機能と呼びます。
-Next.js のページコンポーネント (/pages/xxx.tsx) は、そのページのエントリポイント（ルートコンポーネント）となるため、通常の React コンポーネントとは違って、上位のコンポーネントから props 情報を渡すことができません。 そこで Next.js では、ページコンポーネントの実装ファイル内で getStaticProps という関数を定義することで、ページコンポーネントに渡す props 情報を生成できるようにしています。 getStaticProps 内では、上記のような URL パラメータ情報（/books/[id] の id の部分の値）を取り出して、それを元に props 情報を生成できます。 この仕組みによって、Next.js のページコンポーネントは、1 つの .tsx ファイルで、複数のページ (.html) を生成できるようになっています。
-ダイナミックルーティングの実装（SSG の場合） 静的ジェネレーション (SSG: Static Generation)、つまり Web サイトのビルド時にすべての HTML ファイルを生成してしまうには、あらかじめどのようなパラメーター（上記の例では id）でのアクセスが行われるかを把握した上で、各ページの内容を生成する必要があります。 これを実現するには、ページコンポーネントの実装ファイル (pages/*.tsx) で、次のような async 関数を実装して export します。
-getStaticPaths 関数 URL のパラメーター部分（上記の例では id）で指定可能な値を返すように実装します。言い換えると、プリビルドすべきページの一覧情報を Next.</description></item><item><title>Next.js でローカル開発時 (next dev) のみ有効なデバッグページを作成する (getStaticProps)</title><link>https://maku.blog/p/3vbr2bm/</link><pubDate>Mon, 09 May 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3vbr2bm/</guid><description>何をするか？ Next.js アプリを作っていると、開発中にだけ表示したいデバッグ用のページを作りたくなることがよくあります。 ここでは、ローカルサーバー (next dev) での開発中のみ有効になるデバッグページの作り方を説明します。
-デバッグページの作成 Next.js の各ページのビルド時には、必要に応じてデータフェッチなどを行うための getStaticProps 関数が呼び出されます（参考: Next.js のプリレンダリング機能を使用する (getStaticProps)）。
-この関数の戻り値として、notFound プロパティ を true にしたオブジェクトを返すと、そのページがないものとして扱うことができます（404 Not Found になる）。
-export const getStaticProps: GetStaticProps = () =&amp;gt; { // ... return { // Return the default 404 page with a status code of 404. notFound: true } } この仕組みを利用して次のように実装すれば、ローカルサーバーでの開発中のみ表示可能なデバッグページを作ることができます。 ローカルサーバー (next dev) で実行されているかどうかは、環境変数 process.env.NODE_ENV の値で判断できます（参考: Next.js で環境変数を扱う (.env, NEXT_PUBLIC, NODE_ENV)）。
-src/pages/debug/info.tsx import { GetStaticProps, NextPage } from &amp;#39;next&amp;#39; type EmptyProps = { [key: string]: never } /** * デバッグページのビルド時の前処理。 * 開発サーバー (next dev) での実行時のみ、このページが存在するようにします。 * 本番サーバー (next start) での実行時は、404 Not Found になります。 */ export const getStaticProps: GetStaticProps&amp;lt;EmptyProps&amp;gt; = () =&amp;gt; { const isLocalDev = process.</description></item><item><title>Next.js でブラウザ履歴で戻るボタンを表示する (router.back)</title><link>https://maku.blog/p/m4dmu4c/</link><pubDate>Tue, 22 Feb 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m4dmu4c/</guid><description>Next.js の next/router モジュールが提供する NextRouter オブジェクトの back メソッド を呼び出すと、ブラウザの履歴に従って 1 つ前のページに遷移することができます。 つまり、ブラウザの「戻る」ボタンを押した場合と同じ振る舞いをします。 NextRouter オブジェクトは、useRouter フックで取得することができます。
-次の BackButton コンポーネントはシンプルな「戻る」ボタンを表示し、クリック時に NextRouter#back() を呼び出します。
-図: 戻るボタン（標準の button 版） components/BackButton.tsx import { FC } from &amp;#39;react&amp;#39; import { useRouter } from &amp;#39;next/router&amp;#39; export const BackButton: FC = () =&amp;gt; { const router = useRouter() return ( &amp;lt;button alia-label=&amp;#34;戻る&amp;#34; type=&amp;#34;button&amp;#34; onClick={() =&amp;gt; router.back()}&amp;gt; 戻る &amp;lt;/button&amp;gt; ) } 上の例では、素の button コンポーネントを使っていますが、mui (Material-UI) などの UI ライブラリを使えばリッチなボタンを表示できます。
-図: 戻るボタン（mui 版） components/BackButton.</description></item><item><title>Next.js のページコンポーネントが Client と Server どちらで実行されているか調べる (isServer, isClient, NoSsr)</title><link>https://maku.blog/p/m7is4dn/</link><pubDate>Fri, 13 Aug 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m7is4dn/</guid><description>Next.js のページコンポネント (src/pages/*.tsx) の関数は、静的な HTML ファイルを生成するためにビルド時にも実行されます（参考: Next.js のプリレンダリング機能を使用する）。 従来の React による SPA アプリはクライアントサイド JavaScript でしか実行されないので、同じような感覚で実装していると振る舞いの違いでハマることがあります。 例えば、ページコンポーネントから次のように window オブジェクトを参照しようとすると、Next.js によるプリレンダリング時にエラーになります。 これは、window オブジェクトは、Web ブラウザ上で JavaScript を実行しているときにしか存在しないからです。
-src/pages/hello.tsx import { FC } from &amp;#39;react&amp;#39; const HelloPage: FC = () =&amp;gt; { console.log(window.location) // ReferenceError: window is not defined return &amp;lt;h1&amp;gt;Hello&amp;lt;/h1&amp;gt; } 逆に言うと、実行時に window オブジェクトが存在しているかどうかを調べることによって、ページコンポーネント内のコードが、どのタイミングで実行されているかを判別できます。
-const isClient = () =&amp;gt; typeof window !== &amp;#39;undefined&amp;#39; // const isServer = () =&amp;gt; typeof window === &amp;#39;undefined&amp;#39; const HelloPage: FC = () =&amp;gt; { if (isClient()) { console.</description></item><item><title>Next.js でハッシュフラグメントを扱う（useHash カスタムフック）</title><link>https://maku.blog/p/k2ahpw5/</link><pubDate>Mon, 28 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/k2ahpw5/</guid><description>ハッシュフラグメントとは URL のハッシュフラグメントというのは、下記のような URL の末尾の # 以降の部分を指します。
-https://examle.com/sample#AAA 似たようなものにクエリパラメーター（?key=val のみたいなの）もありますが、ハッシュフラグメントは HTTP リクエスト時に、その文字列（上記の例では AAA）がサーバーに送られないという違いがあります。 つまり、ハッシュフラグメントの値は、クライアントサイドで使用することが意図されています。
-useHash フックの実装 下記の useHash 関数は、Next.js でハッシュフラグメントを簡単に扱えるようにするカスタムフックの例です。 useState フックと同じ感覚で使えるように、ハッシュフラグメントの現在値と、設定用の関数をペアで返します。
-src/libs/useHash.ts import { useCallback } from &amp;#39;react&amp;#39; import { useRouter } from &amp;#39;next/router&amp;#39; /** * URL のハッシュフラグメント部分を扱うためのフックです。 * * 次のようにすると、`hash` 変数に URL の `#` 以降の値が格納されます。 * URL の `#` 以降の値を変更したいときは、`setHash` 関数を使用します。 * * ``` * const [hash, setHash] = useHash() * ``` */ export function useHash(): [string, (newHash: string) =&amp;gt; void] { const router = useRouter() const hash = extractHash(router.</description></item><item><title>Next.js のコンポーネント内でクエリ文字列を取得する (next/router, useRouter)</title><link>https://maku.blog/p/r7fou3a/</link><pubDate>Sun, 27 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/r7fou3a/</guid><description>クエリ文字列とは https://example.com/todos?sortby=title&amp;amp;order=asc URL のクエリ文字列（クエリパラメーター）というのは、上記のような URL の末尾の ? 以降の、sortby=title&amp;amp;order=asc の部分のことを指します。 この部分を参照する方法としては、主に次の 2 種類の方法があります。
-クライアントサイド JS &amp;hellip; useRouter フックを使う サーバーサイド JS &amp;hellip; getServerSideProps に渡されるパラメーターを使う クライアントサイド JS からクエリパラメーターを参照する (router.query) Next.js の useRouter フック を使うと、上記のようなクエリパラメーター部分を簡単に抽出することができます。 次の例では、クエリパラメーターとして渡された sortby と order の値を取得しています。 値が省略された場合は、それぞれの値は undefined になります。
-src/pages/todos.tsx import { NextPage } from &amp;#39;next&amp;#39; import { useRouter } from &amp;#39;next/router&amp;#39; const TodosPage: NextPage = () =&amp;gt; { const router = useRouter() const { sortby, order } = router.query console.</description></item><item><title>Next.js でサーバーサイドで JSON や YAML ファイルを読み込む (fs.readFileSync)</title><link>https://maku.blog/p/iz8fnu3/</link><pubDate>Sun, 09 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/iz8fnu3/</guid><description>何をするか？ Next.js アプリのページコンポーネントの getStaticProps / getServerSideProps 関数や、API ルート (pages/api/*.ts) の handler 関数は、クライアントからのアクセス時やビルド時に、サーバーサイドで呼び出されます。 つまり、これらの関数の中では、Node.js の fs モジュールを使った（サーバー上の）ローカルファイルの読み込みが可能です。
-ここでは、例として、
-ページコンポーネントの getStaticProps 関数から JSON ファイルを読み込む方法 API ルートの handler 関数から YAML ファイルを読み込む方法 を紹介します。
-JSON ファイルを読み込む（in getStaticProps 関数） 使用する JSON ファイル サンプルデータとして次のような JSON ファイルをプロジェクト内に配置します。
-src/data/games.json [ { &amp;#34;id&amp;#34;: &amp;#34;dq1&amp;#34;, &amp;#34;title&amp;#34;: &amp;#34;ドラゴンクエスト&amp;#34; }, { &amp;#34;id&amp;#34;: &amp;#34;dq2&amp;#34;, &amp;#34;title&amp;#34;: &amp;#34;ドラゴンクエスト2&amp;#34; }, { &amp;#34;id&amp;#34;: &amp;#34;dq3&amp;#34;, &amp;#34;title&amp;#34;: &amp;#34;ドラゴンクエスト3&amp;#34; } ] JSON ファイルを読み込む 次のコードでは、getStaticProps 関数の中で src/data/games.json ファイルを読み込んで、ページコンポーネントに渡す props データを作成しています。
-src/pages/games.tsx import * as fs from &amp;#39;fs&amp;#39; import * as path from &amp;#39;path&amp;#39; import { GetStaticProps, NextPage } from &amp;#39;next&amp;#39; type Game = { id: string, title: string } type PageProps = { games: Game[] } export const getStaticProps: GetStaticProps&amp;lt;PageProps&amp;gt; = async (context) =&amp;gt; { // JSON ファイルを読み込む const jsonPath = path.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Next.js のプリレンダリングとルーティング on まくろぐ</title><link>https://maku.blog/p/3o3fq3d/</link><description>Recent content in Next.js のプリレンダリングとルーティング on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 09 May 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/3o3fq3d/index.xml" rel="self" type="application/rss+xml"/><item><title>Next.js のプリレンダリング機能を使用する (getStaticProps)</title><link>https://maku.blog/p/iv4agnt/</link><pubDate>Tue, 04 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/iv4agnt/</guid><description>&lt;h2 id="pre-rendering-とは">Pre-rendering とは&lt;/h2>
+&lt;p>ブログの記事一覧ページなどを生成する場合、なんらかの API で取得した値をもとにページのコンテンツを生成する必要があります。
+例えば、次のように取得した値を使ってページを生成することになります。&lt;/p>
+&lt;ul>
+&lt;li>Web API で取得した値&lt;/li>
+&lt;li>データベースのクエリ結果&lt;/li>
+&lt;li>ローカルファイルの内容や、ファイルの一覧情報&lt;/li>
+&lt;/ul>
+&lt;p>Next.js には、Web サイトのビルド時や、Web サーバーへのアクセス時にこういった API を呼び出して、HTML コンテンツを生成する &lt;strong>Pre-rendering&lt;/strong> 機能が備わっています。
+Pre-rendering 機能は次の 2 種類があり、どちらか一方を使うこともできますし、両方を組み合わせて使うこともできます。&lt;/p>
+&lt;dl>
+&lt;dt>&lt;strong>SSG: Static Generation（静的サイトジェネレーション）&lt;/strong>&lt;/dt>
+&lt;dd>Web サイトのビルド時に HTML ファイルを生成します。Web サーバーは静的な HTML ファイルを返すだけでよいので、パフォーマンスが非常に高くなります。すべてのページを事前に列挙できるのであれば、できるだけこの SSG を使って静的に HTML 生成してしまうことが推奨されています。静的な HTML ファイルをホスト可能なサーバー（GitHub Pages など）があれば、Web サイトを公開できます。&lt;/dd>
+&lt;dt>&lt;strong>SSR: Server-side Rendering（サーバーサイドレンダリング）&lt;/strong>&lt;/dt>
+&lt;dd>クライアントが Web サーバーにアクセスしたときに、サーバーサイドで動的に HTML を生成します。この仕組みを使うと、日々増減するデータを扱いやすくなりますが、Web サーバーとして Next.js サーバーを稼働させておく必要があります。感覚的には、PHP サーバーなどが動作しているイメージに近いです。&lt;/dd>
+&lt;/dl>
+&lt;p>ちなみに、純粋に React.js のみを使用した場合とはどう違うのでしょうか？
+React.js 自体には Pre-rendering 機能は備わっておらず、主に SPA (Single Page Application) を作成するライブラリとして使用されています。
+React.js のみを使って上記の例のような記事一覧ページを生成する場合、Web ブラウザ上で JavaScript を実行してコンテンツを動的に生成する必要があります。
+これを SSG や SSR と区別するために、&lt;strong>CSR: Client-side rendering（クライアントサイドレンダリング）&lt;/strong> と呼びます。&lt;/p></description></item><item><title>Next.js のダイナミックルーティング機能を利用する (getStaticPaths, getStaticProps, getServerSideProps)</title><link>https://maku.blog/p/rdq3ep2/</link><pubDate>Wed, 05 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rdq3ep2/</guid><description>&lt;h2 id="ダイナミックルーティングとは">ダイナミックルーティングとは&lt;/h2>
+&lt;p>Next.js では、&lt;strong>&lt;code>pages/books/[id].tsx&lt;/code>&lt;/strong> のようなファイル名でページを作成すると、1 つのファイルで、&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>/books/001&lt;/code>&lt;/li>
+&lt;li>&lt;code>/books/002&lt;/code>&lt;/li>
+&lt;li>&lt;code>/books/003&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>のようなパス (URL) によるアクセスをハンドルできます。
+これを &lt;strong>ダイナミックルーティング (Dynamic Routes)&lt;/strong> 機能と呼びます。&lt;/p>
+&lt;p>Next.js のページコンポーネント (&lt;code>/pages/xxx.tsx&lt;/code>) は、そのページのエントリポイント（ルートコンポーネント）となるため、通常の React コンポーネントとは違って、上位のコンポーネントから props 情報を渡すことができません。
+そこで Next.js では、ページコンポーネントの実装ファイル内で &lt;strong>&lt;code>getStaticProps&lt;/code>&lt;/strong> という関数を定義することで、ページコンポーネントに渡す props 情報を生成できるようにしています。
+&lt;code>getStaticProps&lt;/code> 内では、上記のような URL パラメータ情報（&lt;code>/books/[id]&lt;/code> の &lt;code>id&lt;/code> の部分の値）を取り出して、それを元に props 情報を生成できます。
+この仕組みによって、Next.js のページコンポーネントは、1 つの &lt;code>.tsx&lt;/code> ファイルで、複数のページ (.html) を生成できるようになっています。&lt;/p>
+&lt;h2 id="ダイナミックルーティングの実装ssg-の場合">ダイナミックルーティングの実装（SSG の場合）&lt;/h2>
+&lt;p>静的ジェネレーション (SSG: Static Generation)、つまり Web サイトのビルド時にすべての HTML ファイルを生成してしまうには、あらかじめどのようなパラメーター（上記の例では &lt;code>id&lt;/code>）でのアクセスが行われるかを把握した上で、各ページの内容を生成する必要があります。
+これを実現するには、ページコンポーネントの実装ファイル (&lt;code>pages/*.tsx&lt;/code>) で、次のような &lt;code>async&lt;/code> 関数を実装して &lt;code>export&lt;/code> します。&lt;/p>
+&lt;dl>
+&lt;dt>&lt;strong>getStaticPaths 関数&lt;/strong>&lt;/dt>
+&lt;dd>URL のパラメーター部分（上記の例では &lt;code>id&lt;/code>）で指定可能な値を返すように実装します。言い換えると、プリビルドすべきページの一覧情報を Next.js に教えてあげるための実装です。この関数は通常、Web サイトのビルド時にだけ実行されますが、開発サーバー (&lt;code>next dev&lt;/code>) 使用時はアクセス毎に呼び出されることに注意してください。&lt;/dd>
+&lt;dt>&lt;strong>getStaticProps 関数&lt;/strong>&lt;/dt>
+&lt;dd>指定されたパラメーターに対応するデータを返すように実装します。この値がページコンポーネントに引数として渡されます。この関数は通常、Web サイトのビルド時にだけ実行されますが、&lt;code>getStaticPath&lt;/code> の戻り値のプロパティ &lt;code>fallback&lt;/code> を &lt;code>true&lt;/code>、あるいは &lt;code>'blocking'&lt;/code> に設定した場合は、アクセス時に呼び出される可能性があります（後述のフォールバックの説明を参照）。&lt;/dd>
+&lt;/dl>
+&lt;p>次の例では、&lt;code>/books/001&lt;/code>、&lt;code>/books/002&lt;/code>、&lt;code>/books/003&lt;/code> といった URL でアクセス可能な &lt;code>books/[id]&lt;/code> ページを定義しています。&lt;/p></description></item><item><title>Next.js でローカル開発時 (next dev) のみ有効なデバッグページを作成する (getStaticProps)</title><link>https://maku.blog/p/3vbr2bm/</link><pubDate>Mon, 09 May 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3vbr2bm/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Next.js アプリを作っていると、開発中にだけ表示したいデバッグ用のページを作りたくなることがよくあります。
+ここでは、ローカルサーバー (&lt;code>next dev&lt;/code>) での開発中のみ有効になるデバッグページの作り方を説明します。&lt;/p>
+&lt;h2 id="デバッグページの作成">デバッグページの作成&lt;/h2>
+&lt;p>Next.js の各ページのビルド時には、必要に応じてデータフェッチなどを行うための &lt;code>getStaticProps&lt;/code> 関数が呼び出されます（参考: &lt;a href="../../p/iv4agnt/">Next.js のプリレンダリング機能を使用する (getStaticProps)&lt;/a>）。&lt;/p>
+&lt;p>この関数の戻り値として、&lt;a href="https://nextjs.org/docs/api-reference/data-fetching/get-static-props#notfound">notFound プロパティ&lt;/a> を true にしたオブジェクトを返すと、そのページがないものとして扱うことができます（404 Not Found になる）。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">getStaticProps&lt;/span>: &lt;span class="kt">GetStaticProps&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Return the default 404 page with a status code of 404.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">notFound&lt;/span>: &lt;span class="kt">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>この仕組みを利用して次のように実装すれば、ローカルサーバーでの開発中のみ表示可能なデバッグページを作ることができます。
+ローカルサーバー (&lt;code>next dev&lt;/code>) で実行されているかどうかは、環境変数 &lt;code>process.env.NODE_ENV&lt;/code> の値で判断できます（参考: &lt;a href="../../p/gbpeyov/">Next.js で環境変数を扱う (.env, NEXT_PUBLIC, NODE_ENV)&lt;/a>）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/pages/debug/info.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">GetStaticProps&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">NextPage&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">EmptyProps&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">key&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kt">never&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * デバッグページのビルド時の前処理。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * 開発サーバー (next dev) での実行時のみ、このページが存在するようにします。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * 本番サーバー (next start) での実行時は、404 Not Found になります。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">getStaticProps&lt;/span>: &lt;span class="kt">GetStaticProps&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">EmptyProps&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">isLocalDev&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">process&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">env&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">NODE_ENV&lt;/span> &lt;span class="o">!==&lt;/span> &lt;span class="s1">&amp;#39;production&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">notFound&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="o">!&lt;/span>&lt;span class="nx">isLocalDev&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">props&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{}&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">DebugInfoPage&lt;/span>: &lt;span class="kt">NextPage&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Debug&lt;/span> &lt;span class="nx">page&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">This&lt;/span> &lt;span class="nx">page&lt;/span> &lt;span class="k">is&lt;/span> &lt;span class="nx">displayed&lt;/span> &lt;span class="nx">only&lt;/span> &lt;span class="nx">during&lt;/span> &lt;span class="nx">development&lt;/span>&lt;span class="p">.&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="nx">DebugInfoPage&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="おまけモジュール化しておく">（おまけ）モジュール化しておく&lt;/h2>
+&lt;p>複数のデバッグページを作成する場合は、前述の &lt;code>getStaticProps&lt;/code> 実装を使いまわせるようにしておくと便利です。&lt;/p></description></item><item><title>Next.js でブラウザ履歴で戻るボタンを表示する (router.back)</title><link>https://maku.blog/p/m4dmu4c/</link><pubDate>Tue, 22 Feb 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m4dmu4c/</guid><description>&lt;p>Next.js の &lt;code>next/router&lt;/code> モジュールが提供する &lt;code>NextRouter&lt;/code> オブジェクトの &lt;a href="https://nextjs.org/docs/api-reference/next/router#routerback">back メソッド&lt;/a> を呼び出すと、ブラウザの履歴に従って 1 つ前のページに遷移することができます。
+つまり、ブラウザの「戻る」ボタンを押した場合と同じ振る舞いをします。
+&lt;code>NextRouter&lt;/code> オブジェクトは、&lt;code>useRouter&lt;/code> フックで取得することができます。&lt;/p>
+&lt;p>次の &lt;code>BackButton&lt;/code> コンポーネントはシンプルな「戻る」ボタンを表示し、クリック時に &lt;code>NextRouter#back()&lt;/code> を呼び出します。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="136" height="88" src="../../p/m4dmu4c/img-001.png" alt="/p/m4dmu4c/img-001.png" />
+ &lt;figcaption>図: 戻るボタン（標準の button 版）&lt;/figcaption>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/BackButton.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">FC&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">useRouter&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next/router&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">BackButton&lt;/span>: &lt;span class="kt">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">router&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useRouter&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span> &lt;span class="na">alia-label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;戻る&amp;#34;&lt;/span> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;button&amp;#34;&lt;/span> &lt;span class="na">onClick&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">router&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">back&lt;/span>&lt;span class="p">()}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="err">戻る&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上の例では、素の &lt;code>button&lt;/code> コンポーネントを使っていますが、mui (Material-UI) などの UI ライブラリを使えばリッチなボタンを表示できます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="188" height="116" src="../../p/m4dmu4c/img-002.png" alt="/p/m4dmu4c/img-002.png" />
+ &lt;figcaption>図: 戻るボタン（mui 版）&lt;/figcaption>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/BackButton.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">FC&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">useRouter&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next/router&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">BackIcon&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@mui/icons-material/ArrowBackIosNew&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">Button&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@mui/material/Button&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">BackButton&lt;/span>: &lt;span class="kt">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">router&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useRouter&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span> &lt;span class="na">aria-label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;戻る&amp;#34;&lt;/span> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;contained&amp;#34;&lt;/span> &lt;span class="na">onClick&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">router&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">back&lt;/span>&lt;span class="p">()}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">BackIcon&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>Next.js のページコンポーネントが Client と Server どちらで実行されているか調べる (isServer, isClient, NoSsr)</title><link>https://maku.blog/p/m7is4dn/</link><pubDate>Fri, 13 Aug 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m7is4dn/</guid><description>&lt;p>Next.js のページコンポネント (&lt;code>src/pages/*.tsx&lt;/code>) の関数は、静的な HTML ファイルを生成するためにビルド時にも実行されます（参考: &lt;a href="../../p/iv4agnt">Next.js のプリレンダリング機能を使用する&lt;/a>）。
+従来の React による SPA アプリはクライアントサイド JavaScript でしか実行されないので、同じような感覚で実装していると振る舞いの違いでハマることがあります。
+例えば、ページコンポーネントから次のように &lt;code>window&lt;/code> オブジェクトを参照しようとすると、Next.js によるプリレンダリング時にエラーになります。
+これは、&lt;code>window&lt;/code> オブジェクトは、Web ブラウザ上で JavaScript を実行しているときにしか存在しないからです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/pages/hello.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">FC&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">HelloPage&lt;/span>: &lt;span class="kt">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">window&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// ReferenceError: window is not defined
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Hello&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>逆に言うと、実行時に &lt;code>window&lt;/code> オブジェクトが存在しているかどうかを調べることによって、ページコンポーネント内のコードが、どのタイミングで実行されているかを判別できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line hl">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">isClient&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="k">typeof&lt;/span> &lt;span class="nb">window&lt;/span> &lt;span class="o">!==&lt;/span> &lt;span class="s1">&amp;#39;undefined&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// const isServer = () =&amp;gt; typeof window === &amp;#39;undefined&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">HelloPage&lt;/span>: &lt;span class="kt">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">isClient&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;これはクライアントサイド JS として実行されているよ！&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">window&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">alert&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;だから alert も使えるよ！&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Hello&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ちなみに、React フックの &lt;code>useEffect&lt;/code> で設定したコールバック関数は、DOM 要素のレンダリング後に実行されるものなので、クライアントサイドでのみ実行されることが保証されています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">HelloPage&lt;/span>: &lt;span class="kt">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ここであれば window オブジェクトは確実に参照できる
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">window&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span> &lt;span class="p">[])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Hello&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>JSX コードで記述した部分も、Next.js のサーバーサイドビルド時と、クライアントサイド JS の両方で実行されます。
+クライアントサイドでのみレンダリングしたい部分は、上記で定義した &lt;code>isClient&lt;/code> 関数を使って次のように記述します。&lt;/p></description></item><item><title>Next.js でハッシュフラグメントを扱う（useHash カスタムフック）</title><link>https://maku.blog/p/k2ahpw5/</link><pubDate>Mon, 28 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/k2ahpw5/</guid><description>&lt;h2 id="ハッシュフラグメントとは">ハッシュフラグメントとは&lt;/h2>
+&lt;p>URL のハッシュフラグメントというのは、下記のような URL の末尾の &lt;code>#&lt;/code> 以降の部分を指します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">https://examle.com/sample#AAA&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>似たようなものにクエリパラメーター（&lt;code>?key=val&lt;/code> のみたいなの）もありますが、ハッシュフラグメントは HTTP リクエスト時に、その文字列（上記の例では &lt;code>AAA&lt;/code>）がサーバーに送られないという違いがあります。
+つまり、ハッシュフラグメントの値は、クライアントサイドで使用することが意図されています。&lt;/p>
+&lt;h2 id="usehash-フックの実装">useHash フックの実装&lt;/h2>
+&lt;p>下記の &lt;code>useHash&lt;/code> 関数は、Next.js でハッシュフラグメントを簡単に扱えるようにするカスタムフックの例です。
+&lt;code>useState&lt;/code> フックと同じ感覚で使えるように、ハッシュフラグメントの現在値と、設定用の関数をペアで返します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/libs/useHash.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">useCallback&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">useRouter&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next/router&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * URL のハッシュフラグメント部分を扱うためのフックです。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> *
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * 次のようにすると、`hash` 変数に URL の `#` 以降の値が格納されます。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * URL の `#` 以降の値を変更したいときは、`setHash` 関数を使用します。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> *
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * ```
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * const [hash, setHash] = useHash()
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * ```
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">useHash&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">newHash&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="k">void&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">router&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useRouter&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">hash&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">extractHash&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">router&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">asPath&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">setHash&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useCallback&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">newHash&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ブラウザの履歴に残すなら、ここを router.push に変えれば OK
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">router&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">replace&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">hash&lt;/span>: &lt;span class="kt">newHash&lt;/span> &lt;span class="p">},&lt;/span> &lt;span class="kc">undefined&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">shallow&lt;/span>: &lt;span class="kt">true&lt;/span> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span> &lt;span class="p">[])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">hash&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setHash&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// URL の # 以降の文字列を取り出すユーティリティ
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">function&lt;/span> &lt;span class="nx">extractHash&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">url&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">url&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">split&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;#&amp;#39;&lt;/span>&lt;span class="p">)[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">??&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>やっていることは簡単で、&lt;code>router.asPath&lt;/code> から抽出したハッシュフラグメントの値を返しているだけです。
+レンダリングのたびに値を抽出して返そうとしますが、まぁこれくらいはよいかなと(^^;&lt;/p></description></item><item><title>Next.js のコンポーネント内でクエリ文字列を取得する (next/router, useRouter)</title><link>https://maku.blog/p/r7fou3a/</link><pubDate>Sun, 27 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/r7fou3a/</guid><description>&lt;h2 id="クエリ文字列とは">クエリ文字列とは&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">https://example.com/todos?sortby=title&amp;amp;order=asc&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>URL のクエリ文字列（クエリパラメーター）というのは、上記のような URL の末尾の &lt;code>?&lt;/code> 以降の、&lt;code>sortby=title&amp;amp;order=asc&lt;/code> の部分のことを指します。
+この部分を参照する方法としては、主に次の 2 種類の方法があります。&lt;/p>
+&lt;ul>
+&lt;li>クライアントサイド JS &amp;hellip; &lt;code>useRouter&lt;/code> フックを使う&lt;/li>
+&lt;li>サーバーサイド JS &amp;hellip; &lt;code>getServerSideProps&lt;/code> に渡されるパラメーターを使う&lt;/li>
+&lt;/ul>
+&lt;h2 id="クライアントサイド-js-からクエリパラメーターを参照する-routerquery">クライアントサイド JS からクエリパラメーターを参照する (router.query)&lt;/h2>
+&lt;p>Next.js の &lt;a href="https://nextjs.org/docs/api-reference/next/router">useRouter フック&lt;/a> を使うと、上記のようなクエリパラメーター部分を簡単に抽出することができます。
+次の例では、クエリパラメーターとして渡された &lt;code>sortby&lt;/code> と &lt;code>order&lt;/code> の値を取得しています。
+値が省略された場合は、それぞれの値は &lt;code>undefined&lt;/code> になります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/pages/todos.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">NextPage&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">useRouter&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next/router&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">TodosPage&lt;/span>: &lt;span class="kt">NextPage&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">router&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useRouter&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">sortby&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">order&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">router&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">query&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">sortby&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// 指定されていなければ undefined
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">order&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// 指定されていなければ undefined
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span> &lt;span class="nx">sortby&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="err">で&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">order&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;asc&amp;#39;&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="s1">&amp;#39;昇順&amp;#39;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;降順&amp;#39;&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="err">ソートします&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="nx">TodosPage&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ プリレンダリングと hydrate 処理の考慮&lt;/span>
+ &lt;span class="xNote_body">&lt;p>Next.js にはページコンポーネントのプリレンダリングの仕組み（あらかじめ JS 部分まで実行して静的な HTML を生成しておく仕組み）があり、その時点では URL のクエリ文字列は参照できないので、&lt;code>router.query&lt;/code> オブジェクトも空っぽになっています。
+上記の例で言えば、プリレンダリング時の &lt;code>sortby&lt;/code> や &lt;code>order&lt;/code> の値は &lt;code>undefined&lt;/code> になっているということです。
+もちろん、実際にクエリパラメーター付きの URL で Web サイトにアクセスするタイミングでは、クライアントサイドで実行される JavaScript で &lt;code>router.query&lt;/code> の値を参照できるようになっていますが、ページコンポーネントの実装では、クエリ文字列が指定されていない場合のことを考えておくべきです。&lt;/p></description></item><item><title>Next.js でサーバーサイドで JSON や YAML ファイルを読み込む (fs.readFileSync)</title><link>https://maku.blog/p/iz8fnu3/</link><pubDate>Sun, 09 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/iz8fnu3/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Next.js アプリのページコンポーネントの &lt;code>getStaticProps&lt;/code> / &lt;code>getServerSideProps&lt;/code> 関数や、API ルート (&lt;code>pages/api/*.ts&lt;/code>) の &lt;code>handler&lt;/code> 関数は、クライアントからのアクセス時やビルド時に、サーバーサイドで呼び出されます。
+つまり、これらの関数の中では、Node.js の &lt;code>fs&lt;/code> モジュールを使った（サーバー上の）ローカルファイルの読み込みが可能です。&lt;/p>
+&lt;p>ここでは、例として、&lt;/p>
+&lt;ol>
+&lt;li>ページコンポーネントの &lt;code>getStaticProps&lt;/code> 関数から JSON ファイルを読み込む方法&lt;/li>
+&lt;li>API ルートの &lt;code>handler&lt;/code> 関数から YAML ファイルを読み込む方法&lt;/li>
+&lt;/ol>
+&lt;p>を紹介します。&lt;/p>
+&lt;h2 id="json-ファイルを読み込むin-getstaticprops-関数">JSON ファイルを読み込む（in getStaticProps 関数）&lt;/h2>
+&lt;h3 id="使用する-json-ファイル">使用する JSON ファイル&lt;/h3>
+&lt;p>サンプルデータとして次のような JSON ファイルをプロジェクト内に配置します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/data/games.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;dq1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;ドラゴンクエスト&amp;#34;&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;dq2&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;ドラゴンクエスト2&amp;#34;&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;dq3&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;ドラゴンクエスト3&amp;#34;&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">]&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="json-ファイルを読み込む">JSON ファイルを読み込む&lt;/h3>
+&lt;p>次のコードでは、&lt;code>getStaticProps&lt;/code> 関数の中で &lt;code>src/data/games.json&lt;/code> ファイルを読み込んで、ページコンポーネントに渡す &lt;code>props&lt;/code> データを作成しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/pages/games.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">fs&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;fs&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">path&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;path&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">GetStaticProps&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">NextPage&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">Game&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">id&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">title&lt;/span>: &lt;span class="kt">string&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">PageProps&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">games&lt;/span>: &lt;span class="kt">Game&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">getStaticProps&lt;/span>: &lt;span class="kt">GetStaticProps&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">PageProps&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// JSON ファイルを読み込む
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">jsonPath&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">path&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">process&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cwd&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="s1">&amp;#39;src&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;data&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;games.json&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">jsonText&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">fs&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">readFileSync&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">jsonPath&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;utf-8&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">games&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">JSON&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">parse&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">jsonText&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">Game&lt;/span>&lt;span class="p">[]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ページコンポーネントに渡す props オブジェクトを設定する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">props&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">games&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">GamesPage&lt;/span>: &lt;span class="kt">NextPage&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">PageProps&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">games&lt;/span> &lt;span class="p">}&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">PageProps&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="nx">GamesPage&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>JSON 形式のテキストは、JavaScript 標準の &lt;code>JSON.parse&lt;/code> 関数でオブジェクトに変換することができるので、プログラム内での扱いはお手軽です。&lt;/p></description></item></channel></rss>

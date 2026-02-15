@@ -1,25 +1,187 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS/Lambda on まくろぐ</title><link>https://maku.blog/tags/aws/lambda/</link><description>Recent content in AWS/Lambda on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><atom:link href="https://maku.blog/tags/aws/lambda/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS CloudFormation で Lambda 関数のリソースを生成する</title><link>https://maku.blog/p/w8s8kx9/</link><pubDate>Mon, 05 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/w8s8kx9/</guid><description>何をするか？ AWS CloudFormation を使うと Lambda 関数を含むインフラ（AWS リソース群）をまとめて生成することができますが、AWS CloudFormation の拡張である AWS SAM を使うと、もっと簡潔に Lambda 関数のリソースを生成することができます。
-例えば、CloudFormation テンプレートの AWS::Lambda::Function リソースでは、Role プロパティが必須でしたが、SAM テンプレートの AWS::Serverless::Function リソースでは、Role プロパティはオプショナルになっています。 Role プロパティを省略すると、Lambda 関数に付けた論理 ID (Logical ID) をもとに、&amp;lt;論理ID&amp;gt;Role という名前のロールが自動生成されます。
-ここでは、AWS SAM を使った Lambda 関数生成の基本として、次のようなパターンで CloudFormation スタックを生成してみます。
-SAM テンプレートに関数コードを埋め込んでデプロイ S3 バケット上の関数の ZIP ファイルを使ってデプロイ SAM テンプレートに関数コードを埋め込んでデプロイ まずは、一番シンプルな例として、SAM テンプレート内に Lambda 関数の実装をハードコーディングしてしまい、それをデプロイ（CloudFormation スタックの生成）してみます。
-下記が SAM テンプレートです。 SAM で Lambda 関数のリソースを定義するときは、リソースタイプとして AWS::Serverless::Function を指定します（CloudFormation では AWS::Lambda::Function です）。 ここでは関数の実装を InlineCode プロパティでハードコーディングし、単純な Hello World! メッセージをレスポンスとして返すようにしています。
-template.yml AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Transform: AWS::Serverless-2016-10-31 Description: Simple Lambda Function Resources: HelloFunction: Type: AWS::Serverless::Function Properties: Runtime: python3.</description></item><item><title>AWS CloudFormation で Lambda 関数のリソースを生成する</title><link>https://maku.blog/p/w8s8kx9/</link><pubDate>Mon, 05 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/w8s8kx9/</guid><description>何をするか？ AWS CloudFormation を使うと Lambda 関数を含むインフラ（AWS リソース群）をまとめて生成することができますが、AWS CloudFormation の拡張である AWS SAM を使うと、もっと簡潔に Lambda 関数のリソースを生成することができます。
-例えば、CloudFormation テンプレートの AWS::Lambda::Function リソースでは、Role プロパティが必須でしたが、SAM テンプレートの AWS::Serverless::Function リソースでは、Role プロパティはオプショナルになっています。 Role プロパティを省略すると、Lambda 関数に付けた論理 ID (Logical ID) をもとに、&amp;lt;論理ID&amp;gt;Role という名前のロールが自動生成されます。
-ここでは、AWS SAM を使った Lambda 関数生成の基本として、次のようなパターンで CloudFormation スタックを生成してみます。
-SAM テンプレートに関数コードを埋め込んでデプロイ S3 バケット上の関数の ZIP ファイルを使ってデプロイ SAM テンプレートに関数コードを埋め込んでデプロイ まずは、一番シンプルな例として、SAM テンプレート内に Lambda 関数の実装をハードコーディングしてしまい、それをデプロイ（CloudFormation スタックの生成）してみます。
-下記が SAM テンプレートです。 SAM で Lambda 関数のリソースを定義するときは、リソースタイプとして AWS::Serverless::Function を指定します（CloudFormation では AWS::Lambda::Function です）。 ここでは関数の実装を InlineCode プロパティでハードコーディングし、単純な Hello World! メッセージをレスポンスとして返すようにしています。
-template.yml AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Transform: AWS::Serverless-2016-10-31 Description: Simple Lambda Function Resources: HelloFunction: Type: AWS::Serverless::Function Properties: Runtime: python3.</description></item><item><title>AWS CloudFormation の設定例: Lambda 関数の設定いろいろ</title><link>https://maku.blog/p/pbo2dpy/</link><pubDate>Thu, 08 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pbo2dpy/</guid><description>タイムアウト時間 (Timeout) Lambda 関数のタイムアウト時間（最大実行可能時間）を設定するには、Timeout プロパティで秒単位の指定を行います。
-例: タイムアウトを 15 秒にする AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Transform: AWS::Serverless-2016-10-31 Resources: MyLambda: Type: AWS::Serverless::Function Properties: Runtime: nodejs14.x CodeUri: function.zip Handler: index.handler Timeout: 15 すべての Lambda 関数の Timeout 値をまとめて設定したいときは、Globals セクションを使います。
-AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Transform: AWS::Serverless-2016-10-31 Globals: Function: Runtime: nodejs14.x CodeUri: function.zip Timeout: 15 Resources: MyLambda1: Type: AWS::Serverless::Function Properties: Handler: index.handler1 MyLambda2: Type: AWS::Serverless::Function Properties: Handler: index.handler2 環境変数 (Environment) Lambda 関数の中から参照可能な環境変数を設定するには、Variables プロパティに、キーと値のペアを指定します。 すべての Lambda 関数に共通で設定する環境変数は、Globals セクションで定義します。
-Globals: Function: Environment: Variables: STAGE: Production TABLE_NAME: global-table Resources: MyFunction: Type: AWS::Serverless::Function Properties: Environment: Variables: TABLE_NAME: resource-table NEW_VAR: hello トリガー設定 (Events) Lambda 関数を呼び出すためのトリガー（イベント）は、Events プロパティで定義できます。 Resouces プロパティと同様に、Events プロパティの一階層目にはイベントの論理 ID (Logical ID) を記述して、その下にそのイベントの設定を記述します。</description></item><item><title>AWS CloudFormation の設定例: Lambda 関数の設定いろいろ</title><link>https://maku.blog/p/pbo2dpy/</link><pubDate>Thu, 08 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pbo2dpy/</guid><description>タイムアウト時間 (Timeout) Lambda 関数のタイムアウト時間（最大実行可能時間）を設定するには、Timeout プロパティで秒単位の指定を行います。
-例: タイムアウトを 15 秒にする AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Transform: AWS::Serverless-2016-10-31 Resources: MyLambda: Type: AWS::Serverless::Function Properties: Runtime: nodejs14.x CodeUri: function.zip Handler: index.handler Timeout: 15 すべての Lambda 関数の Timeout 値をまとめて設定したいときは、Globals セクションを使います。
-AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Transform: AWS::Serverless-2016-10-31 Globals: Function: Runtime: nodejs14.x CodeUri: function.zip Timeout: 15 Resources: MyLambda1: Type: AWS::Serverless::Function Properties: Handler: index.handler1 MyLambda2: Type: AWS::Serverless::Function Properties: Handler: index.handler2 環境変数 (Environment) Lambda 関数の中から参照可能な環境変数を設定するには、Variables プロパティに、キーと値のペアを指定します。 すべての Lambda 関数に共通で設定する環境変数は、Globals セクションで定義します。
-Globals: Function: Environment: Variables: STAGE: Production TABLE_NAME: global-table Resources: MyFunction: Type: AWS::Serverless::Function Properties: Environment: Variables: TABLE_NAME: resource-table NEW_VAR: hello トリガー設定 (Events) Lambda 関数を呼び出すためのトリガー（イベント）は、Events プロパティで定義できます。 Resouces プロパティと同様に、Events プロパティの一階層目にはイベントの論理 ID (Logical ID) を記述して、その下にそのイベントの設定を記述します。</description></item><item><title>AWS CloudFormation の設定例: Lambda 関数から S3 にアクセスできるようにする</title><link>https://maku.blog/p/dzdq3ep/</link><pubDate>Mon, 12 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dzdq3ep/</guid><description>CloudFormation (SAM) を利用して、Lambda 関数および S3 バケットを作成し、Lambda 関数から S3 バケットにアクセスできるようにポリシー設定するテンプレートの例です。 参考までに Lambda 関数の TypeScript コードも載せましたが、あくまで SAM テンプレートの記述例を示すことを目的としています。
-SAM テンプレートの記述例 次の SAM テンプレートでは、AWS リソースとして S3 バケット (MyBucket) と Lambda 関数 (MyFunction) を定義しています。
-template.yml AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Transform: AWS::Serverless-2016-10-31 Resources: # S3 バケットの定義 MyBucket: Type: AWS::S3::Bucket # Lambda 関数の定義 MyFunction: Type: AWS::Serverless::Function Properties: Runtime: nodejs14.x Handler: build/index.handler CodeUri: function.zip Policies: - S3CrudPolicy: BucketName: !Ref MyBucket Environment: Variables: BUCKET_NAME: !Ref MyBucket S3 バケットは単純にスタック内に新規作成するだけなので、何もプロパティ設定していません。 ポイントは、Lambda 関数側のポリシー設定（Policies プロパティ）です。</description></item><item><title>AWS CloudFormation の設定例: Lambda 関数から S3 にアクセスできるようにする</title><link>https://maku.blog/p/dzdq3ep/</link><pubDate>Mon, 12 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dzdq3ep/</guid><description>CloudFormation (SAM) を利用して、Lambda 関数および S3 バケットを作成し、Lambda 関数から S3 バケットにアクセスできるようにポリシー設定するテンプレートの例です。 参考までに Lambda 関数の TypeScript コードも載せましたが、あくまで SAM テンプレートの記述例を示すことを目的としています。
-SAM テンプレートの記述例 次の SAM テンプレートでは、AWS リソースとして S3 バケット (MyBucket) と Lambda 関数 (MyFunction) を定義しています。
-template.yml AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Transform: AWS::Serverless-2016-10-31 Resources: # S3 バケットの定義 MyBucket: Type: AWS::S3::Bucket # Lambda 関数の定義 MyFunction: Type: AWS::Serverless::Function Properties: Runtime: nodejs14.x Handler: build/index.handler CodeUri: function.zip Policies: - S3CrudPolicy: BucketName: !Ref MyBucket Environment: Variables: BUCKET_NAME: !Ref MyBucket S3 バケットは単純にスタック内に新規作成するだけなので、何もプロパティ設定していません。 ポイントは、Lambda 関数側のポリシー設定（Policies プロパティ）です。</description></item><item><title>AWS Lambda のポリシーステートメントの記述例</title><link>https://maku.blog/p/yn7hqx8/</link><pubDate>Sun, 06 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yn7hqx8/</guid><description>参考: AppSync / SSM
-Lambda 関数の呼び出しを許可する { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;lambda:invokeFunction&amp;#34; ], &amp;#34;Resource&amp;#34;: [ &amp;#34;arn:aws:lambda:us-west-2:123456789012:function:my-function&amp;#34;, &amp;#34;arn:aws:lambda:us-west-2:123456789012:function:my-function:*&amp;#34; ] } ] }</description></item><item><title>AWS Lambda のポリシーステートメントの記述例</title><link>https://maku.blog/p/yn7hqx8/</link><pubDate>Sun, 06 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yn7hqx8/</guid><description>参考: AppSync / SSM
-Lambda 関数の呼び出しを許可する { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;lambda:invokeFunction&amp;#34; ], &amp;#34;Resource&amp;#34;: [ &amp;#34;arn:aws:lambda:us-west-2:123456789012:function:my-function&amp;#34;, &amp;#34;arn:aws:lambda:us-west-2:123456789012:function:my-function:*&amp;#34; ] } ] }</description></item><item><title>AWS Lambda をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/n9nydjc/</link><pubDate>Fri, 12 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n9nydjc/</guid><description>Lambda 関数の一覧を取得する (lambda list-functions) $ aws lambda list-functions --max-items 10 関数名だけ取り出す $ aws lambda list-functions --max-items 10 --query &amp;#34;Functions[].FunctionName&amp;#34; Node.js 10 を使ってる関数の ARN を調べる $ aws lambda list-functions --function-version ALL --output text --query &amp;#34;Functions[?Runtime==&amp;#39;nodejs10.x&amp;#39;].FunctionArn AWS から来た「Node.js 10 のサポート切れるから乗り換えてね」というメール (2021-06-04) に書かれていたやり方です。
-Lambda 関数の情報を取得する (lambda get-function) $ aws lambda get-function --function-name my-function 実行結果 { &amp;#34;Configuration&amp;#34;: { &amp;#34;FunctionName&amp;#34;: &amp;#34;my-function&amp;#34;, &amp;#34;FunctionArn&amp;#34;: &amp;#34;arn:aws:lambda:ap-northeast-1:123456789012:function:my-function&amp;#34;, &amp;#34;Runtime&amp;#34;: &amp;#34;nodejs12.x&amp;#34;, &amp;#34;Role&amp;#34;: &amp;#34;arn:aws:iam::123456789012:role/lambda-ex&amp;#34;, &amp;#34;CodeSha256&amp;#34;: &amp;#34;FpFMvUhayLkOoVBpNuNiIVML/tuGv2iJQ7t0yWVTU8c=&amp;#34;, &amp;#34;Version&amp;#34;: &amp;#34;$LATEST&amp;#34;, &amp;#34;TracingConfig&amp;#34;: { &amp;#34;Mode&amp;#34;: &amp;#34;PassThrough&amp;#34; }, &amp;#34;RevisionId&amp;#34;: &amp;#34;88ebe1e1-bfdf-4dc3-84de-3017268fa1ff&amp;#34;, .</description></item><item><title>AWS Lambda をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/n9nydjc/</link><pubDate>Fri, 12 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n9nydjc/</guid><description>Lambda 関数の一覧を取得する (lambda list-functions) $ aws lambda list-functions --max-items 10 関数名だけ取り出す $ aws lambda list-functions --max-items 10 --query &amp;#34;Functions[].FunctionName&amp;#34; Node.js 10 を使ってる関数の ARN を調べる $ aws lambda list-functions --function-version ALL --output text --query &amp;#34;Functions[?Runtime==&amp;#39;nodejs10.x&amp;#39;].FunctionArn AWS から来た「Node.js 10 のサポート切れるから乗り換えてね」というメール (2021-06-04) に書かれていたやり方です。
-Lambda 関数の情報を取得する (lambda get-function) $ aws lambda get-function --function-name my-function 実行結果 { &amp;#34;Configuration&amp;#34;: { &amp;#34;FunctionName&amp;#34;: &amp;#34;my-function&amp;#34;, &amp;#34;FunctionArn&amp;#34;: &amp;#34;arn:aws:lambda:ap-northeast-1:123456789012:function:my-function&amp;#34;, &amp;#34;Runtime&amp;#34;: &amp;#34;nodejs12.x&amp;#34;, &amp;#34;Role&amp;#34;: &amp;#34;arn:aws:iam::123456789012:role/lambda-ex&amp;#34;, &amp;#34;CodeSha256&amp;#34;: &amp;#34;FpFMvUhayLkOoVBpNuNiIVML/tuGv2iJQ7t0yWVTU8c=&amp;#34;, &amp;#34;Version&amp;#34;: &amp;#34;$LATEST&amp;#34;, &amp;#34;TracingConfig&amp;#34;: { &amp;#34;Mode&amp;#34;: &amp;#34;PassThrough&amp;#34; }, &amp;#34;RevisionId&amp;#34;: &amp;#34;88ebe1e1-bfdf-4dc3-84de-3017268fa1ff&amp;#34;, .</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS/Lambda on まくろぐ</title><link>https://maku.blog/tags/aws/lambda/</link><description>Recent content in AWS/Lambda on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 06 Jun 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/aws/lambda/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS CloudFormation で Lambda 関数のリソースを生成する</title><link>https://maku.blog/p/w8s8kx9/</link><pubDate>Mon, 05 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/w8s8kx9/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>AWS CloudFormation を使うと Lambda 関数を含むインフラ（AWS リソース群）をまとめて生成することができますが、AWS CloudFormation の拡張である AWS SAM を使うと、もっと簡潔に Lambda 関数のリソースを生成することができます。&lt;/p>
+&lt;p>例えば、CloudFormation テンプレートの &lt;code>AWS::Lambda::Function&lt;/code> リソースでは、&lt;code>Role&lt;/code> プロパティが必須でしたが、SAM テンプレートの &lt;code>AWS::Serverless::Function&lt;/code> リソースでは、&lt;code>Role&lt;/code> プロパティはオプショナルになっています。
+&lt;code>Role&lt;/code> プロパティを省略すると、Lambda 関数に付けた論理 ID (Logical ID) をもとに、&lt;code>&amp;lt;論理ID&amp;gt;Role&lt;/code> という名前のロールが自動生成されます。&lt;/p>
+&lt;p>ここでは、AWS SAM を使った Lambda 関数生成の基本として、次のようなパターンで CloudFormation スタックを生成してみます。&lt;/p>
+&lt;ol>
+&lt;li>SAM テンプレートに関数コードを埋め込んでデプロイ&lt;/li>
+&lt;li>S3 バケット上の関数の ZIP ファイルを使ってデプロイ&lt;/li>
+&lt;/ol>
+&lt;h2 id="sam-テンプレートに関数コードを埋め込んでデプロイ">SAM テンプレートに関数コードを埋め込んでデプロイ&lt;/h2>
+&lt;p>まずは、一番シンプルな例として、SAM テンプレート内に Lambda 関数の実装をハードコーディングしてしまい、それをデプロイ（CloudFormation スタックの生成）してみます。&lt;/p>
+&lt;p>下記が SAM テンプレートです。
+SAM で Lambda 関数のリソースを定義するときは、リソースタイプとして &lt;strong>&lt;code>AWS::Serverless::Function&lt;/code>&lt;/strong> を指定します（CloudFormation では &lt;code>AWS::Lambda::Function&lt;/code> です）。
+ここでは関数の実装を &lt;strong>&lt;code>InlineCode&lt;/code>&lt;/strong> プロパティでハードコーディングし、単純な &lt;code>Hello World!&lt;/code> メッセージをレスポンスとして返すようにしています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">template.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">AWSTemplateFormatVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2010-09-09&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Transform&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless-2016-10-31&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Simple Lambda Function&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">HelloFunction&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless::Function&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Properties&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Runtime&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">python3.7&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Handler&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">index.handler&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">InlineCode&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">|&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> def handler(event, context):
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> return {&amp;#39;body&amp;#39;: &amp;#39;Hello World!&amp;#39;, &amp;#39;statusCode&amp;#39;: 200}&lt;/span>&lt;span class="w"> &lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この例では省略していますが、&lt;code>Function&lt;/code> リソースのプロパティ &lt;code>PackageType&lt;/code> はデフォルトで &lt;code>Zip&lt;/code> となっており、この場合は、関数の実体を &lt;code>CodeUri&lt;/code>（ZIP ファイルのパス）か、&lt;code>InlineCode&lt;/code>（ハードコーディング）のどちらかで指定します。
+この例では、&lt;code>InlineCode&lt;/code> で関数の内容を埋め込んでいます。&lt;/p></description></item><item><title>AWS CloudFormation の設定例: Lambda 関数の設定いろいろ</title><link>https://maku.blog/p/pbo2dpy/</link><pubDate>Thu, 08 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pbo2dpy/</guid><description>&lt;h2 id="タイムアウト時間-timeout">タイムアウト時間 (Timeout)&lt;/h2>
+&lt;p>Lambda 関数のタイムアウト時間（最大実行可能時間）を設定するには、&lt;code>Timeout&lt;/code> プロパティで秒単位の指定を行います。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例: タイムアウトを 15 秒にする&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">AWSTemplateFormatVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2010-09-09&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Transform&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless-2016-10-31&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyLambda&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless::Function&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Properties&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Runtime&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">nodejs14.x&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">CodeUri&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">function.zip&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Handler&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">index.handler&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Timeout&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">15&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>すべての Lambda 関数の Timeout 値をまとめて設定したいときは、&lt;code>Globals&lt;/code> セクションを使います。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">AWSTemplateFormatVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2010-09-09&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Transform&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless-2016-10-31&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Globals&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Function&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Runtime&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">nodejs14.x&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">CodeUri&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">function.zip&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Timeout&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">15&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyLambda1&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless::Function&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Properties&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Handler&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">index.handler1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyLambda2&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless::Function&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Properties&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Handler&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">index.handler2&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="環境変数-environment">環境変数 (Environment)&lt;/h2>
+&lt;p>Lambda 関数の中から参照可能な環境変数を設定するには、&lt;strong>&lt;code>Variables&lt;/code>&lt;/strong> プロパティに、キーと値のペアを指定します。
+すべての Lambda 関数に共通で設定する環境変数は、&lt;code>Globals&lt;/code> セクションで定義します。&lt;/p></description></item><item><title>AWS CloudFormation の設定例: Lambda 関数から S3 にアクセスできるようにする</title><link>https://maku.blog/p/dzdq3ep/</link><pubDate>Mon, 12 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dzdq3ep/</guid><description>&lt;p>CloudFormation (SAM) を利用して、Lambda 関数および S3 バケットを作成し、Lambda 関数から S3 バケットにアクセスできるようにポリシー設定するテンプレートの例です。
+参考までに Lambda 関数の TypeScript コードも載せましたが、あくまで SAM テンプレートの記述例を示すことを目的としています。&lt;/p>
+&lt;h2 id="sam-テンプレートの記述例">SAM テンプレートの記述例&lt;/h2>
+&lt;p>次の SAM テンプレートでは、AWS リソースとして S3 バケット (&lt;code>MyBucket&lt;/code>) と Lambda 関数 (&lt;code>MyFunction&lt;/code>) を定義しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">template.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">AWSTemplateFormatVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2010-09-09&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Transform&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless-2016-10-31&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># S3 バケットの定義&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyBucket&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::S3::Bucket&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># Lambda 関数の定義&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyFunction&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless::Function&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Properties&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Runtime&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">nodejs14.x&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Handler&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">build/index.handler&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">CodeUri&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">function.zip&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Policies&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">S3CrudPolicy&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">BucketName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>!&lt;span class="l">Ref MyBucket&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Environment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Variables&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">BUCKET_NAME&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>!&lt;span class="l">Ref MyBucket&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>S3 バケットは単純にスタック内に新規作成するだけなので、何もプロパティ設定していません。
+ポイントは、Lambda 関数側のポリシー設定（&lt;code>Policies&lt;/code> プロパティ）です。&lt;/p></description></item><item><title>AWS Lambda のポリシーステートメントの記述例</title><link>https://maku.blog/p/yn7hqx8/</link><pubDate>Sun, 06 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yn7hqx8/</guid><description>&lt;p>参考: &lt;a href="../../../p/cexcpyc/">AppSync&lt;/a> / &lt;a href="../../../p/s3o57jv/">SSM&lt;/a>&lt;/p>
+&lt;h2 id="lambda-関数の呼び出しを許可する">Lambda 関数の呼び出しを許可する&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2012-10-17&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Statement&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="s2">&amp;#34;lambda:invokeFunction&amp;#34;&lt;/span> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;arn:aws:lambda:us-west-2:123456789012:function:my-function&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;arn:aws:lambda:us-west-2:123456789012:function:my-function:*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>AWS Lambda をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/n9nydjc/</link><pubDate>Fri, 12 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n9nydjc/</guid><description>&lt;h2 id="lambda-関数の一覧を取得する-lambda-list-functions">Lambda 関数の一覧を取得する (lambda list-functions)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws lambda list-functions --max-items 10&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">関数名だけ取り出す&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws lambda list-functions --max-items 10
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --query &amp;#34;Functions[].FunctionName&amp;#34;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Node.js 10 を使ってる関数の ARN を調べる&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws lambda list-functions --function-version ALL --output text
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --query &amp;#34;Functions[?Runtime==&amp;#39;nodejs10.x&amp;#39;].FunctionArn&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>AWS から来た「Node.js 10 のサポート切れるから乗り換えてね」というメール (2021-06-04) に書かれていたやり方です。&lt;/p>
+&lt;h2 id="lambda-関数の情報を取得する-lambda-get-function">Lambda 関数の情報を取得する (lambda get-function)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws lambda get-function --function-name my-function&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-958317264" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-958317264">実行結果&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">{
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Configuration&amp;#34;: {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;FunctionName&amp;#34;: &amp;#34;my-function&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;FunctionArn&amp;#34;: &amp;#34;arn:aws:lambda:ap-northeast-1:123456789012:function:my-function&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Runtime&amp;#34;: &amp;#34;nodejs12.x&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Role&amp;#34;: &amp;#34;arn:aws:iam::123456789012:role/lambda-ex&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;CodeSha256&amp;#34;: &amp;#34;FpFMvUhayLkOoVBpNuNiIVML/tuGv2iJQ7t0yWVTU8c=&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Version&amp;#34;: &amp;#34;$LATEST&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;TracingConfig&amp;#34;: {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Mode&amp;#34;: &amp;#34;PassThrough&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> },
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;RevisionId&amp;#34;: &amp;#34;88ebe1e1-bfdf-4dc3-84de-3017268fa1ff&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> },
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Code&amp;#34;: {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;RepositoryType&amp;#34;: &amp;#34;S3&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;Location&amp;#34;: &amp;#34;https://awslambda-ap-northeast-1-tasks.s3.ap-northeast-1.amazonaws.com/snapshots/123456789012/my-function-4203078a-b7c9-4f35-...&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+&lt;p>Lambda 関数のデプロイパッケージをダウンロードするために使用できる、Lambda 関数メタデータと署名付き URL が含まれています。&lt;/p></description></item></channel></rss>

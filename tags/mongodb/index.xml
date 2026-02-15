@@ -1,56 +1,644 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MongoDB on まくろぐ</title><link>https://maku.blog/tags/mongodb/</link><description>Recent content in MongoDB on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Fri, 02 Feb 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/mongodb/index.xml" rel="self" type="application/rss+xml"/><item><title>MongoDB の特徴</title><link>https://maku.blog/p/xzc5z98/</link><pubDate>Mon, 20 May 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xzc5z98/</guid><description>MongoDB はオープンソースの NoSQL データベースで、MongoDB Inc.（旧 10gen）によって開発とサポートが行われています。
-https://www.mongodb.com/ MongoDB は次のような特徴を持っています。
-ドキュメント指向型のデータベースで、BSON 形式 (Binary JSON) でオブジェクトを格納する。 スキーマ定義が必要なく、データ構造が柔軟。 マスタ・スレーブ型のアーキテクチャを取り、書き込みはマスタノードに対してのみ、読み出しは複製されたスレーブノードからのみ行われる。非同期に複製が行われ、一時的に複数のデータバージョンが混在する可能性があるため、完璧な整合性が求められる用途には向かない。 バージョン 1.6 以降はレプリカ・セットという方式を採用し、プライマリ＆セカンダリの役割に基づいて複製制御が行われる。 MapReduce を使ったバッチ処理を利用できる。 セカンダリ・インデックスという機能により、複数の索引を使ってデータを検索できる。 RDB と比較して大量のデータを扱える。Mongo という名前は、英語の humongous（巨大な）から来ている。 JavaScript コードをストアド・プロシージャとして使用できる。</description></item><item><title>mongo シェルの基本的な使い方</title><link>https://maku.blog/p/pwx5kf7/</link><pubDate>Mon, 13 Apr 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pwx5kf7/</guid><description>MongoDB サーバーへの接続 mongo シェルで MongoDB サーバーへ接続するには次の用に実行します。 先に MongoDB サーバーを起動 しておく必要があります）。
-$ mongo # 単純に接続する場合 $ mongo mydb # 使用するデータベース名を指定する場合 ポート番号（デフォルトは 27017）や接続先の IP アドレスを指定することもできます。 下記はすべて正しい接続方法です。
-$ mongo --port 40001 $ mongo --port 40001 mydb $ mongo localhost:40001 $ mongo localhost:40001/mydb $ mongo 192.168.0.100 $ mongo 192.168.0.100/mydb $ mongo 192.168.0.100:40001/mydb ヘルプの表示 (help) mongo シェルを起動したあとに、help コマンドを実行するとヘルプを表示することができます。
-&amp;gt; help db.help() help on db methods db.mycoll.help() help on collection methods sh.help() sharding helpers rs.help() replica set helpers help admin administrative help help connect connecting to a db help help keys key shortcuts help misc misc things to know help mr mapreduce show dbs show database names show collections show collections in current database show users show users in current database show profile show most recent system.</description></item><item><title>MongoDB サーバー (mongod) を起動する</title><link>https://maku.blog/p/3ucs8n3/</link><pubDate>Mon, 13 Apr 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3ucs8n3/</guid><description>MongoDB クライアント（mongo コマンドや Web アプリケーション）から MongoDB のデータベースにアクセスするには、あらかじめ MongoDB サーバー（mongod）を起動しておく必要があります。
-MongoDB サーバーを起動する (mongod) MongoDB サーバーは、単純にコマンドラインから mongod と実行するだけで起動できます（Windows のサービスとして起動 しておくことも可能です）。 mongod コマンドを実行するときに、--dbpath オプションを使ってデータの格納先ディレクトリを指定することができます（デフォルトは /data/db）。 下記の例では、mydata ディレクトリをデータ格納先に指定しています。
-MongoDB サーバーの起動 $ mkdir mydata $ mongod --dbpath mydata ログファイル名を指定する (--logpath, --logappped) MongoDB サーバーのログはデフォルトで標準出力に出力されますが、--logpath オプションを使って、出力先のログファイル名を指定することもできます。 さらに、--logappend オプションを指定すると、これまでのログに追記される形で書き込まれます（このオプションを付けないと、ログファイルが上書きされてしまいます）。
-ログを log.txt に保存する $ mongod --dbpath mydata --logpath log.txt --logappend --dbpath にはディレクトリ名を指定しますが、--logpath にはファイル名を指定することに注意してください。
-ポート番号を指定する (--port) mongod が使用するデフォルトのポート番号は 27017 ですが、--port オプションを使用して、任意のポート番号で起動することができます。 ポート番号を変更しておけば、1 台のホスト上で複数の mongod を立ち上げることができます。
-ポート番号 40001 で起動する $ mongod --dbpath mydata --port 40001 サーバー側のポート番号を変更した場合は、mongo クライアントを起動するときにも mongo localhost:40001/dbname や --port 40001 のようにポート番号の指定が必要になることに注意してください。</description></item><item><title>mongo シェルで JavaScript ファイル（スクリプト）を実行する</title><link>https://maku.blog/p/2thipwb/</link><pubDate>Mon, 31 Mar 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2thipwb/</guid><description>例えば、input.js というスクリプトを mongo シェルで実行するには以下のようにします。 ここでは、mydb という名前のデータベースの books コレクションに、テスト用のドキュメントを追加しています。
-$ mongo mydb input.js input.js db.books.insert({title: &amp;#39;Title 1&amp;#39;}); db.books.insert({title: &amp;#39;Title 2&amp;#39;}); db.books.insert({title: &amp;#39;Title 3&amp;#39;}); ドキュメントには書いてありませんが、標準入力から読み込ませることもできるようです。 この方法を使うと、mongo コマンドのオプションのフォーマット的に、データベース名を省略してスクリプトファイル名を指定できるようになるので、スクリプトの中でデータベースを切り替えることができます。
-$ mongo &amp;lt; input2.js $ mongo --port 40001 &amp;lt; input2.js $ mongo localhost:40001 &amp;lt; input2.js input2.js use testdb; db.books.insert({title: &amp;#39;Title 1&amp;#39;, tags: [&amp;#39;AAA&amp;#39;, &amp;#39;BBB&amp;#39;]}); db.books.insert({title: &amp;#39;Title 2&amp;#39;, tags: [&amp;#39;BBB&amp;#39;, &amp;#39;CCC&amp;#39;]}); db.books.insert({title: &amp;#39;Title 3&amp;#39;, tags: [&amp;#39;CCC&amp;#39;, &amp;#39;AAA&amp;#39;]});</description></item><item><title>MongoDB サーバー (mongod) を Windows サービスとして登録する</title><link>https://maku.blog/p/tm4jzet/</link><pubDate>Fri, 17 Jan 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tm4jzet/</guid><description>Windows サービスとして MongoDB サービスを登録する MongoDB サーバー (mongod) を Windows サービスとして登録しておくと、バックグラウンドで MongoDB サーバーが動作するようになるため、いちいちコマンドラインで mongod を起動する必要がなくなります。
-MongoDB サーバーを Windows サービスとして登録するには、コマンドプロンプトを管理者権限で起動し、次のように入力します。
-Windows サービスとして MongoDB サービスを登録 C:\&amp;gt; mongod --install --dbpath &amp;lt;DBディレクトリ&amp;gt; --logpath &amp;lt;ログファイル名&amp;gt; コンソール上でログを確認することができなくなってしまうので、ログがファイルに保存されるように、ログファイル名を指定しておく必要があります。
-下記は実行例です。 ここでは、データベースディレクトリとして D:\mongo_data、ログファイル名 D:\mongo_log\log.txt を指定しています。 ディレクトリはあらかじめ作成しておく必要があります。
-C:\&amp;gt; mkdir D:\mongo_data C:\&amp;gt; mkdir D:\mongo_log C:\&amp;gt; mongod --install --dbpath D:\mongo_data --logpath D:\mongo_log\log.txt Fri Jan 17 12:11:49.699 Trying to install Windows service &amp;#39;MongoDB&amp;#39; Fri Jan 17 12:11:49.711 Service &amp;#39;MongoDB&amp;#39; (Mongo DB) installed with command line &amp;#39;C:\app\mongodb\mongod.</description></item><item><title>MongoDB と RDB の用語比較</title><link>https://maku.blog/p/gbs79ua/</link><pubDate>Tue, 22 Oct 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gbs79ua/</guid><description>MongoDB で使用する Database や Collection などの用語は、RDB の用語と以下のような関係にあります。
-MongoDB の用語 RDB の用語 Database Database Collection（コレクション） Table（テーブル） Document（ドキュメント） Record / Row（行） Field（フィールド） Column（列） ある Database の Collection に Document を追加するときは、mongo クライアントでは以下のように実行します。
-&amp;gt; use &amp;lt;Database名&amp;gt; &amp;gt; db.&amp;lt;Collection名&amp;gt;.insert(&amp;lt;Document の Field セット&amp;gt;)</description></item><item><title>MongoDB (mongo, mongod) をインストールする</title><link>https://maku.blog/p/jyn7v9y/</link><pubDate>Sat, 28 Dec 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/jyn7v9y/</guid><description>各種 OS 用のパッケージでインストールする MongoDB のクライアント (mongo) やサーバー (mongod)、その他の各種コマンド（mongoexport や mongostat など） は、下記のサイトから各種 OS 用のバイナリをダウンロードしてインストールすることができます。
-MongoDB Community Download | MongoDB Windows 用のインストーラを使うと、簡単に mongod を Windows サービスとして登録したりすることができます（手動でサービス登録することもできます）。 インストールして、bin ディレクトリへのパスが通ったら、mongo コマンドを実行できるか確認しておきましょう。
-mongo コマンドを実行できるか確認 $ mongo --version MongoDB shell version v4.0.9 git version: fc525e2d9b0e4bceff5c2201457e564362909765 allocator: tcmalloc modules: none build environment: distmod: 2008plus-ssl distarch: x86_64 target_arch: x86_64 macOS なら Homebrew でのインストールが楽 macOS の場合、Homebrew を使うと簡単に MongoDB のコマンド群（mongo や mongod）をインストールできます。
-mongodb-community パッケージのインストール $ brew tap mongodb/brew # MongoDB 用のリポジトリ情報を追加 $ brew install mongodb-community # MongoDB 関連コマンドをインストール $ brew upgrade mongodb-community # （バージョンアップしたいとき） これで、/usr/local/bin に以下のようなコマンド群がインストールされます（正確にはこれらはシンボリックリンクであり、実体は /usr/local/Cellar/mongodb-* 以下にインストールされています）。</description></item><item><title>Azure Cosmos DB にアカウントを作って MongoDB API でアクセスする</title><link>https://maku.blog/p/cd9bg3x/</link><pubDate>Tue, 21 May 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cd9bg3x/</guid><description>Azure Cosmos DB と MongoDB API Azure Cosmos DB は、Microsoft の Azure 上に配置できるスケーラブルなデータベースで、SQL や MongoDB API など様々なインタフェースでアクセスできるようになっています。
-MongoDB を使った既存のアプリケーションがある場合、接続先を Azure Cosmos DB アカウントのアドレスに変更するだけで、簡単にクラウド上のデータを扱えるようになります。 ローカルの MongoDB サーバ (mongod) に接続する代わりに、Azure Cosmos DB に接続するということです。
-ここでは、MongoDB API（MongoDB シェル）による Azure Cosmos DB へのアクセスを試してみます。 まずは、Azure 上に Cosmos DB のリソースを作成します。
-Azure Cosmos DB アカウントを作成する Azure ポータルへログインし、Azure Cosmos DB のページを開き、Azure Cosmos DB アカウントの作成 をクリックします。
-次の画面では、アカウント名 や API の種類を設定します。
-アカウント名 に入力した値は、下記のように接続 URI の一部として使われます。 よって、このアカウント名は世界中で一意である必要があります。
-mongodb://＜アカウント名＞:＜キー＞@＜アカウント名＞.documents.azure.com:10255/?ssl=true&amp;amp;replicaSet=globaldb API の種類には、MongoDB API を指定してください。 各項目の入力が終わったら、確認と作成 を押して数分待つと、Azure Cosmos DB アカウントの作成が完了します。</description></item><item><title>MongoDB のインデックスについて</title><link>https://maku.blog/p/gii3wtb/</link><pubDate>Fri, 02 Feb 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gii3wtb/</guid><description>MongoDB で大量のデータを扱う場合、高速な検索を実現するためにインデックスを作成しておく必要があります。 インデックスの詳細は 公式ドキュメント にありますが、ちょっとややこしいのでポイントだけまとめておきます。
-インデックスがないとシーケンシャルサーチになる MongoDB のフィールドのうち、デフォルトでインデックスが作成されるのは _id フィールドだけです（削除もできません）。 インデックスが作成されていないフィールドを検索しようとすると、コレクション全体のシーケンシャルサーチ（線形探索）になるので、データ数が増えるごとに検索速度は遅くなっていきます。
-特定のフィールドに対するインデックスを作成すると、内部的に B-tree（B 木） 構造の逆引きデータが作られるので、そのフィールドの値での検索が高速になります。
-score フィールド用のインデックスを作成する coll.createIndex({ score : 1 }) インデックス情報は昇順 (1: ascending) あるいは降順 (-1: descending) で並べられているため、値の完全一致だけではなく、大小比較による検索も高速に行えます。
-score フィールドが 70 以上のドキュメントを検索 coll.find({ score: { $gte: 70 } }) 複合インデックス (Compound Indexes) 複合インデックス (Compound Indexes) というのを作成しておくと、複数のフィールド値を指定した高速検索が可能になります。
-genre フィールドと price フィールドの複合インデックスを作成 coll.createIndex({ genre: 1, price: -1 }) フィールド名の後ろの数値は、内部的にインデックスがどのような順序で保持されるかという sort order を示しており、1（昇順: ascending）あるいは -1（降順: descending）を指定します。 検索結果をソートしたい場合、この sort order 通りのソート順序であれば高速にソートされます。
-複合インデックスを利用したソート coll.find({}).sort({ genre: 1, price: -1 }) coll.</description></item><item><title>MongoDB と mongosh のチートシート</title><link>https://maku.blog/p/j4c4vnq/</link><pubDate>Thu, 28 Dec 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j4c4vnq/</guid><description>全般（mongosh で接続した後のコマンド） コマンド 説明 db 現在のデータベース名を表示 use &amp;lt;db&amp;gt; 現在のデータベースを切り替える show databases (dbs) データベースの一覧を表示 show collections (tables) コレクションの一覧を表示 show users ユーザーの一覧を表示 show log ログの出力 db.stats() データベースの統計情報を表示 db.&amp;lt;coll&amp;gt;.stats() コレクションの統計情報を表示 db.createCollection(&amp;quot;&amp;lt;coll&amp;gt;&amp;quot;) コレクションを作成（オプション指定付きで作成したいとき） db.getCollectionInfos() コレクション情報を JS 配列として取得 db.getCollectionNames() コレクション名の一覧を JS 配列として取得 ドキュメントの検索 (Find) find の基本 コレクション内のドキュメントを検索するには、find() メソッドの第 1 引数に検索フィルターを指定します。
-すべてのドキュメントを取得する db.&amp;lt;coll&amp;gt;.find() db.&amp;lt;coll&amp;gt;.find({}) name フィールドの値が value に一致するドキュメントを検索する db.&amp;lt;coll&amp;gt;.find({ name: &amp;#34;value&amp;#34; }) awards.wins フィールドが 100 より大きいドキュメントを検索する db.&amp;lt;coll&amp;gt;.find({ &amp;#34;awards.wins&amp;#34;: { $gt: 100 } }) languages フィールドに jp あるいは en を含むドキュメントを検索する db.</description></item><item><title>MongoDB Atlas で不用意なコレクションの削除を防ぐ（読み込み専用ユーザー）</title><link>https://maku.blog/p/tzpxtnm/</link><pubDate>Wed, 27 Dec 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tzpxtnm/</guid><description>MongoDB の API は直感的でわかりやすいですが、開発中に手がすべって db.drop() や collection.drop() を実行してしまうと、データベースやコレクションが丸ごと削除されて悲しいことになります。 本番環境での運用時はもちろん、開発中もこのようなミスが起こらないように設定しておくと安心です。
-例えば、MongoDB 本家のサービスである MongoDB Atlas では、Database ユーザーごとに Role を設定して権限を絞ることができます。
-☝️ Database ユーザーとは MongoDB Atlas の Database ユーザーとは、Node.js アプリなどからサーバーに接続するときに接続文字列 (SRV URI) 内で指定するユーザーのことを示しています。 Atlas サービス自体のアカウントとは別ものなので注意してください。 Database ユーザーは複数作成することができ、用途ごとに Role を割り当てることができます。 例えば、バックアップ用の backup ユーザーには読み込み権限だけを与えておいて、バックアップツールの実装では、このユーザーを接続 URI で指定するようにします。 次の例では、ユーザー (readuser) に、Only read any database (readAnyDatabase) という Role を設定して、データベースの読み込みだけを許可しています。
-図: MongoDB Atlas のユーザー Role 設定 これで、Node.js アプリなどから次のような URI で MongoDB Atlas に接続した場合は、データベースの読み込みだけが可能になります。
-mongodb+srv://readuser:&amp;lt;password&amp;gt;@&amp;lt;cluster&amp;gt;.&amp;lt;random&amp;gt;.mongodb.net:55001/ 組み込みの Role としては以下が用意されていますが、一般的なアプリケーション用の Role であれば、Atlas admin (atlasAdmin) を選択する必要はありません。 コレクションへの書き込みが必要なバックエンド用であれば、Read and write to any database (readWriteAnyDatabase) という Role を選択します。</description></item><item><title>Deno で MongoDB にアクセスする</title><link>https://maku.blog/p/3pwojuj/</link><pubDate>Wed, 18 Jan 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3pwojuj/</guid><description>Deno 用の MongoDB ドライバーとして、deno_mongo が公開されています。 Deno Deploy 上でも使えるので、Deno Deploy で公開する Web API から MongoDB Atlas に接続する、といったことが簡単に行えます。
-mongo | Deno GitHub - denodrivers/mongo: MongoDB driver for Deno MongoDB サーバーへ接続する ローカルホスト上で起動した MongoDB サーバーへ接続するには次のようにします。
-import { MongoClient } from &amp;#34;https://deno.land/x/mongo@v0.31.1/mod.ts&amp;#34;; const client = new MongoClient(); await client.connect(&amp;#34;mongodb://127.0.0.1:27017&amp;#34;); // 後は client インスタンスを使って MongoDB を操作する 実運用を考えると、MONGODB_URI_MYAPP のような環境変数で接続先の MongoDB サーバー（およびユーザー ID とパスワード）を指定できるようにしておいた方がよいでしょう。 例えば、MongoDB Atlas サービスを使用している場合は、次のような構成の接続文字列 (SRV URI) が発行されますが、ここには接続パスワードなどが含まれるので、この URI をハードコーディングすることはできません。
-MongoDB 接続文字列 (SRV URI) の基本構成 mongodb+srv://&amp;lt;user&amp;gt;:&amp;lt;password&amp;gt;@&amp;lt;cluster-url&amp;gt;/ ☝️ SRV URI で authentication failed になる場合 SRV URI を使って MongoDB サーバーにアクセスしようとしたときに認証系のエラーが出る場合は、まずはユーザー ID とパスワードを確認してください。 正しく指定しているのにも関わらずエラーが出る場合は、使用する認証メカニズムの食い違いが発生している可能性があります。 MongoDB はいくつかの認証メカニズム を備えており、MongoDB のバージョンによってどれを使うかが異なっています。 URL の末尾のクエリパラメーターで、?</description></item><item><title>Docker で MongoDB サーバーを立ち上げる</title><link>https://maku.blog/p/y6zgrg2/</link><pubDate>Wed, 18 Jan 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/y6zgrg2/</guid><description>Docker のオフィシャルイメージとして、mongo イメージが公開されています。
-mongo - Official Image | Docker Hub このイメージには、MongoDB サーバー (mongod) や、MongoDB クライアント (mongosh) が含まれており、コマンドを省略してコンテナを起動すると、デフォルトで MongoDB サーバーが立ち上がります。
-MongoDB サーバーのコンテナを起動する 次のように mongo コンテナを起動すると、ローカルホスト上で MongoDB サーバーを立ち上げたのと同様に振舞います。
-$ docker container run --rm -d -p 27017:27017 --name mongo mongo オプションの意味:
---rm &amp;hellip; コンテナを停止したときにコンテナを削除します。コンテナを削除したくなければ、このオプションは外してください。 -d &amp;hellip; デーモンをバックグラウンドで動作させます。 -p 27107:27017 &amp;hellip; ローカルホストの 27107 ポートへのアクセスを、コンテナ内の MongoDB サーバーの 27107 ポートへ転送します。 --name mongo &amp;hellip; 起動するコンテナに mongo という名前を付けます。 mongo &amp;hellip; Docker イメージとして mongo:latest を使用します（デフォルトで :latest が使われます)。 次のようにして、mongo コンテナが起動していることを確認できます。</description></item><item><title>MongoDB for VS Code で Azure Cosmos DB を操作する</title><link>https://maku.blog/p/dt3ahpw/</link><pubDate>Sat, 12 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dt3ahpw/</guid><description>Cosmos DB インスタンスを MongoDB API アクセス用に作成 しておくと、さまざまな MongoDB 用のツールでデータベースにアクセスできるようになります。 ここでは、VS Code 用の拡張「MongoDB for VS Code」を使って、Cosmos DB を操作できるようにしてみます。 TypeScript を使って Web アプリを作成しているときは、エディタとして VS Code を使っていることが多いでしょうから、同じ環境上で Cosmos DB を操作できると開発が捗ります。
-MongoDB for VS Code のインストール 図: MongoDB for VS Code のインストール MongoDB for VS Code は、VS Code の Extesions バー (Cmd/Ctrl + Shift + X) で MongoDB で検索すれば簡単にインストールできます。
-VS Code から Cosmos DB (MongoDB) に接続する 接続文字列で簡単接続 MongoDB for VS Code をインストールすると、サイドバーに 葉っぱのアイコン が出てくるので、ここから MongoDB サーバーに接続することができます。 ちなみに、MongoDB が葉っぱアイコンを使うのは、それを使うことが「シンプルで自然であるから」らしいです（じゃあ水でもいいじゃん、とは言いますまい）。</description></item><item><title>mongo シェルで find の結果をインデントして見やすく表示する (pretty)</title><link>https://maku.blog/p/uvusqb7/</link><pubDate>Mon, 31 Mar 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uvusqb7/</guid><description>mongo シェルで find() を実行した結果を見やすいように整形するには、実行結果に対して pretty() を適用します。
-&amp;gt; db.books.find().pretty() { &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;533973de50b35840de2dda25&amp;#34;), &amp;#34;title&amp;#34; : &amp;#34;Title 1&amp;#34;, &amp;#34;tags&amp;#34; : [ &amp;#34;AAA&amp;#34;, &amp;#34;BBB&amp;#34; ] } { &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;533973de50b35840de2dda26&amp;#34;), &amp;#34;title&amp;#34; : &amp;#34;Title 2&amp;#34;, &amp;#34;tags&amp;#34; : [ &amp;#34;BBB&amp;#34;, &amp;#34;CCC&amp;#34; ] } { &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;533973de50b35840de2dda27&amp;#34;), &amp;#34;title&amp;#34; : &amp;#34;Title 3&amp;#34;, &amp;#34;tags&amp;#34; : [ &amp;#34;CCC&amp;#34;, &amp;#34;AAA&amp;#34; ] }</description></item><item><title>mongo シェルで MapReduce を実行する</title><link>https://maku.blog/p/qvkkcuj/</link><pubDate>Mon, 31 Mar 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qvkkcuj/</guid><description>mongo シェルを使って、下記のような books コレクションに対して MapReduce をかけて、タグ情報のリスト（tags コレクション）を生成する方法を示します。
-{ title: &amp;#39;Title 1&amp;#39;, tags: [&amp;#39;AAA&amp;#39;, &amp;#39;BBB&amp;#39;] } { title: &amp;#39;Title 2&amp;#39;, tags: [&amp;#39;BBB&amp;#39;, &amp;#39;CCC&amp;#39;] } { title: &amp;#39;Title 3&amp;#39;, tags: [&amp;#39;CCC&amp;#39;, &amp;#39;AAA&amp;#39;] } 作成される tags コレクションは、以下のようになることを想定しています。
-{ &amp;#34;_id&amp;#34; : &amp;#34;AAA&amp;#34;, &amp;#34;value&amp;#34; : 2 } { &amp;#34;_id&amp;#34; : &amp;#34;BBB&amp;#34;, &amp;#34;value&amp;#34; : 2 } { &amp;#34;_id&amp;#34; : &amp;#34;CCC&amp;#34;, &amp;#34;value&amp;#34; : 2 } まずは、サンプルデータとなる books コレクションを作成します。
-books.js use testdb; // books コレクションの初期化 db.books.drop(); db.books.save({title: &amp;#39;Title 1&amp;#39;, tags: [&amp;#39;AAA&amp;#39;, &amp;#39;BBB&amp;#39;]}); db.</description></item><item><title>mongo シェルで各フィールドの型を調べる (typeof, instanceof)</title><link>https://maku.blog/p/yejmu4v/</link><pubDate>Tue, 22 Oct 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yejmu4v/</guid><description>mongo シェルで、各フィールドの型（タイプ）を調べたいときは、typeof や instanceof を使用します。
-フィールドの型を調べる typeof mydoc._id 指定した型のフィールドかどうか調べる mydoc._id instanceof ObjectId 参考 Data Types in the mongo Shell — MongoDB Manual</description></item><item><title>MongoDB の ObjectId について（Document の生成時間を調べる）</title><link>https://maku.blog/p/wdbr8dx/</link><pubDate>Tue, 22 Oct 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wdbr8dx/</guid><description>MongoDB の各 Document（RDB でいうレコード）は、それぞれ _id というプライマリキーとなるフィールドを持っています。 この値は、何も指定しないと、自動的に ObjectId オブジェクトが生成されて設定されます。
-&amp;gt; db.mycollection.insert({value:100}) &amp;gt; db.mycollection.findOne() { &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;5265e358c76d2a2f8b870057&amp;#34;), &amp;#34;value&amp;#34; : 100 } この ObjectId オブジェクトは BSON 形式 のオブジェクトで、内部的に以下のような値を保持しています。
-フィールド サイズ 内容 Timestamp 4 bytes 生成時間（秒） Machine ID 3 bytes マシン固有値 PID 2 bytes プロセス ID Counter 3 bytes ランダム値から始まってインクリメントされる ObjectId オブジェクト内に含まれているタイムスタンプは、getTimestamp() メソッドによって取得できます。 これを利用すると、Document の _id フィールドから、その Document が生成された時間を調べることができます。
-&amp;gt; db.mycollection.findOne()._id.getTimestamp() ISODate(&amp;#34;2013-10-22T02:30:48Z&amp;#34;) 参考 ObjectId — MongoDB Manual</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MongoDB on まくろぐ</title><link>https://maku.blog/tags/mongodb/</link><description>Recent content in MongoDB on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Fri, 02 Feb 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/mongodb/index.xml" rel="self" type="application/rss+xml"/><item><title>MongoDB の特徴</title><link>https://maku.blog/p/xzc5z98/</link><pubDate>Mon, 20 May 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xzc5z98/</guid><description>&lt;p>MongoDB はオープンソースの NoSQL データベースで、MongoDB Inc.（旧 10gen）によって開発とサポートが行われています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://www.mongodb.com/">https://www.mongodb.com/&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>MongoDB は次のような特徴を持っています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>ドキュメント指向型&lt;/strong>のデータベースで、BSON 形式 (Binary JSON) でオブジェクトを格納する。&lt;/li>
+&lt;li>スキーマ定義が必要なく、&lt;strong>データ構造が柔軟&lt;/strong>。&lt;/li>
+&lt;li>&lt;strong>マスタ・スレーブ型&lt;/strong>のアーキテクチャを取り、書き込みはマスタノードに対してのみ、読み出しは複製されたスレーブノードからのみ行われる。非同期に複製が行われ、一時的に&lt;strong>複数のデータバージョンが混在する可能性がある&lt;/strong>ため、完璧な整合性が求められる用途には向かない。&lt;/li>
+&lt;li>バージョン 1.6 以降はレプリカ・セットという方式を採用し、プライマリ＆セカンダリの役割に基づいて複製制御が行われる。&lt;/li>
+&lt;li>&lt;strong>MapReduce&lt;/strong> を使ったバッチ処理を利用できる。&lt;/li>
+&lt;li>セカンダリ・インデックスという機能により、複数の索引を使ってデータを検索できる。&lt;/li>
+&lt;li>RDB と比較して大量のデータを扱える。Mongo という名前は、英語の humongous（巨大な）から来ている。&lt;/li>
+&lt;li>JavaScript コードをストアド・プロシージャとして使用できる。&lt;/li>
+&lt;/ul></description></item><item><title>mongo シェルの基本的な使い方</title><link>https://maku.blog/p/pwx5kf7/</link><pubDate>Mon, 13 Apr 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pwx5kf7/</guid><description>&lt;h2 id="mongodb-サーバーへの接続">MongoDB サーバーへの接続&lt;/h2>
+&lt;p>&lt;code>mongo&lt;/code> シェルで MongoDB サーバーへ接続するには次の用に実行します。
+先に &lt;a href="../../p/3ucs8n3">MongoDB サーバーを起動&lt;/a> しておく必要があります）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo &lt;span class="c1"># 単純に接続する場合&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo mydb &lt;span class="c1"># 使用するデータベース名を指定する場合&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ポート番号（デフォルトは &lt;code>27017&lt;/code>）や接続先の IP アドレスを指定することもできます。
+下記はすべて正しい接続方法です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo --port &lt;span class="m">40001&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo --port &lt;span class="m">40001&lt;/span> mydb
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="gp">$&lt;/span> mongo localhost:40001
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo localhost:40001/mydb
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="gp">$&lt;/span> mongo 192.168.0.100
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo 192.168.0.100/mydb
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo 192.168.0.100:40001/mydb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="ヘルプの表示-help">ヘルプの表示 (help)&lt;/h2>
+&lt;p>&lt;code>mongo&lt;/code> シェルを起動したあとに、&lt;strong>&lt;code>help&lt;/code>&lt;/strong> コマンドを実行するとヘルプを表示することができます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> &lt;span class="nb">help&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">db.help() help on db methods
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">db.mycoll.help() help on collection methods
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">sh.help() sharding helpers
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">rs.help() replica set helpers
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">help admin administrative help
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">help connect connecting to a db help
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">help keys key shortcuts
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">help misc misc things to know
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">help mr mapreduce
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">show dbs show database names
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">show collections show collections in current database
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">show users show users in current database
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">show profile show most recent system.profile entries with time &amp;gt;= 1ms
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">show logs show the accessible logger names
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">show log [name] prints out the last segment of log in memory, &amp;#39;global&amp;#39; is default
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">use &amp;lt;db_name&amp;gt; set current database
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">db.mycoll.find() list objects in collection mycoll
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">db.mycoll.find( { a : 1 } ) list objects in mycoll where a == 1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">it result of the last line evaluated; use to further iterate
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">DBQuery.shellBatchSize = x set default number of items to display on shell
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">exit quit the mongo shell
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="コレクションにドキュメントを追加する-dbcollinsert">コレクションにドキュメントを追加する (db.coll.insert)&lt;/h2>
+&lt;p>まず、データベース名を指定して MongoDB サーバーに接続してください。
+ここでは、&lt;code>mydb&lt;/code> という名前のデータベースを使うことにします（実体は必要に応じて自動的に作成されます）。&lt;/p></description></item><item><title>MongoDB サーバー (mongod) を起動する</title><link>https://maku.blog/p/3ucs8n3/</link><pubDate>Mon, 13 Apr 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3ucs8n3/</guid><description>&lt;p>MongoDB クライアント（&lt;code>mongo&lt;/code> コマンドや Web アプリケーション）から MongoDB のデータベースにアクセスするには、あらかじめ MongoDB サーバー（&lt;code>mongod&lt;/code>）を起動しておく必要があります。&lt;/p>
+&lt;h2 id="mongodb-サーバーを起動する-mongod">MongoDB サーバーを起動する (mongod)&lt;/h2>
+&lt;p>MongoDB サーバーは、単純にコマンドラインから &lt;strong>&lt;code>mongod&lt;/code>&lt;/strong> と実行するだけで起動できます（&lt;a href="../../p/tm4jzet">Windows のサービスとして起動&lt;/a> しておくことも可能です）。
+&lt;code>mongod&lt;/code> コマンドを実行するときに、&lt;strong>&lt;code>--dbpath&lt;/code>&lt;/strong> オプションを使ってデータの格納先ディレクトリを指定することができます（デフォルトは &lt;strong>&lt;code>/data/db&lt;/code>&lt;/strong>）。
+下記の例では、&lt;code>mydata&lt;/code> ディレクトリをデータ格納先に指定しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">MongoDB サーバーの起動&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mkdir mydata
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongod --dbpath mydata
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="ログファイル名を指定する---logpath---logappped">ログファイル名を指定する (--logpath, --logappped)&lt;/h2>
+&lt;p>MongoDB サーバーのログはデフォルトで標準出力に出力されますが、&lt;strong>&lt;code>--logpath&lt;/code>&lt;/strong> オプションを使って、出力先のログファイル名を指定することもできます。
+さらに、&lt;strong>&lt;code>--logappend&lt;/code>&lt;/strong> オプションを指定すると、これまでのログに追記される形で書き込まれます（このオプションを付けないと、ログファイルが上書きされてしまいます）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ログを log.txt に保存する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongod --dbpath mydata --logpath log.txt --logappend
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>--dbpath&lt;/code> にはディレクトリ名を指定しますが、&lt;code>--logpath&lt;/code> にはファイル名を指定することに注意してください。&lt;/p>
+&lt;h2 id="ポート番号を指定する---port">ポート番号を指定する (--port)&lt;/h2>
+&lt;p>&lt;code>mongod&lt;/code> が使用するデフォルトのポート番号は &lt;strong>&lt;code>27017&lt;/code>&lt;/strong> ですが、&lt;strong>&lt;code>--port&lt;/code>&lt;/strong> オプションを使用して、任意のポート番号で起動することができます。
+ポート番号を変更しておけば、1 台のホスト上で複数の &lt;code>mongod&lt;/code> を立ち上げることができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ポート番号 40001 で起動する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongod --dbpath mydata --port &lt;span class="m">40001&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>サーバー側のポート番号を変更した場合は、&lt;code>mongo&lt;/code> クライアントを起動するときにも &lt;code>mongo localhost:40001/dbname&lt;/code> や &lt;code>--port 40001&lt;/code> のようにポート番号の指定が必要になることに注意してください。&lt;/p></description></item><item><title>mongo シェルで JavaScript ファイル（スクリプト）を実行する</title><link>https://maku.blog/p/2thipwb/</link><pubDate>Mon, 31 Mar 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2thipwb/</guid><description>&lt;p>例えば、&lt;code>input.js&lt;/code> というスクリプトを &lt;code>mongo&lt;/code> シェルで実行するには以下のようにします。
+ここでは、&lt;code>mydb&lt;/code> という名前のデータベースの &lt;code>books&lt;/code> コレクションに、テスト用のドキュメントを追加しています。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo mydb input.js
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">input.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">insert&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 1&amp;#39;&lt;/span>&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">insert&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 2&amp;#39;&lt;/span>&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">insert&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 3&amp;#39;&lt;/span>&lt;span class="p">});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ドキュメントには書いてありませんが、標準入力から読み込ませることもできるようです。
+この方法を使うと、&lt;code>mongo&lt;/code> コマンドのオプションのフォーマット的に、データベース名を省略してスクリプトファイル名を指定できるようになるので、&lt;strong>スクリプトの中でデータベースを切り替えることができます&lt;/strong>。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo &amp;lt; input2.js
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo --port &lt;span class="m">40001&lt;/span> &amp;lt; input2.js
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo localhost:40001 &amp;lt; input2.js
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">input2.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">use&lt;/span> &lt;span class="nx">testdb&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">insert&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 1&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;AAA&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;BBB&amp;#39;&lt;/span>&lt;span class="p">]});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">insert&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 2&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;BBB&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;CCC&amp;#39;&lt;/span>&lt;span class="p">]});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">insert&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 3&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;CCC&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;AAA&amp;#39;&lt;/span>&lt;span class="p">]});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>MongoDB サーバー (mongod) を Windows サービスとして登録する</title><link>https://maku.blog/p/tm4jzet/</link><pubDate>Fri, 17 Jan 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tm4jzet/</guid><description>&lt;h2 id="windows-サービスとして-mongodb-サービスを登録する">Windows サービスとして MongoDB サービスを登録する&lt;/h2>
+&lt;p>MongoDB サーバー (&lt;code>mongod&lt;/code>) を Windows サービスとして登録しておくと、バックグラウンドで MongoDB サーバーが動作するようになるため、いちいちコマンドラインで &lt;code>mongod&lt;/code> を起動する必要がなくなります。&lt;/p>
+&lt;p>MongoDB サーバーを Windows サービスとして登録するには、&lt;strong>コマンドプロンプトを管理者権限で起動&lt;/strong>し、次のように入力します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Windows サービスとして MongoDB サービスを登録&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">C:\&amp;gt; mongod --install --dbpath &amp;lt;DBディレクトリ&amp;gt; --logpath &amp;lt;ログファイル名&amp;gt;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>コンソール上でログを確認することができなくなってしまうので、ログがファイルに保存されるように、ログファイル名を指定しておく必要があります。&lt;/p>
+&lt;p>下記は実行例です。
+ここでは、データベースディレクトリとして &lt;code>D:\mongo_data&lt;/code>、ログファイル名 &lt;code>D:\mongo_log\log.txt&lt;/code> を指定しています。
+ディレクトリはあらかじめ作成しておく必要があります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">C:\&amp;gt; mkdir D:\mongo_data
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">C:\&amp;gt; mkdir D:\mongo_log
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">C:\&amp;gt; mongod --install --dbpath D:\mongo_data --logpath D:\mongo_log\log.txt
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Fri Jan 17 12:11:49.699 Trying to install Windows service &amp;#39;MongoDB&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Fri Jan 17 12:11:49.711 Service &amp;#39;MongoDB&amp;#39; (Mongo DB) installed with command line &amp;#39;C:\app\mongodb\mongod.exe --dbpath D:\mongo_data --logpath D:\mongo_log\log.txt --service&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Fri Jan 17 12:11:49.712 Service can be started from the command line with &amp;#39;net start MongoDB&amp;#39;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、&lt;strong>&lt;code>MongoDB&lt;/code>&lt;/strong> という名前の Windows サービスとして認識されるようになります。
+&lt;code>sc&lt;/code> コマンドで、実際に登録されているか確認しておきましょう。&lt;/p></description></item><item><title>MongoDB と RDB の用語比較</title><link>https://maku.blog/p/gbs79ua/</link><pubDate>Tue, 22 Oct 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gbs79ua/</guid><description>&lt;p>MongoDB で使用する &lt;strong>Database&lt;/strong> や &lt;strong>Collection&lt;/strong> などの用語は、RDB の用語と以下のような関係にあります。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>MongoDB の用語&lt;/th>
+ &lt;th>RDB の用語&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;strong>Database&lt;/strong>&lt;/td>
+ &lt;td>Database&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>Collection（コレクション）&lt;/strong>&lt;/td>
+ &lt;td>Table（テーブル）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>Document（ドキュメント）&lt;/strong>&lt;/td>
+ &lt;td>Record / Row（行）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>Field（フィールド）&lt;/strong>&lt;/td>
+ &lt;td>Column（列）&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;p>ある Database の Collection に Document を追加するときは、&lt;code>mongo&lt;/code> クライアントでは以下のように実行します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">&amp;gt; use &amp;lt;Database名&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;gt; db.&amp;lt;Collection名&amp;gt;.insert(&amp;lt;Document の Field セット&amp;gt;)&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>MongoDB (mongo, mongod) をインストールする</title><link>https://maku.blog/p/jyn7v9y/</link><pubDate>Sat, 28 Dec 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/jyn7v9y/</guid><description>&lt;h2 id="各種-os-用のパッケージでインストールする">各種 OS 用のパッケージでインストールする&lt;/h2>
+&lt;p>MongoDB のクライアント (&lt;strong>&lt;code>mongo&lt;/code>&lt;/strong>) やサーバー (&lt;strong>&lt;code>mongod&lt;/code>&lt;/strong>)、その他の各種コマンド（&lt;code>mongoexport&lt;/code> や &lt;code>mongostat&lt;/code> など） は、下記のサイトから各種 OS 用のバイナリをダウンロードしてインストールすることができます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://www.mongodb.com/try/download/community">MongoDB Community Download | MongoDB&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Windows 用のインストーラを使うと、簡単に &lt;code>mongod&lt;/code> を Windows サービスとして登録したりすることができます（&lt;a href="../../p/tm4jzet">手動でサービス登録する&lt;/a>こともできます）。
+インストールして、&lt;code>bin&lt;/code> ディレクトリへのパスが通ったら、&lt;code>mongo&lt;/code> コマンドを実行できるか確認しておきましょう。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">mongo コマンドを実行できるか確認&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mongo --version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">MongoDB shell version v4.0.9
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">git version: fc525e2d9b0e4bceff5c2201457e564362909765
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">allocator: tcmalloc
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">modules: none
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">build environment:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> distmod: 2008plus-ssl
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> distarch: x86_64
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> target_arch: x86_64
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="macos-なら-homebrew-でのインストールが楽">macOS なら Homebrew でのインストールが楽&lt;/h2>
+&lt;p>macOS の場合、&lt;a href="https://brew.sh/index_ja">Homebrew&lt;/a> を使うと簡単に MongoDB のコマンド群（&lt;code>mongo&lt;/code> や &lt;code>mongod&lt;/code>）をインストールできます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">mongodb-community パッケージのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> brew tap mongodb/brew &lt;span class="c1"># MongoDB 用のリポジトリ情報を追加&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> brew install mongodb-community &lt;span class="c1"># MongoDB 関連コマンドをインストール&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> brew upgrade mongodb-community &lt;span class="c1"># （バージョンアップしたいとき）&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、&lt;code>/usr/local/bin&lt;/code> に以下のようなコマンド群がインストールされます（正確にはこれらはシンボリックリンクであり、実体は &lt;code>/usr/local/Cellar/mongodb-*&lt;/code> 以下にインストールされています）。&lt;/p></description></item><item><title>Azure Cosmos DB にアカウントを作って MongoDB API でアクセスする</title><link>https://maku.blog/p/cd9bg3x/</link><pubDate>Tue, 21 May 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cd9bg3x/</guid><description>&lt;h2 id="azure-cosmos-db-と-mongodb-api">Azure Cosmos DB と MongoDB API&lt;/h2>
+&lt;p>Azure Cosmos DB は、Microsoft の Azure 上に配置できるスケーラブルなデータベースで、&lt;strong>SQL や MongoDB API など様々なインタフェースでアクセスできる&lt;/strong>ようになっています。&lt;/p>
+&lt;p>MongoDB を使った既存のアプリケーションがある場合、接続先を Azure Cosmos DB アカウントのアドレスに変更するだけで、簡単にクラウド上のデータを扱えるようになります。
+ローカルの MongoDB サーバ (&lt;code>mongod&lt;/code>) に接続する代わりに、Azure Cosmos DB に接続するということです。&lt;/p>
+&lt;p>ここでは、MongoDB API（MongoDB シェル）による Azure Cosmos DB へのアクセスを試してみます。
+まずは、Azure 上に Cosmos DB のリソースを作成します。&lt;/p>
+&lt;h2 id="azure-cosmos-db-アカウントを作成する">Azure Cosmos DB アカウントを作成する&lt;/h2>
+&lt;p>&lt;a href="https://portal.azure.com/">Azure ポータル&lt;/a>へログインし、&lt;samp>Azure Cosmos DB&lt;/samp> のページを開き、&lt;samp>Azure Cosmos DB アカウントの作成&lt;/samp> をクリックします。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="700" height="540" src="../../p/cd9bg3x/cosmos-account-001_hu12261836377971598877.png" alt="/p/cd9bg3x/cosmos-account-001.png" />
+&lt;/figure>
+
+&lt;p>次の画面では、&lt;samp>アカウント名&lt;/samp> や &lt;samp>API&lt;/samp> の種類を設定します。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="500" height="492" src="../../p/cd9bg3x/cosmos-account-002_hu672509507542301180.png" alt="/p/cd9bg3x/cosmos-account-002.png" />
+&lt;/figure>
+
+&lt;p>&lt;samp>アカウント名&lt;/samp> に入力した値は、下記のように接続 URI の一部として使われます。
+よって、この&lt;strong>アカウント名は世界中で一意&lt;/strong>である必要があります。&lt;/p></description></item><item><title>MongoDB のインデックスについて</title><link>https://maku.blog/p/gii3wtb/</link><pubDate>Fri, 02 Feb 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gii3wtb/</guid><description>&lt;p>MongoDB で大量のデータを扱う場合、高速な検索を実現するためにインデックスを作成しておく必要があります。
+インデックスの詳細は &lt;a href="https://www.mongodb.com/docs/manual/indexes/">公式ドキュメント&lt;/a> にありますが、ちょっとややこしいのでポイントだけまとめておきます。&lt;/p>
+&lt;h2 id="インデックスがないとシーケンシャルサーチになる">インデックスがないとシーケンシャルサーチになる&lt;/h2>
+&lt;p>MongoDB のフィールドのうち、デフォルトでインデックスが作成されるのは &lt;code>_id&lt;/code> フィールドだけです（削除もできません）。
+インデックスが作成されていないフィールドを検索しようとすると、コレクション全体のシーケンシャルサーチ（線形探索）になるので、データ数が増えるごとに検索速度は遅くなっていきます。&lt;/p>
+&lt;p>特定のフィールドに対するインデックスを作成すると、内部的に &lt;a href="https://ja.wikipedia.org/wiki/B%E6%9C%A8">B-tree（B 木）&lt;/a> 構造の逆引きデータが作られるので、そのフィールドの値での検索が高速になります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">score フィールド用のインデックスを作成する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">coll&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">createIndex&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">score&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="p">})&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>インデックス情報は昇順 (1: ascending) あるいは降順 (-1: descending) で並べられているため、値の完全一致だけではなく、大小比較による検索も高速に行えます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">score フィールドが 70 以上のドキュメントを検索&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">coll&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">score&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">$gte&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">70&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="p">})&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="複合インデックス-compound-indexes">複合インデックス (Compound Indexes)&lt;/h2>
+&lt;p>複合インデックス (Compound Indexes) というのを作成しておくと、複数のフィールド値を指定した高速検索が可能になります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">genre フィールドと price フィールドの複合インデックスを作成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">coll&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">createIndex&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">genre&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">price&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span> &lt;span class="p">})&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>フィールド名の後ろの数値は、内部的にインデックスがどのような順序で保持されるかという sort order を示しており、&lt;strong>1&lt;/strong>（昇順: ascending）あるいは &lt;strong>-1&lt;/strong>（降順: descending）を指定します。
+検索結果をソートしたい場合、この sort order 通りのソート順序であれば高速にソートされます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">複合インデックスを利用したソート&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">coll&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({}).&lt;/span>&lt;span class="nx">sort&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">genre&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">price&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">coll&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({}).&lt;/span>&lt;span class="nx">sort&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">genre&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">price&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="c1">// 完全に逆順でも高速になる
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>複合インデックスによる検索は、すべてのフィールドを指定する必要はなく、途中までのフィールドの値を指定した場合も高速な検索が可能です。
+このような仕様のため、複合インデックスにおけるフィールドの指定順序は重要です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">複合インデックスを利用した検索&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 複合インデックスが使用される検索方法
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">coll&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">genre&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;RPG&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">price&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">$gt&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">100&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">coll&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">genre&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;RPG&amp;#34;&lt;/span> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 複合インデックスが使われない検索（フィールドの指定順序が間違っている）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">coll&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">price&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">$gt&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">100&lt;/span> &lt;span class="p">},&lt;/span> &lt;span class="nx">genre&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;RPG&amp;#34;&lt;/span> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">coll&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">price&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">$gt&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">100&lt;/span> &lt;span class="p">})&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="テキストインデックス-text-indexes">テキストインデックス (Text Indexes)&lt;/h2>
+&lt;p>インデックスには大まかに下記の 2 種類があります。&lt;/p>
+&lt;ul>
+&lt;li>通常のインデックス &amp;hellip; フィールド単位で完全一致、あるいは大小比較で高速検索&lt;/li>
+&lt;li>テキストインデックス &amp;hellip; テキスト形式のフィールド内から部分文字列を高速検索&lt;/li>
+&lt;/ul>
+&lt;p>要するに、テキストの全文検索のようなことをやりたいときは、通常のインデックスではなく、テキストインデックスを作成する必要があります（参考: &lt;a href="https://www.mongodb.com/docs/manual/core/indexes/index-types/index-text/">Text Indexes — MongoDB Manual&lt;/a>）。&lt;/p></description></item><item><title>MongoDB と mongosh のチートシート</title><link>https://maku.blog/p/j4c4vnq/</link><pubDate>Thu, 28 Dec 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j4c4vnq/</guid><description>&lt;h2 id="全般mongosh-で接続した後のコマンド">全般（mongosh で接続した後のコマンド）&lt;/h2>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>コマンド&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>db&lt;/code>&lt;/td>
+ &lt;td>現在のデータベース名を表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>use &amp;lt;db&amp;gt;&lt;/code>&lt;/td>
+ &lt;td>現在のデータベースを切り替える&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>show databases (dbs)&lt;/code>&lt;/td>
+ &lt;td>データベースの一覧を表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>show collections (tables)&lt;/code>&lt;/td>
+ &lt;td>コレクションの一覧を表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>show users&lt;/code>&lt;/td>
+ &lt;td>ユーザーの一覧を表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>show log&lt;/code>&lt;/td>
+ &lt;td>ログの出力&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>db.stats()&lt;/code>&lt;/td>
+ &lt;td>データベースの統計情報を表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>db.&amp;lt;coll&amp;gt;.stats()&lt;/code>&lt;/td>
+ &lt;td>コレクションの統計情報を表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>db.createCollection(&amp;quot;&amp;lt;coll&amp;gt;&amp;quot;)&lt;/code>&lt;/td>
+ &lt;td>コレクションを作成（オプション指定付きで作成したいとき）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>db.getCollectionInfos()&lt;/code>&lt;/td>
+ &lt;td>コレクション情報を JS 配列として取得&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>db.getCollectionNames()&lt;/code>&lt;/td>
+ &lt;td>コレクション名の一覧を JS 配列として取得&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="ドキュメントの検索-find">ドキュメントの検索 (Find)&lt;/h2>
+&lt;h3 id="find-の基本">find の基本&lt;/h3>
+&lt;p>コレクション内のドキュメントを検索するには、&lt;strong>&lt;code>find()&lt;/code>&lt;/strong> メソッドの第 1 引数に検索フィルターを指定します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">すべてのドキュメントを取得する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&amp;lt;&lt;/span>&lt;span class="nt">coll&lt;/span>&lt;span class="p">&amp;gt;.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&amp;lt;&lt;/span>&lt;span class="nt">coll&lt;/span>&lt;span class="p">&amp;gt;.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({})&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">name フィールドの値が value に一致するドキュメントを検索する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&amp;lt;&lt;/span>&lt;span class="nt">coll&lt;/span>&lt;span class="p">&amp;gt;.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span> &lt;span class="p">})&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">awards.wins フィールドが 100 より大きいドキュメントを検索する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&amp;lt;&lt;/span>&lt;span class="nt">coll&lt;/span>&lt;span class="p">&amp;gt;.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="s2">&amp;#34;awards.wins&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">$gt&lt;/span>: &lt;span class="kt">100&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="p">})&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">languages フィールドに jp あるいは en を含むドキュメントを検索する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&amp;lt;&lt;/span>&lt;span class="nt">coll&lt;/span>&lt;span class="p">&amp;gt;.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">languages&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">$in&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;jp&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;en&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="p">})&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>find()&lt;/code> の第 2 引数 (project fields) では、取得するフィールドを指定できます。
+基本的には取得したいフィールドに &lt;code>1&lt;/code> を指定すれば OK ですが、&lt;code>_id&lt;/code> フィールドだけはデフォルトで取得するようになっているので、&lt;code>_id&lt;/code> フィールドが必要ない場合は明示的に &lt;code>0&lt;/code> を指定する必要があります。&lt;/p></description></item><item><title>MongoDB Atlas で不用意なコレクションの削除を防ぐ（読み込み専用ユーザー）</title><link>https://maku.blog/p/tzpxtnm/</link><pubDate>Wed, 27 Dec 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tzpxtnm/</guid><description>&lt;p>MongoDB の API は直感的でわかりやすいですが、開発中に手がすべって &lt;code>db.drop()&lt;/code> や &lt;code>collection.drop()&lt;/code> を実行してしまうと、データベースやコレクションが丸ごと削除されて悲しいことになります。
+本番環境での運用時はもちろん、開発中もこのようなミスが起こらないように設定しておくと安心です。&lt;/p>
+&lt;p>例えば、MongoDB 本家のサービスである MongoDB Atlas では、Database ユーザーごとに Role を設定して権限を絞ることができます。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ Database ユーザーとは&lt;/span>
+ &lt;span class="xNote_body">MongoDB Atlas の Database ユーザーとは、Node.js アプリなどからサーバーに接続するときに接続文字列 (SRV URI) 内で指定するユーザーのことを示しています。
+Atlas サービス自体のアカウントとは別ものなので注意してください。
+Database ユーザーは複数作成することができ、用途ごとに Role を割り当てることができます。
+例えば、バックアップ用の &lt;code>backup&lt;/code> ユーザーには読み込み権限だけを与えておいて、バックアップツールの実装では、このユーザーを接続 URI で指定するようにします。&lt;/span>
+&lt;/div>
+&lt;p>次の例では、ユーザー (&lt;code>readuser&lt;/code>) に、&lt;strong>&lt;code>Only read any database (readAnyDatabase)&lt;/code>&lt;/strong> という Role を設定して、データベースの読み込みだけを許可しています。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="2159" height="1873" src="../../p/tzpxtnm/img-001.png" alt="/p/tzpxtnm/img-001.png" />
+ &lt;figcaption>図: MongoDB Atlas のユーザー Role 設定&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>これで、Node.js アプリなどから次のような URI で MongoDB Atlas に接続した場合は、データベースの読み込みだけが可能になります。&lt;/p>
+&lt;pre tabindex="0">&lt;code>mongodb+srv://readuser:&amp;lt;password&amp;gt;@&amp;lt;cluster&amp;gt;.&amp;lt;random&amp;gt;.mongodb.net:55001/
+&lt;/code>&lt;/pre>&lt;p>組み込みの Role としては以下が用意されていますが、一般的なアプリケーション用の Role であれば、Atlas admin (atlasAdmin) を選択する必要はありません。
+コレクションへの書き込みが必要なバックエンド用であれば、&lt;strong>&lt;code>Read and write to any database (readWriteAnyDatabase)&lt;/code>&lt;/strong> という Role を選択します。&lt;/p></description></item><item><title>Deno で MongoDB にアクセスする</title><link>https://maku.blog/p/3pwojuj/</link><pubDate>Wed, 18 Jan 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3pwojuj/</guid><description>&lt;p>Deno 用の MongoDB ドライバーとして、&lt;strong>deno_mongo&lt;/strong> が公開されています。
+&lt;a href="../../p/phz7fo3/">Deno Deploy&lt;/a> 上でも使えるので、Deno Deploy で公開する Web API から MongoDB Atlas に接続する、といったことが簡単に行えます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://deno.land/x/mongo">mongo | Deno&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/denodrivers/mongo">GitHub - denodrivers/mongo: MongoDB driver for Deno&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="mongodb-サーバーへ接続する">MongoDB サーバーへ接続する&lt;/h2>
+&lt;p>ローカルホスト上で起動した MongoDB サーバーへ接続するには次のようにします。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">MongoClient&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s2">&amp;#34;https://deno.land/x/mongo@v0.31.1/mod.ts&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">client&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">MongoClient&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">await&lt;/span> &lt;span class="nx">client&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">connect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;mongodb://127.0.0.1:27017&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 後は client インスタンスを使って MongoDB を操作する
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>実運用を考えると、&lt;strong>&lt;code>MONGODB_URI_MYAPP&lt;/code>&lt;/strong> のような環境変数で接続先の MongoDB サーバー（およびユーザー ID とパスワード）を指定できるようにしておいた方がよいでしょう。
+例えば、MongoDB Atlas サービスを使用している場合は、次のような構成の接続文字列 (SRV URI) が発行されますが、ここには接続パスワードなどが含まれるので、この URI をハードコーディングすることはできません。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">MongoDB 接続文字列 (SRV URI) の基本構成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">mongodb+srv://&amp;lt;user&amp;gt;:&amp;lt;password&amp;gt;@&amp;lt;cluster-url&amp;gt;/&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ SRV URI で authentication failed になる場合&lt;/span>
+ &lt;span class="xNote_body">SRV URI を使って MongoDB サーバーにアクセスしようとしたときに認証系のエラーが出る場合は、まずはユーザー ID とパスワードを確認してください。
+正しく指定しているのにも関わらずエラーが出る場合は、使用する認証メカニズムの食い違いが発生している可能性があります。
+&lt;a href="https://www.mongodb.com/docs/drivers/node/current/fundamentals/authentication/mechanisms/">MongoDB はいくつかの認証メカニズム&lt;/a> を備えており、MongoDB のバージョンによってどれを使うかが異なっています。
+URL の末尾のクエリパラメーターで、&lt;strong>&lt;code>?authMechanism=SCRAM-SHA-1&lt;/code>&lt;/strong> のように認証メカニズムを指定できます。&lt;/span>
+&lt;/div>
+&lt;p>次の &lt;code>client.ts&lt;/code> モジュールは、&lt;code>MongoClient&lt;/code> インスタンスを &lt;code>MONGODB_URI_MYAPP&lt;/code> 環境変数が示す MongoDB サーバーに接続し、&lt;code>export&lt;/code> しています。&lt;/p></description></item><item><title>Docker で MongoDB サーバーを立ち上げる</title><link>https://maku.blog/p/y6zgrg2/</link><pubDate>Wed, 18 Jan 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/y6zgrg2/</guid><description>&lt;p>Docker のオフィシャルイメージとして、&lt;strong>&lt;code>mongo&lt;/code>&lt;/strong> イメージが公開されています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://hub.docker.com/_/mongo">mongo - Official Image | Docker Hub&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>このイメージには、MongoDB サーバー (&lt;code>mongod&lt;/code>) や、MongoDB クライアント (&lt;code>mongosh&lt;/code>) が含まれており、コマンドを省略してコンテナを起動すると、デフォルトで MongoDB サーバーが立ち上がります。&lt;/p>
+&lt;h2 id="mongodb-サーバーのコンテナを起動する">MongoDB サーバーのコンテナを起動する&lt;/h2>
+&lt;p>次のように &lt;code>mongo&lt;/code> コンテナを起動すると、ローカルホスト上で MongoDB サーバーを立ち上げたのと同様に振舞います。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> docker container run --rm -d -p 27017:27017 --name mongo mongo
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>オプションの意味:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>--rm&lt;/code>&lt;/strong> &amp;hellip; コンテナを停止したときにコンテナを削除します。コンテナを削除したくなければ、このオプションは外してください。&lt;/li>
+&lt;li>&lt;strong>&lt;code>-d&lt;/code>&lt;/strong> &amp;hellip; デーモンをバックグラウンドで動作させます。&lt;/li>
+&lt;li>&lt;strong>&lt;code>-p 27107:27017&lt;/code>&lt;/strong> &amp;hellip; ローカルホストの &lt;code>27107&lt;/code> ポートへのアクセスを、コンテナ内の MongoDB サーバーの &lt;code>27107&lt;/code> ポートへ転送します。&lt;/li>
+&lt;li>&lt;strong>&lt;code>--name mongo&lt;/code>&lt;/strong> &amp;hellip; 起動するコンテナに &lt;code>mongo&lt;/code> という名前を付けます。&lt;/li>
+&lt;li>&lt;strong>&lt;code>mongo&lt;/code>&lt;/strong> &amp;hellip; Docker イメージとして &lt;code>mongo:latest&lt;/code> を使用します（デフォルトで &lt;code>:latest&lt;/code> が使われます)。&lt;/li>
+&lt;/ul>
+&lt;p>次のようにして、&lt;code>mongo&lt;/code> コンテナが起動していることを確認できます。&lt;/p></description></item><item><title>MongoDB for VS Code で Azure Cosmos DB を操作する</title><link>https://maku.blog/p/dt3ahpw/</link><pubDate>Sat, 12 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dt3ahpw/</guid><description>&lt;p>Cosmos DB インスタンスを &lt;a href="../../p/cd9bg3x">MongoDB API アクセス用に作成&lt;/a> しておくと、さまざまな MongoDB 用のツールでデータベースにアクセスできるようになります。
+ここでは、VS Code 用の拡張「&lt;strong>MongoDB for VS Code&lt;/strong>」を使って、Cosmos DB を操作できるようにしてみます。
+TypeScript を使って Web アプリを作成しているときは、エディタとして VS Code を使っていることが多いでしょうから、同じ環境上で Cosmos DB を操作できると開発が捗ります。&lt;/p>
+&lt;h2 id="mongodb-for-vs-code-のインストール">MongoDB for VS Code のインストール&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="2370" height="528" src="../../p/dt3ahpw/img-001.png" alt="/p/dt3ahpw/img-001.png" />
+ &lt;figcaption>図: MongoDB for VS Code のインストール&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>MongoDB for VS Code は、VS Code の Extesions バー (&lt;code>Cmd/Ctrl + Shift + X&lt;/code>) で &lt;strong>&lt;code>MongoDB&lt;/code>&lt;/strong> で検索すれば簡単にインストールできます。&lt;/p>
+&lt;h2 id="vs-code-から-cosmos-db-mongodb-に接続する">VS Code から Cosmos DB (MongoDB) に接続する&lt;/h2>
+&lt;h3 id="接続文字列で簡単接続">接続文字列で簡単接続&lt;/h3>
+&lt;p>MongoDB for VS Code をインストールすると、サイドバーに &lt;strong>葉っぱのアイコン&lt;/strong> が出てくるので、ここから MongoDB サーバーに接続することができます。
+ちなみに、MongoDB が葉っぱアイコンを使うのは、それを使うことが「シンプルで自然であるから」らしいです（じゃあ水でもいいじゃん、とは言いますまい）。&lt;/p></description></item><item><title>mongo シェルで find の結果をインデントして見やすく表示する (pretty)</title><link>https://maku.blog/p/uvusqb7/</link><pubDate>Mon, 31 Mar 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uvusqb7/</guid><description>&lt;p>&lt;code>mongo&lt;/code> シェルで &lt;code>find()&lt;/code> を実行した結果を見やすいように整形するには、実行結果に対して &lt;strong>&lt;code>pretty()&lt;/code>&lt;/strong> を適用します。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">&amp;gt;&lt;/span> db.books.find&lt;span class="o">()&lt;/span>.pretty&lt;span class="o">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">{
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;533973de50b35840de2dda25&amp;#34;),
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;title&amp;#34; : &amp;#34;Title 1&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;tags&amp;#34; : [
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;AAA&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;BBB&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">{
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;533973de50b35840de2dda26&amp;#34;),
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;title&amp;#34; : &amp;#34;Title 2&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;tags&amp;#34; : [
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;BBB&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;CCC&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">{
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;533973de50b35840de2dda27&amp;#34;),
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;title&amp;#34; : &amp;#34;Title 3&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;tags&amp;#34; : [
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;CCC&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> &amp;#34;AAA&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">}
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>mongo シェルで MapReduce を実行する</title><link>https://maku.blog/p/qvkkcuj/</link><pubDate>Mon, 31 Mar 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qvkkcuj/</guid><description>&lt;p>&lt;code>mongo&lt;/code> シェルを使って、下記のような &lt;code>books&lt;/code> コレクションに対して &lt;strong>MapReduce&lt;/strong> をかけて、タグ情報のリスト（&lt;code>tags&lt;/code> コレクション）を生成する方法を示します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 1&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;AAA&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;BBB&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 2&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;BBB&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;CCC&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 3&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;CCC&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;AAA&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>作成される &lt;code>tags&lt;/code> コレクションは、以下のようになることを想定しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="s2">&amp;#34;_id&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;AAA&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="s2">&amp;#34;_id&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;BBB&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="s2">&amp;#34;_id&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;CCC&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;value&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>まずは、サンプルデータとなる &lt;code>books&lt;/code> コレクションを作成します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">books.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">use&lt;/span> &lt;span class="nx">testdb&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// books コレクションの初期化
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">drop&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">save&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 1&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;AAA&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;BBB&amp;#39;&lt;/span>&lt;span class="p">]});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">save&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 2&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;BBB&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;CCC&amp;#39;&lt;/span>&lt;span class="p">]});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">save&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Title 3&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;CCC&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;AAA&amp;#39;&lt;/span>&lt;span class="p">]});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 確認
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;books collection has been created&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">books&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">();&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ mongo &amp;lt; books.js&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次に、&lt;code>books&lt;/code> コレクションに MapReduce をかけて、&lt;code>tags&lt;/code> コレクションを生成します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">mapreduce.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">use&lt;/span> &lt;span class="nx">testdb&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="nx">map&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kd">function&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">tags&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">tags&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forEach&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kd">function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">tag&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">emit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">tag&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="nx">reduce&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kd">function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">key&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">values&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">var&lt;/span> &lt;span class="nx">sum&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">values&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forEach&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kd">function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">val&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">sum&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="nx">val&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">sum&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">runCommand&lt;/span>&lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">mapReduce&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;books&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// MapReduce をかけるコレクション
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">map&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">map&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// Map 関数
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">reduce&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">reduce&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// Reduce 関数
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">out&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;tags&amp;#39;&lt;/span> &lt;span class="c1">// MapReduce の結果を格納するコレクション
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ mongo &amp;lt; mapreduce.js&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>実際に &lt;code>tags&lt;/code> コレクションが生成されているか確認してみます。&lt;/p></description></item><item><title>mongo シェルで各フィールドの型を調べる (typeof, instanceof)</title><link>https://maku.blog/p/yejmu4v/</link><pubDate>Tue, 22 Oct 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yejmu4v/</guid><description>&lt;p>&lt;code>mongo&lt;/code> シェルで、各フィールドの型（タイプ）を調べたいときは、&lt;strong>&lt;code>typeof&lt;/code>&lt;/strong> や &lt;strong>&lt;code>instanceof&lt;/code>&lt;/strong> を使用します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">フィールドの型を調べる&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">typeof mydoc._id&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">指定した型のフィールドかどうか調べる&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">mydoc._id instanceof ObjectId&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;aside style="display: flex; border: thin dashed gray;">
+&lt;div style="align-self: stretch; writing-mode: vertical-lr; text-align: center; letter-spacing: 0.2em; color: #666; border-right: thin dashed gray; padding: 0.4em 0; line-height: 1.5;">参考&lt;/div>
+&lt;div style="align-self: center; padding: 0.6em 0; line-height: 1.2 !important;">&lt;ul>
+&lt;li>&lt;a href="http://docs.mongodb.org/manual/core/shell-types/#check-types-in-shell">Data Types in the mongo Shell — MongoDB Manual&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/aside></description></item><item><title>MongoDB の ObjectId について（Document の生成時間を調べる）</title><link>https://maku.blog/p/wdbr8dx/</link><pubDate>Tue, 22 Oct 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wdbr8dx/</guid><description>&lt;p>MongoDB の各 Document（RDB でいうレコード）は、それぞれ &lt;strong>&lt;code>_id&lt;/code>&lt;/strong> というプライマリキーとなるフィールドを持っています。
+この値は、何も指定しないと、自動的に &lt;strong>&lt;code>ObjectId&lt;/code>&lt;/strong> オブジェクトが生成されて設定されます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">&amp;gt; db.mycollection.insert({value:100})
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;gt; db.mycollection.findOne()
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">{ &amp;#34;_id&amp;#34; : ObjectId(&amp;#34;5265e358c76d2a2f8b870057&amp;#34;), &amp;#34;value&amp;#34; : 100 }&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この &lt;code>ObjectId&lt;/code> オブジェクトは &lt;a href="http://bsonspec.org/">BSON 形式&lt;/a> のオブジェクトで、内部的に以下のような値を保持しています。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>フィールド&lt;/th>
+ &lt;th>サイズ&lt;/th>
+ &lt;th>内容&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;b>Timestamp&lt;/b>&lt;/td>
+ &lt;td>4 bytes&lt;/td>
+ &lt;td>生成時間（秒）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;b>Machine ID&lt;/b>&lt;/td>
+ &lt;td>3 bytes&lt;/td>
+ &lt;td>マシン固有値&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;b>PID&lt;/b>&lt;/td>
+ &lt;td>2 bytes&lt;/td>
+ &lt;td>プロセス ID&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;b>Counter&lt;/b>&lt;/td>
+ &lt;td>3 bytes&lt;/td>
+ &lt;td>ランダム値から始まってインクリメントされる&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;p>&lt;code>ObjectId&lt;/code> オブジェクト内に含まれているタイムスタンプは、&lt;strong>&lt;code>getTimestamp()&lt;/code>&lt;/strong> メソッドによって取得できます。
+これを利用すると、Document の &lt;code>_id&lt;/code> フィールドから、その Document が生成された時間を調べることができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">&amp;gt; db.mycollection.findOne()._id.getTimestamp()
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ISODate(&amp;#34;2013-10-22T02:30:48Z&amp;#34;)&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;aside style="display: flex; border: thin dashed gray;">
+&lt;div style="align-self: stretch; writing-mode: vertical-lr; text-align: center; letter-spacing: 0.2em; color: #666; border-right: thin dashed gray; padding: 0.4em 0; line-height: 1.5;">参考&lt;/div>
+&lt;div style="align-self: center; padding: 0.6em 0; line-height: 1.2 !important;">&lt;ul>
+&lt;li>&lt;a href="http://docs.mongodb.org/manual/reference/object-id/">ObjectId — MongoDB Manual&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/aside></description></item></channel></rss>

@@ -1,15 +1,147 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>TypeScriptのモジュールの仕組みについて on まくろぐ</title><link>https://maku.blog/p/u53q2qi/</link><description>Recent content in TypeScriptのモジュールの仕組みについて on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 04 Feb 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/u53q2qi/index.xml" rel="self" type="application/rss+xml"/><item><title>TypeScriptでモジュールを作成する／インポートする (export, import)</title><link>https://maku.blog/p/fbu8k8j/</link><pubDate>Thu, 21 Nov 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fbu8k8j/</guid><description>モジュールとは TypeScript で大きなプログラムを作成するときは、モジュールの仕組みを使って 複数のファイルに分割 していきます。 ファイルを分割することでコードを管理しやすくなるだけでなく、名前空間のコンテキストが分けられることになるので、 名前の衝突の問題も解決 することができます。
-モジュールを作るのは簡単で、export キーワードを含む .ts ファイルを作ればそれがモジュールになります。 export キーワードでは、クラスやインタフェースをまるごと公開することもできるし、関数や変数の単位で公開することもできます。
-export の使い方のポイントは、次のように、 クラスや変数を定義するときにプレフィックスとして付加する というところです。 基本的には、定義済みのオブジェクトを後から export するという使い方はしません。
-export class &amp;hellip; export interface &amp;hellip; export const &amp;hellip; export let &amp;hellip; ここからは、具体的な export の使い方を見ていきます。
-クラスやインタフェースの定義を export する 下記の lib/mylib.ts ファイルでは、MyInterface インタフェースと、MyClass クラスを公開しています。 それぞれの定義の前に export キーワードを付けるだけでよいので簡単ですね。
-lib/mylib.ts export interface MyInterface { name: string; } export class MyClass implements MyInterface { constructor(public name: string) {} } 次の index.ts ファイルからは、上記のクラスモジュールを import して読み込んでいます。</description></item><item><title>TypeScriptのモジュールのインポートには import を使う</title><link>https://maku.blog/p/emdtiio/</link><pubDate>Tue, 04 Feb 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/emdtiio/</guid><description>require ではなく import を使う TypeScript で型情報付きのモジュールをインポートするときは、ECMAScript 2015 の module 構文 で定義されている import を使うようにすると、VSCode などで型情報を使った補完がうまく効くようにになります。
-これを使う // Good import * as mod from &amp;#39;mod&amp;#39;; 下記のように、Node.js で一般的に使用されていた CommonJS 形式の require を使ってもインポートできますが、any 型の変数を定義していることになるため、型情報を用いた補完が効きません。
-これは使わない // NG const mod = require(&amp;#39;mod&amp;#39;); TypeScript でモジュールをインポートするときには、できるだけ import を使う ようにしましょう。
-インポートの例（関数ベースのモジュール） Node.js のコアモジュール（os や path など）は、もともと TypeScript 用に作成されたものではありませんが、TypeScript 用の型情報が @types/node モジュールとして提供されています。
-Node.js コアモジュールの型情報をインストール $ npm install --save-dev @types/node これで、Node.js のコアモジュールを下記のように型情報付きでインポートできるようになります。 これは、複数の関数を export する TypeScript モジュールをインポートする方法のよい例です。
-よい例: 型として認識される import * as path from &amp;#39;path&amp;#39;; // 全ての関数をインポート import { join } from &amp;#39;path&amp;#39;; // 個別の関数をインポート これで、VSCode などの IDE で次のように補完が聞くようになります。</description></item><item><title>TypeScriptで名前空間を定義する (namespace)</title><link>https://maku.blog/p/a3eh9w2/</link><pubDate>Thu, 21 Nov 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/a3eh9w2/</guid><description>namespace ではなくモジュールの仕組みを使うべし TypeScript では、namespace キーワードを使って名前空間を定義することができますが、通常はより柔軟性の高い モジュールの仕組み を使うようにしてください（といっても .ts ファイルを分けるだけですが）。
-namespace を使うと、同じファイル内で階層化された名前空間を作ることができますが、あくまでその階層構造はグローバルに共有されています。 一方、モジュールの仕組みを使うと、ファイル単位で名前空間のコンテキストを分けることができます。 大きなプロジェクトであっても、適切な単位でモジュール（ファイル）を分割している限り、名前の衝突は本質的には発生しません。
-とはいえ、これは namespace の記事なので、ここからは namespace の使い方の説明をします。
-namespace による名前空間の定義 namespace による名前空間の定義は簡単で、namespace Xxx { ... } というブロックで囲むだけです。 次の例では、First と Second という名前空間を作成し、それぞれに同じ名前の Person というクラスを定義しています。
-namespace First { export class Person { greet() { console.log(&amp;#39;First.Person&amp;#39;); } } } namespace Second { export class Person { greet() { console.log(&amp;#39;Second.Person&amp;#39;); } } } const p1 = new First.Person(); const p2 = new Second.Person(); p1.greet(); //=&amp;gt; First.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>TypeScriptのモジュールの仕組みについて on まくろぐ</title><link>https://maku.blog/p/u53q2qi/</link><description>Recent content in TypeScriptのモジュールの仕組みについて on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Wed, 22 Apr 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/u53q2qi/index.xml" rel="self" type="application/rss+xml"/><item><title>TypeScriptでモジュールを作成する／インポートする (export, import)</title><link>https://maku.blog/p/fbu8k8j/</link><pubDate>Thu, 21 Nov 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fbu8k8j/</guid><description>&lt;h2 id="モジュールとは">モジュールとは&lt;/h2>
+&lt;p>TypeScript で大きなプログラムを作成するときは、モジュールの仕組みを使って &lt;strong>複数のファイルに分割&lt;/strong> していきます。
+ファイルを分割することでコードを管理しやすくなるだけでなく、名前空間のコンテキストが分けられることになるので、 &lt;strong>名前の衝突の問題も解決&lt;/strong> することができます。&lt;/p>
+&lt;p>モジュールを作るのは簡単で、&lt;strong>&lt;code>export&lt;/code>&lt;/strong> キーワードを含む &lt;code>.ts&lt;/code> ファイルを作ればそれがモジュールになります。
+&lt;code>export&lt;/code> キーワードでは、クラスやインタフェースをまるごと公開することもできるし、関数や変数の単位で公開することもできます。&lt;/p>
+&lt;p>&lt;code>export&lt;/code> の使い方のポイントは、次のように、 &lt;strong>クラスや変数を定義するときにプレフィックスとして付加する&lt;/strong> というところです。
+基本的には、定義済みのオブジェクトを後から &lt;code>export&lt;/code> するという使い方はしません。&lt;/p>
+&lt;ul>
+&lt;li>export class &amp;hellip;&lt;/li>
+&lt;li>export interface &amp;hellip;&lt;/li>
+&lt;li>export const &amp;hellip;&lt;/li>
+&lt;li>export let &amp;hellip;&lt;/li>
+&lt;/ul>
+&lt;p>ここからは、具体的な &lt;code>export&lt;/code> の使い方を見ていきます。&lt;/p>
+&lt;h2 id="クラスやインタフェースの定義を-export-する">クラスやインタフェースの定義を export する&lt;/h2>
+&lt;p>下記の &lt;code>lib/mylib.ts&lt;/code> ファイルでは、&lt;code>MyInterface&lt;/code> インタフェースと、&lt;code>MyClass&lt;/code> クラスを公開しています。
+それぞれの定義の前に &lt;code>export&lt;/code> キーワードを付けるだけでよいので簡単ですね。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">lib/mylib.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">interface&lt;/span> &lt;span class="nx">MyInterface&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">MyClass&lt;/span> &lt;span class="kr">implements&lt;/span> &lt;span class="nx">MyInterface&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">constructor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kr">public&lt;/span> &lt;span class="nx">name&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次の &lt;code>index.ts&lt;/code> ファイルからは、上記のクラスモジュールを &lt;strong>&lt;code>import&lt;/code>&lt;/strong> して読み込んでいます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">index.ts（個別に import）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">MyInterface&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">MyClass&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;./lib/mylib&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">obj&lt;/span>: &lt;span class="kt">MyInterface&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">MyClass&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Maku&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">obj&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//=&amp;gt; Maku
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>from&lt;/code> の後ろに指定するファイルパスには、 &lt;strong>拡張子の &lt;code>.ts&lt;/code> を記述しない&lt;/strong> ことに注意してください（実際に読み込むファイルは &lt;code>.js&lt;/code> なので、&lt;code>.ts&lt;/code> の指定は意味的にも間違っています）。
+上記の例では、インタフェースやクラスの名前を直接指定して、個別の変数に読み込んでいますが、次のようにワイルドカードを使って &lt;code>export&lt;/code> されているものを 1 つの変数にすべて読み込むこともできます。&lt;/p></description></item><item><title>TypeScriptのモジュールのインポートには import を使う</title><link>https://maku.blog/p/emdtiio/</link><pubDate>Tue, 04 Feb 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/emdtiio/</guid><description>&lt;h2 id="require-ではなく-import-を使う">require ではなく import を使う&lt;/h2>
+&lt;p>TypeScript で型情報付きのモジュールをインポートするときは、&lt;a href="https://www.ecma-international.org/ecma-262/6.0/#table-40">ECMAScript 2015 の module 構文&lt;/a> で定義されている &lt;strong>&lt;code>import&lt;/code>&lt;/strong> を使うようにすると、VSCode などで型情報を使った補完がうまく効くようにになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">これを使う&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Good
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">mod&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;mod&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>下記のように、Node.js で一般的に使用されていた CommonJS 形式の &lt;code>require&lt;/code> を使ってもインポートできますが、&lt;code>any&lt;/code> 型の変数を定義していることになるため、型情報を用いた補完が効きません。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">これは使わない&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// NG
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">mod&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kr">require&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;mod&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;strong>TypeScript でモジュールをインポートするときには、できるだけ &lt;code>import&lt;/code> を使う&lt;/strong> ようにしましょう。&lt;/p>
+&lt;h2 id="インポートの例関数ベースのモジュール">インポートの例（関数ベースのモジュール）&lt;/h2>
+&lt;p>Node.js のコアモジュール（&lt;code>os&lt;/code> や &lt;code>path&lt;/code> など）は、もともと TypeScript 用に作成されたものではありませんが、TypeScript 用の型情報が &lt;code>@types/node&lt;/code> モジュールとして提供されています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Node.js コアモジュールの型情報をインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install --save-dev @types/node&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、Node.js のコアモジュールを下記のように型情報付きでインポートできるようになります。
+これは、複数の関数を &lt;code>export&lt;/code> する TypeScript モジュールをインポートする方法のよい例です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">よい例: 型として認識される&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">path&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;path&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 全ての関数をインポート
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">join&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;path&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 個別の関数をインポート
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、VSCode などの IDE で次のように補完が聞くようになります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="984" height="206" src="../../p/emdtiio/img-001.png" alt="/p/emdtiio/img-001.png" />
+&lt;/figure>
+
+&lt;p>逆に、次のようにインポートしてしまうと、&lt;code>any&lt;/code> 型の &lt;code>path&lt;/code> 変数が定義されているものとみなされ、補完機能がうまく働きません。&lt;/p></description></item><item><title>TypeScriptで名前空間を定義する (namespace)</title><link>https://maku.blog/p/a3eh9w2/</link><pubDate>Thu, 21 Nov 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/a3eh9w2/</guid><description>&lt;h2 id="namespace-ではなくモジュールの仕組みを使うべし">namespace ではなくモジュールの仕組みを使うべし&lt;/h2>
+&lt;p>TypeScript では、&lt;strong>&lt;code>namespace&lt;/code>&lt;/strong> キーワードを使って名前空間を定義することができますが、通常はより柔軟性の高い &lt;a href="../../p/fbu8k8j">モジュールの仕組み&lt;/a> を使うようにしてください（といっても &lt;code>.ts&lt;/code> ファイルを分けるだけですが）。&lt;/p>
+&lt;p>&lt;code>namespace&lt;/code> を使うと、同じファイル内で階層化された名前空間を作ることができますが、あくまでその階層構造はグローバルに共有されています。
+一方、モジュールの仕組みを使うと、ファイル単位で名前空間のコンテキストを分けることができます。
+大きなプロジェクトであっても、適切な単位でモジュール（ファイル）を分割している限り、名前の衝突は本質的には発生しません。&lt;/p>
+&lt;p>とはいえ、これは &lt;code>namespace&lt;/code> の記事なので、ここからは &lt;code>namespace&lt;/code> の使い方の説明をします。&lt;/p>
+&lt;h2 id="namespace-による名前空間の定義">namespace による名前空間の定義&lt;/h2>
+&lt;p>&lt;code>namespace&lt;/code> による名前空間の定義は簡単で、&lt;code>namespace Xxx { ... }&lt;/code> というブロックで囲むだけです。
+次の例では、&lt;code>First&lt;/code> と &lt;code>Second&lt;/code> という名前空間を作成し、それぞれに同じ名前の &lt;code>Person&lt;/code> というクラスを定義しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">namespace&lt;/span> &lt;span class="nx">First&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">export&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">Person&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">greet() {&lt;/span> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;First.Person&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">namespace&lt;/span> &lt;span class="nx">Second&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">export&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">Person&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">greet() {&lt;/span> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Second.Person&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">p1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">First&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Person&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">p2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">Second&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Person&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">p1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">greet&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="c1">//=&amp;gt; First.Person
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">p2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">greet&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="c1">//=&amp;gt; Second.Person
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>namespace&lt;/code> の中で定義したクラスなどは、デフォルトではその外の名前空間からは見えないようになっています。
+外からアクセスしたい場合は、上記のようにクラス定義の前に &lt;strong>&lt;code>export&lt;/code>&lt;/strong> を付けて公開しておく必要があります。&lt;/p>
+&lt;p>名前空間は、ドットで区切って入れ子で定義することもできます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">namespace&lt;/span> &lt;span class="nx">First&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Second&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Third&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">export&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">Person&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">greet() {&lt;/span> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Hello&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">p&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">First&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Second&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Third&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Person&lt;/span>&lt;span class="p">();&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記は、下記のように定義するのと同等です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">namespace&lt;/span> &lt;span class="nx">First&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">export&lt;/span> &lt;span class="kr">namespace&lt;/span> &lt;span class="nx">Second&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">export&lt;/span> &lt;span class="kr">namespace&lt;/span> &lt;span class="nx">Third&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">export&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">Person&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">greet() {&lt;/span> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Hello&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>内部の &lt;code>namespace&lt;/code> は、&lt;code>export&lt;/code> で公開しなければ外からアクセスできないため、上記のように &lt;code>export&lt;/code> の連続になります。&lt;/p></description></item></channel></rss>

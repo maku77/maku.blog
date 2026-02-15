@@ -1,21 +1,80 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Firebase/CloudFunctions on まくろぐ</title><link>https://maku.blog/tags/firebase/cloudfunctions/</link><description>Recent content in Firebase/CloudFunctions on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><atom:link href="https://maku.blog/tags/firebase/cloudfunctions/index.xml" rel="self" type="application/rss+xml"/><item><title>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する</title><link>https://maku.blog/p/dtdtbr8/</link><pubDate>Sun, 05 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dtdtbr8/</guid><description>何をするか？ Firestore はクライアントアプリから直接アクセスできることが利点ですが、多数のクライアントから複数のドキュメントを読み込んでいると、あっという間に無料枠を超えて高額な請求が発生してしまいます。
-図: 同じデータなのに何度もドキュメントの Read が発生する Firebase 8.2.0 でリリースされた Cloud Firestore Data Bundles という仕組みを使用すると、Firestore から取得したデータ（クエリ結果）をバンドルというデータにまとめておいて、それを使いまわすことができます。 データバンドルを CDN でキャッシュ、あるいはクライアントサイドでキャッシュすることにより、Firestore へのアクセスを発生させずに、あたかも Firestore からデータフェッチしたかのように動作させることが可能です。 ユーザー数の多いアプリに導入すれば、大きなコスト削減につながります。
-データバンドルは Cloud Functions を使って作成してしまうのが簡単です。 下記のような構成にすれば、クライアントアプリは Firestore にアクセスする代わりにデータバンドルを取得して動作するようになります。
-図: Cloud Functions でバンドルを生成する しかし、これだけでは複数のクライアントから Cloud Functions へのアクセスが発生してしまうので、結局はその都度 Firestore へのアクセスが発生してしまいます。 各クライアントアプリではキャッシュが有効ですが、そのキャッシュでさえ、Ctrl(Cmd) + R によるスーパーリロードで無視されてしまいます。 そこで、次のようにさらに CDN (Firebase Hosting) を挟んでデータバンドルをキャッシュすることで、各クライアントからのアクセスで Cloud Functions が起動されてしまうのを防ぎます。
-図: CDN でバンドルをキャッシュする この構成になっていれば、クライアントがいくら強制リロードしようが、CDN (Firebase Hosting) にキャッシュされたデータバンドルのみが参照されるようになります。 Firestore へのアクセスが発生するのは、CDN 上のキャッシュが無効になったときのみです。 クライアント側のキャッシュ時間や、CDN のキャッシュ時間は、Cloud Functions の関数が返すレスポンスヘッダ (Cache-Control) で制御できます。
-Cloud Functions でデータバンドルを作成する 下記のコードでは、Cloud Functions に登録する createBundle 関数を定義しています。 処理の流れは次のようになっています。</description></item><item><title>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する</title><link>https://maku.blog/p/dtdtbr8/</link><pubDate>Sun, 05 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dtdtbr8/</guid><description>何をするか？ Firestore はクライアントアプリから直接アクセスできることが利点ですが、多数のクライアントから複数のドキュメントを読み込んでいると、あっという間に無料枠を超えて高額な請求が発生してしまいます。
-図: 同じデータなのに何度もドキュメントの Read が発生する Firebase 8.2.0 でリリースされた Cloud Firestore Data Bundles という仕組みを使用すると、Firestore から取得したデータ（クエリ結果）をバンドルというデータにまとめておいて、それを使いまわすことができます。 データバンドルを CDN でキャッシュ、あるいはクライアントサイドでキャッシュすることにより、Firestore へのアクセスを発生させずに、あたかも Firestore からデータフェッチしたかのように動作させることが可能です。 ユーザー数の多いアプリに導入すれば、大きなコスト削減につながります。
-データバンドルは Cloud Functions を使って作成してしまうのが簡単です。 下記のような構成にすれば、クライアントアプリは Firestore にアクセスする代わりにデータバンドルを取得して動作するようになります。
-図: Cloud Functions でバンドルを生成する しかし、これだけでは複数のクライアントから Cloud Functions へのアクセスが発生してしまうので、結局はその都度 Firestore へのアクセスが発生してしまいます。 各クライアントアプリではキャッシュが有効ですが、そのキャッシュでさえ、Ctrl(Cmd) + R によるスーパーリロードで無視されてしまいます。 そこで、次のようにさらに CDN (Firebase Hosting) を挟んでデータバンドルをキャッシュすることで、各クライアントからのアクセスで Cloud Functions が起動されてしまうのを防ぎます。
-図: CDN でバンドルをキャッシュする この構成になっていれば、クライアントがいくら強制リロードしようが、CDN (Firebase Hosting) にキャッシュされたデータバンドルのみが参照されるようになります。 Firestore へのアクセスが発生するのは、CDN 上のキャッシュが無効になったときのみです。 クライアント側のキャッシュ時間や、CDN のキャッシュ時間は、Cloud Functions の関数が返すレスポンスヘッダ (Cache-Control) で制御できます。
-Cloud Functions でデータバンドルを作成する 下記のコードでは、Cloud Functions に登録する createBundle 関数を定義しています。 処理の流れは次のようになっています。</description></item><item><title>Firebase の Cloud Functions で Hello World</title><link>https://maku.blog/p/fvevcs8/</link><pubDate>Sat, 04 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fvevcs8/</guid><description>何をするか？ Cloud Functions に関数をデプロイすると、Google Cloud Platform 上でサーバーレス関数として実行できるようになります（Amazon の AWS Lambda や、Microsoft の Azure Functions に相当するものです）。 この関数は、次のように、様々なイベントをトリガーにして呼び出されます。
-HTTP でのアクセス スケジュールされたタイミング Firestore データベースの更新時 ここでは、HTTP によるアクセス時に Hello from Firebase! というレスポンスを返すだけの関数を Cloud Functions に追加してみます。 また、Firebase にデプロイする前に、エミュレーターでのローカルテストを行います。
-☝️ Firebase なのか GCP なのか Cloud Functions は Firebase プロジェクトからも使用できますが、実体は GCP で提供されているサービスです。 このようなサービスは他にもあり、Firebase のサービスのうち、頭に Cloud と付いてるものは実際には GCP が提供しています（例:「Cloud Firestore」「Cloud Functions」「Cloud Storage」）。 事前準備 最初に Firebase プロジェクトを作成し、Firebase CLI をインストールしておきます。 既存の Firebase プロジェクトに Cloud Functions を追加する場合は、プロジェクトの作成は必要ありません。
-Firebase のアカウントを作成します Firebase コンソール から新規プロジェクトを作成します firebase コマンドでもプロジェクトを作成できますが、上記サイトから作成してしまった方が楽です（名前の重複チェックなどをしてくれます） Firebase CLI をインストール して、firebase コマンドを実行できるようにします Firebase CLI をインストールしたら、次のように Firebase アカウントでサインインしておきます。</description></item><item><title>Firebase の Cloud Functions で Hello World</title><link>https://maku.blog/p/fvevcs8/</link><pubDate>Sat, 04 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fvevcs8/</guid><description>何をするか？ Cloud Functions に関数をデプロイすると、Google Cloud Platform 上でサーバーレス関数として実行できるようになります（Amazon の AWS Lambda や、Microsoft の Azure Functions に相当するものです）。 この関数は、次のように、様々なイベントをトリガーにして呼び出されます。
-HTTP でのアクセス スケジュールされたタイミング Firestore データベースの更新時 ここでは、HTTP によるアクセス時に Hello from Firebase! というレスポンスを返すだけの関数を Cloud Functions に追加してみます。 また、Firebase にデプロイする前に、エミュレーターでのローカルテストを行います。
-☝️ Firebase なのか GCP なのか Cloud Functions は Firebase プロジェクトからも使用できますが、実体は GCP で提供されているサービスです。 このようなサービスは他にもあり、Firebase のサービスのうち、頭に Cloud と付いてるものは実際には GCP が提供しています（例:「Cloud Firestore」「Cloud Functions」「Cloud Storage」）。 事前準備 最初に Firebase プロジェクトを作成し、Firebase CLI をインストールしておきます。 既存の Firebase プロジェクトに Cloud Functions を追加する場合は、プロジェクトの作成は必要ありません。
-Firebase のアカウントを作成します Firebase コンソール から新規プロジェクトを作成します firebase コマンドでもプロジェクトを作成できますが、上記サイトから作成してしまった方が楽です（名前の重複チェックなどをしてくれます） Firebase CLI をインストール して、firebase コマンドを実行できるようにします Firebase CLI をインストールしたら、次のように Firebase アカウントでサインインしておきます。</description></item><item><title>Firebase の Cloud Functions で定期的に Firestore の集計処理を行う</title><link>https://maku.blog/p/vgs4dox/</link><pubDate>Sun, 13 Mar 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vgs4dox/</guid><description>何をするか？ Firestore データベースは、コレクションデータを手軽に格納していくのにはとても便利ですが、全データを集計するような処理は苦手です。 例えば、各ドキュメントに付けられた「タグ」情報をすべて回収して、タグの一覧を生成したい場合、全てのドキュメントを read する必要があるため、ドキュメント数が Firebase の使用料金にダイレクトに効いてきます。 もし、Firestore にドキュメントが追加されるたびに Cloud Functions を起動してこのような集計処理を行うと、凄まじい勢いで課金されてしまいます。
-ここでは、Cloud Functions による 集計処理を定期的なスケジュールで起動する ことで、Firestore ドキュメントの read 処理を削減してみます。 もちろん、リアルタイムな更新が必要なデータには使えませんが、カタログ的なデータであれば、定期的なデータ更新で間に合うケースは多いはずです。
-事前準備 Firebase コンソール からテスト用のプロジェクトを作成してください。ここでは、自動生成されたアプリ ID を myapp-58138 とします。 Firestore データベースに books コレクションを追加し、次のようなサンプルドキュメントを追加してください。tag フィールドは本来は配列 (tags) であるべきですが、ここではシンプル化のために文字列型のスカラデータとしています。 id: 001 (title: Title1, author: Author1, tag: Tag1) id: 002 (title: Title2, author: Author2, tag: Tag2) id: 003 (title: Title3, author: Author3, tag: Tag3) Firebase CLI をインストール して、firebase コマンドを使用できるようにしてください。作成した関数を Cloud Functions にデプロイするために使います。 プロジェクトの雛形の生成 プロジェクト用のディレクトリを作成します。</description></item><item><title>Firebase の Cloud Functions で定期的に Firestore の集計処理を行う</title><link>https://maku.blog/p/vgs4dox/</link><pubDate>Sun, 13 Mar 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vgs4dox/</guid><description>何をするか？ Firestore データベースは、コレクションデータを手軽に格納していくのにはとても便利ですが、全データを集計するような処理は苦手です。 例えば、各ドキュメントに付けられた「タグ」情報をすべて回収して、タグの一覧を生成したい場合、全てのドキュメントを read する必要があるため、ドキュメント数が Firebase の使用料金にダイレクトに効いてきます。 もし、Firestore にドキュメントが追加されるたびに Cloud Functions を起動してこのような集計処理を行うと、凄まじい勢いで課金されてしまいます。
-ここでは、Cloud Functions による 集計処理を定期的なスケジュールで起動する ことで、Firestore ドキュメントの read 処理を削減してみます。 もちろん、リアルタイムな更新が必要なデータには使えませんが、カタログ的なデータであれば、定期的なデータ更新で間に合うケースは多いはずです。
-事前準備 Firebase コンソール からテスト用のプロジェクトを作成してください。ここでは、自動生成されたアプリ ID を myapp-58138 とします。 Firestore データベースに books コレクションを追加し、次のようなサンプルドキュメントを追加してください。tag フィールドは本来は配列 (tags) であるべきですが、ここではシンプル化のために文字列型のスカラデータとしています。 id: 001 (title: Title1, author: Author1, tag: Tag1) id: 002 (title: Title2, author: Author2, tag: Tag2) id: 003 (title: Title3, author: Author3, tag: Tag3) Firebase CLI をインストール して、firebase コマンドを使用できるようにしてください。作成した関数を Cloud Functions にデプロイするために使います。 プロジェクトの雛形の生成 プロジェクト用のディレクトリを作成します。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Firebase/CloudFunctions on まくろぐ</title><link>https://maku.blog/tags/firebase/cloudfunctions/</link><description>Recent content in Firebase/CloudFunctions on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 05 Jun 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/firebase/cloudfunctions/index.xml" rel="self" type="application/rss+xml"/><item><title>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する</title><link>https://maku.blog/p/dtdtbr8/</link><pubDate>Sun, 05 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dtdtbr8/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Firestore はクライアントアプリから直接アクセスできることが利点ですが、多数のクライアントから複数のドキュメントを読み込んでいると、あっという間に無料枠を超えて高額な請求が発生してしまいます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../../p/dtdtbr8/img-001.drawio.svg" alt="/p/dtdtbr8/img-001.drawio.svg" />
+ &lt;figcaption>図: 同じデータなのに何度もドキュメントの Read が発生する&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>&lt;a href="https://firebase.google.com/support/release-notes/js?hl=ja#version_820_-_december_11_2020">Firebase 8.2.0&lt;/a> でリリースされた &lt;a href="https://firebase.google.com/docs/firestore/bundles">Cloud Firestore Data Bundles&lt;/a> という仕組みを使用すると、Firestore から取得したデータ（クエリ結果）をバンドルというデータにまとめておいて、それを使いまわすことができます。
+データバンドルを CDN でキャッシュ、あるいはクライアントサイドでキャッシュすることにより、Firestore へのアクセスを発生させずに、あたかも Firestore からデータフェッチしたかのように動作させることが可能です。
+ユーザー数の多いアプリに導入すれば、大きなコスト削減につながります。&lt;/p>
+&lt;p>データバンドルは Cloud Functions を使って作成してしまうのが簡単です。
+下記のような構成にすれば、クライアントアプリは Firestore にアクセスする代わりにデータバンドルを取得して動作するようになります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../../p/dtdtbr8/img-002.drawio.svg" alt="/p/dtdtbr8/img-002.drawio.svg" />
+ &lt;figcaption>図: Cloud Functions でバンドルを生成する&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>しかし、これだけでは複数のクライアントから Cloud Functions へのアクセスが発生してしまうので、結局はその都度 Firestore へのアクセスが発生してしまいます。
+各クライアントアプリではキャッシュが有効ですが、そのキャッシュでさえ、&lt;code>Ctrl(Cmd) + R&lt;/code> によるスーパーリロードで無視されてしまいます。
+そこで、次のようにさらに CDN (Firebase Hosting) を挟んでデータバンドルをキャッシュすることで、各クライアントからのアクセスで Cloud Functions が起動されてしまうのを防ぎます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../../p/dtdtbr8/img-003.drawio.svg" alt="/p/dtdtbr8/img-003.drawio.svg" />
+ &lt;figcaption>図: CDN でバンドルをキャッシュする&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>この構成になっていれば、クライアントがいくら強制リロードしようが、CDN (Firebase Hosting) にキャッシュされたデータバンドルのみが参照されるようになります。
+Firestore へのアクセスが発生するのは、CDN 上のキャッシュが無効になったときのみです。
+クライアント側のキャッシュ時間や、CDN のキャッシュ時間は、Cloud Functions の関数が返すレスポンスヘッダ (&lt;code>Cache-Control&lt;/code>) で制御できます。&lt;/p></description></item><item><title>Firebase の Cloud Functions で Hello World</title><link>https://maku.blog/p/fvevcs8/</link><pubDate>Sat, 04 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fvevcs8/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Cloud Functions に関数をデプロイすると、Google Cloud Platform 上でサーバーレス関数として実行できるようになります（Amazon の AWS Lambda や、Microsoft の Azure Functions に相当するものです）。
+この関数は、次のように、様々なイベントをトリガーにして呼び出されます。&lt;/p>
+&lt;ul>
+&lt;li>HTTP でのアクセス&lt;/li>
+&lt;li>スケジュールされたタイミング&lt;/li>
+&lt;li>Firestore データベースの更新時&lt;/li>
+&lt;/ul>
+&lt;p>ここでは、HTTP によるアクセス時に &lt;code>Hello from Firebase!&lt;/code> というレスポンスを返すだけの関数を Cloud Functions に追加してみます。
+また、Firebase にデプロイする前に、エミュレーターでのローカルテストを行います。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ Firebase なのか GCP なのか&lt;/span>
+ &lt;span class="xNote_body">Cloud Functions は Firebase プロジェクトからも使用できますが、実体は GCP で提供されているサービスです。
+このようなサービスは他にもあり、Firebase のサービスのうち、頭に Cloud と付いてるものは実際には GCP が提供しています（例:「Cloud Firestore」「Cloud Functions」「Cloud Storage」）。&lt;/span>
+&lt;/div>
+&lt;h2 id="事前準備">事前準備&lt;/h2>
+&lt;p>最初に Firebase プロジェクトを作成し、Firebase CLI をインストールしておきます。
+既存の Firebase プロジェクトに Cloud Functions を追加する場合は、プロジェクトの作成は必要ありません。&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://firebase.google.com/">Firebase&lt;/a> のアカウントを作成します&lt;/li>
+&lt;li>&lt;a href="https://console.firebase.google.com/">Firebase コンソール&lt;/a> から新規プロジェクトを作成します
+&lt;ul>
+&lt;li>&lt;code>firebase&lt;/code> コマンドでもプロジェクトを作成できますが、上記サイトから作成してしまった方が楽です（名前の重複チェックなどをしてくれます）&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="../../../p/pamw7hr/">Firebase CLI をインストール&lt;/a> して、&lt;code>firebase&lt;/code> コマンドを実行できるようにします&lt;/li>
+&lt;/ol>
+&lt;p>Firebase CLI をインストールしたら、次のように Firebase アカウントでサインインしておきます。&lt;/p></description></item><item><title>Firebase の Cloud Functions で定期的に Firestore の集計処理を行う</title><link>https://maku.blog/p/vgs4dox/</link><pubDate>Sun, 13 Mar 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vgs4dox/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Firestore データベースは、コレクションデータを手軽に格納していくのにはとても便利ですが、全データを集計するような処理は苦手です。
+例えば、各ドキュメントに付けられた「タグ」情報をすべて回収して、タグの一覧を生成したい場合、全てのドキュメントを read する必要があるため、ドキュメント数が Firebase の使用料金にダイレクトに効いてきます。
+もし、Firestore にドキュメントが追加されるたびに Cloud Functions を起動してこのような集計処理を行うと、凄まじい勢いで課金されてしまいます。&lt;/p>
+&lt;p>ここでは、Cloud Functions による &lt;strong>集計処理を定期的なスケジュールで起動する&lt;/strong> ことで、Firestore ドキュメントの read 処理を削減してみます。
+もちろん、リアルタイムな更新が必要なデータには使えませんが、カタログ的なデータであれば、定期的なデータ更新で間に合うケースは多いはずです。&lt;/p>
+&lt;h2 id="事前準備">事前準備&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a href="https://console.firebase.google.com/">Firebase コンソール&lt;/a> からテスト用のプロジェクトを作成してください。ここでは、自動生成されたアプリ ID を &lt;code>myapp-58138&lt;/code> とします。&lt;/li>
+&lt;li>Firestore データベースに &lt;code>books&lt;/code> コレクションを追加し、次のようなサンプルドキュメントを追加してください。&lt;code>tag&lt;/code> フィールドは本来は配列 (&lt;code>tags&lt;/code>) であるべきですが、ここではシンプル化のために文字列型のスカラデータとしています。
+&lt;ul>
+&lt;li>id: &lt;code>001&lt;/code> (title: &lt;code>Title1&lt;/code>, author: &lt;code>Author1&lt;/code>, tag: &lt;code>Tag1&lt;/code>)&lt;/li>
+&lt;li>id: &lt;code>002&lt;/code> (title: &lt;code>Title2&lt;/code>, author: &lt;code>Author2&lt;/code>, tag: &lt;code>Tag2&lt;/code>)&lt;/li>
+&lt;li>id: &lt;code>003&lt;/code> (title: &lt;code>Title3&lt;/code>, author: &lt;code>Author3&lt;/code>, tag: &lt;code>Tag3&lt;/code>)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="../../../p/pamw7hr">Firebase CLI をインストール&lt;/a> して、&lt;code>firebase&lt;/code> コマンドを使用できるようにしてください。作成した関数を Cloud Functions にデプロイするために使います。&lt;/li>
+&lt;/ul>
+&lt;h2 id="プロジェクトの雛形の生成">プロジェクトの雛形の生成&lt;/h2>
+&lt;p>プロジェクト用のディレクトリを作成します。&lt;/p></description></item></channel></rss>

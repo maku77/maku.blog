@@ -1,14 +1,270 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>セキュリティ on まくろぐ</title><link>https://maku.blog/tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3/</link><description>Recent content in セキュリティ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sat, 09 Jul 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3/index.xml" rel="self" type="application/rss+xml"/><item><title>各種 Linux のファイアウォール設定ツール</title><link>https://maku.blog/p/ceow5cj/</link><pubDate>Sat, 09 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ceow5cj/</guid><description>従来 Linux のパケットフィルタリングの設定には、iptables が使われていましたが、現在ではより直感的な操作が可能な ufw、firewalld、nftables といったツールが使われています。
-ディストリビューション ファイアウォール設定ツール Ubuntu 8.04 LTS 以降 ufw CentOS 7 以降 firewalld Fedora 18 以降 firewalld Rocky Linux firewalld および nftables 参考: ufw (Uncomplicated Firewall) によるファイアウォール設定 参考: firewalld によるファイアウォール設定 どのツールも下回りとしては Linux カーネルの Netfilter サブシステムの仕組みを利用しています。
-ufw ---+ | firewalld ---+---&amp;gt; Netfilter (Linux kernel) | iptables ---+</description></item><item><title>Linuxメモ: firewalld による Linux のファイアウォール設定</title><link>https://maku.blog/p/ij6kxeq/</link><pubDate>Wed, 06 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ij6kxeq/</guid><description>Red Hat 系 Linux のネットワークのアクセス制御には、従来 iptables が用いられていましたが、現在は firewalld に置き換えられています。 Fedora 18 や CentOS 7、および CentOS の後継的な位置付けの Rocky Linux 8、AlmaLinux 8 には firewalld が標準搭載されています（nftables というのもあります）。
-CentOS 6 の頃は iptables が使われていました。 iptables のルールは /etc/sysconfig/iptables というファイルに保存され、システム再起動時にはこのファイルから設定を復帰させるという動作をしていました。 iptables はコマンド体系が煩雑すぎるという問題があり、より直感的な設定が可能な firewalld が作成されました。 firewalld では「一時的な」ルール設定などにも対応しています。
-ファイアウォールの設定ツールは変化してきていますが、下回りとして Linux カーネルの Netfilter (netfilter firewall) が使用されていることに変わりはありません。
-firewalld のインストール apt でのインストール $ sudo apt install firewalld firewalld の使い方 firewalld の起動・停止と自動起動設定 firewalld は、systemd のサービスとして自動起動できます。
-$ systemctl status firewalld # 現在の状態を確認 $ systemctl start firewalld # 直ちに firewalld を起動 $ systemctl stop firewalld # 直ちに firewalld を停止 $ systemctl enable firewalld # 自動起動する $ systemctl disable firewalld # 自動起動しない firewalld の設定を確認する $ firewall-cmd --list-all firewalld の設定を変更する firewalld で HTTP 通信を許可するには次のようにします。</description></item><item><title>Linux コマンド: ufw による Ubuntu のファイアウォール設定</title><link>https://maku.blog/p/drar8o4/</link><pubDate>Mon, 04 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/drar8o4/</guid><description>ufw とは ufw (Uncomplicated Firewall) は Debian/Ubuntu 系 Linux でパケットフィルタリングの設定（ファイアウォール設定）を行うためのツールです。 従来、パケットフィルタリングのツールとしては iptables が使われていましたが、iptables は設定が煩雑で扱いづらいという問題を抱えていたため、直感的な設定を行うためのツールとして ufw が開発されました。 ufw は Ubuntu 8.04 LTS 以降で使用することができます。
-ufw のサブコマンド 通常コマンド コマンド 説明 ufw enable enables the firewall ufw disable disables the firewall ufw default ARG set default policy ufw logging LEVEL set logging to LEVEL ufw allow ARGS add allow rule ufw deny ARGS add deny rule ufw reject ARGS add reject rule ufw limit ARGS add limit rule ufw delete RULE|NUM delete RULE ufw insert NUM RULE insert RULE at NUM ufw prepend RULE prepend RULE ufw route RULE add route RULE ufw route delete RULE|NUM delete route RULE ufw route insert NUM RULE insert route RULE at NUM ufw reload reload firewall ufw reset reset firewall ufw status show firewall status ufw status numbered show firewall status as numbered list of RULES ufw status verbose show verbose firewall status ufw show ARG show firewall report ufw version display version information アプリケーションプロファイル コマンド 説明 ufw app list list application profiles ufw app info PROFILE show information on PROFILE ufw app update PROFILE update PROFILE ufw app default ARG set default application policy ufw の基本的な使い方 ufw で現在の設定を確認する (ufw status) $ sudo ufw status Status: active To Action From -- ------ ---- OpenSSH ALLOW Anywhere OpenSSH (v6) ALLOW Anywhere (v6) 1 行目の表示で、ufw によるファイアウォールが有効 (Status: active) になっているか、無効 (Status: inactive) になっているかを確認することができます。</description></item><item><title>HMAC-SHA256 コードを生成する</title><link>https://maku.blog/p/uqhbb5p/</link><pubDate>Fri, 02 Aug 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uqhbb5p/</guid><description>Python で HMAC-SHA256 を生成する 下記の siggen.py スクリプトは、コマンドライン引数で渡された「秘密鍵テキスト」と「メッセージ」をもとに HMAC (Hash-based Message Authentication Code) 署名を生成します。
-siggen.py import sys import hashlib import hmac def usage(): print(&amp;#39;python &amp;#39; + sys.argv[0] + &amp;#39; &amp;lt;key&amp;gt; &amp;lt;message&amp;gt;&amp;#39;) sys.exit(1) if __name__ == &amp;#39;__main__&amp;#39;: if len(sys.argv) &amp;lt; 3: usage() key = sys.argv[1] msg = sys.argv[2] sig = hmac.new(key.encode(&amp;#39;ascii&amp;#39;), msg.encode(&amp;#39;ascii&amp;#39;), hashlib.sha256) print(sig.hexdigest()) 使用例 $ python siggen.py &amp;#39;SecretKey&amp;#39; &amp;#39;YourMessage&amp;#39; 8aff2951003c218bd26ee43c99e30527a0c30e06042008a60935ef1ab28891ec ここでは、SHA256 ハッシュ関数を使用していますが (HMAC-SHA256)、hashlib.sha256 の部分を変更すれば、他のハッシュ関数を適用することができます。
-openssl コマンドで HMAC-SHA256 を生成する Linux や macOS などの、openssl コマンドを使用できる環境では、下記のようにして簡単に HMAC-SHA256 を求めることができます。</description></item><item><title>暗号技術まとめ</title><link>https://maku.blog/p/6rn67mc/</link><pubDate>Tue, 20 Dec 2005 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6rn67mc/</guid><description>暗号技術についてのメモです。
-共通鍵暗号 ブロック暗号 ブロック暗号というのは、共通鍵暗号の一種。 データを一定のブロックごとに暗号化する方式。 高速な暗号化処理を行える。
-Triple DES - 1990年代。64 bit のブロック暗号 DES を 3 回繰り返す暗号化アルゴリズム。かつては米国政府標準暗号だった。 MISTY1 - 1990年代。三菱電機が開発した 128 bit 暗号鍵を持つ 64 bit ブロック暗号アルゴリズム。 CAST-128 - 64 bit ブロック暗号。 Camellia - 2000年代。128 bit ブロック暗号。NTT・三菱電機。 AES: Advanced Encryption Standard - 2000年代。128 bit ブロック暗号。 SEED - 128 bit ブロック暗号。 国際標準のブロック暗号 (ISO/IEC18033-3) は、Camellia、AES、SEED、CAST-128、MISTY1、Triple DES。
-ストリーム暗号 MUGI MULTI-S01 SNOW 国際標準のストリーム暗号 (ISO/IEC18033-4) は、MUGI、MULTI-S01、SNOW。
-公開鍵暗号 RSA RSA: Rivest - Shamir - Adleman - 大きな素数の素因数分解が難しいという根拠に基づいた暗号方式。 楕円曲線暗号 楕円曲線状での離散対数問題に基づいた公開鍵暗号方式。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>セキュリティ on まくろぐ</title><link>https://maku.blog/tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3/</link><description>Recent content in セキュリティ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Fri, 09 Jun 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3/index.xml" rel="self" type="application/rss+xml"/><item><title>各種 Linux のファイアウォール設定ツール</title><link>https://maku.blog/p/ceow5cj/</link><pubDate>Sat, 09 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ceow5cj/</guid><description>&lt;p>従来 Linux のパケットフィルタリングの設定には、iptables が使われていましたが、現在ではより直感的な操作が可能な ufw、firewalld、nftables といったツールが使われています。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>ディストリビューション&lt;/th>
+ &lt;th>ファイアウォール設定ツール&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>Ubuntu 8.04 LTS 以降&lt;/td>
+ &lt;td>ufw&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>CentOS 7 以降&lt;/td>
+ &lt;td>firewalld&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>Fedora 18 以降&lt;/td>
+ &lt;td>firewalld&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>Rocky Linux&lt;/td>
+ &lt;td>firewalld および nftables&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/drar8o4/">ufw (Uncomplicated Firewall) によるファイアウォール設定&lt;/a>&lt;/li>
+&lt;li>参考: &lt;a href="../../p/ij6kxeq/">firewalld によるファイアウォール設定&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>どのツールも下回りとしては Linux カーネルの Netfilter サブシステムの仕組みを利用しています。&lt;/p>
+&lt;pre tabindex="0">&lt;code> ufw ---+
+ |
+firewalld ---+---&amp;gt; Netfilter (Linux kernel)
+ |
+ iptables ---+
+&lt;/code>&lt;/pre></description></item><item><title>Linuxメモ: firewalld による Linux のファイアウォール設定</title><link>https://maku.blog/p/ij6kxeq/</link><pubDate>Wed, 06 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ij6kxeq/</guid><description>&lt;p>Red Hat 系 Linux のネットワークのアクセス制御には、従来 &lt;code>iptables&lt;/code> が用いられていましたが、現在は &lt;strong>&lt;code>firewalld&lt;/code>&lt;/strong> に置き換えられています。
+Fedora 18 や CentOS 7、および CentOS の後継的な位置付けの Rocky Linux 8、AlmaLinux 8 には &lt;code>firewalld&lt;/code> が標準搭載されています（&lt;code>nftables&lt;/code> というのもあります）。&lt;/p>
+&lt;p>CentOS 6 の頃は &lt;code>iptables&lt;/code> が使われていました。
+&lt;code>iptables&lt;/code> のルールは &lt;code>/etc/sysconfig/iptables&lt;/code> というファイルに保存され、システム再起動時にはこのファイルから設定を復帰させるという動作をしていました。
+&lt;code>iptables&lt;/code> はコマンド体系が煩雑すぎるという問題があり、より直感的な設定が可能な &lt;code>firewalld&lt;/code> が作成されました。
+&lt;code>firewalld&lt;/code> では「一時的な」ルール設定などにも対応しています。&lt;/p>
+&lt;p>ファイアウォールの設定ツールは変化してきていますが、下回りとして Linux カーネルの Netfilter (netfilter firewall) が使用されていることに変わりはありません。&lt;/p>
+&lt;h2 id="firewalld-のインストール">firewalld のインストール&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">apt でのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo apt install firewalld
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="firewalld-の使い方">firewalld の使い方&lt;/h2>
+&lt;h3 id="firewalld-の起動停止と自動起動設定">firewalld の起動・停止と自動起動設定&lt;/h3>
+&lt;p>&lt;code>firewalld&lt;/code> は、&lt;code>systemd&lt;/code> のサービスとして自動起動できます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> systemctl status firewalld &lt;span class="c1"># 現在の状態を確認&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> systemctl start firewalld &lt;span class="c1"># 直ちに firewalld を起動&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> systemctl stop firewalld &lt;span class="c1"># 直ちに firewalld を停止&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> systemctl &lt;span class="nb">enable&lt;/span> firewalld &lt;span class="c1"># 自動起動する&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> systemctl disable firewalld &lt;span class="c1"># 自動起動しない&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="firewalld-の設定を確認する">firewalld の設定を確認する&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> firewall-cmd --list-all
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="firewalld-の設定を変更する">firewalld の設定を変更する&lt;/h3>
+&lt;p>firewalld で HTTP 通信を許可するには次のようにします。&lt;/p></description></item><item><title>Linux コマンド: ufw による Ubuntu のファイアウォール設定</title><link>https://maku.blog/p/drar8o4/</link><pubDate>Mon, 04 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/drar8o4/</guid><description>&lt;h2 id="ufw-とは">ufw とは&lt;/h2>
+&lt;p>&lt;strong>ufw (Uncomplicated Firewall)&lt;/strong> は Debian/Ubuntu 系 Linux でパケットフィルタリングの設定（ファイアウォール設定）を行うためのツールです。
+従来、パケットフィルタリングのツールとしては iptables が使われていましたが、iptables は設定が煩雑で扱いづらいという問題を抱えていたため、直感的な設定を行うためのツールとして ufw が開発されました。
+ufw は Ubuntu 8.04 LTS 以降で使用することができます。&lt;/p>
+&lt;h2 id="ufw-のサブコマンド">ufw のサブコマンド&lt;/h2>
+&lt;h3 id="通常コマンド">通常コマンド&lt;/h3>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>コマンド&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;a href="#ufw-enable">&lt;code>ufw enable&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>enables the firewall&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="#ufw-disable">&lt;code>ufw disable&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>disables the firewall&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw default ARG&lt;/code>&lt;/td>
+ &lt;td>set default policy&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw logging LEVEL&lt;/code>&lt;/td>
+ &lt;td>set logging to LEVEL&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="#ufw-allow">&lt;code>ufw allow ARGS&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>add allow rule&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw deny ARGS&lt;/code>&lt;/td>
+ &lt;td>add deny rule&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw reject ARGS&lt;/code>&lt;/td>
+ &lt;td>add reject rule&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="#ufw-limit">&lt;code>ufw limit ARGS&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>add limit rule&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="#ufw-delete">&lt;code>ufw delete RULE|NUM&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>delete RULE&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw insert NUM RULE&lt;/code>&lt;/td>
+ &lt;td>insert RULE at NUM&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw prepend RULE&lt;/code>&lt;/td>
+ &lt;td>prepend RULE&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw route RULE&lt;/code>&lt;/td>
+ &lt;td>add route RULE&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw route delete RULE|NUM&lt;/code>&lt;/td>
+ &lt;td>delete route RULE&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw route insert NUM RULE&lt;/code>&lt;/td>
+ &lt;td>insert route RULE at NUM&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw reload&lt;/code>&lt;/td>
+ &lt;td>reload firewall&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw reset&lt;/code>&lt;/td>
+ &lt;td>reset firewall&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="#ufw-status">&lt;code>ufw status&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>show firewall status&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw status numbered&lt;/code>&lt;/td>
+ &lt;td>show firewall status as numbered list of RULES&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw status verbose&lt;/code>&lt;/td>
+ &lt;td>show verbose firewall status&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw show ARG&lt;/code>&lt;/td>
+ &lt;td>show firewall report&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw version&lt;/code>&lt;/td>
+ &lt;td>display version information&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h3 id="アプリケーションプロファイル">アプリケーションプロファイル&lt;/h3>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>コマンド&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>ufw app list&lt;/code>&lt;/td>
+ &lt;td>list application profiles&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw app info PROFILE&lt;/code>&lt;/td>
+ &lt;td>show information on PROFILE&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw app update PROFILE&lt;/code>&lt;/td>
+ &lt;td>update PROFILE&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw app default ARG&lt;/code>&lt;/td>
+ &lt;td>set default application policy&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="ufw-の基本的な使い方">ufw の基本的な使い方&lt;/h2>
+&lt;h3 id="ufw-status">ufw で現在の設定を確認する (ufw status)&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo ufw status
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">Status: active
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">To Action From
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">-- ------ ----
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">OpenSSH ALLOW Anywhere
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">OpenSSH (v6) ALLOW Anywhere (v6)
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>1 行目の表示で、ufw によるファイアウォールが有効 (&lt;code>Status: active&lt;/code>) になっているか、無効 (&lt;code>Status: inactive&lt;/code>) になっているかを確認することができます。&lt;/p></description></item><item><title>HMAC-SHA256 コードを生成する</title><link>https://maku.blog/p/uqhbb5p/</link><pubDate>Fri, 02 Aug 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uqhbb5p/</guid><description>&lt;h2 id="python-で-hmac-sha256-を生成する">Python で HMAC-SHA256 を生成する&lt;/h2>
+&lt;p>下記の &lt;code>siggen.py&lt;/code> スクリプトは、コマンドライン引数で渡された「秘密鍵テキスト」と「メッセージ」をもとに &lt;a href="https://ja.wikipedia.org/wiki/HMAC">HMAC (Hash-based Message Authentication Code)&lt;/a> 署名を生成します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">siggen.py&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">sys&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">hashlib&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">hmac&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">usage&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;python &amp;#39;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s1">&amp;#39; &amp;lt;key&amp;gt; &amp;lt;message&amp;gt;&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="vm">__name__&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s1">&amp;#39;__main__&amp;#39;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">usage&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">key&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">msg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">sys&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sig&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">hmac&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">new&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">encode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;ascii&amp;#39;&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">msg&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">encode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;ascii&amp;#39;&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">hashlib&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sha256&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">hexdigest&lt;/span>&lt;span class="p">())&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">使用例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ python siggen.py &amp;#39;SecretKey&amp;#39; &amp;#39;YourMessage&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">8aff2951003c218bd26ee43c99e30527a0c30e06042008a60935ef1ab28891ec&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ここでは、SHA256 ハッシュ関数を使用していますが (HMAC-SHA256)、&lt;code>hashlib.sha256&lt;/code> の部分を変更すれば、他のハッシュ関数を適用することができます。&lt;/p>
+&lt;h2 id="openssl-コマンドで-hmac-sha256-を生成する">openssl コマンドで HMAC-SHA256 を生成する&lt;/h2>
+&lt;p>Linux や macOS などの、&lt;code>openssl&lt;/code> コマンドを使用できる環境では、下記のようにして簡単に HMAC-SHA256 を求めることができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ echo -n &amp;#39;YourMessage&amp;#39; | openssl dgst -sha256 -hmac &amp;#39;SecretKey&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">8aff2951003c218bd26ee43c99e30527a0c30e06042008a60935ef1ab28891ec&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="おまけランダムで秘密鍵テキストを生成するスクリプト">おまけ（ランダムで秘密鍵テキストを生成するスクリプト）&lt;/h2>
+&lt;p>下記の &lt;code>random-password.py&lt;/code> スクリプトは、HMAC 計算に使用可能な 20 桁のランダムな文字列（秘密鍵）を生成します。
+上記の &lt;code>siggen.py&lt;/code> スクリプトに入力する秘密鍵として使用することができます。&lt;/p></description></item><item><title>暗号技術まとめ</title><link>https://maku.blog/p/6rn67mc/</link><pubDate>Tue, 20 Dec 2005 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6rn67mc/</guid><description>&lt;p>暗号技術についてのメモです。&lt;/p>
+&lt;h2 id="共通鍵暗号">共通鍵暗号&lt;/h2>
+&lt;h3 id="ブロック暗号">ブロック暗号&lt;/h3>
+&lt;p>ブロック暗号というのは、共通鍵暗号の一種。
+データを一定のブロックごとに暗号化する方式。
+高速な暗号化処理を行える。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Triple DES&lt;/strong> - 1990年代。64 bit のブロック暗号 DES を 3 回繰り返す暗号化アルゴリズム。かつては米国政府標準暗号だった。&lt;/li>
+&lt;li>&lt;strong>MISTY1&lt;/strong> - 1990年代。三菱電機が開発した 128 bit 暗号鍵を持つ 64 bit ブロック暗号アルゴリズム。&lt;/li>
+&lt;li>&lt;strong>CAST-128&lt;/strong> - 64 bit ブロック暗号。&lt;/li>
+&lt;li>&lt;strong>Camellia&lt;/strong> - 2000年代。128 bit ブロック暗号。NTT・三菱電機。&lt;/li>
+&lt;li>&lt;strong>AES: Advanced Encryption Standard&lt;/strong> - 2000年代。128 bit ブロック暗号。&lt;/li>
+&lt;li>&lt;strong>SEED&lt;/strong> - 128 bit ブロック暗号。&lt;/li>
+&lt;/ul>
+&lt;p>国際標準のブロック暗号 (&lt;strong>ISO/IEC18033-3&lt;/strong>) は、Camellia、AES、SEED、CAST-128、MISTY1、Triple DES。&lt;/p>
+&lt;h3 id="ストリーム暗号">ストリーム暗号&lt;/h3>
+&lt;ul>
+&lt;li>&lt;strong>MUGI&lt;/strong>&lt;/li>
+&lt;li>&lt;strong>MULTI-S01&lt;/strong>&lt;/li>
+&lt;li>&lt;strong>SNOW&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;p>国際標準のストリーム暗号 (&lt;strong>ISO/IEC18033-4&lt;/strong>) は、MUGI、MULTI-S01、SNOW。&lt;/p>
+&lt;h2 id="公開鍵暗号">公開鍵暗号&lt;/h2>
+&lt;h3 id="rsa">RSA&lt;/h3>
+&lt;ul>
+&lt;li>&lt;strong>RSA: Rivest - Shamir - Adleman&lt;/strong> - 大きな素数の素因数分解が難しいという根拠に基づいた暗号方式。&lt;/li>
+&lt;/ul>
+&lt;h3 id="楕円曲線暗号">楕円曲線暗号&lt;/h3>
+&lt;p>楕円曲線状での離散対数問題に基づいた公開鍵暗号方式。&lt;/p></description></item></channel></rss>

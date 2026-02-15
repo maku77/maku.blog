@@ -1,34 +1,438 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>雑多な技術メモ on まくろぐ</title><link>https://maku.blog/p/e58h5in/</link><description>Recent content in 雑多な技術メモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 05 Feb 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/e58h5in/index.xml" rel="self" type="application/rss+xml"/><item><title>Python で Confluence の情報を取得する</title><link>https://maku.blog/p/wgsz2wn/</link><pubDate>Mon, 05 Feb 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wgsz2wn/</guid><description>Atlassian のドキュメンテーション管理ツールである Confluence は、REST API を使って様々な操作を自動化することができます。 各言語用にラッパーライブラリが公開されているので、通常は REST API を直接呼び出す必要はありません。 ここでは、Atlassian Python API (atlassian-python-api) を使って、Python から Confluence の情報を取得してみます。
-Atlassian Python API documentation (GitHub) atlassian-api/atlassian-python-api atlassian-python-api のインストール pip コマンドで atlassian-python-api パッケージをインストールします。 システムを汚さないように、venv 環境を作成してインストールする のがおすすめです。
-atlassian-python-api パッケージのインストール ## venv 仮想環境を使う場合（Linux/macOS の場合） $ python3 -m venv venv # 仮想環境の作成 $ source venv/bin/activate # 仮想環境に入る ## venv 仮想環境を使う場合（Windows の場合） $ py -m venv venv # 仮想環境の作成 $ venv\Scripts\activate.bat # 仮想環境に入る ## atlassian-python-api パッケージのインストール $ pip install atlassian-python-api ついでに、python-dotenv を入れて、.</description></item><item><title>Python で Jira の情報を取得する</title><link>https://maku.blog/p/thhqqc7/</link><pubDate>Wed, 13 Dec 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/thhqqc7/</guid><description>プロジェクト管理ツールである Jira は、REST API を使って情報を取得できるようになっています。 ここでは、Python を使って Jira の情報を取得してみます。
-jira パッケージのインストール Python から JIRA の情報を取得するには、PyPI で公開されている jira パッケージ を使用すると簡単です（jira パッケージ内部で REST API を使っています）。
-jira パッケージのインストール $ pip install jira jira パッケージの基本的な使い方 下記は、JIRA プロジェクトの一覧を取得する簡単な例です。 ユーザー ID やパスワードは適切なものに置き換えてください。
-jira-projects.py from jira import JIRA, JIRAError JIRA_SERVER = &amp;#34;https://&amp;lt;server&amp;gt;&amp;#34; JIRA_USER = &amp;#34;&amp;lt;user&amp;gt;&amp;#34; JIRA_PW = &amp;#34;&amp;lt;password&amp;gt;&amp;#34; try: jira = JIRA(JIRA_SERVER, basic_auth=(JIRA_USER, JIRA_PW)) for prj in jira.projects(): print(f&amp;#34;key: {prj.key}, name: {prj.name}&amp;#34;) except JIRAError as e: print(f&amp;#34;Error: {e.</description></item><item><title>Stylelint で CSS の記述ミスを防ぐ（CSS の静的解析ツールを導入する）</title><link>https://maku.blog/p/y2fru7o/</link><pubDate>Fri, 17 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/y2fru7o/</guid><description>Stylelint とは https://stylelint.io/ Stylelint は CSS の記述が正しいかをチェックしてくれる lint ツールです。 正しい CSS コードを記述するのはとても難しいので、Stylelint にいろいろ教えてもらいましょう。 Stylelint は、.css ファイルだけでなく、.scss などの CSS プリプロセッサ用のファイルや、HTML に埋め込まれた style 要素なども解析できます。
-既存のプロジェクトに Stylelint をかけると、おそらく大量の指摘事項が表示されます。 まずは、Stylelint の導入だけしておいて、指摘事項は徐々に直していくというやり方で進めるとよいです。
-Stylelint のインストール Stylelint は Node.js の NPM モジュールとして配布されています。 既存のプロジェクトに package.json が存在しない場合は、先に作成しておいてください。
-（必要があれば）package.json の作成 $ npm init -y あるいは、下記のような最小限の package.json ファイルを手動で作成するのでもよいです。
-package.json { &amp;#34;name&amp;#34;: &amp;#34;example.com&amp;#34;, &amp;#34;version&amp;#34;: &amp;#34;0.0.1&amp;#34;, &amp;#34;license&amp;#34;: &amp;#34;UNLICENSED&amp;#34; } package.json があるディレクトリで、次のように実行すると Stylelint がインストールされ、初期設定ファイル (.stylelintrc.json) が作成されます。
-Stylelint のインストールと初期設定ファイルの生成 $ npm init stylelint package.json の内容は次のように更新されます。 stylelint コマンド本体と、stylelint-config-standard という基本的なコンフィグ（後述）がインストールされていることがわかります。</description></item><item><title>IGDB API でゲーム情報のデータベースにアクセスしてみる</title><link>https://maku.blog/p/mu7gqya/</link><pubDate>Mon, 24 Oct 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mu7gqya/</guid><description>IGDB は、世の中の（ビデオ）ゲームの情報をデータベースとして集約しようとしている壮大なプロジェクトで、現在 Twitch が運営しています。 この情報には IGDB API という Web API でアクセスできるようになっていて、簡単に試す程度なら無料で利用できます。 ちょっと試してみたのでメモに残しておきます。 とりあえず、curl コマンドで API のレスポンスを確認するところまで。
-大まかには、Twitch developers console でアプリクライアントを登録し、アクセストークンを発行して API を叩く、という流れになります。
-Twitch アカウントを登録する IGDB API を使うには、Twitch developers コンソールでアプリケーション（クライアント）の登録が必要です。 このサイトにサインインするには、Twitch のアカウントが必要 なので、下記から作成します。 すでに Twitch アカウントを持っている場合は、そのまま使えます。
-Twitch Developers - Login さらに、API を使用する場合は、さらに二段階認証の設定が必須になっているので、次のような感じでたどって設定しておきます。 メールアドレスや電話番号を登録すれば二段階認証を有効化できます。
-Twitch - 設定 - セキュリティとプライバシー アプリケーションを登録してクライアント ID とシークレットを発行する Twitch developers コンソール の アプリ管理画面 でアプリを登録すると、クライアント ID とシークレットキーを取得できます。
-アプリケーションを登録 ボタンをクリック 名前: 適当な名前を入力（グローバルに一意な名前じゃないといけないっぽい） OAuthのリダイレクトURL: 決まっていないなら http://localhost:3000 などを入力しておけば OK カテゴリー: プルダウンから適当に選択（Website Integration など） 作成 ボタンを押して完了 作成されたアプリの 管理 ボタンをクリック 新しい秘密 ボタンを押してクライアントシークレットを発行 上記の手順で、IGDB API を呼び出すためのクライアント ID とシークレットを確認できます。</description></item><item><title>JUnit のテストケースを一時的に無効にする（@Ignore/@Disabledアノテーション）</title><link>https://maku.blog/p/ow3zskd/</link><pubDate>Wed, 30 Sep 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ow3zskd/</guid><description>JUnit で特定のテストケース（クラスや関数）を一時的に無効にしておきたい場合は、次のようなアノテーションをクラスや関数に付けます。
-JUnit4 の場合: @Ignore アノテーション (org.junit.Ignore) JUnit5 の場合: @Disabled アノテーション (org.junit.jupiter.api.Disabled) Java の場合 // import org.junit.Ignore; // import org.junit.Test; public class MyClassTest { @Test @Ignore public void testSomething() { // ... } } Kotlin の場合 // import org.junit.Ignore // import org.junit.Test class MyClassTest { @Test @Ignore fun testSomething() { // ... } } @Ignore (@Disabled) に文字列パラメータを渡すと、なぜそのテストを無効にしているのかを示すことができます。
-@Ignore(&amp;#34;HogeHogeのパラメータを整理中&amp;#34;) @Test fun testSomething() { // ... } このメッセージは JUnit でテストを実行したときに表示されます。 下記は、Android Studio 上で JUnit によるテストを実行したときの表示例です。 16 個のテスト関数のうち 1 つが無視され、その理由が表示されています。</description></item><item><title>npm run スクリプト実行時の ERR! 出力を抑制する (npm run --silent)</title><link>https://maku.blog/p/epm9ipy/</link><pubDate>Thu, 21 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/epm9ipy/</guid><description>npm run コマンドを使うと、package.json に定義されているスクリプトを実行することができるのですが、そこで実行したコマンドがエラー終了（exit 1 など）すると、npm run の実行自体もエラー扱いとなり、下記のようにエラー情報がたくさん出力されます。
-$ npm run test &amp;gt; myapp@1.0.0 test C:\myapp &amp;gt; echo &amp;#34;Error: no test specified&amp;#34; &amp;amp;&amp;amp; exit 1 &amp;#34;Error: no test specified&amp;#34; npm ERR! code ELIFECYCLE npm ERR! errno 1 npm ERR! myapp@1.0.0 test: `echo &amp;#34;Error: no test specified&amp;#34; &amp;amp;&amp;amp; exit 1` npm ERR! Exit status 1 npm ERR! npm ERR! Failed at the myapp@1.0.0 test script. npm ERR! This is probably not a problem with npm.</description></item><item><title>npm でインストール済みのモジュールを簡潔にリスト表示する</title><link>https://maku.blog/p/nuvbg6k/</link><pubDate>Thu, 21 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nuvbg6k/</guid><description>npm list (ls) コマンドは NPM (Node Package Manager) でインストールしたパッケージの一覧を表示するコマンドですが、デフォルトでは依存モジュールをすべてツリー構造で表示するので、出力が大量になります。
-インストールパッケージの一覧を表示 $ npm ls myapp@1.0.0 D:\y\gitwork\myapp +-- textlint@11.6.3 | +-- @textlint/ast-node-types@4.2.5 | +-- @textlint/ast-traverse@2.1.7 | | `-- @textlint/ast-node-types@4.2.5 deduped | +-- @textlint/feature-flag@3.1.6 | | `-- map-like@2.0.0 deduped | +-- @textlint/fixer-formatter@3.1.13 | | +-- @textlint/module-interop@1.0.2 deduped | | +-- @textlint/types@1.3.1 deduped ... なが～い出力 ... 次のように --depth オプションを付けると、トップレベルのモジュール名だけを簡潔に表示することができます。
-$ npm ls --depth=0 myapp@1.0.0 D:\y\gitwork\myapp +-- textlint@11.6.3 +-- textlint-rule-preset-ja-technical-writing@3.1.3 `-- textlint-rule-web-plus-db@1.1.5 グローバルにインストールしたモジュールを表示するときも同様です。
-$ npm ls -g --depth=0</description></item><item><title>ソフトウェアアーキテクトが考えること</title><link>https://maku.blog/p/x2b2gw3/</link><pubDate>Tue, 21 Jul 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/x2b2gw3/</guid><description>ソフトウェアアーキテクチャとは アーキテクチャとは「要求と設計の橋渡し」である ─『オブジェクト開発の神髄』より
-外部から見える特性 構成要素 構成要素間の関係 アーキテクトが考えること 何をもとにシステムを設計するか 部品をどのように組み立てるか システムをどのように動作保証するか パフォーマンス アーキテクチャドライバとは アーキテクチャを決定する要件のことを「アーキテクチャドライバ」といいます。 つまり、アーキテクチャドライバはアーキテクチャ設計のためのインプットとなります。 アーキテクチャドライバには以下の３つの要素があります。
-制約（最重要。変更できないものだから） ビジネス制約 技術制約 品質特性 Performance 性能 Modifiability 変更容易性 Usability ユーザビリティ Availability 可用性 Security セキュリティ Testability テスト容易性 主な機能要件（重要性としては一番低い。ほとんどの場合、制約にかかわらず実現できるので） アーキテクチャドライバはステークホルダーとのコミュニケーションの道具であり、このアーキテクチャドライバの作成（文章作成）を行うのがアーキテクトの最初の仕事です。
-アーキテクチャ設計のステップ アーキテクチャ要件抽出 アーキテクチャドライバの作成（要求を要件として分類する。上の３つの要素） ステークホルダーと仕様優先度レビュー アーキテクチャドライバに基づくシステムの分割 ソフトウェアアーキテクチャレビュー アーキテクチャドキュメント ソフトウェアは様々な視点で捉えられ、これをビュー (View) と呼びます。 アーキテクチャドキュメントはビューの集合と相互作用の説明で構成されます。
-アーキテクトが作成すべき図の例 パッケージ図 パッケージ間の依存関係 それぞれのパッケージに何が配置されるか ソースコードやライブラリの物理構造 コンポーネント図 配置図 物理的なハードウェアやソフトウェアの配置 実行環境を表すノードとの接続関係など アーキテクチャパターン アーキテクチャパターンとは、「アーキテクチャの要素と要素間の関係を使い方の制約と共に特定したもの」です。 ─出展『Principles of software architecture』。
-様々なアーキテクチャパターンが提唱されており、GOF のデザインパターンとは違い統一された解釈は存在しません。
-Shaw and Garlan "Software Architecture" ― Shaw と Garlan のリスト Buschmann et al.</description></item><item><title>UnitTest メモ: ユニットテストの網羅レベルの種類 (C0/C1/C2)</title><link>https://maku.blog/p/aet7iu7/</link><pubDate>Fri, 04 Jul 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/aet7iu7/</guid><description> C0 &amp;hellip; 「命令網羅」 全ての処理が正しく実行される C1 &amp;hellip; 「分岐網羅」 全ての条件が正しく実行される C2 &amp;hellip; 「条件網羅」 全ての組み合わせの経路が実行される</description></item><item><title>Web API, REST API 設計に関するメモ</title><link>https://maku.blog/p/u54mvpk/</link><pubDate>Sun, 25 May 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/u54mvpk/</guid><description>REST API サーバーが返すエラーコード（HTTP レスポンスコード） まずは、最低限、下記の 3 種類のステータスコードを返すように対応するとよいです。
-200 &amp;hellip; OK 400 &amp;hellip; Bad Request（クライアント側の不正） 500 &amp;hellip; Internal Server Error（サーバ側の不正） その後、徐々に以下のように対応していきます。
-200 &amp;hellip; OK 304 &amp;hellip; Not Modified（クライアントキャッシュへの対応〈弱いキャッシュ〉。If-Modified-Since/If-Match ヘッダへの対応） 401 &amp;hellip; Unauthorized（アクセスに認証が必要だが、まだ認証してアクセス権限を取得できていない） 403 &amp;hellip; Forbidden（そのリソースへのアクセス権限がない〈認可されていない〉） 404 &amp;hellip; Not Found（そのリソースは存在しない） 500 &amp;hellip; Internal Server Error URL にはバージョンを含める Web API の互換性がなくなることを見越して、URL のパス部分にはバージョン情報を含めておくとよいです（v2 以降で付けるという手もあり）。 次のようにパスのルート直下にバージョン情報を含めることで、シンプルな構成になります。
-http://api.example.com/v1/users/ バージョン情報がインクリメントされるということは、その API がやりとりするデータに互換性がなくなることを意味します。 バージョン情報はあくまでインタフェースのバージョンを表しています。 API サーバー側の実装が少し変わったからといって、その都度バージョン情報を更新する必要はありません。</description></item><item><title>XAMPP/Apache の DocumentRoot を設定する</title><link>https://maku.blog/p/6h47cno/</link><pubDate>Sun, 29 Apr 2012 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6h47cno/</guid><description>httpd.conf を編集 例えば、Mac OSX にインストールした XAMPP の Apache の場合は、/Applications/XAMPP/xamppfiles/etc/httpd.conf を編集します。
-(1) DocumentRoot の変更 DocumentRoot &amp;#34;/Applications/XAMPP/xamppfiles/htdocs&amp;#34; ↓ DocumentRoot &amp;#34;/Users/maku/website/public_html&amp;#34; (2) 対応する Directory ディレクトリの変更 &amp;lt;Directory &amp;#34;/Applications/XAMPP/xamppfiles/htdocs&amp;#34;&amp;gt; ↓ &amp;lt;Directory &amp;#34;/Users/maku/website/public_html&amp;#34;&amp;gt; トラブルシューティング http://localhost/ にアクセスしたときに以下のようなエラーが出た場合は、DocumentRoot に設定したディレクトリのパーミッションを確認します。
-Access forbidden! You don&amp;#39;t have permission to access the requested directory. There is either no index document or the directory is read-protected. 例えば、DocumentRoot として、/aaa/bbb/ccc を設定した場合、/aaa、/aaa/bbb、/aaa/bbb/ccc 全てに read パーミッションがついている必要があります。
-$ chmod 0755 /aaa $ chmod 0755 /aaa/bbb $ chmod 0755 /aaa/bbb/ccc</description></item><item><title>CPU のアーキテクチャ名と CPU 名の対応表</title><link>https://maku.blog/p/v7bxgmn/</link><pubDate>Sun, 19 Jun 2011 00:00:00 +0900</pubDate><guid>https://maku.blog/p/v7bxgmn/</guid><description>Intel 系 CPU アーキテクチャ名 CPU名 i386 80386 i486 80486 i586 Pentium, MMX Pentium i686 Pentium Pro, Pentium II, Pentium III, Pentium 4 athlon Athlon, Athlon MP, Athlon XP x86_64 Opteron, Athlon64, Xeon (EM64T), Core, Core2Duo メモ x86 (IA-32) Intel 社の 8086 系のプロセッサの略称。（binary hacks より） x86_64 (AMD64) AMD が設計した x86 上位互換の 64 ビットプロセッサのアーキテクチャ。（binary hacks より）</description></item><item><title>画像処理メモ: 画像の 2 値化の閾値を求める方法いろいろ</title><link>https://maku.blog/p/uyp4geh/</link><pubDate>Fri, 25 May 2001 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uyp4geh/</guid><description> 平均法（平均を取るだけ）← 使えない Pタイル法（物体・背景の面積が分かっている場合）← 自動ではない モード法（極小を求める）← グラフを滑らかにする必要がある 判別分析法（クラス間分散が最大となるところで２値化する）← Good</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>雑多な技術メモ on まくろぐ</title><link>https://maku.blog/p/e58h5in/</link><description>Recent content in 雑多な技術メモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 05 Feb 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/e58h5in/index.xml" rel="self" type="application/rss+xml"/><item><title>Python で Confluence の情報を取得する</title><link>https://maku.blog/p/wgsz2wn/</link><pubDate>Mon, 05 Feb 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wgsz2wn/</guid><description>&lt;p>Atlassian のドキュメンテーション管理ツールである Confluence は、REST API を使って様々な操作を自動化することができます。
+各言語用にラッパーライブラリが公開されているので、通常は REST API を直接呼び出す必要はありません。
+ここでは、&lt;strong>Atlassian Python API (&lt;code>atlassian-python-api&lt;/code>)&lt;/strong> を使って、Python から Confluence の情報を取得してみます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://atlassian-python-api.readthedocs.io/">Atlassian Python API documentation&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/atlassian-api/atlassian-python-api">(GitHub) atlassian-api/atlassian-python-api&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="atlassian-python-api-のインストール">atlassian-python-api のインストール&lt;/h2>
+&lt;p>&lt;code>pip&lt;/code> コマンドで &lt;strong>&lt;code>atlassian-python-api&lt;/code>&lt;/strong> パッケージをインストールします。
+システムを汚さないように、&lt;a href="https://maku77.github.io/p/wozpogm/">venv 環境を作成してインストールする&lt;/a> のがおすすめです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">atlassian-python-api パッケージのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">#&lt;/span>&lt;span class="c1"># venv 仮想環境を使う場合（Linux/macOS の場合）&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> python3 -m venv venv &lt;span class="c1"># 仮想環境の作成&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> &lt;span class="nb">source&lt;/span> venv/bin/activate &lt;span class="c1"># 仮想環境に入る&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="gp">#&lt;/span>&lt;span class="c1"># venv 仮想環境を使う場合（Windows の場合）&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> py -m venv venv &lt;span class="c1"># 仮想環境の作成&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> venv&lt;span class="se">\S&lt;/span>cripts&lt;span class="se">\a&lt;/span>ctivate.bat &lt;span class="c1"># 仮想環境に入る&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="gp">#&lt;/span>&lt;span class="c1"># atlassian-python-api パッケージのインストール&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> pip install atlassian-python-api
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ついでに、&lt;strong>&lt;code>python-dotenv&lt;/code>&lt;/strong> を入れて、&lt;a href="https://maku77.github.io/p/gzo8d7y/">&lt;code>.env&lt;/code> ファイル&lt;/a> でアクセストークンを設定できるようにしておきます。&lt;/p></description></item><item><title>Python で Jira の情報を取得する</title><link>https://maku.blog/p/thhqqc7/</link><pubDate>Wed, 13 Dec 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/thhqqc7/</guid><description>&lt;p>プロジェクト管理ツールである Jira は、REST API を使って情報を取得できるようになっています。
+ここでは、Python を使って Jira の情報を取得してみます。&lt;/p>
+&lt;h2 id="jira-パッケージのインストール">jira パッケージのインストール&lt;/h2>
+&lt;p>Python から JIRA の情報を取得するには、PyPI で公開されている &lt;a href="https://pypi.org/project/jira/">jira パッケージ&lt;/a> を使用すると簡単です（&lt;code>jira&lt;/code> パッケージ内部で REST API を使っています）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">jira パッケージのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> pip install jira
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="jira-パッケージの基本的な使い方">jira パッケージの基本的な使い方&lt;/h2>
+&lt;p>下記は、JIRA プロジェクトの一覧を取得する簡単な例です。
+ユーザー ID やパスワードは適切なものに置き換えてください。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">jira-projects.py&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">jira&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">JIRA&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">JIRAError&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">JIRA_SERVER&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;https://&amp;lt;server&amp;gt;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">JIRA_USER&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;&amp;lt;user&amp;gt;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">JIRA_PW&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;&amp;lt;password&amp;gt;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">try&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">jira&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">JIRA&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">JIRA_SERVER&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">basic_auth&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">JIRA_USER&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">JIRA_PW&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">prj&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">jira&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">projects&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;key: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">prj&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">, name: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">prj&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">except&lt;/span> &lt;span class="n">JIRAError&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Error: &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">status_code&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">url&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行結果&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">Key: TST, Name: A Test Project
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Key: TST2, Name: A Test Project 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Key: ANALYTICS, Name: Analytics
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Key: ANTIABUSETEST, Name: Anti-Abuse Test
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Key: ATLAS, Name: Atlas
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Key: ACCESS, Name: Atlassian Access
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Key: CLOUD, Name: Atlassian Cloud
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Jira Cloud サービスを使用している場合、パスワードをそのまま指定する方法は &lt;a href="https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/">非推奨になった&lt;/a> ので、API トークンを発行してパスワードの代わりに指定します。&lt;/p></description></item><item><title>Stylelint で CSS の記述ミスを防ぐ（CSS の静的解析ツールを導入する）</title><link>https://maku.blog/p/y2fru7o/</link><pubDate>Fri, 17 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/y2fru7o/</guid><description>&lt;h2 id="stylelint-とは">Stylelint とは&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a href="https://stylelint.io/">https://stylelint.io/&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Stylelint&lt;/strong> は CSS の記述が正しいかをチェックしてくれる lint ツールです。
+正しい CSS コードを記述するのはとても難しいので、Stylelint にいろいろ教えてもらいましょう。
+Stylelint は、&lt;code>.css&lt;/code> ファイルだけでなく、&lt;code>.scss&lt;/code> などの CSS プリプロセッサ用のファイルや、HTML に埋め込まれた &lt;code>style&lt;/code> 要素なども解析できます。&lt;/p>
+&lt;p>既存のプロジェクトに Stylelint をかけると、おそらく大量の指摘事項が表示されます。
+まずは、Stylelint の導入だけしておいて、指摘事項は徐々に直していくというやり方で進めるとよいです。&lt;/p>
+&lt;h2 id="stylelint-のインストール">Stylelint のインストール&lt;/h2>
+&lt;p>Stylelint は Node.js の NPM モジュールとして配布されています。
+既存のプロジェクトに &lt;code>package.json&lt;/code> が存在しない場合は、先に作成しておいてください。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">（必要があれば）package.json の作成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm init -y
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>あるいは、下記のような最小限の &lt;code>package.json&lt;/code> ファイルを手動で作成するのでもよいです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">package.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;example.com&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;0.0.1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;license&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;UNLICENSED&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>package.json&lt;/code> があるディレクトリで、次のように実行すると Stylelint がインストールされ、初期設定ファイル (&lt;code>.stylelintrc.json&lt;/code>) が作成されます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Stylelint のインストールと初期設定ファイルの生成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm init stylelint
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>package.json&lt;/code> の内容は次のように更新されます。
+&lt;strong>&lt;code>stylelint&lt;/code>&lt;/strong> コマンド本体と、&lt;strong>&lt;code>stylelint-config-standard&lt;/code>&lt;/strong> という基本的なコンフィグ（後述）がインストールされていることがわかります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">package.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;example.com&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;0.0.1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;license&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;UNLICENSED&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;devDependencies&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="nt">&amp;#34;stylelint&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;^15.11.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="nt">&amp;#34;stylelint-config-standard&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;^34.0.0&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>初期設定ファイルは次のような内容になっており、上記でインストールされたコンフィグを読み込むように設定されています。&lt;/p></description></item><item><title>IGDB API でゲーム情報のデータベースにアクセスしてみる</title><link>https://maku.blog/p/mu7gqya/</link><pubDate>Mon, 24 Oct 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mu7gqya/</guid><description>&lt;p>&lt;a href="https://www.igdb.com/">IGDB&lt;/a> は、世の中の（ビデオ）ゲームの情報をデータベースとして集約しようとしている壮大なプロジェクトで、現在 Twitch が運営しています。
+この情報には &lt;a href="https://api-docs.igdb.com/">IGDB API&lt;/a> という Web API でアクセスできるようになっていて、簡単に試す程度なら無料で利用できます。
+ちょっと試してみたのでメモに残しておきます。
+とりあえず、&lt;code>curl&lt;/code> コマンドで API のレスポンスを確認するところまで。&lt;/p>
+&lt;p>大まかには、Twitch developers console でアプリクライアントを登録し、アクセストークンを発行して API を叩く、という流れになります。&lt;/p>
+&lt;h2 id="twitch-アカウントを登録する">Twitch アカウントを登録する&lt;/h2>
+&lt;p>IGDB API を使うには、Twitch developers コンソールでアプリケーション（クライアント）の登録が必要です。
+このサイトにサインインするには、&lt;strong>Twitch のアカウントが必要&lt;/strong> なので、下記から作成します。
+すでに Twitch アカウントを持っている場合は、そのまま使えます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://dev.twitch.tv/login">Twitch Developers - Login&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>さらに、API を使用する場合は、さらに二段階認証の設定が必須になっているので、次のような感じでたどって設定しておきます。
+メールアドレスや電話番号を登録すれば二段階認証を有効化できます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://www.twitch.tv/settings/security">Twitch - 設定 - セキュリティとプライバシー&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="アプリケーションを登録してクライアント-id-とシークレットを発行する">アプリケーションを登録してクライアント ID とシークレットを発行する&lt;/h2>
+&lt;p>&lt;a href="https://dev.twitch.tv/console/">Twitch developers コンソール&lt;/a> の &lt;a href="https://dev.twitch.tv/console/apps/">アプリ管理画面&lt;/a> でアプリを登録すると、クライアント ID とシークレットキーを取得できます。&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>&lt;code>アプリケーションを登録&lt;/code>&lt;/strong> ボタンをクリック
+&lt;ul>
+&lt;li>&lt;code>名前&lt;/code>: 適当な名前を入力（グローバルに一意な名前じゃないといけないっぽい）&lt;/li>
+&lt;li>&lt;code>OAuthのリダイレクトURL&lt;/code>: 決まっていないなら &lt;code>http://localhost:3000&lt;/code> などを入力しておけば OK&lt;/li>
+&lt;li>&lt;code>カテゴリー&lt;/code>: プルダウンから適当に選択（Website Integration など）&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>&lt;code>作成&lt;/code>&lt;/strong> ボタンを押して完了&lt;/li>
+&lt;li>作成されたアプリの &lt;strong>&lt;code>管理&lt;/code>&lt;/strong> ボタンをクリック&lt;/li>
+&lt;li>&lt;strong>&lt;code>新しい秘密&lt;/code>&lt;/strong> ボタンを押してクライアントシークレットを発行&lt;/li>
+&lt;/ol>
+&lt;p>上記の手順で、IGDB API を呼び出すためのクライアント ID とシークレットを確認できます。&lt;/p></description></item><item><title>JUnit のテストケースを一時的に無効にする（@Ignore/@Disabledアノテーション）</title><link>https://maku.blog/p/ow3zskd/</link><pubDate>Wed, 30 Sep 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ow3zskd/</guid><description>&lt;p>JUnit で特定のテストケース（クラスや関数）を一時的に無効にしておきたい場合は、次のようなアノテーションをクラスや関数に付けます。&lt;/p>
+&lt;ul>
+&lt;li>JUnit4 の場合: &lt;a href="https://junit.org/junit4/javadoc/latest/org/junit/Ignore.html">@Ignore アノテーション (org.junit.Ignore)&lt;/a>&lt;/li>
+&lt;li>JUnit5 の場合: &lt;a href="https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/Disabled.html">@Disabled アノテーション (org.junit.jupiter.api.Disabled)&lt;/a>&lt;/li>
+&lt;/ul>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Java の場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// import org.junit.Ignore;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">// import org.junit.Test;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">MyClassTest&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@Test&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nd">@Ignore&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">testSomething&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// ...&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Kotlin の場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-kotlin" data-lang="kotlin">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// import org.junit.Ignore
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// import org.junit.Test
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">MyClassTest&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nd">@Test&lt;/span> &lt;span class="nd">@Ignore&lt;/span> &lt;span class="k">fun&lt;/span> &lt;span class="nf">testSomething&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>@Ignore&lt;/code> (&lt;code>@Disabled&lt;/code>) に文字列パラメータを渡すと、なぜそのテストを無効にしているのかを示すことができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-kotlin" data-lang="kotlin">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Ignore&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;HogeHogeのパラメータを整理中&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Test&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">fun&lt;/span> &lt;span class="nf">testSomething&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このメッセージは JUnit でテストを実行したときに表示されます。
+下記は、Android Studio 上で JUnit によるテストを実行したときの表示例です。
+16 個のテスト関数のうち 1 つが無視され、その理由が表示されています。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="712" height="167" src="../../p/ow3zskd/img-001.png" alt="/p/ow3zskd/img-001.png" />
+&lt;/figure></description></item><item><title>npm run スクリプト実行時の ERR! 出力を抑制する (npm run --silent)</title><link>https://maku.blog/p/epm9ipy/</link><pubDate>Thu, 21 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/epm9ipy/</guid><description>&lt;p>&lt;strong>&lt;code>npm run&lt;/code>&lt;/strong> コマンドを使うと、&lt;code>package.json&lt;/code> に定義されているスクリプトを実行することができるのですが、そこで実行したコマンドがエラー終了（&lt;code>exit 1&lt;/code> など）すると、&lt;code>npm run&lt;/code> の実行自体もエラー扱いとなり、下記のようにエラー情報がたくさん出力されます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm run test
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;gt; myapp@1.0.0 test C:\myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;gt; echo &amp;#34;Error: no test specified&amp;#34; &amp;amp;&amp;amp; exit 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;#34;Error: no test specified&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ERR! code ELIFECYCLE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ERR! errno 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ERR! myapp@1.0.0 test: `echo &amp;#34;Error: no test specified&amp;#34; &amp;amp;&amp;amp; exit 1`
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ERR! Exit status 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ERR!
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ERR! Failed at the myapp@1.0.0 test script.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ERR! This is probably not a problem with npm. There is likely additional logging output above.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm WARN Local package.json exists, but node_modules missing, did you mean to install?
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ERR! A complete log of this run can be found in:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ERR! C:\Users\maku\AppData\Roaming\npm-cache\_logs\2020-05-21T09_29_36_426Z-debug.log&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この &lt;strong>&lt;code>npm ERR!&lt;/code>&lt;/strong> という出力を抑制するには、次のように &lt;strong>&lt;code>--silent&lt;/code>&lt;/strong> オプションを使用します。&lt;/p></description></item><item><title>npm でインストール済みのモジュールを簡潔にリスト表示する</title><link>https://maku.blog/p/nuvbg6k/</link><pubDate>Thu, 21 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nuvbg6k/</guid><description>&lt;p>&lt;strong>&lt;code>npm list (ls)&lt;/code>&lt;/strong> コマンドは NPM (Node Package Manager) でインストールしたパッケージの一覧を表示するコマンドですが、デフォルトでは依存モジュールをすべてツリー構造で表示するので、出力が大量になります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">インストールパッケージの一覧を表示&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm ls
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">myapp@1.0.0 D:\y\gitwork\myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">+-- textlint@11.6.3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">| +-- @textlint/ast-node-types@4.2.5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">| +-- @textlint/ast-traverse@2.1.7
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">| | `-- @textlint/ast-node-types@4.2.5 deduped
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">| +-- @textlint/feature-flag@3.1.6
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">| | `-- map-like@2.0.0 deduped
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">| +-- @textlint/fixer-formatter@3.1.13
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">| | +-- @textlint/module-interop@1.0.2 deduped
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">| | +-- @textlint/types@1.3.1 deduped
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">... なが～い出力 ...&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次のように &lt;strong>&lt;code>--depth&lt;/code>&lt;/strong> オプションを付けると、トップレベルのモジュール名だけを簡潔に表示することができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm ls --depth=0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">myapp@1.0.0 D:\y\gitwork\myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">+-- textlint@11.6.3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">+-- textlint-rule-preset-ja-technical-writing@3.1.3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">`-- textlint-rule-web-plus-db@1.1.5&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>グローバルにインストールしたモジュールを表示するときも同様です。&lt;/p></description></item><item><title>ソフトウェアアーキテクトが考えること</title><link>https://maku.blog/p/x2b2gw3/</link><pubDate>Tue, 21 Jul 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/x2b2gw3/</guid><description>&lt;h2 id="ソフトウェアアーキテクチャとは">ソフトウェアアーキテクチャとは&lt;/h2>
+&lt;p>アーキテクチャとは「&lt;strong>要求と設計の橋渡し&lt;/strong>」である ─『オブジェクト開発の神髄』より&lt;/p>
+&lt;ul>
+&lt;li>外部から見える特性&lt;/li>
+&lt;li>構成要素&lt;/li>
+&lt;li>構成要素間の関係&lt;/li>
+&lt;/ul>
+&lt;h3 id="アーキテクトが考えること">アーキテクトが考えること&lt;/h3>
+&lt;ul>
+&lt;li>何をもとにシステムを設計するか&lt;/li>
+&lt;li>部品をどのように組み立てるか&lt;/li>
+&lt;li>システムをどのように動作保証するか&lt;/li>
+&lt;li>パフォーマンス&lt;/li>
+&lt;/ul>
+&lt;h2 id="アーキテクチャドライバとは">アーキテクチャドライバとは&lt;/h2>
+&lt;p>アーキテクチャを決定する要件のことを「&lt;strong>アーキテクチャドライバ&lt;/strong>」といいます。
+つまり、アーキテクチャドライバはアーキテクチャ設計のためのインプットとなります。
+アーキテクチャドライバには以下の３つの要素があります。&lt;/p>
+&lt;ul>
+&lt;li>制約（最重要。変更できないものだから）
+&lt;ul>
+&lt;li>ビジネス制約&lt;/li>
+&lt;li>技術制約&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>品質特性
+&lt;ul>
+&lt;li>Performance 性能&lt;/li>
+&lt;li>Modifiability 変更容易性&lt;/li>
+&lt;li>Usability ユーザビリティ&lt;/li>
+&lt;li>Availability 可用性&lt;/li>
+&lt;li>Security セキュリティ&lt;/li>
+&lt;li>Testability テスト容易性&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>主な機能要件（重要性としては一番低い。ほとんどの場合、制約にかかわらず実現できるので）&lt;/li>
+&lt;/ul>
+&lt;p>アーキテクチャドライバはステークホルダーとのコミュニケーションの道具であり、このアーキテクチャドライバの作成（文章作成）を行うのがアーキテクトの最初の仕事です。&lt;/p>
+&lt;h2 id="アーキテクチャ設計のステップ">アーキテクチャ設計のステップ&lt;/h2>
+&lt;ol>
+&lt;li>アーキテクチャ要件抽出
+&lt;ol>
+&lt;li>アーキテクチャドライバの作成（要求を要件として分類する。上の３つの要素）&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>ステークホルダーと仕様優先度レビュー&lt;/li>
+&lt;li>アーキテクチャドライバに基づくシステムの分割&lt;/li>
+&lt;li>ソフトウェアアーキテクチャレビュー&lt;/li>
+&lt;/ol>
+&lt;h2 id="アーキテクチャドキュメント">アーキテクチャドキュメント&lt;/h2>
+&lt;p>ソフトウェアは様々な視点で捉えられ、これをビュー (View) と呼びます。
+アーキテクチャドキュメントはビューの集合と相互作用の説明で構成されます。&lt;/p>
+&lt;h3 id="アーキテクトが作成すべき図の例">アーキテクトが作成すべき図の例&lt;/h3>
+&lt;ul>
+&lt;li>パッケージ図
+&lt;ul>
+&lt;li>パッケージ間の依存関係&lt;/li>
+&lt;li>それぞれのパッケージに何が配置されるか&lt;/li>
+&lt;li>ソースコードやライブラリの物理構造&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>コンポーネント図&lt;/li>
+&lt;li>配置図
+&lt;ul>
+&lt;li>物理的なハードウェアやソフトウェアの配置&lt;/li>
+&lt;li>実行環境を表すノードとの接続関係など&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="アーキテクチャパターン">アーキテクチャパターン&lt;/h2>
+&lt;p>アーキテクチャパターンとは、「&lt;strong>アーキテクチャの要素と要素間の関係を使い方の制約と共に特定したもの&lt;/strong>」です。 ─出展『Principles of software architecture』。&lt;/p>
+&lt;p>様々なアーキテクチャパターンが提唱されており、GOF のデザインパターンとは違い統一された解釈は存在しません。&lt;/p>
+&lt;ul>
+&lt;li>Shaw and Garlan "Software Architecture" ― &lt;b>Shaw と Garlan のリスト&lt;/b>&lt;/li>
+&lt;li>Buschmann et al. "Pattern-oriented Software" ― &lt;b>Buschmann らのパターンシステム&lt;/b>&lt;/li>
+&lt;li>Clements et al. "Documenting Software Architecture" ― &lt;b>CMU SEI のパターンカタログ&lt;/b>&lt;/li>
+&lt;/ul>
+&lt;p>パターンの説明を覚えるより、「ルール」や「どの品質特性に影響するのか」を理解することが重要です。
+例えば、Layered Pattern に関しては、&lt;/p></description></item><item><title>UnitTest メモ: ユニットテストの網羅レベルの種類 (C0/C1/C2)</title><link>https://maku.blog/p/aet7iu7/</link><pubDate>Fri, 04 Jul 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/aet7iu7/</guid><description>&lt;ul>
+&lt;li>&lt;strong>C0&lt;/strong> &amp;hellip; &lt;b>「命令網羅」&lt;/b> 全ての処理が正しく実行される&lt;/li>
+&lt;li>&lt;strong>C1&lt;/strong> &amp;hellip; &lt;b>「分岐網羅」&lt;/b> 全ての条件が正しく実行される&lt;/li>
+&lt;li>&lt;strong>C2&lt;/strong> &amp;hellip; &lt;b>「条件網羅」&lt;/b> 全ての組み合わせの経路が実行される&lt;/li>
+&lt;/ul></description></item><item><title>Web API, REST API 設計に関するメモ</title><link>https://maku.blog/p/u54mvpk/</link><pubDate>Sun, 25 May 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/u54mvpk/</guid><description>&lt;h2 id="rest-api-サーバーが返すエラーコードhttp-レスポンスコード">REST API サーバーが返すエラーコード（HTTP レスポンスコード）&lt;/h2>
+&lt;p>まずは、最低限、下記の 3 種類のステータスコードを返すように対応するとよいです。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>200&lt;/strong> &amp;hellip; OK&lt;/li>
+&lt;li>&lt;strong>400&lt;/strong> &amp;hellip; Bad Request（クライアント側の不正）&lt;/li>
+&lt;li>&lt;strong>500&lt;/strong> &amp;hellip; Internal Server Error（サーバ側の不正）&lt;/li>
+&lt;/ul>
+&lt;p>その後、徐々に以下のように対応していきます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>200&lt;/strong> &amp;hellip; OK&lt;/li>
+&lt;li>&lt;strong>304&lt;/strong> &amp;hellip; Not Modified（クライアントキャッシュへの対応〈弱いキャッシュ〉。&lt;code>If-Modified-Since/If-Match&lt;/code> ヘッダへの対応）&lt;/li>
+&lt;li>&lt;strong>401&lt;/strong> &amp;hellip; Unauthorized（アクセスに認証が必要だが、まだ認証してアクセス権限を取得できていない）&lt;/li>
+&lt;li>&lt;strong>403&lt;/strong> &amp;hellip; Forbidden（そのリソースへのアクセス権限がない〈認可されていない〉）&lt;/li>
+&lt;li>&lt;strong>404&lt;/strong> &amp;hellip; Not Found（そのリソースは存在しない）&lt;/li>
+&lt;li>&lt;strong>500&lt;/strong> &amp;hellip; Internal Server Error&lt;/li>
+&lt;/ul>
+&lt;h2 id="url-にはバージョンを含める">URL にはバージョンを含める&lt;/h2>
+&lt;p>Web API の互換性がなくなることを見越して、URL のパス部分にはバージョン情報を含めておくとよいです（v2 以降で付けるという手もあり）。
+次のようにパスのルート直下にバージョン情報を含めることで、シンプルな構成になります。&lt;/p>
+&lt;pre tabindex="0">&lt;code>http://api.example.com/v1/users/
+&lt;/code>&lt;/pre>&lt;p>バージョン情報がインクリメントされるということは、その API がやりとりするデータに互換性がなくなることを意味します。
+バージョン情報はあくまでインタフェースのバージョンを表しています。
+API サーバー側の実装が少し変わったからといって、その都度バージョン情報を更新する必要はありません。&lt;/p></description></item><item><title>XAMPP/Apache の DocumentRoot を設定する</title><link>https://maku.blog/p/6h47cno/</link><pubDate>Sun, 29 Apr 2012 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6h47cno/</guid><description>&lt;h2 id="httpdconf-を編集">httpd.conf を編集&lt;/h2>
+&lt;p>例えば、Mac OSX にインストールした XAMPP の Apache の場合は、&lt;code>/Applications/XAMPP/xamppfiles/etc/httpd.conf&lt;/code> を編集します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">(1) DocumentRoot の変更&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">DocumentRoot &amp;#34;/Applications/XAMPP/xamppfiles/htdocs&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">↓
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">DocumentRoot &amp;#34;/Users/maku/website/public_html&amp;#34;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">(2) 対応する Directory ディレクトリの変更&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">&amp;lt;Directory &amp;#34;/Applications/XAMPP/xamppfiles/htdocs&amp;#34;&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">↓
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;lt;Directory &amp;#34;/Users/maku/website/public_html&amp;#34;&amp;gt;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="トラブルシューティング">トラブルシューティング&lt;/h2>
+&lt;p>&lt;code>http://localhost/&lt;/code> にアクセスしたときに以下のようなエラーが出た場合は、&lt;code>DocumentRoot&lt;/code> に設定したディレクトリのパーミッションを確認します。&lt;/p>
+&lt;pre tabindex="0">&lt;code>Access forbidden!
+
+You don&amp;#39;t have permission to access the requested directory.
+There is either no index document or the directory is read-protected.
+&lt;/code>&lt;/pre>&lt;p>例えば、DocumentRoot として、&lt;code>/aaa/bbb/ccc&lt;/code> を設定した場合、&lt;code>/aaa&lt;/code>、&lt;code>/aaa/bbb&lt;/code>、&lt;code>/aaa/bbb/ccc&lt;/code> 全てに read パーミッションがついている必要があります。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> chmod &lt;span class="m">0755&lt;/span> /aaa
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> chmod &lt;span class="m">0755&lt;/span> /aaa/bbb
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> chmod &lt;span class="m">0755&lt;/span> /aaa/bbb/ccc
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>CPU のアーキテクチャ名と CPU 名の対応表</title><link>https://maku.blog/p/v7bxgmn/</link><pubDate>Sun, 19 Jun 2011 00:00:00 +0900</pubDate><guid>https://maku.blog/p/v7bxgmn/</guid><description>&lt;h2 id="intel-系-cpu">Intel 系 CPU&lt;/h2>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>アーキテクチャ名&lt;/th>
+ &lt;th>CPU名&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>i386&lt;/td>
+ &lt;td>80386&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>i486&lt;/td>
+ &lt;td>80486&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>i586&lt;/td>
+ &lt;td>Pentium, MMX Pentium&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>i686&lt;/td>
+ &lt;td>Pentium Pro, Pentium II, Pentium III, Pentium 4&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>athlon&lt;/td>
+ &lt;td>Athlon, Athlon MP, Athlon XP&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>x86_64&lt;/td>
+ &lt;td>Opteron, Athlon64, Xeon (EM64T), Core, Core2Duo&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="メモ">メモ&lt;/h2>
+&lt;dl>
+&lt;dt>x86 (IA-32)&lt;/dt>
+&lt;dd>Intel 社の 8086 系のプロセッサの略称。（binary hacks より）&lt;/dd>
+&lt;dt>x86_64 (AMD64)&lt;/dt>
+&lt;dd>AMD が設計した x86 上位互換の 64 ビットプロセッサのアーキテクチャ。（binary hacks より）&lt;/dd>
+&lt;/dl></description></item><item><title>画像処理メモ: 画像の 2 値化の閾値を求める方法いろいろ</title><link>https://maku.blog/p/uyp4geh/</link><pubDate>Fri, 25 May 2001 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uyp4geh/</guid><description>&lt;ul>
+&lt;li>&lt;b>平均法&lt;/b>（平均を取るだけ）← 使えない&lt;/li>
+&lt;li>&lt;b>Pタイル法&lt;/b>（物体・背景の面積が分かっている場合）← 自動ではない&lt;/li>
+&lt;li>&lt;b>モード法&lt;/b>（極小を求める）← グラフを滑らかにする必要がある&lt;/li>
+&lt;li>&lt;b>判別分析法&lt;/b>（クラス間分散が最大となるところで２値化する）← Good&lt;/li>
+&lt;/ul></description></item></channel></rss>

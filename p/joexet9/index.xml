@@ -1,18 +1,119 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>QnA Maker のメモ on まくろぐ</title><link>https://maku.blog/p/joexet9/</link><description>Recent content in QnA Maker のメモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 17 Mar 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/joexet9/index.xml" rel="self" type="application/rss+xml"/><item><title>QnA Maker (1) QnA Maker とは？</title><link>https://maku.blog/p/2t6xrbm/</link><pubDate>Thu, 28 Feb 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2t6xrbm/</guid><description>QnA Maker でできること Microsoft が提供している QnA Maker というサービスを使用すると、「質問(Q)と回答(A)」のペアデータを登録するだけで、自然言語での FAQ 検索を行うための API を使用できるようになります。 Microsoft が提供している一連の Cognitive Service のひとつとして位置づけられていて、主に FAQ 系のチャットボット (Bot) を手軽に作成するために使用されています。
-QnA Maker QnA Maker Documentation QnA Maker REST API V4.0 QnAMaker class | Microsoft Docs 例えば、下記のような Q&amp;amp;A のペアを登録していくだけで、機械学習によって回答のモデルが自動生成されます。 QnA Maker では、このモデルのことをナレッジベース (Knowledge base) と呼んでいます。
-Q. お店の営業時間を教えてください。 A. 営業時間は午前10時から午後6時までです。 実際にユーザが入力する質問文章は、登録した Q&amp;amp;A データの質問文と完全に一致する必要はありません。 QnA Maker がどの質問に近いかを判別して、対応する回答文（と一致度）を返してくれます。
-ユーザ入力: 営業時間は？ QnA Makerの回答: 営業時間は午前10時から午後6時までです。 簡単に言ってしまえば、QnA Maker の API が提供する機能はこれだけです（データ管理用の API などもありますが）。 回答文を自動生成してくれるようなこともなく、返される文章は、Q&amp;amp;A データとして登録した回答文そのままです。 とはいえ、サクッと FAQ 系のサービスを作成するときには便利に使用できるサービスです。</description></item><item><title>QnA Maker (2) QnA Maker のサブスクリプションキー、エンドポイントキーとは</title><link>https://maku.blog/p/t6n6jc8/</link><pubDate>Mon, 18 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t6n6jc8/</guid><description>サブスクリプションキー (Subscription Key) サブスクリプションキーは、QnA Maker アプリ自体の作成や編集を行うためのキーです。 後述のエンドポイントキーよりも厳重に管理しなければならないキーです。
-このキーは、Azure ポータル上で QnA Maker のリソースを作成した際に生成されます。 QnA Maker アプリは、Azure 上にリソースを作ってからでないと作成できないため、QnA Maker アプリがすでに存在するのであれば、サブスクリプションキーも必ず存在することになります。
-Azule の QnA Maker リソースに割り当てられたサブスクリプションキーは、Azure ポータルの QnA Maker リソースの Keys のページで確認することができます。
-図: Azure ポータル上での QnA Maker のサブスクリプションキーの確認 LUIS の場合は、アプリ管理用のキーはオーサリングキーと呼んでいたりしますが、それの QnA Maker 版だと考えればよいです。 QnA Maker アプリの場合、このキーの管理は Azure ポータル上で管理されることになっており、Azure 上ではこのようなキーのことをサブスクリプションキーと呼んでいるんですね。 このあたりのチグハグ感に関しては こちらを参照。
-エンドポイントキー (Endpoint Key) エンドポイントキーは、チャットアプリなどのユーザクライアント（Bot Framework では「チャンネル」と呼びます）が、QnA Maker に対してクエリを行うときに使用するキーです。 エンドポイントキーは、QnA Maker ポータルで対象となるナレッジベースを選択後、PUBLISH タブから Publish 処理を実行したとき、あるいは SETTING タブを選択することで確認することができます。
-図: QnA Maker ポータル上での QnA Maker のエンドポイントキーの確認 チャットボットなどから QnA Maker を利用する場合、実運用時に設定する API アクセス用のキーは、こっちのエンドポイントキーです。</description></item><item><title>QnA Maker (3) Node.js から QnA Maker の API を利用する</title><link>https://maku.blog/p/rgnvp2r/</link><pubDate>Thu, 28 Feb 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rgnvp2r/</guid><description>QnA Maker API を呼び出すためのエンドポイント情報を調べる QnA Maker ナレッジベースの Publish REST API を使用して QnA Maker のナレッジベースを使用するためには、QnA Maker ポータル上で対象のナレッジベースを Publish しておく必要があります。
-Publish 処理が完了すると、ナレッジベースにアクセスするための Endpoint key が発行されます。
-curl での QnA Maker API の呼び出しテスト 任意の質問文に対する回答文を得るには、REST API として下記のような HTTP POST リクエストを送ります。
-curl -X POST https://xxx.azurewebsites.net/qnamaker/knowledgebases/＜ナレッジベースID＞/generateAnswer -H &amp;#34;Authorization: EndpointKey ＜上記で発行したキー＞&amp;#34; -H &amp;#34;Content-type: application/json&amp;#34; -d &amp;#34;{&amp;#39;question&amp;#39;:&amp;#39;&amp;lt;質問文&amp;gt;&amp;#39;}&amp;#34; Linux の curl コマンドを使用できる環境であれば、上記のように実行するだけで JSON 形式のレスポンスを確認することができます。
-Node.js から QnA Maker の REST API を呼び出す Node.js から HTTP POST リクエストを送って JSON レスポンスを取得してみます。 HTTP リクエストを行うためのモジュールとして、ここでは request モジュールを使用します。 JavaScript ファイルを作成するディレクトリと同じディレクトリ内で、下記のようにインストールしておいてください。</description></item><item><title>QnA Maker (4) Python から QnA Maker の API を利用する</title><link>https://maku.blog/p/fwyi2fh/</link><pubDate>Tue, 04 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fwyi2fh/</guid><description>QnA Maker は REST API を提供しているので、HTTP リクエストを発行できるプログラミング言語から簡単に制御することができます。 ここでは、Python に標準で付属している urllib.request モジュールを使って HTTP リクエストを発行し、QnA Maker にアクセスしてみます。
-事前準備（アクセスキーの準備） REST API を使用するには、HTTP リクエストのヘッダ情報としてアクセスキーを付加する必要があります。 こちらの記事 を参考に、下記のどちらかのアクセスキーを確認しておいてください。
-サブスクリプションキー (Subscription Key) &amp;hellip; 管理用 エンドポイントキー (Endpoint Key) &amp;hellip; クエリ用 アクセスキーは 9d16b3e6345489ad4a57a0755eb4f96a のような 16 進数文字列です。 QnA のクエリ実行だけであればエンドポイントキーの方を使えば大丈夫ですが、ナレッジベースの作成や更新などを行う場合は、サブスクリプションキーの方を使う必要があります。
-QnA Maker の REST API を呼び出す Python ライブラリ REST API は HTTP リクエストを送るだけで使用できるので、ここでは自力で QnA Maker の API を使用するライブラリを作ってみます。
-下記の QnaRequest クラスは、ナレッジベースの一覧を取得する getAllKnowledgeBases メソッドと、指定したナレッジベースの情報を取得する getKnowledgeBase メソッドを提供しています。 戻り値は JSON 形式のテキストです。
-mylib/qna.py import urllib.request class QnaRequest: BASE_URL = &amp;#39;https://westus.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>QnA Maker のメモ on まくろぐ</title><link>https://maku.blog/p/joexet9/</link><description>Recent content in QnA Maker のメモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Tue, 04 Jun 2019 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/joexet9/index.xml" rel="self" type="application/rss+xml"/><item><title>QnA Maker (1) QnA Maker とは？</title><link>https://maku.blog/p/2t6xrbm/</link><pubDate>Thu, 28 Feb 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2t6xrbm/</guid><description>&lt;h2 id="qna-maker-でできること">QnA Maker でできること&lt;/h2>
+&lt;p>Microsoft が提供している QnA Maker というサービスを使用すると、「質問(Q)と回答(A)」のペアデータを登録するだけで、自然言語での FAQ 検索を行うための API を使用できるようになります。
+Microsoft が提供している一連の Cognitive Service のひとつとして位置づけられていて、主に FAQ 系のチャットボット (Bot) を手軽に作成するために使用されています。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="500" height="268" src="../../p/2t6xrbm/about_hu6783194202617189249.png" alt="/p/2t6xrbm/about.png" />
+&lt;/figure>
+
+&lt;ul>
+&lt;li>&lt;a href="https://www.qnamaker.ai">QnA Maker&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/">QnA Maker Documentation&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://westus.dev.cognitive.microsoft.com/docs/services/5a93fcf85b4ccd136866eb37/operations/5ac266295b4ccd1554da75ff">QnA Maker REST API V4.0&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.microsoft.com/en-us/javascript/api/botbuilder-ai/qnamaker?view=botbuilder-ts-latest">QnAMaker class | Microsoft Docs&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>例えば、下記のような Q&amp;amp;A のペアを登録していくだけで、機械学習によって回答のモデルが自動生成されます。
+QnA Maker では、このモデルのことを&lt;strong>ナレッジベース (Knowledge base)&lt;/strong> と呼んでいます。&lt;/p>
+&lt;pre tabindex="0">&lt;code>Q. お店の営業時間を教えてください。
+A. 営業時間は午前10時から午後6時までです。
+&lt;/code>&lt;/pre>&lt;p>実際にユーザが入力する質問文章は、登録した Q&amp;amp;A データの質問文と完全に一致する必要はありません。
+QnA Maker がどの質問に近いかを判別して、対応する回答文（と一致度）を返してくれます。&lt;/p>
+&lt;pre tabindex="0">&lt;code>ユーザ入力: 営業時間は？
+QnA Makerの回答: 営業時間は午前10時から午後6時までです。
+&lt;/code>&lt;/pre>&lt;p>簡単に言ってしまえば、QnA Maker の API が提供する機能はこれだけです（データ管理用の API などもありますが）。
+回答文を自動生成してくれるようなこともなく、返される文章は、Q&amp;amp;A データとして登録した回答文そのままです。
+とはいえ、サクッと FAQ 系のサービスを作成するときには便利に使用できるサービスです。&lt;/p></description></item><item><title>QnA Maker (2) QnA Maker のサブスクリプションキー、エンドポイントキーとは</title><link>https://maku.blog/p/t6n6jc8/</link><pubDate>Mon, 18 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t6n6jc8/</guid><description>&lt;h2 id="サブスクリプションキー-subscription-key">サブスクリプションキー (Subscription Key)&lt;/h2>
+&lt;p>&lt;strong>サブスクリプションキー&lt;/strong>は、QnA Maker アプリ自体の作成や編集を行うためのキーです。
+後述のエンドポイントキーよりも厳重に管理しなければならないキーです。&lt;/p>
+&lt;p>このキーは、&lt;a href="https://portal.azure.com/">Azure ポータル&lt;/a>上で QnA Maker のリソースを作成した際に生成されます。
+QnA Maker アプリは、Azure 上にリソースを作ってからでないと作成できないため、QnA Maker アプリがすでに存在するのであれば、サブスクリプションキーも必ず存在することになります。&lt;/p>
+&lt;p>Azule の QnA Maker リソースに割り当てられたサブスクリプションキーは、Azure ポータルの &lt;samp>QnA Maker&lt;/samp> リソースの &lt;samp>Keys&lt;/samp> のページで確認することができます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="700" height="270" src="../../p/t6n6jc8/keys-azure_hu4122163940690173543.png" alt="/p/t6n6jc8/keys-azure.png" />
+ &lt;figcaption>図: Azure ポータル上での QnA Maker のサブスクリプションキーの確認&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>LUIS の場合は、アプリ管理用のキーは&lt;strong>オーサリングキー&lt;/strong>と呼んでいたりしますが、それの QnA Maker 版だと考えればよいです。
+QnA Maker アプリの場合、このキーの管理は Azure ポータル上で管理されることになっており、Azure 上ではこのようなキーのことをサブスクリプションキーと呼んでいるんですね。
+このあたりのチグハグ感に関しては &lt;a href="../../p/8myms6s">こちらを参照&lt;/a>。&lt;/p>
+&lt;h2 id="エンドポイントキー-endpoint-key">エンドポイントキー (Endpoint Key)&lt;/h2>
+&lt;p>&lt;strong>エンドポイントキー&lt;/strong>は、チャットアプリなどのユーザクライアント（Bot Framework では「チャンネル」と呼びます）が、QnA Maker に対してクエリを行うときに使用するキーです。
+エンドポイントキーは、QnA Maker ポータルで対象となるナレッジベースを選択後、&lt;samp>PUBLISH&lt;/samp> タブから Publish 処理を実行したとき、あるいは &lt;samp>SETTING&lt;/samp> タブを選択することで確認することができます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="700" height="312" src="../../p/t6n6jc8/keys-endpoint_hu3957920570199005946.png" alt="/p/t6n6jc8/keys-endpoint.png" />
+ &lt;figcaption>図: QnA Maker ポータル上での QnA Maker のエンドポイントキーの確認&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>チャットボットなどから QnA Maker を利用する場合、実運用時に設定する API アクセス用のキーは、こっちのエンドポイントキーです。&lt;/p></description></item><item><title>QnA Maker (3) Node.js から QnA Maker の API を利用する</title><link>https://maku.blog/p/rgnvp2r/</link><pubDate>Thu, 28 Feb 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rgnvp2r/</guid><description>&lt;h2 id="qna-maker-api-を呼び出すためのエンドポイント情報を調べる">QnA Maker API を呼び出すためのエンドポイント情報を調べる&lt;/h2>
+&lt;h3 id="qna-maker-ナレッジベースの-publish">QnA Maker ナレッジベースの Publish&lt;/h3>
+&lt;p>REST API を使用して QnA Maker のナレッジベースを使用するためには、&lt;a href="https://qnamaker.ai/">QnA Maker ポータル&lt;/a>上で対象のナレッジベースを Publish しておく必要があります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="500" height="238" src="../../p/rgnvp2r/qna-from-nodejs_hu579909413149075782.png" alt="/p/rgnvp2r/qna-from-nodejs.png" />
+&lt;/figure>
+
+&lt;p>Publish 処理が完了すると、ナレッジベースにアクセスするための &lt;strong>Endpoint key&lt;/strong> が発行されます。&lt;/p>
+&lt;h3 id="curl-での-qna-maker-api-の呼び出しテスト">curl での QnA Maker API の呼び出しテスト&lt;/h3>
+&lt;p>任意の質問文に対する回答文を得るには、REST API として下記のような HTTP POST リクエストを送ります。&lt;/p>
+&lt;pre tabindex="0">&lt;code>curl -X POST
+ https://xxx.azurewebsites.net/qnamaker/knowledgebases/＜ナレッジベースID＞/generateAnswer
+ -H &amp;#34;Authorization: EndpointKey ＜上記で発行したキー＞&amp;#34;
+ -H &amp;#34;Content-type: application/json&amp;#34;
+ -d &amp;#34;{&amp;#39;question&amp;#39;:&amp;#39;&amp;lt;質問文&amp;gt;&amp;#39;}&amp;#34;
+&lt;/code>&lt;/pre>&lt;p>Linux の &lt;code>curl&lt;/code> コマンドを使用できる環境であれば、上記のように実行するだけで JSON 形式のレスポンスを確認することができます。&lt;/p>
+&lt;h2 id="nodejs-から-qna-maker-の-rest-api-を呼び出す">Node.js から QnA Maker の REST API を呼び出す&lt;/h2>
+&lt;p>Node.js から HTTP POST リクエストを送って JSON レスポンスを取得してみます。
+HTTP リクエストを行うためのモジュールとして、ここでは &lt;code>request&lt;/code> モジュールを使用します。
+JavaScript ファイルを作成するディレクトリと同じディレクトリ内で、下記のようにインストールしておいてください。&lt;/p></description></item><item><title>QnA Maker (4) Python から QnA Maker の API を利用する</title><link>https://maku.blog/p/fwyi2fh/</link><pubDate>Tue, 04 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fwyi2fh/</guid><description>&lt;p>QnA Maker は REST API を提供しているので、HTTP リクエストを発行できるプログラミング言語から簡単に制御することができます。
+ここでは、Python に標準で付属している &lt;strong>&lt;code>urllib.request&lt;/code>&lt;/strong> モジュールを使って HTTP リクエストを発行し、QnA Maker にアクセスしてみます。&lt;/p>
+&lt;h2 id="事前準備アクセスキーの準備">事前準備（アクセスキーの準備）&lt;/h2>
+&lt;p>REST API を使用するには、HTTP リクエストのヘッダ情報としてアクセスキーを付加する必要があります。
+&lt;a href="../../p/t6n6jc8">こちらの記事&lt;/a> を参考に、下記のどちらかのアクセスキーを確認しておいてください。&lt;/p>
+&lt;ul>
+&lt;li>サブスクリプションキー (Subscription Key) &amp;hellip; 管理用&lt;/li>
+&lt;li>エンドポイントキー (Endpoint Key) &amp;hellip; クエリ用&lt;/li>
+&lt;/ul>
+&lt;p>アクセスキーは &lt;code>9d16b3e6345489ad4a57a0755eb4f96a&lt;/code> のような 16 進数文字列です。
+QnA のクエリ実行だけであればエンドポイントキーの方を使えば大丈夫ですが、ナレッジベースの作成や更新などを行う場合は、サブスクリプションキーの方を使う必要があります。&lt;/p>
+&lt;h2 id="qna-maker-の-rest-api-を呼び出す-python-ライブラリ">QnA Maker の REST API を呼び出す Python ライブラリ&lt;/h2>
+&lt;p>REST API は HTTP リクエストを送るだけで使用できるので、ここでは自力で QnA Maker の API を使用するライブラリを作ってみます。&lt;/p>
+&lt;p>下記の &lt;code>QnaRequest&lt;/code> クラスは、ナレッジベースの一覧を取得する &lt;code>getAllKnowledgeBases&lt;/code> メソッドと、指定したナレッジベースの情報を取得する &lt;code>getKnowledgeBase&lt;/code> メソッドを提供しています。
+戻り値は JSON 形式のテキストです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">mylib/qna.py&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">urllib.request&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">QnaRequest&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BASE_URL&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;https://westus.api.cognitive.microsoft.com/qnamaker/v4.0&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="fm">__init__&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">subscriptionKey&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_subscriptionKey&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">subscriptionKey&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_setup_opener&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">_setup_opener&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_opener&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">urllib&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">request&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">build_opener&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_opener&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">addheaders&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Ocp-Apim-Subscription-Key&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_subscriptionKey&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">_get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">with&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_opener&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QnaRequest&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">BASE_URL&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">res&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">res&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">read&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">decode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;utf-8&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">getAllKnowledgeBases&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;すべてのナレッジベースの情報を取得します。&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;/knowledgebases/&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">getKnowledgeBase&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">id&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;指定したナレッジベースの情報を取得します。&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">_get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;/knowledgebases/&lt;/span>&lt;span class="si">{}&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">id&lt;/span>&lt;span class="p">))&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>HTTP リクエストを送るときには、&lt;code>Ocp-Apim-Subscription-Key&lt;/code> ヘッダでアクセス用のキーを付加するようにしています。&lt;/p></description></item></channel></rss>

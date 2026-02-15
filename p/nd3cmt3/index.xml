@@ -1,28 +1,268 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ネットワーク関連技術メモ on まくろぐ</title><link>https://maku.blog/p/nd3cmt3/</link><description>Recent content in ネットワーク関連技術メモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Fri, 08 Mar 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/nd3cmt3/index.xml" rel="self" type="application/rss+xml"/><item><title>HTTP/1.1 の Chunked Transfer Encoding を理解する</title><link>https://maku.blog/p/ugkqy8z/</link><pubDate>Fri, 08 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ugkqy8z/</guid><description>Chunked Transfer Encoding (Coding) とは HTTP/1.1 では Transfer-Encoding: chunked というレスポンスヘッダーを返すことにより、本文（ペイロード）部分を少しずつ返すことができるようになっています。 この仕組みを使うと、クライアントが最初のデータを受信するまでの時間 (TTFB: Time To First Byte) を短くすることができます。
-例えば、次の HTTP レスポンスの例では、Hello と World というテキストを分けて送っています（これらをチャンクと呼んでいます）。 各行末は \r\n で終わっていると考えてください。
-Transfer-Encoding: chunked のレスポンス例 HTTP/1.1 200 OK Content-Type: text/plain Transfer-Encoding: chunked 5 Hello 5 World 0 各チャンクは、サイズ（16進数文字列）とデータが &amp;lt;サイズ&amp;gt;\r\n&amp;lt;データ&amp;gt;\r\n というペアの形で送られます。 そして、最後はサイズ 0 のチャンク (0\r\n\r\n) を送ることで、すべてのデータの送信が完了したことを示します。
-HTTP/1.1 のレスポンスには、この Transfer-Encoding: chunked ヘッダーか、Content-Length ヘッダーのいずれか一方を含む必要があります。 本文全体を一度に送る場合は、Content-Length ヘッダーで本文全体のサイズ（オクテット数）を示します。
-☝️ なぜサイズ情報が必要なのか？ Transfer-Encoding: chunked と Content-Length のどちらを使う場合も、本文のデータサイズを送ることが前提となっています。 これは、クライアント側で一連のデータの受信を完了したことを判断できるようにするためです。
-HTTP 接続では半二重通信が行われるため、1 つのリクエストのやりとりがすべて完了するまで、次のリクエストを送ることができません。 クライアントでデータの受信完了タイミングを判断できれば、次のリクエスト用にその接続を使いまわすことができます (Connection: keep-alive)。</description></item><item><title>ConoHa VPS を借りて独自ドメインでアクセスできるようにする</title><link>https://maku.blog/p/n5emu3a/</link><pubDate>Mon, 27 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n5emu3a/</guid><description>何をするか？ ConoHa の VPS を借りたので、そのときの設定手順をメモしておきます。 大体こんな感じのことをしています。
-ConoHa VPS を契約 して Ubuntu 22.04 を起動 お名前.com で独自ドメインを取得 独自ドメインで ConoHa VPS にアクセスできるようにする（IPv6 も有効化） ConoHa VPS はリーズナブルかつ API でのサーバー管理ができたりして、徐々に人気が高まってきてるみたいです。 安いプランであれば月額数百円で借りることができます。 Docker コンテナやデータベース (RDB) をホストするサーバーが欲しかったのですが、AWS や Azure はプライベートで使うには高すぎるので、今回は ConoHa VPS を採用しました。
-VPS にはグローバル IP アドレスが割り当てられるので独自ドメインは必須ではないですが、やはりドメイン名でアクセスできた方がよいので、いつも通り お名前.com でドメイン取得しました。 ここでは、example.com というドメインを取得したものとして説明しています。
-ConoHa のアカウントを作って VPS を契約 何はともあれ、まずは ConoHa のアカウントを作って ConoHa VPS を借ります。 ポチポチやってけば終わります。
-図: ConoHa VPS での OS の選択 VPS の初期 OS として、Ubuntu 22.04 を選択しました。 上記は選択できる OS の一例ですが、他にもいろいろあります。</description></item><item><title>HTTP/1.1 の認証スキームに関するメモ</title><link>https://maku.blog/p/ufpqqno/</link><pubDate>Sun, 01 May 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ufpqqno/</guid><description>認証スキーム とは、HTTP のリクエストヘッダに指定する Authentication ヘッダーの先頭部分に指定する文字列のこと。
-Basic &amp;hellip; RFC2617 Web ブラウザが標準でサポートしている。 Bearer &amp;hellip; RFC6750 OAuth 2.0 で使われている認証スキームのひとつ。 署名を行う必要はなく、受け取った値をそのまま使える。 Digest &amp;hellip; RFC2617 Web ブラウザが標準でサポートしている。 Negotiate &amp;hellip; RFC4559 OAuth &amp;hellip; RFC5849 OAuth 1.0 で使われていた認証スキーム。 署名のルールが複雑すぎて廃れた。 参考リンク
-RFC7235 - Hypertext Transfer Protocol (HTTP/1.1): Authentication RFC7236 - Initial Hypertext Transfer Protocol (HTTP): Authentication Scheme Registrations</description></item><item><title>ドメイン管理と DNS 管理の違いを理解する</title><link>https://maku.blog/p/bwamwgp/</link><pubDate>Sun, 25 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bwamwgp/</guid><description>ドメイン管理と DNS サーバー 「独自ドメイン＋レンタルサーバー」を契約してブログサイトなどを立ち上げようとすると、どうしてもドメイン管理や DNS 設定を行う必要が出てきます。 同じ会社で一括契約すると、まとめて設定できたりしますが、これらは本来別々のサービスなので、ここで簡単に整理しておきます。
-ドメイン取得・管理は、レジストラ（およびその委託先会社）が行っており、世界で一意なドメインを運用します。 日本では、お名前.com (by GMO) などが有名ですね。 一方で、DNS サービスは、このドメイン名を具体的な IP アドレスに関連づける機能を提供します。
-レジストラ（ドメイン管理会社）が提供するドメイン管理サービスは、あくまでドメイン名を管理しているだけであり、DNS の機能を提供しているわけではありません。 なので、ドメイン管理会社でドメインを取得したら、そのドメインの名前解決に使用する DNS サーバーのアドレスを教えてあげる必要があります。 上の図では、お名前.com のドメイン管理設定で、さくらインターネットの DNS サーバー (ns1/2.dns.ne.jp) のアドレスを設定する例を示しています。
-この設定により、ユーザーが example.com にアクセスしようとすると、DNS サーバー (ns1.dns.ne.jp) によって IP アドレス (12.34.56.78) に変換され、そのアドレスの Web サーバーにアクセスできるという仕組みになっています。
-組み合わせの例 ドメイン取得・管理 DNS サーバー Web サーバー お名前.com お名前.com お名前.com お名前.com さくらインターネット さくらインターネット お名前.com AWS (R53) AWS (EC2) 多くの場合、こんな感じで DNS サーバーと Web サーバーは同じ会社のものを使います。 レンタルサーバーのアドレスなどを自動で設定できたりして便利だからです。 DNS サーバーの使用料金はレンタルサーバーの使用料金に含まれていることが多いですが、AWS の R53 などは個別に使用料金がかかります。
-一方、ドメイン取得・管理会社の方は、年ごとの更新費用などが安い「お名前.com」などを選ぶことが多いです。 Amazon (AWS) などのクラウドサービスでもドメイン取得できたりしますが、ちょっとお値段高めです。</description></item><item><title>WinSCP をコマンドラインから利用して2つのディレクトリを同期する</title><link>https://maku.blog/p/eqrmt6x/</link><pubDate>Fri, 21 Sep 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/eqrmt6x/</guid><description>WinSCP のインストール WinSCP の本体は下記のサイトからダウンロードできます。
-WinSCP :: Official Site :: Download ここでは、コマンドラインから winscp.exe を使用しますので、インストーラを使ってインストールするときに、カスタムインストールを選択し、インストールディレクトリを環境変数(%PATH%)に追加を選択してください。
-winscp コマンドでリモートホストへディレクトリをコピーする ローカルディレクトリの内容を、リモートにあるディレクトリへ同期させるには、次のように winscp.exe の /synchronize オプションを使用します。
-winscp [mysession] /synchronize [local_directory] [remote_directory] 例えば、example.com というホストに、ユーザ名 user で接続してローカルの website ディレクトリ内のファイルを user のホームディレクトリの public_html ディレクトリに同期させるには次のようにします。
-例: ローカルの website をリモートの public_html へ winscp user@example.com /synchronize &amp;#34;C:\Users\maku\website&amp;#34; &amp;#34;/user/maku/public_html&amp;#34; 参考 WinSCP のドキュメント (Command-line Options)</description></item><item><title>HTTP ヘッダに関するメモ</title><link>https://maku.blog/p/3kkchub/</link><pubDate>Sat, 15 Dec 2012 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3kkchub/</guid><description>HTTP1.1 Host 指定 HTTP1.1 では、メッセージヘッダーに Host: &amp;lt;ドメイン&amp;gt; の指定が必須です（これが唯一の必須ヘッダーです）。 これは、1 台の Web サーバーで複数のドメインを運用する、バーチャルホストの機能を実現するために必要とされています。 Web サーバーは、Host ヘッダーで示されたドメイン名と、相対 URI (/index.html など）を組み合わせて、実際のどのリソースを返すかを判断します。 HTTP1.0 を使う場合は、Host: の指定は必要ありません。
-HTTP キープアライブ HTTP1.1 では、最初にスリーウェイハンドシェイクしたら、そのコネクションを一定時間使い続けることで、複数のリソースファイルの取得を効率化しています。 これを HTTP キープアライブ (KeepAlive) といい、HTTP1.1 では標準の振る舞いになっています（HTTP ヘッダーに Connection: keep-alive が付いていると考えるが規定の動作)。 例えば、ブラウザで Web ページを開くと、HTML ファイルだけではなく、CSS ファイルや画像ファイルなどのリソースを取得するために複数のリクエストが発行されますが、そこでは同じコネクションが使用されます。
-コネクションの切断は、サーバーが設定しているタイムアウト時間を過ぎたときに行われますが、クライアントあるいはサーバーが Connection: close ヘッダーを含めることで、切断する意志を伝えることができます。
-プロキシ経由時の「リクエスト行」の URI について プロキシサーバを介する場合は、リクエスト行に 絶対アドレス指定 で URI を指定する必要があります。 これは、リクエストを受け取ったプロキシサーバが、リクエストの転送先サーバを判断するためです。 逆に、プロキシを使わない場合は、リクエスト URI は相対パスで指定します。
-Client ｜ ｜ GET http://target.example.com/index.html HTTP/1.1 ▽ Proxy server ｜ ｜ GET /index.html HTTP/1.1 ▽ target.</description></item><item><title>ネットワークトラブルの調査手順</title><link>https://maku.blog/p/eecgkww/</link><pubDate>Sun, 10 Oct 2010 00:00:00 +0900</pubDate><guid>https://maku.blog/p/eecgkww/</guid><description>ネットワークトラブルはホストに近いところからチェックしていくのがセオリーです。 ソフトウェア的要因よりも、ハードウェア的要因の方を先に調べるのがよいです。
-ハードウェア的要因 ケーブルの断線 NIC の故障 電源の故障 ポートの接触不良 機器の熱暴走 ソフトウェア的要因 IP アドレスの設定ミス デフォルトゲートウェイの設定ミス VLAN の設定ミス ルーティングテーブルの不具合 サーバアプリケーションの設定ミス／不具合 参考: NETWORKWORLD - May 2007
-ping による調査 あるホストに ping が通らないときは、以下の順番で ping を通す確認をしていきます。 テスト結果は正常時の結果と比べなければ意味がないので、正常時の tracert 結果などを定期的にとっておくことが重要です。
-ループバックアドレスに対して ping TCP/IP モジュールの異常の可能性 ホストの IP アドレスへ ping OS が NIC を認識していない可能性 同じスイッチに接続された別の PC へ ping スイッチのポート、ケーブルの故障 VLAN の設定ミス、接続ミス スイッチ自体には IP アドレスは設定されないので、別の PC に ping することで、スイッチまでの接続を確認する。 ルータに ping ルータのダウン、アドレス設定ミス ルータの別のポートへ ping ルーティングプロセスの異常 インタフェースの設定ミス ルータは複数のネットワークにつながっているので、別のネットワーク用のポートにも ping する必要がある。 異なるネットワークの PC へ ping tracert で、通信不能ネットワークを切り分け ターゲットホストに ping ターゲットホストのダウン アプリケーソンレベルの確認 参考: NETWORKWORLD - May 2007</description></item><item><title>IETF によるプロトコル標準化の流れ</title><link>https://maku.blog/p/44o4a9p/</link><pubDate>Wed, 01 Oct 2003 00:00:00 +0900</pubDate><guid>https://maku.blog/p/44o4a9p/</guid><description>プロトタイプが普及する 独自バージョンが作られるようになる IETF (Internet Engineering Task Force) の援助で Working group が作られる Working group は「インターネットドラフト」としてプロトコルを文書化する IETF の IESG (Internet Engineering Steering Group) に提出する 実験期間を経て、IESG によって RFC 番号が割り当てられ、修正などをして「実験 RFC」として公表される 実際の運用によるテストを経て、IESG が「提案標準」として認定する IESG が「ドラフト標準」に推薦する プロトコルに STD 番号が割り当てられ、RFC に加えて STD となる 上記の流れで最低でも 10 ヵ月以上はかかる。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ネットワーク関連技術メモ on まくろぐ</title><link>https://maku.blog/p/nd3cmt3/</link><description>Recent content in ネットワーク関連技術メモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Fri, 08 Mar 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/nd3cmt3/index.xml" rel="self" type="application/rss+xml"/><item><title>HTTP/1.1 の Chunked Transfer Encoding を理解する</title><link>https://maku.blog/p/ugkqy8z/</link><pubDate>Fri, 08 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ugkqy8z/</guid><description>&lt;h2 id="chunked-transfer-encoding-coding-とは">Chunked Transfer Encoding (Coding) とは&lt;/h2>
+&lt;p>HTTP/1.1 では &lt;a href="https://datatracker.ietf.org/doc/html/rfc9112#section-7.1">&lt;code>Transfer-Encoding: chunked&lt;/code>&lt;/a> というレスポンスヘッダーを返すことにより、本文（ペイロード）部分を少しずつ返すことができるようになっています。
+この仕組みを使うと、クライアントが最初のデータを受信するまでの時間 (TTFB: Time To First Byte) を短くすることができます。&lt;/p>
+&lt;p>例えば、次の HTTP レスポンスの例では、&lt;code>Hello&lt;/code> と &lt;code>World&lt;/code> というテキストを分けて送っています（これらをチャンクと呼んでいます）。
+各行末は &lt;code>\r\n&lt;/code> で終わっていると考えてください。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Transfer-Encoding: chunked のレスポンス例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">HTTP/1.1 200 OK
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Content-Type: text/plain
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Transfer-Encoding: chunked
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Hello
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">World
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">　&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>各チャンクは、サイズ（16進数文字列）とデータが &lt;strong>&lt;code>&amp;lt;サイズ&amp;gt;\r\n&amp;lt;データ&amp;gt;\r\n&lt;/code>&lt;/strong> というペアの形で送られます。
+そして、最後はサイズ 0 のチャンク (&lt;code>0\r\n\r\n&lt;/code>) を送ることで、すべてのデータの送信が完了したことを示します。&lt;/p>
+&lt;p>HTTP/1.1 のレスポンスには、この &lt;code>Transfer-Encoding: chunked&lt;/code> ヘッダーか、&lt;a href="https://datatracker.ietf.org/doc/html/rfc9112#name-content-length">&lt;code>Content-Length&lt;/code>&lt;/a> ヘッダーのいずれか一方を含む必要があります。
+本文全体を一度に送る場合は、&lt;code>Content-Length&lt;/code> ヘッダーで本文全体のサイズ（オクテット数）を示します。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ なぜサイズ情報が必要なのか？&lt;/span>
+ &lt;span class="xNote_body">&lt;p>&lt;code>Transfer-Encoding: chunked&lt;/code> と &lt;code>Content-Length&lt;/code> のどちらを使う場合も、本文のデータサイズを送ることが前提となっています。
+これは、クライアント側で一連のデータの受信を完了したことを判断できるようにするためです。&lt;/p>
+&lt;p>HTTP 接続では半二重通信が行われるため、1 つのリクエストのやりとりがすべて完了するまで、次のリクエストを送ることができません。
+クライアントでデータの受信完了タイミングを判断できれば、次のリクエスト用にその接続を使いまわすことができます (&lt;code>Connection: keep-alive&lt;/code>)。&lt;/p></description></item><item><title>ConoHa VPS を借りて独自ドメインでアクセスできるようにする</title><link>https://maku.blog/p/n5emu3a/</link><pubDate>Mon, 27 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n5emu3a/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8C+FN831U+50+4YR6O2" rel="nofollow">ConoHa の VPS&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=3NCT8C+FN831U+50+4YR6O2" alt="">
+ を借りたので、そのときの設定手順をメモしておきます。
+大体こんな感じのことをしています。&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8C+FN831U+50+4YR6O2" rel="nofollow">ConoHa VPS を契約&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=3NCT8C+FN831U+50+4YR6O2" alt="">
+ して Ubuntu 22.04 を起動&lt;/li>
+&lt;li>&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8C+EVU582+50+2HHVNM" rel="nofollow">お名前.com で独自ドメインを取得&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=3NCT8C+EVU582+50+2HHVNM" alt="">
+&lt;/li>
+&lt;li>独自ドメインで ConoHa VPS にアクセスできるようにする（IPv6 も有効化）&lt;/li>
+&lt;/ol>
+&lt;p>ConoHa VPS はリーズナブルかつ API でのサーバー管理ができたりして、徐々に人気が高まってきてるみたいです。
+安いプランであれば月額数百円で借りることができます。
+Docker コンテナやデータベース (RDB) をホストするサーバーが欲しかったのですが、AWS や Azure はプライベートで使うには高すぎるので、今回は ConoHa VPS を採用しました。&lt;/p>
+&lt;p>VPS にはグローバル IP アドレスが割り当てられるので独自ドメインは必須ではないですが、やはりドメイン名でアクセスできた方がよいので、いつも通り &lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8C+EVU582+50+2HHVNM" rel="nofollow">お名前.com&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=3NCT8C+EVU582+50+2HHVNM" alt="">
+ でドメイン取得しました。
+ここでは、&lt;code>example.com&lt;/code> というドメインを取得したものとして説明しています。&lt;/p>
+&lt;h2 id="conoha-のアカウントを作って-vps-を契約">ConoHa のアカウントを作って VPS を契約&lt;/h2>
+&lt;p>何はともあれ、まずは ConoHa のアカウントを作って &lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8C+FN831U+50+4YR6O2" rel="nofollow">ConoHa VPS&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=3NCT8C+FN831U+50+4YR6O2" alt="">
+ を借ります。
+ポチポチやってけば終わります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1932" height="412" src="../../p/n5emu3a/img-001.png" alt="/p/n5emu3a/img-001.png" />
+ &lt;figcaption>図: ConoHa VPS での OS の選択&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>VPS の初期 OS として、&lt;strong>Ubuntu 22.04&lt;/strong> を選択しました。
+上記は選択できる OS の一例ですが、他にもいろいろあります。&lt;/p></description></item><item><title>HTTP/1.1 の認証スキームに関するメモ</title><link>https://maku.blog/p/ufpqqno/</link><pubDate>Sun, 01 May 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ufpqqno/</guid><description>&lt;p>&lt;strong>認証スキーム&lt;/strong> とは、HTTP のリクエストヘッダに指定する Authentication ヘッダーの先頭部分に指定する文字列のこと。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>Basic&lt;/code> &amp;hellip; &lt;a href="https://datatracker.ietf.org/doc/html/rfc2617">RFC2617&lt;/a>
+&lt;ul>
+&lt;li>Web ブラウザが標準でサポートしている。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Bearer&lt;/code> &amp;hellip; &lt;a href="https://datatracker.ietf.org/doc/html/rfc6750">RFC6750&lt;/a>
+&lt;ul>
+&lt;li>OAuth 2.0 で使われている認証スキームのひとつ。&lt;/li>
+&lt;li>署名を行う必要はなく、受け取った値をそのまま使える。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Digest&lt;/code> &amp;hellip; &lt;a href="https://datatracker.ietf.org/doc/html/rfc2617">RFC2617&lt;/a>
+&lt;ul>
+&lt;li>Web ブラウザが標準でサポートしている。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Negotiate&lt;/code> &amp;hellip; &lt;a href="https://datatracker.ietf.org/doc/html/rfc4559">RFC4559&lt;/a>&lt;/li>
+&lt;li>&lt;code>OAuth&lt;/code> &amp;hellip; &lt;a href="https://datatracker.ietf.org/doc/html/rfc5849">RFC5849&lt;/a>
+&lt;ul>
+&lt;li>OAuth 1.0 で使われていた認証スキーム。&lt;/li>
+&lt;li>署名のルールが複雑すぎて廃れた。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>参考リンク&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://datatracker.ietf.org/doc/html/rfc7235">RFC7235 - Hypertext Transfer Protocol (HTTP/1.1): Authentication&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://datatracker.ietf.org/doc/html/rfc7236">RFC7236 - Initial Hypertext Transfer Protocol (HTTP): Authentication Scheme Registrations&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>ドメイン管理と DNS 管理の違いを理解する</title><link>https://maku.blog/p/bwamwgp/</link><pubDate>Sun, 25 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bwamwgp/</guid><description>&lt;h2 id="ドメイン管理と-dns-サーバー">ドメイン管理と DNS サーバー&lt;/h2>
+&lt;p>「独自ドメイン＋レンタルサーバー」を契約してブログサイトなどを立ち上げようとすると、どうしてもドメイン管理や DNS 設定を行う必要が出てきます。
+同じ会社で一括契約すると、まとめて設定できたりしますが、これらは本来別々のサービスなので、ここで簡単に整理しておきます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/bwamwgp/img-001.svg" alt="/p/bwamwgp/img-001.svg" />
+&lt;/figure>
+
+&lt;p>ドメイン取得・管理は、レジストラ（およびその委託先会社）が行っており、世界で一意なドメインを運用します。
+日本では、&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8C+EVU582+50+2HHVNM" rel="nofollow">お名前.com (by GMO)&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=3NCT8C+EVU582+50+2HHVNM" alt="">
+ などが有名ですね。
+一方で、DNS サービスは、このドメイン名を具体的な IP アドレスに関連づける機能を提供します。&lt;/p>
+&lt;p>レジストラ（ドメイン管理会社）が提供するドメイン管理サービスは、あくまでドメイン名を管理しているだけであり、DNS の機能を提供しているわけではありません。
+なので、ドメイン管理会社でドメインを取得したら、そのドメインの名前解決に使用する DNS サーバーのアドレスを教えてあげる必要があります。
+上の図では、&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8C+EVU582+50+2HHVNM" rel="nofollow">お名前.com&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=3NCT8C+EVU582+50+2HHVNM" alt="">
+ のドメイン管理設定で、さくらインターネットの DNS サーバー (ns1/2.dns.ne.jp) のアドレスを設定する例を示しています。&lt;/p>
+&lt;p>この設定により、ユーザーが &lt;code>example.com&lt;/code> にアクセスしようとすると、DNS サーバー (ns1.dns.ne.jp) によって IP アドレス (12.34.56.78) に変換され、そのアドレスの Web サーバーにアクセスできるという仕組みになっています。&lt;/p>
+&lt;h2 id="組み合わせの例">組み合わせの例&lt;/h2>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>ドメイン取得・管理&lt;/th>
+ &lt;th>DNS サーバー&lt;/th>
+ &lt;th>Web サーバー&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>お名前.com&lt;/td>
+ &lt;td>お名前.com&lt;/td>
+ &lt;td>お名前.com&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>お名前.com&lt;/td>
+ &lt;td>さくらインターネット&lt;/td>
+ &lt;td>さくらインターネット&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>お名前.com&lt;/td>
+ &lt;td>AWS (R53)&lt;/td>
+ &lt;td>AWS (EC2)&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;p>多くの場合、こんな感じで DNS サーバーと Web サーバーは同じ会社のものを使います。
+レンタルサーバーのアドレスなどを自動で設定できたりして便利だからです。
+DNS サーバーの使用料金はレンタルサーバーの使用料金に含まれていることが多いですが、AWS の R53 などは個別に使用料金がかかります。&lt;/p>
+&lt;p>一方、ドメイン取得・管理会社の方は、年ごとの更新費用などが安い「お名前.com」などを選ぶことが多いです。
+Amazon (AWS) などのクラウドサービスでもドメイン取得できたりしますが、ちょっとお値段高めです。&lt;/p></description></item><item><title>WinSCP をコマンドラインから利用して2つのディレクトリを同期する</title><link>https://maku.blog/p/eqrmt6x/</link><pubDate>Fri, 21 Sep 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/eqrmt6x/</guid><description>&lt;h2 id="winscp-のインストール">WinSCP のインストール&lt;/h2>
+&lt;p>WinSCP の本体は下記のサイトからダウンロードできます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://winscp.net/eng/download.php">WinSCP :: Official Site :: Download&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>ここでは、コマンドラインから &lt;code>winscp.exe&lt;/code> を使用しますので、インストーラを使ってインストールするときに、&lt;strong>カスタムインストール&lt;/strong>を選択し、&lt;strong>インストールディレクトリを環境変数(%PATH%)に追加&lt;/strong>を選択してください。&lt;/p>
+&lt;h2 id="winscp-コマンドでリモートホストへディレクトリをコピーする">winscp コマンドでリモートホストへディレクトリをコピーする&lt;/h2>
+&lt;p>ローカルディレクトリの内容を、リモートにあるディレクトリへ同期させるには、次のように &lt;code>winscp.exe&lt;/code> の &lt;code>/synchronize&lt;/code> オプションを使用します。&lt;/p>
+&lt;pre tabindex="0">&lt;code>winscp [mysession] /synchronize [local_directory] [remote_directory]
+&lt;/code>&lt;/pre>&lt;p>例えば、&lt;code>example.com&lt;/code> というホストに、ユーザ名 &lt;code>user&lt;/code> で接続してローカルの &lt;code>website&lt;/code> ディレクトリ内のファイルを &lt;code>user&lt;/code> のホームディレクトリの &lt;code>public_html&lt;/code> ディレクトリに同期させるには次のようにします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例: ローカルの website をリモートの public_html へ&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">winscp user@example.com /synchronize &amp;#34;C:\Users\maku\website&amp;#34; &amp;#34;/user/maku/public_html&amp;#34;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="参考">参考&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a href="https://winscp.net/eng/docs/commandline">WinSCP のドキュメント (Command-line Options)&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>HTTP ヘッダに関するメモ</title><link>https://maku.blog/p/3kkchub/</link><pubDate>Sat, 15 Dec 2012 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3kkchub/</guid><description>&lt;h2 id="http11">HTTP1.1&lt;/h2>
+&lt;h3 id="host-指定">Host 指定&lt;/h3>
+&lt;p>HTTP1.1 では、メッセージヘッダーに &lt;strong>&lt;code>Host: &amp;lt;ドメイン&amp;gt;&lt;/code>&lt;/strong> の指定が必須です（これが唯一の必須ヘッダーです）。
+これは、1 台の Web サーバーで複数のドメインを運用する、バーチャルホストの機能を実現するために必要とされています。
+Web サーバーは、&lt;code>Host&lt;/code> ヘッダーで示されたドメイン名と、相対 URI (&lt;code>/index.html&lt;/code> など）を組み合わせて、実際のどのリソースを返すかを判断します。
+HTTP1.0 を使う場合は、&lt;code>Host:&lt;/code> の指定は必要ありません。&lt;/p>
+&lt;h3 id="http-キープアライブ">HTTP キープアライブ&lt;/h3>
+&lt;p>HTTP1.1 では、最初にスリーウェイハンドシェイクしたら、そのコネクションを一定時間使い続けることで、複数のリソースファイルの取得を効率化しています。
+これを HTTP キープアライブ (KeepAlive) といい、HTTP1.1 では標準の振る舞いになっています（HTTP ヘッダーに &lt;strong>&lt;code>Connection: keep-alive&lt;/code>&lt;/strong> が付いていると考えるが規定の動作)。
+例えば、ブラウザで Web ページを開くと、HTML ファイルだけではなく、CSS ファイルや画像ファイルなどのリソースを取得するために複数のリクエストが発行されますが、そこでは同じコネクションが使用されます。&lt;/p>
+&lt;p>コネクションの切断は、サーバーが設定しているタイムアウト時間を過ぎたときに行われますが、クライアントあるいはサーバーが &lt;strong>&lt;code>Connection: close&lt;/code>&lt;/strong> ヘッダーを含めることで、切断する意志を伝えることができます。&lt;/p>
+&lt;h2 id="プロキシ経由時のリクエスト行の-uri-について">プロキシ経由時の「リクエスト行」の URI について&lt;/h2>
+&lt;p>プロキシサーバを介する場合は、リクエスト行に &lt;strong>絶対アドレス指定&lt;/strong> で URI を指定する必要があります。
+これは、リクエストを受け取ったプロキシサーバが、リクエストの転送先サーバを判断するためです。
+逆に、プロキシを使わない場合は、リクエスト URI は相対パスで指定します。&lt;/p>
+&lt;pre tabindex="0">&lt;code>Client
+ ｜
+ ｜ GET http://target.example.com/index.html HTTP/1.1
+ ▽
+Proxy server
+ ｜
+ ｜ GET /index.html HTTP/1.1
+ ▽
+target.example.com
+&lt;/code>&lt;/pre>&lt;h2 id="http-のメッセージヘッダの種類">HTTP のメッセージヘッダの種類&lt;/h2>
+&lt;p>HTTP のメッセージヘッダには、大きく分けて、&lt;/p></description></item><item><title>ネットワークトラブルの調査手順</title><link>https://maku.blog/p/eecgkww/</link><pubDate>Sun, 10 Oct 2010 00:00:00 +0900</pubDate><guid>https://maku.blog/p/eecgkww/</guid><description>&lt;p>ネットワークトラブルはホストに近いところからチェックしていくのがセオリーです。
+ソフトウェア的要因よりも、ハードウェア的要因の方を先に調べるのがよいです。&lt;/p>
+&lt;ul>
+&lt;li>&lt;b>ハードウェア的要因&lt;/b>
+&lt;ul>
+&lt;li>ケーブルの断線&lt;/li>
+&lt;li>NIC の故障&lt;/li>
+&lt;li>電源の故障&lt;/li>
+&lt;li>ポートの接触不良&lt;/li>
+&lt;li>機器の熱暴走&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;b>ソフトウェア的要因&lt;/b>
+&lt;ul>
+&lt;li>IP アドレスの設定ミス&lt;/li>
+&lt;li>デフォルトゲートウェイの設定ミス&lt;/li>
+&lt;li>VLAN の設定ミス&lt;/li>
+&lt;li>ルーティングテーブルの不具合&lt;/li>
+&lt;li>サーバアプリケーションの設定ミス／不具合&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>参考: NETWORKWORLD - May 2007&lt;/p>
+&lt;h2 id="ping-による調査">ping による調査&lt;/h2>
+&lt;p>あるホストに ping が通らないときは、以下の順番で ping を通す確認をしていきます。
+テスト結果は正常時の結果と比べなければ意味がないので、正常時の tracert 結果などを定期的にとっておくことが重要です。&lt;/p>
+&lt;ol>
+&lt;li>ループバックアドレスに対して ping
+&lt;ul>
+&lt;li>TCP/IP モジュールの異常の可能性&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ホストの IP アドレスへ ping
+&lt;ul>
+&lt;li>OS が NIC を認識していない可能性&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>同じスイッチに接続された別の PC へ ping
+&lt;ul>
+&lt;li>スイッチのポート、ケーブルの故障&lt;/li>
+&lt;li>VLAN の設定ミス、接続ミス&lt;/li>
+&lt;li>スイッチ自体には IP アドレスは設定されないので、別の PC に ping することで、スイッチまでの接続を確認する。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ルータに ping
+&lt;ul>
+&lt;li>ルータのダウン、アドレス設定ミス&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ルータの別のポートへ ping
+&lt;ul>
+&lt;li>ルーティングプロセスの異常&lt;/li>
+&lt;li>インタフェースの設定ミス&lt;/li>
+&lt;li>ルータは複数のネットワークにつながっているので、別のネットワーク用のポートにも ping する必要がある。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>異なるネットワークの PC へ ping
+&lt;ul>
+&lt;li>tracert で、通信不能ネットワークを切り分け&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ターゲットホストに ping
+&lt;ul>
+&lt;li>ターゲットホストのダウン&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>アプリケーソンレベルの確認&lt;/li>
+&lt;/ol>
+&lt;p>参考: NETWORKWORLD - May 2007&lt;/p></description></item><item><title>IETF によるプロトコル標準化の流れ</title><link>https://maku.blog/p/44o4a9p/</link><pubDate>Wed, 01 Oct 2003 00:00:00 +0900</pubDate><guid>https://maku.blog/p/44o4a9p/</guid><description>&lt;ol>
+&lt;li>プロトタイプが普及する&lt;/li>
+&lt;li>独自バージョンが作られるようになる&lt;/li>
+&lt;li>IETF (Internet Engineering Task Force) の援助で Working group が作られる&lt;/li>
+&lt;li>Working group は「インターネットドラフト」としてプロトコルを文書化する&lt;/li>
+&lt;li>IETF の IESG (Internet Engineering Steering Group) に提出する&lt;/li>
+&lt;li>実験期間を経て、IESG によって RFC 番号が割り当てられ、修正などをして「実験 RFC」として公表される&lt;/li>
+&lt;li>実際の運用によるテストを経て、IESG が「提案標準」として認定する&lt;/li>
+&lt;li>IESG が「ドラフト標準」に推薦する&lt;/li>
+&lt;li>プロトコルに STD 番号が割り当てられ、RFC に加えて STD となる&lt;/li>
+&lt;/ol>
+&lt;p>上記の流れで最低でも 10 ヵ月以上はかかる。&lt;/p></description></item></channel></rss>

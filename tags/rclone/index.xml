@@ -1,5 +1,39 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>rclone on まくろぐ</title><link>https://maku.blog/tags/rclone/</link><description>Recent content in rclone on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Thu, 04 May 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/rclone/index.xml" rel="self" type="application/rss+xml"/><item><title>rclone コマンドで Cloudflare R2 とファイルを同期する</title><link>https://maku.blog/p/p6o6m3i/</link><pubDate>Thu, 04 May 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p6o6m3i/</guid><description>rclone とは？ rclone は、Cloudflare R2 や AWS S3、Azure Blob Storage などのクラウドストレージにファイルを同期アップロードするためのコマンドラインツールです。 似たようなコマンドラインツールとしては rsync がありますが、rsync が SSH での通信をベースとしているのに対し、rclone は様々なクラウドサービスへの接続をターゲットにしています。
-ここでは、同期先のストレージサービスとして Cloudflare R2 を使うことを想定し、ローカル PC 上のファイル（ディレクトリ）を同期してみます。
-☝️ R2 vs S3 R2 は AWS S3 や Azure Blob Storage と比べて、エグレス料金が無料（下り転送が無料）という太っ腹な料金体系になっており、今後の展開が楽しみなサービスです。 ちなみに、R2 という名前は、S3 より前という意味が込められているとのこと。 rclone のインストール rclone コマンドは Golang で実装されているため、単一の実行バイナリとして提供されています。 下記のページから各 OS 用の実行ファイルをダウンロードして、パスの通ったディレクトリに置くだけでインストールは完了です。
-Rclone downloads macOS や Windows であれば、パッケージマネージャでインストールするのが簡単です。
-macOS の Homebrew でインストール $ brew install rclone Windows の Chocolatey でインストール $ choco search rclone $ choco install rclone Windows の Scoop でインストール $ scoop install rclone 次のように rclone コマンドを実行できるようになれば OK です。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Rclone on まくろぐ</title><link>https://maku.blog/tags/rclone/</link><description>Recent content in Rclone on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Thu, 04 May 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/rclone/index.xml" rel="self" type="application/rss+xml"/><item><title>rclone コマンドで Cloudflare R2 とファイルを同期する</title><link>https://maku.blog/p/p6o6m3i/</link><pubDate>Thu, 04 May 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p6o6m3i/</guid><description>&lt;h2 id="rclone-とは">rclone とは？&lt;/h2>
+&lt;p>&lt;a href="https://rclone.org/">rclone&lt;/a> は、Cloudflare R2 や AWS S3、Azure Blob Storage などのクラウドストレージにファイルを同期アップロードするためのコマンドラインツールです。
+似たようなコマンドラインツールとしては &lt;code>rsync&lt;/code> がありますが、&lt;code>rsync&lt;/code> が SSH での通信をベースとしているのに対し、&lt;code>rclone&lt;/code> は様々なクラウドサービスへの接続をターゲットにしています。&lt;/p>
+&lt;p>ここでは、同期先のストレージサービスとして &lt;a href="https://www.cloudflare.com/ja-jp/products/r2/">Cloudflare R2&lt;/a> を使うことを想定し、ローカル PC 上のファイル（ディレクトリ）を同期してみます。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ R2 vs S3&lt;/span>
+ &lt;span class="xNote_body">R2 は AWS S3 や Azure Blob Storage と比べて、エグレス料金が無料（下り転送が無料）という太っ腹な料金体系になっており、今後の展開が楽しみなサービスです。
+ちなみに、R2 という名前は、S3 より前という意味が込められているとのこと。&lt;/span>
+&lt;/div>
+&lt;h2 id="rclone-のインストール">rclone のインストール&lt;/h2>
+&lt;p>&lt;code>rclone&lt;/code> コマンドは Golang で実装されているため、単一の実行バイナリとして提供されています。
+下記のページから各 OS 用の実行ファイルをダウンロードして、パスの通ったディレクトリに置くだけでインストールは完了です。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://rclone.org/downloads/">Rclone downloads&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>macOS や Windows であれば、パッケージマネージャでインストールするのが簡単です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">macOS の Homebrew でインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> brew install rclone
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Windows の Chocolatey でインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> choco search rclone
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> choco install rclone
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Windows の Scoop でインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> scoop install rclone
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次のように &lt;code>rclone&lt;/code> コマンドを実行できるようになれば OK です。&lt;/p></description></item></channel></rss>

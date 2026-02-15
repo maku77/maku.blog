@@ -1,30 +1,241 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Cloudflare on まくろぐ</title><link>https://maku.blog/tags/cloudflare/</link><description>Recent content in Cloudflare on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sun, 02 Feb 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/cloudflare/index.xml" rel="self" type="application/rss+xml"/><item><title>Cloudflare Workers をはじめる (wrangler)</title><link>https://maku.blog/p/rn7p7n5/</link><pubDate>Sun, 11 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rn7p7n5/</guid><description>Workers とは？ Cloudflare Workers は、Cloudflare 社が提供しているサーバレスプラットフォームで、Web リクエストに応じたレスポンスを返すサービスを簡単に構築することができます。 Workers は世界中に配置されたエッジサーバーで実行されるため、クライアントからの要求に高速に応答することができます。 Azure Functions や AWS Lambda と同じようなサービスですが、それらに比べて Workers は、より高速かつ安価という特徴を持っています。 毎日 10 万リクエストまで無料 で使えるので、趣味用途であれば、無料枠だけでいろいろ試せます。
-本記事の作業を進めるには、あらかじめ Cloudflare のアカウントを作成しておく必要があります。 下記から無料で作成できます。
-Cloudflare Workers を開始する - Sign Up Wrangler をインストールする Worker の開発やデプロイには、wrangler という公式のコマンドラインツールを使用します。 Node.js の npm コマンドを使って、次のようにインストールできます。
-wrangler コマンドのインストール $ npm install wrangler -g Cloudflont へのアクセスを許可する (wrangler login) wrangler コマンドを実行できるようになったら、wrangler login を実行して、Cloudflare のアカウントと関連づけます。
-Cloudflare へのサインイン $ wrangler login ⛅️ wrangler 2.6.2 ------------------- Attempting to login via OAuth... Web ブラウザーが自動的に開いて、Wrangler から Cloudflare のデータにアクセスしてよいか尋ねられるので Allow ボタンを押して許可します。 これで、wrangler の各種コマンドを実行できるようになります。 サインインした状態で wrangler whoami コマンドを実行すると、どの Cloudflare ユーザーでサインインしているかを確認できます。</description></item><item><title>Cloudflare Workers からの fetch 呼び出しをキャッシュする</title><link>https://maku.blog/p/d5mqo6c/</link><pubDate>Sun, 02 Feb 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/d5mqo6c/</guid><description>コンピューターサイエンスにおける難題のひとつであるキャッシュのお話です。 ここでは、サーバーレス関数のプラットフォームである Cloudflare Workers で、サードパーティ API の fetch レスポンスのキャッシュをどのように扱うかを説明します。
-Cloudflare Workers でキャッシュするとはどういうことか Cloudflare Workers にデプロイされた JavaScript 関数は、単一のオリジンサーバーで実行されるのではなく、世界中に分散された Cloudflare CDN 上で実行されます。 つまり、Cloudflare Workers 上でキャッシュメカニズムを動作させるということは、実質的にはクライアントに近いエッジサーバーからキャッシュを返すことを意味します（つまり、どこからでも速い）。
-%%{init:{'flowchart':{'nodeSpacing':15, 'rankSpacing':30}}}%% flowchart LR A[Client] --> B[Worker] subgraph "Cloudflare (Edge)" B C[(Cache)] end B --> A B -->|fetch| D["3rd Party API
-(Origin)"] D -->|response| B Cloudflare Workers 上で扱える Runtime API として Cache API が提供されており、これを使ってエッジサーバー上のキャッシュを制御することができます。 この API は、Web 標準の Cache インタフェースを踏襲しており、Response オブジェクトの内容をキャッシュする仕組みになっています。 例えば、バックエンド API のレスポンス（あるいはそれを加工したデータ）をキャッシュすることで、API レスポンスのレイテンシを低減すると同時に、API リクエスト数を削減することができます。
-実は、Cloudflare Workers 上での fetch 呼び出しはデフォルトでキャッシュされるようになっており、明示的に Cache API を呼ぶ必要はなかったりします。 ただし、これは主に静的なリソースを対象としており、Web API などの JSON レスポンスがキャッシュされるかどうかは、ちょっと複雑な条件によって決まります。</description></item><item><title>Cloudflare Workers で別の Worker と連携する (Service Bindings)</title><link>https://maku.blog/p/mba7gp6/</link><pubDate>Wed, 29 Jan 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mba7gp6/</guid><description>Service Bindings とは Cloudflare Workers は、JavaScript などで実装されたコードを実行可能なサーバーレスプラットフォームです。 Cloudflare Workers の Service Bindings という仕組みを利用すると、ある Worker から別の Worker を簡単に呼び出すことができます。 通常のメソッド呼び出しと同じ感覚で別の Worker で定義されたメソッドを呼びすことができ、料金上の呼び出し回数も増えません。 しかも同じスレッド上で実行されるので、呼び出しのオーバヘッドがありません。
-よーするに、マイクロサービスを Cloudflare Workers で実装しておけば、パフォーマンスやコストの心配をすることなく、簡単に連携できてしまうすごいやつです（AWS などで同じようなことをしようとすると大変）。
-テスト用プロジェクトの作成 ここでは、Worker A から Worker B を呼び出すよう実装してみます。 まずはそれぞれの Worker 用のプロジェクトを作成しておきます。
-2 つの Worker プロジェクトを作成 $ pnpm create cloudflare@latest worker-a $ pnpm create cloudflare@latest worker-b Service Bindings では、Worker 名を使って Bindings の設定を行うことになるので、ここで指定した名前は重要です。 Worker 名を変えたくなったら、wrangler.toml（あるいは wrangler.jsonc）内の name のエントリーを編集してください。
-Worker B の実装（呼び出される側） 先に、呼び出される側の Worker B を実装します。 通常の Worker 実装と同様に、下記のように fetch メソッドを公開するだけでも連携できるのですが、</description></item><item><title>Cloudflare Workers の KV ストレージでアクセストークンをキャッシュする</title><link>https://maku.blog/p/q896mzu/</link><pubDate>Sun, 19 Jan 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/q896mzu/</guid><description>何をするか ここでは、Cloudflare Worker から KV ストレージを使用する例として、サードパーティ製 API のアクセストークンなど、有効期限のある情報をキャッシュする方法 を紹介します。
-サードパーティ API としてアクセストークン（あるいはリフレッシュトークン）を要求する API が定義されている場合、取得したトークンは有効期限内は再利用することが想定されています。 しかし、呼び出しごとに独立したコンテキストで動作する Cloudflare Workers の環境では、呼び出しのたびにトークンを取得することになってしまいます。 このようなケースでは、取得したトークンを KV ストレージにキャッシュしておくことで、次回のアクセス時に再利用することができます。
-KV では、キーと値のペアを保存するときにオプション情報として TTL (Time To Live) を指定することができるので、こういった有効期限のある情報をキャッシュするのに適しています。 KV ストレージの基本的な使い方は下記を参照してください。
-参考: Cloudflare Workers の KV ストレージの使い方 プロジェクトと KV namespace を作成する Cloudflare Worker のプロジェクトをまだ作成していない場合は先に作成しておきます。 ここでは、Hono フレームワークを使用するプロジェクトの雛形を作成します。
-$ pnpm create hono@latest hello-hono $ cd hello-hono 次に、wrangler kv コマンドを使って KV namespace を作成します。 名前は単純に KV としておきます。
-$ wrangler kv namespace create KV KV namespace が作成できたら、コマンドの出力を参考に、wrangler.</description></item><item><title>Cloudflare Workers の KV ストレージの使い方</title><link>https://maku.blog/p/xb5cpr6/</link><pubDate>Sun, 19 Jan 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xb5cpr6/</guid><description>Cloudflare Workers KV とは Cloudflare Workers は基本的にステートレスなサーバーレスプラットフォームですが、KV というデータストアを使うことで、複数のアクセス間でデータを共有することができます。 KV という名前の通り、キー (key) と値 (value) のペアを保存することができ、Worker のコードから簡単にアクセスできるようになっています。
-Cloudflare Workers の基本的な使い方はこちらを参照してください。 下記作業では、すでに Cloudflare Workers のプロジェクト (hello-worker) が作成されていることを前提としています。 まだプロジェクトが作成されていない場合は、下記のように wrangler コマンドでプロジェクトを作成してください。
-Cloudflare Workers プロジェクトの作成 $ wrangler init hello-worker $ cd hello-worker KV namespace の作成 KV にデータを保存するためには、まずは key &amp;amp; value の入れ物である KV namespace を作成する必要があります。 アカウント内に KV namespace を作成するには、wrangler kv namespace create コマンドを使います。 ここでは、単純に KV という名前の KV namespace を作成してみます。
-KV namespace の作成 $ wrangler kv namespace create KV .</description></item><item><title>Cloudflare Workers で作成した Web API に API キーによるアクセス制限をかける</title><link>https://maku.blog/p/u6w6fq4/</link><pubDate>Mon, 13 Jan 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/u6w6fq4/</guid><description>Cloudflare Worker で作成した Web API を公開するときに、固定の API キーによるアクセス制限をかける方法です。 独自サービス用のバックエンド API など、一般公開しない API の実装で使うことを想定しています。
-準備 プロジェクトの作成 Cloudflare Workers のプロジェクトをまだ作っていないときは、wrangler を使って作成 しておきます。
-プロジェクトを作成 $ wrangler init hello-api $ cd hello-api API キーを生成して登録する アクセス制御用の独自の API キーを用意して、それを Workers に登録して使います。 次のように、ランダムな文字列を生成して API キーにしてしまえばよいです。 自分で考えた文字列でも構いませんが、第三者が想像しにくい文字列にしてください。
-ランダムな API キーを生成 $ openssl rand -base64 32 mmdkR+mMvBUnYeu2sn1kMqlXjK9Q4A0Os3I4M4aiMQs= 用意した API キーは、サーバー側の API_KEY という環境変数にセットすることにします。 開発サーバー用の環境変数は .dev.vars ファイル、本番環境用の環境変数は wrangler secret コマンドで設定します。
-.dev.vars（ローカル環境用のシークレット設定） API_KEY=&amp;#34;mmdkR+mMvBUnYeu2sn1kMqlXjK9Q4A0Os3I4M4aiMQs=&amp;#34; Cloudflare Workers 用のシークレット設定 $ wrangler secret put API_KEY Enter a secret value: ********************** これらの値は、Workers のプログラム内で env.</description></item><item><title>Cloudflare Workers と Hono で軽量な Web API を作る</title><link>https://maku.blog/p/33cc7jy/</link><pubDate>Sat, 11 Jan 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/33cc7jy/</guid><description>参考: Cloudflare Workers をはじめる (wrangler) Hono とは Hono は、Cloudflare Workers で使える Web アプリ用のフレームワークで、軽量な Web API を実装するときに便利です。 Node.js の Express に似た API を提供しており、ルーティングやミドルウェアを少ないコードで実装することができます。 Cloudflare Workers の Runtime API だけでも Web API を実装できますが、Hono を使うとよりシンプルなコードで実装できます。
-☝️ Cloudflare Workers ≠ Node.js JavaScript のランタイム環境としては Node.js が有名ですが、Cloudflare Workers は V8 エンジンをベースとした 独自の Workers ランタイム環境 です。 ローカルでの開発中には Node.js のツール群を使ったりするので余計に混乱しますが、デプロイするコードは Cloudflare Workers 上で動作することを意識して実装する必要があります。 具体的には、Node.js の Runtime API は使えず、Cloudflare Workers の Runtime API を使う必要があります（参考: Workers - Node.js compatibility）。 Hono はもともと Cloudflare Workers 上で動作させることを考えて作られているので安心して使えます。 Web 標準機能を使った実装をウリにしており、Deno Deploy、AWS Lambda など他の環境でも動かすことができます。 Hono で Hello World Hono プロジェクトの作成 Hono 用のプロジェクトは npm create で作れるようになっているので、基本的にはこれを使ってサクッと作ります（参考: Hono - Getting Started）。</description></item><item><title>rclone コマンドで Cloudflare R2 とファイルを同期する</title><link>https://maku.blog/p/p6o6m3i/</link><pubDate>Thu, 04 May 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p6o6m3i/</guid><description>rclone とは？ rclone は、Cloudflare R2 や AWS S3、Azure Blob Storage などのクラウドストレージにファイルを同期アップロードするためのコマンドラインツールです。 似たようなコマンドラインツールとしては rsync がありますが、rsync が SSH での通信をベースとしているのに対し、rclone は様々なクラウドサービスへの接続をターゲットにしています。
-ここでは、同期先のストレージサービスとして Cloudflare R2 を使うことを想定し、ローカル PC 上のファイル（ディレクトリ）を同期してみます。
-☝️ R2 vs S3 R2 は AWS S3 や Azure Blob Storage と比べて、エグレス料金が無料（下り転送が無料）という太っ腹な料金体系になっており、今後の展開が楽しみなサービスです。 ちなみに、R2 という名前は、S3 より前という意味が込められているとのこと。 rclone のインストール rclone コマンドは Golang で実装されているため、単一の実行バイナリとして提供されています。 下記のページから各 OS 用の実行ファイルをダウンロードして、パスの通ったディレクトリに置くだけでインストールは完了です。
-Rclone downloads macOS や Windows であれば、パッケージマネージャでインストールするのが簡単です。
-macOS の Homebrew でインストール $ brew install rclone Windows の Chocolatey でインストール $ choco search rclone $ choco install rclone Windows の Scoop でインストール $ scoop install rclone 次のように rclone コマンドを実行できるようになれば OK です。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Cloudflare on まくろぐ</title><link>https://maku.blog/tags/cloudflare/</link><description>Recent content in Cloudflare on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 02 Feb 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/cloudflare/index.xml" rel="self" type="application/rss+xml"/><item><title>Cloudflare Workers をはじめる (wrangler)</title><link>https://maku.blog/p/rn7p7n5/</link><pubDate>Sun, 11 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rn7p7n5/</guid><description>&lt;h2 id="workers-とは">Workers とは？&lt;/h2>
+&lt;p>&lt;a href="https://workers.cloudflare.com/">Cloudflare Workers&lt;/a> は、Cloudflare 社が提供しているサーバレスプラットフォームで、Web リクエストに応じたレスポンスを返すサービスを簡単に構築することができます。
+Workers は世界中に配置されたエッジサーバーで実行されるため、クライアントからの要求に高速に応答することができます。
+Azure Functions や AWS Lambda と同じようなサービスですが、それらに比べて Workers は、より高速かつ安価という特徴を持っています。
+&lt;strong>毎日 10 万リクエストまで無料&lt;/strong> で使えるので、趣味用途であれば、無料枠だけでいろいろ試せます。&lt;/p>
+&lt;p>本記事の作業を進めるには、あらかじめ Cloudflare のアカウントを作成しておく必要があります。
+下記から無料で作成できます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://dash.cloudflare.com/sign-up/workers">Cloudflare Workers を開始する - Sign Up&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="wrangler-をインストールする">Wrangler をインストールする&lt;/h2>
+&lt;p>Worker の開発やデプロイには、&lt;strong>&lt;code>wrangler&lt;/code>&lt;/strong> という公式のコマンドラインツールを使用します。
+&lt;a href="https://nodejs.org/ja/">Node.js&lt;/a> の &lt;code>npm&lt;/code> コマンドを使って、次のようにインストールできます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">wrangler コマンドのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install wrangler -g
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="cloudflont-へのアクセスを許可する-wrangler-login">Cloudflont へのアクセスを許可する (wrangler login)&lt;/h2>
+&lt;p>&lt;code>wrangler&lt;/code> コマンドを実行できるようになったら、&lt;strong>&lt;code>wrangler login&lt;/code>&lt;/strong> を実行して、Cloudflare のアカウントと関連づけます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Cloudflare へのサインイン&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> wrangler login
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ⛅️ wrangler 2.6.2
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">-------------------
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">Attempting to login via OAuth...
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Web ブラウザーが自動的に開いて、Wrangler から Cloudflare のデータにアクセスしてよいか尋ねられるので &lt;strong>&lt;code>Allow&lt;/code>&lt;/strong> ボタンを押して許可します。
+これで、&lt;code>wrangler&lt;/code> の各種コマンドを実行できるようになります。
+サインインした状態で &lt;strong>&lt;code>wrangler whoami&lt;/code>&lt;/strong> コマンドを実行すると、どの Cloudflare ユーザーでサインインしているかを確認できます。&lt;/p></description></item><item><title>Cloudflare Workers からの fetch 呼び出しをキャッシュする</title><link>https://maku.blog/p/d5mqo6c/</link><pubDate>Sun, 02 Feb 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/d5mqo6c/</guid><description>&lt;p>コンピューターサイエンスにおける難題のひとつであるキャッシュのお話です。
+ここでは、サーバーレス関数のプラットフォームである Cloudflare Workers で、サードパーティ API の fetch レスポンスのキャッシュをどのように扱うかを説明します。&lt;/p>
+&lt;h2 id="cloudflare-workers-でキャッシュするとはどういうことか">Cloudflare Workers でキャッシュするとはどういうことか&lt;/h2>
+&lt;p>Cloudflare Workers にデプロイされた JavaScript 関数は、単一のオリジンサーバーで実行されるのではなく、世界中に分散された Cloudflare CDN 上で実行されます。
+つまり、Cloudflare Workers 上でキャッシュメカニズムを動作させるということは、実質的にはクライアントに近いエッジサーバーからキャッシュを返すことを意味します（つまり、どこからでも速い）。&lt;/p>
+&lt;figure style="text-align: center">
+&lt;div class="mermaid">
+%%{init:{'flowchart':{'nodeSpacing':15, 'rankSpacing':30}}}%%
+flowchart LR
+ A[Client] --> B[Worker]
+ subgraph "Cloudflare (Edge)"
+ B
+ C[(Cache)]
+ end
+ B --> A
+ B -->|fetch| D["3rd Party API&lt;br>(Origin)"]
+ D -->|response| B
+&lt;/div>
+&lt;/figure>
+
+&lt;script>
+(function() {
+ 
+ if (window.isMermaidLoaded) return;
+ window.isMermaidLoaded = true;
+
+ 
+ const script = document.createElement('script');
+ script.src = 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js';
+ script.onload = () => { mermaid.initialize({startOnLoad: true}); };
+ document.body.appendChild(script);
+})();
+&lt;/script>
+
+
+&lt;p>Cloudflare Workers 上で扱える Runtime API として &lt;a href="https://developers.cloudflare.com/workers/runtime-apis/cache/">Cache API&lt;/a> が提供されており、これを使ってエッジサーバー上のキャッシュを制御することができます。
+この API は、Web 標準の &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/Cache">Cache&lt;/a> インタフェースを踏襲しており、&lt;code>Response&lt;/code> オブジェクトの内容をキャッシュする仕組みになっています。
+例えば、バックエンド API のレスポンス（あるいはそれを加工したデータ）をキャッシュすることで、API レスポンスのレイテンシを低減すると同時に、API リクエスト数を削減することができます。&lt;/p></description></item><item><title>Cloudflare Workers で別の Worker と連携する (Service Bindings)</title><link>https://maku.blog/p/mba7gp6/</link><pubDate>Wed, 29 Jan 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mba7gp6/</guid><description>&lt;h2 id="service-bindings-とは">Service Bindings とは&lt;/h2>
+&lt;p>Cloudflare Workers は、JavaScript などで実装されたコードを実行可能なサーバーレスプラットフォームです。
+Cloudflare Workers の &lt;strong>Service Bindings&lt;/strong> という仕組みを利用すると、&lt;strong>ある Worker から別の Worker を簡単に呼び出すことができます&lt;/strong>。
+通常のメソッド呼び出しと同じ感覚で別の Worker で定義されたメソッドを呼びすことができ、料金上の呼び出し回数も増えません。
+しかも同じスレッド上で実行されるので、呼び出しのオーバヘッドがありません。&lt;/p>
+&lt;p>よーするに、マイクロサービスを Cloudflare Workers で実装しておけば、パフォーマンスやコストの心配をすることなく、簡単に連携できてしまうすごいやつです（&lt;s>AWS などで同じようなことをしようとすると大変&lt;/s>）。&lt;/p>
+&lt;h2 id="テスト用プロジェクトの作成">テスト用プロジェクトの作成&lt;/h2>
+&lt;p>ここでは、Worker A から Worker B を呼び出すよう実装してみます。
+まずはそれぞれの Worker 用のプロジェクトを作成しておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">2 つの Worker プロジェクトを作成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> pnpm create cloudflare@latest worker-a
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> pnpm create cloudflare@latest worker-b
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Service Bindings では、Worker 名を使って Bindings の設定を行うことになるので、ここで指定した名前は重要です。
+Worker 名を変えたくなったら、&lt;code>wrangler.toml&lt;/code>（あるいは &lt;code>wrangler.jsonc&lt;/code>）内の &lt;code>name&lt;/code> のエントリーを編集してください。&lt;/p>
+&lt;h2 id="worker-b-の実装呼び出される側">Worker B の実装（呼び出される側）&lt;/h2>
+&lt;p>先に、呼び出される側の Worker B を実装します。
+通常の Worker 実装と同様に、下記のように &lt;code>fetch&lt;/code> メソッドを公開するだけでも連携できるのですが、&lt;/p></description></item><item><title>Cloudflare Workers の KV ストレージでアクセストークンをキャッシュする</title><link>https://maku.blog/p/q896mzu/</link><pubDate>Sun, 19 Jan 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/q896mzu/</guid><description>&lt;h2 id="何をするか">何をするか&lt;/h2>
+&lt;p>ここでは、Cloudflare Worker から KV ストレージを使用する例として、サードパーティ製 API のアクセストークンなど、&lt;strong>有効期限のある情報をキャッシュする方法&lt;/strong> を紹介します。&lt;/p>
+&lt;p>サードパーティ API としてアクセストークン（あるいはリフレッシュトークン）を要求する API が定義されている場合、取得したトークンは有効期限内は再利用することが想定されています。
+しかし、呼び出しごとに独立したコンテキストで動作する Cloudflare Workers の環境では、呼び出しのたびにトークンを取得することになってしまいます。
+このようなケースでは、取得したトークンを KV ストレージにキャッシュしておくことで、次回のアクセス時に再利用することができます。&lt;/p>
+&lt;p>KV では、キーと値のペアを保存するときにオプション情報として TTL (Time To Live) を指定することができるので、こういった有効期限のある情報をキャッシュするのに適しています。
+KV ストレージの基本的な使い方は下記を参照してください。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/xb5cpr6/">Cloudflare Workers の KV ストレージの使い方&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="プロジェクトと-kv-namespace-を作成する">プロジェクトと KV namespace を作成する&lt;/h2>
+&lt;p>Cloudflare Worker のプロジェクトをまだ作成していない場合は先に作成しておきます。
+ここでは、&lt;a href="../../p/33cc7jy/">Hono フレームワークを使用する&lt;/a>プロジェクトの雛形を作成します。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> pnpm create hono@latest hello-hono
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> &lt;span class="nb">cd&lt;/span> hello-hono
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>次に、&lt;code>wrangler kv&lt;/code> コマンドを使って KV namespace を作成します。
+名前は単純に &lt;code>KV&lt;/code> としておきます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> wrangler kv namespace create KV
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>KV namespace が作成できたら、コマンドの出力を参考に、&lt;code>wrangler.toml&lt;/code>（あるいは &lt;code>wrangler.json&lt;/code>）に KV namespace のバインド設定を追加します。&lt;/p></description></item><item><title>Cloudflare Workers の KV ストレージの使い方</title><link>https://maku.blog/p/xb5cpr6/</link><pubDate>Sun, 19 Jan 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xb5cpr6/</guid><description>&lt;h2 id="cloudflare-workers-kv-とは">Cloudflare Workers KV とは&lt;/h2>
+&lt;p>Cloudflare Workers は基本的にステートレスなサーバーレスプラットフォームですが、&lt;a href="https://developers.cloudflare.com/kv/">KV&lt;/a> というデータストアを使うことで、複数のアクセス間でデータを共有することができます。
+KV という名前の通り、キー (key) と値 (value) のペアを保存することができ、Worker のコードから簡単にアクセスできるようになっています。&lt;/p>
+&lt;p>Cloudflare Workers の基本的な使い方は&lt;a href="../../p/rn7p7n5/">こちらを参照&lt;/a>してください。
+下記作業では、すでに Cloudflare Workers のプロジェクト (&lt;code>hello-worker&lt;/code>) が作成されていることを前提としています。
+まだプロジェクトが作成されていない場合は、下記のように &lt;code>wrangler&lt;/code> コマンドでプロジェクトを作成してください。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Cloudflare Workers プロジェクトの作成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> wrangler init hello-worker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> &lt;span class="nb">cd&lt;/span> hello-worker
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="kv-namespace-の作成">KV namespace の作成&lt;/h2>
+&lt;p>KV にデータを保存するためには、まずは key &amp;amp; value の入れ物である &lt;strong>KV namespace&lt;/strong> を作成する必要があります。
+アカウント内に KV namespace を作成するには、&lt;strong>&lt;code>wrangler kv namespace create&lt;/code>&lt;/strong> コマンドを使います。
+ここでは、単純に &lt;code>KV&lt;/code> という名前の KV namespace を作成してみます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">KV namespace の作成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> wrangler kv namespace create KV
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">✨ Success!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">Add the following to your configuration file in your kv_namespaces array:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">[[kv_namespaces]]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">binding = &amp;#34;KV&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">id = &amp;#34;2161175c318445cfa3d1dac2f20ee660&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>KV namespace の作成に成功すると、上記のように一意な ID が割り当てられます。
+この ID は、Worker のコード内で使用する変数名と、実際の KV namespace を紐付けるために使われます。
+上記コマンドの出力には、そのための &lt;code>wrangler.toml&lt;/code> での設定方法が示されています。
+&lt;a href="https://dash.cloudflare.com/">Cloudflare のダッシュボード&lt;/a>上でも、KV namespace が作成されていることを確認できます。&lt;/p></description></item><item><title>Cloudflare Workers で作成した Web API に API キーによるアクセス制限をかける</title><link>https://maku.blog/p/u6w6fq4/</link><pubDate>Mon, 13 Jan 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/u6w6fq4/</guid><description>&lt;p>Cloudflare Worker で作成した Web API を公開するときに、固定の API キーによるアクセス制限をかける方法です。
+独自サービス用のバックエンド API など、一般公開しない API の実装で使うことを想定しています。&lt;/p>
+&lt;h2 id="準備">準備&lt;/h2>
+&lt;h3 id="プロジェクトの作成">プロジェクトの作成&lt;/h3>
+&lt;p>Cloudflare Workers のプロジェクトをまだ作っていないときは、&lt;a href="../../p/rn7p7n5/">wrangler を使って作成&lt;/a> しておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">プロジェクトを作成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> wrangler init hello-api
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> &lt;span class="nb">cd&lt;/span> hello-api
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="api-キーを生成して登録する">API キーを生成して登録する&lt;/h3>
+&lt;p>アクセス制御用の独自の API キーを用意して、それを Workers に登録して使います。
+次のように、ランダムな文字列を生成して API キーにしてしまえばよいです。
+自分で考えた文字列でも構いませんが、第三者が想像しにくい文字列にしてください。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ランダムな API キーを生成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> openssl rand -base64 &lt;span class="m">32&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">mmdkR+mMvBUnYeu2sn1kMqlXjK9Q4A0Os3I4M4aiMQs=
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>用意した API キーは、サーバー側の &lt;strong>&lt;code>API_KEY&lt;/code>&lt;/strong> という環境変数にセットすることにします。
+開発サーバー用の環境変数は &lt;strong>&lt;code>.dev.vars&lt;/code>&lt;/strong> ファイル、本番環境用の環境変数は &lt;strong>&lt;code>wrangler secret&lt;/code>&lt;/strong> コマンドで設定します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.dev.vars（ローカル環境用のシークレット設定）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="na">API_KEY&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;mmdkR+mMvBUnYeu2sn1kMqlXjK9Q4A0Os3I4M4aiMQs=&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Cloudflare Workers 用のシークレット設定&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> wrangler secret put API_KEY
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">Enter a secret value: **********************
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これらの値は、Workers のプログラム内で &lt;strong>&lt;code>env.API_KEY&lt;/code>&lt;/strong> で参照することができます。&lt;/p></description></item><item><title>Cloudflare Workers と Hono で軽量な Web API を作る</title><link>https://maku.blog/p/33cc7jy/</link><pubDate>Sat, 11 Jan 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/33cc7jy/</guid><description>&lt;ul>
+&lt;li>参考: &lt;a href="../../p/rn7p7n5/">Cloudflare Workers をはじめる (wrangler)&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="hono-とは">Hono とは&lt;/h2>
+&lt;p>&lt;a href="https://hono.dev/">Hono&lt;/a> は、Cloudflare Workers で使える Web アプリ用のフレームワークで、軽量な Web API を実装するときに便利です。
+Node.js の Express に似た API を提供しており、ルーティングやミドルウェアを少ないコードで実装することができます。
+&lt;a href="https://developers.cloudflare.com/workers/runtime-apis/">Cloudflare Workers の Runtime API&lt;/a> だけでも Web API を実装できますが、Hono を使うとよりシンプルなコードで実装できます。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ Cloudflare Workers ≠ Node.js&lt;/span>
+ &lt;span class="xNote_body">JavaScript のランタイム環境としては Node.js が有名ですが、Cloudflare Workers は V8 エンジンをベースとした &lt;strong>独自の Workers ランタイム環境&lt;/strong> です。
+ローカルでの開発中には Node.js のツール群を使ったりするので余計に混乱しますが、デプロイするコードは Cloudflare Workers 上で動作することを意識して実装する必要があります。
+具体的には、&lt;a href="https://nodejs.org/docs/latest/api/">Node.js の Runtime API&lt;/a> は使えず、Cloudflare Workers の Runtime API を使う必要があります（参考: &lt;a href="https://developers.cloudflare.com/workers/runtime-apis/nodejs/">Workers - Node.js compatibility&lt;/a>）。
+Hono はもともと Cloudflare Workers 上で動作させることを考えて作られているので安心して使えます。
+Web 標準機能を使った実装をウリにしており、Deno Deploy、AWS Lambda など他の環境でも動かすことができます。&lt;/span>
+&lt;/div>
+&lt;h2 id="hono-で-hello-world">Hono で Hello World&lt;/h2>
+&lt;h3 id="hono-プロジェクトの作成">Hono プロジェクトの作成&lt;/h3>
+&lt;p>Hono 用のプロジェクトは &lt;strong>&lt;code>npm create&lt;/code>&lt;/strong> で作れるようになっているので、基本的にはこれを使ってサクッと作ります（参考: &lt;a href="https://hono.dev/docs/getting-started/basic">Hono - Getting Started&lt;/a>）。&lt;/p></description></item><item><title>rclone コマンドで Cloudflare R2 とファイルを同期する</title><link>https://maku.blog/p/p6o6m3i/</link><pubDate>Thu, 04 May 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p6o6m3i/</guid><description>&lt;h2 id="rclone-とは">rclone とは？&lt;/h2>
+&lt;p>&lt;a href="https://rclone.org/">rclone&lt;/a> は、Cloudflare R2 や AWS S3、Azure Blob Storage などのクラウドストレージにファイルを同期アップロードするためのコマンドラインツールです。
+似たようなコマンドラインツールとしては &lt;code>rsync&lt;/code> がありますが、&lt;code>rsync&lt;/code> が SSH での通信をベースとしているのに対し、&lt;code>rclone&lt;/code> は様々なクラウドサービスへの接続をターゲットにしています。&lt;/p>
+&lt;p>ここでは、同期先のストレージサービスとして &lt;a href="https://www.cloudflare.com/ja-jp/products/r2/">Cloudflare R2&lt;/a> を使うことを想定し、ローカル PC 上のファイル（ディレクトリ）を同期してみます。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ R2 vs S3&lt;/span>
+ &lt;span class="xNote_body">R2 は AWS S3 や Azure Blob Storage と比べて、エグレス料金が無料（下り転送が無料）という太っ腹な料金体系になっており、今後の展開が楽しみなサービスです。
+ちなみに、R2 という名前は、S3 より前という意味が込められているとのこと。&lt;/span>
+&lt;/div>
+&lt;h2 id="rclone-のインストール">rclone のインストール&lt;/h2>
+&lt;p>&lt;code>rclone&lt;/code> コマンドは Golang で実装されているため、単一の実行バイナリとして提供されています。
+下記のページから各 OS 用の実行ファイルをダウンロードして、パスの通ったディレクトリに置くだけでインストールは完了です。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://rclone.org/downloads/">Rclone downloads&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>macOS や Windows であれば、パッケージマネージャでインストールするのが簡単です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">macOS の Homebrew でインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> brew install rclone
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Windows の Chocolatey でインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> choco search rclone
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> choco install rclone
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Windows の Scoop でインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> scoop install rclone
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次のように &lt;code>rclone&lt;/code> コマンドを実行できるようになれば OK です。&lt;/p></description></item></channel></rss>

@@ -1,15 +1,1617 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS 一般／環境／設定など on まくろぐ</title><link>https://maku.blog/p/cenio8m/</link><description>Recent content in AWS 一般／環境／設定など on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 11 Apr 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/cenio8m/index.xml" rel="self" type="application/rss+xml"/><item><title>TypeScript で AWS SDK を使う開発環境を整える</title><link>https://maku.blog/p/taiqx6d/</link><pubDate>Thu, 25 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/taiqx6d/</guid><description>TypeScript のプロジェクトを作成する 何をできるようにするか？ ここでは、Node.js はインストール済みであるという前提で、次のようなことを行える TypeScript 環境を整えます。
-npm run build で src ディレクトリ以下の .ts ファイルをコンパイルする
-（.js ファイルが build ディレクトリ以下に出力される） npm start でコンパイルされた build/main.js を起動する 下記のセットアップ手順の 詳しい意味はこちらを参照 していただくとして、ここでは一気にセットアップを終わらせてしまいます。
-セットアップ # アプリ用のディレクトリを作成 $ mkdir myapp $ cd myapp # Node.js アプリの設定ファイル (package.json) を生成 $ npm init -y # TypeScript および Node 型情報をインストール $ npm install typescript -D $ npm install @types/node -D # TypeScript の設定ファイル (tsconfig.json) を生成 $ npx tsc --init package.json を次のような感じで修正します。 主に scripts の定義です。</description></item><item><title>Go 言語で AWS SDK を使う開発環境を整える</title><link>https://maku.blog/p/xnogqgm/</link><pubDate>Mon, 11 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xnogqgm/</guid><description>何をするか？ ここでは、Go 言語用の AWS SDK V2 をセットアップして、各種 AWS サービス用の API を呼び出す準備をします。
-Go 言語は Google が開発したプログラミング言語で、ライブラリインポートの手軽さや、生成された実行バイナリの実行速度に定評があるため、今後も利用ユーザーは増えていきそうです。
-参考: Go 言語とは？／Go をインストールする | まくまくHugo/Goノート Go の実行環境は Go のインストーラー で簡単にインストールできます。 これ以降の説明では、Go の実行環境はインストール済みであると想定しています。
-テスト用の Go プロジェクトを作成する Go プロジェクト用に適当なディレクトリを作成し、その中で go mod init コマンドを実行して go.mod （依存関係などが保存されるファイル）を作成しておきます。 このファイルが存在するディレクトリを、Go はモジュールとして認識します。
-$ mkdir aws-study $ cd aws-study $ go mod init aws-study 上記の例では、go mod init の引数（モジュールパス）を aws-study としましたが、GitHub リポジトリで管理する前提であれば、github.com/&amp;lt;user&amp;gt;/aws-study のようなモジュールパスを指定するようにしてください。 これで、Go 言語プロジェクトの準備完了です。
-AWS SDK でコンフィグ情報を参照してみる AWS SDK を使って AWS のサービスにアクセスするには、認証情報として IAM ユーザーの「アクセスキー ID」や「シークレットアクセスキー」などが必要になります。 これらは、一般的には AWS CLI の aws configure コマンドによって、~/.</description></item><item><title>AWS SDK for Node.js でプロキシ環境変数 (https_proxy) を反映させる</title><link>https://maku.blog/p/6vs27aa/</link><pubDate>Mon, 29 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6vs27aa/</guid><description>AWS SDK for Node.js のプロキシ設定 社内のプロキシ環境下などから AWS SDK (for Node.js) を使って API 呼び出しを行うには、次のようにプロキシエージェント設定を行います。 ここでは、AWS SDK version 2 の設定例を示しています。
-プロキシ設定の例 (AWS SDK v2) import * as AWS from &amp;#39;aws-sdk&amp;#39;; import { HttpsProxyAgent } from &amp;#39;https-proxy-agent&amp;#39;; AWS.config.update({ httpOptions: { agent: new HttpsProxyAgent(&amp;#39;http://proxy.example.com:8080&amp;#39;) } }); これで、それ以降の AWS サービス (AWS.S3 など）の API 呼び出しがプロキシ経由で行われるようになります。
-環境変数 https_proxy の設定を使用する 次のようにすれば、環境変数 https_proxy に設定されたプロキシアドレスを、AWS SDK にも反映させることができます（といっても、process.env.https_proxy を参照しているだけです）。
-import * as AWS from &amp;#39;aws-sdk&amp;#39;; import { HttpsProxyAgent } from &amp;#39;https-proxy-agent&amp;#39;; // プロキシ設定を反映 function setupAwsProxy() { const proxy = process.</description></item><item><title>AWS アカウント、IAM ユーザー、グループ、ポリシーの違い</title><link>https://maku.blog/p/4c7sdwg/</link><pubDate>Wed, 03 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4c7sdwg/</guid><description> AWS を使う上で最初に理解しておくべき、「アカウント」と「ユーザー」まわりの概念についてまとめておきます。
-簡単なイメージとしてはこんな感じ。 AWS アカウント &amp;hellip; 組織およびルートユーザーのこと。通称アカウント。 IAM ユーザー &amp;hellip; 組織内の個別ユーザー。通称ユーザー。 ちなみに、IAM は Identity and Access Management の略。
-AWS アカウント（のルートユーザー） AWS サインアップ時に作られる、組織で 1 つだけ用意されるルートユーザーです。 AWS アカウントの ID は管理者のメールアドレスです。 AWS アカウントは、契約／支払い設定などを含むフルアクセス権限があるので、通常の業務ではこのアカウントは使わず、IAM ユーザーを使います。 IAM ユーザー AWS アカウントから作成されるユーザーで、通常の業務ではこの IAM ユーザーを使います。Linux の一般ユーザーのようなものです。 1 つの AWS アカウントから複数の IAM ユーザーを作成することができます。 IAM ユーザーに IAM ポリシーを割り当てることで、各種リソースへのアクセスが許可されます。IAM ユーザー作成直後は、何もアクセス権限がありません。ちなみに、IAM ポリシーは JSON 形式で記述されます。 IAM グループ 複数の IAM ユーザーをグルーピングするためのものです。 IAM グループに対しても IAM ポリシーを割り当てることができ、複数の IAM ユーザーにまとめて権限設定することができます。 IAM ロール 特定の AWS サービス、IAM ユーザー、IAM グループに一時的に権限を与えるために使われます。例えば、EC2 インスタンスへのアクセス権割り当てなどに使われます。 IAM ロールがどのような権限を表現するかは、IAM ロール自体に IAM ポリシーを割り当てることで制御します。 協力会社のメンバーに自社リソースの権限を与えたいときに、協力会社側で使っている IAM ユーザーに対して、自社で作成した IAM ロールを割り当てる、という使い方ができます。→ 参考: IAM ユーザーにアクセス権限を委任するロールの作成</description></item><item><title>AWS のサービス一覧（2021年版）</title><link>https://maku.blog/p/t8fmsz5/</link><pubDate>Mon, 25 Jan 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t8fmsz5/</guid><description>AWS のサービスを概要説明付きでリスト化したものが欲しくて作っちゃったので置いておきます。 PDF 化したもの も置いておきます。
-分析 (Analytics) Amazon Athena SQL を使用した S3 でのデータクエリ Amazon CloudSearch マネージド型検索サービス Amazon Elasticsearch Service Elasticsearch クラスターを実行し、スケールする Amazon EMR ホスト型 Hadoop フレームワーク Amazon Kinesis リアルタイムストリーミングデータとの連携 Amazon Managed Streaming for Apache Kafka フルマネージド型 Apache Kafka サービス Amazon Redshift 高速かつシンプルで、費用対効果の高いデータウェアハウス Amazon QuickSight 高速ビジネス分析サービス AWS Data Exchange クラウド内サードパーティのデータを検索、購読、および使用 AWS Data Pipeline 定期的なデータ駆動型ワークフローに対するオーケストレーションサービス AWS Glue シンプルでスケーラブルなサーバーレスデータ統合 AWS Lake Formation 安全なデータレイクを数日で構築 Application Integration（アプリケーション統合） AWS Step Functions 分散アプリケーションの調整 Amazon AppFlow SaaS アプリケーションと AWS のサービス向けのコード統合が不要 Amazon EventBridge SaaS アプリと AWS のサービス向けサーバーレスイベントバス Amazon Managed Workflows for Apache Airflow 可用性に優れたセキュアなマネージドワークフローオーケストレーション Amazon MQ マネージド型メッセージブローカーサービス Amazon Simple Notification Service (SNS) Pub/sub、SMS、E メール、およびモバイルプッシュ通知 Amazon Simple Queue Service (SQS) マネージド型メッセージキュー Amazon AppSync 多くのソースから適切なデータを使用して、大規模にアプリを強化 AWS Cost Management（AWS コスト管理） AWS Cost Explorer AWS のコストと使用状況を分析する AWS 予算 カスタムコストと使用予算を設定する AWS のコストと使用状況レポート 包括的なコストと使用状況情報へのアクセス リザーブドインスタンスレポート リザーブドインスタンス (RI) の詳細を把握する Savings Plans 柔軟な料金設定でコンピューティング使用コストを最大 72% 節約 Blockchain （ブロックチェーン） Amazon Managed Blockchain スケーラブルなブロックチェーンネットワークを作成および管理 Amazon Quantum Ledger Database (QLDB) フルマネージド型台帳データベース Business Application（ビジネスアプリケーション） Alexa for Business Alexa を使って組織を強化 Amazon Chime フラストレーションフリーの会議、ビデオ電話、チャット Amazon Honeycode (ベータ) プログラミングなしでモバイルおよびウェブアプリケーションを構築 Amazon WorkDocs エンタープライズドキュメントの安全なストレージと共有 Amazon WorkMail セキュリティで保護されたマネージド型の企業向け E メールおよびカレンダー Compute（コンピューティング） Amazon EC2 クラウド内の仮想サーバー Amazon EC2 Auto Scaling 需要に合わせてコンピューティング性能をスケール Amazon Lightsail 仮想プライベートサーバーを起動および管理 AWS Batch あらゆる規模でバッチジョブを実行 AWS Elastic Beanstalk ウェブアプリの実行と管理 AWS Lambda イベント発生時にコードを実行 AWS Outposts AWS サービスをオンプレミスで実行 AWS Serverless Application Repository サーバーレスアプリケーションを検索、デプロイ、公開する AWS Snow ファミリー エッジロケーションでデータを集約および処理して AWS に転送するデバイス AWS Wavelength 5G デバイスのための超低レイテンシーアプリケーションを提供 VMware Cloud on AWS カスタムハードウェアを使用せずにハイブリッドクラウドを構築する Containers（コンテナ） Amazon Elastic Container Registry コンテナイメージを簡単に保存、管理、デプロイ Amazon Elastic Container Service (ECS) コンテナを実行するためのきわめて安全で信頼性と拡張性が高い方法 Amazon ECS Anywhere (近日公開) インフラストラクチャでの ECS Amazon Elastic Kubernetes Service (EKS) 信頼性が最も高い Kubernetes の実行方法 Amazon EKS Anywhere (近日公開) インフラストラクチャでの Kubernetes Amazon EKS Distro 一貫した Kubernetes クラスターの実行 AWS App2Container 既存のアプリケーションのコンテナ化と移行 AWS Fargate コンテナ向けサーバーレスコンピューティング AWS での Red Hat OpenShift マネージド Red Hat OpenShift クラスター Customer Engagement（カスタマーエンゲージメント） Amazon Connect クラウドベースのコンタクトセンター Amazon Pinpoint チャンネル間でのパーソナライズされたユーザーエンゲージメント Amazon Simple Email Service (SES) E メールの送受信 Database（データベース） Amazon Aurora 高性能マネージドリレーショナルデータベース Amazon Aurora Serverless v2 (プレビュー) 毎秒 100,000 件を超えるトランザクションに瞬時にスケール Amazon DynamoDB マネージド型の NoSQL データベース Amazon DocumentDB (MongoDB 互換) フルマネージド型ドキュメントデータベース Amazon ElastiCache インメモリキャッシングシステム Amazon Keyspaces (Apache Cassandra 用) マネージド型の Cassandra 対応データベース Amazon Neptune フルマネージド型グラフデータベースサービス Amazon Quantum Ledger Database (QLDB) フルマネージド型台帳データベース Amazon RDS MySQL、PostgreSQL、Oracle、SQL Server、MariaDB 向けのマネージドリレーショナルデータベースサービス Amazon RDS on VMware オンプレミスデータベースの管理を自動化 Amazon Redshift 高速、シンプル、費用対効果の高いデータウェアハウジング Amazon Timestream フルマネージド型の時系列データベース AWS Database Migration Service 最小限のダウンタイムでデータベースを移行 AWS Glue シンプルでスケーラブルなサーバーレスデータ統合 Developer Tools（デベロッパーツール） Amazon CodeGuru 最もコストがかかるコード行を見つける Amazon Corretto 本番環境に向けて OpenJDK を配信 AWS Cloud Development Kit (CDK) コードを使用してクラウドインフラストラクチャをモデル化する AWS Cloud9 Cloud IDE でコードを記述、実行、デバッグ AWS CloudShell ブラウザベースのシェル環境 AWS CodeArtifact ソフトウェア開発のためのセキュアかつスケーラブルでコスト効率性に優れたアーティファクト管理 AWS CodeBuild コードのビルドとテスト AWS CodeCommit プライベート Git リポジトリでのコードの保存 AWS CodeDeploy コードデプロイの自動化 AWS CodePipeline 継続的デリバリーを使用したソフトウェアのリリース AWS CodeStar AWS アプリケーションの開発とデプロイ AWS コマンドラインインターフェイス AWS サービスを管理するための統合ツール AWS Device Farm AWS クラウド内の実際のデバイスを使った Android、iOS、ウェブアプリケーションのテスト AWS Fault Injection Simulator 完全マネージド型のカオスエンジニアリングサービス AWS ツールと SDK AWS のためのツールと SDK AWS X-Ray アプリケーションの分析とデバッグ End User Computing（エンドユーザーコンピューティング） Amazon AppStream 2.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS 一般／環境／設定など on まくろぐ</title><link>https://maku.blog/p/cenio8m/</link><description>Recent content in AWS 一般／環境／設定など on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 11 Apr 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/cenio8m/index.xml" rel="self" type="application/rss+xml"/><item><title>TypeScript で AWS SDK を使う開発環境を整える</title><link>https://maku.blog/p/taiqx6d/</link><pubDate>Thu, 25 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/taiqx6d/</guid><description>&lt;h2 id="typescript-のプロジェクトを作成する">TypeScript のプロジェクトを作成する&lt;/h2>
+&lt;h3 id="何をできるようにするか">何をできるようにするか？&lt;/h3>
+&lt;p>ここでは、Node.js はインストール済みであるという前提で、次のようなことを行える TypeScript 環境を整えます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>npm run build&lt;/code>&lt;/strong> で &lt;code>src&lt;/code> ディレクトリ以下の &lt;code>.ts&lt;/code> ファイルをコンパイルする&lt;br>
+（&lt;code>.js&lt;/code> ファイルが &lt;code>build&lt;/code> ディレクトリ以下に出力される）&lt;/li>
+&lt;li>&lt;strong>&lt;code>npm start&lt;/code>&lt;/strong> でコンパイルされた &lt;code>build/main.js&lt;/code> を起動する&lt;/li>
+&lt;/ul>
+&lt;p>下記のセットアップ手順の &lt;a href="../../p/ak7u3h3">詳しい意味はこちらを参照&lt;/a> していただくとして、ここでは一気にセットアップを終わらせてしまいます。&lt;/p>
+&lt;h3 id="セットアップ">セットアップ&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># アプリ用のディレクトリを作成&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ mkdir myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ &lt;span class="nb">cd&lt;/span> myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Node.js アプリの設定ファイル (package.json) を生成&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm init -y
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># TypeScript および Node 型情報をインストール&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install typescript -D
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install @types/node -D
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># TypeScript の設定ファイル (tsconfig.json) を生成&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npx tsc --init&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>package.json&lt;/code> を次のような感じで修正します。
+主に &lt;code>scripts&lt;/code> の定義です。&lt;/p></description></item><item><title>Go 言語で AWS SDK を使う開発環境を整える</title><link>https://maku.blog/p/xnogqgm/</link><pubDate>Mon, 11 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xnogqgm/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ここでは、Go 言語用の AWS SDK V2 をセットアップして、各種 AWS サービス用の API を呼び出す準備をします。&lt;/p>
+&lt;p>Go 言語は Google が開発したプログラミング言語で、ライブラリインポートの手軽さや、生成された実行バイナリの実行速度に定評があるため、今後も利用ユーザーは増えていきそうです。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="https://maku77.github.io/hugo/go/what-is-go.html">Go 言語とは？／Go をインストールする | まくまくHugo/Goノート&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Go の実行環境は &lt;a href="https://go.dev/doc/install">Go のインストーラー&lt;/a> で簡単にインストールできます。
+これ以降の説明では、Go の実行環境はインストール済みであると想定しています。&lt;/p>
+&lt;h2 id="テスト用の-go-プロジェクトを作成する">テスト用の Go プロジェクトを作成する&lt;/h2>
+&lt;p>Go プロジェクト用に適当なディレクトリを作成し、その中で &lt;strong>&lt;code>go mod init&lt;/code>&lt;/strong> コマンドを実行して &lt;strong>&lt;code>go.mod&lt;/code>&lt;/strong> （依存関係などが保存されるファイル）を作成しておきます。
+このファイルが存在するディレクトリを、Go はモジュールとして認識します。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mkdir aws-study
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> &lt;span class="nb">cd&lt;/span> aws-study
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> go mod init aws-study
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>上記の例では、&lt;code>go mod init&lt;/code> の引数（モジュールパス）を &lt;code>aws-study&lt;/code> としましたが、GitHub リポジトリで管理する前提であれば、&lt;strong>&lt;code>github.com/&amp;lt;user&amp;gt;/aws-study&lt;/code>&lt;/strong> のようなモジュールパスを指定するようにしてください。
+これで、Go 言語プロジェクトの準備完了です。&lt;/p>
+&lt;h2 id="aws-sdk-でコンフィグ情報を参照してみる">AWS SDK でコンフィグ情報を参照してみる&lt;/h2>
+&lt;p>AWS SDK を使って AWS のサービスにアクセスするには、認証情報として IAM ユーザーの「アクセスキー ID」や「シークレットアクセスキー」などが必要になります。
+これらは、一般的には AWS CLI の &lt;code>aws configure&lt;/code> コマンドによって、&lt;code>~/.aws/credentials&lt;/code> や &lt;code>~/.aws/config&lt;/code> に保存された情報です。&lt;/p></description></item><item><title>AWS SDK for Node.js でプロキシ環境変数 (https_proxy) を反映させる</title><link>https://maku.blog/p/6vs27aa/</link><pubDate>Mon, 29 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6vs27aa/</guid><description>&lt;h2 id="aws-sdk-for-nodejs-のプロキシ設定">AWS SDK for Node.js のプロキシ設定&lt;/h2>
+&lt;p>社内のプロキシ環境下などから AWS SDK (for Node.js) を使って API 呼び出しを行うには、次のようにプロキシエージェント設定を行います。
+ここでは、AWS SDK version 2 の設定例を示しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">プロキシ設定の例 (AWS SDK v2)&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">AWS&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;aws-sdk&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">HttpsProxyAgent&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;https-proxy-agent&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">AWS&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">update&lt;/span>&lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">httpOptions&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">agent&lt;/span>: &lt;span class="kt">new&lt;/span> &lt;span class="nx">HttpsProxyAgent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;http://proxy.example.com:8080&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、それ以降の AWS サービス (&lt;code>AWS.S3&lt;/code> など）の API 呼び出しがプロキシ経由で行われるようになります。&lt;/p>
+&lt;h2 id="環境変数-https_proxy-の設定を使用する">環境変数 https_proxy の設定を使用する&lt;/h2>
+&lt;p>次のようにすれば、環境変数 &lt;strong>&lt;code>https_proxy&lt;/code>&lt;/strong> に設定されたプロキシアドレスを、AWS SDK にも反映させることができます（といっても、&lt;code>process.env.https_proxy&lt;/code> を参照しているだけです）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">AWS&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;aws-sdk&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">HttpsProxyAgent&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;https-proxy-agent&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// プロキシ設定を反映
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">function&lt;/span> &lt;span class="nx">setupAwsProxy() {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">proxy&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">process&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">env&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">https_proxy&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">proxy&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">AWS&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">update&lt;/span>&lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">httpOptions&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">agent&lt;/span>: &lt;span class="kt">new&lt;/span> &lt;span class="nx">HttpsProxyAgent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">proxy&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>あとは、AWS の各種サービス用の API を使用するだけです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">async&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">putObjectToBucket() {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">setupAwsProxy&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="c1">// 環境変数のプロキシ設定を反映
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">s3&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">AWS&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">S3&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">try&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">output&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">s3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">putObject&lt;/span>&lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Bucket&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;my-s3-bucket-name&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Key&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;key-1&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Body&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;body-1&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}).&lt;/span>&lt;span class="nx">promise&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;SUCCESS - Object added:&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">output&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">catch&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;ERROR:&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">putObjectToBucket&lt;/span>&lt;span class="p">();&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>AWS アカウント、IAM ユーザー、グループ、ポリシーの違い</title><link>https://maku.blog/p/4c7sdwg/</link><pubDate>Wed, 03 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4c7sdwg/</guid><description>&lt;p>AWS を使う上で最初に理解しておくべき、「アカウント」と「ユーザー」まわりの概念についてまとめておきます。&lt;/p>
+&lt;ul>
+&lt;li>簡単なイメージとしてはこんな感じ。
+&lt;ul>
+&lt;li>AWS アカウント &amp;hellip; 組織およびルートユーザーのこと。通称アカウント。&lt;/li>
+&lt;li>IAM ユーザー &amp;hellip; 組織内の個別ユーザー。通称ユーザー。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>ちなみに、IAM は Identity and Access Management の略。&lt;/p>
+&lt;h2 id="aws-アカウントのルートユーザー">AWS アカウント（のルートユーザー）&lt;/h2>
+&lt;ul>
+&lt;li>AWS サインアップ時に作られる、組織で 1 つだけ用意されるルートユーザーです。&lt;/li>
+&lt;li>AWS アカウントの ID は管理者のメールアドレスです。&lt;/li>
+&lt;li>AWS アカウントは、契約／支払い設定などを含むフルアクセス権限があるので、通常の業務ではこのアカウントは使わず、IAM ユーザーを使います。&lt;/li>
+&lt;/ul>
+&lt;h2 id="iam-ユーザー">IAM ユーザー&lt;/h2>
+&lt;ul>
+&lt;li>AWS アカウントから作成されるユーザーで、通常の業務ではこの IAM ユーザーを使います。Linux の一般ユーザーのようなものです。&lt;/li>
+&lt;li>1 つの AWS アカウントから複数の IAM ユーザーを作成することができます。&lt;/li>
+&lt;li>IAM ユーザーに IAM ポリシーを割り当てることで、各種リソースへのアクセスが許可されます。IAM ユーザー作成直後は、何もアクセス権限がありません。ちなみに、IAM ポリシーは JSON 形式で記述されます。&lt;/li>
+&lt;/ul>
+&lt;h2 id="iam-グループ">IAM グループ&lt;/h2>
+&lt;ul>
+&lt;li>複数の IAM ユーザーをグルーピングするためのものです。&lt;/li>
+&lt;li>IAM グループに対しても IAM ポリシーを割り当てることができ、複数の IAM ユーザーにまとめて権限設定することができます。&lt;/li>
+&lt;/ul>
+&lt;h2 id="iam-ロール">IAM ロール&lt;/h2>
+&lt;ul>
+&lt;li>特定の AWS サービス、IAM ユーザー、IAM グループに一時的に権限を与えるために使われます。例えば、EC2 インスタンスへのアクセス権割り当てなどに使われます。&lt;/li>
+&lt;li>IAM ロールがどのような権限を表現するかは、IAM ロール自体に IAM ポリシーを割り当てることで制御します。&lt;/li>
+&lt;li>協力会社のメンバーに自社リソースの権限を与えたいときに、協力会社側で使っている IAM ユーザーに対して、自社で作成した IAM ロールを割り当てる、という使い方ができます。→ 参考: &lt;a href="https://docs.aws.amazon.com/ja_jp/IAM/latest/UserGuide/id_roles_create_for-user.html">IAM ユーザーにアクセス権限を委任するロールの作成&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>AWS のサービス一覧（2021年版）</title><link>https://maku.blog/p/t8fmsz5/</link><pubDate>Mon, 25 Jan 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t8fmsz5/</guid><description>&lt;p>AWS のサービスを概要説明付きでリスト化したものが欲しくて作っちゃったので置いておきます。
+&lt;a href="../../p/t8fmsz5/aws-services.pdf">PDF 化したもの&lt;/a> も置いておきます。&lt;/p>
+&lt;style>
+.local-aws td {
+ padding: 0 0 0.2em 0.2em;
+ background: #fafafa;
+}
+.local-aws th {
+ padding-top: 1.5em;
+ border: none;
+ background: white;
+ text-align: left;
+}
+.local-aws img {
+ max-width: 1.5em;
+}
+&lt;/style>
+&lt;table class="local-aws">
+ &lt;tbody>
+ &lt;tr>&lt;th colspan="2">分析 (Analytics)&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Athena_16.svg" />
+Amazon Athena&lt;/td>
+ &lt;td>SQL を使用した S3 でのデータクエリ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-CloudSearch_16.svg" />
+Amazon CloudSearch&lt;/td>
+ &lt;td>マネージド型検索サービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Elasticsearch-Service_16.svg" />
+Amazon Elasticsearch Service&lt;/td>
+ &lt;td>Elasticsearch クラスターを実行し、スケールする&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-EMR_16.svg" />
+Amazon EMR&lt;/td>
+ &lt;td>ホスト型 Hadoop フレームワーク&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Kinesis_16.svg" />
+Amazon Kinesis&lt;/td>
+ &lt;td>リアルタイムストリーミングデータとの連携&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Managed-Streaming-for-Kafka_16.svg" />
+Amazon Managed Streaming for Apache Kafka&lt;/td>
+ &lt;td>フルマネージド型 Apache Kafka サービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Redshift_16.svg" />
+Amazon Redshift&lt;/td>
+ &lt;td>高速かつシンプルで、費用対効果の高いデータウェアハウス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-QuickSight_16.svg" />
+Amazon QuickSight&lt;/td>
+ &lt;td>高速ビジネス分析サービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Data-Exchange_16.svg" />
+AWS Data Exchange&lt;/td>
+ &lt;td>クラウド内サードパーティのデータを検索、購読、および使用&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Data-Pipeline_16.svg" />
+AWS Data Pipeline&lt;/td>
+ &lt;td>定期的なデータ駆動型ワークフローに対するオーケストレーションサービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Glue_16.svg" />
+AWS Glue&lt;/td>
+ &lt;td>シンプルでスケーラブルなサーバーレスデータ統合&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Lake-Formation_16.svg" />
+AWS Lake Formation&lt;/td>
+ &lt;td>安全なデータレイクを数日で構築&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Application Integration（アプリケーション統合）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Step-Functions_16.svg" />
+AWS Step Functions&lt;/td>
+ &lt;td>分散アプリケーションの調整&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-AppFlow_16.svg" />
+Amazon AppFlow&lt;/td>
+ &lt;td>SaaS アプリケーションと AWS のサービス向けのコード統合が不要&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-EventBridge_16.svg" />
+Amazon EventBridge&lt;/td>
+ &lt;td>SaaS アプリと AWS のサービス向けサーバーレスイベントバス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon Managed Workflows for Apache Airflow&lt;/td>
+ &lt;td>可用性に優れたセキュアなマネージドワークフローオーケストレーション&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-MQ_16.svg" />
+Amazon MQ&lt;/td>
+ &lt;td>マネージド型メッセージブローカーサービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Simple-Notification-Service_16.svg" />
+Amazon Simple Notification Service (SNS)&lt;/td>
+ &lt;td>Pub/sub、SMS、E メール、およびモバイルプッシュ通知&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Simple-Queue-Service_16.svg" />
+Amazon Simple Queue Service (SQS)&lt;/td>
+ &lt;td>マネージド型メッセージキュー&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-AppSync_16.svg" />
+Amazon AppSync&lt;/td>
+ &lt;td>多くのソースから適切なデータを使用して、大規模にアプリを強化&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">AWS Cost Management（AWS コスト管理）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Cost-Explorer_16.svg" />
+AWS Cost Explorer&lt;/td>
+ &lt;td>AWS のコストと使用状況を分析する&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Budgets_16.svg" />
+AWS 予算&lt;/td>
+ &lt;td>カスタムコストと使用予算を設定する&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Cost-and-Usage-Report_16.svg" />
+AWS のコストと使用状況レポート&lt;/td>
+ &lt;td>包括的なコストと使用状況情報へのアクセス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Reserved-Instance-Reporting_16.svg" />
+リザーブドインスタンスレポート&lt;/td>
+ &lt;td>リザーブドインスタンス (RI) の詳細を把握する&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Savings-Plans_16.svg" />
+Savings Plans&lt;/td>
+ &lt;td>柔軟な料金設定でコンピューティング使用コストを最大 72% 節約&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Blockchain （ブロックチェーン）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Managed-Blockchain_16.svg" />
+Amazon Managed Blockchain&lt;/td>
+ &lt;td>スケーラブルなブロックチェーンネットワークを作成および管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Quantum-Ledger-Database_16.svg" />
+Amazon Quantum Ledger Database (QLDB)&lt;/td>
+ &lt;td>フルマネージド型台帳データベース&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Business Application（ビジネスアプリケーション）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Alexa-For-Business_16.svg" />
+Alexa for Business&lt;/td>
+ &lt;td>Alexa を使って組織を強化&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Chime_16.svg" />
+Amazon Chime&lt;/td>
+ &lt;td>フラストレーションフリーの会議、ビデオ電話、チャット&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon Honeycode (ベータ)&lt;/td>
+ &lt;td>プログラミングなしでモバイルおよびウェブアプリケーションを構築&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-WorkDocs_16.svg" />
+Amazon WorkDocs&lt;/td>
+ &lt;td>エンタープライズドキュメントの安全なストレージと共有&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-WorkMail_16.svg" />
+Amazon WorkMail&lt;/td>
+ &lt;td>セキュリティで保護されたマネージド型の企業向け E メールおよびカレンダー&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Compute（コンピューティング）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-EC2_16.svg" />
+Amazon EC2&lt;/td>
+ &lt;td>クラウド内の仮想サーバー&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-EC2-Auto-Scaling_16.svg" />
+Amazon EC2 Auto Scaling&lt;/td>
+ &lt;td>需要に合わせてコンピューティング性能をスケール&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Lightsail_16.svg" />
+Amazon Lightsail&lt;/td>
+ &lt;td>仮想プライベートサーバーを起動および管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Batch_16.svg" />
+AWS Batch&lt;/td>
+ &lt;td>あらゆる規模でバッチジョブを実行&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Elastic-Beanstalk_16.svg" />
+AWS Elastic Beanstalk&lt;/td>
+ &lt;td>ウェブアプリの実行と管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Lambda_16.svg" />
+AWS Lambda&lt;/td>
+ &lt;td>イベント発生時にコードを実行&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Outposts_16.svg" />
+AWS Outposts&lt;/td>
+ &lt;td>AWS サービスをオンプレミスで実行&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Serverless-Application-Repository_16.svg" />
+AWS Serverless Application Repository&lt;/td>
+ &lt;td>サーバーレスアプリケーションを検索、デプロイ、公開する&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+AWS Snow ファミリー&lt;/td>
+ &lt;td>エッジロケーションでデータを集約および処理して AWS に転送するデバイス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Wavelength_16.svg" />
+AWS Wavelength&lt;/td>
+ &lt;td>5G デバイスのための超低レイテンシーアプリケーションを提供&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_VMware-Cloud-on-AWS_16.svg" />
+VMware Cloud on AWS&lt;/td>
+ &lt;td>カスタムハードウェアを使用せずにハイブリッドクラウドを構築する&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Containers（コンテナ）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Elastic-Container-Registry_16.svg" />
+Amazon Elastic Container Registry&lt;/td>
+ &lt;td>コンテナイメージを簡単に保存、管理、デプロイ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Elastic-Container-Service_16.svg" />
+Amazon Elastic Container Service (ECS)&lt;/td>
+ &lt;td>コンテナを実行するためのきわめて安全で信頼性と拡張性が高い方法&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon ECS Anywhere (近日公開)&lt;/td>
+ &lt;td>インフラストラクチャでの ECS&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Elastic-Container-Kubernetes_16.svg" />
+Amazon Elastic Kubernetes Service (EKS)&lt;/td>
+ &lt;td>信頼性が最も高い Kubernetes の実行方法&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon EKS Anywhere (近日公開)&lt;/td>
+ &lt;td>インフラストラクチャでの Kubernetes&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon EKS Distro&lt;/td>
+ &lt;td>一貫した Kubernetes クラスターの実行&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+AWS App2Container&lt;/td>
+ &lt;td>既存のアプリケーションのコンテナ化と移行&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Fargate_16.svg" />
+AWS Fargate&lt;/td>
+ &lt;td>コンテナ向けサーバーレスコンピューティング&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+AWS での Red Hat OpenShift&lt;/td>
+ &lt;td>マネージド Red Hat OpenShift クラスター&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Customer Engagement（カスタマーエンゲージメント）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Connect_16.svg" />
+Amazon Connect&lt;/td>
+ &lt;td>クラウドベースのコンタクトセンター&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Pinpoint_16.svg" />
+Amazon Pinpoint&lt;/td>
+ &lt;td>チャンネル間でのパーソナライズされたユーザーエンゲージメント&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Simple-Email-Service_16.svg" />
+Amazon Simple Email Service (SES)&lt;/td>
+ &lt;td>E メールの送受信&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Database（データベース）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Aurora_16.svg" />
+Amazon Aurora&lt;/td>
+ &lt;td>高性能マネージドリレーショナルデータベース&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon Aurora Serverless v2 (プレビュー)&lt;/td>
+ &lt;td>毎秒 100,000 件を超えるトランザクションに瞬時にスケール&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-DynamoDB_16.svg" />
+Amazon DynamoDB&lt;/td>
+ &lt;td>マネージド型の NoSQL データベース&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-DocumentDB_16.svg" />
+Amazon DocumentDB (MongoDB 互換)&lt;/td>
+ &lt;td>フルマネージド型ドキュメントデータベース&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-ElastiCache_16.svg" />
+Amazon ElastiCache&lt;/td>
+ &lt;td>インメモリキャッシングシステム&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Keyspaces_16.svg" />
+Amazon Keyspaces (Apache Cassandra 用)&lt;/td>
+ &lt;td>マネージド型の Cassandra 対応データベース&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Neptune_16.svg" />
+Amazon Neptune&lt;/td>
+ &lt;td>フルマネージド型グラフデータベースサービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Quantum-Ledger-Database_16_b.svg" />
+Amazon Quantum Ledger Database (QLDB)&lt;/td>
+ &lt;td>フルマネージド型台帳データベース&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-RDS_16.svg" />
+Amazon RDS&lt;/td>
+ &lt;td>MySQL、PostgreSQL、Oracle、SQL Server、MariaDB 向けのマネージドリレーショナルデータベースサービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-RDS-for-VMware_16.svg" />
+Amazon RDS on VMware&lt;/td>
+ &lt;td>オンプレミスデータベースの管理を自動化&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Redshift_16_b.svg" />
+Amazon Redshift&lt;/td>
+ &lt;td>高速、シンプル、費用対効果の高いデータウェアハウジング&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Timestream_16.svg" />
+Amazon Timestream&lt;/td>
+ &lt;td>フルマネージド型の時系列データベース&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Database-Migration_16.svg" />
+AWS Database Migration Service&lt;/td>
+ &lt;td>最小限のダウンタイムでデータベースを移行&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Glue_16.svg" />
+AWS Glue&lt;/td>
+ &lt;td>シンプルでスケーラブルなサーバーレスデータ統合&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Developer Tools（デベロッパーツール）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-CodeGuru_16.svg" />
+Amazon CodeGuru&lt;/td>
+ &lt;td>最もコストがかかるコード行を見つける&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon Corretto&lt;/td>
+ &lt;td>本番環境に向けて OpenJDK を配信&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Cloud-Development-Kit_16.svg" />
+AWS Cloud Development Kit (CDK)&lt;/td>
+ &lt;td>コードを使用してクラウドインフラストラクチャをモデル化する&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Cloud9_16.svg" />
+AWS Cloud9&lt;/td>
+ &lt;td>Cloud IDE でコードを記述、実行、デバッグ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+AWS CloudShell&lt;/td>
+ &lt;td>ブラウザベースのシェル環境&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-CodeArtifact_16.svg" />
+AWS CodeArtifact&lt;/td>
+ &lt;td>ソフトウェア開発のためのセキュアかつスケーラブルでコスト効率性に優れたアーティファクト管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-CodeBuild_16.svg" />
+AWS CodeBuild&lt;/td>
+ &lt;td>コードのビルドとテスト&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-CodeCommit_16.svg" />
+AWS CodeCommit&lt;/td>
+ &lt;td>プライベート Git リポジトリでのコードの保存&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-CodeDeploy_16.svg" />
+AWS CodeDeploy&lt;/td>
+ &lt;td>コードデプロイの自動化&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-CodePipeline_16.svg" />
+AWS CodePipeline&lt;/td>
+ &lt;td>継続的デリバリーを使用したソフトウェアのリリース&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Codestar_16.svg" />
+AWS CodeStar&lt;/td>
+ &lt;td>AWS アプリケーションの開発とデプロイ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Command-Line-Interface_16.svg" />
+AWS コマンドラインインターフェイス&lt;/td>
+ &lt;td>AWS サービスを管理するための統合ツール&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Device-Farm_16.svg" />
+AWS Device Farm&lt;/td>
+ &lt;td>AWS クラウド内の実際のデバイスを使った Android、iOS、ウェブアプリケーションのテスト&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+AWS Fault Injection Simulator&lt;/td>
+ &lt;td>完全マネージド型のカオスエンジニアリングサービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Tools-and-SDK_16.svg" />
+AWS ツールと SDK&lt;/td>
+ &lt;td>AWS のためのツールと SDK&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-X-Ray_16.svg" />
+AWS X-Ray&lt;/td>
+ &lt;td>アプリケーションの分析とデバッグ&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">End User Computing（エンドユーザーコンピューティング）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-App-Stream_16.svg" />
+Amazon AppStream 2.0&lt;/td>
+ &lt;td>デスクトップアプリケーションを安全にブラウザへストリーミングするサービスです&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-WorkDocs_16_b.svg" />
+Amazon WorkDocs&lt;/td>
+ &lt;td>エンタープライズドキュメントの安全なストレージと共有&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-WorkLink_16.svg" />
+Amazon WorkLink&lt;/td>
+ &lt;td>社内のウェブサイトへのモバイルアクセスを可能にする&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-WorkSpaces_16.svg" />
+Amazon WorkSpaces&lt;/td>
+ &lt;td>デスクトップコンピューティングサービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Font-End Web &amp; Mobile（ウェブとモバイルのフロントエンド）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Amplify-Console_16.svg" />
+AWS Amplify&lt;/td>
+ &lt;td>モバイルおよびウェブアプリケーションの構築とデプロイ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-API-Gateway_16.svg" />
+Amazon API Gateway&lt;/td>
+ &lt;td>API を構築し、デプロイし、管理する&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon Location Service (プレビュー)&lt;/td>
+ &lt;td>アプリケーションにロケーションデータをセキュアかつ簡単に追加&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Pinpoint_16_b.svg" />
+Amazon Pinpoint&lt;/td>
+ &lt;td>チャンネル間でのパーソナライズされたユーザーエンゲージメント&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-AppSync_16_b.svg" />
+AWS AppSync&lt;/td>
+ &lt;td>多くのソースから適切なデータを使用して、大規模にアプリを強化&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Device-Farm_16.svg" />
+AWS Device Farm&lt;/td>
+ &lt;td>AWS クラウド内の実際のデバイスを使った Android、iOS、ウェブアプリケーションのテスト&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Game Tech&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-GameLift_16.svg" />
+Amazon GameLift&lt;/td>
+ &lt;td>シンプルで高速な費用対効果の高い専用ゲームサーバーホスティング&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Lumberyard_64.svg" />
+Amazon Lumberyard&lt;/td>
+ &lt;td>AWS や Twitch と統合された完全なソースを利用できる、無料のクロスプラットフォーム 3D ゲームエンジンです。&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Internet of Things（IoT: モノのインターネット）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-IoT-Core_16.svg" />
+AWS IoT Core&lt;/td>
+ &lt;td>デバイスをクラウドに接続&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-IoT-Greengrass-Core_16.svg" />
+AWS Greengrass&lt;/td>
+ &lt;td>デバイスのローカルでのコンピューティング、メッセージング、および同期&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-IoT-1-Click_16.svg" />
+AWS IoT 1-Click&lt;/td>
+ &lt;td>AWS Lambda トリガーのワンクリック作成&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-IoT-Analytics_16.svg" />
+AWS IoT Analytics&lt;/td>
+ &lt;td>IoT デバイスの分析&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-IoT-Button_16.svg" />
+AWS IoT ボタン&lt;/td>
+ &lt;td>クラウドのプログラミング可能なダッシュボタン&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-IoT-Device-Defender_16.svg" />
+AWS IoT Device Defender&lt;/td>
+ &lt;td>IoT デバイスのセキュリティ管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-IoT-Device-Management_16.svg" />
+AWS IoT Device Management&lt;/td>
+ &lt;td>IoT デバイスのオンボード、編成、リモート管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-IoT-Events_16.svg" />
+AWS IoT Events&lt;/td>
+ &lt;td>IoT イベントを検出し、対応&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-IoT-SiteWise_16.svg" />
+AWS IoT SiteWise&lt;/td>
+ &lt;td>IoT データコレクターおよびインタプリタ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-IoT-Things-Graph_16.svg" />
+AWS IoT Things Graph&lt;/td>
+ &lt;td>デバイスおよびウェブサービスを簡単に接続&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+AWS Partner Device Catalog&lt;/td>
+ &lt;td>AWS 互換の IoT ハードウェアの精選カタログ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-FreeRTOS_16.svg" />
+FreeRTOS&lt;/td>
+ &lt;td>マイクロコントローラ向けリアルタイムオペレーティングシステム&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Machine Learning（機械学習）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-SageMaker_16.svg" />
+Amazon SageMaker&lt;/td>
+ &lt;td>機械学習モデルを大規模に構築、トレーニング、デプロイ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Augmented-AI-A2I_16.svg" />
+Amazon Augmented AI&lt;/td>
+ &lt;td>ML 予測のヒューマンレビューを簡単に導入&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-CodeGuru_16.svg" />
+Amazon CodeGuru&lt;/td>
+ &lt;td>最もコストがかかるコード行を見つける&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Comprehend_16.svg" />
+Amazon Comprehend&lt;/td>
+ &lt;td>テキストのインサイトや関係性を検出&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon DevOps Guru&lt;/td>
+ &lt;td>ML 駆動のクラウドオペレーションサービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Elastic-Inference_16.svg" />
+Amazon Elastic Inference&lt;/td>
+ &lt;td>深層学習推論の高速化&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Forecast_16.svg" />
+Amazon Forecast&lt;/td>
+ &lt;td>機械学習を使用して予測の精度を向上させる&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Fraud-Detector_16.svg" />
+Amazon Fraud Detector&lt;/td>
+ &lt;td>オンライン詐欺をより素早く検知&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Kendra_16.svg" />
+Amazon Kendra&lt;/td>
+ &lt;td>ML を利用してエンタープライズ検索を改革&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Lex_16.svg" />
+Amazon Lex&lt;/td>
+ &lt;td>音声やテキストに対応するチャットボットの構築&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon Lookout for Equipment (プレビュー)&lt;/td>
+ &lt;td>センサーデータの分析による異常動作の検知&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon Lookout for Metrics&lt;/td>
+ &lt;td>メトリクス内における異常の検知&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon Lookout for Vision&lt;/td>
+ &lt;td>コンピュータビジョンを使用した製品欠陥の検出&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon Monitron&lt;/td>
+ &lt;td>機器モニタリングのためのエンドツーエンドシステム&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Personalize_16.svg" />
+Amazon Personalize&lt;/td>
+ &lt;td>アプリケーションへのリアルタイムレコメンデーションの構築&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Polly_16.svg" />
+Amazon Polly&lt;/td>
+ &lt;td>テキストを生きた話し声に変換&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Rekognition_16.svg" />
+Amazon Rekognition&lt;/td>
+ &lt;td>イメージとビデオを分析&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon SageMaker Data Wrangler&lt;/td>
+ &lt;td>ML 用にデータを準備するための最も速い方法&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-SageMaker-Ground-Truth_16.svg" />
+Amazon SageMaker Ground Truth&lt;/td>
+ &lt;td>精度の高い機械学習トレーニングデータセットの構築&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Textract_16.svg" />
+Amazon Textract&lt;/td>
+ &lt;td>ドキュメントからテキストやデータを抽出する&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Translate_16.svg" />
+Amazon Translate&lt;/td>
+ &lt;td>自然で流ちょうな言語翻訳&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Transcribe_16.svg" />
+Amazon Transcribe&lt;/td>
+ &lt;td>自動音声認識&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Deep-Learning-AMIs_16.svg" />
+AWS 深層学習 AMI&lt;/td>
+ &lt;td>EC2 で今すぐ深層学習を始める&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Deep-Learning-Containers_16.svg" />
+AWS Deep Learning Containers&lt;/td>
+ &lt;td>深層学習向け Docker イメージ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Deep-Composer_16.svg" />
+AWS DeepComposer&lt;/td>
+ &lt;td>機械学習が有効化されたミュージカルキーボード&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Deep-Lense_16.svg" />
+AWS DeepLens&lt;/td>
+ &lt;td>深層学習に対応したビデオカメラ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Deepracer_16.svg" />
+AWS DeepRacer&lt;/td>
+ &lt;td>機械学習による 18 分の 1 のスケールでの自律走行型レースカー&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+AWS Inferentia&lt;/td>
+ &lt;td>機械学習インファレンスチップ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+AWS Panorama (プレビュー)&lt;/td>
+ &lt;td>エッジに設置したコンピュータビジョンによる運営改善&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_TorchServe_16.svg" />
+AWS での PyTorch&lt;/td>
+ &lt;td>柔軟なオープンソースの機械学習フレームワーク&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Apache-MXNet_16.svg" />
+AWS での Apache MXNet&lt;/td>
+ &lt;td>スケーラブルでパフォーマンスに優れた深層学習&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-TensorFlow-on-AWS_16.svg" />
+AWS での TensorFlow&lt;/td>
+ &lt;td>オープンソースの Machine Intelligence Library&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Management &amp; Governance（マネジメントとガバナンス）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-CloudWatch_16.svg" />
+Amazon CloudWatch&lt;/td>
+ &lt;td>リソースとアプリケーションのモニタリング&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Auto-Scaling_16.svg" />
+AWS Auto Scaling&lt;/td>
+ &lt;td>需要に合わせて複数のリソースをスケール&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Chatbot_16.svg" />
+AWS Chatbot&lt;/td>
+ &lt;td>ChatOps for AWS&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-CloudFormation_16.svg" />
+AWS CloudFormation&lt;/td>
+ &lt;td>テンプレートを使ったリソースの作成と管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Cloud-Trail_16.svg" />
+AWS CloudTrail&lt;/td>
+ &lt;td>ユーザーアクティビティと API 使用状況の追跡&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Command-Line-Interface_16_b.svg" />
+AWS コマンドラインインターフェイス&lt;/td>
+ &lt;td>AWS サービスを管理するための統合ツール&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Compute-Optimizer_16.svg" />
+AWS Compute Optimizer&lt;/td>
+ &lt;td>最適な AWS コンピューティングリソースを特定&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Config_16.svg" />
+AWS Config&lt;/td>
+ &lt;td>リソースのインベントリと変更の追跡&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Control-Tower_16.svg" />
+AWS Control Tower&lt;/td>
+ &lt;td>安全かつ基準に準拠した複数のアカウント環境をセットアップおよび管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Console-Mobile-Application%20_16.svg" />
+AWS コンソールモバイルアプリ&lt;/td>
+ &lt;td>リソースの状態を外出先で確認&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+AWS Distro for OpenTelemetry (プレビュー)&lt;/td>
+ &lt;td>相関するメトリクスとトレースの収集&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-License-Manager_16.svg" />
+AWS License Manager&lt;/td>
+ &lt;td>ライセンスの追跡、管理、制御&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Management-Console_16.svg" />
+AWS マネジメントコンソール&lt;/td>
+ &lt;td>ウェブベースのユーザーインターフェイス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Managed-Services_16.svg" />
+AWS Managed Services&lt;/td>
+ &lt;td>AWS のインフラストラクチャ運用管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon Managed Service for Grafana&lt;/td>
+ &lt;td>強力でインタラクティブなデータ視覚化&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Amazon Managed Service for Prometheus&lt;/td>
+ &lt;td>コンテナのためのセキュアで可用性に優れたモニタリング&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-OpsWorks_16.svg" />
+AWS OpsWorks&lt;/td>
+ &lt;td>Chef と Puppet を使用した運用の自動化&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Organizations_16.svg" />
+AWS Organizations&lt;/td>
+ &lt;td>AWS アカウント全体の一元管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Personal-Health-Dashboard_16.svg" />
+AWS Personal Health Dashboard&lt;/td>
+ &lt;td>AWS のサービス状態のパーソナライズされた表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+AWS Proton (プレビュー)&lt;/td>
+ &lt;td>コンテナとサーバーレスデプロイメントのための自動化された管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Service-Catalog_16.svg" />
+AWS Service Catalog&lt;/td>
+ &lt;td>標準化された製品の作成と使用&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Systems-Manager_16.svg" />
+AWS Systems Manager&lt;/td>
+ &lt;td>運用時の洞察を改善し、実行&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Trusted-Advisor_16.svg" />
+AWS Trusted Advisor&lt;/td>
+ &lt;td>パフォーマンスとセキュリティの最適化&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Well-Architect-Tool_16.svg" />
+AWS Well-Architected Tool&lt;/td>
+ &lt;td>ワークロードの見直しと改善&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Media Services（メディアサービス）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Elastic-Transcoder_16.svg" />
+Amazon Elastic Transcoder&lt;/td>
+ &lt;td>スケーラブルで使いやすいメディア変換サービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Interactive-Video_16.svg" />
+Amazon Interactive Video Service&lt;/td>
+ &lt;td>マネージドライブ動画ソリューション&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Kinesis-Video-Streams_16.svg" />
+Amazon Kinesis Video Streams&lt;/td>
+ &lt;td>ビデオストリームの処理と分析&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Elemental-MediaConnect_16.svg" />
+AWS Elemental MediaConnect&lt;/td>
+ &lt;td>高い信頼性を安全性を持つライブ動画転送&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Elemental-MediaConvert_16.svg" />
+AWS Elemental MediaConvert&lt;/td>
+ &lt;td>ファイルベースのビデオコンテンツを変換&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Elemental-MediaLive_16.svg" />
+AWS Elemental MediaLive&lt;/td>
+ &lt;td>ライブビデオコンテンツを変換&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Elemental-MediaPackage_16.svg" />
+AWS Elemental MediaPackage&lt;/td>
+ &lt;td>動画の発信とパッケージ化&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Elemental-MediaStore_16.svg" />
+AWS Elemental MediaStore&lt;/td>
+ &lt;td>メディアストレージとシンプルな HTTP オリジン&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Elemental-MediaTailor_16.svg" />
+AWS Elemental MediaTailor&lt;/td>
+ &lt;td>動画のパーソナライズと収益化&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Elemental-Appliances-&amp;amp;-Software_16.svg" />
+AWS Elemental アプライアンスとソフトウェア&lt;/td>
+ &lt;td>オンプレミスメディアソリューション&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Migration &amp; Transfer（移行と転送）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Migration-Hub_16.svg" />
+AWS Migration Hub&lt;/td>
+ &lt;td>複数の移行を 1 か所で追跡&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Application-Discovery-Service_16.svg" />
+AWS Application Discovery Service&lt;/td>
+ &lt;td>オンプレミスのアプリケーションを検出して合理的に移行&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Database-Migration_16_b.svg" />
+AWS Database Migration Service&lt;/td>
+ &lt;td>最小限のダウンタイムでデータベースを移行&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Data-Sync_16.svg" />
+AWS DataSync&lt;/td>
+ &lt;td>シンプルかつ高速なオンラインデータ転送&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Server-Migration-Service_16.svg" />
+AWS Server Migration Service&lt;/td>
+ &lt;td>AWS へのオンプレミスサーバーの移行&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+AWS Snow ファミリー&lt;/td>
+ &lt;td>AWS との間でデータを移行するためのデバイス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Transfer-Family_16.svg" />
+AWS Transfer Family&lt;/td>
+ &lt;td>フルマネージド SFTP、FTPS、および FTP サービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-CloudEndure-Migration_16.svg" />
+CloudEndure Migration&lt;/td>
+ &lt;td>AWS への大規模な移行を自動化&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+Migration Evaluator（旧 TSO Logic）&lt;/td>
+ &lt;td>クラウド移行のビジネスケースを作成&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Networking &amp; Content Delivery（ネットワーキングとコンテンツ配信）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Virtual-Private-Cloud_16.svg" />
+Amazon VPC&lt;/td>
+ &lt;td>独立したクラウドリソース&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-API-Gateway_16.svg" />
+Amazon API Gateway&lt;/td>
+ &lt;td>API を構築、デプロイ、管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-CloudFront_16.svg" />
+Amazon CloudFront&lt;/td>
+ &lt;td>グローバルコンテンツ配信ネットワーク&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Route-53_16.svg" />
+Amazon Route 53&lt;/td>
+ &lt;td>スケーラブルなドメインネームシステム (DNS)&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-PrivateLink_16.svg" />
+AWS PrivateLink&lt;/td>
+ &lt;td>AWS でホストされているサービスに安全にアクセス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-App-Mesh_16.svg" />
+AWS App Mesh&lt;/td>
+ &lt;td>マイクロサービスをモニタリングおよびコントロール&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-CloudMap_16.svg" />
+AWS Cloud Map&lt;/td>
+ &lt;td>マイクロサービス向けのアプリケーションリソースレジストリ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Direct-Connect_16.svg" />
+AWS Direct Connect&lt;/td>
+ &lt;td>AWS への専用ネットワーク接続&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Global-Accelerator_16.svg" />
+AWS Global Accelerator&lt;/td>
+ &lt;td>アプリケーションの可用性とパフォーマンスを向上&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Transit-Gateway_16.svg" />
+AWS Transit Gateway&lt;/td>
+ &lt;td>VPC およびアカウント接続を簡単にスケール&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Elastic-Load-Balancing_16.svg" />
+Elastic Load Balancing&lt;/td>
+ &lt;td>複数のターゲットにわたる着信トラフィックの分配&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Quantum Technologies（量子テクノロジー）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Braket_16.svg" />
+Amazon Braket&lt;/td>
+ &lt;td>量子コンピューティングを探索して実験&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Robotics（ロボット工学）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-RoboMaker_16.svg" />
+AWS RoboMaker&lt;/td>
+ &lt;td>ロボット工学アプリケーションの開発、テスト、デプロイ&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Satellite（人工衛星）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Ground-Station_16.svg" />
+AWS Ground Station&lt;/td>
+ &lt;td>サービスとしてのフルマネージド型地上局&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Security, Identity &amp; Compliance（セキュリティ、アイデンティティ、コンプライアンス）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Identity-and-Access-Management_16.svg" />
+AWS Identity &amp; Access Management&lt;/td>
+ &lt;td>サービスとリソースへのアクセスを安全に管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Cognito_16.svg" />
+Amazon Cognito&lt;/td>
+ &lt;td>アプリの ID 管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Detective_16.svg" />
+Amazon Detective&lt;/td>
+ &lt;td>潜在的なセキュリティ問題を調査&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-GuardDuty_16.svg" />
+Amazon GuardDuty&lt;/td>
+ &lt;td>マネージド型脅威検出サービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Inspector_16.svg" />
+Amazon Inspector&lt;/td>
+ &lt;td>アプリケーションのセキュリティの分析&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Macie_16.svg" />
+Amazon Macie&lt;/td>
+ &lt;td>大規模な機密データを検出して保護する&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Artifact_16.svg" />
+AWS Artifact&lt;/td>
+ &lt;td>AWS のコンプライアンスレポートへのオンデマンドアクセス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+AWS Audit Manager&lt;/td>
+ &lt;td>AWS 利用状況の継続的な監査&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Certificate-Manager_16.svg" />
+AWS Certificate Manager&lt;/td>
+ &lt;td>SSL/TLS 証明書のプロビジョニング、管理、およびデプロイメント&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-CloudHSM_16.svg" />
+AWS CloudHSM&lt;/td>
+ &lt;td>法令遵守のためのハードウェアベースキーストレージ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Directory-Service_16.svg" />
+AWS Directory Service&lt;/td>
+ &lt;td>Active Directory のホスティングと管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Firewall-Manager_16.svg" />
+AWS Firewall Manager&lt;/td>
+ &lt;td>ファイアウォールルールの一元管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Key-Management-Services_16.svg" />
+AWS Key Management Service&lt;/td>
+ &lt;td>マネージド型の暗号化キー作成と管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="" />
+AWS Network Firewall&lt;/td>
+ &lt;td>VPC 保護のためのネットワークセキュリティ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Resources-Access-Manager_16.svg" />
+AWS Resource Access Manager&lt;/td>
+ &lt;td>AWS のリソースを共有するためのシンプルでセキュアなサービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Secrets-Manager_16.svg" />
+AWS Secrets Manager&lt;/td>
+ &lt;td>シークレットのローテーション、管理、取得&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Security-Hub_16.svg" />
+AWS Security Hub&lt;/td>
+ &lt;td>統合された AWS セキュリティ &amp; コンプライアンスセンター&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Shield_16.svg" />
+AWS Shield&lt;/td>
+ &lt;td>DDoS 保護&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Single-Sign-On_16.svg" />
+AWS Single Sign-On&lt;/td>
+ &lt;td>クラウドシングルサインオン (SSO) サービス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-WAF_16.svg" />
+AWS WAF&lt;/td>
+ &lt;td>悪意のあるウェブトラフィックのフィルター&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Serverless（サーバーレス）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Lambda_16.svg" />
+AWS Lambda&lt;/td>
+ &lt;td>サーバーに煩わされずにコードを実行&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-API-Gateway_16.svg" />
+Amazon API Gateway&lt;/td>
+ &lt;td>API の構築、デプロイ、管理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-DynamoDB_16.svg" />
+Amazon DynamoDB&lt;/td>
+ &lt;td>マネージド型の NoSQL データベース&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-EventBridge_16.svg" />
+Amazon EventBridge&lt;/td>
+ &lt;td>SaaS アプリと AWS のサービス向けサーバーレスイベントバス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Simple-Notification-Service_16.svg" />
+Amazon Simple Notification Service (SNS)&lt;/td>
+ &lt;td>Pub/sub、SMS、E メール、およびモバイルプッシュ通知&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Simple-Queue-Service_16.svg" />
+Amazon Simple Queue Service (SQS)&lt;/td>
+ &lt;td>マネージド型メッセージキュー&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-S3-Standard_16.svg" />
+Amazon Simple Storage Service (S3)&lt;/td>
+ &lt;td>クラウド内のスケーラブルなストレージ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-AppSync_16.svg" />
+AWS AppSync&lt;/td>
+ &lt;td>多くのソースから適切なデータを使用して、大規模にアプリを強化&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Fargate_16.svg" />
+AWS Fargate&lt;/td>
+ &lt;td>コンテナ向けサーバーレスコンピューティング&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Step-Functions_16.svg" />
+AWS Step Functions&lt;/td>
+ &lt;td>分散型アプリケーションの調整&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">Storage（ストレージ）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-S3-Standard_16.svg" />
+Amazon Simple Storage Service (S3)&lt;/td>
+ &lt;td>スケーラブルなクラウドストレージ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Elastic-Block-Store_16.svg" />
+Amazon Elastic Block Store (EBS)&lt;/td>
+ &lt;td>EC2 ブロックストレージボリューム&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Elastic-File-System_16.svg" />
+Amazon Elastic File System (EFS)&lt;/td>
+ &lt;td>EC2 用フルマネージド型ファイルシステム&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-FSx-for-Lustre_16.svg" />
+Amazon FSx for Lustre&lt;/td>
+ &lt;td>S3 と統合されたハイパフォーマンスファイルシステム&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-FSx-For-WFS_16.svg" />
+Amazon FSx for Windows File Server&lt;/td>
+ &lt;td>フルマネージド型 Windows ネイティブのファイルシステム&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_Amazon-Glacier_16.svg" />
+Amazon S3 Glacier&lt;/td>
+ &lt;td>クラウド上の低コストなアーカイブストレージ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Backup_16.svg" />
+AWS Backup&lt;/td>
+ &lt;td>AWS のサービス全体にわたる一元管理型バックアップ&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Snowball_16.svg" />
+AWS Snow ファミリー&lt;/td>
+ &lt;td>厳しい環境や切断された環境向けの物理エッジコンピューティングおよびストレージデバイス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Storage-Gateway_16.svg" />
+AWS Storage Gateway&lt;/td>
+ &lt;td>ハイブリッドストレージの統合&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-CloudEndure-Disaster-Recovery_16.svg" />
+CloudEndure Disaster Recovery&lt;/td>
+ &lt;td>高度に自動化した災害対策&lt;/td>
+ &lt;/tr>
+ &lt;tr>&lt;th colspan="2">VR &amp; AR（VR および AR）&lt;/th>&lt;/tr>
+ &lt;tr>
+ &lt;td>
+&lt;img style="width: autopx; min-width: autopx;" src="../../p/t8fmsz5/Arch_AWS-Sumerian_16.svg" />
+Amazon Sumerian&lt;/td>
+ &lt;td>VR および AR アプリケーションの構築と実行&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table></description></item></channel></rss>

@@ -1,94 +1,867 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Bot Builder SDK on まくろぐ</title><link>https://maku.blog/tags/bot-builder-sdk/</link><description>Recent content in Bot Builder SDK on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 23 Jul 2019 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/bot-builder-sdk/index.xml" rel="self" type="application/rss+xml"/><item><title>チャットボット (1-1) Bot Builder SDK とは</title><link>https://maku.blog/p/tzaeb9x/</link><pubDate>Mon, 04 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tzaeb9x/</guid><description>Microsoft の Azure は Chatbot サービスを作成する機能を提供しています。 Microsoft が提供している Bot Framework は、この Chatbot サービスを作成するとき、あるいは Chatbot を使用するクライアントを作成するときに使用するツール群（あるいは仕組み）やそれらを取り巻く環境の総称です。
-Microsoft Bot Framework ボットのサーバを実装するためのライブラリは、Bot Builder SDK という名前で提供されています。 現状では、ボットは Node.js と .NET による開発が想定されているため、Bot Builder SDK も Node.js と .NET 用のものが提供されています（2019年3月現在、Python と Java 版が preview リリースされているようです）。
-Bot Builder SDK (for Node.js) Bot Builder SDK (for .Net) Bot Builder サンプルコード集 Node.js と .NET のどちらを使って開発するかに迷ったら、非同期処理を前提にして設計されている Node.js 版を選択するのがよいでしょう。
-Node.js の Bot Builder SDK は、NPM パッケージとして公開されているため、npm コマンドを使って簡単にインストールすることができます。
-$ mkdir mybot $ cd mybot $ npm init -y $ npm install --save botbuilder@4.</description></item><item><title>チャットボット (1-2) Bot Builder SDK で Echo ボットを作成する</title><link>https://maku.blog/p/you6q5r/</link><pubDate>Mon, 04 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/you6q5r/</guid><description>ここでは、Microsoft の Bot Builder SDK を使ったボット作成のファーストステップとして、チャットクライアントから入力されたテキストをそのままオウム返しするだけの Echo ボットを作成します。 言語としては JavaScript (Node.js) を使用することにします。
-ここで作成するのはボットの本体（サービス側）で、クライアントとしては Microsoft が提供している Bot Framework Emulator を使用します。
-Bot Builder SDK をインストールする Node.js 版の Bot Builder SDK（botbuilder パッケージ）は、npm コマンドを使ってインストールすることができます。 パッケージの依存関係を管理するための package.json ファイルも、npm init コマンドで作成しておきます。
-$ mkdir mybot $ cd mybot $ npm init -y $ npm install --save botbuilder@4.x Bot Service のインタフェースは REST API として提供することが定められているのですが、Bot Builder SDK には REST API サーバを作成する機能は含まれていません。 そこで、REST API サーバを作成するための restify パッケージも一緒にインストールしておきます（express などでも実装できると思いますが、リファレンス実装では restify が使用されています）。</description></item><item><title>チャットボット (2-1) Azure でボットをホストするための Web App Bot リソースを作成する</title><link>https://maku.blog/p/tttou4o/</link><pubDate>Tue, 19 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tttou4o/</guid><description>Web App Bot リソースを作成する 作成したボットプログラムは、Azure 上の Web App Bot リソース上で動作させることができます。 このリソースのことを特にボットサービスと呼んだりします。
-Azure ポータル にログインし、下記のように辿ることで Web App Bot リソースの作成画面を表示できます。
-＋リソースの作成 AI + Machine Learning Web App Bot 下記のような Web App Bot リソースの設定画面が表示されるので、1 つずつ入力していきます。
-ボット名 任意のボット名称。後から自由に変更することができるので、自分のわかりやすい名前を付けておけば OK です。例: maku-bot サブスクリプション 月額の請求先となるサブスクリプションを選択します。最初の Azure トライアル期間であれば、Free Trial などを選択できるはずです。 リソースグループ この Web App Bot リソースを所属させるリソースグループを選択します。存在しない場合は 新規作成 のリンクをクリックして新しく作成します。 場所 リソースグループの場所を選択。ここでは、地理的に近い Japan East を選択してます。 価格レベル チャンネルに応じたメッセージ制限解除のためのプラン設定です。 スタンダードチャンネル（Skype、Cortana、Teams、Facebook、Slack などの一般的なクライアント）とのやりとりは無制限なので、通常は F0 の無料プランを選択しておけば OK です。 一方で、プレミアムチャンネル（ユーザ独自のチャンネルや、Web ページ埋め込みチャットボットなど）と多くのメッセージをやりとりする予定がある場合は、有料の S1 プランを選択する必要があります。 無料の F0 だと 1 か月に 10,000 メッセージまでの制限があります。 （参考: Standard channels と Premium channels について） アプリ名 ボットサービスのエンドポイント URL となる XXX.</description></item><item><title>チャットボット (2-2) Web App Bot で生成されたボットのコードを編集する</title><link>https://maku.blog/p/bpqkm2o/</link><pubDate>Wed, 20 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bpqkm2o/</guid><description>チャットボットのソースコードをダウンロードする 下記のページの手順に従い、Azure ポータル上で Web App Bot のリソースを作成すると、自動的に Echo Bot のテンプレートコードが生成されているはずです（選択したテンプレートの種類によって変わりますが、ここでは Node.js 版の Echo Bot テンプレートを指定しているとします）。
-Azure でボットをホストするための Web App Bot リソースを作成する ボットプログラムを作成する場合は、基本的にはこのテンプレートコードをベースにして修正を行っていくのがよいでしょう。 自動生成されたコードは、Azure ポータルから下記のように辿ると ZIP アーカイブでダウロードすることができます。
-すべてのリソース を選択 対象の Web アプリボット リソースを選択（下記の例では maku-bot） ボット管理 の ビルド を選択 ボットのソースコードをダウンロードする のボタンをクリック 図: ボットコードをダウンロード bot ファイルの復号化・暗号化 botFileSecret とは ダウンロードした ZIP アーカイブの中には、ボットサーバの設定ファイルである .bot ファイルが含まれています。
-このファイルは、ローカルでボットサーバを立ち上げたり、エミュレータからそのサーバに接続するときの設定ファイルとして使用するのですが、自動生成された .bot ファイルは、接続情報などの値が暗号化されています。 .bot ファイルの復号化、および暗号化に使用されているキーのことを botFileSecret と呼びます。
-ボットサーバやエミュレータを正しく起動するためには、この botFileSecret を使って .bot ファイルをあらかじめ復号化しておくか、環境変数などでキーを設定しておく必要があります。
-.bot ファイルを復号化した場合は、Azure 上の Web App Bot サービスにデプロイする前に、忘れずに暗号化しておく必要があります。
-botFileSecret の取得 初期の暗号化に使用されている botFileSecret は、Azure ポータルから下記のように辿ることで参照することができます。</description></item><item><title>チャットボット (2-3) Azure の Web App Bot リソースにボットをデプロイする</title><link>https://maku.blog/p/gxm9shf/</link><pubDate>Wed, 20 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gxm9shf/</guid><description>まず前提として、下記の手順により、Azure 上に Web App Bot リソースが作成済みであることとします。 ここに、ローカルで作成したボットをデプロイすることになります。
-Azure でボットをホストするための Web App Bot リソースを作成する Web ブラウザでデプロイする方法（KUDU の Zip Deploy UI） プロジェクトのファイルを ZIP ファイルとしてアーカイブし、Zip Deploy UI という Web ページにドラッグ＆ドロップでデプロイする方法です。 この Web サイトには、下記のような URL でアクセスできます。 &amp;lt;app_name&amp;gt; の部分は、自分のボットアプリ名に置き換えてください。
-https://&amp;lt;app_name&amp;gt;.scm.azurewebsites.net/ZipDeployUI 図: Web App Bot の Zip Deploy UI 左上に表示されるロゴからも分かるように、Azure の Web App サービスでは、Kudu というデプロイエンジンが使われているようですね。
-この /wwwroot ディレクトリの内容が表示されている画面で、エクスプローラ領域に ZIP ファイルをドラッグ＆ドロップすると、ZIP ファイル内のファイルがまとめて /wwwroot にアップロードされます。
-図: ZIP ファイルのドラッグ＆ドロップでデプロイ ボットプログラムのエントリポイントとなる bot.js ファイルを編集してから ZIP 化し、デプロイすることで、ボットの動作が変わることを確認できると思います。
-ZIP アーカイブ作成時の注意 ZIP ファイルの中身が展開された状態でデプロイされるので、ZIP の展開後に余計なディレクトリ階層ができないように ZIP アーカイブを作成してください。 具体的には、プロジェクトのディレクトリを ZIP 化するのではなく、プロジェクトのディレクトリ内のファイル群を ZIP 化します。 コマンドラインから ZIP アーカイブを作成するには、プロジェクトのルートディレクトリから下記のようにします。</description></item><item><title>チャットボット: Azure ポータルで生成されるボットのテンプレートコードを解読＆リファクタしてみる</title><link>https://maku.blog/p/iob68qa/</link><pubDate>Tue, 26 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/iob68qa/</guid><description>Azure が生成するテンプレートコードを理解する 下記の手順に従って Azure ポータル上で Web App Bot リソースを作成すると、ボットプログラムのテンプレートとして index.js や bot.js などのコードが自動生成されます。
-Azure でボットをホストするための Web App Bot リソースを作成する ボットサーバのエントリポイントとなる index.js には、設定情報の読み取りと Web サーバの立ち上げ処理が記述されており、bot.js の方にはボットの応答処理を記述するようになっています。
-つまり、基本的にボットの作成者は bot.js の方にボットのコア部分を実装していけばよいのですが、LUIS や QnA Maker などのサービスと連携する場合は、それぞれの初期化処理が必要であり、結局のところ index.js 側の実装に関してもある程度理解しておく必要があります。
-Azure ポータルで自動生成される index.js は決して理解しやすいものではないので（少なくとも記述時点では）、ここでは index.js の内容を理解する目的と、わかりやすくリファクタする目的を兼ねて、ボットのベースとなるコードを作成していきます。
-最終的には Azure が生成するテンプレートコードと同様の振る舞いになることを想定しています（少なくとも、環境変数の名前などは合わせておいた方がよいです）。
-全体の流れ ボットプログラムのエントリポイントとなる index.js では、大まかに下記のような処理を行います。
-.env ファイルを読み込み、環境変数の情報とマージする 1 の情報を基に、.bot ファイルを読み込む 2 の情報を基に、ボットサーバーを立ち上げる Azure ポータルで生成されるテンプレートコードでは、上記の処理をすべて index.js の中で行っているのですが、ここでは設定の読み込み部分と、ボットサーバの立ち上げ部分を明確に分離してみます。
-config.js: 環境変数や .env ファイルの情報を基に、.bot ファイルの設定を読み込む。 index.js: 上記の設定情報を基にボットサーバを立ち上げる。 という感じにします。
-ステップ(1) 環境変数あるいは .env ファイルの読み込み (config.</description></item><item><title>チャットボット: MS Bot Framework の .bot ファイルで接続情報を管理する</title><link>https://maku.blog/p/8choj4w/</link><pubDate>Wed, 03 Apr 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8choj4w/</guid><description>エミュレータのための .bot ファイル Bot Framework Emulator は、自分自身（チャットクライアント）が接続するボットサーバのアドレスを .bot ファイルから取得します。
-.bot ファイルの中には、&amp;quot;type&amp;quot;: &amp;quot;endpoint&amp;quot; というエンドポイント定義が 1 つ以上記述されており、ここにはボットプログラムのアドレスが記述されています。 エミュレータの設定で、どのエンドポイント設定を使用するかを切り替えることで、実際に接続するボットを使い分けることができます。 典型的には、開発時にローカルホスト上で動作させたボットサーバに接続するための development と、実稼働用に Azure 上で動作させたボットサーバに接続するための production というエンドポイントを定義します。
-図: エミュレータ上でのエンドポイント切り替え ボットプログラムのための .bot ファイル .bot ファイルは、ボットプログラムからも利用されます（こちらの方がメイン）。
-.bot ファイルには、LUIS や QnA Maker のサービスを利用するためのエンドポイント情報（アドレスやエンドポイントキー）が定義されており、ボットプログラムはこれらの情報を使って各サービスの API を利用します。 こららの情報は、ボット自体がローカルホスト上で動作していても、Azure 上で動作していても同様に利用されます。
-また、ここでもボット自体の endpoint エントリが参照され、各種チャンネル（チャットクライアント）がボットにアクセスするときの認証処理のために使用されます。 このあたりの処理は、Bot Builder SDK を使ってボット実装を行っていれば、Adapter クラスとして抽象化されるため、特に意識せずに実装することができます。
-.bot ファイルに LUIS や QnA Maker の接続設定を記述する .bot ファイルは XML ファイルなので、フォーマットさえ理解すればテキストエディタなどで編集してしまうことはできますが、エンドポイントキー部分の復号化・暗号化が必要だったりして面倒です。 Bot Framework Emulator には、.bot ファイルの内容を GUI で編集する機能が付いているのでこの機能を使うのがよいでしょう。
-LUIS/QnA Maker サービスへの接続情報を設定する .bot ファイルをダブルクリックしてエミュレータを起動したら、左上の SERVICES の ＋ ボタンを押すことで各サービスの接続設定を行うことができます。</description></item><item><title>チャットボット: LUIS や QnA Maker サービスへの接続情報を .bot ファイルから取得する</title><link>https://maku.blog/p/o2bqajv/</link><pubDate>Mon, 15 Apr 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/o2bqajv/</guid><description>参考: MS Bot Framework の .bot ファイルで接続情報を管理する ここで作るもの こちらの実装 では、最初のステップとしてボットサーバ自体 (Azure Web Apps) のエンドポイント情報を .bot ファイルから取得する実装を行いました (config.js)。 ここでは、さらに、LUIS サービスや QnA Maker サービスを利用することを想定し、これらの情報も .bot ファイルから取得できるように拡張します。
-使用イメージとしては、下記のようにしてそれぞれの接続情報を簡単に読み込めるようにします。
-const config = require(&amp;#39;./config.js&amp;#39;); const LUIS_APP_NAME = &amp;#39;maku-luis-sample&amp;#39;; const QNA_APP_NAME = &amp;#39;maku-qna-sample&amp;#39;; const botEndpoint = config.loadBotEndpoint(); // ボット自体への接続情報 const luisEndpoint = config.loadLuisEndpoint(LUIS_APP_NAME); // LUIS への接続情報 const qnaEndpoint = config.loadQnaEndpoint(QNA_APP_NAME); // QnA Maker への接続情報 単一のオブジェクトとしてまとめて取得するように実装することもできるのですが、分かりやすさのために、3 つの情報に分けて取得するようにしています。 LUIS や QnA Maker は、複数のアプリ（ナレッジベース）を同時に使用する可能性があるので、アプリ名を指定して接続情報を取得できるようにしています。
-取得した情報は、次のように BotBuilder SDK が提供するクラスへの入力として使用することを想定しています。</description></item><item><title>チャットボット: 作成したチャットボットを LINE に接続する</title><link>https://maku.blog/p/asuzg7k/</link><pubDate>Fri, 19 Apr 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/asuzg7k/</guid><description>LINE に Messaging API チャネルを作成する 自作したチャットボットアプリを LINE から「友だち」として見えるようにするには、まず LINE 側に「プロバイダー」を作成し、そこに「Messaging API チャネル」を追加する必要があります。 この Messaging API チャネルは、LINE アプリから「友だち」として見える単位だと考えればよいでしょう。
-LINE に開発者として登録する LINE のプロバイダー登録作業などは、下記の LINE Developer Console から行うことができます。 初めてアクセスする場合は、開発者としての登録を求められるので、LINE アカウントでログインして開発者情報を入力してください。
-LINE Developer Console プロバイダーを新規作成する LINE に開発者登録できたら、新規プロバイダー作成 のボタンを押して、プロバイダーを作成します。
-Messaging API チャネルを追加する プロバイダーの作成が終わったら、そこに Messaging API チャネル を追加します。
-チャネルの作成時には、アプリアイコンやアプリ名を自由に登録することができます。 アプリ名は一度設定すると 7 日間は変更できないようなので慎重に決めましょう（アイコンは 1 時間経てば変更できます）。
-下のように、プロバイダー上に Messaging API チャネルが追加されていれば OK です。
-スマホの LINE に友達登録する Messaging API のチャネルを選択し、チャネル基本設定 タブを見ると、LINE アプリ用の QR コードが見つかります。
-この QR コードを LINE アプリのカメラで読み取ることで、チャットボットを友達追加することができます。
-ただ、まだボットアプリ本体（自分で作成したボット実装）には接続していないので、話しかけても何も返答してくれません。 下記のようなテンプレートメッセージだけが表示されます。</description></item><item><title>チャットボット: 作成したチャットボットを Slack に接続する</title><link>https://maku.blog/p/rtxqceq/</link><pubDate>Thu, 20 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rtxqceq/</guid><description>Slack に Bot Framework で作成したボットを接続する 図: ボットとのダイレクトメッセージによる会話 Microsoft Azure 上に作成したボットアプリを Slack に接続するには、下記の Bot Service 公式ドキュメントで説明されている手順に従ってください。
-（日本語）ボットを Slack に接続する - Bot Service ｜ Microsoft Docs （英語）Connect a bot to Slack - Bot Service ｜ Microsoft Docs 接続のおおまかな手順は下記のような感じです。
-Slack アプリを作成する（何らかのワークスペースに所属させる形で作成する） Slack アプリにボット用のユーザーを登録する Azure ポータルから、Web アプリボットのチャンネルとして Slack を追加（Slack アプリ側の Client ID、Client Secret、Verification Token をコピペすれば OK） この作業が終わると、ボット（アプリ）が Slack のワークスペースに参加している状態になります。 その時点ではどのチャンネルにも参加していませんが、ダイレクトメッセージを使って一対一でボットと会話することができます。
-特定のチャンネルで会話している最中に @ボット名 と話かけると、そのチャンネルにボットを招待することができます。 チャンネルにボットが参加すると、後はそのチャンネルに対してつぶやくだけでボットが反応するようになります。
-わかりにくいところの補足 図入りで説明されているので、特に迷うことはないと思いますが、Microsoft の Bot チームのドキュメント通りにはうまくいかない部分があるので若干補足しておきます。
-ボットハンドル 「ボットのイベントをサブスクライブ」するという項目で、下記のような Request URL でボットハンドル (YourBotHandle) を指定するところがあります。</description></item><item><title>チャットボット: Chatdown（.chat ファイル）を使ってボットの会話をデザインする</title><link>https://maku.blog/p/a6yzskr/</link><pubDate>Wed, 27 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/a6yzskr/</guid><description>Chatdown フォーマットとは Chatdown フォーマットは、会話の設計をテキストベースで行うことを意図したフォーマットです。 拡張子は .chat で、下記のような感じで会話例を記述していきます。
-sample.chat user=Joe bot=LulaBot bot: Hi! user: yo! bot: [Typing][Delay=3000] Greetings! What would you like to do? * update - You can update your account * List - You can list your data * help - you can get help user: I need the bot framework logo. 上記のように、チャットボットがタイプ中であることや、応答までのディレイなどもデザインすることができます。 Markdown 形式で書式設定できるようになっているのが Chatdown という名前の由来ですね。
-Bot Framework Emulator で会話を再現する Bot Framework Emulator で会話ファイルを読み込むと、チャット UI 上で会話を再現することができます。 ただし、Emulator が読み込むことのできるファイルは .</description></item><item><title>チャットボット: ActivityHandler でボットのイベントハンドラ実装を簡略化する</title><link>https://maku.blog/p/mgujykj/</link><pubDate>Sun, 09 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mgujykj/</guid><description>Bot Builder SDK (Node.js) の botbuilder-core パッケージには、ActivityHandler という、ボットのイベントハンドラ部分の実装を簡略化するためのライブラリが含まれています。 ボットの世界では、「Activity」はひとつのメッセージの処理単位のことを示しています。 この Activity をうまくハンドルするためのクラスだから ActivityHandler という名前が付けられているんですね。
-ここでは、独自のボットクラス (MyBot) を、ActivityHandler を利用せずに実装した場合と、利用して実装した場合で比較してみたいと思います。
-ActivityHandler を使わない場合 例えば、下記のように BotFrameworkAdapter で受信したイベントの処理を MyBot.onTurn() に委譲するとします。
-mybot.js const myBot = new MyBot(); const adapter = new BotFrameworkAdapter({}); const server = require(&amp;#39;restify&amp;#39;).createServer(); server.post(&amp;#39;/api/messages&amp;#39;, (req, res) =&amp;gt; { adapter.processActivity(req, res, async (context) =&amp;gt; { await myBot.onTurn(context); // あとは MyBot に丸投げ }); }); このイベントは、ユーザからメッセージを送られたときだけでなく、ユーザがチャットに参加したとき (ConversationUpdate) などにも発生するため、MyBot.onTurn() の実装の中でアクティビティタイプを見て分岐処理を行わなければなりません。
-class MyBot { constructor() { // ... } async onTurn(context) { if (context.</description></item><item><title>チャットボット: ユーザーの参加／離脱のイベントをハンドルする</title><link>https://maku.blog/p/onctywi/</link><pubDate>Fri, 28 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/onctywi/</guid><description>Bot Builder SDK の ActivityHandler を使って、ユーザーが会話に参加したこと、離脱したことをハンドルする方法を説明します。 ActivityHandler を使ったボット実装の基本に関しては下記を参照してください。
-チャットボット: ActivityHandler でボットのイベントハンドラ実装を簡略化する 下記は、ユーザーが新しく会話に参加したときに、ボットから挨拶するように実装した例です。 ユーザー参加のイベントをハンドルするには、ActivityHandler#onMembersAdded() で、イベントハンドラを登録します。
-mybot.js const { ActivityHandler, BotFrameworkAdapter } = require(&amp;#39;botbuilder&amp;#39;); // ボット実装 class MyBot extends ActivityHandler { constructor() { super(); this.onMessage(this.handleMessage); this.onMembersAdded(this.handleMembersAdded); } async handleMessage(context, next) { const name = context.activity.from.name; const utterance = context.activity.text; await context.sendActivity(`${name}さんは、${utterance}と言いました。`); await next(); } async handleMembersAdded(context, next) { const members = context.activity.membersAdded; for (let i = 0; i &amp;lt; members.length; ++i) { const m = members[i]; if (m.</description></item><item><title>チャットボット: Bot Builder SDK で会話の状態を保存する (Storage)</title><link>https://maku.blog/p/3fnyk44/</link><pubDate>Tue, 11 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3fnyk44/</guid><description>ボットは基本的にステートレスで動作するので、ユーザとの会話のコンテキストを把握するには、ステートの管理を明示的に行う必要があります。 Bot Builder SDK にはそのためのユーティリティクラスが用意されています。 ここでは、Node.js の botbuilder パッケージを使って説明します。
-Storage インタフェース botbuilder パッケージに含まれている Storage インタフェースは、抽象化されたストレージに JSON オブジェクトを保存するための API を定義しています。 write、read、delete の 3 つの API のみなのでとてもシンプルです。
-write メソッド JSON オブジェクトをストレージに保存するための API です。 オブジェクトを保存するときには、名前（キー）を付けて、キー＆バリューの形のオブジェクトとして保存します。 下記の例では、保存したい state オブジェクトに、botState という名前を付けて保存しています。
-state.topic = &amp;#39;someTopic&amp;#39;; await storage.write({ &amp;#39;botState&amp;#39;: state }); read メソッド ストレージに保存されたオブジェクトを読み出すための API です。 読み出したいオブジェクトの名前を配列で渡すと、オブジェクトの連想配列が返ってきます。 下記の例では、botState という名前で保存されたオブジェクトを、state 変数に取り出しています。
-const items = await storage.read([&amp;#39;botState&amp;#39;]); const state = items[&amp;#39;botState&amp;#39;] || {}; delete メソッド ストレージに保存されたオブジェクトを削除するための API です。 削除したいオブジェクトの名前を配列で渡します。</description></item><item><title>チャットボット: Bot Builder SDK で会話の状態を保存する (BotState)</title><link>https://maku.blog/p/6wtzzq4/</link><pubDate>Fri, 28 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6wtzzq4/</guid><description>BotState クラス Bot Builder SDK の BotState クラス は、ボットとの会話内の特定のコンテキストにおける状態を保持するためのクラスです。
-というと難しいですが、簡単に言うと、会話ごとの状態保存や、ユーザーごとの状態保存を行うための便利クラスです。
-BotState クラスには次のようなサブクラスが定義されています。
-ConversationState クラス &amp;hellip; 会話ごとの状態を保存する UserState クラス &amp;hellip; ユーザーごとの状態を保存する PrivateConversationState クラス &amp;hellip; 会話ごとのユーザごとの状態を保存する これらのクラスは、内部で Storage オブジェクトを利用します。
-≪生成コード&amp;#x1F4D6;≫ Storage がグローバルに状態保存を行っていたのに対し、BotState はネームスペースを考慮して状態保存を行うものだと考えることができます。 実際に、ConversationState クラスや UserState クラスの実装を覗いてみると、getStorageKey() というメソッドでストレージ用の保存キーを作成しており、それぞれ次のように構成しています。
-ConversationState が使用する保存キー ${ channelId }/conversations/${ conversationId }/${ this.namespace } UserState が使用する保存キー ${ channelId }/users/${ userId }/${ this.namespace } PrivateConversationState が使用するキー ${ channelId }/conversations/${ conversationId }/users/${ userId }/${ this.namespace } 実用的なボットの状態管理を行うには、Storage インタフェースをそのまま使うのではなく、ConversationState / UserState / PrivateConversationState などを使うことになるでしょう。</description></item><item><title>チャットボット: Bot Builder SDK の Dialog で会話の流れをデザインする (1) ダイアログの基本</title><link>https://maku.blog/p/w36evii/</link><pubDate>Mon, 01 Jul 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/w36evii/</guid><description>Dialog を使わない会話管理 Bot Builder SDK の UserState や ConversationState を使う と、ユーザーや会話ごとの状態管理を行うことできるため、複数回のやりとりが必要な会話を実現することができます。
-例えば、下記のような会話ができるボットを実装してみます。
-User: こんにちは Bot: あなたの名前は？ User: まく Bot: こんにちは まく さん User: おやすみなさい Bot: また来てね まく さん 次のボット実装は、UserState クラスを使って、pos という名前のプロパティを作成し、会話がどこまで進んでいるかを管理しています。
-mybot.js const { ActivityHandler, UserState } = require(&amp;#39;botbuilder&amp;#39;); class MyBot extends ActivityHandler { constructor(storage) { super(); this._createStateObjects(storage); this.onMessage(async (context, next) =&amp;gt; { const prop = await this.nameProp.get(context, { pos: &amp;#39;init&amp;#39; }); // プロパティの &amp;#39;pos&amp;#39; により処理を分岐させる if (prop.pos === &amp;#39;init&amp;#39;) { prop.</description></item><item><title>チャットボット: Bot Builder SDK の Dialog で会話の流れをデザインする (2) スタック管理</title><link>https://maku.blog/p/6arjar6/</link><pubDate>Fri, 19 Jul 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6arjar6/</guid><description>ダイアログの基本 で説明したように、Dialog クラスを使用した会話フローでは、ユーザーからメッセージを受け取るたびに DialogContext#continueDialog() を呼び出すことで、1 ステップずつ処理を進めていきます。 ダイアログには、スタック構造で会話を管理する仕組みがあり、次のようなメソッドを使って、ダイアログの起動（スタックに積む）、ダイアログの終了（スタックから降ろす）という操作を行うことが可能です。
-DialogContext#beginDialog(&amp;quot;ID&amp;quot;) &amp;hellip; ダイアログを開始する（スタックに積む） DialogContext#endDialog() &amp;hellip; アクティブなダイアログを終了する（スタックから降ろす） DialogContext#replaceDialog(&amp;quot;ID&amp;quot;) &amp;hellip; アクティブなダイアログを別のダイアログに置き換える（スタックの一番上を入れ替え） DialogContext#cancelAllDialog() &amp;hellip; すべてのダイアログを終了する（スタックをクリア） ここでは、RootDialog と GreetDialog という名前の 2 つのダイアログクラス作成し、RootDialog から GreetDialog を起動してダイアログのスタックを積むような実装を行ってみます。
-図: ダイアログ遷移のイメージ 下記は、実際のチャットクライアントの表示例です。 右側のバーで示すように、 最初に RootDialog による選択肢が表示され、次に GreetDialog の処理に遷移し、最後に RootDialog に戻ってくるという流れです。
-図: チャットのイメージ 下記は、最初に起動される RootDialog クラスの実装です。 前回の説明 で使用した DialogBot クラスを使って RootDialog を起動することを想定しています。 ウォーターフォールダイアログの最初のステップ (_step1) として、ユーザーに選択肢を提示し、「挨拶する」を選んだ場合に、GreetDialog を新たに起動するようにしています。
-dialogs/rootDialog.js const { ChoiceFactory, ChoicePrompt, ComponentDialog, ListStyle, WaterfallDialog, } = require(&amp;#39;botbuilder-dialogs&amp;#39;); const { GreetDialog } = require(&amp;#39;.</description></item><item><title>チャットボット: Bot Builder SDK で画像やリストなどのリッチなメッセージを送る (MessageFactory)</title><link>https://maku.blog/p/q7vw95i/</link><pubDate>Thu, 04 Jul 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/q7vw95i/</guid><description>Activity オブジェクトと MessageFactory Bot Builder SDK によるボット実装において、ユーザーにメッセージを送るには TurnContext クラス の sendActivity() メソッドを使用します。 下記は、単純なテキストメッセージを送る例です。
-await context.sendActivity(&amp;#39;Hello!&amp;#39;); sendActivity() の第一引数には、このように文字列を渡すことができますが、その名の通り Activity オブジェクトを渡すこともできるようになっています。 Activity オブジェクトを使うと、単純なテキストよりもリッチな形式で表示を行うことができます（どう表示されるかは各チャンネルの実装によりますが）。
-Activity インタフェースは botframework-schema モジュール で定義されていますが、このインタフェースを意識してオブジェクトを作成することはあまりありません。 というのも、いろいろな用途の Activity オブジェクトを生成するためのファクトリーである MessageFactory クラス が用意されているからです。
-例えば、MessageFactory#text() は単純なテキストメッセージを送るための Activity オブジェクトを生成します。
-// const { MessageFactory } = require(&amp;#39;botbuilder&amp;#39;); const msg = MessageFactory.text(&amp;#39;Hello!&amp;#39;); await context.sendActivity(msg); これは実は下記のようにするのと同じです。
-await context.sendActivity(&amp;#39;Hello!&amp;#39;); TurnContext#sendActivity() に直接文字列を渡した場合は、内部で前者のような MessageFactory.text() による Activity 生成が行われています。 単純なテキストを送るだけであれば、sendActivity('Hello') としてしまうのが早いでしょう。
-MessageFactory でリッチなメッセージを作成する MessageFactory が提供するファクトリメソッドを使って、リッチなメッセージを送る例をいくつか紹介します。 ここでは、Bot Framework Emulator の表示例を載せておきます。
-画像・動画を表示する -- contentUrl() const msg = MessageFactory.</description></item><item><title>チャットボット: 独自のミドルウェアを作成してログを記録する</title><link>https://maku.blog/p/fn3amda/</link><pubDate>Tue, 23 Jul 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fn3amda/</guid><description>ミドルウェアとは Bot Framework において、クライアントから受信したメッセージはアダプターを介してボットに届けられますが、アダプターにミドルウェアを設定しておくことで、メッセージがボットに届く前に割り込んで処理を行うことができます。
-Adapter → Middleware1 → Middleware2 → Middleware3 → ... → YourBot ミドルウェアは上記のように複数登録することができ、登録された順に呼び出されていきます。 アダプターにミドルウェアを追加するには、BotFrameworkAdapter#use() メソッドを使用します。
-ミドルウェアの追加 const { BotFrameworkAdapter } = require(&amp;#39;botbuilder&amp;#39;); const adpater = new BotFrameworkAdapter(endpoint); adapter.use(new Middleware1()); adapter.use(new Middleware2()); adapter.use(new Middleware3()); ミドルウェアを実装する 独自のミドルウェアを作成するには、Middleware インタフェース が提供する onTurn メソッドを実装します。
-ここでは、ユーザーの入力をコンソールに出力するだけの ConsoleLogger というミドルウェアクラスを実装してみます。
-middlewares/consoleLogger.js exports.ConsoleLogger = class ConsoleLogger { async onTurn(context, next) { if (context.activity.type === &amp;#34;message&amp;#34;) { console.log(context.activity.text); } await next(); // Invoke a next middleware } }; とても簡単ですね。 あと、onTurn() を抜ける前に忘れずに next() を呼び出して、後続のミドルウェアが正しく呼び出されるようにしておく必要があります。</description></item><item><title>チャットボット: 独自のミドルウェアを作成して禁止ワードを拒否するようにする</title><link>https://maku.blog/p/gt9g2na/</link><pubDate>Tue, 23 Jul 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gt9g2na/</guid><description>前回の記事 では、チャットボットに独自のミドルウェアを追加して、ユーザー入力をログ出力できるようにしました。 今回は、ユーザーが NG ワードを入力したときに、警告を表示して処理を中断するようなミドルウェアを作成してみます。
-その名も NgWordMiddleware です！
-middlewares/NgWordMiddleware.js const NG_WORDS = /アホ|まぬけ|バカ/; exports.NgWordMiddleware = class NgWordMiddleware { async onTurn(context, next) { if (context.activity.type === &amp;#39;message&amp;#39;) { const line = context.activity.text; if (NG_WORDS.test(line)) { await context.sendActivity(&amp;#39;そんなこと言っちゃダメ&amp;#39;); return; } } await next(); // Invoke a next middleware } }; 上記の例では、NG_WORDS 定数に、禁止語句を正規表現の形で登録しています。 ユーザーが入力したテキストに、禁止語句が含まれていたら、「そんなこと言っちゃダメ」と返事して処理を進めないようにします（next() を呼び出さないことで後続の処理を打ち切る）。
-このミドルウェアは、下記のようにアダプターに追加することで有効化できます。
-// const { NgWordMiddleware } = require(&amp;#39;./middlewares/ngWordMiddleware.js&amp;#39;); const adapter = new BotFrameworkAdapter(botEndpoint); adapter.use(new NgWordMiddleware()); この例では、単純に禁止語句が含まれているかだけをチェックしているので、「バカルディ」と入力した場合にも弾かれてしまいます。 このあたりは工夫して処理しなきゃですね。</description></item><item><title>LUIS (4) botbuilder-ai ライブラリを使って LUIS の API を利用する</title><link>https://maku.blog/p/dtwckb9/</link><pubDate>Thu, 18 Apr 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dtwckb9/</guid><description>こちらの記事（Node.js から LUIS の API を利用する） では、自力で LUIS の REST API を呼び出すための URL を構築していました。 ここでは、botbuilder-ai パッケージを使用して、もっと手軽に LUIS の機能を呼び出してみます。
-☝️ ワンポイント 残念ながら botbuilder-ai が提供している LuisRecognizer などのクラスは、チャットボットの実装に使用する TurnContext オブジェクトに依存した設計になっています。 そのため、単純なコンソールアプリケーションから botbuilder-ai パッケージを使用することは難しく、チャットボットの実装でしか利用できません。 LUIS のエンドポイント情報（接続情報）を確認しておく LUIS API を使用するには、下記のような LUIS アプリの APP ID やエンドポイント情報が必要です。
-APP ID: c39eb4df-fbcf-224f-b8b7-a0ee445d11b3 エンドポイント: https://japaneast.api.cognitive.microsoft.com エンドポイントキー（サブスクリプションキー）: c9162c5c0b5edff5270feb6145618acb APP ID とエンドポイントキーは、LUIS ポータル から対象のアプリケーションを開き、下記のように確認できます。
-APP ID: MANAGEタブ → Application Information エンドポイント: MANAGEタブ → Keys and Endpoints → Endpoint カラムの URL の前半部分。 エンドポイントキー: MANAGEタブ → Keys and Endpoints → Key 1 カラム LUIS のエンドポイントキーは、Azure ポータル に作成した LUIS リソース の キー の項目に表示されるものと同じです。 念のため、同一のものが表示されているか確認しておくとよいでしょう。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Bot Builder SDK on まくろぐ</title><link>https://maku.blog/tags/bot-builder-sdk/</link><description>Recent content in Bot Builder SDK on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Tue, 23 Jul 2019 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/bot-builder-sdk/index.xml" rel="self" type="application/rss+xml"/><item><title>チャットボット (1-1) Bot Builder SDK とは</title><link>https://maku.blog/p/tzaeb9x/</link><pubDate>Mon, 04 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tzaeb9x/</guid><description>&lt;p>Microsoft の Azure は Chatbot サービスを作成する機能を提供しています。
+Microsoft が提供している Bot Framework は、この Chatbot サービスを作成するとき、あるいは Chatbot を使用するクライアントを作成するときに使用するツール群（あるいは仕組み）やそれらを取り巻く環境の総称です。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="500" height="272" src="../../p/tzaeb9x/about_hu15088989431302236182.png" alt="/p/tzaeb9x/about.png" />
+&lt;/figure>
+
+&lt;ul>
+&lt;li>&lt;a href="https://dev.botframework.com/">Microsoft Bot Framework&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>ボットのサーバを実装するためのライブラリは、&lt;strong>Bot Builder SDK&lt;/strong> という名前で提供されています。
+現状では、ボットは Node.js と .NET による開発が想定されているため、Bot Builder SDK も Node.js と .NET 用のものが提供されています（2019年3月現在、Python と Java 版が preview リリースされているようです）。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/microsoft/botbuilder-js">Bot Builder SDK (for Node.js)&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/Microsoft/botbuilder-dotnet">Bot Builder SDK (for .Net)&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/microsoft/botbuilder-samples">Bot Builder サンプルコード集&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Node.js と .NET のどちらを使って開発するかに迷ったら、非同期処理を前提にして設計されている Node.js 版を選択するのがよいでしょう。&lt;/p>
+&lt;p>Node.js の Bot Builder SDK は、NPM パッケージとして公開されているため、&lt;code>npm&lt;/code> コマンドを使って簡単にインストールすることができます。&lt;/p></description></item><item><title>チャットボット (1-2) Bot Builder SDK で Echo ボットを作成する</title><link>https://maku.blog/p/you6q5r/</link><pubDate>Mon, 04 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/you6q5r/</guid><description>&lt;p>ここでは、Microsoft の &lt;strong>Bot Builder SDK&lt;/strong> を使ったボット作成のファーストステップとして、チャットクライアントから入力されたテキストをそのままオウム返しするだけの Echo ボットを作成します。
+言語としては JavaScript (Node.js) を使用することにします。&lt;/p>
+&lt;p>ここで作成するのはボットの本体（サービス側）で、クライアントとしては Microsoft が提供している &lt;strong>Bot Framework Emulator&lt;/strong> を使用します。&lt;/p>
+&lt;h2 id="bot-builder-sdk-をインストールする">Bot Builder SDK をインストールする&lt;/h2>
+&lt;p>Node.js 版の Bot Builder SDK（&lt;strong>&lt;code>botbuilder&lt;/code>&lt;/strong> パッケージ）は、&lt;code>npm&lt;/code> コマンドを使ってインストールすることができます。
+パッケージの依存関係を管理するための &lt;code>package.json&lt;/code> ファイルも、&lt;code>npm init&lt;/code> コマンドで作成しておきます。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ mkdir mybot
+$ cd mybot
+$ npm init -y
+$ npm install --save botbuilder@4.x
+&lt;/code>&lt;/pre>&lt;p>Bot Service のインタフェースは REST API として提供することが定められているのですが、Bot Builder SDK には REST API サーバを作成する機能は含まれていません。
+そこで、REST API サーバを作成するための &lt;strong>&lt;code>restify&lt;/code>&lt;/strong> パッケージも一緒にインストールしておきます（&lt;code>express&lt;/code> などでも実装できると思いますが、リファレンス実装では &lt;code>restify&lt;/code> が使用されています）。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ npm install --save restity
+&lt;/code>&lt;/pre>&lt;h2 id="echo-ボットの作成">Echo ボットの作成&lt;/h2>
+&lt;p>下記の実装は、&lt;code>http://localhost:3978/api/messages&lt;/code> というアドレスで、チャットクライアントからのメッセージを待ち受けてオウム返しで応答する最低限の実装です。&lt;/p></description></item><item><title>チャットボット (2-1) Azure でボットをホストするための Web App Bot リソースを作成する</title><link>https://maku.blog/p/tttou4o/</link><pubDate>Tue, 19 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tttou4o/</guid><description>&lt;h2 id="web-app-bot-リソースを作成する">Web App Bot リソースを作成する&lt;/h2>
+&lt;p>作成したボットプログラムは、Azure 上の Web App Bot リソース上で動作させることができます。
+このリソースのことを特にボットサービスと呼んだりします。&lt;/p>
+&lt;p>&lt;a href="https://portal.azure.com/">Azure ポータル&lt;/a> にログインし、下記のように辿ることで Web App Bot リソースの作成画面を表示できます。&lt;/p>
+&lt;ol>
+&lt;li>&lt;samp>＋リソースの作成&lt;/samp>&lt;/li>
+&lt;li>&lt;samp>AI + Machine Learning&lt;/samp>&lt;/li>
+&lt;li>&lt;samp>Web App Bot&lt;/samp>&lt;/li>
+&lt;/ol>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="700" height="506" src="../../p/tttou4o/create-bot-resource1_hu8920387837924275930.png" alt="/p/tttou4o/create-bot-resource1.png" />
+&lt;/figure>
+
+&lt;p>下記のような Web App Bot リソースの設定画面が表示されるので、1 つずつ入力していきます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="500" height="620" src="../../p/tttou4o/create-bot-resource2_hu8796468545536802169.png" alt="/p/tttou4o/create-bot-resource2.png" />
+&lt;/figure>
+
+&lt;dl>
+&lt;dt>ボット名&lt;/dt>
+&lt;dd>任意のボット名称。後から自由に変更することができるので、自分のわかりやすい名前を付けておけば OK です。例: &lt;code>maku-bot&lt;/code>&lt;/dd>
+&lt;dt>サブスクリプション&lt;/dt>
+&lt;dd>月額の請求先となるサブスクリプションを選択します。最初の Azure トライアル期間であれば、&lt;code>Free Trial&lt;/code> などを選択できるはずです。&lt;/dd>
+&lt;dt>リソースグループ&lt;/dt>
+&lt;dd>この Web App Bot リソースを所属させるリソースグループを選択します。存在しない場合は &lt;samp>新規作成&lt;/samp> のリンクをクリックして新しく作成します。&lt;/dd>
+&lt;dt>場所&lt;/dt>
+&lt;dd>リソースグループの場所を選択。ここでは、地理的に近い &lt;code>Japan East&lt;/code> を選択してます。&lt;/dd>
+&lt;dt>価格レベル&lt;/dt>
+&lt;dd>チャンネルに応じたメッセージ制限解除のためのプラン設定です。
+スタンダードチャンネル（Skype、Cortana、Teams、Facebook、Slack などの一般的なクライアント）とのやりとりは無制限なので、&lt;strong>通常は F0 の無料プランを選択しておけば OK&lt;/strong> です。
+一方で、プレミアムチャンネル（ユーザ独自のチャンネルや、Web ページ埋め込みチャットボットなど）と多くのメッセージをやりとりする予定がある場合は、有料の &lt;samp>S1&lt;/samp> プランを選択する必要があります。
+無料の &lt;samp>F0&lt;/samp> だと 1 か月に 10,000 メッセージまでの制限があります。
+（参考: &lt;a href="https://azure.microsoft.com/en-us/pricing/details/bot-service/">Standard channels と Premium channels について&lt;/a>）&lt;/dd>
+&lt;dt>アプリ名&lt;/dt>
+&lt;dd>ボットサービスのエンドポイント URL となる &lt;code>XXX.azurewebsites.net&lt;/code> の &lt;code>XXX&lt;/code> の部分を指定します。
+URL なので、&lt;strong>世界中で一意&lt;/strong>である必要があります。
+アプリ名は後から変更することはできません。&lt;/dd>
+&lt;dt>ボットテンプレート&lt;/dt>
+&lt;dd>自動生成されるボットのソースコードの種類を選択します。ベースとする SDK バージョンや、言語を指定します。
+今回は、最もシンプルな構成になるように、&lt;samp>SDK v4&lt;/samp>、&lt;samp>Node.js&lt;/samp>、&lt;samp>Echo Bot&lt;/samp> と選択しています。&lt;/dd>
+&lt;dt>App Service プラン&lt;/dt>
+&lt;dd>&lt;strong>めっちゃ重要。&lt;/strong>
+App Service プランは、ボットを稼働させるために使用するコンピューティングリソース (VM) の課金プランです。
+&lt;strong>サーバ使用料&lt;/strong>と言えば分りやすいかもしれません。
+上記で設定した「価格レベル」はあくまでチャットのメッセージ数制限を取り払うためのプラン設定であり、サーバの代金はこちらのプランによって変化します。
+QnA Maker などで App Service プランを作成している場合は、それに乗っかる形で同じものを選択することができます。
+App Service プランが存在しない場合はここから新規作成することができます。
+App Service プラン名は、分かりやすいように &lt;code>maku-bot-service-plan&lt;/code> のような名前を付けておくことをオススメします。
+&lt;strong>デフォルトでは有料の価格レベルである &lt;code>S1 Standard&lt;/code> で作成されます。&lt;/strong>
+お試しで使うのであれば、ここは無料の &lt;code>F1&lt;/code> に変更しておいた方がよいのですが、この画面からは選択できないようなので、後から &lt;samp>App Service プラン&lt;/samp>のリソースのページから価格レベルを変更しておく必要があります（後述）。これはワナかぁ～^^;&lt;/dd>
+&lt;dt>Azure Storage&lt;/dt>
+&lt;dd>ボットプログラムがステータスを保持するために使用するストレージを選択します。最初は&lt;samp>新規作成&lt;/samp>を選択しておけば OK です。&lt;/dd>
+&lt;dt>Application Insights&lt;/dt>
+&lt;dd>アプリのトラフィックなどを分析するリソースを作成するかどうか。最初は必要ないと思ったら、余計なリソースを増やさないように&lt;samp>オフ&lt;/samp>にしておけばよいです。&lt;/dd>
+&lt;dt>Microsoft アプリ ID とパスワード&lt;/dt>
+&lt;dd>&lt;samp>自動作成&lt;/samp>にしておけば OK。&lt;a href="https://apps.dev.microsoft.com/">Application Registration Portal&lt;/a> で別途作成したものを設定することも可能です。ちなみに、これまでに作成したアプリの ID のリストもそのサイトで確認できます。&lt;/dd>
+&lt;/dl>
+&lt;h2 id="app-service-プランの価格レベルを変更する">App Service プランの価格レベルを変更する&lt;/h2>
+&lt;p>上記で App Service サービスプランを新規作成した場合は、価格レベルが &lt;code>S1 Standard&lt;/code> になっているので、&lt;strong>お試しで使うのであれば、忘れずにフリーの価格レベル &lt;code>F1 Free&lt;/code> に変更しておきましょう&lt;/strong>。&lt;/p></description></item><item><title>チャットボット (2-2) Web App Bot で生成されたボットのコードを編集する</title><link>https://maku.blog/p/bpqkm2o/</link><pubDate>Wed, 20 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bpqkm2o/</guid><description>&lt;h2 id="チャットボットのソースコードをダウンロードする">チャットボットのソースコードをダウンロードする&lt;/h2>
+&lt;p>下記のページの手順に従い、&lt;a href="https://portal.azure.com/">Azure ポータル&lt;/a>上で Web App Bot のリソースを作成すると、自動的に Echo Bot のテンプレートコードが生成されているはずです（選択したテンプレートの種類によって変わりますが、ここでは Node.js 版の Echo Bot テンプレートを指定しているとします）。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/tttou4o">Azure でボットをホストするための Web App Bot リソースを作成する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>ボットプログラムを作成する場合は、基本的にはこのテンプレートコードをベースにして修正を行っていくのがよいでしょう。
+自動生成されたコードは、Azure ポータルから下記のように辿ると ZIP アーカイブでダウロードすることができます。&lt;/p>
+&lt;ol>
+&lt;li>&lt;samp>すべてのリソース&lt;/samp> を選択&lt;/li>
+&lt;li>対象の &lt;samp>Web アプリボット&lt;/samp> リソースを選択（下記の例では &lt;code>maku-bot&lt;/code>）&lt;/li>
+&lt;li>&lt;samp>ボット管理&lt;/samp> の &lt;samp>ビルド&lt;/samp> を選択&lt;/li>
+&lt;li>&lt;samp>ボットのソースコードをダウンロードする&lt;/samp> のボタンをクリック&lt;/li>
+&lt;/ol>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="700" height="312" src="../../p/bpqkm2o/edit-bot-code1_hu5450279936211555220.png" alt="/p/bpqkm2o/edit-bot-code1.png" />
+ &lt;figcaption>図: ボットコードをダウンロード&lt;/figcaption>
+&lt;/figure>
+
+&lt;h2 id="bot-ファイルの復号化暗号化">bot ファイルの復号化・暗号化&lt;/h2>
+&lt;h3 id="botfilesecret-とは">botFileSecret とは&lt;/h3>
+&lt;p>ダウンロードした ZIP アーカイブの中には、ボットサーバの設定ファイルである &lt;code>.bot&lt;/code> ファイルが含まれています。&lt;/p>
+&lt;p>このファイルは、ローカルでボットサーバを立ち上げたり、エミュレータからそのサーバに接続するときの設定ファイルとして使用するのですが、&lt;strong>自動生成された &lt;code>.bot&lt;/code> ファイルは、接続情報などの値が暗号化されています&lt;/strong>。
+&lt;strong>&lt;code>.bot&lt;/code> ファイルの復号化、および暗号化に使用されているキーのことを botFileSecret と呼びます&lt;/strong>。&lt;/p>
+&lt;p>ボットサーバやエミュレータを正しく起動するためには、この botFileSecret を使って &lt;code>.bot&lt;/code> ファイルをあらかじめ復号化しておくか、環境変数などでキーを設定しておく必要があります。&lt;/p>
+&lt;p>&lt;code>.bot&lt;/code> ファイルを復号化した場合は、Azure 上の Web App Bot サービスにデプロイする前に、忘れずに暗号化しておく必要があります。&lt;/p></description></item><item><title>チャットボット (2-3) Azure の Web App Bot リソースにボットをデプロイする</title><link>https://maku.blog/p/gxm9shf/</link><pubDate>Wed, 20 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gxm9shf/</guid><description>&lt;p>まず前提として、下記の手順により、Azure 上に Web App Bot リソースが作成済みであることとします。
+ここに、ローカルで作成したボットをデプロイすることになります。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/tttou4o">Azure でボットをホストするための Web App Bot リソースを作成する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="web-ブラウザでデプロイする方法kudu-の-zip-deploy-ui">Web ブラウザでデプロイする方法（KUDU の Zip Deploy UI）&lt;/h2>
+&lt;p>プロジェクトのファイルを ZIP ファイルとしてアーカイブし、Zip Deploy UI という Web ページにドラッグ＆ドロップでデプロイする方法です。
+この Web サイトには、下記のような URL でアクセスできます。
+&lt;code>&amp;lt;app_name&amp;gt;&lt;/code> の部分は、自分のボットアプリ名に置き換えてください。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">https://&amp;lt;app_name&amp;gt;.scm.azurewebsites.net/ZipDeployUI&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="700" height="338" src="../../p/gxm9shf/deploy-bot-kudu_hu8407812475071790193.png" alt="/p/gxm9shf/deploy-bot-kudu.png" />
+ &lt;figcaption>図: Web App Bot の Zip Deploy UI&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>左上に表示されるロゴからも分かるように、Azure の Web App サービスでは、&lt;a href="https://github.com/projectkudu/kudu/wiki/">Kudu&lt;/a> というデプロイエンジンが使われているようですね。&lt;/p>
+&lt;p>この &lt;code>/wwwroot&lt;/code> ディレクトリの内容が表示されている画面で、エクスプローラ領域に ZIP ファイルをドラッグ＆ドロップすると、ZIP ファイル内のファイルがまとめて &lt;code>/wwwroot&lt;/code> にアップロードされます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="700" height="332" src="../../p/gxm9shf/deploy-bot-kudu2_hu16501140039945127296.png" alt="/p/gxm9shf/deploy-bot-kudu2.png" />
+ &lt;figcaption>図: ZIP ファイルのドラッグ＆ドロップでデプロイ&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>ボットプログラムのエントリポイントとなる &lt;code>bot.js&lt;/code> ファイルを編集してから ZIP 化し、デプロイすることで、ボットの動作が変わることを確認できると思います。&lt;/p></description></item><item><title>チャットボット: Azure ポータルで生成されるボットのテンプレートコードを解読＆リファクタしてみる</title><link>https://maku.blog/p/iob68qa/</link><pubDate>Tue, 26 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/iob68qa/</guid><description>&lt;h2 id="azure-が生成するテンプレートコードを理解する">Azure が生成するテンプレートコードを理解する&lt;/h2>
+&lt;p>下記の手順に従って Azure ポータル上で Web App Bot リソースを作成すると、ボットプログラムのテンプレートとして &lt;code>index.js&lt;/code> や &lt;code>bot.js&lt;/code> などのコードが自動生成されます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/tttou4o">Azure でボットをホストするための Web App Bot リソースを作成する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>ボットサーバのエントリポイントとなる &lt;code>index.js&lt;/code> には、設定情報の読み取りと Web サーバの立ち上げ処理が記述されており、&lt;code>bot.js&lt;/code> の方にはボットの応答処理を記述するようになっています。&lt;/p>
+&lt;p>つまり、基本的にボットの作成者は &lt;code>bot.js&lt;/code> の方にボットのコア部分を実装していけばよいのですが、LUIS や QnA Maker などのサービスと連携する場合は、それぞれの初期化処理が必要であり、結局のところ &lt;code>index.js&lt;/code> 側の実装に関してもある程度理解しておく必要があります。&lt;/p>
+&lt;p>Azure ポータルで自動生成される &lt;code>index.js&lt;/code> は決して理解しやすいものではないので（少なくとも記述時点では）、ここでは &lt;strong>&lt;code>index.js&lt;/code> の内容を理解する目的と、わかりやすくリファクタする目的を兼ねて、ボットのベースとなるコードを作成&lt;/strong>していきます。&lt;/p>
+&lt;p>最終的には Azure が生成するテンプレートコードと同様の振る舞いになることを想定しています（少なくとも、環境変数の名前などは合わせておいた方がよいです）。&lt;/p>
+&lt;h2 id="全体の流れ">全体の流れ&lt;/h2>
+&lt;p>ボットプログラムのエントリポイントとなる &lt;code>index.js&lt;/code> では、大まかに下記のような処理を行います。&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>.env&lt;/code> ファイルを読み込み、環境変数の情報とマージする&lt;/li>
+&lt;li>1 の情報を基に、&lt;code>.bot&lt;/code> ファイルを読み込む&lt;/li>
+&lt;li>2 の情報を基に、ボットサーバーを立ち上げる&lt;/li>
+&lt;/ol>
+&lt;p>Azure ポータルで生成されるテンプレートコードでは、上記の処理をすべて &lt;code>index.js&lt;/code> の中で行っているのですが、ここでは設定の読み込み部分と、ボットサーバの立ち上げ部分を明確に分離してみます。&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>&lt;code>config.js&lt;/code>&lt;/strong>: 環境変数や &lt;code>.env&lt;/code> ファイルの情報を基に、&lt;code>.bot&lt;/code> ファイルの設定を読み込む。&lt;/li>
+&lt;li>&lt;strong>&lt;code>index.js&lt;/code>&lt;/strong>: 上記の設定情報を基にボットサーバを立ち上げる。&lt;/li>
+&lt;/ol>
+&lt;p>という感じにします。&lt;/p>
+&lt;h2 id="ステップ1-環境変数あるいは-env-ファイルの読み込み-configjs">ステップ(1) 環境変数あるいは .env ファイルの読み込み (config.js)&lt;/h2>
+&lt;p>ボットサーバーは、&lt;code>.bot&lt;/code> ファイルに記述された設定情報に基づいて動作します。
+この &lt;code>.bot&lt;/code> ファイルを読み込むための情報（ファイルパスなど）は、環境変数や &lt;code>.env&lt;/code> ファイルに記述されているため、まずはこれらを読み込まなければいけません。&lt;/p></description></item><item><title>チャットボット: MS Bot Framework の .bot ファイルで接続情報を管理する</title><link>https://maku.blog/p/8choj4w/</link><pubDate>Wed, 03 Apr 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8choj4w/</guid><description>&lt;h2 id="エミュレータのための-bot-ファイル">エミュレータのための .bot ファイル&lt;/h2>
+&lt;p>&lt;a href="https://github.com/Microsoft/BotFramework-Emulator">Bot Framework Emulator&lt;/a> は、自分自身（チャットクライアント）が接続するボットサーバのアドレスを &lt;code>.bot&lt;/code> ファイルから取得します。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="600" height="400" src="../../p/8choj4w/botfile1_hu14061058004911490980.png" alt="/p/8choj4w/botfile1.png" />
+&lt;/figure>
+
+&lt;p>&lt;code>.bot&lt;/code> ファイルの中には、&lt;code>&amp;quot;type&amp;quot;: &amp;quot;endpoint&amp;quot;&lt;/code> というエンドポイント定義が 1 つ以上記述されており、ここには&lt;strong>ボットプログラムのアドレス&lt;/strong>が記述されています。
+エミュレータの設定で、どのエンドポイント設定を使用するかを切り替えることで、実際に接続するボットを使い分けることができます。
+典型的には、開発時にローカルホスト上で動作させたボットサーバに接続するための &lt;strong>&lt;code>development&lt;/code>&lt;/strong> と、実稼働用に Azure 上で動作させたボットサーバに接続するための &lt;strong>&lt;code>production&lt;/code>&lt;/strong> というエンドポイントを定義します。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="460" height="264" src="../../p/8choj4w/botfile2.png" alt="/p/8choj4w/botfile2.png" />
+ &lt;figcaption>図: エミュレータ上でのエンドポイント切り替え&lt;/figcaption>
+&lt;/figure>
+
+&lt;h2 id="ボットプログラムのための-bot-ファイル">ボットプログラムのための .bot ファイル&lt;/h2>
+&lt;p>&lt;code>.bot&lt;/code> ファイルは、ボットプログラムからも利用されます（こちらの方がメイン）。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="700" height="345" src="../../p/8choj4w/botfile3_hu7876861085142966511.png" alt="/p/8choj4w/botfile3.png" />
+&lt;/figure>
+
+&lt;p>&lt;code>.bot&lt;/code> ファイルには、&lt;strong>LUIS や QnA Maker のサービスを利用するためのエンドポイント情報&lt;/strong>（アドレスやエンドポイントキー）が定義されており、ボットプログラムはこれらの情報を使って各サービスの API を利用します。
+こららの情報は、ボット自体がローカルホスト上で動作していても、Azure 上で動作していても同様に利用されます。&lt;/p>
+&lt;p>また、ここでもボット自体の endpoint エントリが参照され、各種チャンネル（チャットクライアント）がボットにアクセスするときの認証処理のために使用されます。
+このあたりの処理は、Bot Builder SDK を使ってボット実装を行っていれば、Adapter クラスとして抽象化されるため、特に意識せずに実装することができます。&lt;/p>
+&lt;h2 id="bot-ファイルに-luis-や-qna-maker-の接続設定を記述する">.bot ファイルに LUIS や QnA Maker の接続設定を記述する&lt;/h2>
+&lt;p>&lt;code>.bot&lt;/code> ファイルは XML ファイルなので、フォーマットさえ理解すればテキストエディタなどで編集してしまうことはできますが、エンドポイントキー部分の復号化・暗号化が必要だったりして面倒です。
+Bot Framework Emulator には、.bot ファイルの内容を GUI で編集する機能が付いているのでこの機能を使うのがよいでしょう。&lt;/p></description></item><item><title>チャットボット: LUIS や QnA Maker サービスへの接続情報を .bot ファイルから取得する</title><link>https://maku.blog/p/o2bqajv/</link><pubDate>Mon, 15 Apr 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/o2bqajv/</guid><description>&lt;ul>
+&lt;li>参考: &lt;a href="../../p/8choj4w">MS Bot Framework の .bot ファイルで接続情報を管理する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="ここで作るもの">ここで作るもの&lt;/h2>
+&lt;p>&lt;a href="../../p/iob68qa">こちらの実装&lt;/a> では、最初のステップとしてボットサーバ自体 (Azure Web Apps) のエンドポイント情報を &lt;code>.bot&lt;/code> ファイルから取得する実装を行いました (&lt;code>config.js&lt;/code>)。
+ここでは、さらに、LUIS サービスや QnA Maker サービスを利用することを想定し、これらの情報も &lt;code>.bot&lt;/code> ファイルから取得できるように拡張します。&lt;/p>
+&lt;p>使用イメージとしては、下記のようにしてそれぞれの接続情報を簡単に読み込めるようにします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">config&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">require&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;./config.js&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">LUIS_APP_NAME&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;maku-luis-sample&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">QNA_APP_NAME&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;maku-qna-sample&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">botEndpoint&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">loadBotEndpoint&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="c1">// ボット自体への接続情報
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">luisEndpoint&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">loadLuisEndpoint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">LUIS_APP_NAME&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// LUIS への接続情報
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">qnaEndpoint&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">loadQnaEndpoint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">QNA_APP_NAME&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// QnA Maker への接続情報
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>単一のオブジェクトとしてまとめて取得するように実装することもできるのですが、分かりやすさのために、3 つの情報に分けて取得するようにしています。
+LUIS や QnA Maker は、複数のアプリ（ナレッジベース）を同時に使用する可能性があるので、アプリ名を指定して接続情報を取得できるようにしています。&lt;/p>
+&lt;p>取得した情報は、次のように BotBuilder SDK が提供するクラスへの入力として使用することを想定しています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>botEndpoint&lt;/code> オブジェクトは、&lt;code>botbuilder&lt;/code> パッケージの &lt;code>BotFrameworkAdapter&lt;/code> クラスのコンストラクタに渡されます。&lt;/li>
+&lt;li>&lt;code>luisEndpoint&lt;/code> オブジェクトは、&lt;code>botbuilder-ai&lt;/code> パッケージの &lt;code>LuisRecognizer&lt;/code> クラスのコンストラクタに渡されます。&lt;/li>
+&lt;li>&lt;code>qnaEndpoint&lt;/code> オブジェクトは、&lt;code>botbuilder-ai&lt;/code> パッケージの &lt;code>QnAMaker&lt;/code> クラスのコンストラクタに渡されます。&lt;/li>
+&lt;/ul>
+&lt;p>下記は、実際に取得されるオブジェクトの内容の例です。
+これらのオブジェクトは、上記のように SDK のクラスへの入力用に使用するので、各プロパティの値を直接参照することはないと思います。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">上記のコードで得られる情報の例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">botEndpoint&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">appId&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;921c6a01-1948-0f4d-9a82-75daf6a6d43c&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">appPassword&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;16lgoF+phvG:MPeg1eIDma*fcNU#!5jv&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">luisEndpoint&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">applicationId&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;c5514855-fa6b-8f4c-c695-9ac7d3519412&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">endpointKey&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;9ccff1530f4214fd8e319434a1408fa2&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">endpoint&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;https://westus.api.cognitive.microsoft.com&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">qnaEndpoint&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">knowledgeBaseId&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;c78ec3e7-a58d-ca44-dbb6-e7805d8130c6&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">endpointKey&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;c9153f6c-980c-bd41-4ba6-370392cda0e8&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">host&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;https://maku-qna-sample.azurewebsites.net/qnamaker&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="botframework-config-パッケージのインストール">botframework-config パッケージのインストール&lt;/h2>
+&lt;p>&lt;code>.bot&lt;/code> ファイルのロードには、Node の &lt;strong>&lt;code>botframework-config&lt;/code>&lt;/strong> パッケージが提供する &lt;code>BotConfiguration&lt;/code> クラスを使用します。
+必要があれば、下記のようにインストールして、&lt;code>package.json&lt;/code> に依存関係を追記します。&lt;/p></description></item><item><title>チャットボット: 作成したチャットボットを LINE に接続する</title><link>https://maku.blog/p/asuzg7k/</link><pubDate>Fri, 19 Apr 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/asuzg7k/</guid><description>&lt;h2 id="line-に-messaging-api-チャネルを作成する">LINE に Messaging API チャネルを作成する&lt;/h2>
+&lt;p>自作したチャットボットアプリを LINE から「友だち」として見えるようにするには、まず LINE 側に「プロバイダー」を作成し、そこに「&lt;strong>Messaging API チャネル&lt;/strong>」を追加する必要があります。
+この Messaging API チャネルは、LINE アプリから「友だち」として見える単位だと考えればよいでしょう。&lt;/p>
+&lt;h3 id="line-に開発者として登録する">LINE に開発者として登録する&lt;/h3>
+&lt;p>LINE のプロバイダー登録作業などは、下記の &lt;strong>LINE Developer Console&lt;/strong> から行うことができます。
+初めてアクセスする場合は、開発者としての登録を求められるので、LINE アカウントでログインして開発者情報を入力してください。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://developers.line.biz/console/register/messaging-api/provider/">LINE Developer Console&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h3 id="プロバイダーを新規作成する">プロバイダーを新規作成する&lt;/h3>
+&lt;p>LINE に開発者登録できたら、&lt;samp>新規プロバイダー作成&lt;/samp> のボタンを押して、プロバイダーを作成します。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="700" height="452" src="../../p/asuzg7k/connect-to-line-001_hu10272047064623469357.png" alt="/p/asuzg7k/connect-to-line-001.png" />
+&lt;/figure>
+
+&lt;h3 id="messaging-api-チャネルを追加する">Messaging API チャネルを追加する&lt;/h3>
+&lt;p>プロバイダーの作成が終わったら、そこに &lt;strong>Messaging API チャネル&lt;/strong> を追加します。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="700" height="422" src="../../p/asuzg7k/connect-to-line-002_hu7629139533632617466.png" alt="/p/asuzg7k/connect-to-line-002.png" />
+&lt;/figure>
+
+&lt;p>チャネルの作成時には、アプリアイコンやアプリ名を自由に登録することができます。
+アプリ名は一度設定すると 7 日間は変更できないようなので慎重に決めましょう（アイコンは 1 時間経てば変更できます）。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="500" height="520" src="../../p/asuzg7k/connect-to-line-003_hu8577726236098286274.png" alt="/p/asuzg7k/connect-to-line-003.png" />
+&lt;/figure>
+
+&lt;p>下のように、プロバイダー上に Messaging API チャネルが追加されていれば OK です。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="500" height="342" src="../../p/asuzg7k/connect-to-line-004_hu17560519592571775238.png" alt="/p/asuzg7k/connect-to-line-004.png" />
+&lt;/figure>
+
+&lt;h3 id="スマホの-line-に友達登録する">スマホの LINE に友達登録する&lt;/h3>
+&lt;p>Messaging API のチャネルを選択し、&lt;samp>チャネル基本設定&lt;/samp> タブを見ると、LINE アプリ用の QR コードが見つかります。&lt;/p></description></item><item><title>チャットボット: 作成したチャットボットを Slack に接続する</title><link>https://maku.blog/p/rtxqceq/</link><pubDate>Thu, 20 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rtxqceq/</guid><description>&lt;h2 id="slack-に-bot-framework-で作成したボットを接続する">Slack に Bot Framework で作成したボットを接続する&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="700" height="258" src="../../p/rtxqceq/connect-to-slack-001_hu7439744207728099245.png" alt="/p/rtxqceq/connect-to-slack-001.png" />
+ &lt;figcaption>図: ボットとのダイレクトメッセージによる会話&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>Microsoft Azure 上に作成したボットアプリを Slack に接続するには、下記の Bot Service 公式ドキュメントで説明されている手順に従ってください。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.microsoft.com/ja-jp/azure/bot-service/bot-service-channel-connect-slack?view=azure-bot-service-4.0">（日本語）ボットを Slack に接続する - Bot Service ｜ Microsoft Docs&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.microsoft.com/en-us/azure/bot-service/bot-service-channel-connect-slack?view=azure-bot-service-4.0">（英語）Connect a bot to Slack - Bot Service ｜ Microsoft Docs&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>接続のおおまかな手順は下記のような感じです。&lt;/p>
+&lt;ol>
+&lt;li>Slack アプリを作成する（何らかのワークスペースに所属させる形で作成する）&lt;/li>
+&lt;li>Slack アプリにボット用のユーザーを登録する&lt;/li>
+&lt;li>Azure ポータルから、Web アプリボットのチャンネルとして Slack を追加（Slack アプリ側の Client ID、Client Secret、Verification Token をコピペすれば OK）&lt;/li>
+&lt;/ol>
+&lt;p>この作業が終わると、ボット（アプリ）が Slack のワークスペースに参加している状態になります。
+その時点ではどのチャンネルにも参加していませんが、ダイレクトメッセージを使って一対一でボットと会話することができます。&lt;/p>
+&lt;p>特定のチャンネルで会話している最中に &lt;code>@ボット名&lt;/code> と話かけると、そのチャンネルにボットを招待することができます。
+チャンネルにボットが参加すると、後はそのチャンネルに対してつぶやくだけでボットが反応するようになります。&lt;/p>
+&lt;h2 id="わかりにくいところの補足">わかりにくいところの補足&lt;/h2>
+&lt;p>図入りで説明されているので、特に迷うことはないと思いますが、Microsoft の Bot チームのドキュメント通りにはうまくいかない部分があるので若干補足しておきます。&lt;/p>
+&lt;h3 id="ボットハンドル">ボットハンドル&lt;/h3>
+&lt;p>「ボットのイベントをサブスクライブ」するという項目で、下記のような Request URL で&lt;a href="https://docs.microsoft.com/ja-jp/azure/bot-service/bot-service-resources-identifiers-guide?view=azure-bot-service-4.0#bot-handle">ボットハンドル (YourBotHandle)&lt;/a> を指定するところがあります。&lt;/p></description></item><item><title>チャットボット: Chatdown（.chat ファイル）を使ってボットの会話をデザインする</title><link>https://maku.blog/p/a6yzskr/</link><pubDate>Wed, 27 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/a6yzskr/</guid><description>&lt;h2 id="chatdown-フォーマットとは">Chatdown フォーマットとは&lt;/h2>
+&lt;p>&lt;a href="https://github.com/Microsoft/botbuilder-tools/tree/master/packages/Chatdown">Chatdown フォーマット&lt;/a>は、会話の設計をテキストベースで行うことを意図したフォーマットです。
+拡張子は &lt;strong>&lt;code>.chat&lt;/code>&lt;/strong> で、下記のような感じで会話例を記述していきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">sample.chat&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">user=Joe
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bot=LulaBot
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bot: Hi!
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">user: yo!
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bot: [Typing][Delay=3000]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Greetings!
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">What would you like to do?
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* update - You can update your account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* List - You can list your data
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* help - you can get help
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">user: I need the bot framework logo.&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のように、チャットボットがタイプ中であることや、応答までのディレイなどもデザインすることができます。
+Markdown 形式で書式設定できるようになっているのが Chatdown という名前の由来ですね。&lt;/p>
+&lt;h2 id="bot-framework-emulator-で会話を再現する">Bot Framework Emulator で会話を再現する&lt;/h2>
+&lt;p>&lt;a href="https://github.com/Microsoft/BotFramework-Emulator">Bot Framework Emulator&lt;/a> で会話ファイルを読み込むと、チャット UI 上で会話を再現することができます。
+ただし、Emulator が読み込むことのできるファイルは &lt;code>.transcript&lt;/code> 形式のファイルなので、あらかじめ &lt;code>.chat&lt;/code> ファイルを変換して &lt;code>.transcript&lt;/code> ファイルを生成しておく必要があります。&lt;/p></description></item><item><title>チャットボット: ActivityHandler でボットのイベントハンドラ実装を簡略化する</title><link>https://maku.blog/p/mgujykj/</link><pubDate>Sun, 09 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mgujykj/</guid><description>&lt;p>Bot Builder SDK (Node.js) の &lt;code>botbuilder-core&lt;/code> パッケージには、&lt;a href="https://github.com/microsoft/botbuilder-js/blob/master/libraries/botbuilder-core/src/activityHandler.ts">ActivityHandler&lt;/a> という、ボットのイベントハンドラ部分の実装を簡略化するためのライブラリが含まれています。
+ボットの世界では、「Activity」はひとつのメッセージの処理単位のことを示しています。
+この Activity をうまくハンドルするためのクラスだから &lt;code>ActivityHandler&lt;/code> という名前が付けられているんですね。&lt;/p>
+&lt;p>ここでは、独自のボットクラス (&lt;code>MyBot&lt;/code>) を、&lt;code>ActivityHandler&lt;/code> を利用せずに実装した場合と、利用して実装した場合で比較してみたいと思います。&lt;/p>
+&lt;h2 id="activityhandler-を使わない場合">ActivityHandler を使わない場合&lt;/h2>
+&lt;p>例えば、下記のように &lt;code>BotFrameworkAdapter&lt;/code> で受信したイベントの処理を &lt;code>MyBot.onTurn()&lt;/code> に委譲するとします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">mybot.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">myBot&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">MyBot&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">adapter&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">BotFrameworkAdapter&lt;/span>&lt;span class="p">({});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">server&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">require&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;restify&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">createServer&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">server&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">post&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;/api/messages&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">req&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">res&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">adapter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">processActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">req&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">res&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">myBot&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">onTurn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// あとは MyBot に丸投げ
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このイベントは、ユーザからメッセージを送られたときだけでなく、ユーザがチャットに参加したとき (&lt;code>ConversationUpdate&lt;/code>) などにも発生するため、&lt;code>MyBot.onTurn()&lt;/code> の実装の中でアクティビティタイプを見て分岐処理を行わなければなりません。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">class&lt;/span> &lt;span class="nx">MyBot&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">constructor&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">async&lt;/span> &lt;span class="nx">onTurn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">type&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="nx">ActivityTypes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Message&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">utterance&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`You said: &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">utterance&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">type&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="nx">ActivityTypes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ConversationUpdate&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`[ConversationUpdate event detected]`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`[&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">turnContext&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">type&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb"> event detected]`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このあたりの分岐処理を簡潔にしてくれるのが &lt;code>ActivityHandler&lt;/code> クラスです。&lt;/p>
+&lt;h2 id="activityhandler-を使う場合">ActivityHandler を使う場合&lt;/h2>
+&lt;p>下記は、&lt;code>ActivityHandler&lt;/code> を利用したボット実装の例です。
+&lt;strong>&lt;code>onMessage()&lt;/code>&lt;/strong> メソッドを使って通常メッセージのハンドラを登録し、&lt;strong>&lt;code>onConversationUpdate()&lt;/code>&lt;/strong> メソッドを使って会話更新時のハンドラを登録します。&lt;/p></description></item><item><title>チャットボット: ユーザーの参加／離脱のイベントをハンドルする</title><link>https://maku.blog/p/onctywi/</link><pubDate>Fri, 28 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/onctywi/</guid><description>&lt;p>Bot Builder SDK の &lt;code>ActivityHandler&lt;/code> を使って、ユーザーが会話に参加したこと、離脱したことをハンドルする方法を説明します。
+&lt;code>ActivityHandler&lt;/code> を使ったボット実装の基本に関しては下記を参照してください。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/mgujykj">チャットボット: ActivityHandler でボットのイベントハンドラ実装を簡略化する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>下記は、ユーザーが新しく会話に参加したときに、ボットから挨拶するように実装した例です。
+ユーザー参加のイベントをハンドルするには、&lt;a href="https://docs.microsoft.com/en-us/javascript/api/botbuilder-core/activityhandler?view=botbuilder-ts-latest#onmembersadded-bothandler-">ActivityHandler#onMembersAdded()&lt;/a> で、イベントハンドラを登録します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">mybot.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">ActivityHandler&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">BotFrameworkAdapter&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">require&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;botbuilder&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ボット実装
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">class&lt;/span> &lt;span class="nx">MyBot&lt;/span> &lt;span class="kr">extends&lt;/span> &lt;span class="nx">ActivityHandler&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">constructor&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">super&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">onMessage&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleMessage&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">onMembersAdded&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleMembersAdded&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">async&lt;/span> &lt;span class="nx">handleMessage&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">next&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">name&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">from&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">utterance&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">さんは、&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">utterance&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">と言いました。`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">next&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">async&lt;/span> &lt;span class="nx">handleMembersAdded&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">next&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">members&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">membersAdded&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">members&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="o">++&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">m&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">members&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">m&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span> &lt;span class="o">!==&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">recipient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ボット以外のユーザが参加したときにメッセージを表示
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">await&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">m&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">さん、こんにちは！`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">next&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">exports&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">MyBot&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">MyBot&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ちなみに、このイベントハンドラは、&lt;strong>ボット自身が会話に参加したときにも呼び出されます&lt;/strong>。
+ボット以外のユーザーが参加したときだけメッセージを送るには、&lt;code>context.activity.recipient.id&lt;/code> と参加者の ID を比較し、通常のユーザーであることを確認します（&lt;code>recipient.id&lt;/code> にはボットの ID が入っています）。&lt;/p>
+&lt;p>上記の例では、ユーザーが参加したときのイベントをハンドルしていますが、ユーザー離脱時のイベントも &lt;a href="https://docs.microsoft.com/en-us/javascript/api/botbuilder-core/activityhandler?view=botbuilder-ts-latest#onmembersremoved-bothandler-">ActivityHandler#onMembersRemoved()&lt;/a> を使って同様にハンドルすることができます。&lt;/p>
+&lt;p>Bot Framework Emulator を使っている場合は、画面上部の &lt;samp>Restart conversation&lt;/samp> ボタンを押せば、ボットからのメッセージを確認することができます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="544" height="302" src="../../p/onctywi/handle-members-added-001.png" alt="/p/onctywi/handle-members-added-001.png" />
+&lt;/figure>
+
+&lt;p>Slack をチャンネル（クライアント）として使用している場合は、あるチャンネルにボットを招待したときや、そのチャンネルに新しくユーザーを招待したときに &lt;code>onMembersAdded()&lt;/code> が呼び出されるようです。
+なので、このイベントハンドラはそんなに頻繁に呼び出されるものではありません。&lt;/p></description></item><item><title>チャットボット: Bot Builder SDK で会話の状態を保存する (Storage)</title><link>https://maku.blog/p/3fnyk44/</link><pubDate>Tue, 11 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3fnyk44/</guid><description>&lt;p>ボットは基本的に&lt;strong>ステートレスで動作する&lt;/strong>ので、ユーザとの会話のコンテキストを把握するには、ステートの管理を明示的に行う必要があります。
+Bot Builder SDK にはそのためのユーティリティクラスが用意されています。
+ここでは、Node.js の &lt;code>botbuilder&lt;/code> パッケージを使って説明します。&lt;/p>
+&lt;h2 id="storage-インタフェース">Storage インタフェース&lt;/h2>
+&lt;p>&lt;code>botbuilder&lt;/code> パッケージに含まれている &lt;a href="https://github.com/microsoft/botbuilder-js/blob/master/libraries/botbuilder-core/src/storage.ts">Storage インタフェース&lt;/a>は、抽象化されたストレージに JSON オブジェクトを保存するための API を定義しています。
+&lt;code>write&lt;/code>、&lt;code>read&lt;/code>、&lt;code>delete&lt;/code> の 3 つの API のみなのでとてもシンプルです。&lt;/p>
+&lt;h3 id="write-メソッド">write メソッド&lt;/h3>
+&lt;p>JSON オブジェクトをストレージに保存するための API です。
+オブジェクトを保存するときには、名前（キー）を付けて、キー＆バリューの形のオブジェクトとして保存します。
+下記の例では、保存したい &lt;code>state&lt;/code> オブジェクトに、&lt;code>botState&lt;/code> という名前を付けて保存しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">state&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">topic&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;someTopic&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">await&lt;/span> &lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">write&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="s1">&amp;#39;botState&amp;#39;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">state&lt;/span> &lt;span class="p">});&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="read-メソッド">read メソッド&lt;/h3>
+&lt;p>ストレージに保存されたオブジェクトを読み出すための API です。
+読み出したいオブジェクトの名前を配列で渡すと、オブジェクトの連想配列が返ってきます。
+下記の例では、&lt;code>botState&lt;/code> という名前で保存されたオブジェクトを、&lt;code>state&lt;/code> 変数に取り出しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">items&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kr">await&lt;/span> &lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">read&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s1">&amp;#39;botState&amp;#39;&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">state&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">items&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;botState&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="p">{};&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="delete-メソッド">delete メソッド&lt;/h3>
+&lt;p>ストレージに保存されたオブジェクトを削除するための API です。
+削除したいオブジェクトの名前を配列で渡します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">await&lt;/span> &lt;span class="nx">storage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="k">delete&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s1">&amp;#39;botState&amp;#39;&lt;/span>&lt;span class="p">]);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="memorystorage-クラス">MemoryStorage クラス&lt;/h2>
+&lt;p>実際にストレージを扱うには、&lt;code>Storage&lt;/code> インタフェースを実装したクラスが必要です。
+&lt;a href="https://github.com/microsoft/botbuilder-js/blob/master/libraries/botbuilder-core/src/memoryStorage.ts">MemoryStorage クラス&lt;/a> はローカルテスト用のインメモリストレージで、ボットのプロセスが終了するまで情報を保持します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">MemoryStorage のインスタンス化&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">MemoryStorage&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">require&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;botbuilder&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">storage&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">MemoryStorage&lt;/span>&lt;span class="p">();&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="テスト実装">テスト実装&lt;/h3>
+&lt;p>下記はローカル環境で &lt;code>MemoryStorage&lt;/code> の振る舞いをテストするためのシンプルなボット実装です。
+ユーザがメッセージを送るたびに、&lt;code>state&lt;/code> オブジェクトに保持したカウンタの値が 1 ずつ増えていきます。&lt;/p></description></item><item><title>チャットボット: Bot Builder SDK で会話の状態を保存する (BotState)</title><link>https://maku.blog/p/6wtzzq4/</link><pubDate>Fri, 28 Jun 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6wtzzq4/</guid><description>&lt;h2 id="botstate-クラス">BotState クラス&lt;/h2>
+&lt;p>Bot Builder SDK の &lt;a href="https://github.com/microsoft/botbuilder-js/blob/master/libraries/botbuilder-core/src/botState.ts">BotState クラス&lt;/a> は、ボットとの会話内の特定のコンテキストにおける状態を保持するためのクラスです。&lt;/p>
+&lt;p>というと難しいですが、簡単に言うと、&lt;strong>会話ごとの状態保存&lt;/strong>や、&lt;strong>ユーザーごとの状態保存&lt;/strong>を行うための便利クラスです。&lt;/p>
+&lt;p>&lt;code>BotState&lt;/code> クラスには次のようなサブクラスが定義されています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/microsoft/botbuilder-js/blob/master/libraries/botbuilder-core/src/conversationState.ts">ConversationState クラス&lt;/a> &amp;hellip; 会話ごとの状態を保存する&lt;/li>
+&lt;li>&lt;a href="https://github.com/microsoft/botbuilder-js/blob/master/libraries/botbuilder-core/src/userState.ts">UserState クラス&lt;/a> &amp;hellip; ユーザーごとの状態を保存する&lt;/li>
+&lt;li>&lt;a href="https://github.com/microsoft/botbuilder-js/blob/master/libraries/botbuilder-core/src/privateConversationState.ts">PrivateConversationState クラス&lt;/a> &amp;hellip; 会話ごとのユーザごとの状態を保存する&lt;/li>
+&lt;/ul>
+&lt;p>これらのクラスは、内部で &lt;a href="../../p/3fnyk44">Storage&lt;/a> オブジェクトを利用します。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/6wtzzq4/state-001.svg" alt="/p/6wtzzq4/state-001.svg" />
+ &lt;figcaption> &lt;span class="xImage_codeLink">≪&lt;a href="state-001.puml.txt">生成コード&amp;#x1F4D6;&lt;/a>≫&lt;/span>&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>&lt;code>Storage&lt;/code> がグローバルに状態保存を行っていたのに対し、&lt;strong>&lt;code>BotState&lt;/code> はネームスペースを考慮して状態保存を行うもの&lt;/strong>だと考えることができます。
+実際に、&lt;code>ConversationState&lt;/code> クラスや &lt;code>UserState&lt;/code> クラスの実装を覗いてみると、&lt;code>getStorageKey()&lt;/code> というメソッドでストレージ用の保存キーを作成しており、それぞれ次のように構成しています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;b>ConversationState&lt;/b> が使用する保存キー
+&lt;ul>
+&lt;li>&lt;code>${ channelId }/conversations/${ conversationId }/${ this.namespace }&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;b>UserState&lt;/b> が使用する保存キー
+&lt;ul>
+&lt;li>&lt;code>${ channelId }/users/${ userId }/${ this.namespace }&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;b>PrivateConversationState&lt;/b> が使用するキー
+&lt;ul>
+&lt;li>&lt;code>${ channelId }/conversations/${ conversationId }/users/${ userId }/${ this.namespace }&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>実用的なボットの状態管理を行うには、&lt;code>Storage&lt;/code> インタフェースをそのまま使うのではなく、&lt;code>ConversationState&lt;/code> / &lt;code>UserState&lt;/code> / &lt;code>PrivateConversationState&lt;/code> などを使うことになるでしょう。&lt;/p></description></item><item><title>チャットボット: Bot Builder SDK の Dialog で会話の流れをデザインする (1) ダイアログの基本</title><link>https://maku.blog/p/w36evii/</link><pubDate>Mon, 01 Jul 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/w36evii/</guid><description>&lt;h2 id="dialog-を使わない会話管理">Dialog を使わない会話管理&lt;/h2>
+&lt;p>Bot Builder SDK の &lt;a href="../../p/6wtzzq4">UserState や ConversationState を使う&lt;/a> と、ユーザーや会話ごとの状態管理を行うことできるため、複数回のやりとりが必要な会話を実現することができます。&lt;/p>
+&lt;p>例えば、下記のような会話ができるボットを実装してみます。&lt;/p>
+&lt;pre tabindex="0">&lt;code>User: こんにちは
+ Bot: あなたの名前は？
+User: まく
+ Bot: こんにちは まく さん
+User: おやすみなさい
+ Bot: また来てね まく さん
+&lt;/code>&lt;/pre>&lt;p>次のボット実装は、&lt;code>UserState&lt;/code> クラスを使って、&lt;code>pos&lt;/code> という名前のプロパティを作成し、会話がどこまで進んでいるかを管理しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">mybot.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">ActivityHandler&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">UserState&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">require&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;botbuilder&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">class&lt;/span> &lt;span class="nx">MyBot&lt;/span> &lt;span class="kr">extends&lt;/span> &lt;span class="nx">ActivityHandler&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">constructor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">super&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">_createStateObjects&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">onMessage&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kr">async&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">next&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">prop&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kr">await&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">nameProp&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">pos&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;init&amp;#39;&lt;/span> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// プロパティの &amp;#39;pos&amp;#39; により処理を分岐させる
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">prop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">pos&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;init&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">prop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">pos&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;askName&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;あなたの名前は？&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">prop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">pos&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;askName&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">prop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">pos&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;end&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">prop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`こんにちは &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">prop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb"> さん`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">prop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">pos&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;init&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`また来てね &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">prop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb"> さん`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// プロパティに保存
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">await&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">nameProp&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">prop&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">userState&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">saveChanges&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 状態管理用のオブジェクトを作成
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">_createStateObjects&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">userState&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">UserState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">storage&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">nameProp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">userState&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">createProperty&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;name&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">exports&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">MyBot&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">MyBot&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>会話の流れに従って、&lt;code>pos&lt;/code> プロパティの値は &lt;code>init&lt;/code> → &lt;code>askName&lt;/code> → &lt;code>end&lt;/code> と変化していきます（最後に &lt;code>init&lt;/code> に戻る）。
+このように、&lt;code>UserState&lt;/code> を使った状態管理だけでも、会話の流れを表現することはできるのですが、こんな状態管理を各トピックごとに実装するのは非常に骨が折れます。&lt;/p></description></item><item><title>チャットボット: Bot Builder SDK の Dialog で会話の流れをデザインする (2) スタック管理</title><link>https://maku.blog/p/6arjar6/</link><pubDate>Fri, 19 Jul 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6arjar6/</guid><description>&lt;p>&lt;a href="../../p/w36evii">ダイアログの基本&lt;/a> で説明したように、&lt;code>Dialog&lt;/code> クラスを使用した会話フローでは、ユーザーからメッセージを受け取るたびに &lt;code>DialogContext#continueDialog()&lt;/code> を呼び出すことで、1 ステップずつ処理を進めていきます。
+ダイアログには、スタック構造で会話を管理する仕組みがあり、次のようなメソッドを使って、ダイアログの起動（スタックに積む）、ダイアログの終了（スタックから降ろす）という操作を行うことが可能です。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>DialogContext#beginDialog(&amp;quot;ID&amp;quot;)&lt;/code> &amp;hellip; ダイアログを開始する（スタックに積む）&lt;/li>
+&lt;li>&lt;code>DialogContext#endDialog()&lt;/code> &amp;hellip; アクティブなダイアログを終了する（スタックから降ろす）&lt;/li>
+&lt;li>&lt;code>DialogContext#replaceDialog(&amp;quot;ID&amp;quot;)&lt;/code> &amp;hellip; アクティブなダイアログを別のダイアログに置き換える（スタックの一番上を入れ替え）&lt;/li>
+&lt;li>&lt;code>DialogContext#cancelAllDialog()&lt;/code> &amp;hellip; すべてのダイアログを終了する（スタックをクリア）&lt;/li>
+&lt;/ul>
+&lt;p>ここでは、&lt;code>RootDialog&lt;/code> と &lt;code>GreetDialog&lt;/code> という名前の 2 つのダイアログクラス作成し、&lt;code>RootDialog&lt;/code> から &lt;code>GreetDialog&lt;/code> を起動してダイアログのスタックを積むような実装を行ってみます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="500" height="183" src="../../p/6arjar6/dialog-stack-001_hu1400193414383335806.png" alt="/p/6arjar6/dialog-stack-001.png" />
+ &lt;figcaption>図: ダイアログ遷移のイメージ&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>下記は、実際のチャットクライアントの表示例です。
+右側のバーで示すように、 最初に &lt;code>RootDialog&lt;/code> による選択肢が表示され、次に &lt;code>GreetDialog&lt;/code> の処理に遷移し、最後に &lt;code>RootDialog&lt;/code> に戻ってくるという流れです。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="422" height="674" src="../../p/6arjar6/dialog-stack-002.png" alt="/p/6arjar6/dialog-stack-002.png" />
+ &lt;figcaption>図: チャットのイメージ&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>下記は、最初に起動される &lt;code>RootDialog&lt;/code> クラスの実装です。
+&lt;a href="../../p/w36evii">前回の説明&lt;/a> で使用した &lt;code>DialogBot&lt;/code> クラスを使って &lt;code>RootDialog&lt;/code> を起動することを想定しています。
+ウォーターフォールダイアログの最初のステップ (&lt;code>_step1&lt;/code>) として、ユーザーに選択肢を提示し、「挨拶する」を選んだ場合に、&lt;code>GreetDialog&lt;/code> を新たに起動するようにしています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">dialogs/rootDialog.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ChoiceFactory&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ChoicePrompt&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ComponentDialog&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ListStyle&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">WaterfallDialog&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">require&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;botbuilder-dialogs&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">GreetDialog&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">require&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;./greetDialog.js&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * 会話のエントリポイントとなるルートダイアログ。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">exports&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">RootDialog&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">RootDialog&lt;/span> &lt;span class="kr">extends&lt;/span> &lt;span class="nx">ComponentDialog&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">constructor&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">super&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;RootDialog&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Create dialog instances
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">greetDialog&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">GreetDialog&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">choicePrompt&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">ChoicePrompt&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;choicePrompt&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">choicePrompt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">style&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">ListStyle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">heroCard&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Add control flow dialogs and prompts
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">addDialog&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span> &lt;span class="nx">WaterfallDialog&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;start&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">_step1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">bind&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">_step2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">bind&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">_step3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">bind&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">addDialog&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">greetDialog&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">addDialog&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">choicePrompt&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">async&lt;/span> &lt;span class="nx">_step1&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">step&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="kr">await&lt;/span> &lt;span class="nx">step&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">prompt&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">choicePrompt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">prompt&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;やりたいことを選んでね。&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">choices&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">ChoiceFactory&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">toChoices&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s1">&amp;#39;挨拶する&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;バイバイ&amp;#39;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">async&lt;/span> &lt;span class="nx">_step2&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">step&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">text&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">step&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">result&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">value&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">ctx&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">step&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">match&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sr">/挨拶/&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="kr">await&lt;/span> &lt;span class="nx">step&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">beginDialog&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">greetDialog&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;さようなら&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="kr">await&lt;/span> &lt;span class="nx">step&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">endDialog&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">async&lt;/span> &lt;span class="nx">_step3&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">step&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">ctx&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">step&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;また来てね&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="kr">await&lt;/span> &lt;span class="nx">step&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">endDialog&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>下記は、&lt;code>RootDialog&lt;/code> から起動される（スタックに積まれる） &lt;code>GreetDialog&lt;/code> の実装です。
+ユーザーに名前の入力を促し、ユーザーに対して挨拶をしたらダイアログを終了します。&lt;/p></description></item><item><title>チャットボット: Bot Builder SDK で画像やリストなどのリッチなメッセージを送る (MessageFactory)</title><link>https://maku.blog/p/q7vw95i/</link><pubDate>Thu, 04 Jul 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/q7vw95i/</guid><description>&lt;h2 id="activity-オブジェクトと-messagefactory">Activity オブジェクトと MessageFactory&lt;/h2>
+&lt;p>Bot Builder SDK によるボット実装において、ユーザーにメッセージを送るには &lt;a href="https://github.com/microsoft/botbuilder-js/blob/master/libraries/botbuilder-core/src/turnContext.ts">TurnContext クラス&lt;/a> の &lt;code>sendActivity()&lt;/code> メソッドを使用します。
+下記は、単純なテキストメッセージを送る例です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">await&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Hello!&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="316" height="192" src="../../p/q7vw95i/message-factory-001.png" alt="/p/q7vw95i/message-factory-001.png" />
+&lt;/figure>
+
+&lt;p>&lt;code>sendActivity()&lt;/code> の第一引数には、このように文字列を渡すことができますが、その名の通り &lt;strong>&lt;code>Activity&lt;/code> オブジェクトを渡すこともできる&lt;/strong>ようになっています。
+&lt;code>Activity&lt;/code> オブジェクトを使うと、単純なテキストよりもリッチな形式で表示を行うことができます（どう表示されるかは各チャンネルの実装によりますが）。&lt;/p>
+&lt;p>&lt;code>Activity&lt;/code> インタフェースは &lt;a href="https://github.com/microsoft/botbuilder-js/blob/master/libraries/botframework-schema/src/index.ts">botframework-schema モジュール&lt;/a> で定義されていますが、このインタフェースを意識してオブジェクトを作成することはあまりありません。
+というのも、いろいろな用途の &lt;code>Activity&lt;/code> オブジェクトを生成するためのファクトリーである &lt;a href="https://github.com/microsoft/botbuilder-js/blob/master/libraries/botbuilder-core/src/messageFactory.ts">MessageFactory クラス&lt;/a> が用意されているからです。&lt;/p>
+&lt;p>例えば、&lt;code>MessageFactory#text()&lt;/code> は単純なテキストメッセージを送るための &lt;code>Activity&lt;/code> オブジェクトを生成します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// const { MessageFactory } = require(&amp;#39;botbuilder&amp;#39;);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">msg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">MessageFactory&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Hello!&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">await&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">msg&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これは実は下記のようにするのと同じです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">await&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Hello!&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>TurnContext#sendActivity()&lt;/code> に直接文字列を渡した場合は、内部で前者のような &lt;code>MessageFactory.text()&lt;/code> による &lt;code>Activity&lt;/code> 生成が行われています。
+単純なテキストを送るだけであれば、&lt;code>sendActivity('Hello')&lt;/code> としてしまうのが早いでしょう。&lt;/p>
+&lt;h2 id="messagefactory-でリッチなメッセージを作成する">MessageFactory でリッチなメッセージを作成する&lt;/h2>
+&lt;p>&lt;code>MessageFactory&lt;/code> が提供するファクトリメソッドを使って、リッチなメッセージを送る例をいくつか紹介します。
+ここでは、Bot Framework Emulator の表示例を載せておきます。&lt;/p>
+&lt;h3 id="画像動画を表示する----contenturl">画像・動画を表示する -- contentUrl()&lt;/h3>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="316" height="377" src="../../p/q7vw95i/message-factory-002.png" alt="/p/q7vw95i/message-factory-002.png" />
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">msg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">MessageFactory&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">contentUrl&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;https://maku.blog/assets/img/site-logo.png&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// 画像や動画のURL
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s1">&amp;#39;image/png&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// 画像や動画のMIMEタイプ
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s1">&amp;#39;タイトル&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// タイトル（画像が見つからないときの代替テキスト）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s1">&amp;#39;説明文&amp;#39;&lt;/span> &lt;span class="c1">// 説明文（オプション）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">await&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">msg&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記の例では png 画像を表示していますが、mp4 などの動画を指定することもできます。
+Youtube のアドレスをそのまま記述してもいいみたいです。&lt;/p></description></item><item><title>チャットボット: 独自のミドルウェアを作成してログを記録する</title><link>https://maku.blog/p/fn3amda/</link><pubDate>Tue, 23 Jul 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fn3amda/</guid><description>&lt;h2 id="ミドルウェアとは">ミドルウェアとは&lt;/h2>
+&lt;p>Bot Framework において、クライアントから受信したメッセージはアダプターを介してボットに届けられますが、アダプターにミドルウェアを設定しておくことで、メッセージがボットに届く前に割り込んで処理を行うことができます。&lt;/p>
+&lt;div style="text-align:center; font-weight:bold;">Adapter → Middleware1 → Middleware2 → Middleware3 → ... → YourBot&lt;/div>
+&lt;p>ミドルウェアは上記のように複数登録することができ、登録された順に呼び出されていきます。
+アダプターにミドルウェアを追加するには、&lt;strong>&lt;code>BotFrameworkAdapter#use()&lt;/code>&lt;/strong> メソッドを使用します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ミドルウェアの追加&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">BotFrameworkAdapter&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">require&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;botbuilder&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">adpater&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">BotFrameworkAdapter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">endpoint&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">adapter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">use&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span> &lt;span class="nx">Middleware1&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">adapter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">use&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span> &lt;span class="nx">Middleware2&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">adapter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">use&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span> &lt;span class="nx">Middleware3&lt;/span>&lt;span class="p">());&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="ミドルウェアを実装する">ミドルウェアを実装する&lt;/h2>
+&lt;p>独自のミドルウェアを作成するには、&lt;a href="https://docs.microsoft.com/ja-jp/javascript/api/botbuilder-core/middleware?view=botbuilder-ts-latest">Middleware インタフェース&lt;/a> が提供する &lt;strong>&lt;code>onTurn&lt;/code>&lt;/strong> メソッドを実装します。&lt;/p>
+&lt;p>ここでは、ユーザーの入力をコンソールに出力するだけの &lt;code>ConsoleLogger&lt;/code> というミドルウェアクラスを実装してみます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">middlewares/consoleLogger.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">exports&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ConsoleLogger&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">ConsoleLogger&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">async&lt;/span> &lt;span class="nx">onTurn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">next&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">type&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s2">&amp;#34;message&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">next&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="c1">// Invoke a next middleware
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>とても簡単ですね。
+あと、&lt;code>onTurn()&lt;/code> を抜ける前に忘れずに &lt;strong>&lt;code>next()&lt;/code>&lt;/strong> を呼び出して、後続のミドルウェアが正しく呼び出されるようにしておく必要があります。&lt;/p>
+&lt;p>このミドルウェアをアダプターに登録するには次のようにします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// const { ConsoleLogger } = require(&amp;#39;./middlewares/consoleLogger.js&amp;#39;);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">adapter&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">BotFrameworkAdapter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">botEndpoint&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">adapter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">use&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span> &lt;span class="nx">ConsoleLogger&lt;/span>&lt;span class="p">());&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、ユーザーがチャットクライアント（チャンネル）から &lt;code>こんにちは&lt;/code> と入力すると、ボットサーバー側のコンソールに &lt;code>こんにちは&lt;/code> と出力されるようになります。&lt;/p>
+&lt;p>ちなみに、上記のミドルウェアを TypeScript で実装すると下記のような感じになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">./middlewares/consoleLogger.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">Middleware&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">TurnContext&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s2">&amp;#34;botbuilder&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">ConsoleLogger&lt;/span> &lt;span class="kr">implements&lt;/span> &lt;span class="nx">Middleware&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">public&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="nx">onTurn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>: &lt;span class="kt">TurnContext&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">next&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">Promise&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">void&lt;/span>&lt;span class="p">&amp;gt;)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">type&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;message&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">await&lt;/span> &lt;span class="nx">next&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="botbuilder-sdk-組み込まれているロギング用ミドルウェアを使用する">BotBuilder SDK 組み込まれているロギング用ミドルウェアを使用する&lt;/h2>
+&lt;h3 id="transcriptloggermiddleware-を使う">TranscriptLoggerMiddleware を使う&lt;/h3>
+&lt;p>BotBuilder SDK の &lt;code>botbuilder&lt;/code> モジュールには、組み込みのロギング用ミドルウェアとして &lt;strong>&lt;code>TranscriptLoggerMiddleware&lt;/code>&lt;/strong> が含まれています。&lt;/p></description></item><item><title>チャットボット: 独自のミドルウェアを作成して禁止ワードを拒否するようにする</title><link>https://maku.blog/p/gt9g2na/</link><pubDate>Tue, 23 Jul 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gt9g2na/</guid><description>&lt;p>&lt;a href="../../p/fn3amda">前回の記事&lt;/a> では、チャットボットに独自のミドルウェアを追加して、ユーザー入力をログ出力できるようにしました。
+今回は、ユーザーが NG ワードを入力したときに、警告を表示して処理を中断するようなミドルウェアを作成してみます。&lt;/p>
+&lt;p>その名も &lt;strong>&lt;code>NgWordMiddleware&lt;/code>&lt;/strong> です！&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">middlewares/NgWordMiddleware.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">NG_WORDS&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="sr">/アホ|まぬけ|バカ/&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">exports&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">NgWordMiddleware&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">NgWordMiddleware&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">async&lt;/span> &lt;span class="nx">onTurn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">next&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">type&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;message&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">line&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">activity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">NG_WORDS&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">line&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">sendActivity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;そんなこと言っちゃダメ&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">await&lt;/span> &lt;span class="nx">next&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="c1">// Invoke a next middleware
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記の例では、&lt;code>NG_WORDS&lt;/code> 定数に、禁止語句を正規表現の形で登録しています。
+ユーザーが入力したテキストに、禁止語句が含まれていたら、「そんなこと言っちゃダメ」と返事して処理を進めないようにします（&lt;code>next()&lt;/code> を呼び出さないことで後続の処理を打ち切る）。&lt;/p>
+&lt;p>このミドルウェアは、下記のようにアダプターに追加することで有効化できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// const { NgWordMiddleware } = require(&amp;#39;./middlewares/ngWordMiddleware.js&amp;#39;);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">adapter&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">BotFrameworkAdapter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">botEndpoint&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">adapter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">use&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span> &lt;span class="nx">NgWordMiddleware&lt;/span>&lt;span class="p">());&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="342" height="194" src="../../p/gt9g2na/middleware2-001.png" alt="/p/gt9g2na/middleware2-001.png" />
+&lt;/figure>
+
+&lt;p>この例では、単純に禁止語句が含まれているかだけをチェックしているので、「バカルディ」と入力した場合にも弾かれてしまいます。
+このあたりは工夫して処理しなきゃですね。&lt;/p></description></item><item><title>LUIS (4) botbuilder-ai ライブラリを使って LUIS の API を利用する</title><link>https://maku.blog/p/dtwckb9/</link><pubDate>Thu, 18 Apr 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dtwckb9/</guid><description>&lt;p>&lt;a href="../../p/tewj3gs">こちらの記事（Node.js から LUIS の API を利用する）&lt;/a> では、自力で LUIS の REST API を呼び出すための URL を構築していました。
+ここでは、&lt;strong>&lt;code>botbuilder-ai&lt;/code>&lt;/strong> パッケージを使用して、もっと手軽に LUIS の機能を呼び出してみます。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ ワンポイント&lt;/span>
+ &lt;span class="xNote_body">残念ながら &lt;code>botbuilder-ai&lt;/code> が提供している &lt;code>LuisRecognizer&lt;/code> などのクラスは、チャットボットの実装に使用する &lt;code>TurnContext&lt;/code> オブジェクトに依存した設計になっています。
+そのため、単純なコンソールアプリケーションから &lt;code>botbuilder-ai&lt;/code> パッケージを使用することは難しく、チャットボットの実装でしか利用できません。&lt;/span>
+&lt;/div>
+
+&lt;h2 id="luis-のエンドポイント情報接続情報を確認しておく">LUIS のエンドポイント情報（接続情報）を確認しておく&lt;/h2>
+&lt;p>LUIS API を使用するには、下記のような LUIS アプリの APP ID やエンドポイント情報が必要です。&lt;/p>
+&lt;ul>
+&lt;li>&lt;b>APP ID:&lt;/b> &lt;code>c39eb4df-fbcf-224f-b8b7-a0ee445d11b3&lt;/code>&lt;/li>
+&lt;li>&lt;b>エンドポイント:&lt;/b> &lt;code>https://japaneast.api.cognitive.microsoft.com&lt;/code>&lt;/li>
+&lt;li>&lt;b>エンドポイントキー（サブスクリプションキー）:&lt;/b> &lt;code>c9162c5c0b5edff5270feb6145618acb&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>APP ID とエンドポイントキーは、&lt;a href="https://luis.ai/">LUIS ポータル&lt;/a> から対象のアプリケーションを開き、下記のように確認できます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;b>APP ID:&lt;/b> &lt;samp>MANAGE&lt;/samp>タブ → &lt;samp>Application Information&lt;/samp>&lt;/li>
+&lt;li>&lt;b>エンドポイント:&lt;/b> &lt;samp>MANAGE&lt;/samp>タブ → &lt;samp>Keys and Endpoints&lt;/samp> → &lt;samp>Endpoint&lt;/samp> カラムの URL の前半部分。&lt;/li>
+&lt;li>&lt;b>エンドポイントキー:&lt;/b> &lt;samp>MANAGE&lt;/samp>タブ → &lt;samp>Keys and Endpoints&lt;/samp> → &lt;samp>Key 1&lt;/samp> カラム&lt;/li>
+&lt;/ul>
+&lt;p>LUIS のエンドポイントキーは、&lt;a href="https://portal.azure.com/">Azure ポータル&lt;/a> に作成した &lt;samp>LUIS リソース&lt;/samp> の &lt;samp>キー&lt;/samp> の項目に表示されるものと同じです。
+念のため、同一のものが表示されているか確認しておくとよいでしょう。&lt;/p></description></item></channel></rss>

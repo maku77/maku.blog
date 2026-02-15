@@ -1,29 +1,212 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Next.js アプリの環境構築 on まくろぐ</title><link>https://maku.blog/p/3o2ep2c/</link><description>Recent content in Next.js アプリの環境構築 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 04 May 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/3o2ep2c/index.xml" rel="self" type="application/rss+xml"/><item><title>Next.js で HelloWorld（プロジェクト作成からサーバー起動まで）</title><link>https://maku.blog/p/ubmu3bj/</link><pubDate>Sun, 18 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ubmu3bj/</guid><description>Next.js とは Next.js は、React.js アプリ開発に必要なアレコレを詰め込んだパッケージです。 React.js を素の状態で導入すると、他にもいろいろなツールやライブラリを組み合わせていくことになるのですが、Next.js を使うとモダンな Web アプリ開発に必要なものが一気に揃えられます。
-React.js は基本的に SPA（シングルページアプリ）を想定していますが、Next.js では複数ページによる構成や、サーバーサイドレンダリングなどをサポートしています。 これは、Next.js が単なる React.js 用のコンポーネントライブラリでないことを示しています。
-Next.js には次のような特徴があります。
-ゼロコンフィグ: 何も設定しなくても、最初から開発サーバーの立ち上げ、プロダクト用ビルドを行えるようになっています。これらは、最適なパフォーマンスが出るようメンテナンスが続けられています。カスタマイズしたいときも、複雑怪奇な webpack.config.js を作成する必要はなく、next.config.js による最小限の設定で済みます。できれば何も設定しないのが理想です。 SSR/SSG によるプリレンダリング: React.js はクライアントサイドで JavaScript を実行する CSR (Client Side Rendering) で動作しますが、Next.js は SSR (Server Side Rendering) や SSG (Static Site Generation) をサポートしています。これは、一般的な Node.js の API を利用してページを構築できることを意味します。開発元の Vercel は、パフォーマンスの面から SSG を推奨しています。 TypeScript をサポート: いまどきの Web アプリ開発では TypeScript はほぼ必須なので、標準サポートはうれしいです。空の tsconfig.js を置くだけで、TypeScript 対応は完了です（設定は自動で行われます）。 ファイルベースのルーティング: pages ディレクトリ以下の構成をそのままルーティング用のリンク名として使うことができます。例えば、pages/xxx/yyy.js は、/xxx/yyy というリンク名にマッピングされます。React Router によるルーティング設定が面倒だと感じている人にとってはうれしいかもしれません。 部分的な高速リロード (Fast Refresh): Next.</description></item><item><title>Next.js のプロジェクトを TypeScript 化する</title><link>https://maku.blog/p/ny9fmty/</link><pubDate>Mon, 26 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ny9fmty/</guid><description>何をするか？ create-next-app コマンドで Next.js プロジェクトを生成するときに --typescript (--ts) オプションをつけて実行すると、TypeScript 対応したプロジェクトを生成することができます。
-$ npx create-next-app myapp --typescript # ただ、こっちのテンプレートを使う方法の方が若干洗練されてる気はする $ npx create-next-app myapp --example with-typescript また、Next.js は既存の JavaScript プロジェクトを TypeScript 化する機能も備えています。 ここから先は、その方法を説明します。
-参考 Next.js で HelloWorld TypeScript 環境の導入 Next.js は、プロジェクトのルートに tsconfig.json ファイルがあると、自動的に TypeScript モードで動作するようになります。 次のようにして、空の tsconfig.json ファイルを作成し、TypeScript 用のパッケージをインストールします。
-$ touch tsconfig.json $ npm install typescript @types/node @types/react --save-dev なんと、これだけで Next.js プロジェクトへの TypeScript 導入は完了です。 お手軽〜
-自動生成される設定ファイルを見ておく 上記のステップで、TypeScript の設定ファイル (tsconfig.json) に何も記述していないことに気づいたかもしれません。 実は、Next.js のビルド（next dev や next build）を実行すると、自動的に設定ファイルの内容を更新してくれるようになっています。</description></item><item><title>Next.js アプリのソースコードを GitHub で管理する</title><link>https://maku.blog/p/xjw8it5/</link><pubDate>Sat, 24 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xjw8it5/</guid><description>Next.js のプロジェクトは、create-next-app コマンドで作成済みであるとします。
-参考: Next.js で HelloWorld create-next-app コマンドで Next.js アプリを新規作成すると、アプリのトップディレクトリに、Git リポジトリ (.git/) が自動的に生成されます。 git log コマンドを実行すると、初回のコミットがすでに生成されていることがわかります。
-$ git log commit 4607ecdd2f3f9f3d0d4c86442463c3b86856e88a (HEAD -&amp;gt; main) Author: maku &amp;lt;maku@example.com&amp;gt; Date: Sun Apr 18 23:28:22 2021 +0900 Initial commit from Create Next App この Next.js アプリを GitHub で管理したいときは、以下の手順で GitHub リポジトリと結びつけます。
-GitHub 上に 新規リポジトリを追加 します リポジトリ名は create-next-app で指定したアプリ名と合わせましょう。 Initialize this repository with: の項目では、README.txt の作成にはチェックを入れないでください。リポジトリファイル (.git) はすでに create-next-app によって生成されているので、GitHub 側のリポジトリは空の状態で作成する必要があります。 既存の Next.js アプリを上記の GitHub リポジトリに結びつけます $ cd myapp $ git remote add origin https://github.</description></item><item><title>Next.js アプリを GitHub Actions でビルドして GitHub Pages で公開する</title><link>https://maku.blog/p/au8ju6g/</link><pubDate>Sat, 24 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/au8ju6g/</guid><description>何をするか？ ここでは、Next.js アプリを次のような構成でホスティング（Web サイトとして公開）できるようにします。
-create-next-app で作成した Next.js アプリのコードを GitHub で管理する main ブランチにプッシュ（マージ）したら GitHub Actions で下記を実行 Next.js アプリをビルド (npm run build, npm run export) GitHub Pages にデプロイ つまり、この設定が終わると、GitHub に Next.js アプリのコードをプッシュするだけで、自動的にビルドされて、Web サイトに反映されるようになります。
-GitHub リポジトリの準備 空の GitHub リポジトリを作成し、そこに create-next-app で作成した Next.js アプリをプッシュします。 リポジトリ名は、最終的な Web サイトのアドレスをどうしたいかで、次のように作り分けます。
-ユーザーサイト（あるいは Organization サイト） 公開 URL: https://&amp;lt;username&amp;gt;.github.io/ 作成するリポジトリ名: &amp;lt;username&amp;gt;.github.io プロジェクトサイト 公開 URL: https://&amp;lt;username&amp;gt;.github.io/&amp;lt;repository&amp;gt;/ 作成するリポジトリ名: &amp;lt;repository&amp;gt; ここでは、プロジェクトサイトとして myapp というリポジトリを作成した場合の例で説明していきます。
-$ npx create-next-app myapp $ cd myapp $ git remote add origin https://github.</description></item><item><title>Next.js アプリを Vercel で公開する</title><link>https://maku.blog/p/j6ht5fq/</link><pubDate>Fri, 07 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j6ht5fq/</guid><description>Vercel とは？ Vercel は Next.js を開発している企業であり、同名の Vercel というサービスを提供しています。
-Vercel - Develop. Preview. Ship. For the best frontend teams Vercel サービスは Next.js アプリのホスティングに特化しており、GitHub などのリポジトリと連携させることにより、ビルドから Next.js サーバーによるホスティングまでを簡単に自動化することができます（実際には、Vercel サービスは、Next.js 以外で作成した Web サイト、例えば、Hugo で作成したブログなどのホスティングにも対応しています）。
-Next.js アプリで SSR (Server-side Rendering) や API ルートなどの機能を使用している場合は、Next.js サーバー上で Web サイトをホスティングする必要があるのですが、現状そのような環境をサーバーレスなサービスとして提供しているのは Vercel のみです（一応 Serverless Next.js という AWS Lambda で動かすものもあったりしますが）。
-Next.js の開発サーバー (next dev) で何らかのアプリをローカルで動かせているのであれば、Vercel を使って、ほぼそのままの形でネット上に公開することができます。 小規模な Web サイトであれば無料で動かせますし、とっても簡単なので、一度試してみるとよいです。
-Vercel で Next.js アプリを公開する ここでは、GitHub にプッシュした Next.js アプリを Vercel を使って公開してみます。 まずは、下記を参考にして、GitHub に何らかの Next.</description></item><item><title>Vercel のウェブサイトに独自ドメインを割り当てる</title><link>https://maku.blog/p/9vakw8i/</link><pubDate>Fri, 07 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9vakw8i/</guid><description>Vercel で公開している Web サイトに、お名前.com で取得した独自ドメインを割り当てる方法を説明します。 Vercel 上での Next.js アプリ公開までの手順は、下記の記事を参考にしてください。
-参考: Next.js アプリを Vercel で公開する ここでは、独自ドメインを「お名前.com」で取得済みだと仮定しますが、別のレジストラで取得している場合もほぼ同様に設定できるはずです。 大きく分けて、次の 2 種類の設定方法があります。
-Vercel の DNS サーバーを使う方法 Vercel 以外の DNS サーバーを使う方法 独自ドメインの「レジストラ」と「DNS サーバー」の関係については、下記の記事で簡単にまとめていますので参考にしてください。 後述の設定で何をしているのかが分かりやすくなると思います。
-ドメイン管理と DNS 管理の違いを理解する Vercel の DNS サーバーを使う方法 お名前.com などのレジストラで独自ドメインを取得すると、そのドメインをどの DNS サーバーで運用するかという設定を行えるはずです。 次のように Vercel 側の DNS サーバー設定を行うと、お名前.com 側に設定すべき DNS サーバー名を確認できます。
-(1) Vercel のサイト から対象アプリのページを開き、Settings → Domains と選択し、取得済みの独自ドメイン名を入力して Add ボタンを押してください。ここでは、例として example.com というドメインを管理するとします（ドメイン自体は「お名前.com」で取得したものです）。
-図: Vercel に独自ドメインを設定する (2) example.com に加えて www.example.com もエイリアスとして設定するかというダイアログが出ますが、example.com だけでよければ、Add example.com を選択すれば　OK です。</description></item><item><title>Next.js で src からの相対パスで import できるようにする (tsconfig.json)</title><link>https://maku.blog/p/qgvamzc/</link><pubDate>Thu, 26 Aug 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qgvamzc/</guid><description>何をするか？ Next.js (TypeScript) のプロジェクトで、src ディレクトリ以下の階層構造が深くなってくると、別のディレクトリのモジュールをインポートするときの相対パスがわかりにくくなってきます。
-import { sleep } from &amp;#39;../../../../../utils/timeUtil&amp;#39; このような場合は、次に説明するような tsconfig.json の設定をしておくと、シンプルなパスでインポートできるようになります。
-compilerOptions.paths プロパティ (module alias) tsconfig.json の compilerOptions.paths プロパティ（と baseUrl プロパティ）を設定すると、特定のパスに配置されたモジュール（.ts ファイル）を、エイリアス名（ここでは @）を使って参照できるようになります。
-tsconfig.json { &amp;#34;compilerOptions&amp;#34;: { // ... &amp;#34;baseUrl&amp;#34;: &amp;#34;.&amp;#34;, &amp;#34;paths&amp;#34;: { &amp;#34;@/*&amp;#34;: [&amp;#34;./src/*&amp;#34;] } } } 上記のように設定すると、プロジェクトルートの src ディレクトリ以下のモジュールを、どの階層にあるコードからでも、@/moduleName という名前で参照できるようになります。 例えば、src/utils/timeUtil.ts というモジュールをインポートするとき、これまでは、次のようにカレントディレクトリからの相対パスで指定しなければいけなかったところを、
-import { sleep } from &amp;#39;../../../../../utils/timeUtil&amp;#39; 次のように src ディレクトリを示すエイリアス名 @ を使って指定できるようになります。
-import { sleep } from &amp;#39;@/utils/timeUtil&amp;#39; ☝️ ワンポイント 上記のようなエイリアス名を使った場合でも正しくモジュールを参照できるのは、Next.js のビルドシステムが JavaScript へのトランスパイル時に本来のモジュールのパスに変換してくれるおかげです（おそらく webpack などによるバンドル時に処理されています）。 このあたりにも、Next.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Next.js アプリの環境構築 on まくろぐ</title><link>https://maku.blog/p/3o2ep2c/</link><description>Recent content in Next.js アプリの環境構築 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Thu, 26 Aug 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/3o2ep2c/index.xml" rel="self" type="application/rss+xml"/><item><title>Next.js で HelloWorld（プロジェクト作成からサーバー起動まで）</title><link>https://maku.blog/p/ubmu3bj/</link><pubDate>Sun, 18 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ubmu3bj/</guid><description>&lt;h2 id="nextjs-とは">Next.js とは&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="250" height="auto" src="../../p/ubmu3bj/img-001.svg" alt="/p/ubmu3bj/img-001.svg" />
+&lt;/figure>
+
+&lt;p>&lt;a href="https://nextjs.org/">Next.js&lt;/a> は、React.js アプリ開発に必要なアレコレを詰め込んだパッケージです。
+React.js を素の状態で導入すると、他にもいろいろなツールやライブラリを組み合わせていくことになるのですが、&lt;strong>Next.js を使うとモダンな Web アプリ開発に必要なものが一気に揃えられます&lt;/strong>。&lt;/p>
+&lt;p>React.js は基本的に SPA（シングルページアプリ）を想定していますが、Next.js では複数ページによる構成や、サーバーサイドレンダリングなどをサポートしています。
+これは、Next.js が単なる React.js 用のコンポーネントライブラリでないことを示しています。&lt;/p>
+&lt;p>Next.js には次のような特徴があります。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>ゼロコンフィグ&lt;/strong>: 何も設定しなくても、最初から開発サーバーの立ち上げ、プロダクト用ビルドを行えるようになっています。これらは、最適なパフォーマンスが出るようメンテナンスが続けられています。カスタマイズしたいときも、複雑怪奇な &lt;code>webpack.config.js&lt;/code> を作成する必要はなく、&lt;code>next.config.js&lt;/code> による最小限の設定で済みます。できれば何も設定しないのが理想です。&lt;/li>
+&lt;li>&lt;strong>SSR/SSG によるプリレンダリング&lt;/strong>: React.js はクライアントサイドで JavaScript を実行する CSR (Client Side Rendering) で動作しますが、Next.js は SSR (Server Side Rendering) や SSG (Static Site Generation) をサポートしています。これは、一般的な Node.js の API を利用してページを構築できることを意味します。開発元の Vercel は、パフォーマンスの面から SSG を推奨しています。&lt;/li>
+&lt;li>&lt;strong>TypeScript をサポート&lt;/strong>: いまどきの Web アプリ開発では TypeScript はほぼ必須なので、標準サポートはうれしいです。空の &lt;code>tsconfig.js&lt;/code> を置くだけで、TypeScript 対応は完了です（設定は自動で行われます）。&lt;/li>
+&lt;li>&lt;strong>ファイルベースのルーティング&lt;/strong>: &lt;code>pages&lt;/code> ディレクトリ以下の構成をそのままルーティング用のリンク名として使うことができます。例えば、&lt;code>pages/xxx/yyy.js&lt;/code> は、&lt;code>/xxx/yyy&lt;/code> というリンク名にマッピングされます。React Router によるルーティング設定が面倒だと感じている人にとってはうれしいかもしれません。&lt;/li>
+&lt;li>&lt;strong>部分的な高速リロード (Fast Refresh)&lt;/strong>: Next.js の開発サーバーを使って開発しているときに、React コンポーネントのステートを保ったままコード修正を反映できます。例えば、フォームに入力された値を保ったままページ内容を部分的に更新できます。&lt;/li>
+&lt;li>&lt;strong>サーバーレス API&lt;/strong>: アプリ作成用に、簡易な Web API を作る機能が備わっています。&lt;code>pages/api&lt;/code> ディレクトリに JS ファイルを置くだけで API の完成です。&lt;/li>
+&lt;li>&lt;strong>CSS Modules &amp;amp; Sass&lt;/strong>: コンポーネントから CSS ファイルを import できるようにする CSS modules の仕組みを標準サポートしています。もちろん生の CSS ではなく、Sass で記述できます。生の CSS を使った場合も、ベンダープレフィックスや Flexbox の不具合などを考慮してくれるため、ブラウザの互換性を考慮する必要がありません。CSS-in-JS な styled-jsx もデフォルトで使えます。&lt;/li>
+&lt;li>&lt;strong>コードスプリッティング&lt;/strong>: 効率的なウェブサイト表示のためのコードスプリッティング機能をサポートしています。これは自動で行われるため、特に意識しなくても最適な形で Web サイトをデプロイできます。&lt;/li>
+&lt;/ul>
+&lt;h2 id="nextjs-の-hello-world-アプリを作成する">Next.js の Hello World アプリを作成する&lt;/h2>
+&lt;h3 id="create-next-app-によるアプリ生成">create-next-app によるアプリ生成&lt;/h3>
+&lt;p>次のように &lt;strong>&lt;code>create-next-app&lt;/code>&lt;/strong> コマンドを実行すると、カレントディレクトリに Next.js アプリの雛形として &lt;code>myapp&lt;/code> ディレクトリが作成されます（Node.js はインストール済みとします）。&lt;/p></description></item><item><title>Next.js のプロジェクトを TypeScript 化する</title><link>https://maku.blog/p/ny9fmty/</link><pubDate>Mon, 26 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ny9fmty/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>&lt;code>create-next-app&lt;/code> コマンドで Next.js プロジェクトを生成するときに &lt;strong>&lt;code>--typescript (--ts)&lt;/code>&lt;/strong> オプションをつけて実行すると、TypeScript 対応したプロジェクトを生成することができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npx create-next-app myapp --typescript
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ただ、こっちのテンプレートを使う方法の方が若干洗練されてる気はする
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npx create-next-app myapp --example with-typescript&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>また、Next.js は既存の JavaScript プロジェクトを TypeScript 化する機能も備えています。
+ここから先は、その方法を説明します。&lt;/p>
+&lt;aside style="display: flex; border: thin dashed gray;">
+&lt;div style="align-self: stretch; writing-mode: vertical-lr; text-align: center; letter-spacing: 0.2em; color: #666; border-right: thin dashed gray; padding: 0.4em 0; line-height: 1.5;">参考&lt;/div>
+&lt;div style="align-self: center; padding: 0.6em 0; line-height: 1.2 !important;">&lt;ul>
+&lt;li>&lt;a href="../../p/ubmu3bj">Next.js で HelloWorld&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/aside>
+&lt;h2 id="typescript-環境の導入">TypeScript 環境の導入&lt;/h2>
+&lt;p>Next.js は、プロジェクトのルートに &lt;strong>&lt;code>tsconfig.json&lt;/code>&lt;/strong> ファイルがあると、自動的に TypeScript モードで動作するようになります。
+次のようにして、空の &lt;code>tsconfig.json&lt;/code> ファイルを作成し、TypeScript 用のパッケージをインストールします。&lt;/p></description></item><item><title>Next.js アプリのソースコードを GitHub で管理する</title><link>https://maku.blog/p/xjw8it5/</link><pubDate>Sat, 24 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xjw8it5/</guid><description>&lt;p>Next.js のプロジェクトは、&lt;code>create-next-app&lt;/code> コマンドで作成済みであるとします。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/ubmu3bj">Next.js で HelloWorld&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>create-next-app&lt;/code> コマンドで Next.js アプリを新規作成すると、アプリのトップディレクトリに、Git リポジトリ (&lt;code>.git/&lt;/code>) が自動的に生成されます。
+&lt;code>git log&lt;/code> コマンドを実行すると、初回のコミットがすでに生成されていることがわかります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ git log
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">commit 4607ecdd2f3f9f3d0d4c86442463c3b86856e88a (HEAD -&amp;gt; main)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Author: maku &amp;lt;maku@example.com&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Date: Sun Apr 18 23:28:22 2021 +0900
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Initial commit from Create Next App&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この Next.js アプリを GitHub で管理したいときは、以下の手順で GitHub リポジトリと結びつけます。&lt;/p>
+&lt;ol>
+&lt;li>GitHub 上に &lt;a href="https://github.com/new">新規リポジトリを追加&lt;/a> します
+&lt;ul>
+&lt;li>リポジトリ名は &lt;code>create-next-app&lt;/code> で指定したアプリ名と合わせましょう。&lt;/li>
+&lt;li>&lt;code>Initialize this repository with:&lt;/code> の項目では、&lt;code>README.txt&lt;/code> の作成にはチェックを入れないでください。リポジトリファイル (&lt;code>.git&lt;/code>) はすでに &lt;code>create-next-app&lt;/code> によって生成されているので、GitHub 側のリポジトリは空の状態で作成する必要があります。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>既存の Next.js アプリを上記の GitHub リポジトリに結びつけます
+&lt;pre tabindex="0">&lt;code>$ cd myapp
+$ git remote add origin https://github.com/&amp;lt;username&amp;gt;/myapp.git
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>既存の Next.js アプリの内容（前述の初回コミット）をプッシュします
+&lt;pre tabindex="0">&lt;code>$ git push -u origin main
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;/ol>
+&lt;p>あとは、コード修正しながらコミット＆プッシュを繰り返し、Next.js アプリを育てていけば OK です。&lt;/p></description></item><item><title>Next.js アプリを GitHub Actions でビルドして GitHub Pages で公開する</title><link>https://maku.blog/p/au8ju6g/</link><pubDate>Sat, 24 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/au8ju6g/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ここでは、Next.js アプリを次のような構成でホスティング（Web サイトとして公開）できるようにします。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>create-next-app&lt;/code> で作成した Next.js アプリのコードを GitHub で管理する&lt;/li>
+&lt;li>&lt;code>main&lt;/code> ブランチにプッシュ（マージ）したら &lt;strong>GitHub Actions&lt;/strong> で下記を実行
+&lt;ul>
+&lt;li>Next.js アプリをビルド (&lt;code>npm run build&lt;/code>, &lt;code>npm run export&lt;/code>)&lt;/li>
+&lt;li>&lt;strong>GitHub Pages&lt;/strong> にデプロイ&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>つまり、この設定が終わると、GitHub に Next.js アプリのコードをプッシュするだけで、自動的にビルドされて、Web サイトに反映されるようになります。&lt;/p>
+&lt;h2 id="github-リポジトリの準備">GitHub リポジトリの準備&lt;/h2>
+&lt;p>空の GitHub リポジトリを作成し、そこに &lt;code>create-next-app&lt;/code> で作成した Next.js アプリをプッシュします。
+リポジトリ名は、最終的な Web サイトのアドレスをどうしたいかで、次のように作り分けます。&lt;/p>
+&lt;ul>
+&lt;li>ユーザーサイト（あるいは Organization サイト）
+&lt;ul>
+&lt;li>公開 URL: &lt;code>https://&amp;lt;username&amp;gt;.github.io/&lt;/code>&lt;/li>
+&lt;li>作成するリポジトリ名: &lt;strong>&lt;code>&amp;lt;username&amp;gt;.github.io&lt;/code>&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>プロジェクトサイト
+&lt;ul>
+&lt;li>公開 URL: &lt;code>https://&amp;lt;username&amp;gt;.github.io/&amp;lt;repository&amp;gt;/&lt;/code>&lt;/li>
+&lt;li>作成するリポジトリ名: &lt;strong>&lt;code>&amp;lt;repository&amp;gt;&lt;/code>&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>ここでは、プロジェクトサイトとして &lt;code>myapp&lt;/code> というリポジトリを作成した場合の例で説明していきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npx create-next-app myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ cd myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ git remote add origin https://github.com/&amp;lt;username&amp;gt;/myapp.git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ git push -u origin main&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のように実行すると、初期状態の Next.js アプリが GitHub にプッシュされます。&lt;/p></description></item><item><title>Next.js アプリを Vercel で公開する</title><link>https://maku.blog/p/j6ht5fq/</link><pubDate>Fri, 07 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j6ht5fq/</guid><description>&lt;h2 id="vercel-とは">Vercel とは？&lt;/h2>
+&lt;p>Vercel は Next.js を開発している企業であり、同名の Vercel というサービスを提供しています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://vercel.com/">Vercel - Develop. Preview. Ship. For the best frontend teams&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Vercel サービスは Next.js アプリのホスティングに特化しており、GitHub などのリポジトリと連携させることにより、ビルドから Next.js サーバーによるホスティングまでを簡単に自動化することができます（実際には、Vercel サービスは、Next.js 以外で作成した Web サイト、例えば、&lt;a href="https://gohugo.io/">Hugo&lt;/a> で作成したブログなどのホスティングにも対応しています）。&lt;/p>
+&lt;p>Next.js アプリで SSR (Server-side Rendering) や API ルートなどの機能を使用している場合は、Next.js サーバー上で Web サイトをホスティングする必要があるのですが、現状そのような環境をサーバーレスなサービスとして提供しているのは Vercel のみです（一応 &lt;a href="https://www.serverless.com/blog/serverless-nextjs">Serverless Next.js&lt;/a> という AWS Lambda で動かすものもあったりしますが）。&lt;/p>
+&lt;p>Next.js の開発サーバー (&lt;code>next dev&lt;/code>) で何らかのアプリをローカルで動かせているのであれば、Vercel を使って、ほぼそのままの形でネット上に公開することができます。
+小規模な Web サイトであれば無料で動かせますし、とっても簡単なので、一度試してみるとよいです。&lt;/p>
+&lt;h2 id="vercel-で-nextjs-アプリを公開する">Vercel で Next.js アプリを公開する&lt;/h2>
+&lt;p>ここでは、GitHub にプッシュした Next.js アプリを Vercel を使って公開してみます。
+まずは、下記を参考にして、GitHub に何らかの Next.js コードをプッシュしてください（といっても &lt;code>create-next-app&lt;/code> で生成したコードをそのままプッシュするだけで OK です）。&lt;/p></description></item><item><title>Vercel のウェブサイトに独自ドメインを割り当てる</title><link>https://maku.blog/p/9vakw8i/</link><pubDate>Fri, 07 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9vakw8i/</guid><description>&lt;p>Vercel で公開している Web サイトに、&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8C+EVU582+50+2HHVNM" rel="nofollow">お名前.com&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=3NCT8C+EVU582+50+2HHVNM" alt="">
+ で取得した独自ドメインを割り当てる方法を説明します。
+Vercel 上での Next.js アプリ公開までの手順は、下記の記事を参考にしてください。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/j6ht5fq">Next.js アプリを Vercel で公開する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>ここでは、独自ドメインを「お名前.com」で取得済みだと仮定しますが、別のレジストラで取得している場合もほぼ同様に設定できるはずです。
+大きく分けて、次の 2 種類の設定方法があります。&lt;/p>
+&lt;ul>
+&lt;li>Vercel の DNS サーバーを使う方法&lt;/li>
+&lt;li>Vercel 以外の DNS サーバーを使う方法&lt;/li>
+&lt;/ul>
+&lt;p>独自ドメインの「レジストラ」と「DNS サーバー」の関係については、下記の記事で簡単にまとめていますので参考にしてください。
+後述の設定で何をしているのかが分かりやすくなると思います。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/bwamwgp/">ドメイン管理と DNS 管理の違いを理解する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="vercel-の-dns-サーバーを使う方法">Vercel の DNS サーバーを使う方法&lt;/h2>
+&lt;p>お名前.com などのレジストラで独自ドメインを取得すると、そのドメインをどの DNS サーバーで運用するかという設定を行えるはずです。
+次のように Vercel 側の DNS サーバー設定を行うと、お名前.com 側に設定すべき DNS サーバー名を確認できます。&lt;/p>
+&lt;p>(1) &lt;a href="https://vercel.com/">Vercel のサイト&lt;/a> から対象アプリのページを開き、&lt;strong>Settings&lt;/strong> → &lt;strong>Domains&lt;/strong> と選択し、取得済みの独自ドメイン名を入力して &lt;strong>Add&lt;/strong> ボタンを押してください。ここでは、例として &lt;code>example.com&lt;/code> というドメインを管理するとします（ドメイン自体は「お名前.com」で取得したものです）。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="800" height="384" src="../../p/9vakw8i/img-001_hu500919531342924169.png" alt="/p/9vakw8i/img-001.png" />
+ &lt;figcaption>図: Vercel に独自ドメインを設定する&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>(2) &lt;code>example.com&lt;/code> に加えて &lt;code>www.example.com&lt;/code> もエイリアスとして設定するかというダイアログが出ますが、&lt;code>example.com&lt;/code> だけでよければ、&lt;strong>&lt;code>Add example.com&lt;/code>&lt;/strong> を選択すれば　OK です。&lt;/p></description></item><item><title>Next.js で src からの相対パスで import できるようにする (tsconfig.json)</title><link>https://maku.blog/p/qgvamzc/</link><pubDate>Thu, 26 Aug 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qgvamzc/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Next.js (TypeScript) のプロジェクトで、&lt;code>src&lt;/code> ディレクトリ以下の階層構造が深くなってくると、別のディレクトリのモジュールをインポートするときの相対パスがわかりにくくなってきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">sleep&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;../../../../../utils/timeUtil&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このような場合は、次に説明するような &lt;strong>&lt;code>tsconfig.json&lt;/code>&lt;/strong> の設定をしておくと、シンプルなパスでインポートできるようになります。&lt;/p>
+&lt;h2 id="compileroptionspaths-プロパティ-module-alias">compilerOptions.paths プロパティ (module alias)&lt;/h2>
+&lt;p>&lt;code>tsconfig.json&lt;/code> の &lt;strong>&lt;code>compilerOptions.paths&lt;/code>&lt;/strong> プロパティ（と &lt;strong>&lt;code>baseUrl&lt;/code>&lt;/strong> プロパティ）を設定すると、特定のパスに配置されたモジュール（.ts ファイル）を、エイリアス名（ここでは &lt;code>@&lt;/code>）を使って参照できるようになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">tsconfig.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;compilerOptions&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s2">&amp;#34;baseUrl&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;.&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;paths&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;@/*&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;./src/*&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のように設定すると、プロジェクトルートの &lt;code>src&lt;/code> ディレクトリ以下のモジュールを、どの階層にあるコードからでも、&lt;strong>&lt;code>@/moduleName&lt;/code>&lt;/strong> という名前で参照できるようになります。
+例えば、&lt;code>src/utils/timeUtil.ts&lt;/code> というモジュールをインポートするとき、これまでは、次のようにカレントディレクトリからの相対パスで指定しなければいけなかったところを、&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">sleep&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;../../../../../utils/timeUtil&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次のように &lt;code>src&lt;/code> ディレクトリを示すエイリアス名 &lt;code>@&lt;/code> を使って指定できるようになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">sleep&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@/utils/timeUtil&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ ワンポイント&lt;/span>
+ &lt;span class="xNote_body">上記のようなエイリアス名を使った場合でも正しくモジュールを参照できるのは、Next.js のビルドシステムが JavaScript へのトランスパイル時に本来のモジュールのパスに変換してくれるおかげです（おそらく webpack などによるバンドル時に処理されています）。
+このあたりにも、Next.js のゼロコンフィグ思想が垣間見えます。&lt;/span>
+&lt;/div>
+&lt;p>ちなみに、一緒に設定している &lt;code>&amp;quot;baseUrl&amp;quot;: &amp;quot;.&amp;quot;&lt;/code> というオプションは、本来は次のように &lt;code>./&lt;/code> プレフィックスを付けない名前でインポートしたときに、プロジェクトルートからの相対パスでモジュールを検索してくれるようにするためのオプションです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">sleep&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;src/utils/timeUtil&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この &lt;code>baseUrl&lt;/code> の設定は &lt;code>paths&lt;/code> の設定とは関係なさそうに見えますが、一緒に設定しておかないとビルド時のパス解決に失敗するので、必ず &lt;code>baseUrl&lt;/code> と &lt;code>paths&lt;/code> の両方の設定が必要です。
+&lt;code>baseUrl&lt;/code> を設定すると、3rd パーティ製の npm モジュールとの見分けがつきにくくなるという弊害があるため、このあたりは将来的に改善されそうな気がします。&lt;/p></description></item></channel></rss>

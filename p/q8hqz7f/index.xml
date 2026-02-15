@@ -1,18 +1,223 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Next.js のスタイル設定 (CSS) on まくろぐ</title><link>https://maku.blog/p/q8hqz7f/</link><description>Recent content in Next.js のスタイル設定 (CSS) on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 10 May 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/q8hqz7f/index.xml" rel="self" type="application/rss+xml"/><item><title>Next.js ですべてのページにグローバルな CSS を適用する (pages/_app.ts)</title><link>https://maku.blog/p/s9iry9g/</link><pubDate>Thu, 06 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/s9iry9g/</guid><description>Next.js で、すべてのページコンポーネント (pages/*.tsx) に共通のスタイルシート（いわゆるグローバル CSS）を適用したい場合は、pages/_app.tsx(js) というファイルを作成して、そこで CSS ファイルをインポートします。
-例えば、グローバル CSS として次のようなファイルを用意したとします。
-styles/global.css * { box-sizing: border-box; } html { margin: 0; padding: 0; } body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif; max-width: 50rem; padding: 0.5rem; margin: 0 auto; font-size: 100%; } a { color: inherit; text-decoration: none; } この CSS ファイルを pages/_app.tsx からインポートすれば、すべてのコンポーネントにスタイルが反映されます。 このファイルが存在しない場合は作成してください。
-pages/_app.tsx import type { AppProps } from &amp;#39;next/app&amp;#39; import &amp;#39;.</description></item><item><title>Next.js でコンポーネント単位の CSS を作成する (CSS Modules)</title><link>https://maku.blog/p/seq2cmw/</link><pubDate>Thu, 06 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/seq2cmw/</guid><description>CSS Modules とは CSS Modules は、コンポーネント（ファイル）単位で CSS ファイルを分けて管理する仕組みです（これ自体は Next.js の仕組みではありません）。 CSS の名前空間がコンポーネントごとに分離されるため、シンプルな CSS クラス名を付けても名前がコンフリクトする心配がありません。
-Next.js は標準で CSS Modules の仕組みをサポートしており、CSS ファイルの拡張子を .module.css にするだけで、各コンポーネントの実装ファイルから簡単にインポートすることができます。
-Next.js で CSS Modules 機能を使う Next.js で特定のコンポーネント用に CSS ファイルを用意するときは、そのコンポーネントと同じディレクトリに .module.css という拡張子を持つファイルを作成します。 この拡張子は、Next.js で CSS Modules の仕組みを使うときのルールです。
-ここでは、警告メッセージを表示する Alert コンポーネント用の Alert.module.css を作成してみます。 といっても、普通に CSS ファイルを記述するだけです。 グローバルに適用する CSS ファイルと異なるのは、Alert コンポーネント用のスタイル定義しか含まれていないことです。
-components/Alert.module.css .box { margin: 1em; padding: 0.5em; background: red; color: white; font-weight: bolder; border-radius: 0.5em; } この CSS ファイルを Alert コンポーネントから使用するには、次のようにインポートします。</description></item><item><title>Next.js で Sass (scss/sass) を有効にする</title><link>https://maku.blog/p/2n2doyb/</link><pubDate>Thu, 06 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2n2doyb/</guid><description>Next.js は Sass を使ったスタイルシート記述 (.scss / .sass ファイル）をサポートしています。 ほぼゼロコンフィグ（設定なし）で使用できますが、NPM の sass モジュールだけはマニュアルでインストールする必要があります。
-sass のインストール ### yarn の場合 $ yarn add sass --dev ### npm の場合 $ npm install sass --save-dev 今まで .css 拡張子で作成していたファイルを、.scss に変更すれば、SCSS フォーマットでスタイル記述できます。
-置換前: styles/global.css 置換後: styles/global.scss あとは、.css ファイルをインポートしている部分を、.scss に置換すれば導入完了です。
-pages/_app.tsx import type { AppProps } from &amp;#39;next/app&amp;#39; import &amp;#39;../styles/global.scss&amp;#39; export default function MyApp({ Component, pageProps }: AppProps) { return &amp;lt;Component {...pageProps} /&amp;gt; } もちろん、CSS Modules の仕組み を使っている場合にも Sass を使うことができます。 その場合は、.</description></item><item><title>Next.js でコンポーネント内に直接 CSS を記述する (styled-jsx)</title><link>https://maku.blog/p/pbp2dpy/</link><pubDate>Tue, 04 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pbp2dpy/</guid><description>Next.js は CSS-in-JS ライブラリの一種である styled-jsx をデフォルトでサポートしています（styled-jsx も Next.js と同様に Vercel がメンテナンスしています）。 React コンポーネントの定義の中に、次のように CSS を直接記述することができます。
-&amp;lt;style jsx&amp;gt;{` ... `}&amp;lt;/style&amp;gt; 下記は実際に styled-jsx を使って p 要素をスタイル設定した例です。
-pages/sample.tsx export default () =&amp;gt; &amp;lt;&amp;gt; &amp;lt;p&amp;gt;only this paragraph will get the style&amp;lt;/p&amp;gt; &amp;lt;style jsx&amp;gt;{` p { color: red; } `}&amp;lt;/style&amp;gt; &amp;lt;/&amp;gt; ここで設定したスタイルのスコープは、この React コンポーネントに閉じたものになるため、他の React コンポーネントに影響を与えてしまう心配がありません。 そのため、シンプルなタグ名やクラス名でスタイル設定を行うことができます。
-Next.js は、外部ファイルとして作成した .css や scss ファイルを読み込む CSS Modules の機能 もデフォルトでサポートしています（その場合は *.module.css というファイル名にするというルールがあります）。</description></item><item><title>Next.js で Bootstrap と React Bootstrap を使う</title><link>https://maku.blog/p/k8mxakw/</link><pubDate>Mon, 10 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/k8mxakw/</guid><description>何をするか？ Next.js アプリから、CSS フレームワークの Bootstrap を使えるようにする方法を説明します。
-Bootstrap を導入 各コンポーネントの実装で、Bootstrap の CSS クラスを参照できるようにします React Bootstrap を導入 Bootstrap を React コンポーネントの形で使えるようにします Bootstrap を導入する bootstrap モジュールをインストールする方法 Bootstrap は npm install で簡単にインストールできます。
-$ npm install bootstrap@next --save あとは、次のような pages/_app.tsx ファイルを作成して、グローバル CSS としてインポートすれば OK です。
-pages/_app.tsx import type { AppProps } from &amp;#39;next/app&amp;#39; import &amp;#39;bootstrap/dist/css/bootstrap.min.css&amp;#39; export default function MyApp({ Component, pageProps }: AppProps) { return &amp;lt;Component {...pageProps} /&amp;gt; } これで、各ページコンポーネントから Bootstrap の CSS クラスを参照できるようになります。
-CDN 上のファイルを参照する方法 CDN 上で公開されている Bootstrap ファイルを参照することもできます。 pages/_app.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Next.js のスタイル設定 (CSS) on まくろぐ</title><link>https://maku.blog/p/q8hqz7f/</link><description>Recent content in Next.js のスタイル設定 (CSS) on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 10 May 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/q8hqz7f/index.xml" rel="self" type="application/rss+xml"/><item><title>Next.js ですべてのページにグローバルな CSS を適用する (pages/_app.ts)</title><link>https://maku.blog/p/s9iry9g/</link><pubDate>Thu, 06 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/s9iry9g/</guid><description>&lt;p>Next.js で、すべてのページコンポーネント (&lt;code>pages/*.tsx&lt;/code>) に共通のスタイルシート（いわゆるグローバル CSS）を適用したい場合は、&lt;strong>&lt;code>pages/_app.tsx(js)&lt;/code>&lt;/strong> というファイルを作成して、そこで CSS ファイルをインポートします。&lt;/p>
+&lt;p>例えば、グローバル CSS として次のようなファイルを用意したとします。&lt;/p>
+
+&lt;div class="xAccordion">
+ &lt;input id="id-926548137" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-926548137">styles/global.css&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-css" data-lang="css">&lt;span class="line">&lt;span class="cl">&lt;span class="o">*&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">box-sizing&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">border-box&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">html&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">margin&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">padding&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">body&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">font-family&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">apple-system&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">BlinkMacSystemFont&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Segoe&lt;/span> &lt;span class="n">UI&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Roboto&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Oxygen&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Ubuntu&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Cantarell&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Fira&lt;/span> &lt;span class="n">Sans&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Droid&lt;/span> &lt;span class="n">Sans&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Helvetica&lt;/span> &lt;span class="n">Neue&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">sans-serif&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">max-width&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">50&lt;/span>&lt;span class="kt">rem&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">padding&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="kt">rem&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">margin&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="kc">auto&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">font-size&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">100&lt;/span>&lt;span class="kt">%&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">a&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">color&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">inherit&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">text-decoration&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">none&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+&lt;p>この CSS ファイルを &lt;code>pages/_app.tsx&lt;/code> からインポートすれば、すべてのコンポーネントにスタイルが反映されます。
+このファイルが存在しない場合は作成してください。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">pages/_app.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">AppProps&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next/app&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="s1">&amp;#39;../styles/global.css&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">MyApp&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">Component&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">pageProps&lt;/span> &lt;span class="p">}&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">AppProps&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Component&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="na">...pageProps&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ pages/_app.tsx って何者？&lt;/span>
+ &lt;span class="xNote_body">Next.js は &lt;code>pages/_app.tsx&lt;/code> を特殊なファイルとして扱い、ここで &lt;code>default export&lt;/code> しているコンポーネントを、すべてのページコンポーネントの親コンポーネントとして扱います。
+具体的には、上記コード中の &lt;code>Component&lt;/code> 部分が各ページのコンポーネントに置き換えられた形で動作します。
+結果的に、ここでインポートした CSS が、全ページから参照できることになります。
+ちなみに、ここで複数の CSS ファイルをインポートしている場合は、Next.js が Web サイトのビルド時に 1 つの CSS ファイルにマージしてくれます。&lt;/span>
+&lt;/div>
+&lt;p>Bootstrap や Tailwind CSS などの CSS フレームワークを使いたい場合も、この &lt;code>pages/_app.tsx&lt;/code> ファイルでインポートすれば OK です。&lt;/p></description></item><item><title>Next.js でコンポーネント単位の CSS を作成する (CSS Modules)</title><link>https://maku.blog/p/seq2cmw/</link><pubDate>Thu, 06 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/seq2cmw/</guid><description>&lt;h2 id="css-modules-とは">CSS Modules とは&lt;/h2>
+&lt;p>&lt;strong>CSS Modules&lt;/strong> は、コンポーネント（ファイル）単位で CSS ファイルを分けて管理する仕組みです（これ自体は Next.js の仕組みではありません）。
+CSS の名前空間がコンポーネントごとに分離されるため、シンプルな CSS クラス名を付けても名前がコンフリクトする心配がありません。&lt;/p>
+&lt;p>Next.js は標準で CSS Modules の仕組みをサポートしており、CSS ファイルの拡張子を &lt;strong>&lt;code>.module.css&lt;/code>&lt;/strong> にするだけで、各コンポーネントの実装ファイルから簡単にインポートすることができます。&lt;/p>
+&lt;h2 id="nextjs-で-css-modules-機能を使う">Next.js で CSS Modules 機能を使う&lt;/h2>
+&lt;p>Next.js で特定のコンポーネント用に CSS ファイルを用意するときは、そのコンポーネントと同じディレクトリに &lt;strong>&lt;code>.module.css&lt;/code>&lt;/strong> という拡張子を持つファイルを作成します。
+この拡張子は、Next.js で CSS Modules の仕組みを使うときのルールです。&lt;/p>
+&lt;p>ここでは、警告メッセージを表示する &lt;code>Alert&lt;/code> コンポーネント用の &lt;code>Alert.module.css&lt;/code> を作成してみます。
+といっても、普通に CSS ファイルを記述するだけです。
+グローバルに適用する CSS ファイルと異なるのは、&lt;code>Alert&lt;/code> コンポーネント用のスタイル定義しか含まれていないことです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/Alert.module.css&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-css" data-lang="css">&lt;span class="line">&lt;span class="cl">&lt;span class="p">.&lt;/span>&lt;span class="nc">box&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">margin&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="kt">em&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">padding&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="kt">em&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">background&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">red&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">color&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">white&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">font-weight&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">bolder&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">border-radius&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="kt">em&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この CSS ファイルを &lt;code>Alert&lt;/code> コンポーネントから使用するには、次のようにインポートします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/Alert.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">React&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">styles&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;./Alert.module.css&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">Props&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">message&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">Alert&lt;/span>: &lt;span class="kt">React.FC&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Props&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">message&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">className&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">styles&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">box&lt;/span>&lt;span class="p">}&amp;gt;{&lt;/span>&lt;span class="nx">message&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記の例では &lt;code>.css&lt;/code> ファイルを使いましたが、Next.js は &lt;a href="../../p/2n2doyb">Sass を標準サポート&lt;/a> しているので、&lt;code>.scss&lt;/code> ファイルも同様にインポートすることができます。&lt;/p></description></item><item><title>Next.js で Sass (scss/sass) を有効にする</title><link>https://maku.blog/p/2n2doyb/</link><pubDate>Thu, 06 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2n2doyb/</guid><description>&lt;p>Next.js は Sass を使ったスタイルシート記述 (&lt;code>.scss&lt;/code> / &lt;code>.sass&lt;/code> ファイル）をサポートしています。
+ほぼゼロコンフィグ（設定なし）で使用できますが、NPM の sass モジュールだけはマニュアルでインストールする必要があります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">sass のインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">### yarn の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add sass --dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">### npm の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install sass --save-dev&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>今まで &lt;code>.css&lt;/code> 拡張子で作成していたファイルを、&lt;code>.scss&lt;/code> に変更すれば、SCSS フォーマットでスタイル記述できます。&lt;/p>
+&lt;ul>
+&lt;li>置換前: &lt;code>styles/global&lt;strong>.css&lt;/strong>&lt;/code>&lt;/li>
+&lt;li>置換後: &lt;code>styles/global&lt;strong>.scss&lt;/strong>&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>あとは、&lt;code>.css&lt;/code> ファイルをインポートしている部分を、&lt;code>.scss&lt;/code> に置換すれば導入完了です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">pages/_app.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">AppProps&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next/app&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="s1">&amp;#39;../styles/global.scss&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">MyApp&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">Component&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">pageProps&lt;/span> &lt;span class="p">}&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">AppProps&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Component&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="na">...pageProps&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>もちろん、&lt;a href="../../p/seq2cmw">CSS Modules の仕組み&lt;/a> を使っている場合にも Sass を使うことができます。
+その場合は、&lt;code>.module.css&lt;/code> という拡張子を &lt;code>.module.scss&lt;/code> に置き換えます。&lt;/p></description></item><item><title>Next.js でコンポーネント内に直接 CSS を記述する (styled-jsx)</title><link>https://maku.blog/p/pbp2dpy/</link><pubDate>Tue, 04 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pbp2dpy/</guid><description>&lt;p>Next.js は CSS-in-JS ライブラリの一種である &lt;a href="https://www.npmjs.com/package/styled-jsx">styled-jsx&lt;/a> をデフォルトでサポートしています（&lt;code>styled-jsx&lt;/code> も &lt;code>Next.js&lt;/code> と同様に Vercel がメンテナンスしています）。
+React コンポーネントの定義の中に、次のように CSS を直接記述することができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">style&lt;/span> &lt;span class="na">jsx&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="sb">`
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb">`&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>下記は実際に styled-jsx を使って &lt;code>p&lt;/code> 要素をスタイル設定した例です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">pages/sample.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">&amp;lt;&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">only&lt;/span> &lt;span class="k">this&lt;/span> &lt;span class="nx">paragraph&lt;/span> &lt;span class="nx">will&lt;/span> &lt;span class="kr">get&lt;/span> &lt;span class="nx">the&lt;/span> &lt;span class="nx">style&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">style&lt;/span> &lt;span class="na">jsx&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="sb">`
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> p {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> color: red;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> `&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ここで設定したスタイルのスコープは、この React コンポーネントに閉じたものになるため、他の React コンポーネントに影響を与えてしまう心配がありません。
+そのため、シンプルなタグ名やクラス名でスタイル設定を行うことができます。&lt;/p>
+&lt;p>Next.js は、外部ファイルとして作成した &lt;code>.css&lt;/code> や &lt;code>scss&lt;/code> ファイルを読み込む &lt;a href="../../p/seq2cmw">CSS Modules の機能&lt;/a> もデフォルトでサポートしています（その場合は &lt;code>*.module.css&lt;/code> というファイル名にするというルールがあります）。&lt;/p></description></item><item><title>Next.js で Bootstrap と React Bootstrap を使う</title><link>https://maku.blog/p/k8mxakw/</link><pubDate>Mon, 10 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/k8mxakw/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Next.js アプリから、CSS フレームワークの Bootstrap を使えるようにする方法を説明します。&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://getbootstrap.com/">Bootstrap&lt;/a> を導入
+&lt;ul>
+&lt;li>各コンポーネントの実装で、Bootstrap の CSS クラスを参照できるようにします&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="https://react-bootstrap.github.io/">React Bootstrap&lt;/a> を導入
+&lt;ul>
+&lt;li>Bootstrap を React コンポーネントの形で使えるようにします&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="bootstrap-を導入する">Bootstrap を導入する&lt;/h2>
+&lt;h3 id="bootstrap-モジュールをインストールする方法">bootstrap モジュールをインストールする方法&lt;/h3>
+&lt;p>Bootstrap は &lt;code>npm install&lt;/code> で簡単にインストールできます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install bootstrap@next --save&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>あとは、次のような &lt;strong>&lt;code>pages/_app.tsx&lt;/code>&lt;/strong> ファイルを作成して、グローバル CSS としてインポートすれば OK です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">pages/_app.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">AppProps&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next/app&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="s1">&amp;#39;bootstrap/dist/css/bootstrap.min.css&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">MyApp&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">Component&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">pageProps&lt;/span> &lt;span class="p">}&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">AppProps&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Component&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="na">...pageProps&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、各ページコンポーネントから Bootstrap の CSS クラスを参照できるようになります。&lt;/p>
+&lt;h3 id="cdn-上のファイルを参照する方法">CDN 上のファイルを参照する方法&lt;/h3>
+&lt;p>CDN 上で公開されている Bootstrap ファイルを参照することもできます。
+&lt;strong>&lt;code>pages/_app.tsx&lt;/code>&lt;/strong> ファイルを作成して、次のように Bootstrap の CSS ファイルを読み込みます。
+これで、各ページの &lt;code>head&lt;/code> 要素内に &lt;code>link&lt;/code> 要素が追加されます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">pages/_app.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">AppProps&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next/app&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">Head&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next/head&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">MyApp&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">Component&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">pageProps&lt;/span> &lt;span class="p">}&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">AppProps&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Head&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c">&amp;lt;!-- Bootstrap CSS --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">link&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">rel&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;stylesheet&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">integrity&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">crossOrigin&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;anonymous&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">link&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Head&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Component&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="na">...pageProps&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>最新の CDN アドレスは、&lt;a href="https://getbootstrap.jp/docs/5.0/getting-started/introduction/">Bootstrap のサイト&lt;/a> で確認してください。
+一点注意なのは、JSX では &lt;code>crossorigin&lt;/code> 属性は &lt;strong>&lt;code>crossOrigin&lt;/code>&lt;/strong> のように &lt;code>O&lt;/code> を大文字にしないといけないというところです。
+Bootstrap の高度なコンポーネントを使うときは、JavaScript ファイルも必要なことがあります。
+その場合は、&lt;code>Component&lt;/code> 要素の後ろあたりに &lt;code>script&lt;/code> 要素を追加すれば OK です。&lt;/p></description></item></channel></rss>

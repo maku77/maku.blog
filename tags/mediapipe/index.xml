@@ -1,5 +1,29 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MediaPipe on まくろぐ</title><link>https://maku.blog/tags/mediapipe/</link><description>Recent content in MediaPipe on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sun, 30 Jun 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/mediapipe/index.xml" rel="self" type="application/rss+xml"/><item><title>Svelte 実装例: MediaPipe で Web カメラ映像をジェスチャー認識する</title><link>https://maku.blog/p/pqmxxqz/</link><pubDate>Sun, 30 Jun 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pqmxxqz/</guid><description>何をするか？ 図: Svelte &amp;#43; MediaPipe によるジェスチャー認識 MediaPipe を使った Svelte アプリを作ってみます。 MediaPipe は様々なメディアの認識処理に対応していますが、ここでは Web カメラからの入力映像を使ったジェスチャー認識を行います。 MediaPipe を使った Web アプリは、Web ブラウザだけで動作するので、静的な Web サイトとしてホスティングすることができます（参考: Svelte アプリを静的サイトとしてビルドする）。
-プロジェクトの作成 まずは空っぽの Svelte プロジェクトを新規作成します。
-$ npm create svelte@latest myapp （種類として Skeleton、TypeScript を選択） 続いて、必要なライブラリをインストールしておきます。 MediaType ではタスク別に使用するモジュールが分かれており、視覚系のタスクには @mediapipe/tasks-vision モジュールを使用します。
-@mediapipe/tasks-vision &amp;hellip; 視覚（画像／動画）系タスク ← 今回はコレを使う @mediapipe/tasks-genai &amp;hellip; 生成 AI (LLM) 系タスク @mediapipe/tasks-text &amp;hellip; テキスト系タスク @mediapipe/tasks-audio &amp;hellip; 音声系タスク Svelte アプリで依存ライブラリを追加するときは devDependencies として追加すれば OK です。
-$ cd myapp $ npm install -D @mediapipe/tasks-vision Web カメラからの入力映像を表示する MediaPipe を使った認識処理の前に、Web カメラからの入力映像を画面上に表示できるようにしておきましょう。 そのためには、HTML の video 要素に、Web カメラからの入力 (MediaStream) を関連付ける必要があります。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MediaPipe on まくろぐ</title><link>https://maku.blog/tags/mediapipe/</link><description>Recent content in MediaPipe on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 30 Jun 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/mediapipe/index.xml" rel="self" type="application/rss+xml"/><item><title>Svelte 実装例: MediaPipe で Web カメラ映像をジェスチャー認識する</title><link>https://maku.blog/p/pqmxxqz/</link><pubDate>Sun, 30 Jun 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pqmxxqz/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="300" height="366" src="../../p/pqmxxqz/img-001_hu3967675139545907590.png" alt="/p/pqmxxqz/img-001.png" />
+ &lt;figcaption>図: Svelte &amp;#43; MediaPipe によるジェスチャー認識&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>&lt;a href="https://github.com/google-ai-edge/mediapipe">MediaPipe&lt;/a> を使った Svelte アプリを作ってみます。
+MediaPipe は様々なメディアの認識処理に対応していますが、ここでは Web カメラからの入力映像を使ったジェスチャー認識を行います。
+MediaPipe を使った Web アプリは、Web ブラウザだけで動作するので、静的な Web サイトとしてホスティングすることができます（参考: &lt;a href="../../p/4oudmxy/">Svelte アプリを静的サイトとしてビルドする&lt;/a>）。&lt;/p>
+&lt;h2 id="プロジェクトの作成">プロジェクトの作成&lt;/h2>
+&lt;p>まずは空っぽの Svelte プロジェクトを新規作成します。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm create svelte@latest myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">（種類として Skeleton、TypeScript を選択）
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>続いて、必要なライブラリをインストールしておきます。
+MediaType ではタスク別に使用するモジュールが分かれており、視覚系のタスクには &lt;strong>&lt;code>@mediapipe/tasks-vision&lt;/code>&lt;/strong> モジュールを使用します。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>@mediapipe/tasks-vision&lt;/code> &amp;hellip; 視覚（画像／動画）系タスク &lt;strong>← 今回はコレを使う&lt;/strong>&lt;/li>
+&lt;li>&lt;code>@mediapipe/tasks-genai&lt;/code> &amp;hellip; 生成 AI (LLM) 系タスク&lt;/li>
+&lt;li>&lt;code>@mediapipe/tasks-text&lt;/code> &amp;hellip; テキスト系タスク&lt;/li>
+&lt;li>&lt;code>@mediapipe/tasks-audio&lt;/code> &amp;hellip; 音声系タスク&lt;/li>
+&lt;/ul>
+&lt;p>Svelte アプリで依存ライブラリを追加するときは &lt;code>devDependencies&lt;/code> として追加すれば OK です。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> &lt;span class="nb">cd&lt;/span> myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install -D @mediapipe/tasks-vision
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="web-カメラからの入力映像を表示する">Web カメラからの入力映像を表示する&lt;/h2>
+&lt;p>MediaPipe を使った認識処理の前に、Web カメラからの入力映像を画面上に表示できるようにしておきましょう。
+そのためには、HTML の &lt;code>video&lt;/code> 要素に、Web カメラからの入力 (&lt;code>MediaStream&lt;/code>) を関連付ける必要があります。&lt;/p></description></item></channel></rss>

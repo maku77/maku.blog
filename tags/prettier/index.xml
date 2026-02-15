@@ -1,11 +1,211 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Prettier on まくろぐ</title><link>https://maku.blog/tags/prettier/</link><description>Recent content in Prettier on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Wed, 14 Jul 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/prettier/index.xml" rel="self" type="application/rss+xml"/><item><title>ESLint + Prettier の設定方法まとめ</title><link>https://maku.blog/p/yfow6dk/</link><pubDate>Sun, 23 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yfow6dk/</guid><description>ここでは、とにかく混乱しがちな ESLint + Prettier の設定方法をまとめておきます。 まず、基本的な構成として、TypeScript (with React) の Lint をかけられるようにして、必要に応じて Airbnb スタイル を追加で設定する、という流れにしたいと思います。
-TypeScript プロジェクトの準備 前提条件として、TypeScript (+ React) のプロジェクト自体は作成済みとします。 何も準備できていなければ、Next.js の create-next-app コマンドを使うと簡単に作成できます（typescript および @types/node、@types/react、@types/react-dom などの型情報が導入された状態のプロジェクトが作成されます）。
-2 つやり方あるけど、大体中身は同じ # テンプレートを使う方法 $ create-next-app myapp --example with-typescript # typescript オプションを使う方法 $ create-next-app myapp --typescript 参考 Next.js で HelloWorld（プロジェクト作成からサーバー起動まで） Next.js のプロジェクトを TypeScript 化する Prettier + ESLint の基本設定 (for TypeScript with React) 必要なパッケージのインストール # Prettier 本体 $ yarn add --dev --exact prettier # ESLint 本体 $ yarn add --dev eslint # ESLint 用のプラグインおよび共有設定 $ yarn add --dev @typescript-eslint/eslint-plugin $ yarn add --dev @typescript-eslint/parser $ yarn add --dev eslint-plugin-react $ yarn add --dev eslint-plugin-react-hooks $ yarn add --dev eslint-config-prettier # npm スクリプトの並列実行用 $ yarn add --dev npm-run-all npm の場合 # Prettier 本体 $ npm install prettier --save-dev --save-exact # ESLint 本体 $ npm install eslint --save-dev # ESLint 用のプラグインおよび共有設定 $ npm install @typescript-eslint/eslint-plugin --save-dev $ npm install @typescript-eslint/parser --save-dev $ npm install eslint-plugin-react --save-dev $ npm install eslint-plugin-react-hooks --save-dev $ npm install eslint-config-prettier --save-dev # npm スクリプトの並列実行用 $ npm install npm-run-all --save-dev .</description></item><item><title>VS Code のフォーマッターで自動整形する (editor.formatOnSave)</title><link>https://maku.blog/p/qcoz9ju/</link><pubDate>Wed, 14 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qcoz9ju/</guid><description>VS Code には、標準で各種言語用のフォーマッターが搭載されており、JavaScript、TypeScript、JSON、HTML などのコードを自動整形することができます。
-手動でフォーマッターを起動する ファイル全体をフォーマット (editor.action.formatDocument) コマンドパレット1 を使う場合: Format Document を選択 ショートカットキーを使う場合: (Windows) Shift + Alt + F (macOS) Shift + Option + F 選択中の行をフォーマット (editor.action.formatSelection) コマンドパレット1 を使う場合: Format Selection を選択 ショートカットキーを使う場合: (Windows) Ctrl + K → Ctrl + F (macOS) Cmd + K → Cmd + F ファイル保存時などに自動でフォーマットする 下記の設定をしておくと、ファイル保存時や、コードの編集中に自動的にフォーマッターを起動することができます。 設定ファイル (settings.json) の場所に関しては、こちらの記事 を参考にしてください。
-全ての種類のファイルで自動フォーマットする場合 settings.json { // 自動フォーマット設定 &amp;#34;editor.formatOnSave&amp;#34;: true, // 保存時にフォーマット &amp;#34;editor.formatOnType&amp;#34;: true, // 入力中（改行時）にフォーマット &amp;#34;editor.formatOnPaste&amp;#34;: true, // ペースト時にフォーマット // その他.</description></item><item><title>TypeScript コードを Prettier で自動整形する</title><link>https://maku.blog/p/au8iu6u/</link><pubDate>Wed, 26 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/au8iu6u/</guid><description>Prettier とは？ Prettier は、TypeScript や JavaScript などのソースコードを自動フォーマットするためのツールです。 HTML や CSS など様々なファイルに対応していますが、主に TypeScript や JavaScript のフォーマッターとして使用されています。 実際にどのようにフォーマットされるかは、Playground のページ で試すことができます。
-特徴と思想 Prettier の一番の特徴は、Opinionated（独断的な） コードフォーマッターであることを標榜していることです。 これは、ユーザーに自由なカスタマイズを許さず、「Prettier 自身が定義しているスタイルに強制的にフォーマットするよ」ということです（セミコロンの有無など最低限の設定はできます）。 これにより、コーディングスタイルに関する 不毛な議論を避ける ことができ、プロジェクト内のコーディングスタイルを簡単に統一することができます。
-もちろん、自分がベストだと思っているスタイルでフォーマットすることはできなくなるかもしれませんが、そんな些細なことよりも、アプリケーション（成果物）を作り上げることに集中すべきだという考え方です。
-Prettier がやらないこと Prettier はあくまでコードのフォーマットのみを行います。 コードの意味を解析して危険な部分（潜在的バグ）を検出してくれたりはしないので、そういったことを行いたい場合は、他の静的解析ツール（ESLint など）を使う必要があります。 ESLint にもコードフォーマット機能がありますが、フォーマッターとしては Prettier が優れており、「Prettier による整形 ＋ ESLint による静的解析」という形で組み合わせて使うのが一般的です。
-あと、import 文のソートなど、一見やってくれてもよさそうなフォーマットもしてくれなかったりします。 これは、その import 順序がロジック的に意味を持っていたりする場合に、Prettier が判断できないからです。 このように、いろいろと想像と異なるフォーマット結果になることがありますが、そこにはちゃんと理由があります（参考: Rationale）。 あまり気にせずにそんなものだと考えるのがよいです。 ちなみに、ESLint の方には import 文のソートを行うプラグイン (eslint-plugin-import) があります。
-Prettier をインストールする Prettier は npm で簡単にインストールすることができます。 TypeScript のプロジェクトは作成済み で、package.json がすでに存在すると想定します。
-### yarn の場合 $ yarn add prettier --dev --exact ### npm の場合 $ npm install prettier --save-dev --save-exact Prettier は、パッチバージョンが上がるだけで、出力結果に微妙な差分が生まれる可能性があります。 そのため、インストール時のオプションとして --save-exact を指定することで、明確なバージョンを package.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Prettier on まくろぐ</title><link>https://maku.blog/tags/prettier/</link><description>Recent content in Prettier on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Wed, 14 Jul 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/prettier/index.xml" rel="self" type="application/rss+xml"/><item><title>ESLint + Prettier の設定方法まとめ</title><link>https://maku.blog/p/yfow6dk/</link><pubDate>Sun, 23 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yfow6dk/</guid><description>&lt;p>ここでは、とにかく混乱しがちな &lt;strong>ESLint + Prettier&lt;/strong> の設定方法をまとめておきます。
+まず、基本的な構成として、&lt;strong>TypeScript (with React)&lt;/strong> の Lint をかけられるようにして、&lt;strong>必要に応じて Airbnb スタイル&lt;/strong> を追加で設定する、という流れにしたいと思います。&lt;/p>
+&lt;h2 id="typescript-プロジェクトの準備">TypeScript プロジェクトの準備&lt;/h2>
+&lt;p>前提条件として、TypeScript (+ React) のプロジェクト自体は作成済みとします。
+何も準備できていなければ、Next.js の &lt;code>create-next-app&lt;/code> コマンドを使うと簡単に作成できます（&lt;code>typescript&lt;/code> および &lt;code>@types/node&lt;/code>、&lt;code>@types/react&lt;/code>、&lt;code>@types/react-dom&lt;/code> などの型情報が導入された状態のプロジェクトが作成されます）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">2 つやり方あるけど、大体中身は同じ&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl"># テンプレートを使う方法
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ create-next-app myapp --example with-typescript
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># typescript オプションを使う方法
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ create-next-app myapp --typescript&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;aside style="display: flex; border: thin dashed gray;">
+&lt;div style="align-self: stretch; writing-mode: vertical-lr; text-align: center; letter-spacing: 0.2em; color: #666; border-right: thin dashed gray; padding: 0.4em 0; line-height: 1.5;">参考&lt;/div>
+&lt;div style="align-self: center; padding: 0.6em 0; line-height: 1.2 !important;">&lt;ul>
+&lt;li>&lt;a href="../../p/ubmu3bj">Next.js で HelloWorld（プロジェクト作成からサーバー起動まで）&lt;/a>&lt;/li>
+&lt;li>&lt;a href="../../p/ny9fmty">Next.js のプロジェクトを TypeScript 化する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/aside>
+&lt;h2 id="prettier--eslint-の基本設定-for-typescript-with-react">Prettier + ESLint の基本設定 (for TypeScript with React)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">必要なパッケージのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl"># Prettier 本体
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev --exact prettier
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ESLint 本体
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev eslint
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ESLint 用のプラグインおよび共有設定
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev @typescript-eslint/eslint-plugin
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev @typescript-eslint/parser
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev eslint-plugin-react
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev eslint-plugin-react-hooks
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev eslint-config-prettier
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># npm スクリプトの並列実行用
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev npm-run-all&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-987236451" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-987236451">npm の場合&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl"># Prettier 本体
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install prettier --save-dev --save-exact
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ESLint 本体
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install eslint --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ESLint 用のプラグインおよび共有設定
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install @typescript-eslint/eslint-plugin --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install @typescript-eslint/parser --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install eslint-plugin-react --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install eslint-plugin-react-hooks --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install eslint-config-prettier --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># npm スクリプトの並列実行用
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install npm-run-all --save-dev&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.prettierrc（必要に応じて Prettier フォーマット設定）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">semi&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 行末のセミコロンは省略する&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">singleQuote&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 引用符にはシングルクォートを使う&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.prettierignore（Prettier の無視設定）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">.next/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">build/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">*.html&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.eslintrc.yml（ESLint 設定）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">root&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">env&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">browser&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">es2021&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">extends&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">eslint:recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:react/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:react-hooks/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:@typescript-eslint/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:@typescript-eslint/recommended-requiring-type-checking&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">prettier&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">parser&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;@typescript-eslint/parser&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">parserOptions&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ecmaVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">12&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ecmaFeatures&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">jsx&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">project&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">./tsconfig.json&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">plugins&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">react&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">react-hooks&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;@typescript-eslint&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">rules&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">react/react-in-jsx-scope&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">off&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">package.json（npm スクリプト設定）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">scripts&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;lint&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;run-p -c -l lint:**&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;lint:prettier&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;prettier --check .&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;lint:eslint&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;eslint . --ext .ts,.tsx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;lint:tsc&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;tsc&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;fix&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;run-s -l fix:**&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;fix:prettier&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;prettier --write .&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;fix:eslint&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;eslint . --ext .ts,.tsx --fix&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、次のようにして Prettier + ESLint による Lint チェックと自動修正をかけられるようになります。&lt;/p></description></item><item><title>VS Code のフォーマッターで自動整形する (editor.formatOnSave)</title><link>https://maku.blog/p/qcoz9ju/</link><pubDate>Wed, 14 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qcoz9ju/</guid><description>&lt;p>VS Code には、標準で各種言語用のフォーマッターが搭載されており、JavaScript、TypeScript、JSON、HTML などのコードを自動整形することができます。&lt;/p>
+&lt;h2 id="手動でフォーマッターを起動する">手動でフォーマッターを起動する&lt;/h2>
+&lt;h3 id="ファイル全体をフォーマット-editoractionformatdocument">ファイル全体をフォーマット (editor.action.formatDocument)&lt;/h3>
+&lt;ul>
+&lt;li>コマンドパレット&lt;sup id="fnref:1">&lt;a href="#fn:1" class="footnote-ref" role="doc-noteref">1&lt;/a>&lt;/sup> を使う場合: &lt;strong>Format Document&lt;/strong> を選択&lt;/li>
+&lt;li>ショートカットキーを使う場合:
+&lt;ul>
+&lt;li>(Windows) &lt;strong>&lt;code>Shift + Alt + F&lt;/code>&lt;/strong>&lt;/li>
+&lt;li>(macOS) &lt;strong>&lt;code>Shift + Option + F&lt;/code>&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="選択中の行をフォーマット-editoractionformatselection">選択中の行をフォーマット (editor.action.formatSelection)&lt;/h3>
+&lt;ul>
+&lt;li>コマンドパレット&lt;sup id="fnref1:1">&lt;a href="#fn:1" class="footnote-ref" role="doc-noteref">1&lt;/a>&lt;/sup> を使う場合: &lt;strong>Format Selection&lt;/strong> を選択&lt;/li>
+&lt;li>ショートカットキーを使う場合:
+&lt;ul>
+&lt;li>(Windows) &lt;strong>&lt;code>Ctrl + K → Ctrl + F&lt;/code>&lt;/strong>&lt;/li>
+&lt;li>(macOS) &lt;strong>&lt;code>Cmd + K → Cmd + F&lt;/code>&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="ファイル保存時などに自動でフォーマットする">ファイル保存時などに自動でフォーマットする&lt;/h2>
+&lt;p>下記の設定をしておくと、ファイル保存時や、コードの編集中に自動的にフォーマッターを起動することができます。
+設定ファイル (&lt;code>settings.json&lt;/code>) の場所に関しては、&lt;a href="../../p/tfq2cnw">こちらの記事&lt;/a> を参考にしてください。&lt;/p>
+&lt;h3 id="全ての種類のファイルで自動フォーマットする場合">全ての種類のファイルで自動フォーマットする場合&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">settings.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 自動フォーマット設定
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s2">&amp;#34;editor.formatOnSave&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// 保存時にフォーマット
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s2">&amp;#34;editor.formatOnType&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// 入力中（改行時）にフォーマット
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s2">&amp;#34;editor.formatOnPaste&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// ペースト時にフォーマット
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// その他...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>フォーマッターによっては、保存時のフォーマット (&lt;code>editor.formatOnSave&lt;/code>) にしか対応していません。&lt;/p></description></item><item><title>TypeScript コードを Prettier で自動整形する</title><link>https://maku.blog/p/au8iu6u/</link><pubDate>Wed, 26 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/au8iu6u/</guid><description>&lt;h2 id="prettier-とは">Prettier とは？&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="1618" height="472" src="../../p/au8iu6u/img-001.png" alt="/p/au8iu6u/img-001.png" />
+&lt;/figure>
+
+&lt;p>&lt;a href="https://prettier.io/">Prettier&lt;/a> は、TypeScript や JavaScript などのソースコードを自動フォーマットするためのツールです。
+HTML や CSS など様々なファイルに対応していますが、主に TypeScript や JavaScript のフォーマッターとして使用されています。
+実際にどのようにフォーマットされるかは、&lt;a href="https://prettier.io/playground/">Playground のページ&lt;/a> で試すことができます。&lt;/p>
+&lt;h3 id="特徴と思想">特徴と思想&lt;/h3>
+&lt;p>Prettier の一番の特徴は、&lt;strong>Opinionated（独断的な）&lt;/strong> コードフォーマッターであることを標榜していることです。
+これは、ユーザーに自由なカスタマイズを許さず、「Prettier 自身が定義しているスタイルに強制的にフォーマットするよ」ということです（セミコロンの有無など最低限の設定はできます）。
+これにより、コーディングスタイルに関する &lt;strong>不毛な議論を避ける&lt;/strong> ことができ、プロジェクト内のコーディングスタイルを簡単に統一することができます。&lt;/p>
+&lt;p>もちろん、自分がベストだと思っているスタイルでフォーマットすることはできなくなるかもしれませんが、そんな些細なことよりも、アプリケーション（成果物）を作り上げることに集中すべきだという考え方です。&lt;/p>
+&lt;h3 id="prettier-がやらないこと">Prettier がやらないこと&lt;/h3>
+&lt;p>Prettier はあくまでコードのフォーマットのみを行います。
+コードの意味を解析して危険な部分（潜在的バグ）を検出してくれたりはしないので、そういったことを行いたい場合は、他の静的解析ツール（ESLint など）を使う必要があります。
+ESLint にもコードフォーマット機能がありますが、フォーマッターとしては Prettier が優れており、「Prettier による整形 ＋ ESLint による静的解析」という形で組み合わせて使うのが一般的です。&lt;/p>
+&lt;p>あと、import 文のソートなど、一見やってくれてもよさそうなフォーマットもしてくれなかったりします。
+これは、その import 順序がロジック的に意味を持っていたりする場合に、Prettier が判断できないからです。
+このように、いろいろと想像と異なるフォーマット結果になることがありますが、そこにはちゃんと理由があります（参考: &lt;a href="https://prettier.io/docs/en/rationale.html">Rationale&lt;/a>）。
+あまり気にせずにそんなものだと考えるのがよいです。
+ちなみに、ESLint の方には import 文のソートを行うプラグイン (&lt;code>eslint-plugin-import&lt;/code>) があります。&lt;/p>
+&lt;h2 id="prettier-をインストールする">Prettier をインストールする&lt;/h2>
+&lt;p>Prettier は &lt;code>npm&lt;/code> で簡単にインストールすることができます。
+&lt;a href="../../p/ak7u3h3">TypeScript のプロジェクトは作成済み&lt;/a> で、&lt;code>package.json&lt;/code> がすでに存在すると想定します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">### yarn の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add prettier --dev --exact
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">### npm の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install prettier --save-dev --save-exact&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Prettier は、パッチバージョンが上がるだけで、出力結果に微妙な差分が生まれる可能性があります。
+そのため、インストール時のオプションとして &lt;strong>&lt;code>--save-exact&lt;/code>&lt;/strong> を指定することで、明確なバージョンを &lt;code>package.json&lt;/code> の依存情報として保存することが推奨されています。
+これにより、チームメンバー全員のフォーマット結果を確実に一致させることができます。&lt;/p></description></item></channel></rss>

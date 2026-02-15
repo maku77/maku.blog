@@ -1,50 +1,322 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>GitHubメモ on まくろぐ</title><link>https://maku.blog/p/5q4fr3d/</link><description>Recent content in GitHubメモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Fri, 26 Aug 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/5q4fr3d/index.xml" rel="self" type="application/rss+xml"/><item><title>GitHub OAuth トークンを取得する (1) 処理の流れを理解する</title><link>https://maku.blog/p/ubkt3ai/</link><pubDate>Sun, 16 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ubkt3ai/</guid><description>GitHub の OAuth トークンとは GitHub API を使って GitHub 上の情報（リポジトリ情報やユーザー情報）を取得するには、GitHub によって発行されるアクセストークンが必要です。 GitHub API ver.3 (REST API) ではアクセストークンを必要としない API もありましたが、GitHub API ver.4 (GraphQL API) では必ずアクセストークンが必要です。
-アクセストークンにはいくつか種類があり、GitHub の Web サイト上で作成する パーソナルアクセストークン や、Web アプリの OAuth プロセスで取得する OAuth アクセストークン などがあります。 アクセストークンの取得方法は異なりますが、いずれも取得した後は同じように使用できます。
-パーソナルアクセストークン : ユーザーが GitHub サイト上で作成 OAuth アクセストークン : Web アプリ内の OAuth プロセスで取得 通常、Web アプリから GitHub API を使用する場合は、後者の OAuth を使用してアクセストークンの取得を自動化します。 ここでは、GitHub の OAuth アクセストークン取得の流れを、実装コードを示しながら説明していきます。
-GitHub の OAuth の流れ (Web application flow) Web アプリから OAuth トークンを取得するまでの流れはざっと次のような感じになります。</description></item><item><title>GitHub OAuth トークンを取得する (2) Azure Functions 経由で取得する</title><link>https://maku.blog/p/ar2bjs2/</link><pubDate>Tue, 18 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ar2bjs2/</guid><description>何をするか？ ここでは、静的な Web サイト（の JavaScript) から、GitHub の OAuth トークンを取得できるようにしてみます。 この処理を実装すると、GitHub と連携した Web アプリを、GitHub Pages や Azure Static Web Apps などの、静的サイト用のホスティングサービス上で公開できるようになります。 汎用的な Web サーバー（VPSなど）でホスティングする場合と比べ、非常に安価に運用することができます。
-前提知識として、下記の GitHub の OAuth トークン取得の流れを理解しているものとします。
-参考: GitHub OAuth トークンを取得する (1) 処理の流れを理解する 静的な Web サイトから GitHub のアクセストークンを取得するときにネックになるのが、クロスオリジン通信 (CORS) の制約です。 また、GitHub のアクセストークンリクエストには、クライアントシークレット情報が必須であり（2020年、2021年現在）、これをクライアントサイドの JavaScript にハードコードするわけにはいきません。 よって、ブラウザ上で実行される JavaScript からは、実質アクセストークンの取得ができないので、何らかのバックエンドサーバーを介す形でアクセストークンを取得する必要があります。
-バックエンドサーバーはどのようなものでも構わないのですが、ここではサーバーレス環境である Azure Functions を使ってアクセストークンの取得機能を実装します。
-Azure Functions に関数を追加する Azure Functions に HTTP トリガーで起動する関数を追加し、GitHub の OAuth トークンを取得する処理を実装します。 まずは下記の記事を参考にして、Functions アプリ（プロジェクト）を作成してください。
-参考: Azure Functions で簡単な関数を作ってみる 作成する関数の仕様は次のとおりとします。</description></item><item><title>Apollo Client で GitHub GraphQL API を使う (Node &amp; React)</title><link>https://maku.blog/p/qcp2cnx/</link><pubDate>Fri, 31 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qcp2cnx/</guid><description>Apollo Client とは Apollo パッケージは、GraphQL を使ったクライアントアプリやサーバーを作成するためのライブラリ群です。 クライアントアプリを作るためのライブラリは、Apollo Client として @apollo/client という NPM パッケージにまとめられています。
-Web アプリのコンポーネントを作成するときは React がよく使われますが、Apollo は GraphQL を扱いやすくする React コンポーネント（ApolloProvider、Query、Mutation、Subscription）や React Hook 拡張（useQuery) などを提供しています。
-ここでは、Apollo Client パッケージを使用して、
-Node.js アプリ（コマンドラインアプリの JS）から GraphQL API の実行 React アプリ（Web サイトの JS）から GraphQL API の実行 を行ってみます。 呼び出す GraphQL API は何でもよいのですが、今回は GitHub GraphQL API を利用することにします。
-Node パッケージのインストール Apollo Client Apollo Client 関連のパッケージとしては、@apollo/client と、それが使用する graphql をインストールします。
-Apollo Client のインストール ### yarn の場合 $ yarn add @apollo/client graphql ### npm の場合 $ npm install @apollo/client graphql fetch ポリフィル Apollo クライアント内部の実装では、Web ブラウザの fetch API を利用しています。 React アプリから Apollo クライアントを利用する場合は問題ないのですが、コンソールで動作する Node.</description></item><item><title>GitHub Actions でコンテナイメージをビルドして Docker Hub へ push する</title><link>https://maku.blog/p/v9r8o5k/</link><pubDate>Fri, 26 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/v9r8o5k/</guid><description>何をするか？ Docker イメージを作成するための Dockerfile を GitHub のリポジトリで管理しているとします。 ここでは、GitHub Actions のワークフローを作成して、GitHub リポジトリにコードを push したときに次のような処理が自動で実行されるようにします。
-Dockerfile を使ってイメージをビルド Docker Hub にイメージを push 前提条件として、Docker Hub のアカウントは作成済みとします。
-Dockerfile の準備 GitHub のリポジトリを作成して、ルートディレクトリに次のような Dockerfile をコミット＆プッシュしておきます。
-Dockerfile FROM alpine:3 CMD [&amp;#34;echo&amp;#34;, &amp;#34;Hello World&amp;#34;] 上記のサンプルコードは、軽量の Alpine Linux で Hello World と出力するだけの Dockerfile ですが、もちろん好きなように記述していただいて構いません。
-GitHub Actions の Secrets 情報を登録 GitHub Actions から Docker Hub にイメージをプッシュできるようにするため、GitHub リポジトリの Secrets 情報として、Docker Hub のユーザー名およびアクセストークンを登録しておきます。
-Docker Hub のアクセストークンは次のように発行できます。
-Docker Hub にサインイン 右上のユーザー名をクリックして、Account Settings を選択 Security → New Access Token と選択して、トークンの説明文を入力 Access Token description: Deploy hello world など適当に入力 Access permissions: 少なくとも Read, Write を付ける Generate ボタンを押して生成 これで、次のような感じのアクセストークンが発行されるので、どこかにコピーしておきます（後から確認することはできません）。</description></item><item><title>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする</title><link>https://maku.blog/p/un3gu8m/</link><pubDate>Sun, 27 Feb 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/un3gu8m/</guid><description>何をするか？ Web サイトのコンテンツを GitHub で管理し、さくらの VPS や、お名前.com の VPS で Web サーバーを運用している場合、GitHub Actions でビルドとデプロイを自動化すると便利です。 ここでは、Web サイトのビルドに Hugo、VPS サーバーへのデプロイに rsync を使う前提で、次のような手順で自動化を進めていきます。
-SSH 鍵を作成する（自動デプロイのためパスワードは設定しない） VPS 側に SSH 公開鍵を登録する GitHub Actions のシークレットとして SSH 秘密鍵を登録する GitHub Actions のワークフローを作成し、ビルド (Hugo) とデプロイ (rsync) を自動化する Web サイトのビルドには何を使ってもよいのですが、現時点でおそらく最速の静的サイトジェネレーターである Hugo を例にして説明しています。 GitHub Actions による自動化が完了すると、GitHub の main ブランチに Web サイトコンテンツを push するだけで、Hugo によるビルドと rsync による VPS へのデプロイが自動で行われるようになります。
-SSH キーペアを作成して VPS へ公開鍵を登録する rsync コマンドで使用する SSH 鍵を ssh-keygen コマンドで作成しておきます。 GitHub Actions から rsync コマンドを実行するので、SSH 秘密鍵にはパスワードを設定しないようにします。 次の例では、github-actions / github-actions.</description></item><item><title>GitHub GraphQL のスキーマ情報を取得する</title><link>https://maku.blog/p/whv8it5/</link><pubDate>Wed, 09 Sep 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/whv8it5/</guid><description>GitHub API のサイトからダウンロードする方法 次のサイトから GitHub GraphQL API のスキーマ定義ファイル (schema.docs.graphql) をダウンロードすることができます。
-パブリックスキーマ - GitHub Docs 例えば、このファイル内の Query オブジェクト (type Query) の定義を見ると、クエリのトップレベルにどのようなオブジェクト（フィールド）を指定できるかが分かります。
-schema.docs.graphql type Query { ... organization( login: String! ): Organization ... user( login: String! ): User } 上記の場合、Query オブジェクト内に organization や user フィールドが定義されているので、クライアントアプリからクエリ要求を出すときに、次のような感じで指定できるということが分かります。
-query { organization(login: &amp;#34;netflix&amp;#34;) { name description avatarUrl } user(login: &amp;#34;octocat&amp;#34;) { name company url avatarUrl } } スキーマ定義ファイル (.graphql) とクライアントアプリ側のクエリ定義 (query {...}) を組み合わせることで、TypeScript 用の型定義ファイルを自動生成することができます（クエリ要求の戻り値の型を定義できます）。 詳しくは、Apollo CLI などのコマンドラインツールを確認してください。</description></item><item><title>GitHub Pages で React Router を使った SPA サイトを動かす方法</title><link>https://maku.blog/p/9u8it5f/</link><pubDate>Mon, 07 Sep 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9u8it5f/</guid><description>React Router などを使った SPA (Single Page Application) な Web サイトは、GitHub Pages でそのまま動作させようとしてもうまく動きません。 ここでは、その理由と、対応方法について説明します。
-GitHub Pages で SPA サイトが動作しない理由 たとえば、React Router を使った Web サイトは、次のような URL を使って目的のコンテンツ (/book/123) を表示するようルーティングします。
-https://yourname.github.io/repo-name/book/123 React Router を使ったアプリで、この URL を実際に処理するファイルは、
-https://yourname.github.io/repo-name/index.html であり、そこに記述された JavaScript ファイル内で、URL の末尾の /book/123 という部分をルーティング用のパス文字列として処理します。 つまり、前述の URL の /book/123 という部分は、単なるアプリ用のデータであり、実際に存在するファイルを示しているわけではありません。
-一方、GitHub Pages はそのような事情を知らないので、/book/123 という URL でアクセスしようとすると、/book/123/index.html というファイルを見つけようとして 404 エラー になってしまいます。
-先頭ページ (/index.html) を開いた後で、JavaScript でルーティング（React の Link コンポーネントによる遷移）を行っている間はうまく動作するのですが、ページをリロードしたり、Web ブラウザのアドレスバーに URL を直接入力したりすると、やはり 404 エラーになってしまいます。 OAuth 認証を使用した Web サイトの場合は、リダイレクトによって指定された URL へのアクセスが必要になるため、これは大きな制約になります。</description></item><item><title>GitHub Pages で Jekyll による自動変換を無効化する (.nojekyll)</title><link>https://maku.blog/p/my8fmsy/</link><pubDate>Thu, 03 Sep 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/my8fmsy/</guid><description>GitHub プロジェクトの設定画面から、GitHub Pages を有効化すると、簡単にウェブサイトをホスティングすることができます。 デフォルトでは、リポジトリ内の Markdown ファイル (.md) が Jekyll によって HTML に変換されるのですが、直接 HTML ファイルをデプロイする場合は、この変換処理は無駄です。
-そのような場合は、次のようにして Jekyll による変換を無効化できます。
-リポジトリのルート（GitHub Pages のソースディレクトリ）に .nojekyll ファイルを置く これだけです。
-Hugo などの静的 Web サイト生成ツールで作成したサイトをデプロイするような場合は、この設定を行っておくと、ファイルのプッシュ後に GitHub Pages に反映されるまでの時間がほんの少し早くなるかもしれません。
-速度を気にしない場合はこの設定をする必要はありませんが、プッシュする Web サイトリソース内に、アンダースコア (_) で始まるファイルやディレクトリなどが含まれている場合は、この設定は必須になります。 なぜなら、Jekyll がアンダースコアで始まるファイルやディレクトリを取り除いてしまうからです。
-GitHub Pages のソースブランチとして gh-pages ブランチを設定している場合は、そのブランチのルートに .nojekyll を配置しなければいけないことに注意してください。 ちなみに、GitHub Actions でデプロイするときに、peaceiris/actions-gh-pages を使っている場合は、自動的にデプロイ先のブランチ (gh-pages) に .nojekyll ファイルを作成してくれます。
-- name: Deploy uses: peaceiris/actions-gh-pages@v3 with: github_token: ${{ secrets.GITHUB_TOKEN }} publish_dir: ./public</description></item><item><title>GitHub Actions で Web サイトをビルドして GitHub Pages へ公開する</title><link>https://maku.blog/p/5q3eq2c/</link><pubDate>Tue, 01 Sep 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5q3eq2c/</guid><description>何をするか？ GitHub Actions を使うと、GitHub で管理されている Web サイト用リソースの「ビルドとデプロイ」を簡単に自動化することができます。
-ここでは、
-npm run build による Web サイトのビルド ビルドされたリソースの GitHub Pages へのデプロイ（gh-pages ブランチ） を行う設定を行います。 最終的に、https://yourname.github.io/project名/ という URL で Web サイトが公開されます。
-前提条件として、GitHub リポジトリに npm run build でビルド可能な Web サイト用リソースがコミットされているものとします。
-☝️ 他のビルド方法は？ ここでは、npm run build による Web サイトのビルドを前提としましたが、例えば、Hugo によるビルドなどもほぼ同様に行えます。 GitHub Actions の設定 GitHub プロジェクトの Actions タブから、次のように新規ワークフローを作成します。
-set up a workflow yourself をクリック main.yml の編集画面になるので、次のように入力して Start commit ボタンを押す .github/workflows/main.yml name: Build and deploy website on: push: branches: [ master ] jobs: build: runs-on: ubuntu-latest steps: - uses: actions/checkout@v2 - name: Setup Node.</description></item><item><title>Parcel でビルドした Web サイトが GitHub Pages で動作しないとき</title><link>https://maku.blog/p/m7jw8ju/</link><pubDate>Tue, 01 Sep 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m7jw8ju/</guid><description>React アプリを Parcel でビルドして GitHub Pages で公開しようとしたら、真っ白な画面になってしまったので対応方法のメモです。 原因は、トップページの index.html から読み込んでいる JavaScript ファイルのパスが、/index.js のように、ドメインルートからの相対パスになっていることでした。
-GitHub Pages で公開する Web サイトの URL が、
-https://yourname.github.io/ であれば問題ないのですが、
-https://yourname.github.io/project名/ になっている場合は、読み込むファイルは /project名/index.js になっていないといけません。 これを解決するには、例えば、Parcel でビルドしているときは --public-url オプションを使って、次のように指定します。
-$ parcel build src/index.html -d build --public-url &amp;#34;/project名/&amp;#34; こうすることで、トップページから /index.js というパスで参照していたものが /project名/index.js に変わってうまく動作するようになります。
-npm run build で Web サイトのビルドを行っているのであれば、package.json 内のスクリプト定義で次のように記述しておけばよいでしょう。
-package.json { // ... &amp;#34;scripts&amp;#34;: { &amp;#34;start&amp;#34;: &amp;#34;parcel src/index.html --open&amp;#34;, &amp;#34;build&amp;#34;: &amp;#34;rm -rf build &amp;amp;&amp;amp; parcel build src/index.html -d build --public-url &amp;#39;/project名/&amp;#39;&amp;#34; }, // .</description></item><item><title>GitHub GraphQL API の呼び出し回数制限 (rate limit) の情報を取得する</title><link>https://maku.blog/p/bqz7emt/</link><pubDate>Sun, 02 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bqz7emt/</guid><description>GitHub API を使ったアプリケーションを作成するときは、API の呼び出し回数制限を意識した設計を行う必要があります。 GitHub API バージョン3 の REST API には、1 時間に 5000 リクエストまでという明確な呼び出し回数制限がありましたが、API バージョン4 の GraphQL API はそのクエリの性質上、ちょっと異なるコスト計算方法が採用されています。
-GraphQL resource limitations | GitHub Developer Guide 正確な計算方法は上記のサイトに記述されていますが、簡単にいうと、GraphQL クエリの入れ子階層が深くなり、複雑になるほどコストがかかるという計算になっています。
-ある GraphQL クエリが実際にどれだけのコストがかかるかは、下記のように rateLimit 情報を取得することで調べることができます。
-query { rateLimit { limit cost remaining resetAt } search(query: &amp;#34;repo:electron/electron is:issue&amp;#34;, type: ISSUE, first: 5) { issueCount nodes { ... on Issue { title labels(first: 10) { nodes { name }} } } } } 上記のクエリを実行すると、次のような感じの JSON レスポンスが返ってきます。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>GitHubメモ on まくろぐ</title><link>https://maku.blog/p/5q4fr3d/</link><description>Recent content in GitHubメモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Fri, 26 Aug 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/5q4fr3d/index.xml" rel="self" type="application/rss+xml"/><item><title>GitHub OAuth トークンを取得する (1) 処理の流れを理解する</title><link>https://maku.blog/p/ubkt3ai/</link><pubDate>Sun, 16 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ubkt3ai/</guid><description>&lt;h2 id="github-の-oauth-トークンとは">GitHub の OAuth トークンとは&lt;/h2>
+&lt;p>GitHub API を使って GitHub 上の情報（リポジトリ情報やユーザー情報）を取得するには、GitHub によって発行されるアクセストークンが必要です。
+GitHub API ver.3 (REST API) ではアクセストークンを必要としない API もありましたが、GitHub API ver.4 (GraphQL API) では必ずアクセストークンが必要です。&lt;/p>
+&lt;p>アクセストークンにはいくつか種類があり、GitHub の Web サイト上で作成する &lt;strong>パーソナルアクセストークン&lt;/strong> や、Web アプリの OAuth プロセスで取得する &lt;strong>OAuth アクセストークン&lt;/strong> などがあります。
+アクセストークンの取得方法は異なりますが、いずれも取得した後は同じように使用できます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;b>パーソナルアクセストークン&lt;/b>
+: ユーザーが GitHub サイト上で作成&lt;/li>
+&lt;li>&lt;b>OAuth アクセストークン&lt;/b>
+: Web アプリ内の OAuth プロセスで取得&lt;/li>
+&lt;/ul>
+&lt;p>通常、Web アプリから GitHub API を使用する場合は、後者の OAuth を使用してアクセストークンの取得を自動化します。
+ここでは、GitHub の OAuth アクセストークン取得の流れを、実装コードを示しながら説明していきます。&lt;/p>
+&lt;h2 id="github-の-oauth-の流れ-web-application-flow">GitHub の OAuth の流れ (Web application flow)&lt;/h2>
+&lt;p>Web アプリから OAuth トークンを取得するまでの流れはざっと次のような感じになります。&lt;/p></description></item><item><title>GitHub OAuth トークンを取得する (2) Azure Functions 経由で取得する</title><link>https://maku.blog/p/ar2bjs2/</link><pubDate>Tue, 18 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ar2bjs2/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ここでは、静的な Web サイト（の JavaScript) から、GitHub の OAuth トークンを取得できるようにしてみます。
+この処理を実装すると、GitHub と連携した Web アプリを、GitHub Pages や Azure Static Web Apps などの、静的サイト用のホスティングサービス上で公開できるようになります。
+汎用的な Web サーバー（VPSなど）でホスティングする場合と比べ、非常に安価に運用することができます。&lt;/p>
+&lt;p>前提知識として、下記の GitHub の OAuth トークン取得の流れを理解しているものとします。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/ubkt3ai">GitHub OAuth トークンを取得する (1) 処理の流れを理解する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>静的な Web サイトから GitHub のアクセストークンを取得するときにネックになるのが、クロスオリジン通信 (CORS) の制約です。
+また、GitHub のアクセストークンリクエストには、クライアントシークレット情報が必須であり（2020年、2021年現在）、これをクライアントサイドの JavaScript にハードコードするわけにはいきません。
+よって、ブラウザ上で実行される JavaScript からは、実質アクセストークンの取得ができないので、何らかのバックエンドサーバーを介す形でアクセストークンを取得する必要があります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="660" height="286" src="../../p/ar2bjs2/img-001.png" alt="/p/ar2bjs2/img-001.png" />
+&lt;/figure>
+
+&lt;p>バックエンドサーバーはどのようなものでも構わないのですが、ここではサーバーレス環境である &lt;strong>Azure Functions&lt;/strong> を使ってアクセストークンの取得機能を実装します。&lt;/p>
+&lt;h2 id="azure-functions-に関数を追加する">Azure Functions に関数を追加する&lt;/h2>
+&lt;p>Azure Functions に HTTP トリガーで起動する関数を追加し、GitHub の OAuth トークンを取得する処理を実装します。
+まずは下記の記事を参考にして、Functions アプリ（プロジェクト）を作成してください。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/vgt5g7f">Azure Functions で簡単な関数を作ってみる&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>作成する関数の仕様は次のとおりとします。&lt;/p>
+&lt;ul>
+&lt;li>HTTP GET リクエストのクエリ文字列で、OAuth アプリのクライアント ID (&lt;code>client_id&lt;/code>) と、GitHub から取得した一時コード (&lt;code>code&lt;/code>) を受け取る。&lt;/li>
+&lt;li>OAuth アプリのクライアントシークレット (&lt;code>client_secret&lt;/code>) は Functions アプリの環境変数（アプリケーション設定）で設定しておく（ハードコードしない）。&lt;/li>
+&lt;li>GitHub に対してアクセストークンの取得リクエスト (HTTP POST) を送り、その結果をクライアントへそのまま返す。ただし、クライアントから指定されたクライアント ID (&lt;code>client_id&lt;/code>) がそもそも不正な場合は、アクセストークンの取得は行わず、直ちに 400 (Bad Request) エラーを返す。&lt;/li>
+&lt;/ul>
+&lt;h3 id="環境変数の設定">環境変数の設定&lt;/h3>
+&lt;p>Functions アプリの &lt;strong>&lt;code>環境&lt;/code>&lt;/strong> → &lt;strong>&lt;code>構成&lt;/code>&lt;/strong> を開き、GitHub に登録した OAuth アプリの「クライアントID」と「クライアントシークレット」を登録してください。
+ここでは次のような名前で登録することにします。&lt;/p></description></item><item><title>Apollo Client で GitHub GraphQL API を使う (Node &amp; React)</title><link>https://maku.blog/p/qcp2cnx/</link><pubDate>Fri, 31 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qcp2cnx/</guid><description>&lt;h2 id="apollo-client-とは">Apollo Client とは&lt;/h2>
+&lt;p>Apollo パッケージは、GraphQL を使ったクライアントアプリやサーバーを作成するためのライブラリ群です。
+クライアントアプリを作るためのライブラリは、&lt;strong>Apollo Client&lt;/strong> として &lt;strong>&lt;code>@apollo/client&lt;/code>&lt;/strong> という NPM パッケージにまとめられています。&lt;/p>
+&lt;p>Web アプリのコンポーネントを作成するときは React がよく使われますが、Apollo は GraphQL を扱いやすくする React コンポーネント（&lt;code>ApolloProvider&lt;/code>、&lt;code>Query&lt;/code>、&lt;code>Mutation&lt;/code>、&lt;code>Subscription&lt;/code>）や React Hook 拡張（&lt;code>useQuery&lt;/code>) などを提供しています。&lt;/p>
+&lt;p>ここでは、Apollo Client パッケージを使用して、&lt;/p>
+&lt;ul>
+&lt;li>Node.js アプリ（コマンドラインアプリの JS）から GraphQL API の実行&lt;/li>
+&lt;li>React アプリ（Web サイトの JS）から GraphQL API の実行&lt;/li>
+&lt;/ul>
+&lt;p>を行ってみます。
+呼び出す GraphQL API は何でもよいのですが、今回は &lt;strong>GitHub GraphQL API&lt;/strong> を利用することにします。&lt;/p>
+&lt;h2 id="node-パッケージのインストール">Node パッケージのインストール&lt;/h2>
+&lt;h3 id="apollo-client">Apollo Client&lt;/h3>
+&lt;p>Apollo Client 関連のパッケージとしては、&lt;strong>&lt;code>@apollo/client&lt;/code>&lt;/strong> と、それが使用する &lt;strong>&lt;code>graphql&lt;/code>&lt;/strong> をインストールします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Apollo Client のインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">### yarn の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add @apollo/client graphql
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">### npm の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install @apollo/client graphql&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="fetch-ポリフィル">fetch ポリフィル&lt;/h3>
+&lt;p>Apollo クライアント内部の実装では、Web ブラウザの fetch API を利用しています。
+React アプリから Apollo クライアントを利用する場合は問題ないのですが、コンソールで動作する Node.js アプリから利用する場合は、fetch API の埋め合わせ (polyfill) をするモジュールが必要になります。
+ここでは、&lt;strong>&lt;code>cross-fetch&lt;/code>&lt;/strong> パッケージをインストールしておきます。&lt;/p></description></item><item><title>GitHub Actions でコンテナイメージをビルドして Docker Hub へ push する</title><link>https://maku.blog/p/v9r8o5k/</link><pubDate>Fri, 26 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/v9r8o5k/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Docker イメージを作成するための &lt;code>Dockerfile&lt;/code> を GitHub のリポジトリで管理しているとします。
+ここでは、GitHub Actions のワークフローを作成して、GitHub リポジトリにコードを push したときに次のような処理が自動で実行されるようにします。&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>Dockerfile&lt;/code> を使ってイメージをビルド&lt;/li>
+&lt;li>Docker Hub にイメージを push&lt;/li>
+&lt;/ol>
+&lt;p>前提条件として、Docker Hub のアカウントは作成済みとします。&lt;/p>
+&lt;h2 id="dockerfile-の準備">Dockerfile の準備&lt;/h2>
+&lt;p>GitHub のリポジトリを作成して、ルートディレクトリに次のような &lt;code>Dockerfile&lt;/code> をコミット＆プッシュしておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Dockerfile&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-dockerfile" data-lang="dockerfile">&lt;span class="line">&lt;span class="cl">&lt;span class="k">FROM&lt;/span>&lt;span class="s"> alpine:3&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">CMD&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;echo&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Hello World&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のサンプルコードは、軽量の Alpine Linux で Hello World と出力するだけの &lt;code>Dockerfile&lt;/code> ですが、もちろん好きなように記述していただいて構いません。&lt;/p>
+&lt;h2 id="github-actions-の-secrets-情報を登録">GitHub Actions の Secrets 情報を登録&lt;/h2>
+&lt;p>GitHub Actions から Docker Hub にイメージをプッシュできるようにするため、GitHub リポジトリの Secrets 情報として、Docker Hub のユーザー名およびアクセストークンを登録しておきます。&lt;/p>
+&lt;p>Docker Hub のアクセストークンは次のように発行できます。&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://hub.docker.com">Docker Hub&lt;/a> にサインイン&lt;/li>
+&lt;li>右上のユーザー名をクリックして、&lt;code>Account Settings&lt;/code> を選択&lt;/li>
+&lt;li>&lt;code>Security&lt;/code> → &lt;code>New Access Token&lt;/code> と選択して、トークンの説明文を入力
+&lt;ul>
+&lt;li>&lt;code>Access Token description&lt;/code>: Deploy hello world など適当に入力&lt;/li>
+&lt;li>&lt;code>Access permissions&lt;/code>: 少なくとも Read, Write を付ける&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Generate&lt;/code> ボタンを押して生成&lt;/li>
+&lt;/ol>
+&lt;p>これで、次のような感じのアクセストークンが発行されるので、どこかにコピーしておきます（後から確認することはできません）。&lt;/p></description></item><item><title>GitHub Actions で Hugo サイトをビルドして VPS サーバーに rsync デプロイする</title><link>https://maku.blog/p/un3gu8m/</link><pubDate>Sun, 27 Feb 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/un3gu8m/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Web サイトのコンテンツを GitHub で管理し、&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8K+4T95TE+D8Y+C9YHU" rel="nofollow">さくらの VPS&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=3NCT8K+4T95TE+D8Y+C9YHU" alt="">
+ や、&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8K+3X3R5E+50+35KFN6" rel="nofollow">お名前.com の VPS&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=3NCT8K+3X3R5E+50+35KFN6" alt="">
+ で Web サーバーを運用している場合、GitHub Actions でビルドとデプロイを自動化すると便利です。
+ここでは、Web サイトのビルドに &lt;strong>Hugo&lt;/strong>、VPS サーバーへのデプロイに &lt;strong>rsync&lt;/strong> を使う前提で、次のような手順で自動化を進めていきます。&lt;/p>
+&lt;ol>
+&lt;li>SSH 鍵を作成する（自動デプロイのためパスワードは設定しない）&lt;/li>
+&lt;li>VPS 側に SSH 公開鍵を登録する&lt;/li>
+&lt;li>GitHub Actions のシークレットとして SSH 秘密鍵を登録する&lt;/li>
+&lt;li>GitHub Actions のワークフローを作成し、ビルド (Hugo) とデプロイ (rsync) を自動化する&lt;/li>
+&lt;/ol>
+&lt;p>Web サイトのビルドには何を使ってもよいのですが、現時点でおそらく最速の静的サイトジェネレーターである Hugo を例にして説明しています。
+GitHub Actions による自動化が完了すると、GitHub の main ブランチに Web サイトコンテンツを push するだけで、Hugo によるビルドと rsync による VPS へのデプロイが自動で行われるようになります。&lt;/p>
+&lt;h2 id="ssh-キーペアを作成して-vps-へ公開鍵を登録する">SSH キーペアを作成して VPS へ公開鍵を登録する&lt;/h2>
+&lt;p>&lt;code>rsync&lt;/code> コマンドで使用する SSH 鍵を &lt;code>ssh-keygen&lt;/code> コマンドで作成しておきます。
+GitHub Actions から &lt;code>rsync&lt;/code> コマンドを実行するので、SSH 秘密鍵にはパスワードを設定しないようにします。
+次の例では、&lt;code>github-actions&lt;/code> / &lt;code>github-actions.pub&lt;/code> という名前のキーペアを作成しています。
+ファイル名は何でも構いません。&lt;/p></description></item><item><title>GitHub GraphQL のスキーマ情報を取得する</title><link>https://maku.blog/p/whv8it5/</link><pubDate>Wed, 09 Sep 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/whv8it5/</guid><description>&lt;h2 id="github-api-のサイトからダウンロードする方法">GitHub API のサイトからダウンロードする方法&lt;/h2>
+&lt;p>次のサイトから GitHub GraphQL API のスキーマ定義ファイル (&lt;code>schema.docs.graphql&lt;/code>) をダウンロードすることができます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.github.com/ja/graphql/overview/public-schema">パブリックスキーマ - GitHub Docs&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>例えば、このファイル内の &lt;code>Query&lt;/code> オブジェクト (&lt;code>type Query&lt;/code>) の定義を見ると、クエリのトップレベルにどのようなオブジェクト（フィールド）を指定できるかが分かります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">schema.docs.graphql&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-graphql" data-lang="graphql">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">type&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">Query&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">...&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">organization&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">login&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">String&lt;/span>&lt;span class="p">!&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">):&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">Organization&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">...&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">user&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">login&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">String&lt;/span>&lt;span class="p">!&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">):&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">User&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記の場合、&lt;code>Query&lt;/code> オブジェクト内に &lt;code>organization&lt;/code> や &lt;code>user&lt;/code> フィールドが定義されているので、クライアントアプリからクエリ要求を出すときに、次のような感じで指定できるということが分かります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-graphql" data-lang="graphql">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">query&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nc">organization&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="py">login&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;netflix&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nc">name&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">description&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">avatarUrl&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">user&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="py">login&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;octocat&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nc">name&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">company&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">url&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">avatarUrl&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>スキーマ定義ファイル (&lt;code>.graphql&lt;/code>) とクライアントアプリ側のクエリ定義 (&lt;code>query {...}&lt;/code>) を組み合わせることで、TypeScript 用の型定義ファイルを自動生成することができます（クエリ要求の戻り値の型を定義できます）。
+詳しくは、&lt;a href="https://www.apollographql.com/docs/devtools/cli/">Apollo CLI&lt;/a> などのコマンドラインツールを確認してください。&lt;/p></description></item><item><title>GitHub Pages で React Router を使った SPA サイトを動かす方法</title><link>https://maku.blog/p/9u8it5f/</link><pubDate>Mon, 07 Sep 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9u8it5f/</guid><description>&lt;p>React Router などを使った SPA (Single Page Application) な Web サイトは、GitHub Pages でそのまま動作させようとしてもうまく動きません。
+ここでは、その理由と、対応方法について説明します。&lt;/p>
+&lt;h2 id="github-pages-で-spa-サイトが動作しない理由">GitHub Pages で SPA サイトが動作しない理由&lt;/h2>
+&lt;p>たとえば、React Router を使った Web サイトは、次のような URL を使って目的のコンテンツ (&lt;code>/book/123&lt;/code>) を表示するようルーティングします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">https://yourname.github.io/repo-name/book/123&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>React Router を使ったアプリで、この URL を実際に処理するファイルは、&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">https://yourname.github.io/repo-name/index.html&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>であり、そこに記述された JavaScript ファイル内で、URL の末尾の &lt;code>/book/123&lt;/code> という部分をルーティング用のパス文字列として処理します。
+つまり、前述の URL の &lt;code>/book/123&lt;/code> という部分は、単なるアプリ用のデータであり、実際に存在するファイルを示しているわけではありません。&lt;/p>
+&lt;p>一方、GitHub Pages はそのような事情を知らないので、&lt;strong>&lt;code>/book/123&lt;/code> という URL でアクセスしようとすると、&lt;code>/book/123/index.html&lt;/code> というファイルを見つけようとして 404 エラー&lt;/strong> になってしまいます。&lt;/p>
+&lt;p>先頭ページ (&lt;code>/index.html&lt;/code>) を開いた後で、JavaScript でルーティング（React の &lt;code>Link&lt;/code> コンポーネントによる遷移）を行っている間はうまく動作するのですが、ページをリロードしたり、Web ブラウザのアドレスバーに URL を直接入力したりすると、やはり 404 エラーになってしまいます。
+OAuth 認証を使用した Web サイトの場合は、リダイレクトによって指定された URL へのアクセスが必要になるため、これは大きな制約になります。&lt;/p></description></item><item><title>GitHub Pages で Jekyll による自動変換を無効化する (.nojekyll)</title><link>https://maku.blog/p/my8fmsy/</link><pubDate>Thu, 03 Sep 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/my8fmsy/</guid><description>&lt;p>GitHub プロジェクトの設定画面から、GitHub Pages を有効化すると、簡単にウェブサイトをホスティングすることができます。
+デフォルトでは、リポジトリ内の Markdown ファイル (&lt;code>.md&lt;/code>) が Jekyll によって HTML に変換されるのですが、直接 HTML ファイルをデプロイする場合は、この変換処理は無駄です。&lt;/p>
+&lt;p>そのような場合は、次のようにして Jekyll による変換を無効化できます。&lt;/p>
+&lt;ol>
+&lt;li>リポジトリのルート（GitHub Pages のソースディレクトリ）に &lt;strong>&lt;code>.nojekyll&lt;/code>&lt;/strong> ファイルを置く&lt;/li>
+&lt;/ol>
+&lt;p>これだけです。&lt;/p>
+&lt;p>Hugo などの静的 Web サイト生成ツールで作成したサイトをデプロイするような場合は、この設定を行っておくと、ファイルのプッシュ後に GitHub Pages に反映されるまでの時間がほんの少し早くなるかもしれません。&lt;/p>
+&lt;p>速度を気にしない場合はこの設定をする必要はありませんが、プッシュする Web サイトリソース内に、アンダースコア (&lt;code>_&lt;/code>) で始まるファイルやディレクトリなどが含まれている場合は、この設定は必須になります。
+なぜなら、Jekyll がアンダースコアで始まるファイルやディレクトリを取り除いてしまうからです。&lt;/p>
+&lt;p>GitHub Pages のソースブランチとして &lt;code>gh-pages&lt;/code> ブランチを設定している場合は、そのブランチのルートに &lt;code>.nojekyll&lt;/code> を配置しなければいけないことに注意してください。
+ちなみに、GitHub Actions でデプロイするときに、&lt;a href="https://github.com/peaceiris/actions-gh-pages">peaceiris/actions-gh-pages&lt;/a> を使っている場合は、&lt;a href="https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-enable-built-in-jekyll-enable_jekyll">自動的にデプロイ先のブランチ (&lt;code>gh-pages&lt;/code>) に &lt;code>.nojekyll&lt;/code> ファイルを作成してくれます&lt;/a>。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Deploy&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">peaceiris/actions-gh-pages@v3&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">github_token&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ secrets.GITHUB_TOKEN }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">publish_dir&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">./public&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>GitHub Actions で Web サイトをビルドして GitHub Pages へ公開する</title><link>https://maku.blog/p/5q3eq2c/</link><pubDate>Tue, 01 Sep 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5q3eq2c/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>GitHub Actions を使うと、GitHub で管理されている Web サイト用リソースの「ビルドとデプロイ」を簡単に自動化することができます。&lt;/p>
+&lt;p>ここでは、&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>npm run build&lt;/code> による Web サイトのビルド&lt;/li>
+&lt;li>ビルドされたリソースの GitHub Pages へのデプロイ（&lt;code>gh-pages&lt;/code> ブランチ）&lt;/li>
+&lt;/ol>
+&lt;p>を行う設定を行います。
+最終的に、&lt;code>https://yourname.github.io/project名/&lt;/code> という URL で Web サイトが公開されます。&lt;/p>
+&lt;p>前提条件として、GitHub リポジトリに &lt;strong>&lt;code>npm run build&lt;/code>&lt;/strong> でビルド可能な Web サイト用リソースがコミットされているものとします。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ 他のビルド方法は？&lt;/span>
+ &lt;span class="xNote_body">ここでは、&lt;code>npm run build&lt;/code> による Web サイトのビルドを前提としましたが、例えば、Hugo によるビルドなどもほぼ同様に行えます。&lt;/span>
+&lt;/div>
+
+&lt;h2 id="github-actions-の設定">GitHub Actions の設定&lt;/h2>
+&lt;p>GitHub プロジェクトの &lt;strong>&lt;code>Actions&lt;/code>&lt;/strong> タブから、次のように新規ワークフローを作成します。&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>&lt;code>set up a workflow yourself&lt;/code>&lt;/strong> をクリック&lt;/li>
+&lt;li>&lt;code>main.yml&lt;/code> の編集画面になるので、次のように入力して &lt;strong>&lt;code>Start commit&lt;/code>&lt;/strong> ボタンを押す&lt;/li>
+&lt;/ol>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.github/workflows/main.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Build and deploy website&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">push&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">branches&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">master ]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">jobs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">build&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">runs-on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ubuntu-latest&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">steps&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">actions/checkout@v2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Setup Node.js&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">actions/setup-node@v1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">node-version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">14.&lt;/span>&lt;span class="l">x&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Install NPM packages&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">npm ci&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Build website&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">npm run build --if-present&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Deploy website&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">peaceiris/actions-gh-pages@v3&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">github_token&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ secrets.GITHUB_TOKEN }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">publish_dir&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">build&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これだけで、初回の Web サイトビルドが開始され、ビルド結果が &lt;code>gh-pages&lt;/code> ブランチに格納されます。
+今後は、&lt;code>master&lt;/code> ブランチへのプッシュが行われるたびに、このビルドが実行されます。&lt;/p></description></item><item><title>Parcel でビルドした Web サイトが GitHub Pages で動作しないとき</title><link>https://maku.blog/p/m7jw8ju/</link><pubDate>Tue, 01 Sep 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m7jw8ju/</guid><description>&lt;p>React アプリを Parcel でビルドして GitHub Pages で公開しようとしたら、真っ白な画面になってしまったので対応方法のメモです。
+原因は、トップページの &lt;code>index.html&lt;/code> から読み込んでいる JavaScript ファイルのパスが、&lt;code>/index.js&lt;/code> のように、ドメインルートからの相対パスになっていることでした。&lt;/p>
+&lt;p>GitHub Pages で公開する Web サイトの URL が、&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>https://yourname.github.io/&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>であれば問題ないのですが、&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>https://yourname.github.io/project名/&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>になっている場合は、読み込むファイルは &lt;code>/project名/index.js&lt;/code> になっていないといけません。
+これを解決するには、例えば、Parcel でビルドしているときは &lt;strong>&lt;code>--public-url&lt;/code>&lt;/strong> オプションを使って、次のように指定します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ parcel build src/index.html -d build --public-url &amp;#34;/project名/&amp;#34;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>こうすることで、トップページから &lt;code>/index.js&lt;/code> というパスで参照していたものが &lt;code>/project名/index.js&lt;/code> に変わってうまく動作するようになります。&lt;/p>
+&lt;p>&lt;code>npm run build&lt;/code> で Web サイトのビルドを行っているのであれば、&lt;code>package.json&lt;/code> 内のスクリプト定義で次のように記述しておけばよいでしょう。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">package.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s2">&amp;#34;scripts&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;start&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;parcel src/index.html --open&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;rm -rf build &amp;amp;&amp;amp; parcel build src/index.html -d build --public-url &amp;#39;/project名/&amp;#39;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>NPM スクリプト内に GitHub のプロジェクト名を含めるのが嫌なときは、CI/CD サーバー上のビルド設定でパラメータ指定するのがよいかもしれません。
+例えば、GitHub Actions を使っている場合は、次のような感じで NPM スクリプトに追加パラメータを指定することができます。&lt;/p></description></item><item><title>GitHub GraphQL API の呼び出し回数制限 (rate limit) の情報を取得する</title><link>https://maku.blog/p/bqz7emt/</link><pubDate>Sun, 02 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bqz7emt/</guid><description>&lt;p>GitHub API を使ったアプリケーションを作成するときは、API の呼び出し回数制限を意識した設計を行う必要があります。
+GitHub API バージョン3 の REST API には、1 時間に 5000 リクエストまでという明確な呼び出し回数制限がありましたが、API バージョン4 の GraphQL API はそのクエリの性質上、ちょっと異なるコスト計算方法が採用されています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://developer.github.com/v4/guides/resource-limitations/">GraphQL resource limitations | GitHub Developer Guide&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>正確な計算方法は上記のサイトに記述されていますが、簡単にいうと、GraphQL クエリの入れ子階層が深くなり、複雑になるほどコストがかかるという計算になっています。&lt;/p>
+&lt;p>ある GraphQL クエリが実際にどれだけのコストがかかるかは、下記のように &lt;strong>&lt;code>rateLimit&lt;/code>&lt;/strong> 情報を取得することで調べることができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-graphql" data-lang="graphql">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">query&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nc">rateLimit&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">limit&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">cost&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">remaining&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">resetAt&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">search&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kd">query&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;repo:electron/electron is:issue&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">ISSUE&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">first&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">5&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">issueCount&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">nodes&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">...&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">on&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="py">Issue&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">title&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">labels&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="py">first&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">10&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="py">nodes&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="py">name&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のクエリを実行すると、次のような感じの JSON レスポンスが返ってきます。&lt;/p></description></item></channel></rss>

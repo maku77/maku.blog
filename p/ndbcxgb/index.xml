@@ -1,8 +1,70 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Meilisearch のメモ on まくろぐ</title><link>https://maku.blog/p/ndbcxgb/</link><description>Recent content in Meilisearch のメモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Thu, 15 Feb 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/ndbcxgb/index.xml" rel="self" type="application/rss+xml"/><item><title>Meilisearch サーチエンジンを使ってみる</title><link>https://maku.blog/p/bo8q8p7/</link><pubDate>Tue, 24 Jan 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bo8q8p7/</guid><description>Meilisearch とは？ Meilisearch は、簡単に使えることをポリシーとして作られた OSS のサーチエンジンで、これを利用すると、アプリの フロントエンドに高速な検索機能 を組み込むことができます。 個人や中小企業でも手軽に導入でき、柔軟な設定により様々な用途に対応できます。 Meilisearch には次のような特徴があります。
-高速な応答（検索結果は 50 ミリ秒以内に得られる。ただし、1,000 万件以上の大規模なデータは想定していない） インクリメンタルサーチ（入力するたびにプレフィックスで絞り込んで結果を返す） タイポ入力補正（検索語句を多少間違えて入力してもそれっぽい単語で検索してくれる） プレースホルダー検索（キーワードを入力せずにカテゴリーなどで結果を絞り込む） カスタムランキング処理（ranking rules による検索結果のソート） 検索結果のハイライト表示（入力キーワードに一致した位置がわかる） 日本語を含む各種言語に対応（形態素解析エンジンに Lindera を採用） 同義語の定義 Meilisearch は 簡単であること を哲学としているので、類似の検索フレームワークに比べて全体的にシンプルな構成になっています。 Elasticsearch などでは大袈裟すぎるというニーズにマッチするかもしれません。 JSON 形式のドキュメントを REST API で登録してインデックスを作成するだけで、REST API による検索が可能になります。 最終的にはフロントエンドから直接 REST API を呼び出すように UI を作り込んでいく必要がありますが、プレビュー用の Web サーバー（ダッシュボード UI）が内蔵されているので、コーディングなしでインクリメンタルサーチを試すことができます。
-図: Meilisearch ダッシュボード 似たような検索エンジンとしては、Algolia という SaaS があります。 Meilisearch は Algolia にインスパイアされて作られているので、アルゴリズム等は似ていますが、オープンソース であるという大きな違いがあります（Algolia は個人で使うには高すぎるというのもあります&amp;hellip;）。
-Meilisearch サーバーを起動する Docker Hub に getmeili/meilisearch というイメージが公開されているので、これを使えば簡単に Meilisearch のサーバーを立ち上げることができます。</description></item><item><title>Meilisearch を本番環境で使用する（マスターキーと API キーを理解する）</title><link>https://maku.blog/p/iuvuyzd/</link><pubDate>Thu, 15 Feb 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/iuvuyzd/</guid><description>爆速で使いやすいインクリメンタル・サーチエンジンの Meilisearch ですが、本番環境で運用するときは、アクセス制御用のマスターキーや API キーの使い方を理解する必要があります。
-Meilisearch のデフォルト動作 Meilisearch サーバーを次のように特に何もオプションを指定せずに起動すると、開発用の development 環境として立ち上がります。 アクセス制御用のマスターキーも設定されません。
-お試し用の Meilisearch サーバー起動 $ docker run -it --rm -p 7700:7700 \ -v $(pwd)/meili_data:/meili_data \ getmeili/meilisearch:v1.6 動作環境やマスターキーは、Meilisearch サーバーの起動時に、下記のような環境変数（あるいはコマンドライン引数）で指定することができます。
-環境変数 CLI オプション デフォルト値 設定可能な値 MEILI_ENV --env development development or production MEILI_MASTER_KEY --master-key なし 16 バイト以上の UTF-8 文字列 デフォルトではアクセス制御を行うためのマスターキーが設定されず、Meilisearch サーバーはどのような API 呼び出しも受け付けてしまいます（インデックスデータの更新を含めて）。 マスターキーを設定して Meilisearch サーバーを起動すると、API への匿名アクセスができなくなります（ヘルスチェック用の API エンドポイント /health を除く）。
-マスターキーと API キー Meilisearch のキーには、マスターキー (master key) と API キー (API keys) の 2 種類があります。 どちらのキーも、API 呼び出し時の Authorization ヘッダーに指定するものですが、次のような用途の違いがあります。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Meilisearch のメモ on まくろぐ</title><link>https://maku.blog/p/ndbcxgb/</link><description>Recent content in Meilisearch のメモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 04 Mar 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/ndbcxgb/index.xml" rel="self" type="application/rss+xml"/><item><title>Meilisearch サーチエンジンを使ってみる</title><link>https://maku.blog/p/bo8q8p7/</link><pubDate>Tue, 24 Jan 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bo8q8p7/</guid><description>&lt;h2 id="meilisearch-とは">Meilisearch とは？&lt;/h2>
+&lt;p>&lt;a href="https://www.meilisearch.com/">Meilisearch&lt;/a> は、簡単に使えることをポリシーとして作られた OSS のサーチエンジンで、これを利用すると、アプリの &lt;strong>フロントエンドに高速な検索機能&lt;/strong> を組み込むことができます。
+個人や中小企業でも手軽に導入でき、柔軟な設定により様々な用途に対応できます。
+Meilisearch には次のような特徴があります。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>高速な応答&lt;/strong>（検索結果は 50 ミリ秒以内に得られる。ただし、1,000 万件以上の大規模なデータは想定していない）&lt;/li>
+&lt;li>&lt;strong>インクリメンタルサーチ&lt;/strong>（入力するたびにプレフィックスで絞り込んで結果を返す）&lt;/li>
+&lt;li>&lt;strong>タイポ入力補正&lt;/strong>（検索語句を多少間違えて入力してもそれっぽい単語で検索してくれる）&lt;/li>
+&lt;li>&lt;strong>プレースホルダー検索&lt;/strong>（キーワードを入力せずにカテゴリーなどで結果を絞り込む）&lt;/li>
+&lt;li>&lt;strong>カスタムランキング処理&lt;/strong>（ranking rules による検索結果のソート）&lt;/li>
+&lt;li>&lt;strong>検索結果のハイライト表示&lt;/strong>（入力キーワードに一致した位置がわかる）&lt;/li>
+&lt;li>&lt;strong>日本語を含む各種言語に対応&lt;/strong>（形態素解析エンジンに Lindera を採用）&lt;/li>
+&lt;li>&lt;strong>同義語の定義&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;p>Meilisearch は &lt;strong>簡単であること&lt;/strong> を哲学としているので、類似の検索フレームワークに比べて全体的にシンプルな構成になっています。
+Elasticsearch などでは大袈裟すぎるというニーズにマッチするかもしれません。
+JSON 形式のドキュメントを REST API で登録してインデックスを作成するだけで、REST API による検索が可能になります。
+最終的にはフロントエンドから直接 REST API を呼び出すように UI を作り込んでいく必要がありますが、プレビュー用の Web サーバー（ダッシュボード UI）が内蔵されているので、コーディングなしでインクリメンタルサーチを試すことができます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1125" height="648" src="../../p/bo8q8p7/img-003.png" alt="/p/bo8q8p7/img-003.png" />
+ &lt;figcaption>図: Meilisearch ダッシュボード&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>似たような検索エンジンとしては、Algolia という SaaS があります。
+Meilisearch は Algolia にインスパイアされて作られているので、アルゴリズム等は似ていますが、&lt;strong>オープンソース&lt;/strong> であるという大きな違いがあります（Algolia は個人で使うには高すぎるというのもあります&amp;hellip;）。&lt;/p>
+&lt;h2 id="meilisearch-サーバーを起動する">Meilisearch サーバーを起動する&lt;/h2>
+&lt;p>Docker Hub に &lt;a href="https://hub.docker.com/r/getmeili/meilisearch/">getmeili/meilisearch&lt;/a> というイメージが公開されているので、これを使えば簡単に Meilisearch のサーバーを立ち上げることができます。&lt;/p></description></item><item><title>Meilisearch を本番環境で使用する（マスターキーと API キーを理解する）</title><link>https://maku.blog/p/iuvuyzd/</link><pubDate>Thu, 15 Feb 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/iuvuyzd/</guid><description>&lt;p>爆速で使いやすいインクリメンタル・サーチエンジンの &lt;strong>Meilisearch&lt;/strong> ですが、本番環境で運用するときは、アクセス制御用のマスターキーや API キーの使い方を理解する必要があります。&lt;/p>
+&lt;h2 id="meilisearch-のデフォルト動作">Meilisearch のデフォルト動作&lt;/h2>
+&lt;p>Meilisearch サーバーを次のように特に何もオプションを指定せずに起動すると、開発用の &lt;code>development&lt;/code> 環境として立ち上がります。
+アクセス制御用のマスターキーも設定されません。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">お試し用の Meilisearch サーバー起動&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ docker run -it --rm -p 7700:7700 \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -v $(pwd)/meili_data:/meili_data \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> getmeili/meilisearch:v1.6&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>動作環境やマスターキーは、Meilisearch サーバーの起動時に、下記のような環境変数（あるいはコマンドライン引数）で指定することができます。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>環境変数&lt;/th>
+ &lt;th>CLI オプション&lt;/th>
+ &lt;th>デフォルト値&lt;/th>
+ &lt;th>設定可能な値&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;a href="https://www.meilisearch.com/docs/learn/configuration/instance_options#environment">&lt;code>MEILI_ENV&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>&lt;code>--env&lt;/code>&lt;/td>
+ &lt;td>&lt;code>development&lt;/code>&lt;/td>
+ &lt;td>&lt;code>development&lt;/code> or &lt;code>production&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="https://www.meilisearch.com/docs/learn/configuration/instance_options#master-key">&lt;code>MEILI_MASTER_KEY&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>&lt;code>--master-key&lt;/code>&lt;/td>
+ &lt;td>なし&lt;/td>
+ &lt;td>16 バイト以上の UTF-8 文字列&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;p>デフォルトではアクセス制御を行うためのマスターキーが設定されず、Meilisearch サーバーはどのような API 呼び出しも受け付けてしまいます（インデックスデータの更新を含めて）。
+マスターキーを設定して Meilisearch サーバーを起動すると、API への匿名アクセスができなくなります（ヘルスチェック用の API エンドポイント &lt;code>/health&lt;/code> を除く）。&lt;/p>
+&lt;h2 id="マスターキーと-api-キー">マスターキーと API キー&lt;/h2>
+&lt;p>Meilisearch のキーには、&lt;strong>マスターキー (master key)&lt;/strong> と &lt;strong>API キー (API keys)&lt;/strong> の 2 種類があります。
+どちらのキーも、API 呼び出し時の &lt;code>Authorization&lt;/code> ヘッダーに指定するものですが、次のような用途の違いがあります。&lt;/p></description></item></channel></rss>

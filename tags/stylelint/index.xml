@@ -1,6 +1,55 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Stylelint on まくろぐ</title><link>https://maku.blog/tags/stylelint/</link><description>Recent content in Stylelint on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Fri, 17 Nov 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/stylelint/index.xml" rel="self" type="application/rss+xml"/><item><title>Stylelint で CSS の記述ミスを防ぐ（CSS の静的解析ツールを導入する）</title><link>https://maku.blog/p/y2fru7o/</link><pubDate>Fri, 17 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/y2fru7o/</guid><description>Stylelint とは https://stylelint.io/ Stylelint は CSS の記述が正しいかをチェックしてくれる lint ツールです。 正しい CSS コードを記述するのはとても難しいので、Stylelint にいろいろ教えてもらいましょう。 Stylelint は、.css ファイルだけでなく、.scss などの CSS プリプロセッサ用のファイルや、HTML に埋め込まれた style 要素なども解析できます。
-既存のプロジェクトに Stylelint をかけると、おそらく大量の指摘事項が表示されます。 まずは、Stylelint の導入だけしておいて、指摘事項は徐々に直していくというやり方で進めるとよいです。
-Stylelint のインストール Stylelint は Node.js の NPM モジュールとして配布されています。 既存のプロジェクトに package.json が存在しない場合は、先に作成しておいてください。
-（必要があれば）package.json の作成 $ npm init -y あるいは、下記のような最小限の package.json ファイルを手動で作成するのでもよいです。
-package.json { &amp;#34;name&amp;#34;: &amp;#34;example.com&amp;#34;, &amp;#34;version&amp;#34;: &amp;#34;0.0.1&amp;#34;, &amp;#34;license&amp;#34;: &amp;#34;UNLICENSED&amp;#34; } package.json があるディレクトリで、次のように実行すると Stylelint がインストールされ、初期設定ファイル (.stylelintrc.json) が作成されます。
-Stylelint のインストールと初期設定ファイルの生成 $ npm init stylelint package.json の内容は次のように更新されます。 stylelint コマンド本体と、stylelint-config-standard という基本的なコンフィグ（後述）がインストールされていることがわかります。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Stylelint on まくろぐ</title><link>https://maku.blog/tags/stylelint/</link><description>Recent content in Stylelint on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Fri, 17 Nov 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/stylelint/index.xml" rel="self" type="application/rss+xml"/><item><title>Stylelint で CSS の記述ミスを防ぐ（CSS の静的解析ツールを導入する）</title><link>https://maku.blog/p/y2fru7o/</link><pubDate>Fri, 17 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/y2fru7o/</guid><description>&lt;h2 id="stylelint-とは">Stylelint とは&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a href="https://stylelint.io/">https://stylelint.io/&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Stylelint&lt;/strong> は CSS の記述が正しいかをチェックしてくれる lint ツールです。
+正しい CSS コードを記述するのはとても難しいので、Stylelint にいろいろ教えてもらいましょう。
+Stylelint は、&lt;code>.css&lt;/code> ファイルだけでなく、&lt;code>.scss&lt;/code> などの CSS プリプロセッサ用のファイルや、HTML に埋め込まれた &lt;code>style&lt;/code> 要素なども解析できます。&lt;/p>
+&lt;p>既存のプロジェクトに Stylelint をかけると、おそらく大量の指摘事項が表示されます。
+まずは、Stylelint の導入だけしておいて、指摘事項は徐々に直していくというやり方で進めるとよいです。&lt;/p>
+&lt;h2 id="stylelint-のインストール">Stylelint のインストール&lt;/h2>
+&lt;p>Stylelint は Node.js の NPM モジュールとして配布されています。
+既存のプロジェクトに &lt;code>package.json&lt;/code> が存在しない場合は、先に作成しておいてください。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">（必要があれば）package.json の作成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm init -y
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>あるいは、下記のような最小限の &lt;code>package.json&lt;/code> ファイルを手動で作成するのでもよいです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">package.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;example.com&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;0.0.1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;license&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;UNLICENSED&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>package.json&lt;/code> があるディレクトリで、次のように実行すると Stylelint がインストールされ、初期設定ファイル (&lt;code>.stylelintrc.json&lt;/code>) が作成されます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Stylelint のインストールと初期設定ファイルの生成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm init stylelint
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>package.json&lt;/code> の内容は次のように更新されます。
+&lt;strong>&lt;code>stylelint&lt;/code>&lt;/strong> コマンド本体と、&lt;strong>&lt;code>stylelint-config-standard&lt;/code>&lt;/strong> という基本的なコンフィグ（後述）がインストールされていることがわかります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">package.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;example.com&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;0.0.1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;license&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;UNLICENSED&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;devDependencies&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="nt">&amp;#34;stylelint&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;^15.11.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="nt">&amp;#34;stylelint-config-standard&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;^34.0.0&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>初期設定ファイルは次のような内容になっており、上記でインストールされたコンフィグを読み込むように設定されています。&lt;/p></description></item></channel></rss>

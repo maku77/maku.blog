@@ -1,23 +1,96 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS/API Gateway on まくろぐ</title><link>https://maku.blog/tags/aws/api-gateway/</link><description>Recent content in AWS/API Gateway on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><atom:link href="https://maku.blog/tags/aws/api-gateway/index.xml" rel="self" type="application/rss+xml"/><item><title>Amazon API Gateway で API キーでアクセス制限された Web API を作成する</title><link>https://maku.blog/p/j2ij4dv/</link><pubDate>Sun, 05 Jan 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j2ij4dv/</guid><description>Amazon API Gateway で作成した Web API には、独自の API キーによるアクセス制限 をかけることができます。 これにより、x-api-key ヘッダーが含まれていない HTTP リクエストを拒否することができます。 例えば、AWS 外の特定のバックエンドサービスからのアクセスのみを許可して連携させたいときに便利です。 ここでは、簡単な Hello World API を作成して、API キーによるアクセス制限をかけてみます。
-Lambda 関数を作成する 最初に、API 実装として Lambda 関数を作成しておきます。
-AWS マネジメントコンソール にサインインして、Lambda サービスを開きます。 関数の作成 をクリックして、一から作成 (Author from scratch) で次のように作成します。 関数名 (Function name): hello ランタイム (Runtime): Node.js 22.x アーキテクチャ (Architecture): arm64 （intel アーキテクチャより少し安い） 次のような Lambda 関数のコードが生成されたら成功です。
-index.mjs export const handler = async (event) =&amp;gt; { // TODO implement const response = { statusCode: 200, body: JSON.</description></item><item><title>Amazon API Gateway で API キーでアクセス制限された Web API を作成する</title><link>https://maku.blog/p/j2ij4dv/</link><pubDate>Sun, 05 Jan 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j2ij4dv/</guid><description>Amazon API Gateway で作成した Web API には、独自の API キーによるアクセス制限 をかけることができます。 これにより、x-api-key ヘッダーが含まれていない HTTP リクエストを拒否することができます。 例えば、AWS 外の特定のバックエンドサービスからのアクセスのみを許可して連携させたいときに便利です。 ここでは、簡単な Hello World API を作成して、API キーによるアクセス制限をかけてみます。
-Lambda 関数を作成する 最初に、API 実装として Lambda 関数を作成しておきます。
-AWS マネジメントコンソール にサインインして、Lambda サービスを開きます。 関数の作成 をクリックして、一から作成 (Author from scratch) で次のように作成します。 関数名 (Function name): hello ランタイム (Runtime): Node.js 22.x アーキテクチャ (Architecture): arm64 （intel アーキテクチャより少し安い） 次のような Lambda 関数のコードが生成されたら成功です。
-index.mjs export const handler = async (event) =&amp;gt; { // TODO implement const response = { statusCode: 200, body: JSON.</description></item><item><title>AWS CDK で API Gateway に Cognito 認証によるアクセス制御を追加する</title><link>https://maku.blog/p/vujw9jv/</link><pubDate>Mon, 18 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vujw9jv/</guid><description>何をするか？ ここでは、API Gateway で提供している REST API にアクセス制御を追加するため、既存の Cognito ユーザープールによるオーソライザーを API Gateway に設定してみます。 これにより、Cognito のユーザープールで認証済みのユーザーのみが REST API を呼び出せるようになります。
-後述の CDK コードでは、API Gateway と Lambda 関数、オーソライザーを生成していますが、Cognito ユーザープールは既存のものを参照しています（こういったユースケースは多いと思います）。
-なお、CDK による API Gateway の作成方法（Lambda プロキシ統合）については下記の記事を参考にしてください。 ここでは、Cognito ユーザープールによるオーソライザーの作成方法にフォーカスします。
-AWS CDK で API Gateway の REST API を作成する Lambda 関数を作成する REST API のバックエンドである Lambda 関数は最低限の実装で用意します。 ユーザー認証後に、API Gateway 経由で正しくこのハンドラを呼び出せるかの確認用です。
-lambda/info.ts import { APIGatewayProxyHandler } from &amp;#34;aws-lambda&amp;#34; /** GET /info */ export const handler: APIGatewayProxyHandler = async (event) =&amp;gt; { console.</description></item><item><title>AWS CDK で API Gateway に Cognito 認証によるアクセス制御を追加する</title><link>https://maku.blog/p/vujw9jv/</link><pubDate>Mon, 18 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vujw9jv/</guid><description>何をするか？ ここでは、API Gateway で提供している REST API にアクセス制御を追加するため、既存の Cognito ユーザープールによるオーソライザーを API Gateway に設定してみます。 これにより、Cognito のユーザープールで認証済みのユーザーのみが REST API を呼び出せるようになります。
-後述の CDK コードでは、API Gateway と Lambda 関数、オーソライザーを生成していますが、Cognito ユーザープールは既存のものを参照しています（こういったユースケースは多いと思います）。
-なお、CDK による API Gateway の作成方法（Lambda プロキシ統合）については下記の記事を参考にしてください。 ここでは、Cognito ユーザープールによるオーソライザーの作成方法にフォーカスします。
-AWS CDK で API Gateway の REST API を作成する Lambda 関数を作成する REST API のバックエンドである Lambda 関数は最低限の実装で用意します。 ユーザー認証後に、API Gateway 経由で正しくこのハンドラを呼び出せるかの確認用です。
-lambda/info.ts import { APIGatewayProxyHandler } from &amp;#34;aws-lambda&amp;#34; /** GET /info */ export const handler: APIGatewayProxyHandler = async (event) =&amp;gt; { console.</description></item><item><title>AWS CDK で API Gateway の REST API を作成する</title><link>https://maku.blog/p/k7eoer5/</link><pubDate>Mon, 18 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/k7eoer5/</guid><description>概要 API Gateway は HTTPS で Lambda 関数を呼び出す API Gateway で REST API のエンドポイントを定義すると、HTTPS リクエストで Lambda 関数を呼び出せるようになります。
-クライアント ─(HTTPS)─&amp;gt; API Gateway ─(AWS API)─&amp;gt; Lambda 関数 API Gateway には Cognito のユーザープールと連携する機能を備えており、認証済みのユーザーにのみ API 呼び出しを許可するといったことが可能です（具体的に言うと、API Gateway が見えないところで ID トークンの正当性を確認してくれたりします）。
-☝️ 新しい Lambda 関数 URL 2022 年 4 月に公開された Lambda 関数 URL の仕組みを使うと、直接 Lambda 関数にエンドポイント URL を割り当てて呼び出すことができます。 Cognito 連携などを使わないシンプルな Web API であれば、Lambda 関数 URL の仕組みで作ってしまうのが手っ取り早いかもしれません。 Lambda プロキシ統合 Lambda 関数は様々な AWS サービスからのイベント通知によって起動する仕組みになっており、API Gateway からの HTTPS リクエストもそのうちのひとつです。 Lambda 関数のハンドラが呼び出されるとき、そのパラメーターとして「イベントオブジェクト」を受け取ることができるのですが、このイベントオブジェクトの中身は発生源によって異なります。</description></item><item><title>AWS CDK で API Gateway の REST API を作成する</title><link>https://maku.blog/p/k7eoer5/</link><pubDate>Mon, 18 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/k7eoer5/</guid><description>概要 API Gateway は HTTPS で Lambda 関数を呼び出す API Gateway で REST API のエンドポイントを定義すると、HTTPS リクエストで Lambda 関数を呼び出せるようになります。
-クライアント ─(HTTPS)─&amp;gt; API Gateway ─(AWS API)─&amp;gt; Lambda 関数 API Gateway には Cognito のユーザープールと連携する機能を備えており、認証済みのユーザーにのみ API 呼び出しを許可するといったことが可能です（具体的に言うと、API Gateway が見えないところで ID トークンの正当性を確認してくれたりします）。
-☝️ 新しい Lambda 関数 URL 2022 年 4 月に公開された Lambda 関数 URL の仕組みを使うと、直接 Lambda 関数にエンドポイント URL を割り当てて呼び出すことができます。 Cognito 連携などを使わないシンプルな Web API であれば、Lambda 関数 URL の仕組みで作ってしまうのが手っ取り早いかもしれません。 Lambda プロキシ統合 Lambda 関数は様々な AWS サービスからのイベント通知によって起動する仕組みになっており、API Gateway からの HTTPS リクエストもそのうちのひとつです。 Lambda 関数のハンドラが呼び出されるとき、そのパラメーターとして「イベントオブジェクト」を受け取ることができるのですが、このイベントオブジェクトの中身は発生源によって異なります。</description></item><item><title>Amazon API Gateway をコマンドライン (CLI) から操作する</title><link>https://maku.blog/p/qwb6v89/</link><pubDate>Mon, 11 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qwb6v89/</guid><description>AWS CLI（コマンドラインkツール）で Amazon API Gateway を操作するには、aws apigatewayv2 コマンドを使用します。 API Gateway の作成や更新を行うためには、IAM ユーザーに適切な権限が必要ですが、AmazonAPIGatewayAdministrator 管理ポリシーを付けるとほとんどの操作が可能になります。 通常、REST API を作成する場合は、バックエンドの Lambda 関数も合わせて必要になるので、AWSLambdaFullAccess などの管理ポリシーも必要になります。
-REST API を作成する (apigateway create-rest-api) リファレンス: apigateway create-rest-api
-$ aws apigateway create-rest-api --name &amp;#34;My First API&amp;#34; \ --description &amp;#34;This is my first API&amp;#34; \ --region ap-northeast-1 apiKeySource: HEADER createdDate: &amp;#39;2022-04-18T15:46:00+09:00&amp;#39; description: This is my first API disableExecuteApiEndpoint: false endpointConfiguration: types: - EDGE id: mk6mj65po6 name: My First API --name オプションのみが必須です。 API の作成に成功すると、上記のように ID (mk6mj65po6) が返されます。</description></item><item><title>Amazon API Gateway をコマンドライン (CLI) から操作する</title><link>https://maku.blog/p/qwb6v89/</link><pubDate>Mon, 11 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qwb6v89/</guid><description>AWS CLI（コマンドラインkツール）で Amazon API Gateway を操作するには、aws apigatewayv2 コマンドを使用します。 API Gateway の作成や更新を行うためには、IAM ユーザーに適切な権限が必要ですが、AmazonAPIGatewayAdministrator 管理ポリシーを付けるとほとんどの操作が可能になります。 通常、REST API を作成する場合は、バックエンドの Lambda 関数も合わせて必要になるので、AWSLambdaFullAccess などの管理ポリシーも必要になります。
-REST API を作成する (apigateway create-rest-api) リファレンス: apigateway create-rest-api
-$ aws apigateway create-rest-api --name &amp;#34;My First API&amp;#34; \ --description &amp;#34;This is my first API&amp;#34; \ --region ap-northeast-1 apiKeySource: HEADER createdDate: &amp;#39;2022-04-18T15:46:00+09:00&amp;#39; description: This is my first API disableExecuteApiEndpoint: false endpointConfiguration: types: - EDGE id: mk6mj65po6 name: My First API --name オプションのみが必須です。 API の作成に成功すると、上記のように ID (mk6mj65po6) が返されます。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS/API Gateway on まくろぐ</title><link>https://maku.blog/tags/aws/api-gateway/</link><description>Recent content in AWS/API Gateway on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 05 Jan 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/aws/api-gateway/index.xml" rel="self" type="application/rss+xml"/><item><title>Amazon API Gateway で API キーでアクセス制限された Web API を作成する</title><link>https://maku.blog/p/j2ij4dv/</link><pubDate>Sun, 05 Jan 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j2ij4dv/</guid><description>&lt;p>Amazon API Gateway で作成した Web API には、&lt;strong>独自の API キーによるアクセス制限&lt;/strong> をかけることができます。
+これにより、&lt;strong>&lt;code>x-api-key&lt;/code>&lt;/strong> ヘッダーが含まれていない HTTP リクエストを拒否することができます。
+例えば、AWS 外の特定のバックエンドサービスからのアクセスのみを許可して連携させたいときに便利です。
+ここでは、簡単な Hello World API を作成して、API キーによるアクセス制限をかけてみます。&lt;/p>
+&lt;h2 id="lambda-関数を作成する">Lambda 関数を作成する&lt;/h2>
+&lt;p>最初に、API 実装として Lambda 関数を作成しておきます。&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://aws.amazon.com/console/">AWS マネジメントコンソール&lt;/a> にサインインして、&lt;strong>Lambda&lt;/strong> サービスを開きます。&lt;/li>
+&lt;li>&lt;strong>&lt;code>関数の作成&lt;/code>&lt;/strong> をクリックして、&lt;code>一から作成 (Author from scratch)&lt;/code> で次のように作成します。
+&lt;ul>
+&lt;li>関数名 (Function name): &lt;code>hello&lt;/code>&lt;/li>
+&lt;li>ランタイム (Runtime): &lt;code>Node.js 22.x&lt;/code>&lt;/li>
+&lt;li>アーキテクチャ (Architecture): &lt;code>arm64&lt;/code> （intel アーキテクチャより少し安い）&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;p>次のような Lambda 関数のコードが生成されたら成功です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">index.mjs&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">handler&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// TODO implement
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">response&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">statusCode&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">200&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">body&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">JSON&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">stringify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Hello from Lambda!&amp;#39;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">response&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="api-gateway-で-web-api-を作成する">API Gateway で Web API を作成する&lt;/h2>
+&lt;p>次に、API Gateway で API を作成して、上記の Lambda 関数を HTTP 経由で呼び出せるようにします。&lt;/p></description></item><item><title>AWS CDK で API Gateway に Cognito 認証によるアクセス制御を追加する</title><link>https://maku.blog/p/vujw9jv/</link><pubDate>Mon, 18 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vujw9jv/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ここでは、API Gateway で提供している REST API にアクセス制御を追加するため、既存の Cognito ユーザープールによるオーソライザーを API Gateway に設定してみます。
+これにより、Cognito のユーザープールで認証済みのユーザーのみが REST API を呼び出せるようになります。&lt;/p>
+&lt;p>後述の CDK コードでは、API Gateway と Lambda 関数、オーソライザーを生成していますが、Cognito ユーザープールは既存のものを参照しています（こういったユースケースは多いと思います）。&lt;/p>
+&lt;p>なお、CDK による API Gateway の作成方法（Lambda プロキシ統合）については下記の記事を参考にしてください。
+ここでは、Cognito ユーザープールによるオーソライザーの作成方法にフォーカスします。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../../p/k7eoer5">AWS CDK で API Gateway の REST API を作成する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="lambda-関数を作成する">Lambda 関数を作成する&lt;/h2>
+&lt;p>REST API のバックエンドである Lambda 関数は最低限の実装で用意します。
+ユーザー認証後に、API Gateway 経由で正しくこのハンドラを呼び出せるかの確認用です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">lambda/info.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">APIGatewayProxyHandler&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s2">&amp;#34;aws-lambda&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/** GET /info */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">handler&lt;/span>: &lt;span class="kt">APIGatewayProxyHandler&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;headers: &amp;#34;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">JSON&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">stringify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">headers&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">undefined&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">statusCode&lt;/span>: &lt;span class="kt">200&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">body&lt;/span>: &lt;span class="kt">JSON.stringify&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">message&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;Hello, API Gateway!&amp;#34;&lt;/span> &lt;span class="p">}),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">headers&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;Access-Control-Allow-Origin&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="cognito-ユーザープールによるオーソライザーの追加">Cognito ユーザープールによるオーソライザーの追加&lt;/h2>
+&lt;p>下記は、&lt;code>cdk init app&lt;/code> で作成した CDK アプリのスタック生成コードに手を入れたものです。&lt;/p></description></item><item><title>AWS CDK で API Gateway の REST API を作成する</title><link>https://maku.blog/p/k7eoer5/</link><pubDate>Mon, 18 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/k7eoer5/</guid><description>&lt;h2 id="概要">概要&lt;/h2>
+&lt;h3 id="api-gateway-は-https-で-lambda-関数を呼び出す">API Gateway は HTTPS で Lambda 関数を呼び出す&lt;/h3>
+&lt;p>API Gateway で REST API のエンドポイントを定義すると、HTTPS リクエストで Lambda 関数を呼び出せるようになります。&lt;/p>
+&lt;div style="text-align:center; font-weight:bold;">クライアント ─(HTTPS)─&amp;gt; API Gateway ─(AWS API)─&amp;gt; Lambda 関数&lt;/div>
+
+&lt;p>API Gateway には Cognito のユーザープールと連携する機能を備えており、認証済みのユーザーにのみ API 呼び出しを許可するといったことが可能です（具体的に言うと、API Gateway が見えないところで ID トークンの正当性を確認してくれたりします）。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ 新しい Lambda 関数 URL&lt;/span>
+ &lt;span class="xNote_body">2022 年 4 月に公開された &lt;a href="https://aws.amazon.com/jp/about-aws/whats-new/2022/04/aws-lambda-function-urls-built-in-https-endpoints/">Lambda 関数 URL&lt;/a> の仕組みを使うと、直接 Lambda 関数にエンドポイント URL を割り当てて呼び出すことができます。
+Cognito 連携などを使わないシンプルな Web API であれば、Lambda 関数 URL の仕組みで作ってしまうのが手っ取り早いかもしれません。&lt;/span>
+&lt;/div>
+&lt;h3 id="lambda-プロキシ統合">Lambda プロキシ統合&lt;/h3>
+&lt;p>Lambda 関数は様々な AWS サービスからのイベント通知によって起動する仕組みになっており、API Gateway からの HTTPS リクエストもそのうちのひとつです。
+Lambda 関数のハンドラが呼び出されるとき、そのパラメーターとして「イベントオブジェクト」を受け取ることができるのですが、このイベントオブジェクトの中身は発生源によって異なります。&lt;/p></description></item><item><title>Amazon API Gateway をコマンドライン (CLI) から操作する</title><link>https://maku.blog/p/qwb6v89/</link><pubDate>Mon, 11 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qwb6v89/</guid><description>&lt;p>AWS CLI（コマンドラインkツール）で Amazon API Gateway を操作するには、&lt;strong>&lt;code>aws apigatewayv2&lt;/code>&lt;/strong> コマンドを使用します。
+API Gateway の作成や更新を行うためには、IAM ユーザーに適切な権限が必要ですが、&lt;strong>&lt;code>AmazonAPIGatewayAdministrator&lt;/code>&lt;/strong> 管理ポリシーを付けるとほとんどの操作が可能になります。
+通常、REST API を作成する場合は、バックエンドの Lambda 関数も合わせて必要になるので、&lt;strong>&lt;code>AWSLambdaFullAccess&lt;/code>&lt;/strong> などの管理ポリシーも必要になります。&lt;/p>
+&lt;h2 id="rest-api-を作成する-apigateway-create-rest-api">REST API を作成する (apigateway create-rest-api)&lt;/h2>
+&lt;p>リファレンス: &lt;a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/apigateway/create-rest-api.html">apigateway create-rest-api&lt;/a>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> aws apigateway create-rest-api --name &lt;span class="s2">&amp;#34;My First API&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span>&lt;span class="go"> --description &amp;#34;This is my first API&amp;#34; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> --region ap-northeast-1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">apiKeySource: HEADER
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">createdDate: &amp;#39;2022-04-18T15:46:00+09:00&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">description: This is my first API
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">disableExecuteApiEndpoint: false
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">endpointConfiguration:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> types:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> - EDGE
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">id: mk6mj65po6
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">name: My First API
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>--name&lt;/code> オプションのみが必須です。
+API の作成に成功すると、上記のように ID (&lt;code>mk6mj65po6&lt;/code>) が返されます。&lt;/p></description></item></channel></rss>

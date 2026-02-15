@@ -1,27 +1,477 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>React 雑多記事 on まくろぐ</title><link>https://maku.blog/p/m7it4do/</link><description>Recent content in React 雑多記事 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sun, 18 Jul 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/m7it4do/index.xml" rel="self" type="application/rss+xml"/><item><title>React実装例: クリックで開閉可能なツリービューを作る</title><link>https://maku.blog/p/weow5dm/</link><pubDate>Wed, 11 Nov 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/weow5dm/</guid><description>ここでは、React コンポーネントとして、開閉可能なツリービューを作ってみます。 コンポーネント名はツリーのノードを示す TreeNode です。
-図: TreeNode コンポーネントの表示例 初期の表示内容としては、ルートの TreeNode を 1 つだけ配置し、そのラベルをクリックしたときに、子要素となる TreeNode を 3 つ生成して表示します。 実際のアプリケーションでは、このタイミングで GraphQL サーバーなどからデータを取得してツリー展開していく、といったことができると思います。
-下記は TreeNode コンポーネントの実装です。
-components/TreeNode.tsx import * as React from &amp;#39;react&amp;#39;; import styles from &amp;#39;./TreeNode.scss&amp;#39;; export const TreeNode: React.FC&amp;lt;{label: string}&amp;gt; = ({label}) =&amp;gt; { const [isOpen, setIsOpen] = React.useState(false); const [childNodes, setChildNodes] = React.useState(null); // チェックボックスのクリックで isOpen ステートを更新 const handleChange = (e: React.ChangeEvent&amp;lt;HTMLInputElement&amp;gt;) =&amp;gt; { setIsOpen(e.target.checked); } // isOpen ステートの変更を監視し、childNodes に子ノードとなる TreeNode をセットする React.</description></item><item><title>React アプリの中で D3.js を使ってチャートを描画する</title><link>https://maku.blog/p/j52iy4k/</link><pubDate>Thu, 13 Apr 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j52iy4k/</guid><description>何をするか？ D3.js は、Web ブラウザ上で様々なデータをビジュアライズするためのデファクトスタンダードな描画ライブラリです。 ここでは、React (Next.js) アプリ内で、D3.js を使って簡単なチャートを描画してみます。
-☝️ ほかの描画ライブラリ JavaScript による描画ライブラリには、他にも Chart.js や Mermaid.js などいろいろなものがあります。 Chart.js を使うと、折れ線グラフや散布図などを簡単に描画することができます。 Mermaid.js を使うと、独自フォーマットのテキストをもとにフローチャートなどを描画することができます。 これらの描画ライブラリは、D3.js と比べて簡単に使うことができますが、描画可能な図の種類は限られています。 一方、D3.js は高度なカスタマイズや自由度の高いデータの可視化が可能ですが、初学者にとってはやや学習コストが高くなっています。 D3.js のインストール NPM あるいは Yarn で、プロジェクトに D3.js の依存を追加します。 TypeScript を使用している場合は、D3.js 本体 (d3) に加え、型情報 (@types/d3) もインストールします。
-D3.js のインストール（NPM の場合） $ npm install d3 $ npm install --save-dev @types/d3 D3.js のインストール（Yarn の場合） $ yarn add d3 $ yarn add --dev @types/d3 React コンポーネント内で D3.js を使う React アプリは作成済みであるとし、D3.js を使って描画を行うコンポーネントを新しく作成します。 次の HelloChart コンポーネントは、D3.</description></item><item><title>React で入力フォームの onChange イベントを IME ON のときに無視する</title><link>https://maku.blog/p/cv6fpx7/</link><pubDate>Sun, 29 Jan 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cv6fpx7/</guid><description>何をするか？ React のテキスト入力フォーム（input コンポーネントや mui の TextField など）で onChange イベントハンドラーを設定すると、入力テキストが変化したときに任意の処理を行うことができます。 ただ、onChange イベントは IME での日本語変換中にも呼び出されてしまう ので、おそらく、想定しているよりも多く呼び出されてしまいます。 インクリメンタルサーチなどで、入力のたびに API 呼び出しをしているようなケースでは、この振る舞いは抑制しなければいけません。
-ここでは、IME が ON になっているとき（つまり日本語変換中）に、onChange イベントを無視する実装例を紹介します。 このあたりの実装は、ブラウザごとの微妙な振る舞いの差（特に Esc キーで IME 入力をキャンセルした場合など）を考えると、結構複雑だったりします。
-実装してみる React の input コンポーネントの onCompositionStart と onCompositionEnd イベントハンドラーを設定すると、IME を ON/OFF したタイミングを知ることができます。 そのタイミングで、isImeOn のようなフラグを制御すれば、必要に応じて onChange イベントを無視できるようになります。
-// import { FC, useRef, useState } from &amp;#39;react&amp;#39; const SearchBox: FC = () =&amp;gt; { // 現在 IME ON（変換中）かどうかのフラグ const isImeOn = useRef(false) // 以前の入力テキスト（ブラウザごとの onChange の振る舞いの差異への対策） const [prevText, setPrevText] = useState(&amp;#39;&amp;#39;) // 入力テキストを処理する const handleChange = (text: string) =&amp;gt; { if (prevText === text) return if (text === &amp;#39;&amp;#39;) { // Chrome ではテキストクリア時に onCompositionEnd が呼ばれないことがある isImeOn.</description></item><item><title>React の props.children の型定義には ReactNode を使う</title><link>https://maku.blog/p/xenv4bh/</link><pubDate>Sun, 18 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xenv4bh/</guid><description>children の型定義 TypeScript で React の関数コンポーネントを定義するときには、下記のような React.FC (React.FunctionComponent) を使用します。
-type FC&amp;lt;P = {}&amp;gt; = FunctionComponent&amp;lt;P&amp;gt;; interface FunctionComponent&amp;lt;P = {}&amp;gt; { (props: PropsWithChildren&amp;lt;P&amp;gt;, context?: any): ReactElement&amp;lt;any, any&amp;gt; | null; propTypes?: WeakValidationMap&amp;lt;P&amp;gt; | undefined; contextTypes?: ValidationMap&amp;lt;any&amp;gt; | undefined; defaultProps?: Partial&amp;lt;P&amp;gt; | undefined; displayName?: string | undefined; } // ... type PropsWithChildren&amp;lt;P&amp;gt; = P &amp;amp; { children?: ReactNode | undefined }; FC の型パラメータ P は、上記のような PropsWithChildren 型にラップされるので、props の型定義をするときに明示的に children を含める必要はありません。 下記の ColorBox コンポーネントは、指定した背景色で子要素 (children) を表示します。</description></item><item><title>React の JSX 記述のコツ</title><link>https://maku.blog/p/xjv6gqy/</link><pubDate>Thu, 17 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xjv6gqy/</guid><description>React アプリケーションでは、コンポーネントの UI を JSX 構文を用いて記述します。 下記は、JSX コードを記述するときのポイントのまとめです。 通常の JavaScript コードとは異なる記述方法が必要になるため慣れが必要ですが、ここに挙げたポイントをおさえておけば大体対応できます。
-JSX の最上位要素はひとつ JSX 要素を作成するとき、トップレベルの要素は 1 つだけにする必要があります。 次のコードでは、トップレベルに 2 つの p 要素が並んでいるのでエラーになります。
-ダメな例 const MyComponent: React.FC = () =&amp;gt; { return ( &amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt; &amp;lt;p&amp;gt;World&amp;lt;/p&amp;gt; ) } これを解決するには、例えば次のようにルート要素として div を配置します。
-return ( &amp;lt;div&amp;gt; &amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt; &amp;lt;p&amp;gt;World&amp;lt;/p&amp;gt; &amp;lt;/div&amp;gt; ) もちろん、これはこれで動作するのですが、ルートに余計な div 要素が作られてしまうのを防ぎたいときは、次のように &amp;lt;&amp;gt;...&amp;lt;/&amp;gt; で囲います（これは &amp;lt;React.Fragment&amp;gt; の省略記法です）。
-return ( &amp;lt;&amp;gt; &amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt; &amp;lt;p&amp;gt;World&amp;lt;/p&amp;gt; &amp;lt;/&amp;gt; ) 条件を満たすときのみ出力する 次のコードは、n &amp;gt; 0 を満たしたときに、後半の p 要素を表示します。
-return &amp;lt;&amp;gt; {n &amp;gt; 0 &amp;amp;&amp;amp; &amp;lt;p&amp;gt;条件を満たしたよ&amp;lt;/p&amp;gt;} &amp;lt;/&amp;gt; JSX コードの中では、if や for といった値を返さない文 (statement) を記述することができません。 なので、出力を条件分岐させたいときは、この例のように、&amp;amp;&amp;amp; や || のような演算子を駆使する必要があります。</description></item><item><title>React Router でコンポーネントの表示・非表示を切り替える</title><link>https://maku.blog/p/nfxds8n/</link><pubDate>Sat, 22 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nfxds8n/</guid><description>React の Router 系コンポーネント (BrowserRouter / HashRouter / MemoryRouter) を使用すると、論理的なパス管理によって React コンポーネントの表示の On/Off を切り替えることができます。 例えば、/users というパスでアクセスしたときには Users コンポーネントを表示し、/projects というパスでアクセスしたときには Projects コンポーネントを表示する、といったことを実現できます。
-react-router-dom のインストール Router 系のコンポーネントは react-router-dom モジュールで提供されているので、まずはこれをインストールします。 TypeScript を使用する場合は、型定義ファイルも一緒にインストールしておきます。
-$ npm install --save react-router-dom $ npm install --save-dev @types/react-router-dom BrowserRouter による表示切り替え 図: Router による表示切り替え 次の App コンポーネントでは、BrowserRouter コンポーネントを使って、Page1 と Page2 コンポーネントの表示を切り替えます。 Router 系のコンポーネントには、Router というエイリアス名を付けるのが慣例なのでそれに従います。 Router コンポーネントの下には、表示切り替え用のリンク要素として Link コンポーネントを配置し、表示要素として Route コンポーネントを配置します。
-components/App.tsx import * as React from &amp;#39;react&amp;#39; import { BrowserRouter as Router, Link, Route } from &amp;#39;react-router-dom&amp;#39; // 子コンポーネントを適当に用意 const Page1: React.</description></item><item><title>React でモーダルダイアログを表示する (react-modal)</title><link>https://maku.blog/p/q6fnu29/</link><pubDate>Sun, 02 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/q6fnu29/</guid><description>react-modal パッケージが提供する ReactModal コンポーネントを使用すると、React アプリ内で簡単にモーダルダイアログを実現することができます。
-上記は、設定 ボタンを押してモーダルな設定ダイアログを開いたときの表示例です。
-react-modal のインストール ReactModal コンポーネントを使うために、react-modal パッケージと TypeScript の型定義ファイルをインストールします。
-$ npm install --save react-modal $ npm install --save-dev @types/react-modal ReactModal コンポーネントを使用する ReactModal の使い方 ReactModal コンポーネントは、isOpen プロパティでダイアログの表示・非表示を制御するようになっています。
-// import ReactModal from &amp;#39;react-modal&amp;#39;; &amp;lt;ReactModal isOpen={this.props.isOpen} onAfterOpen={this.handleOpen} onRequestClose={this.handleClose} style={this.customStyles} contentLabel=&amp;#34;Settings&amp;#34; &amp;gt; // ... フォームの内容などをここに記述 ... &amp;lt;/ReactModal&amp;gt; onAfterOpen でオープン時、onRequestClose でクローズ時のイベントをハンドルすることができます。 ReactModal は自分自身のダイアログを自動で閉じたりしないので、onRequestClose に設定したハンドラ内で、isOpen プロパティに渡す値を false に設定してダイアログを閉じる必要があります。 onRequestClose ハンドラは、Esc キーを押したときや、ダイアログ外の領域をクリックしたときなどに呼び出されます。
-コンポーネントの作成 下記のサンプルコードは ReactModal を使ったコンポーネントの作成例です。 ここでは、ユーザー名を入力可能な設定ダイアログを想定しています。 React を使ったフォームの作成方法などは次の記事を参照してください。
-参考: React コンポーネントでフォームの入力を処理する components/settingsDialog.</description></item><item><title>React コンポーネントに CSS スタイルを設定する</title><link>https://maku.blog/p/eu4cksy/</link><pubDate>Sun, 12 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/eu4cksy/</guid><description>React は Web サイトの View レイヤのコンポーネントを作るためのライブラリですが、CSS ファイルの扱い方は特に決められておらず、今でも多くの人が試行錯誤しています。 ここでは、React アプリにおける CSS の扱い方を、下記のように分類して順番に説明していきます。
-従来通り HTML 起点でスタイルを読み込む方法 インラインスタイル CSS Modules CSS in JS ライブラリ HTML ファイルで読み込んだ CSS ファイルを参照する これは React を使わない従来の HTML/CSS のやり方に近い方法です。 HTML ファイル内の style 要素で定義した CSS クラスや、HTML から読み込んだ CSS ファイル内で定義した CSS クラスを React コンポーネントから使用します。
-例えば、HTML ファイル内で次のようにスタイル定義されているとします。
-index.html &amp;lt;!DOCTYPE html&amp;gt; &amp;lt;html&amp;gt; &amp;lt;head&amp;gt; &amp;lt;meta charset=&amp;#34;utf-8&amp;#34;&amp;gt; &amp;lt;title&amp;gt;MyApp&amp;lt;/title&amp;gt; &amp;lt;meta name=&amp;#34;viewport&amp;#34; content=&amp;#34;width=device-width, initial-scale=1&amp;#34;&amp;gt;&amp;lt;/head&amp;gt; &amp;lt;style&amp;gt; .hello { color: blue; background: #aaccff; padding: 0.5em; font-weight: bolder; border-radius: 0.5em; } &amp;lt;/style&amp;gt; &amp;lt;/head&amp;gt; &amp;lt;body&amp;gt; &amp;lt;div id=&amp;#34;root&amp;#34;&amp;gt;&amp;lt;/div&amp;gt; &amp;lt;script src=&amp;#34;index.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>React 雑多記事 on まくろぐ</title><link>https://maku.blog/p/m7it4do/</link><description>Recent content in React 雑多記事 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Tue, 12 Dec 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/m7it4do/index.xml" rel="self" type="application/rss+xml"/><item><title>React実装例: クリックで開閉可能なツリービューを作る</title><link>https://maku.blog/p/weow5dm/</link><pubDate>Wed, 11 Nov 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/weow5dm/</guid><description>&lt;p>ここでは、React コンポーネントとして、開閉可能なツリービューを作ってみます。
+コンポーネント名はツリーのノードを示す &lt;code>TreeNode&lt;/code> です。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="400" height="251" src="../../p/weow5dm/img-001.gif" alt="/p/weow5dm/img-001.gif" />
+ &lt;figcaption>図: TreeNode コンポーネントの表示例&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>初期の表示内容としては、ルートの &lt;code>TreeNode&lt;/code> を 1 つだけ配置し、そのラベルをクリックしたときに、子要素となる &lt;code>TreeNode&lt;/code> を 3 つ生成して表示します。
+実際のアプリケーションでは、このタイミングで GraphQL サーバーなどからデータを取得してツリー展開していく、といったことができると思います。&lt;/p>
+&lt;p>下記は &lt;code>TreeNode&lt;/code> コンポーネントの実装です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/TreeNode.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">React&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">styles&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;./TreeNode.scss&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">TreeNode&lt;/span>: &lt;span class="kt">React.FC&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">label&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">({&lt;/span>&lt;span class="nx">label&lt;/span>&lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">isOpen&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setIsOpen&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">useState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">childNodes&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setChildNodes&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">useState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// チェックボックスのクリックで isOpen ステートを更新
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">handleChange&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>: &lt;span class="kt">React.ChangeEvent&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">HTMLInputElement&lt;/span>&lt;span class="p">&amp;gt;)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">setIsOpen&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">target&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">checked&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// isOpen ステートの変更を監視し、childNodes に子ノードとなる TreeNode をセットする
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">setChildNodes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">isOpen&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="nx">createChildNodes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">label&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="kc">null&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">isOpen&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">className&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">styles&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">TreeNode&lt;/span>&lt;span class="p">}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">label&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">input&lt;/span> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;checkbox&amp;#34;&lt;/span> &lt;span class="na">onChange&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">handleChange&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">span&lt;/span> &lt;span class="na">className&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">styles&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">TreeNode_icon&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nx">label&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">label&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">className&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">styles&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">TreeNode_children&lt;/span>&lt;span class="p">}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nx">childNodes&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&amp;gt;;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 3つの TreeNode 要素を適当に作る
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">function&lt;/span> &lt;span class="nx">createChildNodes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">labelPrefix&lt;/span>: &lt;span class="kt">String&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ReactElement&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">labels&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[...&lt;/span>&lt;span class="nb">Array&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">)].&lt;/span>&lt;span class="nx">map&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">labelPrefix&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nx">labels&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">map&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">x&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">TreeNode&lt;/span> &lt;span class="na">key&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">x&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="na">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">x&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;)}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&amp;gt;;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ツリーノードの開閉状態は、HTML のチェックボックス (&lt;code>&amp;lt;input type=&amp;quot;checkbox&amp;quot;&amp;gt;&lt;/code>) から取得できる情報をそのまま利用しています（上記の例では &lt;code>e.target.checked&lt;/code> で参照しています）。
+この状態が &lt;code>true&lt;/code> になったとき、動的に子ノードとなる &lt;code>TreeNode&lt;/code> を 3 つ作成して表示しています (&lt;code>createChildNodes&lt;/code>)。
+子ノードも &lt;code>TreeNode&lt;/code> なので、クリックすれば無限に掘り進んでいくことができます。&lt;/p></description></item><item><title>React アプリの中で D3.js を使ってチャートを描画する</title><link>https://maku.blog/p/j52iy4k/</link><pubDate>Thu, 13 Apr 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j52iy4k/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>&lt;a href="https://d3js.org/">D3.js&lt;/a> は、Web ブラウザ上で様々なデータをビジュアライズするためのデファクトスタンダードな描画ライブラリです。
+ここでは、React (Next.js) アプリ内で、D3.js を使って簡単なチャートを描画してみます。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ ほかの描画ライブラリ&lt;/span>
+ &lt;span class="xNote_body">JavaScript による描画ライブラリには、他にも &lt;a href="https://www.chartjs.org/">Chart.js&lt;/a> や &lt;a href="https://mermaid.js.org/">Mermaid.js&lt;/a> などいろいろなものがあります。
+Chart.js を使うと、折れ線グラフや散布図などを簡単に描画することができます。
+Mermaid.js を使うと、独自フォーマットのテキストをもとにフローチャートなどを描画することができます。
+これらの描画ライブラリは、D3.js と比べて簡単に使うことができますが、描画可能な図の種類は限られています。
+一方、D3.js は高度なカスタマイズや自由度の高いデータの可視化が可能ですが、初学者にとってはやや学習コストが高くなっています。&lt;/span>
+&lt;/div>
+&lt;h2 id="d3js-のインストール">D3.js のインストール&lt;/h2>
+&lt;p>NPM あるいは Yarn で、プロジェクトに D3.js の依存を追加します。
+TypeScript を使用している場合は、D3.js 本体 (&lt;strong>&lt;code>d3&lt;/code>&lt;/strong>) に加え、型情報 (&lt;strong>&lt;code>@types/d3&lt;/code>&lt;/strong>) もインストールします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">D3.js のインストール（NPM の場合）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install d3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install --save-dev @types/d3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">D3.js のインストール（Yarn の場合）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> yarn add d3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> yarn add --dev @types/d3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="react-コンポーネント内で-d3js-を使う">React コンポーネント内で D3.js を使う&lt;/h2>
+&lt;p>React アプリは作成済みであるとし、D3.js を使って描画を行うコンポーネントを新しく作成します。
+次の &lt;code>HelloChart&lt;/code> コンポーネントは、D3.js を使って簡単な棒グラフを描画します。
+内部的に &lt;code>svg&lt;/code> 要素を保持しており、その中に複数の &lt;code>rect&lt;/code> を配置することで棒グラフを構築しています。
+&lt;code>useRef&lt;/code> フックで &lt;code>svg&lt;/code> 要素の参照を取得し、D3.js の描画先として設定しています。&lt;/p></description></item><item><title>React で入力フォームの onChange イベントを IME ON のときに無視する</title><link>https://maku.blog/p/cv6fpx7/</link><pubDate>Sun, 29 Jan 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cv6fpx7/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>React のテキスト入力フォーム（&lt;code>input&lt;/code> コンポーネントや mui の &lt;code>TextField&lt;/code> など）で &lt;code>onChange&lt;/code> イベントハンドラーを設定すると、入力テキストが変化したときに任意の処理を行うことができます。
+ただ、&lt;strong>&lt;code>onChange&lt;/code> イベントは IME での日本語変換中にも呼び出されてしまう&lt;/strong> ので、おそらく、想定しているよりも多く呼び出されてしまいます。
+インクリメンタルサーチなどで、入力のたびに API 呼び出しをしているようなケースでは、この振る舞いは抑制しなければいけません。&lt;/p>
+&lt;p>ここでは、IME が ON になっているとき（つまり日本語変換中）に、&lt;code>onChange&lt;/code> イベントを無視する実装例を紹介します。
+このあたりの実装は、ブラウザごとの微妙な振る舞いの差（特に &lt;code>Esc&lt;/code> キーで IME 入力をキャンセルした場合など）を考えると、結構複雑だったりします。&lt;/p>
+&lt;h2 id="実装してみる">実装してみる&lt;/h2>
+&lt;p>React の &lt;code>input&lt;/code> コンポーネントの &lt;strong>&lt;code>onCompositionStart&lt;/code>&lt;/strong> と &lt;strong>&lt;code>onCompositionEnd&lt;/code>&lt;/strong> イベントハンドラーを設定すると、IME を ON/OFF したタイミングを知ることができます。
+そのタイミングで、&lt;code>isImeOn&lt;/code> のようなフラグを制御すれば、必要に応じて &lt;code>onChange&lt;/code> イベントを無視できるようになります。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// import { FC, useRef, useState } from &amp;#39;react&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">SearchBox&lt;/span>: &lt;span class="kt">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 現在 IME ON（変換中）かどうかのフラグ
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">isImeOn&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useRef&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 以前の入力テキスト（ブラウザごとの onChange の振る舞いの差異への対策）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">prevText&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setPrevText&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 入力テキストを処理する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">handleChange&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">text&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">prevText&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="nx">text&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">return&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">text&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Chrome ではテキストクリア時に onCompositionEnd が呼ばれないことがある
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">isImeOn&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">current&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">isImeOn&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">current&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="c1">// IME 変換中は何もしない
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">setPrevText&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ここで最新の入力値にもとづいて検索処理などを行う
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">input&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;search&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;search&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onChange&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">handleChange&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">target&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">value&lt;/span>&lt;span class="p">)}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onCompositionStart&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">isImeOn&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">current&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">true&lt;/span> &lt;span class="c1">// IME 入力中フラグを ON
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onCompositionEnd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">isImeOn&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">current&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">false&lt;/span> &lt;span class="c1">// IME 入力中フラグを OFF
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">handleChange&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">target&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">HTMLInputElement&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">value&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// 入力確定したとき
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>ポイントは、&lt;code>onCompositionEnd&lt;/code> ハンドラーの中で &lt;code>handleChange&lt;/code> を明示的に呼び出しているところでしょうか。
+これを入れておかないと、IME での変換を確定したときに、入力されたテキストを処理することができません（&lt;code>onChange&lt;/code> は呼び出されるけど、IME 変換中とみなして処理をスキップしてしまうため）。&lt;/p></description></item><item><title>React の props.children の型定義には ReactNode を使う</title><link>https://maku.blog/p/xenv4bh/</link><pubDate>Sun, 18 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xenv4bh/</guid><description>&lt;h2 id="children-の型定義">children の型定義&lt;/h2>
+&lt;p>TypeScript で React の関数コンポーネントを定義するときには、下記のような &lt;a href="https://github.com/DefinitelyTyped/DefinitelyTyped/blob/33988371025ae2e58bdaa4391d6661d4ef273242/types/react/index.d.ts#L543">React.FC (React.FunctionComponent)&lt;/a> を使用します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">type&lt;/span> &lt;span class="nx">FC&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">P&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{}&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">FunctionComponent&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">P&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">interface&lt;/span> &lt;span class="nx">FunctionComponent&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">P&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{}&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">PropsWithChildren&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">P&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">context&lt;/span>&lt;span class="o">?:&lt;/span> &lt;span class="nx">any&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">ReactElement&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">any&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">any&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="kc">null&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">propTypes&lt;/span>&lt;span class="o">?:&lt;/span> &lt;span class="nx">WeakValidationMap&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">P&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="kc">undefined&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">contextTypes&lt;/span>&lt;span class="o">?:&lt;/span> &lt;span class="nx">ValidationMap&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">any&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="kc">undefined&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">defaultProps&lt;/span>&lt;span class="o">?:&lt;/span> &lt;span class="nx">Partial&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">P&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="kc">undefined&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">displayName&lt;/span>&lt;span class="o">?:&lt;/span> &lt;span class="nx">string&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="kc">undefined&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">type&lt;/span> &lt;span class="nx">PropsWithChildren&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">P&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">P&lt;/span> &lt;span class="o">&amp;amp;&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">children&lt;/span>&lt;span class="o">?:&lt;/span> &lt;span class="nx">ReactNode&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="kc">undefined&lt;/span> &lt;span class="p">};&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>FC&lt;/code> の型パラメータ &lt;code>P&lt;/code> は、上記のような &lt;code>PropsWithChildren&lt;/code> 型にラップされるので、&lt;code>props&lt;/code> の型定義をするときに明示的に &lt;code>children&lt;/code> を含める必要はありません。
+下記の &lt;code>ColorBox&lt;/code> コンポーネントは、指定した背景色で子要素 (&lt;code>children&lt;/code>) を表示します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ColorBox.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">FC&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">Props&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">color&lt;/span>: &lt;span class="kt">string&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">ColorBox&lt;/span>: &lt;span class="kt">FC&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Props&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">color&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">children&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">style&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{{&lt;/span> &lt;span class="nx">background&lt;/span>: &lt;span class="kt">color&lt;/span> &lt;span class="p">}}&amp;gt;{&lt;/span>&lt;span class="nx">children&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ただ、これだと、&lt;code>ColorBox&lt;/code> コンポーネントの型情報を見ただけでは、子要素 (&lt;code>children&lt;/code>) が必要なのかどうかを判別することができません。
+&lt;code>props&lt;/code> の型定義で、明示的に &lt;code>children&lt;/code> の型情報を指定するには、次のように &lt;strong>&lt;code>React.ReactNode&lt;/code>&lt;/strong> を使います。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line hl">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">FC&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ReactNode&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">Props&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">color&lt;/span>: &lt;span class="kt">string&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="nx">children&lt;/span>: &lt;span class="kt">ReactNode&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">ColorBox&lt;/span>: &lt;span class="kt">FC&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Props&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">color&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">children&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">style&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{{&lt;/span> &lt;span class="nx">background&lt;/span>: &lt;span class="kt">color&lt;/span> &lt;span class="p">}}&amp;gt;{&lt;/span>&lt;span class="nx">children&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、子要素を指定せずに &lt;code>ColorBox&lt;/code> コンポーネントを使おうとしたときにエラー表示してくれるようになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">ColorBox&lt;/span> &lt;span class="na">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;red&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span> &lt;span class="c1">// 子要素がないのでエラー！
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ちなみに、子要素の指定がオプショナルであることを明示するには、次のように &lt;code>children?&lt;/code> と定義すれば OK です。
+これであれば何も定義しないのと同じでは？と思うかもしれませんが、この定義があることで、子要素を指定したときに確実に何らかの描画が行われるということを示すことができます。&lt;/p></description></item><item><title>React の JSX 記述のコツ</title><link>https://maku.blog/p/xjv6gqy/</link><pubDate>Thu, 17 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xjv6gqy/</guid><description>&lt;p>React アプリケーションでは、コンポーネントの UI を JSX 構文を用いて記述します。
+下記は、JSX コードを記述するときのポイントのまとめです。
+通常の JavaScript コードとは異なる記述方法が必要になるため慣れが必要ですが、ここに挙げたポイントをおさえておけば大体対応できます。&lt;/p>
+&lt;h2 id="jsx-の最上位要素はひとつ">JSX の最上位要素はひとつ&lt;/h2>
+&lt;p>JSX 要素を作成するとき、トップレベルの要素は 1 つだけにする必要があります。
+次のコードでは、トップレベルに 2 つの &lt;code>p&lt;/code> 要素が並んでいるのでエラーになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ダメな例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">MyComponent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Hello&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">World&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これを解決するには、例えば次のようにルート要素として &lt;code>div&lt;/code> を配置します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Hello&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">World&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>もちろん、これはこれで動作するのですが、ルートに余計な &lt;code>div&lt;/code> 要素が作られてしまうのを防ぎたいときは、次のように &lt;strong>&lt;code>&amp;lt;&amp;gt;...&amp;lt;/&amp;gt;&lt;/code>&lt;/strong> で囲います（これは &lt;code>&amp;lt;React.Fragment&amp;gt;&lt;/code> の省略記法です）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Hello&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">World&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="条件を満たすときのみ出力する">条件を満たすときのみ出力する&lt;/h2>
+&lt;p>次のコードは、&lt;code>n &amp;gt; 0&lt;/code> を満たしたときに、後半の &lt;code>p&lt;/code> 要素を表示します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nx">n&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">条件を満たしたよ&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>JSX コードの中では、&lt;code>if&lt;/code> や &lt;code>for&lt;/code> といった値を返さない文 (statement) を記述することができません。
+なので、出力を条件分岐させたいときは、この例のように、&lt;strong>&lt;code>&amp;amp;&amp;amp;&lt;/code>&lt;/strong> や &lt;strong>&lt;code>||&lt;/code>&lt;/strong> のような演算子を駆使する必要があります。&lt;/p></description></item><item><title>React Router でコンポーネントの表示・非表示を切り替える</title><link>https://maku.blog/p/nfxds8n/</link><pubDate>Sat, 22 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nfxds8n/</guid><description>&lt;p>React の Router 系コンポーネント (&lt;code>BrowserRouter&lt;/code> / &lt;code>HashRouter&lt;/code> / &lt;code>MemoryRouter&lt;/code>) を使用すると、論理的なパス管理によって React コンポーネントの表示の On/Off を切り替えることができます。
+例えば、&lt;code>/users&lt;/code> というパスでアクセスしたときには &lt;code>Users&lt;/code> コンポーネントを表示し、&lt;code>/projects&lt;/code> というパスでアクセスしたときには &lt;code>Projects&lt;/code> コンポーネントを表示する、といったことを実現できます。&lt;/p>
+
+
+&lt;h2 id="react-router-dom-のインストール">react-router-dom のインストール&lt;/h2>
+&lt;p>Router 系のコンポーネントは &lt;strong>&lt;code>react-router-dom&lt;/code>&lt;/strong> モジュールで提供されているので、まずはこれをインストールします。
+TypeScript を使用する場合は、型定義ファイルも一緒にインストールしておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install --save react-router-dom
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install --save-dev @types/react-router-dom&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="browserrouter-による表示切り替え">BrowserRouter による表示切り替え&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="300" height="140" src="../../p/nfxds8n/img-001_hu554846046530466067.png" alt="/p/nfxds8n/img-001.png" />
+ &lt;figcaption>図: Router による表示切り替え&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>次の &lt;code>App&lt;/code> コンポーネントでは、&lt;a href="https://reactrouter.com/web/api/BrowserRouter">BrowserRouter&lt;/a> コンポーネントを使って、&lt;code>Page1&lt;/code> と &lt;code>Page2&lt;/code> コンポーネントの表示を切り替えます。
+Router 系のコンポーネントには、&lt;code>Router&lt;/code> というエイリアス名を付けるのが慣例なのでそれに従います。
+&lt;code>Router&lt;/code> コンポーネントの下には、表示切り替え用のリンク要素として &lt;a href="https://reactrouter.com/web/api/Link">Link&lt;/a> コンポーネントを配置し、表示要素として &lt;a href="https://reactrouter.com/web/api/Route">Route&lt;/a> コンポーネントを配置します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/App.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">as&lt;/span> &lt;span class="nx">React&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">BrowserRouter&lt;/span> &lt;span class="nx">as&lt;/span> &lt;span class="nx">Router&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">Link&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">Route&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;react-router-dom&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 子コンポーネントを適当に用意
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">Page1&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Page1&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">Page2&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Page2&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Appコンポーネント
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">App&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Router&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">nav&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&amp;lt;&lt;/span>&lt;span class="nt">Link&lt;/span> &lt;span class="na">to&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/page1&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Page1&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Link&lt;/span>&lt;span class="p">&amp;gt;]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&amp;lt;&lt;/span>&lt;span class="nt">Link&lt;/span> &lt;span class="na">to&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/page2&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Page2&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Link&lt;/span>&lt;span class="p">&amp;gt;]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">nav&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Route&lt;/span> &lt;span class="na">path&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/page1&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;&lt;/span>&lt;span class="nt">Page1&lt;/span> &lt;span class="p">/&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">Route&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Route&lt;/span> &lt;span class="na">path&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/page2&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;&lt;/span>&lt;span class="nt">Page2&lt;/span> &lt;span class="p">/&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">Route&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Router&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>あとは、この &lt;code>App&lt;/code> コンポーネントを次のように表示します。&lt;/p></description></item><item><title>React でモーダルダイアログを表示する (react-modal)</title><link>https://maku.blog/p/q6fnu29/</link><pubDate>Sun, 02 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/q6fnu29/</guid><description>&lt;p>&lt;a href="https://github.com/reactjs/react-modal">react-modal&lt;/a> パッケージが提供する &lt;code>ReactModal&lt;/code> コンポーネントを使用すると、React アプリ内で簡単にモーダルダイアログを実現することができます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="500" height="186" src="../../p/q6fnu29/img-001_hu7614025001262659367.png" alt="/p/q6fnu29/img-001.png" />
+&lt;/figure>
+
+&lt;p>上記は、&lt;code>設定&lt;/code> ボタンを押してモーダルな設定ダイアログを開いたときの表示例です。&lt;/p>
+&lt;h2 id="react-modal-のインストール">react-modal のインストール&lt;/h2>
+&lt;p>&lt;code>ReactModal&lt;/code> コンポーネントを使うために、&lt;code>react-modal&lt;/code> パッケージと TypeScript の型定義ファイルをインストールします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install --save react-modal
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install --save-dev @types/react-modal&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="reactmodal-コンポーネントを使用する">ReactModal コンポーネントを使用する&lt;/h2>
+&lt;h3 id="reactmodal-の使い方">ReactModal の使い方&lt;/h3>
+&lt;p>&lt;code>ReactModal&lt;/code> コンポーネントは、&lt;strong>&lt;code>isOpen&lt;/code>&lt;/strong> プロパティでダイアログの表示・非表示を制御するようになっています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// import ReactModal from &amp;#39;react-modal&amp;#39;;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">ReactModal&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">isOpen&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">isOpen&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onAfterOpen&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleOpen&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onRequestClose&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleClose&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">style&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">customStyles&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">contentLabel&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;Settings&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ... フォームの内容などをここに記述 ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">ReactModal&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;strong>&lt;code>onAfterOpen&lt;/code>&lt;/strong> でオープン時、&lt;strong>&lt;code>onRequestClose&lt;/code>&lt;/strong> でクローズ時のイベントをハンドルすることができます。
+&lt;code>ReactModal&lt;/code> は自分自身のダイアログを自動で閉じたりしないので、&lt;code>onRequestClose&lt;/code> に設定したハンドラ内で、&lt;code>isOpen&lt;/code> プロパティに渡す値を &lt;code>false&lt;/code> に設定してダイアログを閉じる必要があります。
+&lt;code>onRequestClose&lt;/code> ハンドラは、&lt;code>Esc&lt;/code> キーを押したときや、ダイアログ外の領域をクリックしたときなどに呼び出されます。&lt;/p>
+&lt;h3 id="コンポーネントの作成">コンポーネントの作成&lt;/h3>
+&lt;p>下記のサンプルコードは &lt;code>ReactModal&lt;/code> を使ったコンポーネントの作成例です。
+ここでは、ユーザー名を入力可能な設定ダイアログを想定しています。
+React を使ったフォームの作成方法などは次の記事を参照してください。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/tdpybmw">React コンポーネントでフォームの入力を処理する&lt;/a>&lt;/li>
+&lt;/ul>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/settingsDialog.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">React&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">ReactModal&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react-modal&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">interface&lt;/span> &lt;span class="nx">Props&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/** このダイアログを表示するなら true */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">isOpen&lt;/span>: &lt;span class="kt">boolean&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/** このダイアログを閉じるときのコールバック */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">onClose&lt;/span>&lt;span class="o">?:&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="k">void&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">interface&lt;/span> &lt;span class="nx">State&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">username&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">SettingsDialog&lt;/span> &lt;span class="kr">extends&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Component&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Props&lt;/span>&lt;span class="err">,&lt;/span> &lt;span class="na">State&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">constructor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">props&lt;/span>: &lt;span class="kt">Props&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">super&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">state&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">username&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 具体的に #root 要素などを指定した方がよい？
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">ReactModal&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">setAppElement&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;body&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">public&lt;/span> &lt;span class="nx">render&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ReactNode&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">ReactModal&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">isOpen&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">isOpen&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onAfterOpen&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleOpen&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onRequestClose&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleClose&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">style&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">customStyles&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">contentLabel&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;Settings&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">form&lt;/span> &lt;span class="na">onSubmit&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleSubmit&lt;/span>&lt;span class="p">}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">label&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="err">ユーザー名&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">input&lt;/span> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;text&amp;#34;&lt;/span> &lt;span class="na">autoFocus&lt;/span> &lt;span class="na">value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">username&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onChange&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleChangeUsername&lt;/span>&lt;span class="p">}&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">input&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">label&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">form&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">ReactModal&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// フォームのサブミット時にダイアログを閉じる
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">private&lt;/span> &lt;span class="nx">handleSubmit&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>: &lt;span class="kt">React.FormEvent&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">HTMLFormElement&lt;/span>&lt;span class="p">&amp;gt;)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">preventDefault&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">handleClose&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">private&lt;/span> &lt;span class="nx">handleChangeUsername&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>: &lt;span class="kt">React.ChangeEvent&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">HTMLInputElement&lt;/span>&lt;span class="p">&amp;gt;)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">setState&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">username&lt;/span>: &lt;span class="kt">event.target.value&lt;/span>&lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ダイアログが開いたときに呼び出される
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">private&lt;/span> &lt;span class="nx">handleOpen&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ここで設定情報などを読み込む
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ダイアログ領域外のクリックや、ESCキーを押したときに呼び出される
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">private&lt;/span> &lt;span class="nx">handleClose&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 親コンポーネントにダイアログを閉じてもらうためのコールバック通知
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">onClose&lt;/span>&lt;span class="o">?&lt;/span>&lt;span class="p">.();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// スタイルのカスタマイズ
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">private&lt;/span> &lt;span class="nx">customStyles&lt;/span>: &lt;span class="kt">ReactModal.Styles&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ダイアログ内のスタイル（中央に表示）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">content&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">top&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;50%&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">left&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;50%&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">right&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;auto&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">bottom&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;auto&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">marginRight&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;-50%&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">transform&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;translate(-50%, -50%)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 親ウィンドウのスタイル（ちょっと暗くする）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">overlay&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">background&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;rgba(0, 0, 0, 0.2)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="作成したコンポーネントを使用する">作成したコンポーネントを使用する&lt;/h3>
+&lt;p>上記で作成した &lt;code>SettingsDialog&lt;/code> コンポーネントの使用例です。
+&lt;code>設定&lt;/code> ボタンを押したときに、&lt;code>SettingsDialog&lt;/code> の &lt;code>isOpen&lt;/code> プロパティを &lt;code>true&lt;/code> に設定することでダイアログを表示しています。&lt;/p></description></item><item><title>React コンポーネントに CSS スタイルを設定する</title><link>https://maku.blog/p/eu4cksy/</link><pubDate>Sun, 12 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/eu4cksy/</guid><description>&lt;p>React は Web サイトの View レイヤのコンポーネントを作るためのライブラリですが、CSS ファイルの扱い方は特に決められておらず、今でも多くの人が試行錯誤しています。
+ここでは、React アプリにおける CSS の扱い方を、下記のように分類して順番に説明していきます。&lt;/p>
+&lt;ol>
+&lt;li>従来通り HTML 起点でスタイルを読み込む方法&lt;/li>
+&lt;li>インラインスタイル&lt;/li>
+&lt;li>CSS Modules&lt;/li>
+&lt;li>CSS in JS ライブラリ&lt;/li>
+&lt;/ol>
+&lt;h2 id="html-ファイルで読み込んだ-css-ファイルを参照する">HTML ファイルで読み込んだ CSS ファイルを参照する&lt;/h2>
+&lt;p>これは React を使わない従来の HTML/CSS のやり方に近い方法です。
+HTML ファイル内の &lt;code>style&lt;/code> 要素で定義した CSS クラスや、HTML から読み込んだ CSS ファイル内で定義した CSS クラスを React コンポーネントから使用します。&lt;/p>
+&lt;p>例えば、HTML ファイル内で次のようにスタイル定義されているとします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">index.html&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&amp;lt;!DOCTYPE html&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">head&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">meta&lt;/span> &lt;span class="na">charset&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;utf-8&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>MyApp&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">meta&lt;/span> &lt;span class="na">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;viewport&amp;#34;&lt;/span> &lt;span class="na">content&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;width=device-width, initial-scale=1&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">head&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nc">hello&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">color&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">blue&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">background&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mh">#aaccff&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">padding&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="kt">em&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">font-weight&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">bolder&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">border-radius&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="kt">em&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">head&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">body&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;root&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">src&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;index.js&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">body&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次の &lt;code>Hello&lt;/code> コンポーネントは、1 つの &lt;code>div&lt;/code> 要素を生成するだけの簡単な React コンポーネントで、上記で定義した CSS クラス &lt;code>hello&lt;/code> を使用しています。&lt;/p></description></item></channel></rss>

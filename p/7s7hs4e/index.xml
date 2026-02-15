@@ -1,5 +1,65 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS 関連メモ on まくろぐ</title><link>https://maku.blog/p/7s7hs4e/</link><description>Recent content in AWS 関連メモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sun, 05 Jan 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/7s7hs4e/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS SNS トピックから通知されるイベントデータの例</title><link>https://maku.blog/p/qcpybnx/</link><pubDate>Mon, 19 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qcpybnx/</guid><description>AWS SNS トピックからメッセージが発行されたときに、サブスクライバー（Lambda 関数など）にどのようなイベントデータが配信されるかの例です。
-基本的なメッセージの構造 Lambda 関数で受け取る場合 SNS トピックに対して Lambda 関数をサブスクライブしておくと、Lambda 関数の第一引数 (event) で、次のようなオブジェクトを受信できます。 重要な情報は、Records[0].Sns の下に格納されています。
-{ &amp;#34;Records&amp;#34;: [ { &amp;#34;EventSource&amp;#34;: &amp;#34;aws:sns&amp;#34;, &amp;#34;EventVersion&amp;#34;: &amp;#34;1.0&amp;#34;, &amp;#34;EventSubscriptionArn&amp;#34;: &amp;#34;arn:aws:sns:ap-northeast-1:123456789012:mytopic:0884-5d81c0db-4e13-829f-596f7ea9f8ad&amp;#34;, &amp;#34;Sns&amp;#34;: { &amp;#34;Type&amp;#34;: &amp;#34;Notification&amp;#34;, ... &amp;#34;Subject&amp;#34;: &amp;#34;Message Title&amp;#34;, &amp;#34;Message&amp;#34;: &amp;#34;Message Body&amp;#34;, ... } } ] } メールで受け取る場合 SNS トピックに「JSON 形式のメール」をサブスクライブしておくと、SNS のメッセージが発行されたときに、次のような内容のメールが届きます。
-{ &amp;#34;Type&amp;#34;: &amp;#34;Notification&amp;#34;, ... &amp;#34;Subject&amp;#34;: &amp;#34;Message Title&amp;#34;, &amp;#34;Message&amp;#34;: &amp;#34;Message Body&amp;#34;, ... } Lambda 関数の第一引数で渡される event オブジェクトで表現すると、event.Records[0].Sns に相当する部分の情報がメールで送られてきます。
-具体的な SNS メッセージの例 下記の例では、Records[0].Sns 以下の情報のみを示しています（JSON 形式のメールで送られる内容です）。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS 関連メモ on まくろぐ</title><link>https://maku.blog/p/7s7hs4e/</link><description>Recent content in AWS 関連メモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 19 Apr 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/7s7hs4e/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS SNS トピックから通知されるイベントデータの例</title><link>https://maku.blog/p/qcpybnx/</link><pubDate>Mon, 19 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qcpybnx/</guid><description>&lt;p>AWS SNS トピックからメッセージが発行されたときに、サブスクライバー（Lambda 関数など）にどのようなイベントデータが配信されるかの例です。&lt;/p>
+&lt;h2 id="基本的なメッセージの構造">基本的なメッセージの構造&lt;/h2>
+&lt;h3 id="lambda-関数で受け取る場合">Lambda 関数で受け取る場合&lt;/h3>
+&lt;p>SNS トピックに対して Lambda 関数をサブスクライブしておくと、Lambda 関数の第一引数 (event) で、次のようなオブジェクトを受信できます。
+重要な情報は、&lt;code>Records[0].Sns&lt;/code> の下に格納されています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;Records&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;EventSource&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;aws:sns&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;EventVersion&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;1.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;EventSubscriptionArn&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;arn:aws:sns:ap-northeast-1:123456789012:mytopic:0884-5d81c0db-4e13-829f-596f7ea9f8ad&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;Sns&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;Type&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;Notification&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;Subject&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;Message Title&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;Message&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;Message Body&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="メールで受け取る場合">メールで受け取る場合&lt;/h3>
+&lt;p>SNS トピックに「JSON 形式のメール」をサブスクライブしておくと、SNS のメッセージが発行されたときに、次のような内容のメールが届きます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;Type&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;Notification&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;Subject&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;Message Title&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;Message&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;Message Body&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Lambda 関数の第一引数で渡される &lt;code>event&lt;/code> オブジェクトで表現すると、&lt;strong>&lt;code>event.Records[0].Sns&lt;/code>&lt;/strong> に相当する部分の情報がメールで送られてきます。&lt;/p>
+&lt;h2 id="具体的な-sns-メッセージの例">具体的な SNS メッセージの例&lt;/h2>
+&lt;p>下記の例では、&lt;code>Records[0].Sns&lt;/code> 以下の情報のみを示しています（JSON 形式のメールで送られる内容です）。&lt;/p>
+&lt;h3 id="sns-のマネージメントコンソールからメッセージ発行したとき">SNS のマネージメントコンソールからメッセージ発行したとき&lt;/h3>
+&lt;p>件名に &lt;code>Message Title&lt;/code>、本文に &lt;code>Message Body&lt;/code> を設定してメッセージ発行したときに送られるイベントデータの例です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Type&amp;#34;&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Notification&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;MessageId&amp;#34;&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;789b67e7-9bd8-5a6e-99d0-3f10e520edf7&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;TopicArn&amp;#34;&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;arn:aws:sns:ap-northeast-1:123456789012:mytopic&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Subject&amp;#34;&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Message Title&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Message&amp;#34;&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Message Body&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Timestamp&amp;#34;&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2021-04-19T12:51:04.019Z&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;SignatureVersion&amp;#34;&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Signature&amp;#34;&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;bKXAFppLnPMeajvylkQvjiH/9RNeAlNfxbBC7HJbiOt7SKrw9oVk+CI1ZYsADcNt9aAtAOysdHrFD97J/N4n5o+tV+Dz5hsjxqKskYOCrYDRTTqLyhwa5OBtjAhU74IZy9ByfBSQWfOD1I5AFp0FLUWR8ieop/ZTV5buf4FodNm4scwW18nUJ1D5iTPNy3NinWq0wVP2FT7Ykt9HCdNleaFamMZ+war4OHsRhOgvDqOV4auZ2yvayMf70eJPHLbuQn09E0IlQYsvUArTOSknbFK3lsbeLfJBHmIa2qnuZm+VTknNgJxkCJNyer+7EKTrOABYqXsz55ENYJsn5xvjCA==&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;SigningCertURL&amp;#34;&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;https://sns.ap-northeast-1.amazonaws.com/SimpleNotificationService-94bdb98bd93083010a507c1833636cda.pem&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;UnsubscribeURL&amp;#34;&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;https://sns.ap-northeast-1.amazonaws.com/?Action=Unsubscribe&amp;amp;SubscriptionArn=arn:aws:sns:ap-northeast-1:123456789012:mytopic:97989c34-955f-49c8-856c-1b8e3e926a6f&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="s3-の-putobject-イベントを-sns-から通知したとき">S3 の PutObject イベントを SNS から通知したとき&lt;/h3>
+&lt;p>S3 バケットに対して &lt;code>sample.txt&lt;/code> をアップロードしたときの SNS 通知の例です。
+&lt;code>Message&lt;/code> プロパティの中に JSON 形式の情報が格納されていて、この中身を見ると、アップロードされたファイルの名前（S3 オブジェクトのキー）などが分かります。&lt;/p></description></item></channel></rss>

@@ -1,32 +1,445 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ツール on まくろぐ</title><link>https://maku.blog/p/zb9ocav/</link><description>Recent content in ツール on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 15 Sep 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/zb9ocav/index.xml" rel="self" type="application/rss+xml"/><item><title>rg (ripgrep) コマンドの使い方まとめ</title><link>https://maku.blog/p/4jhbtm3/</link><pubDate>Mon, 15 Sep 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4jhbtm3/</guid><description>超高速なテキスト検索コマンド rg (ripgrep) にはずっとお世話になっていますが、ちょっと凝った検索をしようとしたときに、オプションを忘れてしまうことが多いので、チートシートの形でまとめておきます。
-Ripgrep チートシート rg TODO カレントディレクトリ以下ですべての「TODO」を検索します。 rg &amp;quot;^def add&amp;quot; 行頭が def add で始まる行を検索します（デフォルトで正規表現とみなされます）。 rg -F "* + *&amp;quot; 検索文字列を正規表現として解釈せず、そのままの文字列として検索します。上記の例では、* + * という文字列を検索します。 rg -i TODO 大文字・小文字を区別せずに「TODO」を検索します。 rg -w TODO 単語単位で「TODO」を検索します。例えば TODOS や MYTODO はマッチしません（安心してください、TODO: にはマッチします）。 rg -C2 TODO マッチした行の前後 2 行も一緒に表示します（-A2 -B2 と指定するのと同様）。 rg -c TODO 各ファイルごとにマッチした行数のみを表示します。 rg TODO src/main src/main ディレクトリ以下（あるいは同名のファイル）で「TODO」を検索します。 ディレクトリであることを明示したい場合は、末尾にスラッシュを付けます（src/main/）。 rg -t py TODO Python ファイル（拡張子 .py）のみを検索対象にします。 ここで指定するタイプは拡張子ではなくファイルタイプです。指定できるファイルタイプの一覧は rg --type-list で確認できます。 逆に、特定のファイルタイプを除外したい場合は -T py のように大文字の -T を使います。 例えば、ファイルタイプとして minified: *.</description></item><item><title>Alacritty で快適なターミナル環境を手にいれる（macOS/Windows/Linux 対応）</title><link>https://maku.blog/p/p9ppdqy/</link><pubDate>Tue, 26 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p9ppdqy/</guid><description>Alacritty とは Alacritty（アラクリッティ） は、macOS や Windows の「ターミナル」アプリの代わりに使えるターミナルエミュレーターで、次のような特徴を持っています。
-Windows/macOS/Linux/BSD など主要な OS をサポート（ノウハウや設定を使いまわせる） Rust で実装されていて高速。レンダリングも GPU で高速。 VI モードでキーボードによる快適な操作が可能 設定ファイルが TOML 形式でわかりやすい（シンプルさを追求しているため、GUI ベースの設定画面は提供しない） vim や tmux のようなターミナルに寄生するアプリと相性がよくて表示の問題が起きにくい スクロールバッファ内の検索が可能 マルチウィンドウモードもあり（ただし思想としては tmux などのターミナルマルチプレクサーを使うべきとしている） 簡単にまとめると、vim や tmux 使いで、シンプルで高速なクロスプラットフォームなターミナルアプリを求めている人にうってつけということですね！ ちなみに、Alacritty という名前の末尾が tty になっているのがおしゃれです（「敏捷性」を表す英単語「alacrity」をもじってます）。
-VI モード VI モードに切り替えると、VI 風のキーバインドを使ったカーソルの移動、画面スクロール、検索などが可能になります。 VI モードへの入り方だけ特殊 (Ctrl + Shift + Space) ですが、あとはほぼ VI の操作方法に従って操作できます（参考: まくまく Vim ノート）。
-キーバインド 説明 Ctrl + Shift + Space VI モード ON/OFF i VI モード OFF（普通のプロンプト操作に戻る） h / j / k / l カーソル移動 v / Ctrl + v / Shift + v 選択／矩形選択／行選択 y 選択したテキストをヤンク（コピー） Ctrl + B / Ctrl + F 上下スクロール / / ?</description></item><item><title>tmux チートシート</title><link>https://maku.blog/p/hijkfza/</link><pubDate>Sun, 24 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/hijkfza/</guid><description>tmux の基本要素 図: tmux の構成要素 クライアント tmux の起動元となるターミナルアプリです。 クライアントは tmux サーバーを介してセッションやウィンドウを操作します。 最初に tmux コマンドを実行したときに tmux サーバーが立ち上がり、1 つ目のセッションとウィンドウが生成されます。 複数のクライアントが同じセッションに接続できます。 セッション セッションは tmux 内での作業単位で、クライアントからセッションにアタッチすることで、セッション内のウィンドウを操作できるようになります。 セッション内には複数のウィンドウを作成することができます。 クライアントからセッションをデタッチしても、tmux サーバーが存在する限り、セッションは生き続けることができます。 ウィンドウ ウィンドウはセッション内でのトップレベルの表示領域で、見た目としては Web ブラウザのタブのように見えます。 ウィンドウはセンション間で移動することができます。 ウィンドウは複数のペインに分割することができます。 ペイン ペインはウィンドウ内の分割領域を表します。 IDE のようにウィンドウを分割して複数の作業を同時に行えます。 tmux のコマンド入力の仕組み ターミナルアプリなどのクライアントから tmux コマンドを実行すると、tmux セッションが立ち上がり、クライアントがアタッチされます。 アタッチされたクライアント上で PREFIX キーとの組み合わせによるキーシーケンスを入力することで、tmux セッション内のウィンドウを操作できます。 PREFIX キーには、デフォルトで Ctrl + b が割り当てられています。
-tmux の制御コマンドには名前が付けられており、tmux コマンドの引数で制御コマンド名を渡すことで実行できるようになっています（内部的には tmux サーバーにコマンドが送られています）。 tmux セッション内で tmux コマンドを実行すると、そのセッションに対しての操作になります。 また、PREFIX → : に続けてコマンド名を入力する方法もあります。
-例えば、セッション内に新しいウィンドウを作成したいときは、以下のように複数の方法で実行できます。
-PREFIX → c と入力する PREFIX → :new-window と入力する（:neww でも OK） ターミナル上で tmux new-window を実行する（neww でも OK） セッション (Session) tmux の一連の機能を使用するには、最初にセッションを作成する必要があります。 セッションを作成すると、同時に 1 つのウィンドウが作成されます。</description></item><item><title>ウェブサイトのリンク切れを自動でチェックする (muffet)</title><link>https://maku.blog/p/s7q8o5k/</link><pubDate>Sat, 23 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/s7q8o5k/</guid><description>muffet のインストール muffet はウェブサイトのリンク切れをチェックしてくれるコマンドラインツールです。 Go 言語で実装されており、いろいろな OS (Linux、macOS、Windows) で利用することができます。
-raviqqe/muffet: Fast website link checker in Go インストール方法は、上記サイトに記述されていますが、例えば macOS であれば、homebrew を使って次のように簡単にインストールできます。
-macOS の場合 % brew install muffet 各 OS 用の実行バイナリが欲しければ、Release ページ からダウンロードできます。
-muffet の使い方 基本的な使い方は、次のように調べたいウェブページのアドレスを入力するだけです。
-% muffet http://localhost:51000 リンク元のサイトアドレスと、アクセスできなかったサイトアドレスの組み合わせが一覧表示されます。
-http://localhost:51000/p/eu7djpv/ 404	http://localhost:51000/assets/favicon/180x180.png 404	http://localhost:51000/assets/favicon/192x192.png http://localhost:51000/p/ckahx6k/ 404	http://localhost:51000/assets/favicon/180x180.png 404	http://localhost:51000/assets/favicon/192x192.png 404	http://video.google.com/videoplay?docid=973149761529535925 404 (following redirect https://www.example.com/p/44327.html) http://www.example.com/44327/2005/04/tipsinbox.html muffet は複数スレッドで高速にリンクチェックを行いますが、ひとつのドメインに対する同時接続数を制限したいときは、--max-connections-per-host オプションを指定します。 Web サーバーへの負荷を考慮したいときに使えます。
-同時接続数を制限する % muffet --max-connections-per-host=5 http://localhost:51000 --exclude オプションを使うと、チェック対象外とするアドレスを正規表現で指定できます。 例えば、次のようにすれば、https:// で始まるリンクをチェック対象外にできます。 ローカル Web サーバーで開発している場合、このオプション指定によって外部サイトのリンクだけをチェック対象外にできます。</description></item><item><title>Windows のコマンドラインで ZIP ファイルを作成する (Compress-Archive)</title><link>https://maku.blog/p/vin35f7/</link><pubDate>Wed, 03 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vin35f7/</guid><description>Windows のコマンドプロンプト（あるいは PowerShell）から zip ファイルを作成するには、PowerShell の Compress-Archive コマンド を使用します。 特に何もインストールしなくても実行できます。
-指定したディレクトリを zip 圧縮する src ディレクトリを dst.zip にアーカイブ C:\&amp;gt; powershell compress-archive src dst 作成される zip ファイル dst.zip +-- src/ +-- file1 +-- file2 +-- file3 出力ファイル名 dst.zip の .zip は省略することができます。 dst.zip を展開すると、ルートに src ディレクトリが現れる状態になります。
-ディレクトリ内のファイルのみを zip 圧縮する ルートディレクトリ（この例では src）を zip ファイルに含めずに、そのディレクトリ内のファイル群だけを zip ファイルにまとめたいときは、次のように src/* と指定します。
-src ディレクトリの中身だけを dst.zip にアーカイブ C:\&amp;gt; powershell compress-archive src/* dst 作成される zip ファイル dst.zip +-- file1 +-- file2 +-- file3 複数のディレクトリやファイルを zip 圧縮する 圧縮対象のディレクトリやファイルを複数指定するには、次のようにカンマ (,) で列挙します。 カンマの前後にはスペースを入れないことに注意してください。</description></item><item><title>EditorConfig でコーディングスタイルを統一する</title><link>https://maku.blog/p/7aoa6x5/</link><pubDate>Fri, 20 Nov 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7aoa6x5/</guid><description>EditorConfig とは EditorConfig（.editorconfig ファイル）を導入すると、各種エディタ（Visual Studio、Android Studio、Vim など）に共通のコーディングスタイルを設定することができます。
-ソフトウェア開発プロジェクトでは、通常なんらかのコーディングルールが決められています。 ただ、開発者ごとに使用するエディタ、IDE が異なると、設定方法を統一できないという問題が発生します。 EditorConfig は、特定のエディタに依存しない、コーディングスタイルを記述するためのフォーマット（およびツール群） です。
-EditorConfig で設定可能な項目は、エンコーディング形式や改行コード、インデントサイズといったごく基本的な項目のみですが、最低限の記述スタイルをプロジェクト全体で素早く統一することができます。
-EditorConfig の導入（.editorconfig ファイルの作成） EditorConfig の導入はとても簡単で、次のような設定ファイル (.editorconfig) をプロジェクトのルートに作成するだけです。
-.editorconfig # ここが最上位の設定ファイル root = true # 全種類のテキストファイルの基本設定 [*] charset = utf-8 end_of_line = lf indent_size = 4 indent_style = space insert_final_newline = true trim_trailing_whitespace = true # あとは、ファイルの種類ごとに設定を上書き [*.{js,jsx,ts,tsx}] indent_size = 2 max_line_length = 80 [*.{kt,kts}] max_line_length = 100 [*.md] trim_trailing_whitespace = false [*.py] max_line_length = 80 [*.</description></item><item><title>英辞郎の PDIC の高度な使い方</title><link>https://maku.blog/p/en9hm8g/</link><pubDate>Mon, 04 Jun 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/en9hm8g/</guid><description>「英辞郎 第十版」に付いている辞書ソフト PDIC-R (Personal Dictionary-R) の高度な使い方をメモメモ φ(・ｪ・o)
-これを使いこなすと、英辞郎がかなり便利になります。
-熟語の検索 take over + Enter と入力すると、take &amp;hellip; over という英文を検索することができる（&amp;hellip; は任意の数の単語） take ~ over + Enter と入力すると、熟語としての take over の意味そのものを検索することができる。訳語部において、~ は任意の目的語を意味している。 AND/OR 検索（関連語検索） WORD 欄に複数の単語をスペースや | で繋げて入力し、Enter キーを押すことで、AND 検索、OR 検索を行うことができます（関連語検索と言います）。
-単語A 単語B + Enter 見出し語の AND 検索を行う。 スペースは半角でも全角でもよい。 単語A|単語B + Enter 見出し語の OR 検索を行う。 ヘルプには | の前後にスペースがあってもよいとされているが、実際はスペースがあるとうまくいかないっぽい。 単語A -単語B + Enter 見出し語に単語Aを含むが、単語Bは含まないものを検索する。 例: dog|cat -my -- 見出し語に「dog」あるいは「cat」を含むが「my」は含まないものを検索する。 単語A +単語B + Enter 見出し語に単語Aが含まれ、かつ、訳に単語Bが含まれるものを検索する。 例: dog cat +やれやれ -- 見出し語に「dog」と「cat」が含まれ、さらに、訳に「やれやれ」が含まれるものを検索する。 | や - は見出し語に作用するのに対し、+ は訳に対して作用するのでかなり特殊ですね。</description></item><item><title>ランダム ID 生成ツール</title><link>https://maku.blog/p/3nx9is3/</link><pubDate>Sat, 21 Apr 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3nx9is3/</guid><description>文字数: 文字候補: 再生成 指定した文字数のランダムな ID を生成します。 数字の 1（いち）とアルファベット小文字の l（エル）、数字の 0（ぜろ）とアルファベット大文字の O（オー）は区別しにくいので、デフォルトでは含めないようにしています。 このような UX 上の工夫は、さまざまな標準プロトコルで推奨されています。 例えば、下記は RFC 8628 におけるユーザーコード表示の例です。
-参考: RFC 8628 - OAuth 2.0 Device Authorization Grant の例 It is RECOMMENDED to avoid character sets that contain two or more characters that can easily be confused with each other, like "0" and "O" or "1", "l" and "I". Furthermore, to the extent practical, when a character set contains a character that may be confused with characters outside the character set, a character outside the set MAY be substituted with the one in the character set with which it is commonly confused; for example, "</description></item><item><title>TeraTerm マクロのメモ</title><link>https://maku.blog/p/kx7myd9/</link><pubDate>Tue, 19 Apr 2011 00:00:00 +0900</pubDate><guid>https://maku.blog/p/kx7myd9/</guid><description>マクロの起動の仕方 TeraTerm が起動している場合 メニューから Control → Macro でマクロファイル (.ttl) を選択 TeraTerm を起動してマクロを実行する場合 C:\&amp;gt; ttermpro.exe /M=sample.ttl TeraTerm を起動せずにマクロを実行する場合 C:\&amp;gt; ttpmacro.exe sample.ttl マクロの実行中止ダイアログを表示しないようにするには、/V オプションをつけます。 ttpmacro.exe でマクロを実行した場合、マクロ中で connect コマンドを実行したときに TeraTerm が表示されます。
-例1: COM1 ポートでシリアル接続する場合 connect &amp;#39;/C=1&amp;#39; 例2: TCP/IP (Telnet) 接続する場合 connect &amp;#39;host.example.com&amp;#39; 例3: TCP/IP (any port) 接続する場合 connect &amp;#39;host.example.com:8080&amp;#39; 文字列を表示する (dispstr) dispstr を使えば、TeraTerm アプリケーションの機能として文字列を表示できます。 マクロの実行経過などを表示したい場合などは dispstr を使うのがよいでしょう。
-dispstr &amp;#39;Hello World&amp;#39;#$0A 末尾の #$0A は改行コード (LF) を表しています。
-間違えやすいものに sendln がありますが、これは接続先の端末に対してコマンドを送るものです。 以下のように echo コマンドを送信した場合は、リモートの端末上で echo コマンドが実行されることになります。</description></item><item><title>TeraTerm でログを自動保存する</title><link>https://maku.blog/p/oi9yak2/</link><pubDate>Fri, 17 Jul 2009 00:00:00 +0900</pubDate><guid>https://maku.blog/p/oi9yak2/</guid><description>TeraTerm 起動時にログを自動でファイルに保存するようにする （Version: TeraTerm 4.62 で確認）
-メニューから、Setup → Additional settings&amp;hellip; Log のタブを開き、例えば以下のように設定 Default Log File Name (strftime format): %Y%m%dT%H%M%S-log.txt Default Log Save Folder: D:\y\log\teraterm Auto start loggin: Check 最後に Setup → Save setup で設定を保存 これで、TeraTerm 起動時に自動で 20090717T201506-log.txt のような名前で、ログファイルを作成してくれるようになります。
-ログファイルの各行に Windows システム時刻を付加する 以下のように設定しておくと、
-メニューから File → Log&amp;hellip; （ログ取得中の場合はいったんログ取得を停止してから） Option から Timestamp にチェックを入れて Save 最後に Setup → Save setup で設定を保存 ログファイルの各行に以下のような、時刻のプレフィックスが付くようになります。
-[Tue Jun 28 13:37:27.890 2011] ... [Tue Jun 28 13:37:30.590 2011] .</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ツール on まくろぐ</title><link>https://maku.blog/p/zb9ocav/</link><description>Recent content in ツール on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 15 Sep 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/zb9ocav/index.xml" rel="self" type="application/rss+xml"/><item><title>rg (ripgrep) コマンドの使い方まとめ</title><link>https://maku.blog/p/4jhbtm3/</link><pubDate>Mon, 15 Sep 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4jhbtm3/</guid><description>&lt;p>超高速なテキスト検索コマンド &lt;a href="https://github.com/BurntSushi/ripgrep">&lt;strong>rg (ripgrep)&lt;/strong>&lt;/a> にはずっとお世話になっていますが、ちょっと凝った検索をしようとしたときに、オプションを忘れてしまうことが多いので、チートシートの形でまとめておきます。&lt;/p>
+&lt;h2 id="ripgrep-チートシート">Ripgrep チートシート&lt;/h2>
+&lt;ul>
+&lt;li>&lt;code>rg TODO&lt;/code>
+&lt;ul>
+&lt;li>カレントディレクトリ以下ですべての「TODO」を検索します。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>rg &amp;quot;^def add&amp;quot;&lt;/code>
+&lt;ul>
+&lt;li>行頭が &lt;code>def add&lt;/code> で始まる行を検索します（デフォルトで正規表現とみなされます）。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>rg &lt;strong>-F&lt;/strong> "* + *&amp;quot;&lt;/code>
+&lt;ul>
+&lt;li>検索文字列を正規表現として解釈せず、そのままの文字列として検索します。上記の例では、&lt;code>* + *&lt;/code> という文字列を検索します。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>rg &lt;strong>-i&lt;/strong> TODO&lt;/code>
+&lt;ul>
+&lt;li>大文字・小文字を区別せずに「TODO」を検索します。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>rg &lt;strong>-w&lt;/strong> TODO&lt;/code>
+&lt;ul>
+&lt;li>単語単位で「TODO」を検索します。例えば &lt;code>TODOS&lt;/code> や &lt;code>MYTODO&lt;/code> はマッチしません（安心してください、&lt;code>TODO:&lt;/code> にはマッチします）。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>rg &lt;strong>-C2&lt;/strong> TODO&lt;/code>
+&lt;ul>
+&lt;li>マッチした行の前後 2 行も一緒に表示します（&lt;code>-A2 -B2&lt;/code> と指定するのと同様）。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>rg &lt;strong>-c&lt;/strong> TODO&lt;/code>
+&lt;ul>
+&lt;li>各ファイルごとにマッチした行数のみを表示します。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>rg TODO &lt;strong>src/main&lt;/strong>&lt;/code>
+&lt;ul>
+&lt;li>&lt;code>src/main&lt;/code> ディレクトリ以下（あるいは同名のファイル）で「TODO」を検索します。
+ディレクトリであることを明示したい場合は、末尾にスラッシュを付けます（&lt;code>src/main/&lt;/code>）。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>rg &lt;strong>-t py&lt;/strong> TODO&lt;/code>
+&lt;ul>
+&lt;li>Python ファイル（拡張子 &lt;code>.py&lt;/code>）のみを検索対象にします。&lt;/li>
+&lt;li>ここで指定するタイプは拡張子ではなくファイルタイプです。指定できるファイルタイプの一覧は &lt;strong>&lt;code>rg --type-list&lt;/code>&lt;/strong> で確認できます。&lt;/li>
+&lt;li>逆に、特定のファイルタイプを除外したい場合は &lt;code>&lt;strong>-T&lt;/strong> py&lt;/code> のように大文字の &lt;code>-T&lt;/code> を使います。&lt;/li>
+&lt;li>例えば、ファイルタイプとして &lt;code>minified: *.min.css, *.min.html, *.min.js&lt;/code> が定義されているので、&lt;strong>&lt;code>-T minified&lt;/code>&lt;/strong> と指定すると &lt;code>min&lt;/code> 系のファイルを除外できます。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>rg &lt;strong>-g "*.{js,ts}&amp;quot;&lt;/strong> TODO&lt;/code>
+&lt;ul>
+&lt;li>glob パターンで指定したファイルのみを検索対象にします。引数がシェルによって展開されないように、必ずクォートで囲みます。&lt;/li>
+&lt;li>大文字小文字を区別せずにマッチさせたい場合は、&lt;code>-g&lt;/code> の代わりに &lt;strong>&lt;code>--iglob&lt;/code>&lt;/strong> を使います。&lt;/li>
+&lt;li>glob パターンの例:
+&lt;ul>
+&lt;li>&lt;code>-g &amp;quot;*.{js.ts}&amp;quot;&lt;/code> &amp;hellip; 拡張子が &lt;code>.js&lt;/code> または &lt;code>.ts&lt;/code> のファイル&lt;/li>
+&lt;li>&lt;code>--iglob &amp;quot;*test*&lt;/code> &amp;hellip; ファイル名に &lt;code>test&lt;/code> や &lt;code>Test&lt;/code> を含むファイル&lt;/li>
+&lt;li>&lt;code>-g &amp;quot;**/game/**/*.py&amp;quot;&lt;/code> &amp;hellip; 任意の階層の &lt;code>game&lt;/code> ディレクトリ以下の &lt;code>.py&lt;/code> ファイル&lt;/li>
+&lt;li>&lt;code>-g &amp;quot;**/game/*.py&amp;quot;&lt;/code> &amp;hellip; 任意の階層の &lt;code>game&lt;/code> ディレクトリ直下の &lt;code>.py&lt;/code> ファイル&lt;/li>
+&lt;li>&lt;code>-g &amp;quot;/.*&amp;quot;&lt;/code> &amp;hellip; この階層のドットファイル&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>rg &lt;strong>--hidden&lt;/strong> TODO&lt;/code>
+&lt;ul>
+&lt;li>隠しファイル・隠しディレクトリも検索対象に含めます。&lt;/li>
+&lt;li>ただし、ドットファイルだけを検索したい場合は、&lt;code>-g &amp;quot;.*&amp;quot;&lt;/code> のように glob パターンを使う方がよいです。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>rg &lt;strong>--no-ignore&lt;/strong> TODO&lt;/code>
+&lt;ul>
+&lt;li>&lt;code>.gitignore&lt;/code> や &lt;code>.ignore&lt;/code>、&lt;code>$HOME/.rgignore&lt;/code> などで無視されているファイル・ディレクトリも検索対象に含めます。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="どのファイルが検索対象になっているかを調べる">どのファイルが検索対象になっているかを調べる&lt;/h2>
+&lt;p>&lt;code>--files&lt;/code> オプションを使うと、実際にどのファイルが検索対象になっているかを確認できます。
+試行錯誤しながら検索条件を調整したいときに便利です。&lt;/p></description></item><item><title>Alacritty で快適なターミナル環境を手にいれる（macOS/Windows/Linux 対応）</title><link>https://maku.blog/p/p9ppdqy/</link><pubDate>Tue, 26 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p9ppdqy/</guid><description>&lt;h2 id="alacritty-とは">Alacritty とは&lt;/h2>
+&lt;p>&lt;a href="https://alacritty.org/">Alacritty（アラクリッティ）&lt;/a> は、macOS や Windows の「ターミナル」アプリの代わりに使えるターミナルエミュレーターで、次のような特徴を持っています。&lt;/p>
+&lt;ul>
+&lt;li>Windows/macOS/Linux/BSD など主要な OS をサポート（ノウハウや設定を使いまわせる）&lt;/li>
+&lt;li>Rust で実装されていて高速。レンダリングも GPU で高速。&lt;/li>
+&lt;li>VI モードでキーボードによる快適な操作が可能&lt;/li>
+&lt;li>設定ファイルが TOML 形式でわかりやすい（シンプルさを追求しているため、GUI ベースの設定画面は提供しない）&lt;/li>
+&lt;li>&lt;code>vim&lt;/code> や &lt;code>tmux&lt;/code> のようなターミナルに寄生するアプリと相性がよくて表示の問題が起きにくい&lt;/li>
+&lt;li>スクロールバッファ内の検索が可能&lt;/li>
+&lt;li>マルチウィンドウモードもあり（ただし思想としては &lt;code>tmux&lt;/code> などのターミナルマルチプレクサーを使うべきとしている）&lt;/li>
+&lt;/ul>
+&lt;p>簡単にまとめると、&lt;code>vim&lt;/code> や &lt;code>tmux&lt;/code> 使いで、シンプルで高速なクロスプラットフォームなターミナルアプリを求めている人にうってつけということですね！
+ちなみに、Alacritty という名前の末尾が tty になっているのがおしゃれです（「敏捷性」を表す英単語「alacrity」をもじってます）。&lt;/p>
+&lt;h2 id="vi-モード">VI モード&lt;/h2>
+&lt;p>VI モードに切り替えると、VI 風のキーバインドを使ったカーソルの移動、画面スクロール、検索などが可能になります。
+VI モードへの入り方だけ特殊 (&lt;code>Ctrl + Shift + Space&lt;/code>) ですが、あとはほぼ VI の操作方法に従って操作できます（参考: &lt;a href="https://maku77.github.io/vim/">まくまく Vim ノート&lt;/a>）。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>キーバインド&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>Ctrl + Shift + Space&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>VI モード ON/OFF&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>i&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>VI モード OFF（普通のプロンプト操作に戻る）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>h&lt;/code> / &lt;code>j&lt;/code> / &lt;code>k&lt;/code> / &lt;code>l&lt;/code>&lt;/td>
+ &lt;td>カーソル移動&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>v&lt;/code> / &lt;code>Ctrl + v&lt;/code> / &lt;code>Shift + v&lt;/code>&lt;/td>
+ &lt;td>選択／矩形選択／行選択&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>y&lt;/code>&lt;/td>
+ &lt;td>選択したテキストをヤンク（コピー）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>Ctrl + B&lt;/code> / &lt;code>Ctrl + F&lt;/code>&lt;/td>
+ &lt;td>上下スクロール&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>/&lt;/code> / &lt;code>?&lt;/code>&lt;/td>
+ &lt;td>前方検索／後方検索&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="スクロールバッファ内の検索">スクロールバッファ内の検索&lt;/h2>
+&lt;p>下記のキーコンビネーションで、スクロールバッファ内のテキストをインクリメンタルサーチできます。
+まぁ、これを使わなくても VI モードに入って &lt;code>/&lt;/code> で検索しちゃえばよい気はします。&lt;/p></description></item><item><title>tmux チートシート</title><link>https://maku.blog/p/hijkfza/</link><pubDate>Sun, 24 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/hijkfza/</guid><description>&lt;h2 id="tmux-の基本要素">tmux の基本要素&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="700" height="auto" src="../../p/hijkfza/img-001.drawio.svg" alt="/p/hijkfza/img-001.drawio.svg" />
+ &lt;figcaption>図: tmux の構成要素&lt;/figcaption>
+&lt;/figure>
+
+&lt;dl>
+&lt;dt>クライアント&lt;/dt>
+&lt;dd>tmux の起動元となるターミナルアプリです。
+クライアントは tmux サーバーを介してセッションやウィンドウを操作します。
+最初に &lt;code>tmux&lt;/code> コマンドを実行したときに tmux サーバーが立ち上がり、1 つ目のセッションとウィンドウが生成されます。
+複数のクライアントが同じセッションに接続できます。&lt;/dd>
+&lt;dt>セッション&lt;/dt>
+&lt;dd>セッションは tmux 内での作業単位で、クライアントからセッションにアタッチすることで、セッション内のウィンドウを操作できるようになります。
+セッション内には複数のウィンドウを作成することができます。
+クライアントからセッションをデタッチしても、tmux サーバーが存在する限り、セッションは生き続けることができます。&lt;/dd>
+&lt;dt>ウィンドウ&lt;/dt>
+&lt;dd>ウィンドウはセッション内でのトップレベルの表示領域で、見た目としては Web ブラウザのタブのように見えます。
+ウィンドウはセンション間で移動することができます。
+ウィンドウは複数のペインに分割することができます。&lt;/dd>
+&lt;dt>ペイン&lt;/dt>
+&lt;dd>ペインはウィンドウ内の分割領域を表します。
+IDE のようにウィンドウを分割して複数の作業を同時に行えます。&lt;/dd>
+&lt;/dl>
+&lt;h2 id="tmux-のコマンド入力の仕組み">tmux のコマンド入力の仕組み&lt;/h2>
+&lt;p>ターミナルアプリなどのクライアントから &lt;code>tmux&lt;/code> コマンドを実行すると、tmux セッションが立ち上がり、クライアントがアタッチされます。
+アタッチされたクライアント上で &lt;strong>&lt;code>PREFIX&lt;/code>&lt;/strong> キーとの組み合わせによるキーシーケンスを入力することで、tmux セッション内のウィンドウを操作できます。
+&lt;code>PREFIX&lt;/code> キーには、デフォルトで &lt;strong>&lt;code>Ctrl + b&lt;/code>&lt;/strong> が割り当てられています。&lt;/p>
+&lt;p>tmux の制御コマンドには名前が付けられており、&lt;code>tmux&lt;/code> コマンドの引数で制御コマンド名を渡すことで実行できるようになっています（内部的には tmux サーバーにコマンドが送られています）。
+tmux セッション内で &lt;code>tmux&lt;/code> コマンドを実行すると、そのセッションに対しての操作になります。
+また、&lt;strong>&lt;code>PREFIX → :&lt;/code>&lt;/strong> に続けてコマンド名を入力する方法もあります。&lt;/p>
+&lt;p>例えば、セッション内に新しいウィンドウを作成したいときは、以下のように複数の方法で実行できます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>PREFIX → c&lt;/code>&lt;/strong> と入力する&lt;/li>
+&lt;li>&lt;strong>&lt;code>PREFIX → :new-window&lt;/code>&lt;/strong> と入力する（&lt;code>:neww&lt;/code> でも OK）&lt;/li>
+&lt;li>ターミナル上で &lt;strong>&lt;code>tmux new-window&lt;/code>&lt;/strong> を実行する（&lt;code>neww&lt;/code> でも OK）&lt;/li>
+&lt;/ul>
+&lt;h2 id="セッション-session">セッション (Session)&lt;/h2>
+&lt;p>tmux の一連の機能を使用するには、最初にセッションを作成する必要があります。
+セッションを作成すると、同時に 1 つのウィンドウが作成されます。&lt;/p></description></item><item><title>ウェブサイトのリンク切れを自動でチェックする (muffet)</title><link>https://maku.blog/p/s7q8o5k/</link><pubDate>Sat, 23 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/s7q8o5k/</guid><description>&lt;h2 id="muffet-のインストール">muffet のインストール&lt;/h2>
+&lt;p>&lt;strong>&lt;code>muffet&lt;/code>&lt;/strong> はウェブサイトのリンク切れをチェックしてくれるコマンドラインツールです。
+Go 言語で実装されており、いろいろな OS (Linux、macOS、Windows) で利用することができます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/raviqqe/muffet">raviqqe/muffet: Fast website link checker in Go&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>インストール方法は、上記サイトに記述されていますが、例えば macOS であれば、homebrew を使って次のように簡単にインストールできます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">macOS の場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">%&lt;/span> brew install muffet
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>各 OS 用の実行バイナリが欲しければ、&lt;a href="https://github.com/raviqqe/muffet/releases">Release ページ&lt;/a> からダウンロードできます。&lt;/p>
+&lt;h2 id="muffet-の使い方">muffet の使い方&lt;/h2>
+&lt;p>基本的な使い方は、次のように調べたいウェブページのアドレスを入力するだけです。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">%&lt;/span> muffet http://localhost:51000
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>リンク元のサイトアドレスと、アクセスできなかったサイトアドレスの組み合わせが一覧表示されます。&lt;/p>
+&lt;pre tabindex="0">&lt;code>http://localhost:51000/p/eu7djpv/
+	404	http://localhost:51000/assets/favicon/180x180.png
+	404	http://localhost:51000/assets/favicon/192x192.png
+http://localhost:51000/p/ckahx6k/
+	404	http://localhost:51000/assets/favicon/180x180.png
+	404	http://localhost:51000/assets/favicon/192x192.png
+	404	http://video.google.com/videoplay?docid=973149761529535925
+	404 (following redirect https://www.example.com/p/44327.html)
+	 	http://www.example.com/44327/2005/04/tipsinbox.html
+&lt;/code>&lt;/pre>&lt;p>muffet は複数スレッドで高速にリンクチェックを行いますが、ひとつのドメインに対する同時接続数を制限したいときは、&lt;strong>&lt;code>--max-connections-per-host&lt;/code>&lt;/strong> オプションを指定します。
+Web サーバーへの負荷を考慮したいときに使えます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">同時接続数を制限する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">%&lt;/span> muffet --max-connections-per-host&lt;span class="o">=&lt;/span>&lt;span class="m">5&lt;/span> http://localhost:51000
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;strong>&lt;code>--exclude&lt;/code>&lt;/strong> オプションを使うと、チェック対象外とするアドレスを正規表現で指定できます。
+例えば、次のようにすれば、&lt;code>https://&lt;/code> で始まるリンクをチェック対象外にできます。
+ローカル Web サーバーで開発している場合、このオプション指定によって外部サイトのリンクだけをチェック対象外にできます。&lt;/p></description></item><item><title>Windows のコマンドラインで ZIP ファイルを作成する (Compress-Archive)</title><link>https://maku.blog/p/vin35f7/</link><pubDate>Wed, 03 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vin35f7/</guid><description>&lt;p>Windows のコマンドプロンプト（あるいは PowerShell）から zip ファイルを作成するには、PowerShell の &lt;a href="https://docs.microsoft.com/ja-jp/powershell/module/Microsoft.PowerShell.Archive/Compress-Archive">Compress-Archive コマンド&lt;/a> を使用します。
+特に何もインストールしなくても実行できます。&lt;/p>
+&lt;h2 id="指定したディレクトリを-zip-圧縮する">指定したディレクトリを zip 圧縮する&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src ディレクトリを dst.zip にアーカイブ&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">C:\&amp;gt; powershell compress-archive src dst&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">作成される zip ファイル&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">dst.zip
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- src/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- file1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- file2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- file3&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>出力ファイル名 &lt;code>dst.zip&lt;/code> の &lt;code>.zip&lt;/code> は省略することができます。
+&lt;code>dst.zip&lt;/code> を展開すると、ルートに &lt;code>src&lt;/code> ディレクトリが現れる状態になります。&lt;/p>
+&lt;h2 id="ディレクトリ内のファイルのみを-zip-圧縮する">ディレクトリ内のファイルのみを zip 圧縮する&lt;/h2>
+&lt;p>ルートディレクトリ（この例では &lt;code>src&lt;/code>）を zip ファイルに含めずに、そのディレクトリ内のファイル群だけを zip ファイルにまとめたいときは、次のように &lt;strong>&lt;code>src/*&lt;/code>&lt;/strong> と指定します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src ディレクトリの中身だけを dst.zip にアーカイブ&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">C:\&amp;gt; powershell compress-archive src/* dst&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">作成される zip ファイル&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">dst.zip
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- file1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- file2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- file3&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="複数のディレクトリやファイルを-zip-圧縮する">複数のディレクトリやファイルを zip 圧縮する&lt;/h2>
+&lt;p>圧縮対象のディレクトリやファイルを複数指定するには、次のようにカンマ (&lt;code>,&lt;/code>) で列挙します。
+カンマの前後にはスペースを入れないことに注意してください。&lt;/p></description></item><item><title>EditorConfig でコーディングスタイルを統一する</title><link>https://maku.blog/p/7aoa6x5/</link><pubDate>Fri, 20 Nov 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7aoa6x5/</guid><description>&lt;h2 id="editorconfig-とは">EditorConfig とは&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="105" height="90" src="../../p/7aoa6x5/img-001.png" alt="/p/7aoa6x5/img-001.png" />
+&lt;/figure>
+
+&lt;p>&lt;a href="https://editorconfig.org/">EditorConfig&lt;/a>（&lt;code>.editorconfig&lt;/code> ファイル）を導入すると、各種エディタ（Visual Studio、Android Studio、Vim など）に共通のコーディングスタイルを設定することができます。&lt;/p>
+&lt;p>ソフトウェア開発プロジェクトでは、通常なんらかのコーディングルールが決められています。
+ただ、開発者ごとに使用するエディタ、IDE が異なると、設定方法を統一できないという問題が発生します。
+EditorConfig は、特定のエディタに依存しない、&lt;strong>コーディングスタイルを記述するためのフォーマット（およびツール群）&lt;/strong> です。&lt;/p>
+&lt;p>EditorConfig で設定可能な項目は、エンコーディング形式や改行コード、インデントサイズといったごく基本的な項目のみですが、最低限の記述スタイルをプロジェクト全体で素早く統一することができます。&lt;/p>
+&lt;h2 id="editorconfig-の導入editorconfig-ファイルの作成">EditorConfig の導入（.editorconfig ファイルの作成）&lt;/h2>
+&lt;p>EditorConfig の導入はとても簡単で、次のような設定ファイル (&lt;strong>&lt;code>.editorconfig&lt;/code>&lt;/strong>) をプロジェクトのルートに作成するだけです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.editorconfig&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl"># ここが最上位の設定ファイル
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">root = true
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 全種類のテキストファイルの基本設定
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[*]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">charset = utf-8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">end_of_line = lf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">indent_size = 4
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">indent_style = space
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">insert_final_newline = true
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">trim_trailing_whitespace = true
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># あとは、ファイルの種類ごとに設定を上書き
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[*.{js,jsx,ts,tsx}]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">indent_size = 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">max_line_length = 80
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[*.{kt,kts}]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">max_line_length = 100
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[*.md]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">trim_trailing_whitespace = false
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[*.py]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">max_line_length = 80
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[*.rb]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">indent_size = 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">max_line_length = 80
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[*.{yml,yaml,json}]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">indent_size = 2&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>各プロパティの内容は、ほぼ自明ですが、それぞれ次のような意味を持っています。&lt;/p></description></item><item><title>英辞郎の PDIC の高度な使い方</title><link>https://maku.blog/p/en9hm8g/</link><pubDate>Mon, 04 Jun 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/en9hm8g/</guid><description>&lt;p>「英辞郎 第十版」に付いている辞書ソフト PDIC-R (Personal Dictionary-R) の高度な使い方をメモメモ φ(・ｪ・o)&lt;/p>
+&lt;p>これを使いこなすと、英辞郎がかなり便利になります。&lt;/p>
+&lt;h2 id="熟語の検索">熟語の検索&lt;/h2>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>take over&lt;/code>&lt;/strong> + &lt;kbd>Enter&lt;/kbd> と入力すると、take &amp;hellip; over という英文を検索することができる（&amp;hellip; は任意の数の単語）&lt;/li>
+&lt;li>&lt;strong>&lt;code>take ~ over&lt;/code>&lt;/strong> + &lt;kbd>Enter&lt;/kbd> と入力すると、熟語としての take over の意味そのものを検索することができる。訳語部において、&lt;code>~&lt;/code> は任意の目的語を意味している。&lt;/li>
+&lt;/ul>
+&lt;h2 id="andor-検索関連語検索">AND/OR 検索（関連語検索）&lt;/h2>
+&lt;p>WORD 欄に複数の単語をスペースや &lt;code>|&lt;/code> で繋げて入力し、&lt;kbd>Enter&lt;/kbd> キーを押すことで、AND 検索、OR 検索を行うことができます（関連語検索と言います）。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>単語A 単語B&lt;/code> + &lt;kbd>Enter&lt;/kbd>
+&lt;ul>
+&lt;li>見出し語の AND 検索を行う。&lt;/li>
+&lt;li>スペースは半角でも全角でもよい。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>単語A|単語B&lt;/code> + &lt;kbd>Enter&lt;/kbd>
+&lt;ul>
+&lt;li>見出し語の OR 検索を行う。&lt;/li>
+&lt;li>ヘルプには &lt;code>|&lt;/code> の前後にスペースがあってもよいとされているが、実際はスペースがあるとうまくいかないっぽい。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>単語A -単語B&lt;/code> + &lt;kbd>Enter&lt;/kbd>
+&lt;ul>
+&lt;li>見出し語に単語Aを含むが、単語Bは含まないものを検索する。&lt;/li>
+&lt;li>例: &lt;code>dog|cat -my&lt;/code> -- 見出し語に「dog」あるいは「cat」を含むが「my」は含まないものを検索する。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>単語A +単語B&lt;/code> + &lt;kbd>Enter&lt;/kbd>
+&lt;ul>
+&lt;li>見出し語に単語Aが含まれ、かつ、訳に単語Bが含まれるものを検索する。&lt;/li>
+&lt;li>例: &lt;code>dog cat +やれやれ&lt;/code> -- 見出し語に「dog」と「cat」が含まれ、さらに、訳に「やれやれ」が含まれるものを検索する。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>|&lt;/code> や &lt;code>-&lt;/code> は見出し語に作用するのに対し、&lt;code>+&lt;/code> は訳に対して作用するのでかなり特殊ですね。&lt;/p></description></item><item><title>ランダム ID 生成ツール</title><link>https://maku.blog/p/3nx9is3/</link><pubDate>Sat, 21 Apr 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3nx9is3/</guid><description>&lt;form style="color:white; background:#c50; padding:1rem; text-align:center;">
+ &lt;label>
+ 文字数:
+ &lt;input id="digits" type="number" value="7" style="width:3.5em">
+ &lt;/label>
+ &lt;label>
+ 文字候補:
+ &lt;input id="candidate" type="text" value="23456789abcdefghijkmnopqrstuvwxyz" required style="width:20em">&lt;/input>
+ &lt;/label>
+ &lt;div id="result" style="border-radius:1rem; letter-spacing:0.1em; text-align: center; background:#fff0e0; color:#c50; font-size: 2.5rem; font-weight: bolder; margin: 1rem 1rem 0 1rem; padding: 0.7em;">&lt;/div>
+ &lt;button onclick="generate(); return false;" style="margin-top:1rem; font-size:1.5em;">再生成&lt;/button>
+&lt;/form>
+&lt;script>
+function generate() {
+ // 最大桁数を 100 文字までに制限
+ const $digitsElem = document.getElementById('digits');
+ const digits = Math.min(100, $digitsElem.value);
+ $digitsElem.value = digits;
+
+ // ランダム文字列を生成
+ const candidate = document.getElementById('candidate').value;
+ let result = '';
+ for (let i = 0; i &lt; digits; ++i) {
+ let index = Math.floor(Math.random() * candidate.length);
+ result += candidate.charAt(index);
+ }
+
+ // 結果表示
+ document.getElementById('result').innerText = result;
+}
+window.onload = generate();
+&lt;/script>
+&lt;p>指定した文字数のランダムな ID を生成します。
+数字の &lt;code>1&lt;/code>（いち）とアルファベット小文字の &lt;code>l&lt;/code>（エル）、数字の &lt;code>0&lt;/code>（ぜろ）とアルファベット大文字の &lt;code>O&lt;/code>（オー）は区別しにくいので、デフォルトでは含めないようにしています。
+このような UX 上の工夫は、さまざまな標準プロトコルで推奨されています。
+例えば、下記は RFC 8628 におけるユーザーコード表示の例です。&lt;/p></description></item><item><title>TeraTerm マクロのメモ</title><link>https://maku.blog/p/kx7myd9/</link><pubDate>Tue, 19 Apr 2011 00:00:00 +0900</pubDate><guid>https://maku.blog/p/kx7myd9/</guid><description>&lt;h2 id="マクロの起動の仕方">マクロの起動の仕方&lt;/h2>
+&lt;h3 id="teraterm-が起動している場合">TeraTerm が起動している場合&lt;/h3>
+&lt;ol>
+&lt;li>メニューから &lt;strong>Control&lt;/strong> → &lt;strong>Macro&lt;/strong> でマクロファイル (.ttl) を選択&lt;/li>
+&lt;/ol>
+&lt;h3 id="teraterm-を起動してマクロを実行する場合">TeraTerm を起動してマクロを実行する場合&lt;/h3>
+&lt;pre tabindex="0">&lt;code>C:\&amp;gt; ttermpro.exe /M=sample.ttl
+&lt;/code>&lt;/pre>&lt;h3 id="teraterm-を起動せずにマクロを実行する場合">TeraTerm を起動せずにマクロを実行する場合&lt;/h3>
+&lt;pre tabindex="0">&lt;code>C:\&amp;gt; ttpmacro.exe sample.ttl
+&lt;/code>&lt;/pre>&lt;p>マクロの実行中止ダイアログを表示しないようにするには、&lt;code>/V&lt;/code> オプションをつけます。
+ttpmacro.exe でマクロを実行した場合、マクロ中で &lt;code>connect&lt;/code> コマンドを実行したときに TeraTerm が表示されます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例1: COM1 ポートでシリアル接続する場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">connect &amp;#39;/C=1&amp;#39;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例2: TCP/IP (Telnet) 接続する場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">connect &amp;#39;host.example.com&amp;#39;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例3: TCP/IP (any port) 接続する場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">connect &amp;#39;host.example.com:8080&amp;#39;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="文字列を表示する-dispstr">文字列を表示する (dispstr)&lt;/h2>
+&lt;p>&lt;code>dispstr&lt;/code> を使えば、TeraTerm アプリケーションの機能として文字列を表示できます。
+マクロの実行経過などを表示したい場合などは &lt;code>dispstr&lt;/code> を使うのがよいでしょう。&lt;/p>
+&lt;pre tabindex="0">&lt;code>dispstr &amp;#39;Hello World&amp;#39;#$0A
+&lt;/code>&lt;/pre>&lt;p>末尾の &lt;code>#$0A&lt;/code> は改行コード (LF) を表しています。&lt;/p>
+&lt;p>間違えやすいものに &lt;code>sendln&lt;/code> がありますが、これは接続先の端末に対してコマンドを送るものです。
+以下のように &lt;code>echo&lt;/code> コマンドを送信した場合は、リモートの端末上で &lt;code>echo&lt;/code> コマンドが実行されることになります。&lt;/p>
+&lt;pre tabindex="0">&lt;code>sendln &amp;#39;echo Hello World&amp;#39;
+&lt;/code>&lt;/pre>&lt;h2 id="メッセージボックスを表示する-messagebox">メッセージボックスを表示する (messagebox)&lt;/h2>
+&lt;pre tabindex="0">&lt;code>messagebox &amp;#34;Hello TTL!&amp;#34; &amp;#34;It&amp;#39;s cool&amp;#34;
+&lt;/code>&lt;/pre>&lt;h2 id="ビープ音を出す-beep">ビープ音を出す (beep)&lt;/h2>
+&lt;p>ビープ音を出すコマンドの書式は以下の通りです。&lt;/p></description></item><item><title>TeraTerm でログを自動保存する</title><link>https://maku.blog/p/oi9yak2/</link><pubDate>Fri, 17 Jul 2009 00:00:00 +0900</pubDate><guid>https://maku.blog/p/oi9yak2/</guid><description>&lt;h2 id="teraterm-起動時にログを自動でファイルに保存するようにする">TeraTerm 起動時にログを自動でファイルに保存するようにする&lt;/h2>
+&lt;p>（Version: TeraTerm 4.62 で確認）&lt;/p>
+&lt;ol>
+&lt;li>メニューから、&lt;kbd>&lt;samp>Setup&lt;/samp>&lt;/kbd> → &lt;kbd>&lt;samp>Additional settings&amp;hellip;&lt;/samp>&lt;/kbd>&lt;/li>
+&lt;li>Log のタブを開き、例えば以下のように設定
+&lt;ul>
+&lt;li>Default Log File Name (strftime format): &lt;kbd>%Y%m%dT%H%M%S-log.txt&lt;/kbd>&lt;/li>
+&lt;li>Default Log Save Folder: &lt;kbd>D:\y\log\teraterm&lt;/kbd>&lt;/li>
+&lt;li>Auto start loggin: &lt;kbd>Check&lt;/kbd>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>最後に &lt;kbd>&lt;samp>Setup&lt;/samp>&lt;/kbd> → &lt;kbd>&lt;samp>Save setup&lt;/samp>&lt;/kbd> で設定を保存&lt;/li>
+&lt;/ol>
+&lt;p>これで、TeraTerm 起動時に自動で &lt;code>20090717T201506-log.txt&lt;/code> のような名前で、ログファイルを作成してくれるようになります。&lt;/p>
+&lt;h2 id="ログファイルの各行に-windows-システム時刻を付加する">ログファイルの各行に Windows システム時刻を付加する&lt;/h2>
+&lt;p>以下のように設定しておくと、&lt;/p>
+&lt;ol>
+&lt;li>メニューから &lt;kbd>&lt;samp>File&lt;/samp>&lt;/kbd> → &lt;kbd>&lt;samp>Log&amp;hellip;&lt;/samp>&lt;/kbd> （ログ取得中の場合はいったんログ取得を停止してから）&lt;/li>
+&lt;li>Option から &lt;kbd>&lt;samp>Timestamp&lt;/samp>&lt;/kbd> にチェックを入れて &lt;kbd>&lt;samp>Save&lt;/samp>&lt;/kbd>&lt;/li>
+&lt;li>最後に &lt;kbd>&lt;samp>Setup&lt;/samp>&lt;/kbd> → &lt;kbd>&lt;samp>Save setup&lt;/samp>&lt;/kbd> で設定を保存&lt;/li>
+&lt;/ol>
+&lt;p>ログファイルの各行に以下のような、時刻のプレフィックスが付くようになります。&lt;/p>
+&lt;pre tabindex="0">&lt;code>[Tue Jun 28 13:37:27.890 2011] ...
+[Tue Jun 28 13:37:30.590 2011] ...
+[Tue Jun 28 13:37:30.590 2011] ...
+&lt;/code>&lt;/pre>&lt;h2 id="ログ取得のダイアログを非表示する">ログ取得のダイアログを非表示する&lt;/h2>
+&lt;p>ログ取得中のダイアログが邪魔な場合は、以下のように消すことができます。&lt;/p></description></item></channel></rss>

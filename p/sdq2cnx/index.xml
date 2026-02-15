@@ -1,42 +1,532 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS CloudFormation/SAM/CDK のメモ on まくろぐ</title><link>https://maku.blog/p/sdq2cnx/</link><description>Recent content in AWS CloudFormation/SAM/CDK のメモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sun, 17 Apr 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/sdq2cnx/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS CloudFormation 入門 (Hello World)</title><link>https://maku.blog/p/h7arpdj/</link><pubDate>Thu, 01 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/h7arpdj/</guid><description>CloudFormation とは AWS CloudFormation を使用すると、テンプレートファイル (YAML or JSON) で定義した AWS リソース群をまとめて生成（更新）することができます。 いわゆる IaC (Infrastructure as Code) 環境を提供するものであり、Ansible や Chef を使ったことがあれば、それの AWS リソース構築用だと考えると分かりやすいです。
-テンプレートから生成されるインフラ（AWS リソース群）は スタック と呼ばれ、テンプレートがあればスタックは何度でも生成することができます。 これはオブジェクト指向プログラミングにおける、クラスとインスタンスの関係に似ています。 必要のなくなったリソース群は、スタック単位でまとめて削除することができます。
-CloudFormation の主な特徴は次の通りです。
-何度でも同じ構成でリソースをセットアップできる（他のリージョンに複製したり、一時的に使うインフラを自動生成できる） テンプレートはテキストファイル (YAML/JSON) なので、GitHub などでバージョン管理することができ、PullRequest ベースのコードレビューを行える 冪等性が考慮されており、テンプレートには最終的な結果だけを定義しておけばよい（構成のアップデート時に差分を意識する必要はない） 例えば、次のようなテンプレートを使用すると、S3 サービスのバケットリソースを自動で作成することができます。
-template.yml AWSTemplateFormatVersion: &amp;#34;2010-09-09&amp;#34; Resources: HelloBucket: Type: AWS::S3::Bucket 必須のルートプロパティは Resources だけですが、テンプレートフォーマットのバージョンを示す AWSTemplateFormatVersion は最低限指定しておくのがよいでしょう（2021年時点で、2010-09-09 が最新バージョンです）。
-CloudFormation コンソールからスタックを生成する CloudFormation マネージメントコンソール を使うと、Web サイト上でスタックを生成することができます。
-CloudFormation マネージメントコンソールを使ったスタックの生成手順は以下の通りです。
-サイドバーから Stacks（スタック）を選択する CloudFormation で管理されているスタックの一覧が表示されます。 （スタックの作成）ボタンを押す テンプレートを指定する S3 上に置いたファイルを指定することもできますが、ここではローカルに作成した YAML ファイルをアップロードします。そのためには、Template is ready（テンプレートの準備完了） → Upload a template file（テンプレートファイルのアップロード）を選択し、YAML ファイルを選択します。 任意のスタック名（mystack など）を入力します テンプレートファイル内にパラメータ (Parameters) を定義している場合は、ここで具体的な値を入力できます。 あとはそのまま進めていって、Create stack（スタックの作成）を押せば、スタックの生成処理が始まります。 スタックの一覧画面に戻ると、作成中のスタックのステータスが CREATE_IN_PROGRESS となって表示されます。 しばらくしてスタックの生成処理が完了すると、ステータスが CREATE_COMPLETE に変わります。 これで、テンプレートで定義した AWS リソース群が使用できる状態になります。</description></item><item><title>AWS CloudFormation をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/zkxamw9/</link><pubDate>Thu, 11 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/zkxamw9/</guid><description>テンプレートファイルが正しく記述できているか確認する (cloudformation validate-template) YAML や JSON 形式で作成した CloudFormation 用のテンプレートファイルが、正しく記述できているかを調べることができます。
-正しく記述できている場合 $ aws cloudformation validate-template --template-body file://template.json Description: Sample template Parameters: [] 不正なフォーマットの場合 An error occurred (ValidationError) when calling the ValidateTemplate operation: Template format error: JSON not well-formed. (line 5, column 2) 不正なプロパティがある場合 An error occurred (ValidationError) when calling the ValidateTemplate operation: Invalid template property or properties [ABC] スタックを作成する (cloudformation create-stack) ローカルの YAML テンプレートから生成 $ aws cloudformation create-stack --stack-name mystack \ --template-body file://template.</description></item><item><title>AWS CloudFormation で Lambda 関数のリソースを生成する</title><link>https://maku.blog/p/w8s8kx9/</link><pubDate>Mon, 05 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/w8s8kx9/</guid><description>何をするか？ AWS CloudFormation を使うと Lambda 関数を含むインフラ（AWS リソース群）をまとめて生成することができますが、AWS CloudFormation の拡張である AWS SAM を使うと、もっと簡潔に Lambda 関数のリソースを生成することができます。
-例えば、CloudFormation テンプレートの AWS::Lambda::Function リソースでは、Role プロパティが必須でしたが、SAM テンプレートの AWS::Serverless::Function リソースでは、Role プロパティはオプショナルになっています。 Role プロパティを省略すると、Lambda 関数に付けた論理 ID (Logical ID) をもとに、&amp;lt;論理ID&amp;gt;Role という名前のロールが自動生成されます。
-ここでは、AWS SAM を使った Lambda 関数生成の基本として、次のようなパターンで CloudFormation スタックを生成してみます。
-SAM テンプレートに関数コードを埋め込んでデプロイ S3 バケット上の関数の ZIP ファイルを使ってデプロイ SAM テンプレートに関数コードを埋め込んでデプロイ まずは、一番シンプルな例として、SAM テンプレート内に Lambda 関数の実装をハードコーディングしてしまい、それをデプロイ（CloudFormation スタックの生成）してみます。
-下記が SAM テンプレートです。 SAM で Lambda 関数のリソースを定義するときは、リソースタイプとして AWS::Serverless::Function を指定します（CloudFormation では AWS::Lambda::Function です）。 ここでは関数の実装を InlineCode プロパティでハードコーディングし、単純な Hello World! メッセージをレスポンスとして返すようにしています。
-template.yml AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Transform: AWS::Serverless-2016-10-31 Description: Simple Lambda Function Resources: HelloFunction: Type: AWS::Serverless::Function Properties: Runtime: python3.</description></item><item><title>AWS CloudFormation の設定例: Lambda 関数の設定いろいろ</title><link>https://maku.blog/p/pbo2dpy/</link><pubDate>Thu, 08 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pbo2dpy/</guid><description>タイムアウト時間 (Timeout) Lambda 関数のタイムアウト時間（最大実行可能時間）を設定するには、Timeout プロパティで秒単位の指定を行います。
-例: タイムアウトを 15 秒にする AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Transform: AWS::Serverless-2016-10-31 Resources: MyLambda: Type: AWS::Serverless::Function Properties: Runtime: nodejs14.x CodeUri: function.zip Handler: index.handler Timeout: 15 すべての Lambda 関数の Timeout 値をまとめて設定したいときは、Globals セクションを使います。
-AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Transform: AWS::Serverless-2016-10-31 Globals: Function: Runtime: nodejs14.x CodeUri: function.zip Timeout: 15 Resources: MyLambda1: Type: AWS::Serverless::Function Properties: Handler: index.handler1 MyLambda2: Type: AWS::Serverless::Function Properties: Handler: index.handler2 環境変数 (Environment) Lambda 関数の中から参照可能な環境変数を設定するには、Variables プロパティに、キーと値のペアを指定します。 すべての Lambda 関数に共通で設定する環境変数は、Globals セクションで定義します。
-Globals: Function: Environment: Variables: STAGE: Production TABLE_NAME: global-table Resources: MyFunction: Type: AWS::Serverless::Function Properties: Environment: Variables: TABLE_NAME: resource-table NEW_VAR: hello トリガー設定 (Events) Lambda 関数を呼び出すためのトリガー（イベント）は、Events プロパティで定義できます。 Resouces プロパティと同様に、Events プロパティの一階層目にはイベントの論理 ID (Logical ID) を記述して、その下にそのイベントの設定を記述します。</description></item><item><title>AWS CloudFormation の設定例: Lambda 関数から S3 にアクセスできるようにする</title><link>https://maku.blog/p/dzdq3ep/</link><pubDate>Mon, 12 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dzdq3ep/</guid><description>CloudFormation (SAM) を利用して、Lambda 関数および S3 バケットを作成し、Lambda 関数から S3 バケットにアクセスできるようにポリシー設定するテンプレートの例です。 参考までに Lambda 関数の TypeScript コードも載せましたが、あくまで SAM テンプレートの記述例を示すことを目的としています。
-SAM テンプレートの記述例 次の SAM テンプレートでは、AWS リソースとして S3 バケット (MyBucket) と Lambda 関数 (MyFunction) を定義しています。
-template.yml AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Transform: AWS::Serverless-2016-10-31 Resources: # S3 バケットの定義 MyBucket: Type: AWS::S3::Bucket # Lambda 関数の定義 MyFunction: Type: AWS::Serverless::Function Properties: Runtime: nodejs14.x Handler: build/index.handler CodeUri: function.zip Policies: - S3CrudPolicy: BucketName: !Ref MyBucket Environment: Variables: BUCKET_NAME: !Ref MyBucket S3 バケットは単純にスタック内に新規作成するだけなので、何もプロパティ設定していません。 ポイントは、Lambda 関数側のポリシー設定（Policies プロパティ）です。</description></item><item><title>AWS CloudFormation で S3 バケットのリソースを作成する</title><link>https://maku.blog/p/ugt6gr4/</link><pubDate>Fri, 09 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ugt6gr4/</guid><description>S3 バケット定義の基本 AWS CloudFormation で S3 バケットを作成・設定するには、次のようにテンプレートファイル内で AWS::S3::Bucket タイプのリソースを定義します。
-template.yml AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Resources: MyBucket: Type: AWS::S3::Bucket 上記の例では、論理 ID (Logical ID) が MyBucket の S3 バケットを定義しています。 論理 ID はこのテンプレートで生成するスタック内で一意の ID です。 実際に生成される S3 バケット名（物理 ID）は CloudFormation が自動で生成します（後述）。
-このテンプレートを使って、CloudFormation スタック（ここでは S3 バケットのみ含まれる）を生成するには、次のように aws cloudformation deploy コマンドを実行します。
-mystack スタックを生成 $ aws cloudformation deploy --template-file template.yml --stack-name mystack スタック内に生成された AWS リソースの一覧は次のように確認できます。
-$ aws cloudformation describe-stack-resources --stack-name mystack StackResources: - DriftInformation: StackResourceDriftStatus: NOT_CHECKED LogicalResourceId: MyBucket PhysicalResourceId: mystack-mybucket-bq8iux8uepew ResourceStatus: CREATE_COMPLETE ResourceType: AWS::S3::Bucket StackId: arn:aws:cloudformation:ap-northeast-1:123456789012:stack/mystack/c7e06a46-9902-11eb-9a29-8b1f770a16f7 StackName: mystack Timestamp: &amp;#39;2021-04-09T07:09:13.</description></item><item><title>AWS CloudFormation で DyanamoDB のリソースを作成する</title><link>https://maku.blog/p/h3gsjs2/</link><pubDate>Wed, 07 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/h3gsjs2/</guid><description>SAM で簡単な DynamoDB テーブルを生成してみる DynamoDB のテーブルリソースも、Lambda 関数などのリソースと同様に AWS SAM で自動生成＆更新することができます。 CloudFormation のテンプレートをそのまま記述するより、拡張された SAM テンプレートの形式で記述することで、シンプルにリソースを定義することができます。
-SAM テンプレート内で DynamoDB のテーブルを定義するときは、リソースタイプとして AWS::Serverless::SimpleTable を指定します（CloudFormation スタック内に実際に生成されるリソースのタイプは AWS::DynamoDB::Table になります）。
-DynamoDB テーブルを作成するための最低限の SAM テンプレートはとてもシンプルです。 次の例では、MyTable という 論理 ID (Logical ID) で DynamoDB のテーブルを定義しています。 論理 ID はスタック内でリソースを特定するための名前です。
-template.yml AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Transform: AWS::Serverless-2016-10-31 Description: My sample app Resources: MyTable: Type: AWS::Serverless::SimpleTable ひとつもプライマリキーを指定していませんが、その場合はデフォルトで id という名前のプライマリキー（String 型）が定義されます。 AWS CLI で次のように実行すると、CloudFormation のスタックを作成することができます。
-$ aws cloudformation deploy --stack-name mystack \ --template-file template.yml CloudFormation スタック内に、実際にどのような AWS リソースが作成されたかを調べるには以下のようにします。 ここではリソースタイプと、その物理 ID (Pysical ID) を table 形式で出力してみました。</description></item><item><title>AWS CloudFormation で SNS トピックのリソースを生成する</title><link>https://maku.blog/p/ymzbmx9/</link><pubDate>Tue, 13 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ymzbmx9/</guid><description>CloudFormation で SNS トピックを作成する CloudFormation スタック内に SNS トピックを生成するには、CloudFormation テンプレートで AWS::SNS::Topic というタイプのリソースを定義します。
-このリソースのプロパティはすべてオプショナル（省略可能）なので、最低限のリソース定義は次のようになります。
-template.yml AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Resources: MyTopic: Type: AWS::SNS::Topic トピック名 (Properties.TopicName) すら指定していませんが、その場合は、CloudFormation のスタック名と、トピックの論理 ID（上記の場合は MyTopic）の組み合わせから、自動的にトピック名が割り当てられるようになっています（例: mystack-MyTopic-WMD9B9WWLEXN）。
-上記のテンプレートから CloudFormation スタックを生成するには、AWS CLI を使って次のように実行します。
-mystack スタックの生成 $ aws cloudformation deploy --stack-name mystack \ --template-file template.yml \ --capabilities CAPABILITY_IAM 無事スタックが生成されたら、次のようにして生成された SNS トピックの物理 ID (ARN) を調べることができます。
-SNS トピックの ARN を調べる $ aws cloudformation describe-stack-resources \ --stack-name mystack \ --output text \ --query &amp;#34;StackResources[].PhysicalResourceId&amp;#34; arn:aws:sns:ap-northeast-1:123456789012:mystack-MyTopic-WMD9B9WWLEXN Lambda 関数や S3 バケットから SNS トピックに対して publish するときは、この ARN を指定することになります。</description></item><item><title>AWS CloudFormation の設定例: SNS トピックを Lambda 関数からサブスクライブする</title><link>https://maku.blog/p/5q4epyb/</link><pubDate>Mon, 19 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5q4epyb/</guid><description>何をするか？ ここでは、CloudFormation (SAM) のテンプレートを使って、SNS トピックをサブスクライブする Lambda 関数を定義してみます。
-サブスクライブ対象とする SNS トピック自体は、あらかじめ何らかの方法で作成済みであり、次のような ARN を取得できているものとします。
-SNS トピックの ARN arn:aws:sns:ap-northeast-1:123456789012:mytopic 上記のような CloudFormation スタックが完成すると、マネージメントコンソールや CLI で SNS トピックのメッセージを発行して、Lambda 関数にイベントが届くことを確認できます。
-参考 CloudFormation で SNS トピックの作成 CloudFormation の設定例: S3 通知を SNS トピックに Publish する テンプレートの記述例 次の SAM テンプレートでは、Lambda 関数を定義しつつ、そのイベントソースとして SNS トピックを設定しています。 イベントソースの指定は、実際には、SNS トピックに Lambda 関数をサブスクライブすることを意味しています。 SNS トピックの ARN は、入力パラメータ TopicArn のデフォルト値として指定しています。
-template.yml AWSTemplateFormatVersion: 2010-09-09 Transform: AWS::Serverless-2016-10-31 Parameters: TopicArn: Type: String Default: arn:aws:sns:ap-northeast-1:123456789012:mytopic Resources: MyFunction: Type: AWS::Serverless::Function Properties: Runtime: python3.</description></item><item><title>AWS CloudFormation の設定例: S3 通知を SNS トピックに Publish する</title><link>https://maku.blog/p/3o2dpyb/</link><pubDate>Tue, 13 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3o2dpyb/</guid><description>何をするか？ ここでは、CloudFormation のテンプレートを使って、次のような AWS リソースを定義してみます。
-S3 バケット（Logical ID: MyBucket) SNS トピック (Logical ID: MyTopic) 上記の S3 バケットへの書き込み時に、SNS トピックへ publish 動作のイメージとしてはこんな感じです。
-このような構成でリソースを作っておくと、S3 バケット上のデータ更新を、SNS トピックのサブスクライブによって監視できるようになります。 例えば、Lambda 関数を SNS トピックのサブスクライバーとして登録すれば、S3 バケットへの書き込みを Lambda 関数でハンドルできます。
-参考情報 CloudFormation テンプレートで S3 バケットや SNS トピックを定義する方法は、下記の記事を参考にしてください。
-CloudFormation で S3 バケットの作成 CloudFormation で SNS トピックの作成 テンプレートの記述例 次の CloudFormation テンプレートでは、S3 バケットと SNS トピックのリソースを定義しています。 デフォルトの名前はそれぞれ次のようになっています。
-S3 バケット名: myapp-sample-bucket-&amp;lt;AccountId&amp;gt; SNS トピック名: myapp-sample-topic S3 バケット名は世界で一意でなければいけないため、末尾に使用中のアカウント ID を付加するようにしています。
-template.yml AWSTemplateFormatVersion: &amp;#39;2010-09-09&amp;#39; Parameters: BucketPrefix: Type: String Default: myapp-sample-bucket TopicName: Type: String Default: myapp-sample-topic Resources: MyTopic: Type: AWS::SNS::Topic Properties: TopicName: !</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS CloudFormation/SAM/CDK のメモ on まくろぐ</title><link>https://maku.blog/p/sdq2cnx/</link><description>Recent content in AWS CloudFormation/SAM/CDK のメモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 19 Apr 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/sdq2cnx/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS CloudFormation 入門 (Hello World)</title><link>https://maku.blog/p/h7arpdj/</link><pubDate>Thu, 01 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/h7arpdj/</guid><description>&lt;h2 id="cloudformation-とは">CloudFormation とは&lt;/h2>
+&lt;p>AWS CloudFormation を使用すると、テンプレートファイル (YAML or JSON) で定義した AWS リソース群をまとめて生成（更新）することができます。
+いわゆる IaC (Infrastructure as Code) 環境を提供するものであり、Ansible や Chef を使ったことがあれば、それの AWS リソース構築用だと考えると分かりやすいです。&lt;/p>
+&lt;p>テンプレートから生成されるインフラ（AWS リソース群）は &lt;strong>スタック&lt;/strong> と呼ばれ、テンプレートがあればスタックは何度でも生成することができます。
+これはオブジェクト指向プログラミングにおける、クラスとインスタンスの関係に似ています。
+必要のなくなったリソース群は、スタック単位でまとめて削除することができます。&lt;/p>
+&lt;p>CloudFormation の主な特徴は次の通りです。&lt;/p>
+&lt;ul>
+&lt;li>何度でも同じ構成でリソースをセットアップできる（他のリージョンに複製したり、一時的に使うインフラを自動生成できる）&lt;/li>
+&lt;li>テンプレートはテキストファイル (YAML/JSON) なので、GitHub などでバージョン管理することができ、PullRequest ベースのコードレビューを行える&lt;/li>
+&lt;li>冪等性が考慮されており、テンプレートには最終的な結果だけを定義しておけばよい（構成のアップデート時に差分を意識する必要はない）&lt;/li>
+&lt;/ul>
+&lt;p>例えば、次のようなテンプレートを使用すると、S3 サービスのバケットリソースを自動で作成することができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">template.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">AWSTemplateFormatVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;2010-09-09&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">HelloBucket&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::S3::Bucket&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>必須のルートプロパティは &lt;strong>&lt;code>Resources&lt;/code>&lt;/strong> だけですが、テンプレートフォーマットのバージョンを示す &lt;strong>&lt;code>AWSTemplateFormatVersion&lt;/code>&lt;/strong> は最低限指定しておくのがよいでしょう（2021年時点で、&lt;code>2010-09-09&lt;/code> が最新バージョンです）。&lt;/p>
+&lt;h2 id="cloudformation-コンソールからスタックを生成する">CloudFormation コンソールからスタックを生成する&lt;/h2>
+&lt;p>&lt;a href="https://console.aws.amazon.com/cloudformation/">CloudFormation マネージメントコンソール&lt;/a> を使うと、Web サイト上でスタックを生成することができます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1362" height="305" src="../../p/h7arpdj/img-001.png" alt="/p/h7arpdj/img-001.png" />
+&lt;/figure>
+
+&lt;p>CloudFormation マネージメントコンソールを使ったスタックの生成手順は以下の通りです。&lt;/p>
+&lt;ol>
+&lt;li>サイドバーから &lt;strong>&lt;code>Stacks&lt;/code>&lt;/strong>（スタック）を選択する
+&lt;ul>
+&lt;li>CloudFormation で管理されているスタックの一覧が表示されます。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>（スタックの作成）ボタンを押す&lt;/li>
+&lt;li>テンプレートを指定する
+&lt;ul>
+&lt;li>S3 上に置いたファイルを指定することもできますが、ここではローカルに作成した YAML ファイルをアップロードします。そのためには、&lt;strong>&lt;code>Template is ready&lt;/code>&lt;/strong>（テンプレートの準備完了） → &lt;strong>&lt;code>Upload a template file&lt;/code>&lt;/strong>（テンプレートファイルのアップロード）を選択し、YAML ファイルを選択します。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>任意のスタック名（&lt;code>mystack&lt;/code> など）を入力します
+&lt;ul>
+&lt;li>テンプレートファイル内にパラメータ (Parameters) を定義している場合は、ここで具体的な値を入力できます。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>あとはそのまま進めていって、&lt;strong>&lt;code>Create stack&lt;/code>&lt;/strong>（スタックの作成）を押せば、スタックの生成処理が始まります。&lt;/li>
+&lt;/ol>
+&lt;p>スタックの一覧画面に戻ると、作成中のスタックのステータスが &lt;code>CREATE_IN_PROGRESS&lt;/code> となって表示されます。
+しばらくしてスタックの生成処理が完了すると、ステータスが &lt;code>CREATE_COMPLETE&lt;/code> に変わります。
+これで、テンプレートで定義した AWS リソース群が使用できる状態になります。&lt;/p></description></item><item><title>AWS CloudFormation をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/zkxamw9/</link><pubDate>Thu, 11 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/zkxamw9/</guid><description>&lt;h2 id="テンプレートファイルが正しく記述できているか確認する-cloudformation-validate-template">テンプレートファイルが正しく記述できているか確認する (cloudformation validate-template)&lt;/h2>
+&lt;p>YAML や JSON 形式で作成した CloudFormation 用のテンプレートファイルが、正しく記述できているかを調べることができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">正しく記述できている場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation validate-template --template-body file://template.json
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Description: Sample template
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Parameters: []&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">不正なフォーマットの場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">An error occurred (ValidationError) when calling the ValidateTemplate operation: Template format error: JSON not well-formed. (line 5, column 2)&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">不正なプロパティがある場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">An error occurred (ValidationError) when calling the ValidateTemplate operation: Invalid template property or properties [ABC]&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="スタックを作成する-cloudformation-create-stack">スタックを作成する (cloudformation create-stack)&lt;/h2>
+&lt;h3 id="ローカルの-yaml-テンプレートから生成">ローカルの YAML テンプレートから生成&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation create-stack --stack-name mystack \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --template-body file://template.yml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-764891235" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-764891235">実行結果&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">StackId: arn:aws:cloudformation:ap-northeast-1:123456789012:stack/mystack/b810c3cd-e492-eb11-6cab-b7f82d02a2e5&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+&lt;h3 id="s3-バケット上の-yaml-テンプレートから生成">S3 バケット上の YAML テンプレートから生成&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation create-stack --stack-name mystack \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --template-url https://s3.xxx.xxx/.../template.yaml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="パラメーターを指定する場合">パラメーターを指定する場合&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation create-stack --stack-name mystack \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --template-body file://template.yml \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --parameters &amp;#34;ParameterKey=Key1,ParameterValue=Value1&amp;#34; \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;ParameterKey=Key2,ParameterValue=Value2&amp;#34; \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;ParameterKey=Key3,ParameterValue=Value3&amp;#34;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="スタックの情報を取得する-cloudformation-describe-stacks-describe-stack-resources">スタックの情報を取得する (cloudformation describe-stacks, describe-stack-resources)&lt;/h2>
+&lt;h3 id="スタックの一覧を取得する">スタックの一覧を取得する&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation describe-stacks&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="指定したスタックの情報を取得する">指定したスタックの情報を取得する&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation describe-stacks --stack-name &amp;lt;スタック名&amp;gt;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-298473165" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-298473165">実行結果&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">Stacks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">CreationTime&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2021-04-01T12:21:20.064000+00:00&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">DisableRollback&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">DriftInformation&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">StackDriftStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">NOT_CHECKED&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">EnableTerminationProtection&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">NotificationARNs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">RollbackConfiguration&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{}&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">StackId&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">arn:aws:cloudformation:ap-northeast-1:123456789012:stack/mystack/b810c3cd-e492-eb11-6cab-b7f82d02a2e5&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">StackName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">mystack&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">StackStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">CREATE_COMPLETE&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Tags&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[]&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+&lt;h3 id="指定したスタック内のリソースリストを取得する">指定したスタック内のリソースリストを取得する&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation describe-stack-resources --stack-name &amp;lt;スタック名&amp;gt;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-463189275" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-463189275">実行結果（1つのS3バケットがある場合）&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">StackResources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">DriftInformation&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">StackResourceDriftStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">NOT_CHECKED&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">LogicalResourceId&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">HelloBucket&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">PhysicalResourceId&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">mystack-hellobucket-npd68k1m8ut8a&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ResourceStatus&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">CREATE_COMPLETE&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ResourceType&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::S3::Bucket&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">StackId&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">arn:aws:cloudformation:ap-northeast-1:123456789012:stack/mystack/de70c0f6-f192-eb11-1b8b-55dc1106bc7d&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">StackName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">mystack&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Timestamp&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2021-04-01T13:54:43.857000+00:00&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+&lt;h2 id="スタックを削除する-cloudformation-delete-stack">スタックを削除する (cloudformation delete-stack)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation delete-stack --stack-name &amp;lt;STACK_NAME&amp;gt;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="スタックが特定のステータスになるまで待機する-cloudformation-wait">スタックが特定のステータスになるまで待機する (cloudformation wait)&lt;/h2>
+&lt;h3 id="スタックが-create_complete-になるまで待機する">スタックが CREATE_COMPLETE になるまで待機する&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation wait stack-create-complete --stack-name &amp;lt;STACK_NAME&amp;gt;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="チェンジセットが-create_complete-になるまで待機する">チェンジセットが CREATE_COMPLETE になるまで待機する&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation wait change-set-create-complete \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --stack-name &amp;lt;STACK_NAME&amp;gt; \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --change-set-name &amp;lt;CHANGE_SET_NAME&amp;gt;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>AWS CloudFormation で Lambda 関数のリソースを生成する</title><link>https://maku.blog/p/w8s8kx9/</link><pubDate>Mon, 05 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/w8s8kx9/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>AWS CloudFormation を使うと Lambda 関数を含むインフラ（AWS リソース群）をまとめて生成することができますが、AWS CloudFormation の拡張である AWS SAM を使うと、もっと簡潔に Lambda 関数のリソースを生成することができます。&lt;/p>
+&lt;p>例えば、CloudFormation テンプレートの &lt;code>AWS::Lambda::Function&lt;/code> リソースでは、&lt;code>Role&lt;/code> プロパティが必須でしたが、SAM テンプレートの &lt;code>AWS::Serverless::Function&lt;/code> リソースでは、&lt;code>Role&lt;/code> プロパティはオプショナルになっています。
+&lt;code>Role&lt;/code> プロパティを省略すると、Lambda 関数に付けた論理 ID (Logical ID) をもとに、&lt;code>&amp;lt;論理ID&amp;gt;Role&lt;/code> という名前のロールが自動生成されます。&lt;/p>
+&lt;p>ここでは、AWS SAM を使った Lambda 関数生成の基本として、次のようなパターンで CloudFormation スタックを生成してみます。&lt;/p>
+&lt;ol>
+&lt;li>SAM テンプレートに関数コードを埋め込んでデプロイ&lt;/li>
+&lt;li>S3 バケット上の関数の ZIP ファイルを使ってデプロイ&lt;/li>
+&lt;/ol>
+&lt;h2 id="sam-テンプレートに関数コードを埋め込んでデプロイ">SAM テンプレートに関数コードを埋め込んでデプロイ&lt;/h2>
+&lt;p>まずは、一番シンプルな例として、SAM テンプレート内に Lambda 関数の実装をハードコーディングしてしまい、それをデプロイ（CloudFormation スタックの生成）してみます。&lt;/p>
+&lt;p>下記が SAM テンプレートです。
+SAM で Lambda 関数のリソースを定義するときは、リソースタイプとして &lt;strong>&lt;code>AWS::Serverless::Function&lt;/code>&lt;/strong> を指定します（CloudFormation では &lt;code>AWS::Lambda::Function&lt;/code> です）。
+ここでは関数の実装を &lt;strong>&lt;code>InlineCode&lt;/code>&lt;/strong> プロパティでハードコーディングし、単純な &lt;code>Hello World!&lt;/code> メッセージをレスポンスとして返すようにしています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">template.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">AWSTemplateFormatVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2010-09-09&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Transform&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless-2016-10-31&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Simple Lambda Function&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">HelloFunction&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless::Function&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Properties&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Runtime&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">python3.7&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Handler&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">index.handler&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">InlineCode&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">|&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> def handler(event, context):
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> return {&amp;#39;body&amp;#39;: &amp;#39;Hello World!&amp;#39;, &amp;#39;statusCode&amp;#39;: 200}&lt;/span>&lt;span class="w"> &lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この例では省略していますが、&lt;code>Function&lt;/code> リソースのプロパティ &lt;code>PackageType&lt;/code> はデフォルトで &lt;code>Zip&lt;/code> となっており、この場合は、関数の実体を &lt;code>CodeUri&lt;/code>（ZIP ファイルのパス）か、&lt;code>InlineCode&lt;/code>（ハードコーディング）のどちらかで指定します。
+この例では、&lt;code>InlineCode&lt;/code> で関数の内容を埋め込んでいます。&lt;/p></description></item><item><title>AWS CloudFormation の設定例: Lambda 関数の設定いろいろ</title><link>https://maku.blog/p/pbo2dpy/</link><pubDate>Thu, 08 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pbo2dpy/</guid><description>&lt;h2 id="タイムアウト時間-timeout">タイムアウト時間 (Timeout)&lt;/h2>
+&lt;p>Lambda 関数のタイムアウト時間（最大実行可能時間）を設定するには、&lt;code>Timeout&lt;/code> プロパティで秒単位の指定を行います。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例: タイムアウトを 15 秒にする&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">AWSTemplateFormatVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2010-09-09&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Transform&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless-2016-10-31&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyLambda&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless::Function&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Properties&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Runtime&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">nodejs14.x&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">CodeUri&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">function.zip&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Handler&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">index.handler&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Timeout&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">15&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>すべての Lambda 関数の Timeout 値をまとめて設定したいときは、&lt;code>Globals&lt;/code> セクションを使います。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">AWSTemplateFormatVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2010-09-09&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Transform&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless-2016-10-31&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Globals&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Function&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Runtime&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">nodejs14.x&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">CodeUri&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">function.zip&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Timeout&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">15&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyLambda1&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless::Function&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Properties&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Handler&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">index.handler1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyLambda2&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless::Function&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Properties&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Handler&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">index.handler2&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="環境変数-environment">環境変数 (Environment)&lt;/h2>
+&lt;p>Lambda 関数の中から参照可能な環境変数を設定するには、&lt;strong>&lt;code>Variables&lt;/code>&lt;/strong> プロパティに、キーと値のペアを指定します。
+すべての Lambda 関数に共通で設定する環境変数は、&lt;code>Globals&lt;/code> セクションで定義します。&lt;/p></description></item><item><title>AWS CloudFormation の設定例: Lambda 関数から S3 にアクセスできるようにする</title><link>https://maku.blog/p/dzdq3ep/</link><pubDate>Mon, 12 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dzdq3ep/</guid><description>&lt;p>CloudFormation (SAM) を利用して、Lambda 関数および S3 バケットを作成し、Lambda 関数から S3 バケットにアクセスできるようにポリシー設定するテンプレートの例です。
+参考までに Lambda 関数の TypeScript コードも載せましたが、あくまで SAM テンプレートの記述例を示すことを目的としています。&lt;/p>
+&lt;h2 id="sam-テンプレートの記述例">SAM テンプレートの記述例&lt;/h2>
+&lt;p>次の SAM テンプレートでは、AWS リソースとして S3 バケット (&lt;code>MyBucket&lt;/code>) と Lambda 関数 (&lt;code>MyFunction&lt;/code>) を定義しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">template.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">AWSTemplateFormatVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2010-09-09&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Transform&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless-2016-10-31&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># S3 バケットの定義&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyBucket&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::S3::Bucket&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># Lambda 関数の定義&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyFunction&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless::Function&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Properties&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Runtime&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">nodejs14.x&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Handler&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">build/index.handler&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">CodeUri&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">function.zip&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Policies&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">S3CrudPolicy&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">BucketName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>!&lt;span class="l">Ref MyBucket&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Environment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Variables&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">BUCKET_NAME&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>!&lt;span class="l">Ref MyBucket&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>S3 バケットは単純にスタック内に新規作成するだけなので、何もプロパティ設定していません。
+ポイントは、Lambda 関数側のポリシー設定（&lt;code>Policies&lt;/code> プロパティ）です。&lt;/p></description></item><item><title>AWS CloudFormation で S3 バケットのリソースを作成する</title><link>https://maku.blog/p/ugt6gr4/</link><pubDate>Fri, 09 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ugt6gr4/</guid><description>&lt;h2 id="s3-バケット定義の基本">S3 バケット定義の基本&lt;/h2>
+&lt;p>AWS CloudFormation で S3 バケットを作成・設定するには、次のようにテンプレートファイル内で &lt;strong>&lt;code>AWS::S3::Bucket&lt;/code>&lt;/strong> タイプのリソースを定義します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">template.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">AWSTemplateFormatVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2010-09-09&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyBucket&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::S3::Bucket&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記の例では、論理 ID (Logical ID) が &lt;code>MyBucket&lt;/code> の S3 バケットを定義しています。
+論理 ID はこのテンプレートで生成するスタック内で一意の ID です。
+実際に生成される S3 バケット名（物理 ID）は CloudFormation が自動で生成します（後述）。&lt;/p>
+&lt;p>このテンプレートを使って、CloudFormation スタック（ここでは S3 バケットのみ含まれる）を生成するには、次のように &lt;strong>&lt;code>aws cloudformation deploy&lt;/code>&lt;/strong> コマンドを実行します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">mystack スタックを生成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation deploy --template-file template.yml --stack-name mystack&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>スタック内に生成された AWS リソースの一覧は次のように確認できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation describe-stack-resources --stack-name mystack
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">StackResources:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- DriftInformation:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> StackResourceDriftStatus: NOT_CHECKED
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> LogicalResourceId: MyBucket
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> PhysicalResourceId: mystack-mybucket-bq8iux8uepew
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ResourceStatus: CREATE_COMPLETE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ResourceType: AWS::S3::Bucket
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> StackId: arn:aws:cloudformation:ap-northeast-1:123456789012:stack/mystack/c7e06a46-9902-11eb-9a29-8b1f770a16f7
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> StackName: mystack
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Timestamp: &amp;#39;2021-04-09T07:09:13.622000+00:00&amp;#39;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>PhysicalResourceId&lt;/code> のところを見ると、実際に作成された S3 バケットの物理 ID (Physical ID) が分かります。&lt;/p></description></item><item><title>AWS CloudFormation で DyanamoDB のリソースを作成する</title><link>https://maku.blog/p/h3gsjs2/</link><pubDate>Wed, 07 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/h3gsjs2/</guid><description>&lt;h2 id="sam-で簡単な-dynamodb-テーブルを生成してみる">SAM で簡単な DynamoDB テーブルを生成してみる&lt;/h2>
+&lt;p>DynamoDB のテーブルリソースも、Lambda 関数などのリソースと同様に AWS SAM で自動生成＆更新することができます。
+CloudFormation のテンプレートをそのまま記述するより、拡張された SAM テンプレートの形式で記述することで、シンプルにリソースを定義することができます。&lt;/p>
+&lt;p>SAM テンプレート内で DynamoDB のテーブルを定義するときは、リソースタイプとして &lt;strong>&lt;code>AWS::Serverless::SimpleTable&lt;/code>&lt;/strong> を指定します（CloudFormation スタック内に実際に生成されるリソースのタイプは &lt;code>AWS::DynamoDB::Table&lt;/code> になります）。&lt;/p>
+&lt;p>DynamoDB テーブルを作成するための最低限の SAM テンプレートはとてもシンプルです。
+次の例では、&lt;code>MyTable&lt;/code> という 論理 ID (Logical ID) で DynamoDB のテーブルを定義しています。
+論理 ID はスタック内でリソースを特定するための名前です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">template.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">AWSTemplateFormatVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2010-09-09&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Transform&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless-2016-10-31&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">My sample app&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyTable&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::Serverless::SimpleTable&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ひとつもプライマリキーを指定していませんが、その場合はデフォルトで &lt;code>id&lt;/code> という名前のプライマリキー（&lt;code>String&lt;/code> 型）が定義されます。
+&lt;a href="../../p/zkxamw9">AWS CLI&lt;/a> で次のように実行すると、CloudFormation のスタックを作成することができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation deploy --stack-name mystack \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --template-file template.yml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>CloudFormation スタック内に、実際にどのような AWS リソースが作成されたかを調べるには以下のようにします。
+ここではリソースタイプと、その物理 ID (Pysical ID) を table 形式で出力してみました。&lt;/p></description></item><item><title>AWS CloudFormation で SNS トピックのリソースを生成する</title><link>https://maku.blog/p/ymzbmx9/</link><pubDate>Tue, 13 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ymzbmx9/</guid><description>&lt;h2 id="cloudformation-で-sns-トピックを作成する">CloudFormation で SNS トピックを作成する&lt;/h2>
+&lt;p>CloudFormation スタック内に SNS トピックを生成するには、CloudFormation テンプレートで &lt;a href="https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-properties-sns-topic.html">AWS::SNS::Topic&lt;/a> というタイプのリソースを定義します。&lt;/p>
+&lt;p>このリソースのプロパティはすべてオプショナル（省略可能）なので、最低限のリソース定義は次のようになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">template.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">AWSTemplateFormatVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2010-09-09&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyTopic&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::SNS::Topic&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>トピック名 (&lt;code>Properties.TopicName&lt;/code>) すら指定していませんが、その場合は、CloudFormation のスタック名と、トピックの論理 ID（上記の場合は &lt;code>MyTopic&lt;/code>）の組み合わせから、自動的にトピック名が割り当てられるようになっています（例: &lt;code>mystack-MyTopic-WMD9B9WWLEXN&lt;/code>）。&lt;/p>
+&lt;p>上記のテンプレートから CloudFormation スタックを生成するには、AWS CLI を使って次のように実行します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">mystack スタックの生成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation deploy --stack-name mystack \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --template-file template.yml \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --capabilities CAPABILITY_IAM&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>無事スタックが生成されたら、次のようにして生成された SNS トピックの物理 ID (ARN) を調べることができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">SNS トピックの ARN を調べる&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws cloudformation describe-stack-resources \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --stack-name mystack \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --output text \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --query &amp;#34;StackResources[].PhysicalResourceId&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">arn:aws:sns:ap-northeast-1:123456789012:mystack-MyTopic-WMD9B9WWLEXN&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Lambda 関数や S3 バケットから SNS トピックに対して publish するときは、この ARN を指定することになります。&lt;/p></description></item><item><title>AWS CloudFormation の設定例: SNS トピックを Lambda 関数からサブスクライブする</title><link>https://maku.blog/p/5q4epyb/</link><pubDate>Mon, 19 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5q4epyb/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ここでは、CloudFormation (SAM) のテンプレートを使って、SNS トピックをサブスクライブする Lambda 関数を定義してみます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/5q4epyb/img-sns-to-lambda.svg" alt="/p/5q4epyb/img-sns-to-lambda.svg" />
+&lt;/figure>
+
+&lt;p>サブスクライブ対象とする SNS トピック自体は、あらかじめ何らかの方法で作成済みであり、次のような ARN を取得できているものとします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">SNS トピックの ARN&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">arn:aws:sns:ap-northeast-1:123456789012:mytopic&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のような CloudFormation スタックが完成すると、マネージメントコンソールや CLI で SNS トピックのメッセージを発行して、Lambda 関数にイベントが届くことを確認できます。&lt;/p>
+&lt;aside style="display: flex; border: thin dashed gray;">
+&lt;div style="align-self: stretch; writing-mode: vertical-lr; text-align: center; letter-spacing: 0.2em; color: #666; border-right: thin dashed gray; padding: 0.4em 0; line-height: 1.5;">参考&lt;/div>
+&lt;div style="align-self: center; padding: 0.6em 0; line-height: 1.2 !important;">&lt;ul>
+&lt;li>&lt;a href="../../p/ymzbmx9">CloudFormation で SNS トピックの作成&lt;/a>&lt;/li>
+&lt;li>&lt;a href="../../p/3o2dpyb">CloudFormation の設定例: S3 通知を SNS トピックに Publish する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/aside>
+&lt;h2 id="テンプレートの記述例">テンプレートの記述例&lt;/h2>
+&lt;p>次の SAM テンプレートでは、Lambda 関数を定義しつつ、そのイベントソースとして SNS トピックを設定しています。
+イベントソースの指定は、実際には、SNS トピックに Lambda 関数をサブスクライブすることを意味しています。
+SNS トピックの ARN は、入力パラメータ &lt;code>TopicArn&lt;/code> のデフォルト値として指定しています。&lt;/p></description></item><item><title>AWS CloudFormation の設定例: S3 通知を SNS トピックに Publish する</title><link>https://maku.blog/p/3o2dpyb/</link><pubDate>Tue, 13 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3o2dpyb/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ここでは、CloudFormation のテンプレートを使って、次のような AWS リソースを定義してみます。&lt;/p>
+&lt;ul>
+&lt;li>S3 バケット（Logical ID: &lt;code>MyBucket&lt;/code>)&lt;/li>
+&lt;li>SNS トピック (Logical ID: &lt;code>MyTopic&lt;/code>)&lt;/li>
+&lt;li>上記の S3 バケットへの書き込み時に、SNS トピックへ publish&lt;/li>
+&lt;/ul>
+&lt;p>動作のイメージとしてはこんな感じです。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/3o2dpyb/img-s3-to-sns.svg" alt="/p/3o2dpyb/img-s3-to-sns.svg" />
+&lt;/figure>
+
+&lt;p>このような構成でリソースを作っておくと、S3 バケット上のデータ更新を、SNS トピックのサブスクライブによって監視できるようになります。
+例えば、Lambda 関数を SNS トピックのサブスクライバーとして登録すれば、S3 バケットへの書き込みを Lambda 関数でハンドルできます。&lt;/p>
+&lt;h3 id="参考情報">参考情報&lt;/h3>
+&lt;p>CloudFormation テンプレートで S3 バケットや SNS トピックを定義する方法は、下記の記事を参考にしてください。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/ugt6gr4">CloudFormation で S3 バケットの作成&lt;/a>&lt;/li>
+&lt;li>&lt;a href="../../p/ymzbmx9">CloudFormation で SNS トピックの作成&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="テンプレートの記述例">テンプレートの記述例&lt;/h2>
+&lt;p>次の CloudFormation テンプレートでは、S3 バケットと SNS トピックのリソースを定義しています。
+デフォルトの名前はそれぞれ次のようになっています。&lt;/p>
+&lt;ul>
+&lt;li>S3 バケット名: &lt;code>myapp-sample-bucket-&amp;lt;AccountId&amp;gt;&lt;/code>&lt;/li>
+&lt;li>SNS トピック名: &lt;code>myapp-sample-topic&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>S3 バケット名は世界で一意でなければいけないため、末尾に使用中のアカウント ID を付加するようにしています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">template.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">AWSTemplateFormatVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;2010-09-09&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Parameters&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">BucketPrefix&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">String&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Default&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">myapp-sample-bucket&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">TopicName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">String&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Default&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">myapp-sample-topic&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">Resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyTopic&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::SNS::Topic&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Properties&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">TopicName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>!&lt;span class="l">Sub ${TopicName}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyTopicPolicy&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::SNS::TopicPolicy&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Properties&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">PolicyDocument&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Id&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>!&lt;span class="l">Ref MyTopic&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="ld">2012-10-17&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Statement&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">Effect&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Allow&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Principal&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Service&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">s3.amazonaws.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Action&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">sns:Publish&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Resource&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>!&lt;span class="l">Ref MyTopic&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Condition&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ArnLike&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">aws:SourceArn&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>!&lt;span class="l">Sub arn:aws:s3:::${BucketPrefix}-${AWS::AccountId}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Topics&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- !&lt;span class="l">Ref MyTopic&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">MyBucket&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">AWS::S3::Bucket&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Properties&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">BucketName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>!&lt;span class="l">Sub ${BucketPrefix}-${AWS::AccountId}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">NotificationConfiguration&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">TopicConfigurations&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">Event&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">s3:ObjectCreated:Put&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">Topic&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>!&lt;span class="l">Ref MyTopic&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このテンプレートを使って CloudFormation スタックを生成するには、例えば AWS CLI を使って次のように実行します。&lt;/p></description></item></channel></rss>

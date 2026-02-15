@@ -1,87 +1,1137 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Svelte 関連メモ on まくろぐ</title><link>https://maku.blog/p/td962u6/</link><description>Recent content in Svelte 関連メモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 17 Mar 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/td962u6/index.xml" rel="self" type="application/rss+xml"/><item><title>Svelte を始める (SvelteKit で Hello World）</title><link>https://maku.blog/p/qmy6cdh/</link><pubDate>Thu, 17 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qmy6cdh/</guid><description>Svelte とは Svelte は、コンパイラベースの Web アプリケーションフレームワークです。 特殊なテンプレート言語を使ってコンポーネントを実装することで、高度に最適化された HTML/JavaScript/CSS を出力することができます。 React.js アプリなどは、クライアントサイド JavaScript から共通のライブラリを呼び出す形で動作しますが、Svelte はコンパイル後の最適化された JavaScript のみで動作するようになっており、最終的な成果物が非常にコンパクトになります。 独自のテンプレート構文を学ぶ必要はありますが、ユーザー操作に反応するコンポーネントを、少ないコードで記述できるよう工夫されています。
-☝️ ライバル？の Astro との違い Svelte よりも後発のコンパイラベースの Web アプリフレームワークに Astro があります。 Astro は、ビルド時にほとんどの JavaScript コードを実行して、その時点で静的な HTML ファイルを生成するというアプローチをとっています。 最終的にデプロイするのは、HTML (+CSS) だけになるので、初期表示が爆速になるという考え方です。 一方、Svelte はあくまで最適化された JavaScript コードはクライアントサイドで動かすという考え方です。
-完全に静的なサイトであれば Astro を使い、インタラクティブなサイトであれば Svelte を使う、という使い分けがよさそうです。
-参考: Astro 関連メモ Svelte + SvelteKit プロジェクトの作成 Svelte のプロジェクトは次のように npm create svelte コマンドで簡単に作成できます。 ウィザード形式の質問に答えていくだけで、TypeScript や ESLint、Prettier の導入まで一気にやってくれます。
-Svelte プロジェクト (myapp) の作成 $ npm create svelte@latest myapp .</description></item><item><title>Svelte 実装例: $state ルーンによる状態変数を localStorage/sessionStorage と連動させる</title><link>https://maku.blog/p/tpjvh3q/</link><pubDate>Mon, 17 Mar 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tpjvh3q/</guid><description>何をするか？ Svelte 5 のコンポーネントで使用する状態変数は $state ルーンを使って定義できますが、ページをリロードするとその値はリセットされてしまいます。 この記事では、$state ルーンで定義した状態変数の値を localStorage や sessionStorage と同期させる方法を紹介します。 localStorage と同期させた場合は、ブラウザを開き直したときにも以前の状態を復帰できます。 sessionStorage と同期させた場合は、ブラウザのタブを開いている間だけ状態を保持できます。
-$state ルーンを使って状態変数を共有する方法は、下記の記事を参照してください。
-Svelte 入門: 複数のコンポーネントで状態を共有する（$state ルーン） 実装例 図: サインイン状態を管理する AuthState クラスの実装と使用例 ここでは、サインイン状態を管理する AuthState クラスを作成し、その userName プロパティ（状態変数）を localStorage に保存する例を示します。 サインイン状態を示す signedIn プロパティも用意していますが、こちらは $derived ルーンで定義されており、userName プロパティの値に応じて自動的に値が決まるようになっています（userName がセットされているときに true になります）。
-src/lib/auth-state.svelte.ts import { onMount } from &amp;#39;svelte&amp;#39;; const STORAGE_KEY = &amp;#39;userName&amp;#39;; // 複数のコンポーネントで状態を共有するため、リアクティブな変数をグローバルに定義します let userName = $state(&amp;#39;&amp;#39;); let signedIn = $derived(!!userName); export class AuthState { /** サインインしているユーザー名を参照するためのプロパティ (reactive) */ get userName(): string { return userName; } /** サインインしているかどうかを示すプロパティ (reactive) */ get signedIn(): boolean { return signedIn; } constructor() { // ページが読み込まれたときに localStorage の値で状態変数を初期化します // （このコードはコンポーネントの初期化中に呼び出す必要があります） onMount(() =&amp;gt; { userName = localStorage.</description></item><item><title>Svelte 入門: 複数のコンポーネントで状態を共有する（$state ルーン）</title><link>https://maku.blog/p/nhuh2if/</link><pubDate>Sun, 16 Mar 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nhuh2if/</guid><description>$state ルーンのおさらい Svelte 5 では、$state ルーンを使ってリアクティブな変数を定義することができます。 下記は公式サイトでも最初に出てくる基本的なカウンター変数の実装例です。
-src/lib/components/CounterButton.svelte &amp;lt;script lang=&amp;#34;ts&amp;#34;&amp;gt; let count = $state(0); &amp;lt;/script&amp;gt; &amp;lt;button onclick={() =&amp;gt; count++}&amp;gt; clicks: {count} &amp;lt;/button&amp;gt; 上記のように $state ルーンを使って定義した count 変数はリアクティブな変数として扱われ、count の値が変更されると、それに連動して画面上の表示も更新されます（clicks: 0 が clicks: 1 になる）。 count の値を変更したあとに再描画処理を呼び出す、という手続き的なコードを書く必要はありません。
-リアクティブな変数のロジックを切り出す $state ルーンを使ったロジックは、.svelte コンポーネントから分離して別ファイルに記述することができます。 これは Svelte 5 でルーンが導入された理由のひとつです。 $state ルーンを使う TypeScript コードの拡張子は、単純な .ts ではなく .svelte.ts にする必要があります（ルーンは特殊なビルド処理が必要なため）。
-下記は、リアクティブなカウンター変数のロジックを別ファイルに分離した例です。 $state ルーンだけでなく、$effect ルーンを使ってリアクティブ変数の変化に反応させることもできます。 ここでは、count 変数の値が変更されるたびにコンソールにログを出力するようにしています。
-src/lib/counter.svelte.ts export function createCounter() { let count = $state(0); $effect(() =&amp;gt; { console.log(`The count is now ${count}`); }); return { get count() { return count; }, increment: () =&amp;gt; { count += 1; } }; } この createCounter() 関数は、任意のコンポーネントから以下のように使用します。</description></item><item><title>Svelte 入門: API ルートのグローバル変数の生存期間</title><link>https://maku.blog/p/c28msnk/</link><pubDate>Tue, 18 Feb 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/c28msnk/</guid><description>何をするか？ Svelte/SvelteKit を使った Web アプリケーションでは、src/routes 以下のサーバーモジュール (+server.ts) で GET や POST 関数をエクスポートするだけで、API ルートとして動作させることができます（Web API のエンドポイントとして動作します）。
-このサーバーモジュール内でグローバル変数を定義すると、その値は サーバーが起動している間だけ保持されます。 ここでは、この振る舞いを確認するためのサンプルコードを示します。
-複数のクライアントからのリクエスト間で同じ変数が共有されるため、ユーザー情報などを格納してしまうと、セキュリティ上のリスクが生じる可能性があることに注意してください。
-実装例 下記のサーバールート実装 (/api/messages) では、POST リクエストで送られてきたメッセージを最大 5 件までグローバル変数 (messages) に保持しています。 GET リクエストでアクセスすると、保持しているメッセージを JSON 形式で返します。
-src/routes/api/messages/&amp;#43;server.ts import { error, json } from &amp;#39;@sveltejs/kit&amp;#39;; // API route のグローバル変数はサーバーが起動している間のみ保持される let messages: string[] = []; /** /api/messages への GET リクエストを処理する */ export async function GET() { return json({ messages }); } /** /api/messages への POST リクエストを処理する */ export async function POST({ request }) { const msg = (await request.</description></item><item><title>Svelte 入門: サーバー Hooks で Basic 認証を実装する</title><link>https://maku.blog/p/mem8u54/</link><pubDate>Tue, 11 Feb 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mem8u54/</guid><description>Hooks とは SvelteKit には Hooks の仕組みが提供されており、特にサーバー Hooks を定義することで、任意のリクエストに割り込んで処理を行うことができます。 例えば、各ルートのハンドラーが呼び出される前に、次のような処理を行うことができます。
-リクエストのログを取る リクエストの内容を変更する（リダイレクトなど） リクエストを拒否する（アクセス制御） 後続の処理のためにデータを付加する（Cookie に基づくユーザー情報など） この記事では、サーバー Hooks の利用例として、簡単な Basic 認証 を実装する方法を解説します。
-図: Chrome の Basic 認証ダイアログ 管理者にしかアクセスできないページを手っ取り早く作りたい場合などに便利ですが、Basic 認証はセキュアな認証方式ではないので、あくまで Hooks の使い方の例と考えてください。 本番環境に認証・認可の仕組みを導入する場合は、OAuth などのよりセキュアな方式を検討してください。
-サーバー Hooks の基本 サーバー Hooks を定義するのはとても簡単で、SvelteKit のプロジェクト内に src/hooks.server.ts（あるいは .js）を作成し、handle 関数をエクスポートするだけです。 ファイル名を間違えると、Hooks が正しく動作しないので注意してください（特に hook でなく hooks であることに注意）。
-次の サーバー Hooks 実装では、リクエストイベントの内容をコンソールに出力しています。
-src/hooks.server.ts import type { Handle } from &amp;#39;@sveltejs/kit&amp;#39;; export const handle: Handle = async ({ event, resolve }) =&amp;gt; { console.</description></item><item><title>Svelte 入門: 外部 API 用のキーを Private な環境変数で定義する ($env)</title><link>https://maku.blog/p/nmdte68/</link><pubDate>Sun, 09 Feb 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nmdte68/</guid><description>何をするか？ Svelte (+SvelteKit) を使ったアプリケーションから、API キーが必要な外部サービスを呼び出す方法を紹介します。 例えば、サードパーティ API や、データベースサーバーにアクセスするときには、API キーが必要になることがあります。 API キーはクライアントサイドからは見えてはいけないので、プライベートな環境変数として定義し、サーバー側で実行されるコードからのみ参照するようにします。
-Private 環境変数 Svelte アプリでは、PUBLIC_ というプレフィックスが付いている環境変数は Public な環境変数、それ以外は Private な環境変数として扱われます。 つまり、環境変数名に PUBLIC_ を付けなければ、サーバーサイドで実行されるコード（+page.server.ts や +server.ts）からのみ参照できるようになります。
-本番環境用の環境変数は、デプロイ先のサービス上（Cloudflare Pages や Vercel）で設定する必要がありますが、開発サーバーで使用する環境変数は、.env ファイルで定義しておくことができます。
-.env MY_API_KEY=&amp;#34;c3ytex9bsyed9zjgnbxhk2hninmd&amp;#34; .env ファイルには、API キーなどの機密情報を記述することになるため、Git などのバージョン管理ツールにコミットしてはいけません（おそらく .gitignore に .env ファイルが登録されているはずです）。 Git にコミットするのは、次のような参考ファイルだけにしておきます。
-.env.example MY_API_KEY=&amp;#34;XXXXX&amp;#34; アプリ実行時に Private な環境変数を参照するには、SvelteKit が提供する $env/dynamic/private モジュールを使います。
-src/routes/lib/server/sample.ts import { env } from &amp;#39;$env/dynamic/private&amp;#39;; // ... console.log(env.MY_API_KEY); これに似たモジュールに $env/static/private がありますが、こちらは名前の通り、ビルド時に（static に）環境変数の値を参照することになります。 多くのケースでは dynamic の方を使うことになると思いますが、環境に応じて使い分けてください。
-モジュール 環境変数の参照タイミング $env/static/private ビルド時に 環境変数を参照する。 $env/dynamic/private 実行時に 環境変数を参照する。 例えば、GitHub Actions でビルドして Cloudflare Pages にデプロイするようなケースでは、static の方を使った場合は GitHub Actions の環境変数が参照され、dynamic の方を使った場合は Cloudflare Pages の環境変数が参照されることになります。</description></item><item><title>Svelte 実装例: Web ブラウザで音声認識する (SpeechRecognition)</title><link>https://maku.blog/p/bf4cpjx/</link><pubDate>Wed, 31 Jul 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bf4cpjx/</guid><description>何をするか？ Web ブラウザーの SpeechRecognition API を使って、音声認識をしてみます。 ここでは Svelte アプリケーションとして作成しますが、単純な HTML + JavaScript の組み合わせでもほぼ同様のコードになると思います（参考: Svelte 関連メモ）。
-デモ: https://p-bf4cpjx-svelte-speech-recognition.vercel.app/ ソースコード: https://github.com/maku77/p-bf4cpjx-svelte-speech-recognition/ プロジェクトの準備 Svelte (SvelteKit) のプロジェクトがない場合は最初に作成しておきます。
-プロジェクトの作成 $ npm create svelte@latest myapp (選択肢が表示されたら TypeScript を選択しておく） $ cd myapp $ npm install SpeechRecognition はブラウザ標準の API として策定されているものですが、TypeScript の型情報が認識されなかったので DefinitelyTyped で提供されている型情報 @types/dom-speech-recognition をインストールしておきます。
-型情報のインストール $ npm install --save-dev @types/dom-speech-recognition これで、window.SpeechRecognition コンストラクタや、SpeechRecognitionResult などの各型情報を参照できるようになります。
-SpeechRecognition の使い方 SpeechRecognition による音声認識の基本的な流れは次のようになります。
-SpeechRecognition インスタンスを生成して、各種パラメーターを設定する。 SpeechRecognition.onresult プロパティに、認識結果を受け取るためのコールバック関数を設定する。 SpeechRecognition.start() でマイクからの音声キャプチャと音声認識を開始する。 SpeechRecognition インスタンスの生成 まず、SpeechRecognition インスタンスを生成して、各種パラメータを設定していきます。 次のような感じで関数化しておくと分かりやすいです。</description></item><item><title>Svelte 実装例: MediaPipe で Web カメラ映像をジェスチャー認識する</title><link>https://maku.blog/p/pqmxxqz/</link><pubDate>Sun, 30 Jun 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pqmxxqz/</guid><description>何をするか？ 図: Svelte &amp;#43; MediaPipe によるジェスチャー認識 MediaPipe を使った Svelte アプリを作ってみます。 MediaPipe は様々なメディアの認識処理に対応していますが、ここでは Web カメラからの入力映像を使ったジェスチャー認識を行います。 MediaPipe を使った Web アプリは、Web ブラウザだけで動作するので、静的な Web サイトとしてホスティングすることができます（参考: Svelte アプリを静的サイトとしてビルドする）。
-プロジェクトの作成 まずは空っぽの Svelte プロジェクトを新規作成します。
-$ npm create svelte@latest myapp （種類として Skeleton、TypeScript を選択） 続いて、必要なライブラリをインストールしておきます。 MediaType ではタスク別に使用するモジュールが分かれており、視覚系のタスクには @mediapipe/tasks-vision モジュールを使用します。
-@mediapipe/tasks-vision &amp;hellip; 視覚（画像／動画）系タスク ← 今回はコレを使う @mediapipe/tasks-genai &amp;hellip; 生成 AI (LLM) 系タスク @mediapipe/tasks-text &amp;hellip; テキスト系タスク @mediapipe/tasks-audio &amp;hellip; 音声系タスク Svelte アプリで依存ライブラリを追加するときは devDependencies として追加すれば OK です。
-$ cd myapp $ npm install -D @mediapipe/tasks-vision Web カメラからの入力映像を表示する MediaPipe を使った認識処理の前に、Web カメラからの入力映像を画面上に表示できるようにしておきましょう。 そのためには、HTML の video 要素に、Web カメラからの入力 (MediaStream) を関連付ける必要があります。</description></item><item><title>Svelte 実装例: テキストフィールドと URL のクエリ文字列を同期させる</title><link>https://maku.blog/p/uy89x6s/</link><pubDate>Tue, 12 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uy89x6s/</guid><description>Web サイトに検索用のテキストフィールドなどを配置する場合、入力内容と URL のクエリパラメーターを同期させると、ブラウザのブックマークなどで入力内容を保存することができます。
-図: input 要素とクエリパラメーターの同期 Svelte での実装例 下記は input 要素を 1 つだけ持つシンプルな Svelte ページコンポーネントの例です。
-src/routes/&amp;#43;page.svelte &amp;lt;script lang=&amp;#34;ts&amp;#34;&amp;gt; import { onMount } from &amp;#39;svelte&amp;#39;; import { page } from &amp;#39;$app/stores&amp;#39;; import { replaceState } from &amp;#39;$app/navigation&amp;#39;; /** 入力フィールドのテキスト */ let query = &amp;#39;&amp;#39;; // マウント時に URL のクエリパラメーターを取得し、入力フィールドの内容 (query) として反映する。 onMount(() =&amp;gt; { const params = $page.url.searchParams; query = params.get(&amp;#39;q&amp;#39;) ?? &amp;#39;&amp;#39;; }); /** 入力フィールドの内容 (query) に合わせて URL のクエリパラメーターを変更する。 */ function updateUrl() { const url = $page.</description></item><item><title>Svelte 実装例: チャットボット用の UI を作る</title><link>https://maku.blog/p/t6f8b4s/</link><pubDate>Mon, 11 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t6f8b4s/</guid><description>図: Svelte によるチャットボット用 UI の実装例 Svelte で ChatGPT のようなチャットボット UI を作るときの実装例です。 UI ライブラリなどを使わずに、プレーンな Svelte (+SvelteKit) だけで実装しています。 シンプルなチャットボットを作りたいときに参考になるかもしれません。
-ソースコード（GitHub リポジトリ） デモサイト (Cloudflare Pages) 実際にはボットサーバーは存在しないので、ユーザーの入力したテキストを 1 秒後にオウム返しする関数を作っています。 下記のトップページ (+page.svelte) で呼び出している sendMessageToBot() 関数がそれです。
-src/routes/&amp;#43;page.svelte &amp;lt;script lang=&amp;#34;ts&amp;#34;&amp;gt; import &amp;#39;./global.css&amp;#39;; import { sendMessageToBot } from &amp;#39;$lib/utils&amp;#39;; import Chat, { type ChatBubbleData } from &amp;#39;$lib/Chat/Chat.svelte&amp;#39;; /** 表示する会話の内容（ユーザーと Bot のメッセージのリスト） */ let bubbles: ChatBubbleData[] = []; /** * ユーザーがメッセージを入力し終わったときに呼ばれるコールバック関数です。 * * ユーザーの入力内容は直ちにチャットバブルとして表示し、ボットに入力内容を送ります。 * ボットからの応答が返ってきたときに、その内容をチャットバブルとして表示します。 */ async function handleSend(userMessage: string): Promise&amp;lt;void&amp;gt; { bubbles = [.</description></item><item><title>Svelte 入門: Svelte コンポーネントからイベントを発生させる</title><link>https://maku.blog/p/6d8gjyg/</link><pubDate>Wed, 06 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6d8gjyg/</guid><description>Svelte コンポーネント内で発生するイベント（ボタンクリックなど）を親コンポーネントでハンドルできるようにすると、親子コンポーネント間で連携が可能になります（コンポーネント内の値そのものを bind プロパティで連携させる方法もあります）。
-イベントをそのまま伝搬させる方法 Svelte が提供する HTML 要素は、on:イベント名 というプロパティでそのイベントを補足するためのハンドラー関数を設定できるようになっています（例: &amp;lt;button on:click={handleClick}&amp;gt;）。 イベントハンドラーを指定せずに on:イベント名 というプロパティだけを指定した場合は、そのイベントがそのまま親コンポーネントに伝搬されます。 次の MyButton コンポーネントは、button 要素で発生する click イベントを伝搬させています。
-src/lib/MyButton.svelte &amp;lt;button on:click&amp;gt;MyButton&amp;lt;/button&amp;gt; この click イベントは、親コンポーネントから次のようにハンドルすることができます。
-src/routes/&amp;#43;page.svelte &amp;lt;script lang=&amp;#34;ts&amp;#34;&amp;gt; import MyButton from &amp;#39;$lib/MyButton.svelte&amp;#39;; function handleClick() { alert(&amp;#39;Clicked!&amp;#39;); } &amp;lt;/script&amp;gt; &amp;lt;MyButton on:click={handleClick} /&amp;gt; シンプルですね！ でもこれだとあまり汎用性がありません。
-独自のインベントをディスパッチする方法 Svelte コンポーネントから独自のイベントをディスパッチするには、createEventDispatcher() 関数で作成したディスパッチ関数を呼び出します。 ディスパッチ関数の第 1 引数はイベント名で、必要があれば第 2 引数で送信するデータを指定します。
-次の MyPrompt コンポーネントは、ユーザーメッセージの入力エリアと、送信ボタンを備えたコンポーネントです（チャットの入力エリアのようなイメージです）。 送信ボタンを押すと、ユーザーが入力したメッセージと一意の ID を、独自の send イベントとしてディスパッチします。
-src/lib/MyPrompt.svelte &amp;lt;script lang=&amp;#34;ts&amp;#34;&amp;gt; import { createEventDispatcher } from &amp;#39;svelte&amp;#39;; let message = &amp;#39;&amp;#39;; // ユーザーが入力したテキスト let messageId = 0; // 一意の ID // イベントディスパッチャーを作成（イベント名とデータ型のペアを並べる） const dispatch = createEventDispatcher&amp;lt;{ send: { message: string; messageId: number }; // &amp;#34;send&amp;#34; イベントの定義 }&amp;gt;(); function handleSubmit() { if (message) { dispatch(&amp;#39;send&amp;#39;, { message, messageId }); // イベントを送信 message = &amp;#39;&amp;#39;; // ユーザーが入力したテキストをクリア messageId += 1; // ID を更新 } } &amp;lt;/script&amp;gt; &amp;lt;form on:submit|preventDefault={handleSubmit}&amp;gt; &amp;lt;input type=&amp;#34;text&amp;#34; bind:value={message} placeholder=&amp;#34;Write a message.</description></item><item><title>Svelte 入門: 開発サーバーで動作中かどうかを調べる (dev)</title><link>https://maku.blog/p/wu4bn29/</link><pubDate>Sat, 04 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wu4bn29/</guid><description>SvelteKit の $app/environment モジュールが提供する dev 変数 (boolean) の値を見ると、開発サーバー (npm run dev) で動作しているかどうかを調べることができます。 このフラグを利用することで、次のように開発環境と本番環境における振る舞いを切り替えることができます。
-開発環境と本番環境で、異なる API エンドポイントに接続する 開発環境で動作しているときは、作成途中のコンポーネントを表示する 次の Svelte コンポーネントでは、dev 変数の値に応じて処理を分岐しています。
-&amp;#43;page.svelte &amp;lt;script lang=&amp;#34;ts&amp;#34;&amp;gt; import { dev } from &amp;#39;$app/environment&amp;#39;; let envName = dev ? &amp;#39;開発環境&amp;#39; : &amp;#39;本番環境&amp;#39;; &amp;lt;/script&amp;gt; &amp;lt;p&amp;gt;現在&amp;lt;b&amp;gt;{envName}&amp;lt;/b&amp;gt;で動作しています。&amp;lt;/p&amp;gt; {#if dev} &amp;lt;p&amp;gt;このメッセージは&amp;lt;b&amp;gt;開発環境&amp;lt;/b&amp;gt;でのみ表示されます。&amp;lt;/p&amp;gt; {:else} &amp;lt;p&amp;gt;このメッセージは&amp;lt;b&amp;gt;本番環境&amp;lt;/b&amp;gt;でのみ表示されます。&amp;lt;/p&amp;gt; {/if} npm run dev による開発サーバー上で実行しているときは次のように出力されます。
-&amp;lt;p&amp;gt;現在&amp;lt;b&amp;gt;開発環境&amp;lt;/b&amp;gt;で動作しています。&amp;lt;/p&amp;gt; &amp;lt;p&amp;gt;このメッセージは&amp;lt;b&amp;gt;開発環境&amp;lt;/b&amp;gt;でのみ表示されます。&amp;lt;/p&amp;gt; npm run build でビルドし、npm run preview でプレビュー用サーバーを起動した場合は次のように出力されます。
-&amp;lt;p&amp;gt;現在&amp;lt;b&amp;gt;本番環境&amp;lt;/b&amp;gt;で動作しています。&amp;lt;/p&amp;gt; &amp;lt;p&amp;gt;このメッセージは&amp;lt;b&amp;gt;本番環境&amp;lt;/b&amp;gt;でのみ表示されます。&amp;lt;/p&amp;gt;</description></item><item><title>Svelte 入門: SvelteKit を使ったプロジェクトのディレクトリ構成／コーディングルールなど</title><link>https://maku.blog/p/69urn22/</link><pubDate>Wed, 01 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/69urn22/</guid><description>Svelte/SvelteKit を使用したプロジェクトのディレクトリ構成やファイル名などのルールのまとめです。 これはひとつの案なので、具体的なルールはプロジェクトごとに決めてください。
-SvelteKit のようなファイルベースのルーティングを採用したフレームワークでは、プロジェクトの構成は大体決まったものになるのですが、それでも細かい部分では独自のルールを採用することが多いと思います。 プロジェクトごとに定義したルールは、GitHub リポジトリの README.md あたりに記述しておくとよいです。
-ディレクトリ構成 下記のプロジェクト構造は、SvelteKit 本家の Project structure • Docs • SvelteKit からの抜粋です。
-my-project/ ├ src/ │ ├ lib/ │ │ ├ server/ │ │ │ └ [your server-only lib files] │ │ └ [your lib files] │ ├ params/ │ │ └ [your param matchers] │ ├ routes/ │ │ └ [your routes] │ ├ app.html │ ├ error.html │ ├ hooks.client.js │ ├ hooks.</description></item><item><title>Svelte 入門: SvelteKit の load 関数でデータのロード処理を定義する</title><link>https://maku.blog/p/wqt76qw/</link><pubDate>Tue, 31 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wqt76qw/</guid><description>load 関数の基本 SvelteKit には、+pages.ts や +pages.server.ts といった、特殊なルートファイルにデータのロード処理を定義する仕組みが用意されています。 ページコンポーネント (+page.svelte) の UI 実装からデータのロード処理を分離することで、データの取得タイミングを細かく制御できるようになり、以下のような恩恵を得られます。
-サーバーサイドレンダリング (SSR) ビルド時に外部データを使ってページを生成することができます。 静的な HTML を配信することは、SEO の観点で有利に働く可能性があります。 外部 API の呼び出しにアクセストークンが必要な場合は、サーバーサイドでのみ呼び出すようにすることで、アクセストークンを公開せずに済みます。 プリロード SvelteKit は、リンクホバーなどをトリガーにして、ページ遷移前にデータをプリロードすることができます。 ロード処理の使い回し layout.js(.ts) や layout.server.js(.ts) にデータのロード処理を記述することで、そのレイアウトが適用される複数のページから同じデータを参照できます。 データのロード処理は、決められた名前のルートファイルで、load という名前の関数を export することで定義します（Promise を返す async 関数として定義することも可能です）。 load 関数から return した値は、ページコンポーネント内から data という変数で参照することができます。 この対応付けは SvelteKit のルールであり、慣れるしかありません（逆にこの作法を知らないとコードを読めません）。
-図: data 変数と load 関数の関係 load 関数は、ユーザー操作によってインタラクティブに情報を取得するためのものというよりは、あくまでページの初期表示内容を取得するためのものだと考えるとよいです。
-load 関数は、src/routes ディレクトリ以下に配置する次のようなファイルに定義することができ、それぞれ呼び出されるタイミング（サーバーサイド (SSR) or クライアントサイド (CSR)）や、適用範囲が異なっています。
-ファイル名 CSR SSR 注釈 適用範囲 +page.js(.ts) ✅ ✅※ ※ export const ssr = false と記述した場合はクライアントサイドでのみ呼び出されます。 同一ディレクトリの +page.</description></item><item><title>Svelte 実装例: インクリメンタルサーチによる頻繁な API 呼び出しを防ぐ debounce 処理</title><link>https://maku.blog/p/c3ckhdf/</link><pubDate>Mon, 30 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/c3ckhdf/</guid><description>debounce 処理とは Web アプリケーションにインクリメンタルサーチの機能を組み込む際、検索 API の頻繁な呼び出しが課題となることがあります。 たとえば、"abcde" というキーワードで検索したいときに、"a" → "ab" → "abc" のように 1 文字入力するたびに API 呼び出しが走ると検索サーバーに負荷がかかってしまいます。
-このような場合に、最後のユーザー入力から一定時間待つ debounce 処理を入れます。 次の Svelte コンポーネントでは、入力エリアでキーボード入力するたびに handleKeyUp 関数を呼び出していますが、入力内容を query 変数に反映するのを 1 秒間待つようにしています。
-debounce 処理 &amp;lt;script lang=&amp;#34;ts&amp;#34;&amp;gt; let query = &amp;#39;&amp;#39;; // クエリ文字列（この値が変化したらサーチ API を呼び出す想定） let timeoutId: number; // debounce 処理用のタイマー ID const handleKeyUp = (event: KeyboardEvent) =&amp;gt; { // リアルタイムなユーザー入力テキスト const text: string = (event.target as HTMLInputElement).value; // query 変数への代入はユーザー入力が終わってから 1 秒後に行う（debounce 処理） clearTimeout(timeoutId); timeoutId = setTimeout(() =&amp;gt; { query = text; }, 1000); }; &amp;lt;/script&amp;gt; &amp;lt;input on:keyup={handleKeyUp} /&amp;gt; &amp;lt;p&amp;gt;query: {query}&amp;lt;/p&amp;gt; こうすることで、ユーザーが一連のテキストを入力し終わったタイミングで、一度だけ検索 API を呼び出すことができるようになります（もちろん、1 秒以上の間隔を上げずにキーボード入力がされた場合ですが）。</description></item><item><title>Svelte 入門: YAML ファイルをインポートして使う</title><link>https://maku.blog/p/umhwooq/</link><pubDate>Mon, 25 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/umhwooq/</guid><description>Svelte で YAML ファイルをインポートして使う方法 Svelte (SvelteKit) には YAML ファイルを直接インポートして JavaScript オブジェクトして扱う仕組みはありませんが、raw インポートの仕組みを使えば、YAML ファイルを文字列データとしてそのまま読み込むことができます（これは SvelteKit がビルドに使っている Vite の仕組みです）。
-YAML ファイルを文字列としてインポートする import gamesYaml from &amp;#39;$lib/assets/games.yaml?raw&amp;#39; このようにして読み込んだ YAML テキストを、Node.js の YAML ライブラリなどでパースすれば、YAML ファイルの内容を JavaScript オブジェクトとして扱うことができます。 ビルド時に処理を完結させることができるので、例えば、static-adapter を使った静的ビルド (SSG) が必要な環境でも利用できます。
-実装例 YAML ファイルを扱うために js-yaml ライブラリを使うので、次のようにしてインストールしておきます。
-js-yaml（およびその型ファイル）のインストール $ npm install --save-dev js-yaml @types/js-yaml サンプルの YAML ファイルとして、下記のようなゲームソフト情報を含んだ games.yaml を使います。 この YAML ファイルはビルド時にインポートするので、static ディレクトリではなく src ディレクトリのどこかに配置します（ここでは、lib/assets というディレクトリに配置しています）。
-src/lib/assets/games.yaml - title: シャドウラン date: 1996-02-23 price: 7800 - title: トムキャットアレイ date: 1994-12-22 price: 7800 - title: 真・女神転生 date: 1994-02-25 次の Svelte コンポーネントでは、ビルド時に YAML ファイルを読み込んで、JavaScript オブジェクトと扱えるようにしていします。 実装には TypeScript を使っていますが、raw インポートした YAML ファイルからは型情報を推測してくれないようなので、自分で Game 型を定義しています。</description></item><item><title>Svelte 入門: JSON ファイルをインポートして使う</title><link>https://maku.blog/p/pzrza7m/</link><pubDate>Tue, 19 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pzrza7m/</guid><description>Svelte (SvelteKit) アプリ内の Svelte コンポーネントや JavaScript/TypeScript ライブラリでは、JSON ファイルを import 文で簡単に読み込めるようになっています（正確には Vite の Static Asset Handling の仕組みを利用しています）。
-ここでは、サンプルデータとして下記のようなゲームソフト情報を含んだ JSON ファイルを用意します。 この JSON ファイルはビルド時にインポートするので、static ディレクトリではなく src ディレクトリのどこかに配置します（ここでは、lib/assets というディレクトリに配置しています）。
-src/lib/assets/games.json [ { &amp;#34;title&amp;#34;: &amp;#34;シャドウラン&amp;#34;, &amp;#34;date&amp;#34;: &amp;#34;1996-02-23&amp;#34;, &amp;#34;price&amp;#34;: 7800 }, { &amp;#34;title&amp;#34;: &amp;#34;トムキャットアレイ&amp;#34;, &amp;#34;date&amp;#34;: &amp;#34;1994-12-22&amp;#34;, &amp;#34;price&amp;#34;: 7800 }, { &amp;#34;title&amp;#34;: &amp;#34;真・女神転生&amp;#34;, &amp;#34;date&amp;#34;: &amp;#34;1994-02-25&amp;#34; } ] このファイルを Svelte コンポーネントから直接インポートしてもよいのですが、次のように明示的に TypeScript の型情報を付加するライブラリでラップしておくと便利かもしれません。
-src/lib/games.ts import rawJson from &amp;#39;$lib/assets/games.json&amp;#39;; /** ゲームソフトの情報 */ export type Game = { /** ゲームタイトル */ title: string; /** 発売日 */ date: string; /** 価格 */ price?</description></item><item><title>Svelte 入門: Svelte アプリを完全な静的サイトとしてビルドする (SSG: Static Site Generation)</title><link>https://maku.blog/p/4oudmxy/</link><pubDate>Tue, 05 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4oudmxy/</guid><description>何をするか？ Svelte/SvelteKit を使ったプロジェクト全体を、完全な静的リソースの形にビルドする SSG (Static Site Genration) 機能の使い方について説明します。 AWS の S3 ストレージのようなファイルの配信機能しか持たないサービスで Web サイトをホスティングする場合、SSG によるビルドが必要になります。
-ちなみに、Cloudflare Pages や Vercel のようなモダンなホスティングサービス上で Svelte アプリをビルドする場合は、このような設定は一切行わずにデプロイすることができます（ゼロコンフィグ）。 できればそういったサービスを使うことを推奨しますが、ここでは何らかの事情でそういった便利なサービスを使用できないケースを想定しています（会社のポリシーで S3 しか使えないなど）。
-SvelteKit の SSG 設定 adapter-static のインストール SvelteKit の @sveltejs/adapter-static というモジュールが SSG 機能を提供しているので、まずはこのモジュールをインストールします。
-adapter-static のインストール $ npm install --save-dev @sveltejs/adapter-static adapter-static の有効化 ビルド設定ファイル (svelte.config.js) で、adapter-static を使用するように設定します。 プロジェクトの初期状態では、次のような感じで adapter-auto というモジュールが使われるように設定されていると思います。
-svelte.config.js（変更前） import adapter from &amp;#39;@sveltejs/adapter-auto&amp;#39;; import { vitePreprocess } from &amp;#39;@sveltejs/kit/vite&amp;#39;; /** @type {import(&amp;#39;@sveltejs/kit&amp;#39;).Config} */ const config = { preprocess: vitePreprocess(), kit: { adapter: adapter() } }; export default config; adapter-auto は、Vercel や Cloudflare Pages などのサービス上でビルドするときに使えるモジュールですが、SSG するときには使えないので、ここを adapter-static に置き換えてやります。</description></item><item><title>Svelte 実装例: Svelte アプリから D3.js を使う</title><link>https://maku.blog/p/7acxmwo/</link><pubDate>Mon, 04 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7acxmwo/</guid><description>何をするか？ Svelte を使用した Web アプリケーションの中から、SVG 描画ライブラリである D3.js を使用する方法を説明します。 Svelte のプロジェクトは、npm create svelte@latest コマンドなどで既に作成されていることを前提とします。
-参考: Svelte を始める (SvelteKit で Hello World） D3.js のインストール Svelte はビルド時に実装コードをバニラ JS の形にコンパイルするので、D3.js (d3) などの外部ライブラリは devDependencies としてインストールすれば OK です。 TypeScript を使う場合は、型情報の @types/d3 も一緒にインストールしておきます。
-d3 モジュールと型情報をインストール $ npm install --save-dev d3 @types/d3 D3.js による描画 ここでは、次のような簡単な棒グラフを Svelte アプリ内の D3.js で描画してみます。
-D3.js による棒グラフの例 D3.js の d3.select() 関数は DOM 要素を参照するため、クライアントサイド JavaScript として実行しなければいけないことに注意してください。 具体的には、Svelte の onMount() コールバック内で呼び出すようにします。 直接 d3.select() 関数を呼び出してしまうと、ReferenceError: document is not defined のようなエラーが発生します。</description></item><item><title>Svelte 実装例: Hamburger ボタンを作る</title><link>https://maku.blog/p/z5cwfjm/</link><pubDate>Fri, 01 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/z5cwfjm/</guid><description>Svelte コンポーネントによる Hamburger アイコンの実装例です。 ボタンをクリックすると open 変数の値が true になり、CSS アニメーションで×印に変化します。
-図: Svelte コンポーネントによるハンバーガーアイコン src/lib/components/Hamburger.svelte &amp;lt;script lang=&amp;#34;ts&amp;#34;&amp;gt; export let open = false; &amp;lt;/script&amp;gt; &amp;lt;button class:open on:click={() =&amp;gt; (open = !open)}&amp;gt; &amp;lt;svg width=&amp;#34;40&amp;#34; height=&amp;#34;40&amp;#34;&amp;gt; &amp;lt;line id=&amp;#34;top&amp;#34; x1=&amp;#34;9&amp;#34; y1=&amp;#34;10&amp;#34; x2=&amp;#34;31&amp;#34; y2=&amp;#34;10&amp;#34; /&amp;gt; &amp;lt;line id=&amp;#34;middle&amp;#34; x1=&amp;#34;9&amp;#34; y1=&amp;#34;20&amp;#34; x2=&amp;#34;31&amp;#34; y2=&amp;#34;20&amp;#34; /&amp;gt; &amp;lt;line id=&amp;#34;bottom&amp;#34; x1=&amp;#34;9&amp;#34; y1=&amp;#34;30&amp;#34; x2=&amp;#34;31&amp;#34; y2=&amp;#34;30&amp;#34; /&amp;gt; &amp;lt;/svg&amp;gt; &amp;lt;/button&amp;gt; &amp;lt;style&amp;gt; button { display: inline-block; width: 40px; height: 40px; padding: 0; cursor: pointer; border: none; background: #333; box-shadow: inset 0 0 0 2px #cccccc; /* 内側に枠を付ける */ z-index: 20; /* （これは必要に応じて）他の要素より上に表示する */ } button:hover { background: #555; } svg line { stroke: currentColor; stroke-linecap: round; stroke-width: 3; stroke: #cccccc; transition: transform 0.</description></item><item><title>Svelte 実装例: ページ遷移用のナビゲーションメニューを作成する</title><link>https://maku.blog/p/2nrgf2m/</link><pubDate>Wed, 30 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2nrgf2m/</guid><description>Svelte サイト内でページ遷移を行うためのナビゲーションコンポーネントの作成例です。
-現在の URL（パス）の取得方法 SvelteKit の $app/stores モジュールが提供する page ストアを利用すると、現在表示中のページの URL や、その一部であるパス情報を取得することができます。 この情報を利用することで、ナビゲーションコンポーネント内のカレントページに相当する項目をハイライト表示します（この URL 情報は、パンくずリストなどでも利用できます）。
-現在のページのパス情報は、次のように $page.url.pathname 参照できます。
-&amp;lt;script&amp;gt; import { page } from &amp;#39;$app/stores&amp;#39;; &amp;lt;/script&amp;gt; &amp;lt;b&amp;gt;pathname = {$page.url.pathname}&amp;lt;/b&amp;gt; ページ遷移すると、pathname の値が、/ → /about → /blog のような感じで変化します。
-Nav コンポーネントの実装例 次の Svelte コンポーネント (Nav) は、サイト内でページ遷移を行うためのボタンを表示します。 現在のページに相当するボタンには、赤色の下線を表示しています。
-図: Nav コンポーネントの表示 src/lib/components/Nav.svelte &amp;lt;script&amp;gt; import { page } from &amp;#39;$app/stores&amp;#39;; const pages = [ { name: &amp;#39;Home&amp;#39;, path: &amp;#39;/&amp;#39; }, { name: &amp;#39;About&amp;#39;, path: &amp;#39;/about&amp;#39; }, { name: &amp;#39;Blog&amp;#39;, path: &amp;#39;/blog&amp;#39; } ]; &amp;lt;/script&amp;gt; &amp;lt;nav&amp;gt; {#each pages as p} {#if p.</description></item><item><title>Svelte 入門: 動的に class 属性を off/on する</title><link>https://maku.blog/p/x3vpkn4/</link><pubDate>Tue, 22 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/x3vpkn4/</guid><description>HTML 要素の class 属性の値を動的に変化させることで、スタイルの切り替えをしたいことはよくあります。 ナビゲーションメニューで、現在表示しているページをハイライトするのは典型的な例です。
-ここでは、ボタンを押すことで Off/On できる簡単なランプ (Lamp) コンポーネントを作ってみます。
-図: class 属性の変更による表示切り替え Lamp.svelte &amp;lt;script lang=&amp;#34;ts&amp;#34;&amp;gt; let active = false; // ランプの On/Off 状態 function toggle() { active = !active; } &amp;lt;/script&amp;gt; &amp;lt;div class=&amp;#34;container&amp;#34;&amp;gt; &amp;lt;div class=&amp;#34;lamp {active ? &amp;#39;active&amp;#39; : &amp;#39;&amp;#39;}&amp;#34; /&amp;gt; &amp;lt;button on:click={toggle}&amp;gt; {#if active}OFF{:else}ON{/if} &amp;lt;/button&amp;gt; &amp;lt;/div&amp;gt; &amp;lt;style&amp;gt; .container { display: flex; align-items: center; gap: 0.5rem; } .lamp { display: inline-block; width: 30px; height: 30px; box-sizing: border-box; border: 4px ridge rgba(0, 0, 0, 0.</description></item><item><title>Svelte 入門: 複数のページで共通のレイアウトを定義する (+layout.svelte)</title><link>https://maku.blog/p/vwyvd5x/</link><pubDate>Tue, 22 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vwyvd5x/</guid><description>レイアウトファイル (+layout.svelte) の基本 Svelte のフレームワークである SvelteKit は、複数のページで使用する共通レイアウトを定義するための仕組みを提供しています。 共通レイアウトを定義するのは簡単で、src/routes/+layout.svelte というファイルを作成するだけで、そのレイアウトが全ページ (src/routes/**/+page.svelte) に適用されます。
-src/routes/&amp;#43;layout.svelte（共通レイアウト） &amp;lt;header&amp;gt; &amp;lt;h1&amp;gt;サイト名&amp;lt;/h1&amp;gt; &amp;lt;/header&amp;gt; &amp;lt;div class=&amp;#34;main&amp;#34;&amp;gt; &amp;lt;slot /&amp;gt; &amp;lt;/div&amp;gt; &amp;lt;style&amp;gt; header { position: fixed; top: 0; left: 0; width: 100%; padding: 1rem 1.5rem; background-color: #333; color: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); z-index: 1000; } h1 { margin: 0; } .main { margin: 7rem 2rem 4rem 2rem; } &amp;lt;/style&amp;gt; 各ページのコンテンツは、レイアウトファイル内の &amp;lt;slot /&amp;gt; 部分に展開されます（参考: スロットの仕組み）。
-実際には SvelteKit で作成したアプリケーションは、最上位のページテンプレートとして src/app.</description></item><item><title>Svelte 入門: Svelte コンポーネントに子要素を渡せるようにする (&lt;slot />)</title><link>https://maku.blog/p/gcdawrj/</link><pubDate>Mon, 21 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gcdawrj/</guid><description>スロットの基本 &amp;lt;slot /&amp;gt; Svelte コンポーネントを使用するときに子要素として渡した内容は、Svelte コンポーネントの中から &amp;lt;slot /&amp;gt; で参照することができます。 &amp;lt;slot /&amp;gt; の仕組みは、Vue.js や Astro でも採用されています（React.js では children prop で参照します）。
-次の ExtLink コンポーネントは、外部サイトへのリンクを表示するコンポーネントの実装例です。
-src/lib/ExtLink.svelte &amp;lt;script lang=&amp;#34;ts&amp;#34;&amp;gt; export let href: string; &amp;lt;/script&amp;gt; &amp;lt;a {href} target=&amp;#34;_blank&amp;#34; rel=&amp;#34;noopener noreferrer&amp;#34;&amp;gt;&amp;lt;slot /&amp;gt;&amp;lt;/a&amp;gt; この ExtLink コンポーネントは次のように使用します。
-src/routes/&amp;#43;page.svelte &amp;lt;script lang=&amp;#34;ts&amp;#34;&amp;gt; import ExtLink from &amp;#39;$lib/ExtLink.svelte&amp;#39;; &amp;lt;/script&amp;gt; &amp;lt;h1&amp;gt;Hello&amp;lt;/h1&amp;gt; &amp;lt;ExtLink href=&amp;#34;https://www.bing.com/&amp;#34;&amp;gt;Bing&amp;lt;/ExtLink&amp;gt; この例では、コンポーネント内の &amp;lt;slot /&amp;gt; という部分に Bing というテキストが展開されることになります。 よって、リンク部分は次のような HTML にコンパイルされます。
-&amp;lt;a href=&amp;#34;https://www.bing.com/&amp;#34; target=&amp;#34;_blank&amp;#34; rel=&amp;#34;noopener noreferrer&amp;#34;&amp;gt;Bing&amp;lt;/a&amp;gt; 名前付きスロット &amp;lt;slot name="name" /&amp;gt; 子要素を複数のパートに分けてコンポーネントに渡したいことがあります。 このような場合は、名前付きスロット という仕組みを使います。 次の Box コンポーネントは、3 つのスロットを受け取れるようにしています。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Svelte 関連メモ on まくろぐ</title><link>https://maku.blog/p/td962u6/</link><description>Recent content in Svelte 関連メモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 17 Mar 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/td962u6/index.xml" rel="self" type="application/rss+xml"/><item><title>Svelte を始める (SvelteKit で Hello World）</title><link>https://maku.blog/p/qmy6cdh/</link><pubDate>Thu, 17 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qmy6cdh/</guid><description>&lt;h2 id="svelte-とは">Svelte とは&lt;/h2>
+&lt;p>&lt;a href="https://svelte.dev/">Svelte&lt;/a> は、コンパイラベースの Web アプリケーションフレームワークです。
+特殊なテンプレート言語を使ってコンポーネントを実装することで、高度に最適化された HTML/JavaScript/CSS を出力することができます。
+React.js アプリなどは、クライアントサイド JavaScript から共通のライブラリを呼び出す形で動作しますが、Svelte はコンパイル後の最適化された JavaScript のみで動作するようになっており、最終的な成果物が非常にコンパクトになります。
+独自のテンプレート構文を学ぶ必要はありますが、ユーザー操作に反応するコンポーネントを、少ないコードで記述できるよう工夫されています。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ ライバル？の Astro との違い&lt;/span>
+ &lt;span class="xNote_body">&lt;p>Svelte よりも後発のコンパイラベースの Web アプリフレームワークに Astro があります。
+Astro は、ビルド時にほとんどの JavaScript コードを実行して、その時点で静的な HTML ファイルを生成するというアプローチをとっています。
+最終的にデプロイするのは、HTML (+CSS) だけになるので、初期表示が爆速になるという考え方です。
+一方、Svelte はあくまで最適化された JavaScript コードはクライアントサイドで動かすという考え方です。&lt;/p>
+&lt;p>完全に静的なサイトであれば Astro を使い、インタラクティブなサイトであれば Svelte を使う、という使い分けがよさそうです。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/669r7r2/">Astro 関連メモ&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/span>
+&lt;/div>
+&lt;h2 id="svelte--sveltekit-プロジェクトの作成">Svelte + SvelteKit プロジェクトの作成&lt;/h2>
+&lt;p>Svelte のプロジェクトは次のように &lt;strong>&lt;code>npm create svelte&lt;/code>&lt;/strong> コマンドで簡単に作成できます。
+ウィザード形式の質問に答えていくだけで、TypeScript や ESLint、Prettier の導入まで一気にやってくれます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Svelte プロジェクト (myapp) の作成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm create svelte@latest myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">...（省略）...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">┌ Welcome to SvelteKit!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">│
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">◇ Which Svelte app template?
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">│ Skeleton project
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">│
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">◇ Add type checking with TypeScript?
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">│ Yes, using TypeScript syntax
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">│
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">◇ Select additional options (use arrow keys/space bar)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">│ Add ESLint for code linting, Add Prettier for code formatting
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">│
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">└ Your project is ready!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">...（省略）...
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ Svelte と SvelteKit&lt;/span>
+ &lt;span class="xNote_body">上記のコマンドは、実際には &lt;a href="https://kit.svelte.jp/">SvelteKit&lt;/a> というアプリケーションフレームワークを利用する雛形プロジェクトを生成します。
+Svelte と SvelteKit の関係は、React.js と Next.js の関係のようなものです。
+Svelte はコンポーネントのコンパイラーですが、これだけでは Web アプリを構成することはできません。
+SvelteKit を使うことで、ファイルベースのルーティングや、サーバーサイドレンダリング、Vite によるバンドリングなどを行えるようになります。&lt;/span>
+&lt;/div>
+&lt;p>Svelte プロジェクト（&lt;code>myapp&lt;/code> ディレクトリ）を作成したら、次のように依存モジュールをインストールし、開発サーバーを立ち上げることができます。&lt;/p></description></item><item><title>Svelte 実装例: $state ルーンによる状態変数を localStorage/sessionStorage と連動させる</title><link>https://maku.blog/p/tpjvh3q/</link><pubDate>Mon, 17 Mar 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tpjvh3q/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Svelte 5 のコンポーネントで使用する状態変数は &lt;code>$state&lt;/code> ルーンを使って定義できますが、ページをリロードするとその値はリセットされてしまいます。
+この記事では、&lt;code>$state&lt;/code> ルーンで定義した状態変数の値を &lt;code>localStorage&lt;/code> や &lt;code>sessionStorage&lt;/code> と同期させる方法を紹介します。
+&lt;code>localStorage&lt;/code> と同期させた場合は、ブラウザを開き直したときにも以前の状態を復帰できます。
+&lt;code>sessionStorage&lt;/code> と同期させた場合は、ブラウザのタブを開いている間だけ状態を保持できます。&lt;/p>
+&lt;p>&lt;code>$state&lt;/code> ルーンを使って状態変数を共有する方法は、下記の記事を参照してください。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/nhuh2if/">Svelte 入門: 複数のコンポーネントで状態を共有する（$state ルーン）&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="実装例">実装例&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1540" height="140" src="../../p/tpjvh3q/img-001.png" alt="/p/tpjvh3q/img-001.png" />
+ &lt;figcaption>図: サインイン状態を管理する AuthState クラスの実装と使用例&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>ここでは、サインイン状態を管理する &lt;code>AuthState&lt;/code> クラスを作成し、その &lt;strong>&lt;code>userName&lt;/code>&lt;/strong> プロパティ（状態変数）を &lt;code>localStorage&lt;/code> に保存する例を示します。
+サインイン状態を示す &lt;strong>&lt;code>signedIn&lt;/code>&lt;/strong> プロパティも用意していますが、こちらは &lt;code>$derived&lt;/code> ルーンで定義されており、&lt;code>userName&lt;/code> プロパティの値に応じて自動的に値が決まるようになっています（&lt;code>userName&lt;/code> がセットされているときに &lt;code>true&lt;/code> になります）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/auth-state.svelte.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">onMount&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;svelte&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">STORAGE_KEY&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;userName&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 複数のコンポーネントで状態を共有するため、リアクティブな変数をグローバルに定義します
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">userName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">$state&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">let&lt;/span> &lt;span class="nx">signedIn&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">$derived&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">!!&lt;/span>&lt;span class="nx">userName&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">AuthState&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="cm">/** サインインしているユーザー名を参照するためのプロパティ (reactive) */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">get&lt;/span> &lt;span class="nx">userName&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">return&lt;/span> &lt;span class="nx">userName&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="cm">/** サインインしているかどうかを示すプロパティ (reactive) */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">get&lt;/span> &lt;span class="nx">signedIn&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kr">boolean&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">return&lt;/span> &lt;span class="nx">signedIn&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">constructor&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="c1">// ページが読み込まれたときに localStorage の値で状態変数を初期化します
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>		&lt;span class="c1">// （このコードはコンポーネントの初期化中に呼び出す必要があります）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>		&lt;span class="nx">onMount&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">			&lt;span class="nx">userName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">localStorage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getItem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">STORAGE_KEY&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">signIn&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="c1">// 実際には正しいユーザー情報やトークンを取得して保存します
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>		&lt;span class="nx">userName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;Maku&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">localStorage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">setItem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">STORAGE_KEY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">userName&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">signOut&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">userName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">localStorage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">removeItem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">STORAGE_KEY&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>AuthState&lt;/code> クラスのコンストラクターでは、Svelte のライフサイクルフックである &lt;code>onMount()&lt;/code> 関数を使って、ページが読み込まれたときに &lt;code>localStorage&lt;/code> から &lt;code>userName&lt;/code> の値を取得しています。
+これにより、ページをリロードしたときに以前の状態を復元できます。
+Svelte の仕組み上、&lt;code>onMount&lt;/code> 関数はコンポーネントの初期化中にしか呼び出せないため、&lt;code>new AuthState()&lt;/code> というインスタンス化コードはコンポーネント側に記述する必要があります（後述）。&lt;/p></description></item><item><title>Svelte 入門: 複数のコンポーネントで状態を共有する（$state ルーン）</title><link>https://maku.blog/p/nhuh2if/</link><pubDate>Sun, 16 Mar 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nhuh2if/</guid><description>&lt;h2 id="state-ルーンのおさらい">$state ルーンのおさらい&lt;/h2>
+&lt;p>Svelte 5 では、&lt;strong>&lt;code>$state&lt;/code>&lt;/strong> ルーンを使ってリアクティブな変数を定義することができます。
+下記は公式サイトでも最初に出てくる基本的なカウンター変数の実装例です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/components/CounterButton.svelte&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">lang&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;ts&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kd">let&lt;/span> &lt;span class="nx">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">$state&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span> &lt;span class="na">onclick&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">count&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	clicks: &lt;span class="p">{&lt;/span>&lt;span class="nx">count&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のように &lt;code>$state&lt;/code> ルーンを使って定義した &lt;code>count&lt;/code> 変数はリアクティブな変数として扱われ、&lt;code>count&lt;/code> の値が変更されると、それに連動して画面上の表示も更新されます（&lt;code>clicks: 0&lt;/code> が &lt;code>clicks: 1&lt;/code> になる）。
+&lt;code>count&lt;/code> の値を変更したあとに再描画処理を呼び出す、という手続き的なコードを書く必要はありません。&lt;/p>
+&lt;h2 id="リアクティブな変数のロジックを切り出す">リアクティブな変数のロジックを切り出す&lt;/h2>
+&lt;p>&lt;code>$state&lt;/code> ルーンを使ったロジックは、&lt;code>.svelte&lt;/code> コンポーネントから分離して別ファイルに記述することができます。
+これは Svelte 5 でルーンが導入された理由のひとつです。
+&lt;code>$state&lt;/code> ルーンを使う TypeScript コードの拡張子は、単純な &lt;code>.ts&lt;/code> ではなく &lt;strong>&lt;code>.svelte.ts&lt;/code>&lt;/strong> にする必要があります（ルーンは特殊なビルド処理が必要なため）。&lt;/p>
+&lt;p>下記は、リアクティブなカウンター変数のロジックを別ファイルに分離した例です。
+&lt;code>$state&lt;/code> ルーンだけでなく、&lt;code>$effect&lt;/code> ルーンを使ってリアクティブ変数の変化に反応させることもできます。
+ここでは、&lt;code>count&lt;/code> 変数の値が変更されるたびにコンソールにログを出力するようにしています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/counter.svelte.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">export function createCounter() &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kd">let&lt;/span> &lt;span class="nx">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">$state&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">$effect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`The count is now $&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">count&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="sb">`);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb">	&lt;/span>&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="k">return&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="kr">get&lt;/span> &lt;span class="nx">count&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="nx">count&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">increment&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">count&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この &lt;code>createCounter()&lt;/code> 関数は、任意のコンポーネントから以下のように使用します。&lt;/p></description></item><item><title>Svelte 入門: API ルートのグローバル変数の生存期間</title><link>https://maku.blog/p/c28msnk/</link><pubDate>Tue, 18 Feb 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/c28msnk/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Svelte/SvelteKit を使った Web アプリケーションでは、&lt;code>src/routes&lt;/code> 以下のサーバーモジュール (&lt;strong>&lt;code>+server.ts&lt;/code>&lt;/strong>) で &lt;strong>&lt;code>GET&lt;/code>&lt;/strong> や &lt;strong>&lt;code>POST&lt;/code>&lt;/strong> 関数をエクスポートするだけで、API ルートとして動作させることができます（Web API のエンドポイントとして動作します）。&lt;/p>
+&lt;p>このサーバーモジュール内でグローバル変数を定義すると、その値は &lt;strong>サーバーが起動している間だけ保持されます&lt;/strong>。
+ここでは、この振る舞いを確認するためのサンプルコードを示します。&lt;/p>
+&lt;p>複数のクライアントからのリクエスト間で同じ変数が共有されるため、ユーザー情報などを格納してしまうと、セキュリティ上のリスクが生じる可能性があることに注意してください。&lt;/p>
+&lt;h2 id="実装例">実装例&lt;/h2>
+&lt;p>下記のサーバールート実装 (&lt;code>/api/messages&lt;/code>) では、POST リクエストで送られてきたメッセージを最大 5 件までグローバル変数 (&lt;code>messages&lt;/code>) に保持しています。
+GET リクエストでアクセスすると、保持しているメッセージを JSON 形式で返します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/routes/api/messages/&amp;#43;server.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">error&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">json&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@sveltejs/kit&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// API route のグローバル変数はサーバーが起動している間のみ保持される
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">messages&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/** /api/messages への GET リクエストを処理する */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">GET() {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="k">return&lt;/span> &lt;span class="nx">json&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">messages&lt;/span> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/** /api/messages への POST リクエストを処理する */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">POST&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">request&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">const&lt;/span> &lt;span class="nx">msg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">await&lt;/span> &lt;span class="nx">request&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">()).&lt;/span>&lt;span class="nx">trim&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="nx">msg&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">400&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;Text is required in the request body&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="c1">// 最新の 5 つのメッセージを保持
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>	&lt;span class="nx">messages&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[...&lt;/span>&lt;span class="nx">messages&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">slice&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="nx">msg&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="k">return&lt;/span> &lt;span class="nx">json&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">messages&lt;/span> &lt;span class="p">},&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">status&lt;/span>: &lt;span class="kt">201&lt;/span> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ページコンポーネントからこの API ルートにアクセスするコードは以下のようになります。
+テキストボックスに入力したメッセージを送信すると、API ルート側で保持しているメッセージリストが更新され、その内容が画面上に表示されます。&lt;/p></description></item><item><title>Svelte 入門: サーバー Hooks で Basic 認証を実装する</title><link>https://maku.blog/p/mem8u54/</link><pubDate>Tue, 11 Feb 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mem8u54/</guid><description>&lt;h2 id="hooks-とは">Hooks とは&lt;/h2>
+&lt;p>SvelteKit には &lt;a href="https://svelte.dev/docs/kit/hooks">Hooks の仕組み&lt;/a>が提供されており、特にサーバー Hooks を定義することで、任意のリクエストに割り込んで処理を行うことができます。
+例えば、各ルートのハンドラーが呼び出される前に、次のような処理を行うことができます。&lt;/p>
+&lt;ul>
+&lt;li>リクエストのログを取る&lt;/li>
+&lt;li>リクエストの内容を変更する（リダイレクトなど）&lt;/li>
+&lt;li>リクエストを拒否する（アクセス制御）&lt;/li>
+&lt;li>後続の処理のためにデータを付加する（Cookie に基づくユーザー情報など）&lt;/li>
+&lt;/ul>
+&lt;p>この記事では、サーバー Hooks の利用例として、簡単な &lt;strong>Basic 認証&lt;/strong> を実装する方法を解説します。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="310" height="240" src="../../p/mem8u54/img-001_hu746487663595535000.png" alt="/p/mem8u54/img-001.png" />
+ &lt;figcaption>図: Chrome の Basic 認証ダイアログ&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>管理者にしかアクセスできないページを手っ取り早く作りたい場合などに便利ですが、Basic 認証はセキュアな認証方式ではないので、あくまで Hooks の使い方の例と考えてください。
+本番環境に認証・認可の仕組みを導入する場合は、OAuth などのよりセキュアな方式を検討してください。&lt;/p>
+&lt;h2 id="サーバー-hooks-の基本">サーバー Hooks の基本&lt;/h2>
+&lt;p>サーバー Hooks を定義するのはとても簡単で、SvelteKit のプロジェクト内に &lt;strong>&lt;code>src/hooks.server.ts&lt;/code>&lt;/strong>（あるいは &lt;code>.js&lt;/code>）を作成し、&lt;strong>&lt;code>handle&lt;/code>&lt;/strong> 関数をエクスポートするだけです。
+ファイル名を間違えると、Hooks が正しく動作しないので注意してください（特に &lt;code>hook&lt;/code> でなく &lt;code>hooks&lt;/code> であることに注意）。&lt;/p>
+&lt;p>次の サーバー Hooks 実装では、リクエストイベントの内容をコンソールに出力しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/hooks.server.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">Handle&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@sveltejs/kit&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">handle&lt;/span>: &lt;span class="kt">Handle&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">resolve&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">JSON&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">stringify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">undefined&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">const&lt;/span> &lt;span class="nx">response&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">resolve&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="k">return&lt;/span> &lt;span class="nx">response&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-392467185" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-392467185">出力例&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;cookies&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;locals&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;params&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;request&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;route&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;/&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;url&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;http://localhost:5173/&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;isDataRequest&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;isSubRequest&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+&lt;p>&lt;code>handle&lt;/code> 関数には、&lt;strong>&lt;code>event&lt;/code>&lt;/strong> オブジェクト (&lt;a href="https://svelte.dev/docs/kit/@sveltejs-kit#RequestEvent">RequestEvent&lt;/a>) と、&lt;strong>&lt;code>resolve&lt;/code>&lt;/strong> 関数が渡されます。
+&lt;code>resolve&lt;/code> 関数は、各ルートに対応するレンダラーを呼び出して、その結果を &lt;code>Response&lt;/code> オブジェクトとして返す関数です。
+よって、上記のコードのように単純に &lt;code>resolve(event)&lt;/code> とすると、デフォルトのレンダリング処理を行った結果を返すことになります。&lt;/p></description></item><item><title>Svelte 入門: 外部 API 用のキーを Private な環境変数で定義する ($env)</title><link>https://maku.blog/p/nmdte68/</link><pubDate>Sun, 09 Feb 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nmdte68/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Svelte (+SvelteKit) を使ったアプリケーションから、API キーが必要な外部サービスを呼び出す方法を紹介します。
+例えば、サードパーティ API や、データベースサーバーにアクセスするときには、API キーが必要になることがあります。
+API キーはクライアントサイドからは見えてはいけないので、プライベートな環境変数として定義し、サーバー側で実行されるコードからのみ参照するようにします。&lt;/p>
+&lt;h2 id="private-環境変数">Private 環境変数&lt;/h2>
+&lt;p>Svelte アプリでは、&lt;strong>&lt;code>PUBLIC_&lt;/code>&lt;/strong> というプレフィックスが付いている環境変数は Public な環境変数、それ以外は Private な環境変数として扱われます。
+つまり、環境変数名に &lt;code>PUBLIC_&lt;/code> を付けなければ、サーバーサイドで実行されるコード（&lt;code>+page.server.ts&lt;/code> や &lt;code>+server.ts&lt;/code>）からのみ参照できるようになります。&lt;/p>
+&lt;p>本番環境用の環境変数は、デプロイ先のサービス上（Cloudflare Pages や Vercel）で設定する必要がありますが、開発サーバーで使用する環境変数は、&lt;strong>&lt;code>.env&lt;/code>&lt;/strong> ファイルで定義しておくことができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.env&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="na">MY_API_KEY&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;c3ytex9bsyed9zjgnbxhk2hninmd&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>.env&lt;/code> ファイルには、API キーなどの機密情報を記述することになるため、Git などのバージョン管理ツールにコミットしてはいけません（おそらく &lt;code>.gitignore&lt;/code> に &lt;code>.env&lt;/code> ファイルが登録されているはずです）。
+Git にコミットするのは、次のような参考ファイルだけにしておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.env.example&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="na">MY_API_KEY&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;XXXXX&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>アプリ実行時に Private な環境変数を参照するには、SvelteKit が提供する &lt;strong>&lt;code>$env/dynamic/private&lt;/code>&lt;/strong> モジュールを使います。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/routes/lib/server/sample.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">env&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;$env/dynamic/private&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">env&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">MY_API_KEY&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これに似たモジュールに &lt;strong>&lt;code>$env/static/private&lt;/code>&lt;/strong> がありますが、こちらは名前の通り、ビルド時に（static に）環境変数の値を参照することになります。
+多くのケースでは &lt;code>dynamic&lt;/code> の方を使うことになると思いますが、環境に応じて使い分けてください。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>モジュール&lt;/th>
+ &lt;th>環境変数の参照タイミング&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>$env/static/private&lt;/code>&lt;/td>
+ &lt;td>&lt;strong>ビルド時に&lt;/strong> 環境変数を参照する。&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>$env/dynamic/private&lt;/code>&lt;/td>
+ &lt;td>&lt;strong>実行時に&lt;/strong> 環境変数を参照する。&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;p>例えば、GitHub Actions でビルドして Cloudflare Pages にデプロイするようなケースでは、&lt;code>static&lt;/code> の方を使った場合は GitHub Actions の環境変数が参照され、&lt;code>dynamic&lt;/code> の方を使った場合は Cloudflare Pages の環境変数が参照されることになります。&lt;/p></description></item><item><title>Svelte 実装例: Web ブラウザで音声認識する (SpeechRecognition)</title><link>https://maku.blog/p/bf4cpjx/</link><pubDate>Wed, 31 Jul 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bf4cpjx/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Web ブラウザーの &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition">SpeechRecognition&lt;/a> API を使って、音声認識をしてみます。
+ここでは Svelte アプリケーションとして作成しますが、単純な HTML + JavaScript の組み合わせでもほぼ同様のコードになると思います（参考: &lt;a href="../../p/td962u6/">Svelte 関連メモ&lt;/a>）。&lt;/p>
+&lt;iframe allow="microphone" frameborder="0" style="border: none" width="100%" height="300" src="https://p-bf4cpjx-svelte-speech-recognition.vercel.app" style="resize: both; overflow: auto;">&lt;/iframe>
+&lt;ul>
+&lt;li>デモ: &lt;a href="https://p-bf4cpjx-svelte-speech-recognition.vercel.app/">https://p-bf4cpjx-svelte-speech-recognition.vercel.app/&lt;/a>&lt;/li>
+&lt;li>ソースコード: &lt;a href="https://github.com/maku77/p-bf4cpjx-svelte-speech-recognition/">https://github.com/maku77/p-bf4cpjx-svelte-speech-recognition/&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="プロジェクトの準備">プロジェクトの準備&lt;/h2>
+&lt;p>Svelte (SvelteKit) のプロジェクトがない場合は最初に作成しておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">プロジェクトの作成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm create svelte@latest myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">(選択肢が表示されたら TypeScript を選択しておく）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="gp">$&lt;/span> &lt;span class="nb">cd&lt;/span> myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>SpeechRecognition&lt;/code> はブラウザ標準の API として策定されているものですが、TypeScript の型情報が認識されなかったので DefinitelyTyped で提供されている型情報 &lt;strong>&lt;code>@types/dom-speech-recognition&lt;/code>&lt;/strong> をインストールしておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">型情報のインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install --save-dev @types/dom-speech-recognition
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、&lt;code>window.SpeechRecognition&lt;/code> コンストラクタや、&lt;code>SpeechRecognitionResult&lt;/code> などの各型情報を参照できるようになります。&lt;/p>
+&lt;h2 id="speechrecognition-の使い方">SpeechRecognition の使い方&lt;/h2>
+&lt;p>&lt;code>SpeechRecognition&lt;/code> による音声認識の基本的な流れは次のようになります。&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>SpeechRecognition&lt;/code> インスタンスを生成して、各種パラメーターを設定する。&lt;/li>
+&lt;li>&lt;code>SpeechRecognition.onresult&lt;/code> プロパティに、認識結果を受け取るためのコールバック関数を設定する。&lt;/li>
+&lt;li>&lt;code>SpeechRecognition.start()&lt;/code> でマイクからの音声キャプチャと音声認識を開始する。&lt;/li>
+&lt;/ol>
+&lt;h2 id="speechrecognition-インスタンスの生成">SpeechRecognition インスタンスの生成&lt;/h2>
+&lt;p>まず、&lt;code>SpeechRecognition&lt;/code> インスタンスを生成して、各種パラメータを設定していきます。
+次のような感じで関数化しておくと分かりやすいです。&lt;/p></description></item><item><title>Svelte 実装例: MediaPipe で Web カメラ映像をジェスチャー認識する</title><link>https://maku.blog/p/pqmxxqz/</link><pubDate>Sun, 30 Jun 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pqmxxqz/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="300" height="366" src="../../p/pqmxxqz/img-001_hu3967675139545907590.png" alt="/p/pqmxxqz/img-001.png" />
+ &lt;figcaption>図: Svelte &amp;#43; MediaPipe によるジェスチャー認識&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>&lt;a href="https://github.com/google-ai-edge/mediapipe">MediaPipe&lt;/a> を使った Svelte アプリを作ってみます。
+MediaPipe は様々なメディアの認識処理に対応していますが、ここでは Web カメラからの入力映像を使ったジェスチャー認識を行います。
+MediaPipe を使った Web アプリは、Web ブラウザだけで動作するので、静的な Web サイトとしてホスティングすることができます（参考: &lt;a href="../../p/4oudmxy/">Svelte アプリを静的サイトとしてビルドする&lt;/a>）。&lt;/p>
+&lt;h2 id="プロジェクトの作成">プロジェクトの作成&lt;/h2>
+&lt;p>まずは空っぽの Svelte プロジェクトを新規作成します。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm create svelte@latest myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">（種類として Skeleton、TypeScript を選択）
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>続いて、必要なライブラリをインストールしておきます。
+MediaType ではタスク別に使用するモジュールが分かれており、視覚系のタスクには &lt;strong>&lt;code>@mediapipe/tasks-vision&lt;/code>&lt;/strong> モジュールを使用します。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>@mediapipe/tasks-vision&lt;/code> &amp;hellip; 視覚（画像／動画）系タスク &lt;strong>← 今回はコレを使う&lt;/strong>&lt;/li>
+&lt;li>&lt;code>@mediapipe/tasks-genai&lt;/code> &amp;hellip; 生成 AI (LLM) 系タスク&lt;/li>
+&lt;li>&lt;code>@mediapipe/tasks-text&lt;/code> &amp;hellip; テキスト系タスク&lt;/li>
+&lt;li>&lt;code>@mediapipe/tasks-audio&lt;/code> &amp;hellip; 音声系タスク&lt;/li>
+&lt;/ul>
+&lt;p>Svelte アプリで依存ライブラリを追加するときは &lt;code>devDependencies&lt;/code> として追加すれば OK です。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> &lt;span class="nb">cd&lt;/span> myapp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install -D @mediapipe/tasks-vision
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="web-カメラからの入力映像を表示する">Web カメラからの入力映像を表示する&lt;/h2>
+&lt;p>MediaPipe を使った認識処理の前に、Web カメラからの入力映像を画面上に表示できるようにしておきましょう。
+そのためには、HTML の &lt;code>video&lt;/code> 要素に、Web カメラからの入力 (&lt;code>MediaStream&lt;/code>) を関連付ける必要があります。&lt;/p></description></item><item><title>Svelte 実装例: テキストフィールドと URL のクエリ文字列を同期させる</title><link>https://maku.blog/p/uy89x6s/</link><pubDate>Tue, 12 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uy89x6s/</guid><description>&lt;p>Web サイトに検索用のテキストフィールドなどを配置する場合、入力内容と URL のクエリパラメーターを同期させると、ブラウザのブックマークなどで入力内容を保存することができます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="402" height="94" src="../../p/uy89x6s/img-001.gif" alt="/p/uy89x6s/img-001.gif" />
+ &lt;figcaption>図: input 要素とクエリパラメーターの同期&lt;/figcaption>
+&lt;/figure>
+
+&lt;h2 id="svelte-での実装例">Svelte での実装例&lt;/h2>
+&lt;p>下記は &lt;code>input&lt;/code> 要素を 1 つだけ持つシンプルな Svelte ページコンポーネントの例です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/routes/&amp;#43;page.svelte&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">lang&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;ts&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">onMount&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;svelte&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">page&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;$app/stores&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">replaceState&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;$app/navigation&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="cm">/** 入力フィールドのテキスト */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kd">let&lt;/span> &lt;span class="nx">query&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="c1">// マウント時に URL のクエリパラメーターを取得し、入力フィールドの内容 (query) として反映する。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>	&lt;span class="nx">onMount&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="kr">const&lt;/span> &lt;span class="nx">params&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">$page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">url&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">searchParams&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">query&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">params&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;q&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">??&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="cm">/** 入力フィールドの内容 (query) に合わせて URL のクエリパラメーターを変更する。 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kd">function&lt;/span> &lt;span class="nx">updateUrl() {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="kr">const&lt;/span> &lt;span class="nx">url&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">$page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">url&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// new URL(window.location.href); でも可
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>		&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">query&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">			&lt;span class="nx">url&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">searchParams&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">set&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;q&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">query&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">			&lt;span class="nx">url&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">searchParams&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="k">delete&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;q&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">replaceState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">url&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">input&lt;/span> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;text&amp;#34;&lt;/span> &lt;span class="na">bind:value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">query&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="s">on:input=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">updateUrl&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;strong>&lt;code>onMount()&lt;/code>&lt;/strong> でセットしたコールバック関数は、このコンポーネントがブラウザ上で表示されたときに呼び出されます。
+このタイミングで、URL のクエリパラメーター（&lt;code>?q=ABC&lt;/code>）を参照し、テキストフィールドの値（&lt;code>query&lt;/code> 変数）に反映しています。&lt;/p>
+&lt;p>&lt;code>input&lt;/code> 要素の &lt;strong>&lt;code>on:input&lt;/code>&lt;/strong> プロパティには、ユーザーがテキスト入力したときに呼び出されるイベントハンドラーを設定します。
+このタイミングで URL 末尾のクエリパラメーターを同期させています。
+ページ遷移を発生させずに URL だけ書き換えるには、&lt;code>$app/navigation&lt;/code> が提供する &lt;strong>&lt;code>pushState()&lt;/code>&lt;/strong> か &lt;strong>&lt;code>replaceState()&lt;/code>&lt;/strong> 関数を使用できます。
+&lt;code>pushState()&lt;/code> を使うと呼び出しごとにブラウザの履歴に積まれてしまうので、今回のケースでは &lt;code>replaceState()&lt;/code> を使った方がよさそうです。&lt;/p></description></item><item><title>Svelte 実装例: チャットボット用の UI を作る</title><link>https://maku.blog/p/t6f8b4s/</link><pubDate>Mon, 11 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t6f8b4s/</guid><description>&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="567" height="257" src="../../p/t6f8b4s/img-001.gif" alt="/p/t6f8b4s/img-001.gif" />
+ &lt;figcaption>図: Svelte によるチャットボット用 UI の実装例&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>Svelte で ChatGPT のようなチャットボット UI を作るときの実装例です。
+UI ライブラリなどを使わずに、プレーンな Svelte (+SvelteKit) だけで実装しています。
+シンプルなチャットボットを作りたいときに参考になるかもしれません。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/maku77/p-t6f8b4s-svelte-chatbot-ui">ソースコード（GitHub リポジトリ）&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://p-t6f8b4s-svelte-chatbot-ui.pages.dev/">デモサイト (Cloudflare Pages)&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>実際にはボットサーバーは存在しないので、ユーザーの入力したテキストを 1 秒後にオウム返しする関数を作っています。
+下記のトップページ (&lt;code>+page.svelte&lt;/code>) で呼び出している &lt;code>sendMessageToBot()&lt;/code> 関数がそれです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/routes/&amp;#43;page.svelte&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">lang&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;ts&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">import&lt;/span> &lt;span class="s1">&amp;#39;./global.css&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">sendMessageToBot&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;$lib/utils&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">import&lt;/span> &lt;span class="nx">Chat&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="nx">ChatBubbleData&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;$lib/Chat/Chat.svelte&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="cm">/** 表示する会話の内容（ユーザーと Bot のメッセージのリスト） */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kd">let&lt;/span> &lt;span class="nx">bubbles&lt;/span>: &lt;span class="kt">ChatBubbleData&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="cm">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">	 * ユーザーがメッセージを入力し終わったときに呼ばれるコールバック関数です。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">	 *
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">	 * ユーザーの入力内容は直ちにチャットバブルとして表示し、ボットに入力内容を送ります。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">	 * ボットからの応答が返ってきたときに、その内容をチャットバブルとして表示します。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">	 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">async&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">handleSend&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">userMessage&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">Promise&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">void&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">bubbles&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[...&lt;/span>&lt;span class="nx">bubbles&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;You&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">content&lt;/span>: &lt;span class="kt">userMessage&lt;/span> &lt;span class="p">}];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="kr">const&lt;/span> &lt;span class="nx">botMessage&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">sendMessageToBot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">userMessage&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">bubbles&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[...&lt;/span>&lt;span class="nx">bubbles&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Bot&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">content&lt;/span>: &lt;span class="kt">botMessage&lt;/span> &lt;span class="p">}];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Chat&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">bubbles&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="na">onSend&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">handleSend&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="s">/&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>Svelte 入門: Svelte コンポーネントからイベントを発生させる</title><link>https://maku.blog/p/6d8gjyg/</link><pubDate>Wed, 06 Mar 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6d8gjyg/</guid><description>&lt;p>Svelte コンポーネント内で発生するイベント（ボタンクリックなど）を親コンポーネントでハンドルできるようにすると、親子コンポーネント間で連携が可能になります（コンポーネント内の値そのものを &lt;code>bind&lt;/code> プロパティで連携させる方法もあります）。&lt;/p>
+&lt;h2 id="イベントをそのまま伝搬させる方法">イベントをそのまま伝搬させる方法&lt;/h2>
+&lt;p>Svelte が提供する HTML 要素は、&lt;strong>&lt;code>on:イベント名&lt;/code>&lt;/strong> というプロパティでそのイベントを補足するためのハンドラー関数を設定できるようになっています（例: &lt;code>&amp;lt;button on:click={handleClick}&amp;gt;&lt;/code>）。
+イベントハンドラーを指定せずに &lt;code>on:イベント名&lt;/code> というプロパティだけを指定した場合は、そのイベントがそのまま親コンポーネントに伝搬されます。
+次の &lt;code>MyButton&lt;/code> コンポーネントは、&lt;code>button&lt;/code> 要素で発生する &lt;code>click&lt;/code> イベントを伝搬させています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/MyButton.svelte&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span> &lt;span class="na">on:click&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>MyButton&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この &lt;code>click&lt;/code> イベントは、親コンポーネントから次のようにハンドルすることができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/routes/&amp;#43;page.svelte&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">lang&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;ts&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">import&lt;/span> &lt;span class="nx">MyButton&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;$lib/MyButton.svelte&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kd">function&lt;/span> &lt;span class="nx">handleClick() {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">alert&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Clicked!&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">MyButton&lt;/span> &lt;span class="na">on:click&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">handleClick&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="s">/&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>シンプルですね！
+でもこれだとあまり汎用性がありません。&lt;/p>
+&lt;h2 id="独自のインベントをディスパッチする方法">独自のインベントをディスパッチする方法&lt;/h2>
+&lt;p>Svelte コンポーネントから独自のイベントをディスパッチするには、&lt;strong>&lt;code>createEventDispatcher()&lt;/code>&lt;/strong> 関数で作成したディスパッチ関数を呼び出します。
+ディスパッチ関数の第 1 引数はイベント名で、必要があれば第 2 引数で送信するデータを指定します。&lt;/p>
+&lt;p>次の &lt;code>MyPrompt&lt;/code> コンポーネントは、ユーザーメッセージの入力エリアと、送信ボタンを備えたコンポーネントです（チャットの入力エリアのようなイメージです）。
+送信ボタンを押すと、ユーザーが入力したメッセージと一意の ID を、独自の &lt;code>send&lt;/code> イベントとしてディスパッチします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/MyPrompt.svelte&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">lang&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;ts&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">createEventDispatcher&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;svelte&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kd">let&lt;/span> &lt;span class="nx">message&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// ユーザーが入力したテキスト
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>	&lt;span class="kd">let&lt;/span> &lt;span class="nx">messageId&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 一意の ID
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="c1">// イベントディスパッチャーを作成（イベント名とデータ型のペアを並べる）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>	&lt;span class="kr">const&lt;/span> &lt;span class="nx">dispatch&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">createEventDispatcher&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">send&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">message&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">messageId&lt;/span>: &lt;span class="kt">number&lt;/span> &lt;span class="p">};&lt;/span> &lt;span class="c1">// &amp;#34;send&amp;#34; イベントの定義
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>	&lt;span class="p">}&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kd">function&lt;/span> &lt;span class="nx">handleSubmit() {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">message&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">			&lt;span class="nx">dispatch&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;send&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">message&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">messageId&lt;/span> &lt;span class="p">});&lt;/span> &lt;span class="c1">// イベントを送信
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>			&lt;span class="nx">message&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// ユーザーが入力したテキストをクリア
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>			&lt;span class="nx">messageId&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// ID を更新
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>		&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">form&lt;/span> &lt;span class="na">on:submit&lt;/span>&lt;span class="o">|&lt;/span>&lt;span class="na">preventDefault&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">handleSubmit&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">input&lt;/span> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;text&amp;#34;&lt;/span> &lt;span class="na">bind:value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">message&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="s">placeholder=&amp;#34;Write&lt;/span> &lt;span class="na">a&lt;/span> &lt;span class="na">message&lt;/span>&lt;span class="err">...&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;submit&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>Send&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">form&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div style="text-align: center">
+ &lt;div>
+ &lt;input type="text" placeholder="Write a message..." />
+ &lt;button>Send&lt;/button>
+ &lt;/div>
+ &lt;div>図: 表示イメージ（動作しません）&lt;/div>
+&lt;/div>
+&lt;p>ディスパッチャー関数を作成する &lt;code>createEventDispatcher()&lt;/code> の型パラメーターを指定することで、イベント名と送信するデータの型を定義することができます。
+上記の例では、&lt;code>send&lt;/code> という名前のイベント型を定義していますが、他のイベント型の定義も追加することができます。
+もちろん、TypeScript を使わない場合は型パラメーターは省略できます。&lt;/p></description></item><item><title>Svelte 入門: 開発サーバーで動作中かどうかを調べる (dev)</title><link>https://maku.blog/p/wu4bn29/</link><pubDate>Sat, 04 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wu4bn29/</guid><description>&lt;p>SvelteKit の &lt;strong>&lt;code>$app/environment&lt;/code>&lt;/strong> モジュールが提供する &lt;strong>&lt;code>dev&lt;/code>&lt;/strong> 変数 (boolean) の値を見ると、開発サーバー (&lt;code>npm run dev&lt;/code>) で動作しているかどうかを調べることができます。
+このフラグを利用することで、次のように開発環境と本番環境における振る舞いを切り替えることができます。&lt;/p>
+&lt;ul>
+&lt;li>開発環境と本番環境で、異なる API エンドポイントに接続する&lt;/li>
+&lt;li>開発環境で動作しているときは、作成途中のコンポーネントを表示する&lt;/li>
+&lt;/ul>
+&lt;p>次の Svelte コンポーネントでは、&lt;code>dev&lt;/code> 変数の値に応じて処理を分岐しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">&amp;#43;page.svelte&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">lang&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;ts&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">dev&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;$app/environment&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kd">let&lt;/span> &lt;span class="nx">envName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">dev&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="s1">&amp;#39;開発環境&amp;#39;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;本番環境&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>現在&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="nx">envName&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>で動作しています。&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>&lt;span class="k">#if&lt;/span> &lt;span class="nx">dev&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>このメッセージは&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>開発環境&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>でのみ表示されます。&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="k">else&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>このメッセージは&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>本番環境&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>でのみ表示されます。&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>&lt;span class="k">/if&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>npm run dev&lt;/code> による開発サーバー上で実行しているときは次のように出力されます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>現在&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>開発環境&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>で動作しています。&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>このメッセージは&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>開発環境&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>でのみ表示されます。&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>npm run build&lt;/code> でビルドし、&lt;code>npm run preview&lt;/code> でプレビュー用サーバーを起動した場合は次のように出力されます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>現在&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>本番環境&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>で動作しています。&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>このメッセージは&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>本番環境&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>でのみ表示されます。&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Svelte 入門: SvelteKit を使ったプロジェクトのディレクトリ構成／コーディングルールなど</title><link>https://maku.blog/p/69urn22/</link><pubDate>Wed, 01 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/69urn22/</guid><description>&lt;p>Svelte/SvelteKit を使用したプロジェクトのディレクトリ構成やファイル名などのルールのまとめです。
+これはひとつの案なので、具体的なルールはプロジェクトごとに決めてください。&lt;/p>
+&lt;p>SvelteKit のようなファイルベースのルーティングを採用したフレームワークでは、プロジェクトの構成は大体決まったものになるのですが、それでも細かい部分では独自のルールを採用することが多いと思います。
+プロジェクトごとに定義したルールは、GitHub リポジトリの &lt;code>README.md&lt;/code> あたりに記述しておくとよいです。&lt;/p>
+&lt;h2 id="ディレクトリ構成">ディレクトリ構成&lt;/h2>
+&lt;p>下記のプロジェクト構造は、SvelteKit 本家の &lt;a href="https://kit.svelte.dev/docs/project-structure">Project structure • Docs • SvelteKit&lt;/a> からの抜粋です。&lt;/p>
+&lt;pre tabindex="0">&lt;code>my-project/
+├ src/
+│ ├ lib/
+│ │ ├ server/
+│ │ │ └ [your server-only lib files]
+│ │ └ [your lib files]
+│ ├ params/
+│ │ └ [your param matchers]
+│ ├ routes/
+│ │ └ [your routes]
+│ ├ app.html
+│ ├ error.html
+│ ├ hooks.client.js
+│ ├ hooks.server.js
+│ └ service-worker.js
+├ static/
+│ └ [your static assets]
+├ tests/
+│ └ [your tests]
+├ package.json
+├ svelte.config.js
+├ tsconfig.json
+└ vite.config.js
+&lt;/code>&lt;/pre>&lt;p>基本的にはこのようなディレクトリ構造になりますが、&lt;code>src/lib&lt;/code> ディレクトリ以下の構成や、各種ファイル名のルールなどは、プロジェクトごとに定義しておいた方がよいでしょう。&lt;/p></description></item><item><title>Svelte 入門: SvelteKit の load 関数でデータのロード処理を定義する</title><link>https://maku.blog/p/wqt76qw/</link><pubDate>Tue, 31 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wqt76qw/</guid><description>&lt;h2 id="load-関数の基本">load 関数の基本&lt;/h2>
+&lt;p>SvelteKit には、&lt;strong>&lt;code>+pages.ts&lt;/code>&lt;/strong> や &lt;strong>&lt;code>+pages.server.ts&lt;/code>&lt;/strong> といった、特殊なルートファイルにデータのロード処理を定義する仕組みが用意されています。
+ページコンポーネント (&lt;code>+page.svelte&lt;/code>) の UI 実装からデータのロード処理を分離することで、データの取得タイミングを細かく制御できるようになり、以下のような恩恵を得られます。&lt;/p>
+&lt;ul>
+&lt;li>サーバーサイドレンダリング (SSR)
+&lt;ul>
+&lt;li>ビルド時に外部データを使ってページを生成することができます。
+静的な HTML を配信することは、SEO の観点で有利に働く可能性があります。
+外部 API の呼び出しにアクセストークンが必要な場合は、サーバーサイドでのみ呼び出すようにすることで、アクセストークンを公開せずに済みます。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>プリロード
+&lt;ul>
+&lt;li>SvelteKit は、リンクホバーなどをトリガーにして、ページ遷移前にデータをプリロードすることができます。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ロード処理の使い回し
+&lt;ul>
+&lt;li>&lt;code>layout.js(.ts&lt;/code>) や &lt;code>layout.server.js(.ts)&lt;/code> にデータのロード処理を記述することで、そのレイアウトが適用される複数のページから同じデータを参照できます。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>データのロード処理は、決められた名前のルートファイルで、&lt;strong>&lt;code>load&lt;/code>&lt;/strong> という名前の関数を &lt;code>export&lt;/code> することで定義します（&lt;code>Promise&lt;/code> を返す &lt;code>async&lt;/code> 関数として定義することも可能です）。
+&lt;code>load&lt;/code> 関数から &lt;code>return&lt;/code> した値は、ページコンポーネント内から &lt;strong>&lt;code>data&lt;/code>&lt;/strong> という変数で参照することができます。
+この対応付けは SvelteKit のルールであり、慣れるしかありません（逆にこの作法を知らないとコードを読めません）。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/wqt76qw/img-001.drawio.svg" alt="/p/wqt76qw/img-001.drawio.svg" />
+ &lt;figcaption>図: data 変数と load 関数の関係&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>&lt;code>load&lt;/code> 関数は、ユーザー操作によってインタラクティブに情報を取得するためのものというよりは、あくまでページの初期表示内容を取得するためのものだと考えるとよいです。&lt;/p>
+&lt;p>&lt;code>load&lt;/code> 関数は、&lt;code>src/routes&lt;/code> ディレクトリ以下に配置する次のようなファイルに定義することができ、それぞれ呼び出されるタイミング（サーバーサイド &lt;strong>(SSR)&lt;/strong> or クライアントサイド &lt;strong>(CSR)&lt;/strong>）や、適用範囲が異なっています。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>ファイル名&lt;/th>
+ &lt;th style="text-align: center">CSR&lt;/th>
+ &lt;th style="text-align: center">SSR&lt;/th>
+ &lt;th>注釈&lt;/th>
+ &lt;th>適用範囲&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>+page.js(.ts)&lt;/code>&lt;/td>
+ &lt;td style="text-align: center">✅&lt;/td>
+ &lt;td style="text-align: center">✅※&lt;/td>
+ &lt;td>※ &lt;code>export const ssr = false&lt;/code> と記述した場合はクライアントサイドでのみ呼び出されます。&lt;/td>
+ &lt;td>同一ディレクトリの &lt;code>+page.svelte&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>+page.server.js(.ts)&lt;/code>&lt;/td>
+ &lt;td style="text-align: center">─&lt;/td>
+ &lt;td style="text-align: center">✅&lt;/td>
+ &lt;td>サーバーからしかアクセスできない外部 API にアクセスする場合はこれを使います。&lt;/td>
+ &lt;td>同一ディレクトリの &lt;code>+page.svelte&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>+layout.js(.ts)&lt;/code>&lt;/td>
+ &lt;td style="text-align: center">✅&lt;/td>
+ &lt;td style="text-align: center">✅※&lt;/td>
+ &lt;td>&lt;code>export const ssr = false&lt;/code> と記述した場合はクライアントサイドでのみ呼び出されます。&lt;/td>
+ &lt;td>&lt;code>+layout.svelte&lt;/code> とそれが適用されるファイル&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>+layout.server.js(.ts)&lt;/code>&lt;/td>
+ &lt;td style="text-align: center">─&lt;/td>
+ &lt;td style="text-align: center">✅&lt;/td>
+ &lt;td>サーバーからしかアクセスできない外部 API にアクセスする場合はこれを使います。&lt;/td>
+ &lt;td>&lt;code>+layout.svelte&lt;/code> とそれが適用されるファイル&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;p>基本的には、下記の方針でファイルを使い分ければよいです。&lt;/p></description></item><item><title>Svelte 実装例: インクリメンタルサーチによる頻繁な API 呼び出しを防ぐ debounce 処理</title><link>https://maku.blog/p/c3ckhdf/</link><pubDate>Mon, 30 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/c3ckhdf/</guid><description>&lt;h2 id="debounce-処理とは">debounce 処理とは&lt;/h2>
+&lt;p>Web アプリケーションにインクリメンタルサーチの機能を組み込む際、検索 API の頻繁な呼び出しが課題となることがあります。
+たとえば、"abcde" というキーワードで検索したいときに、"a" → "ab" → "abc" のように 1 文字入力するたびに API 呼び出しが走ると検索サーバーに負荷がかかってしまいます。&lt;/p>
+&lt;p>このような場合に、最後のユーザー入力から一定時間待つ &lt;strong>debounce&lt;/strong> 処理を入れます。
+次の Svelte コンポーネントでは、入力エリアでキーボード入力するたびに &lt;code>handleKeyUp&lt;/code> 関数を呼び出していますが、入力内容を &lt;code>query&lt;/code> 変数に反映するのを 1 秒間待つようにしています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">debounce 処理&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">lang&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;ts&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kd">let&lt;/span> &lt;span class="nx">query&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// クエリ文字列（この値が変化したらサーチ API を呼び出す想定）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>	&lt;span class="kd">let&lt;/span> &lt;span class="nx">timeoutId&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">number&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// debounce 処理用のタイマー ID
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">const&lt;/span> &lt;span class="nx">handleKeyUp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">KeyboardEvent&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="c1">// リアルタイムなユーザー入力テキスト
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>		&lt;span class="kr">const&lt;/span> &lt;span class="nx">text&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">string&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">target&lt;/span> &lt;span class="nx">as&lt;/span> &lt;span class="nx">HTMLInputElement&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">value&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="c1">// query 変数への代入はユーザー入力が終わってから 1 秒後に行う（debounce 処理）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="c1">&lt;/span>		&lt;span class="nx">clearTimeout&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">timeoutId&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">		&lt;span class="nx">timeoutId&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">setTimeout&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">			&lt;span class="nx">query&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">text&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">		&lt;span class="p">},&lt;/span> &lt;span class="mi">1000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">input&lt;/span> &lt;span class="na">on:keyup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">{handleKeyUp}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>query: {query}&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>こうすることで、ユーザーが一連のテキストを入力し終わったタイミングで、一度だけ検索 API を呼び出すことができるようになります（もちろん、1 秒以上の間隔を上げずにキーボード入力がされた場合ですが）。&lt;/p>
+&lt;h2 id="fetch-と組み合わせた使用例">fetch と組み合わせた使用例&lt;/h2>
+&lt;p>上記の例では、最後のユーザー入力から 1 秒経過したときに &lt;code>query&lt;/code> 変数にその入力内容を反映するようにしています。
+この内容が変化するたびに API 呼び出しを行うには、次のようにリアクティブステートメント (&lt;strong>&lt;code>$:&lt;/code>&lt;/strong>) 内で &lt;code>query&lt;/code> 変数を参照します。
+ここでは、&lt;a href="https://pokeapi.co/">PokéAPI&lt;/a> でポケモンを検索するようにしてみました。&lt;/p></description></item><item><title>Svelte 入門: YAML ファイルをインポートして使う</title><link>https://maku.blog/p/umhwooq/</link><pubDate>Mon, 25 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/umhwooq/</guid><description>&lt;h2 id="svelte-で-yaml-ファイルをインポートして使う方法">Svelte で YAML ファイルをインポートして使う方法&lt;/h2>
+&lt;p>Svelte (SvelteKit) には YAML ファイルを直接インポートして JavaScript オブジェクトして扱う仕組みはありませんが、&lt;code>raw&lt;/code> インポートの仕組みを使えば、YAML ファイルを文字列データとしてそのまま読み込むことができます（これは SvelteKit がビルドに使っている Vite の仕組みです）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">YAML ファイルを文字列としてインポートする&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">gamesYaml&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;$lib/assets/games.yaml?raw&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このようにして読み込んだ YAML テキストを、Node.js の YAML ライブラリなどでパースすれば、YAML ファイルの内容を JavaScript オブジェクトとして扱うことができます。
+ビルド時に処理を完結させることができるので、例えば、&lt;a href="../../p/4oudmxy/">static-adapter を使った静的ビルド (SSG)&lt;/a> が必要な環境でも利用できます。&lt;/p>
+&lt;h2 id="実装例">実装例&lt;/h2>
+&lt;p>YAML ファイルを扱うために &lt;code>js-yaml&lt;/code> ライブラリを使うので、次のようにしてインストールしておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">js-yaml（およびその型ファイル）のインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install --save-dev js-yaml @types/js-yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>サンプルの YAML ファイルとして、下記のようなゲームソフト情報を含んだ &lt;code>games.yaml&lt;/code> を使います。
+この YAML ファイルはビルド時にインポートするので、&lt;code>static&lt;/code> ディレクトリではなく &lt;code>src&lt;/code> ディレクトリのどこかに配置します（ここでは、&lt;code>lib/assets&lt;/code> というディレクトリに配置しています）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/assets/games.yaml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">- &lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">シャドウラン&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">date&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="ld">1996-02-23&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">price&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">7800&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">トムキャットアレイ&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">date&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="ld">1994-12-22&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">price&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">7800&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">真・女神転生&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">date&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="ld">1994-02-25&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次の Svelte コンポーネントでは、ビルド時に YAML ファイルを読み込んで、JavaScript オブジェクトと扱えるようにしていします。
+実装には TypeScript を使っていますが、&lt;code>raw&lt;/code> インポートした YAML ファイルからは型情報を推測してくれないようなので、自分で &lt;code>Game&lt;/code> 型を定義しています。&lt;/p></description></item><item><title>Svelte 入門: JSON ファイルをインポートして使う</title><link>https://maku.blog/p/pzrza7m/</link><pubDate>Tue, 19 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pzrza7m/</guid><description>&lt;p>Svelte (SvelteKit) アプリ内の Svelte コンポーネントや JavaScript/TypeScript ライブラリでは、JSON ファイルを &lt;strong>&lt;code>import&lt;/code>&lt;/strong> 文で簡単に読み込めるようになっています（正確には Vite の Static Asset Handling の仕組みを利用しています）。&lt;/p>
+&lt;p>ここでは、サンプルデータとして下記のようなゲームソフト情報を含んだ JSON ファイルを用意します。
+この JSON ファイルはビルド時にインポートするので、&lt;code>static&lt;/code> ディレクトリではなく &lt;code>src&lt;/code> ディレクトリのどこかに配置します（ここでは、&lt;code>lib/assets&lt;/code> というディレクトリに配置しています）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/assets/games.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;シャドウラン&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1996-02-23&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;price&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">7800&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;トムキャットアレイ&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1994-12-22&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;price&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">7800&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;真・女神転生&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1994-02-25&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">]&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このファイルを Svelte コンポーネントから直接インポートしてもよいのですが、次のように明示的に TypeScript の型情報を付加するライブラリでラップしておくと便利かもしれません。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/games.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">rawJson&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;$lib/assets/games.json&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/** ゲームソフトの情報 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="nx">Game&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="cm">/** ゲームタイトル */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">title&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="cm">/** 発売日 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">date&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="cm">/** 価格 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">price?&lt;/span>: &lt;span class="kt">number&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 型情報を付けて games という名前で export する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">games&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">rawJson&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">Game&lt;/span>&lt;span class="p">[];&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>実際には、明示的に型情報を付加しなくても、JSON ファイルの内容から自動的に型情報を推測してくれます。
+ただ、上記のように型情報を定義することで、ドキュメントテーションコメントを記述できたり、JSON ファイル内のデータが想定外の型で記述されているときに警告してくれるというメリットがあります。&lt;/p></description></item><item><title>Svelte 入門: Svelte アプリを完全な静的サイトとしてビルドする (SSG: Static Site Generation)</title><link>https://maku.blog/p/4oudmxy/</link><pubDate>Tue, 05 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4oudmxy/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Svelte/SvelteKit を使ったプロジェクト全体を、完全な静的リソースの形にビルドする &lt;strong>SSG (Static Site Genration)&lt;/strong> 機能の使い方について説明します。
+AWS の S3 ストレージのようなファイルの配信機能しか持たないサービスで Web サイトをホスティングする場合、SSG によるビルドが必要になります。&lt;/p>
+&lt;p>ちなみに、Cloudflare Pages や Vercel のようなモダンなホスティングサービス上で Svelte アプリをビルドする場合は、このような設定は一切行わずにデプロイすることができます（ゼロコンフィグ）。
+できればそういったサービスを使うことを推奨しますが、ここでは何らかの事情でそういった便利なサービスを使用できないケースを想定しています（会社のポリシーで S3 しか使えないなど）。&lt;/p>
+&lt;h2 id="sveltekit-の-ssg-設定">SvelteKit の SSG 設定&lt;/h2>
+&lt;h3 id="adapter-static-のインストール">adapter-static のインストール&lt;/h3>
+&lt;p>SvelteKit の &lt;strong>&lt;code>@sveltejs/adapter-static&lt;/code>&lt;/strong> というモジュールが SSG 機能を提供しているので、まずはこのモジュールをインストールします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">adapter-static のインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install --save-dev @sveltejs/adapter-static
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="adapter-static-の有効化">adapter-static の有効化&lt;/h3>
+&lt;p>ビルド設定ファイル (&lt;strong>&lt;code>svelte.config.js&lt;/code>&lt;/strong>) で、&lt;code>adapter-static&lt;/code> を使用するように設定します。
+プロジェクトの初期状態では、次のような感じで &lt;code>adapter-auto&lt;/code> というモジュールが使われるように設定されていると思います。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">svelte.config.js（変更前）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line hl">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">adapter&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;@sveltejs/adapter-auto&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">vitePreprocess&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;@sveltejs/kit/vite&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/** @type {import(&amp;#39;@sveltejs/kit&amp;#39;).Config} */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">config&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">preprocess&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">vitePreprocess&lt;/span>&lt;span class="p">(),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">kit&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">adapter&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">adapter&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="nx">config&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>adapter-auto&lt;/code> は、Vercel や Cloudflare Pages などのサービス上でビルドするときに使えるモジュールですが、SSG するときには使えないので、ここを &lt;code>adapter-static&lt;/code> に置き換えてやります。&lt;/p></description></item><item><title>Svelte 実装例: Svelte アプリから D3.js を使う</title><link>https://maku.blog/p/7acxmwo/</link><pubDate>Mon, 04 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7acxmwo/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Svelte を使用した Web アプリケーションの中から、SVG 描画ライブラリである D3.js を使用する方法を説明します。
+Svelte のプロジェクトは、&lt;code>npm create svelte@latest&lt;/code> コマンドなどで既に作成されていることを前提とします。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/qmy6cdh/">Svelte を始める (SvelteKit で Hello World）&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="d3js-のインストール">D3.js のインストール&lt;/h2>
+&lt;p>Svelte はビルド時に実装コードをバニラ JS の形にコンパイルするので、D3.js (&lt;strong>&lt;code>d3&lt;/code>&lt;/strong>) などの外部ライブラリは &lt;code>devDependencies&lt;/code> としてインストールすれば OK です。
+TypeScript を使う場合は、型情報の &lt;strong>&lt;code>@types/d3&lt;/code>&lt;/strong> も一緒にインストールしておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">d3 モジュールと型情報をインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install --save-dev d3 @types/d3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="d3js-による描画">D3.js による描画&lt;/h2>
+&lt;p>ここでは、次のような簡単な棒グラフを Svelte アプリ内の D3.js で描画してみます。&lt;/p>
+&lt;div style="text-align: center">
+&lt;svg width="150" height="100" style="background: rgb(255, 255, 204);">&lt;rect x="0" y="70" width="30" height="30" fill="steelblue">&lt;/rect>&lt;rect x="30" y="40" width="30" height="60" fill="steelblue">&lt;/rect>&lt;rect x="60" y="10" width="30" height="90" fill="steelblue">&lt;/rect>&lt;rect x="90" y="60" width="30" height="40" fill="steelblue">&lt;/rect>&lt;rect x="120" y="30" width="30" height="70" fill="steelblue">&lt;/rect>&lt;/svg>
+&lt;div>D3.js による棒グラフの例&lt;/div>
+&lt;/div>
+&lt;p>D3.js の &lt;strong>&lt;code>d3.select()&lt;/code>&lt;/strong> 関数は DOM 要素を参照するため、クライアントサイド JavaScript として実行しなければいけないことに注意してください。
+具体的には、Svelte の &lt;strong>&lt;code>onMount()&lt;/code>&lt;/strong> コールバック内で呼び出すようにします。
+直接 &lt;code>d3.select()&lt;/code> 関数を呼び出してしまうと、&lt;code>ReferenceError: document is not defined&lt;/code> のようなエラーが発生します。&lt;/p></description></item><item><title>Svelte 実装例: Hamburger ボタンを作る</title><link>https://maku.blog/p/z5cwfjm/</link><pubDate>Fri, 01 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/z5cwfjm/</guid><description>&lt;p>Svelte コンポーネントによる Hamburger アイコンの実装例です。
+ボタンをクリックすると &lt;code>open&lt;/code> 変数の値が true になり、CSS アニメーションで×印に変化します。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="130" height="59" src="../../p/z5cwfjm/img-001.gif" alt="/p/z5cwfjm/img-001.gif" />
+ &lt;figcaption>図: Svelte コンポーネントによるハンバーガーアイコン&lt;/figcaption>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/components/Hamburger.svelte&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">lang&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;ts&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">export&lt;/span> &lt;span class="kd">let&lt;/span> &lt;span class="nx">open&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span> &lt;span class="na">class:open&lt;/span> &lt;span class="na">on:click&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">open&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">!&lt;/span>&lt;span class="nx">open&lt;/span>&lt;span class="p">)}&lt;/span>&lt;span class="err">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;40&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;40&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">line&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;top&amp;#34;&lt;/span> &lt;span class="na">x1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;9&amp;#34;&lt;/span> &lt;span class="na">y1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;10&amp;#34;&lt;/span> &lt;span class="na">x2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;31&amp;#34;&lt;/span> &lt;span class="na">y2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;10&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">line&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;middle&amp;#34;&lt;/span> &lt;span class="na">x1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;9&amp;#34;&lt;/span> &lt;span class="na">y1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20&amp;#34;&lt;/span> &lt;span class="na">x2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;31&amp;#34;&lt;/span> &lt;span class="na">y2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;20&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">line&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;bottom&amp;#34;&lt;/span> &lt;span class="na">x1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;9&amp;#34;&lt;/span> &lt;span class="na">y1&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="na">x2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;31&amp;#34;&lt;/span> &lt;span class="na">y2&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;30&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">button&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">display&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">inline-block&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">width&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">40&lt;/span>&lt;span class="kt">px&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">height&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">40&lt;/span>&lt;span class="kt">px&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">padding&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">cursor&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">pointer&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">border&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">none&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">background&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mh">#333&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">box-shadow&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">inset&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="kt">px&lt;/span> &lt;span class="mh">#cccccc&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c">/* 内側に枠を付ける */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">z-index&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c">/* （これは必要に応じて）他の要素より上に表示する */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">button&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="nd">hover&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">background&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mh">#555&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">svg&lt;/span> &lt;span class="nt">line&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="n">stroke&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">currentColor&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="n">stroke-linecap&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">round&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="n">stroke-width&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="n">stroke&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mh">#cccccc&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">transition&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="k">transform&lt;/span> &lt;span class="mf">0.2&lt;/span>&lt;span class="kt">s&lt;/span> &lt;span class="kc">ease-in-out&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">.&lt;/span>&lt;span class="nc">open&lt;/span> &lt;span class="p">#&lt;/span>&lt;span class="nn">top&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">transform&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">translate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">13&lt;/span>&lt;span class="kt">px&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">-1&lt;/span>&lt;span class="kt">px&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nb">rotate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">45&lt;/span>&lt;span class="kt">deg&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">.&lt;/span>&lt;span class="nc">open&lt;/span> &lt;span class="p">#&lt;/span>&lt;span class="nn">middle&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">opacity&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">.&lt;/span>&lt;span class="nc">open&lt;/span> &lt;span class="p">#&lt;/span>&lt;span class="nn">bottom&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">transform&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">translate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">-15&lt;/span>&lt;span class="kt">px&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">13&lt;/span>&lt;span class="kt">px&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nb">rotate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">-45&lt;/span>&lt;span class="kt">deg&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>1 つの &lt;code>.svelte&lt;/code> ファイルでコンパクトに実装できていい感じです。&lt;/p></description></item><item><title>Svelte 実装例: ページ遷移用のナビゲーションメニューを作成する</title><link>https://maku.blog/p/2nrgf2m/</link><pubDate>Wed, 30 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2nrgf2m/</guid><description>&lt;p>Svelte サイト内でページ遷移を行うためのナビゲーションコンポーネントの作成例です。&lt;/p>
+&lt;h2 id="現在の-urlパスの取得方法">現在の URL（パス）の取得方法&lt;/h2>
+&lt;p>SvelteKit の &lt;strong>&lt;code>$app/stores&lt;/code>&lt;/strong> モジュールが提供する &lt;strong>&lt;code>page&lt;/code>&lt;/strong> ストアを利用すると、現在表示中のページの URL や、その一部であるパス情報を取得することができます。
+この情報を利用することで、ナビゲーションコンポーネント内のカレントページに相当する項目をハイライト表示します（この URL 情報は、パンくずリストなどでも利用できます）。&lt;/p>
+&lt;p>現在のページのパス情報は、次のように &lt;strong>&lt;code>$page.url.pathname&lt;/code>&lt;/strong> 参照できます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">page&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;$app/stores&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>pathname = &lt;span class="p">{&lt;/span>&lt;span class="nx">$page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">url&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">pathname&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>ページ遷移すると、&lt;code>pathname&lt;/code> の値が、&lt;code>/&lt;/code> → &lt;code>/about&lt;/code> → &lt;code>/blog&lt;/code> のような感じで変化します。&lt;/p>
+&lt;h2 id="nav-コンポーネントの実装例">Nav コンポーネントの実装例&lt;/h2>
+&lt;p>次の Svelte コンポーネント (&lt;code>Nav&lt;/code>) は、サイト内でページ遷移を行うためのボタンを表示します。
+現在のページに相当するボタンには、赤色の下線を表示しています。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="339" height="81" src="../../p/2nrgf2m/img-001.png" alt="/p/2nrgf2m/img-001.png" />
+ &lt;figcaption>図: Nav コンポーネントの表示&lt;/figcaption>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/components/Nav.svelte&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">page&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;$app/stores&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">const&lt;/span> &lt;span class="nx">pages&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Home&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">path&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;/&amp;#39;&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;About&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">path&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;/about&amp;#39;&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="p">{&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Blog&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">path&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;/blog&amp;#39;&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">nav&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">{&lt;/span>&lt;span class="k">#each&lt;/span> &lt;span class="nx">pages&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">p&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="p">{&lt;/span>&lt;span class="k">#if&lt;/span> &lt;span class="nx">p&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">path&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="nx">$page&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">url&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">pathname&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">			&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">span&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;active&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="nx">p&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">span&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="p">{&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="k">else&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">			&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">a&lt;/span> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">p&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">path&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">&amp;gt;&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">p&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="s">&amp;lt;/a&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="p">{&lt;/span>&lt;span class="k">/if&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">{&lt;/span>&lt;span class="k">/each&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">nav&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">nav&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">display&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">flex&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">gap&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="kt">rem&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">a&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="nt">span&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">color&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">white&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">background&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mh">#333&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">padding&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="kt">em&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="kt">em&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">text-decoration&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">none&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">a&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="nd">hover&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">filter&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">brightness&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mf">1.4&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c">/* ホバー時に少し明るくする */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">text-decoration&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">underline&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">.&lt;/span>&lt;span class="nc">active&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">box-shadow&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">inset&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="mi">-4&lt;/span>&lt;span class="kt">px&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="kc">red&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c">/* 赤い下線を引く */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>あとは、SvelteKit のレイアウトコンポーネント (&lt;code>+layout.svelte&lt;/code>) に次のように記述しておけば、全ページにナビゲーションメニューを表示できます。&lt;/p></description></item><item><title>Svelte 入門: 動的に class 属性を off/on する</title><link>https://maku.blog/p/x3vpkn4/</link><pubDate>Tue, 22 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/x3vpkn4/</guid><description>&lt;p>HTML 要素の class 属性の値を動的に変化させることで、スタイルの切り替えをしたいことはよくあります。
+ナビゲーションメニューで、現在表示しているページをハイライトするのは典型的な例です。&lt;/p>
+&lt;p>ここでは、ボタンを押すことで Off/On できる簡単なランプ (&lt;code>Lamp&lt;/code>) コンポーネントを作ってみます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="486" height="82" src="../../p/x3vpkn4/img-001.png" alt="/p/x3vpkn4/img-001.png" />
+ &lt;figcaption>図: class 属性の変更による表示切り替え&lt;/figcaption>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Lamp.svelte&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">lang&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;ts&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kd">let&lt;/span> &lt;span class="nx">active&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// ランプの On/Off 状態
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>	&lt;span class="kd">function&lt;/span> &lt;span class="nx">toggle() {&lt;/span> &lt;span class="nx">active&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">!&lt;/span>&lt;span class="nx">active&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;container&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">	&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;lamp &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">active&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="s1">&amp;#39;active&amp;#39;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span> &lt;span class="na">on:click&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">toggle&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="p">{&lt;/span>&lt;span class="k">#if&lt;/span> &lt;span class="nx">active&lt;/span>&lt;span class="p">}&lt;/span>OFF&lt;span class="p">{&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="k">else&lt;/span>&lt;span class="p">}&lt;/span>ON&lt;span class="p">{&lt;/span>&lt;span class="k">/if&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">.&lt;/span>&lt;span class="nc">container&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">display&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">flex&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">align-items&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">center&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">gap&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="kt">rem&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">.&lt;/span>&lt;span class="nc">lamp&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">display&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">inline-block&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">width&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">30&lt;/span>&lt;span class="kt">px&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">height&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">30&lt;/span>&lt;span class="kt">px&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">box-sizing&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">border-box&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">border&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="kt">px&lt;/span> &lt;span class="kc">ridge&lt;/span> &lt;span class="nb">rgba&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.3&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">border-radius&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="kt">px&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">background&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">gray&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">.&lt;/span>&lt;span class="nc">active&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">background&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">lightgreen&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ポイントは下記の部分で、&lt;code>active&lt;/code> 変数の値が &lt;code>true&lt;/code> のときに、&lt;code>class&lt;/code> 属性に　&lt;code>active&lt;/code> を追加するようにしています。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;lamp &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">active&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="s1">&amp;#39;active&amp;#39;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>ただし、これは Svelte では冗長な書き方です。
+上記のように、boolean 変数名と CSS のクラス名が同じ場合（ここでは &lt;code>active&lt;/code>）、Svelte では &lt;strong>&lt;code>class:クラス名&lt;/code>&lt;/strong> という省略記述が可能です。&lt;/p></description></item><item><title>Svelte 入門: 複数のページで共通のレイアウトを定義する (+layout.svelte)</title><link>https://maku.blog/p/vwyvd5x/</link><pubDate>Tue, 22 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vwyvd5x/</guid><description>&lt;h2 id="レイアウトファイル-layoutsvelte-の基本">レイアウトファイル (+layout.svelte) の基本&lt;/h2>
+&lt;p>Svelte のフレームワークである SvelteKit は、複数のページで使用する共通レイアウトを定義するための仕組みを提供しています。
+共通レイアウトを定義するのは簡単で、&lt;strong>&lt;code>src/routes/+layout.svelte&lt;/code>&lt;/strong> というファイルを作成するだけで、そのレイアウトが全ページ (&lt;code>src/routes/**/+page.svelte&lt;/code>) に適用されます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/routes/&amp;#43;layout.svelte（共通レイアウト）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">header&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>サイト名&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">header&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;main&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">	&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">slot&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">header&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">position&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">fixed&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">top&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">left&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">width&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">100&lt;/span>&lt;span class="kt">%&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">padding&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="kt">rem&lt;/span> &lt;span class="mf">1.5&lt;/span>&lt;span class="kt">rem&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">background-color&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mh">#333&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">color&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mh">#fff&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">box-shadow&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="kt">px&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="kt">px&lt;/span> &lt;span class="nb">rgba&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">z-index&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1000&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">h1&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">margin&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">.&lt;/span>&lt;span class="nc">main&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">margin&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">7&lt;/span>&lt;span class="kt">rem&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="kt">rem&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="kt">rem&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="kt">rem&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>各ページのコンテンツは、レイアウトファイル内の &lt;strong>&lt;code>&amp;lt;slot /&amp;gt;&lt;/code>&lt;/strong> 部分に展開されます（参考: &lt;a href="../../p/gcdawrj/">スロットの仕組み&lt;/a>）。&lt;/p>
+&lt;p>実際には SvelteKit で作成したアプリケーションは、最上位のページテンプレートとして &lt;strong>&lt;code>src/app.html&lt;/code>&lt;/strong> を使うので、次のような入れ子構造でコンテンツが挿入されていくことになります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="700" height="auto" src="../../p/vwyvd5x/img-001.drawio.svg" alt="/p/vwyvd5x/img-001.drawio.svg" />
+ &lt;figcaption>図: Svelte の &amp;#43;layout.svelte ファイルの仕組み&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>&lt;code>+layout.svelte&lt;/code> ファイルが存在しない場合は、&lt;code>&amp;lt;slot /&amp;gt;&lt;/code> とだけ記述されたファイルが存在するかのように振る舞います。
+ようするに、&lt;code>+page.svelte&lt;/code> の内容がそのまま &lt;code>%sveltekit.body%&lt;/code> の位置に展開されます。&lt;/p>
+&lt;h2 id="レイアウトファイルをネストする">レイアウトファイルをネストする&lt;/h2>
+&lt;p>&lt;code>src/routes&lt;/code> のディレクトリ階層内に複数の &lt;code>+layout.svelte&lt;/code> を配置すると、そのレイアウトは上位のディレクトリに配置されたレイアウトを継承します。
+例えば、次のようなディレクトリ構成にすると、下位の &lt;code>src/routes/admin/+layout.svelte&lt;/code> は、上位の &lt;code>src/routes/+layout.svelte&lt;/code> を継承します。&lt;/p></description></item><item><title>Svelte 入門: Svelte コンポーネントに子要素を渡せるようにする (&lt;slot />)</title><link>https://maku.blog/p/gcdawrj/</link><pubDate>Mon, 21 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gcdawrj/</guid><description>&lt;h2 id="スロットの基本-ltslot-gt">スロットの基本 &amp;lt;slot /&amp;gt;&lt;/h2>
+&lt;p>Svelte コンポーネントを使用するときに子要素として渡した内容は、Svelte コンポーネントの中から &lt;strong>&lt;code>&amp;lt;slot /&amp;gt;&lt;/code>&lt;/strong> で参照することができます。
+&lt;code>&amp;lt;slot /&amp;gt;&lt;/code> の仕組みは、Vue.js や Astro でも採用されています（React.js では &lt;code>children&lt;/code> prop で参照します）。&lt;/p>
+&lt;p>次の &lt;code>ExtLink&lt;/code> コンポーネントは、外部サイトへのリンクを表示するコンポーネントの実装例です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/ExtLink.svelte&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">lang&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;ts&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">export&lt;/span> &lt;span class="kd">let&lt;/span> &lt;span class="nx">href&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">a&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">href&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="na">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;_blank&amp;#34;&lt;/span> &lt;span class="na">rel&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;noopener noreferrer&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;&lt;/span>&lt;span class="nt">slot&lt;/span> &lt;span class="p">/&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">a&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この &lt;code>ExtLink&lt;/code> コンポーネントは次のように使用します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/routes/&amp;#43;page.svelte&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-svelte" data-lang="svelte">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">lang&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;ts&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">import&lt;/span> &lt;span class="nx">ExtLink&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;$lib/ExtLink.svelte&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>Hello&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">ExtLink&lt;/span> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;https://www.bing.com/&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>Bing&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">ExtLink&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この例では、コンポーネント内の &lt;code>&amp;lt;slot /&amp;gt;&lt;/code> という部分に &lt;code>Bing&lt;/code> というテキストが展開されることになります。
+よって、リンク部分は次のような HTML にコンパイルされます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">a&lt;/span> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;https://www.bing.com/&amp;#34;&lt;/span> &lt;span class="na">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;_blank&amp;#34;&lt;/span> &lt;span class="na">rel&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;noopener noreferrer&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>Bing&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">a&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="名前付きスロット-ltslot-namename-gt">名前付きスロット &amp;lt;slot name="name" /&amp;gt;&lt;/h2>
+&lt;p>子要素を複数のパートに分けてコンポーネントに渡したいことがあります。
+このような場合は、&lt;strong>名前付きスロット&lt;/strong> という仕組みを使います。
+次の &lt;code>Box&lt;/code> コンポーネントは、3 つのスロットを受け取れるようにしています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>header&lt;/code> という名前のスロット&lt;/li>
+&lt;li>名前なしスロット&lt;/li>
+&lt;li>&lt;code>footer&lt;/code> という名前のスロット&lt;/li>
+&lt;/ul>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/Box.svelte&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;container&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;header&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">		&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">slot&lt;/span> &lt;span class="na">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;header&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>No header was provided&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">slot&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;body&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">		&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">slot&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;footer&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">		&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">slot&lt;/span> &lt;span class="na">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;footer&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">.&lt;/span>&lt;span class="nc">container&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">display&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">flex&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">flex-direction&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">column&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">gap&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="kt">rem&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">width&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">300&lt;/span>&lt;span class="kt">px&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">color&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mh">#333&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">border&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="kt">px&lt;/span> &lt;span class="kc">solid&lt;/span> &lt;span class="mh">#333&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">border-radius&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="kt">rem&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">box-shadow&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="kt">px&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="kt">px&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="kt">px&lt;/span> &lt;span class="nb">rgba&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">padding&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="kt">em&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">.&lt;/span>&lt;span class="nc">header&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">font-size&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">1.5&lt;/span>&lt;span class="kt">rem&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">.&lt;/span>&lt;span class="nc">footer&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="k">color&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mh">#666&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この &lt;code>Box&lt;/code> コンポーネントを使うときは、次のように何らかの要素の &lt;strong>&lt;code>slot&lt;/code>&lt;/strong> prop でどのスロットに子要素を渡すかを指定します。&lt;/p></description></item></channel></rss>

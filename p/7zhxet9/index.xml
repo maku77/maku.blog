@@ -1,11 +1,225 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Java のメモ on まくろぐ</title><link>https://maku.blog/p/7zhxet9/</link><description>Recent content in Java のメモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Wed, 13 May 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/7zhxet9/index.xml" rel="self" type="application/rss+xml"/><item><title>ISO 639-2 (alpha-3) 言語コードから Java の Locale オブジェクトを生成する</title><link>https://maku.blog/p/jbs8o3h/</link><pubDate>Wed, 13 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/jbs8o3h/</guid><description>Locale クラスは ISO 639-2（3桁）の言語コードを受け付けるのか？ ISO 639-2 (alpha-3) では、言語を 3 桁のアルファベットで識別できるよう定義しています（例: 日本語は jpn）。 この言語識別子を使って、Java の Locale オブジェクトを生成できるのでしょうか？
-Java の Locale クラス の説明には、次のように記載されています。
-言語に alpha-2 コードと alpha-3 コードの両方がある場合は、alpha-2 コードを使用する必要があります。
-また、Locale クラスのコンストラクタ の第 1 引数の説明には、次のように書かれています。
-language - ISO 639 alpha-2 または alpha-3 言語コード、または最高 8 文字の言語のサブタグ。
-実際に試してみると、alpha-2 コード（2桁）はほぼすべて対応しているのに対し、alpha-3 コード（3桁）は対応がいまいちのようです。
-sample.kt fun main() { // alpha-2 で指定 println(Locale(&amp;#34;ja&amp;#34;).displayLanguage) // 日本語 (OK) println(Locale(&amp;#34;en&amp;#34;).displayLanguage) // 英語 (OK) println(Locale(&amp;#34;fr&amp;#34;).displayLanguage) // フランス語 (OK) println(Locale(&amp;#34;zh&amp;#34;).displayLanguage) // 中国語 (OK) // alpha-3 で指定 println(Locale(&amp;#34;jpn&amp;#34;).</description></item><item><title>Java/Kotlin で ISO 3166 国コードの一覧を取得する</title><link>https://maku.blog/p/5weufam/</link><pubDate>Mon, 11 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5weufam/</guid><description>Locale クラスで国コードのリストを取得する Locale クラスの getISOCountries() メソッド を使用すると、ISO 3166 で定義されている国コードの一覧を取得することができます。
-String[] Locale.getISOCountries() ISO3166-1 alpha-2（2桁のアルファベット） Set&amp;lt;String&amp;gt; Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA2) ISO3166-1 alpha-2（2桁のアルファベット） Set&amp;lt;String&amp;gt; Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA3) ISO3166-1 alpha-3（3桁のアルファベット） Set&amp;lt;String&amp;gt; Locale.getISOCountries(Locale.IsoCountryCode.PART3) ISO3166-3（4桁のアルファベット） サンプルコード 次の Kotlin コードでは、Locale.getISOCountries() で ISO3166-1 alpha-2 の国コードをすべて取得し、それぞれについて、2桁の国コード、3桁の国コード、国名を表示しています。 Try Kotlin のサイトにコピペして実行できます。
-import java.util.Locale fun main() { for (alpha2 in Locale.getISOCountries()) { val loc = Locale(&amp;#34;dummylang&amp;#34;, alpha2) val alpha3 = loc.getISO3Country() val name = loc.getDisplayCountry() println(&amp;#34;$alpha2 $alpha3 $name&amp;#34;) } } 実行結果 AD AND Andorra AE ARE United Arab Emirates AF AFG Afghanistan AG ATG Antigua and Barbuda AI AIA Anguilla AL ALB Albania .</description></item><item><title>Java/Kotlin で ISO 639 言語コードの一覧を取得する</title><link>https://maku.blog/p/wjxanza/</link><pubDate>Mon, 11 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wjxanza/</guid><description>Locale クラスで言語識別子のリストを取得する Locale クラスの getISOLanguages() メソッド を使用すると、ISO 639-1 alpha2 で定義されている 2 桁の言語識別子の一覧を取得することができます。
-String[] Locale.getISOLanguages() サンプルコード 次の Kotlin コードでは、Locale.getISOLanguages() で ISO 639-1 alpha-2 の言語識別子をすべて取得し、それぞれについて、2桁の言語識別子、3桁の言語識別子 (ISO 639-2/T)、言語名を表示しています。 Try Kotlin のサイトにコピペして実行できます。
-langcodes.kt import java.util.Locale fun main() { for (alpha2 in Locale.getISOLanguages()) { val loc = Locale(alpha2) val alpha3 = loc.getISO3Language() val name = loc.getDisplayLanguage() println(&amp;#34;$alpha2 $alpha3 $name&amp;#34;) } } 実行結果 aa aar Afar ab abk Abkhazian ae ave Avestan af afr Afrikaans ak aka Akan am amh Amharic .</description></item><item><title>JavaFX2 で CheckBox を ScrollPane に並べる</title><link>https://maku.blog/p/j6jv8iu/</link><pubDate>Mon, 10 Oct 2011 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j6jv8iu/</guid><description>Main.java import javafx.application.Application; import javafx.scene.Group; import javafx.scene.Scene; import javafx.scene.control.CheckBox; import javafx.scene.layout.VBox; import javafx.scene.paint.Color; import javafx.stage.Stage; public class Main extends Application { public static void main(String[] args) { launch(args); } private Group createRootGroup() { CheckBox cb1 = new CheckBox(&amp;#34;First&amp;#34;); CheckBox cb2 = new CheckBox(&amp;#34;Second&amp;#34;); CheckBox cb3 = new CheckBox(&amp;#34;Third&amp;#34;); // Align vertically VBox vbox = new VBox(); vbox.setSpacing(10); vbox.getChildren().add(cb1); vbox.getChildren().add(cb2); vbox.getChildren().add(cb3); // Add to the root Group root = new Group(); root.</description></item><item><title>JavaFX2 で HelloWorld（ウィンドウの表示）</title><link>https://maku.blog/p/haq7myf/</link><pubDate>Mon, 10 Oct 2011 00:00:00 +0900</pubDate><guid>https://maku.blog/p/haq7myf/</guid><description> Main.java import javafx.application.Application; import javafx.scene.Group; import javafx.scene.Scene; import javafx.scene.paint.Color; import javafx.stage.Stage; public class Main extends Application { public static void main(String[] args) { launch(args); } @Override public void start(Stage primaryStage) { Group root = new Group(); Scene scene = new Scene(root, 400, 300, Color.GRAY); primaryStage.setScene(scene); primaryStage.show(); } }</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Java のメモ on まくろぐ</title><link>https://maku.blog/p/7zhxet9/</link><description>Recent content in Java のメモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Wed, 13 May 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/7zhxet9/index.xml" rel="self" type="application/rss+xml"/><item><title>ISO 639-2 (alpha-3) 言語コードから Java の Locale オブジェクトを生成する</title><link>https://maku.blog/p/jbs8o3h/</link><pubDate>Wed, 13 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/jbs8o3h/</guid><description>&lt;h2 id="locale-クラスは-iso-639-23桁の言語コードを受け付けるのか">Locale クラスは ISO 639-2（3桁）の言語コードを受け付けるのか？&lt;/h2>
+&lt;p>ISO 639-2 (alpha-3) では、言語を 3 桁のアルファベットで識別できるよう定義しています（例: 日本語は &lt;code>jpn&lt;/code>）。
+この言語識別子を使って、Java の &lt;code>Locale&lt;/code> オブジェクトを生成できるのでしょうか？&lt;/p>
+&lt;p>Java の &lt;a href="https://docs.oracle.com/javase/jp/10/docs/api/java/util/Locale.html">Locale クラス&lt;/a> の説明には、次のように記載されています。&lt;/p>
+&lt;blockquote>
+&lt;p>言語に alpha-2 コードと alpha-3 コードの両方がある場合は、alpha-2 コードを使用する必要があります。&lt;/p>
+&lt;/blockquote>
+&lt;p>また、&lt;a href="https://docs.oracle.com/javase/jp/10/docs/api/java/util/Locale.html#%3Cinit%3E(java.lang.String)">Locale クラスのコンストラクタ&lt;/a> の第 1 引数の説明には、次のように書かれています。&lt;/p>
+&lt;blockquote>
+&lt;p>language - ISO 639 alpha-2 または alpha-3 言語コード、または最高 8 文字の言語のサブタグ。&lt;/p>
+&lt;/blockquote>
+&lt;p>実際に試してみると、alpha-2 コード（2桁）はほぼすべて対応しているのに対し、alpha-3 コード（3桁）は対応がいまいちのようです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">sample.kt&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-kotlin" data-lang="kotlin">&lt;span class="line">&lt;span class="cl">&lt;span class="k">fun&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// alpha-2 で指定
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Locale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;ja&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">displayLanguage&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// 日本語 (OK)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Locale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;en&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">displayLanguage&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// 英語 (OK)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Locale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fr&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">displayLanguage&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// フランス語 (OK)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Locale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;zh&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">displayLanguage&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// 中国語 (OK)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// alpha-3 で指定
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Locale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;jpn&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">displayLanguage&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// 日本語 (OK)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Locale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;eng&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">displayLanguage&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// 英語 (OK)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Locale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fra&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">displayLanguage&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// fra (NG)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Locale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;zho&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">displayLanguage&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// zho (NG)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>Locale&lt;/code> クラスが認識できる alpha-2 コードの一覧は、&lt;code>Locale.getISOLanguages()&lt;/code> で取得できます。
+一方、認識できる alpha-3 コードの一覧を取得するメソッドは存在しませんが、上記の結果をみる限り、フランス語を表す &lt;code>fra&lt;/code> と中国語を表す &lt;code>zho&lt;/code> という言語コードからは、&lt;code>Locale&lt;/code> クラスは言語情報をうまく生成してくれません。
+何とも使いにくいですね。&lt;/p></description></item><item><title>Java/Kotlin で ISO 3166 国コードの一覧を取得する</title><link>https://maku.blog/p/5weufam/</link><pubDate>Mon, 11 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5weufam/</guid><description>&lt;h2 id="locale-クラスで国コードのリストを取得する">Locale クラスで国コードのリストを取得する&lt;/h2>
+&lt;p>&lt;a href="https://docs.oracle.com/javase/10/docs/api/java/util/Locale.html#getISOCountries()">Locale クラスの getISOCountries() メソッド&lt;/a> を使用すると、ISO 3166 で定義されている国コードの一覧を取得することができます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>String[] Locale.getISOCountries()&lt;/code>
+&lt;ul>
+&lt;li>ISO3166-1 alpha-2（2桁のアルファベット）&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Set&amp;lt;String&amp;gt; Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA2)&lt;/code>
+&lt;ul>
+&lt;li>ISO3166-1 alpha-2（2桁のアルファベット）&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Set&amp;lt;String&amp;gt; Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA3)&lt;/code>
+&lt;ul>
+&lt;li>ISO3166-1 alpha-3（3桁のアルファベット）&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Set&amp;lt;String&amp;gt; Locale.getISOCountries(Locale.IsoCountryCode.PART3)&lt;/code>
+&lt;ul>
+&lt;li>ISO3166-3（4桁のアルファベット）&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="サンプルコード">サンプルコード&lt;/h2>
+&lt;p>次の Kotlin コードでは、&lt;code>Locale.getISOCountries()&lt;/code> で ISO3166-1 alpha-2 の国コードをすべて取得し、それぞれについて、2桁の国コード、3桁の国コード、国名を表示しています。
+&lt;a href="https://try.kotlinlang.org/">Try Kotlin&lt;/a> のサイトにコピペして実行できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-kotlin" data-lang="kotlin">&lt;span class="line">&lt;span class="cl">&lt;span class="k">import&lt;/span> &lt;span class="nn">java.util.Locale&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">fun&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">alpha2&lt;/span> &lt;span class="k">in&lt;/span> &lt;span class="nc">Locale&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">getISOCountries&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">val&lt;/span> &lt;span class="py">loc&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">Locale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;dummylang&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">alpha2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">val&lt;/span> &lt;span class="py">alpha3&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">loc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">getISO3Country&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">val&lt;/span> &lt;span class="py">name&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">loc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">getDisplayCountry&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">$alpha2&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">$alpha3&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">$name&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行結果&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">AD AND Andorra
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">AE ARE United Arab Emirates
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">AF AFG Afghanistan
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">AG ATG Antigua and Barbuda
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">AI AIA Anguilla
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">AL ALB Albania
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">... 省略 ...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">WS WSM Samoa
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">YE YEM Yemen
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">YT MYT Mayotte
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ZA ZAF South Africa
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ZM ZMB Zambia
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ZW ZWE Zimbabwe&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;ul>
+&lt;li>&lt;a href="../../p/5weufam/countries.txt">実行結果 (countires.txt)&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;aside style="display: flex; border: thin dashed gray;">
+&lt;div style="align-self: stretch; writing-mode: vertical-lr; text-align: center; letter-spacing: 0.2em; color: #666; border-right: thin dashed gray; padding: 0.4em 0; line-height: 1.5;">参考&lt;/div>
+&lt;div style="align-self: center; padding: 0.6em 0; line-height: 1.2 !important;">&lt;ul>
+&lt;li>&lt;a href="../../p/tfs5gr3/">国コードや言語コードのまとめ (ISO 3166, ISO 639)&lt;/a>&lt;/li>
+&lt;li>&lt;a href="../../p/wjxanza/">Java/Kotlin で ISO 639 言語コードの一覧を取得する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/aside></description></item><item><title>Java/Kotlin で ISO 639 言語コードの一覧を取得する</title><link>https://maku.blog/p/wjxanza/</link><pubDate>Mon, 11 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wjxanza/</guid><description>&lt;h2 id="locale-クラスで言語識別子のリストを取得する">Locale クラスで言語識別子のリストを取得する&lt;/h2>
+&lt;p>&lt;a href="https://docs.oracle.com/javase/10/docs/api/java/util/Locale.html#getISOLanguages()">Locale クラスの getISOLanguages() メソッド&lt;/a> を使用すると、ISO 639-1 alpha2 で定義されている 2 桁の言語識別子の一覧を取得することができます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>String[] Locale.getISOLanguages()&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="サンプルコード">サンプルコード&lt;/h2>
+&lt;p>次の Kotlin コードでは、&lt;code>Locale.getISOLanguages()&lt;/code> で ISO 639-1 alpha-2 の言語識別子をすべて取得し、それぞれについて、2桁の言語識別子、3桁の言語識別子 (ISO 639-2/T)、言語名を表示しています。
+&lt;a href="https://try.kotlinlang.org/">Try Kotlin&lt;/a> のサイトにコピペして実行できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">langcodes.kt&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-kotlin" data-lang="kotlin">&lt;span class="line">&lt;span class="cl">&lt;span class="k">import&lt;/span> &lt;span class="nn">java.util.Locale&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">fun&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">alpha2&lt;/span> &lt;span class="k">in&lt;/span> &lt;span class="nc">Locale&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">getISOLanguages&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">val&lt;/span> &lt;span class="py">loc&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">Locale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">alpha2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">val&lt;/span> &lt;span class="py">alpha3&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">loc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">getISO3Language&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">val&lt;/span> &lt;span class="py">name&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">loc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">getDisplayLanguage&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">$alpha2&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">$alpha3&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">$name&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行結果&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">aa aar Afar
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ab abk Abkhazian
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ae ave Avestan
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">af afr Afrikaans
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ak aka Akan
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">am amh Amharic
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">... 省略 ...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">xh xho Xhosa
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">yi yid Yiddish
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">yo yor Yoruba
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">za zha Zhuang
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">zh zho Chinese
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">zu zul Zulu&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;ul>
+&lt;li>&lt;a href="../../p/wjxanza/langcodes.txt">実行結果 (langcodes.txt)&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="おまけ">おまけ&lt;/h2>
+&lt;p>いろんな言語名をいろんな Locale 設定で出力してみるサンプルコードです。
+HTML の表として出力しています。&lt;/p></description></item><item><title>JavaFX2 で CheckBox を ScrollPane に並べる</title><link>https://maku.blog/p/j6jv8iu/</link><pubDate>Mon, 10 Oct 2011 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j6jv8iu/</guid><description>&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="200" height="172" src="../../p/j6jv8iu/img-001.png" alt="/p/j6jv8iu/img-001.png" />
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Main.java&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">javafx.application.Application&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">javafx.scene.Group&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">javafx.scene.Scene&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">javafx.scene.control.CheckBox&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">javafx.scene.layout.VBox&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">javafx.scene.paint.Color&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">javafx.stage.Stage&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">Main&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">extends&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Application&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">launch&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Group&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">createRootGroup&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">CheckBox&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">cb1&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">CheckBox&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;First&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">CheckBox&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">cb2&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">CheckBox&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Second&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">CheckBox&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">cb3&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">CheckBox&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Third&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// Align vertically&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">VBox&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">vbox&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">VBox&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">vbox&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setSpacing&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">10&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">vbox&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getChildren&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="na">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">cb1&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">vbox&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getChildren&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="na">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">cb2&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">vbox&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getChildren&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="na">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">cb3&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// Add to the root&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Group&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">root&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Group&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">root&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getChildren&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="na">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vbox&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">root&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@Override&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">start&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Stage&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">primaryStage&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Group&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">root&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">createRootGroup&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Scene&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">scene&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Scene&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">root&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">200&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">150&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Color&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">IVORY&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">primaryStage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setScene&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">scene&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">primaryStage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">show&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>JavaFX2 で HelloWorld（ウィンドウの表示）</title><link>https://maku.blog/p/haq7myf/</link><pubDate>Mon, 10 Oct 2011 00:00:00 +0900</pubDate><guid>https://maku.blog/p/haq7myf/</guid><description>&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="200" height="172" src="../../p/haq7myf/img-001.png" alt="/p/haq7myf/img-001.png" />
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Main.java&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">javafx.application.Application&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">javafx.scene.Group&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">javafx.scene.Scene&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">javafx.scene.paint.Color&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">javafx.stage.Stage&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">Main&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">extends&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Application&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">launch&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@Override&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">start&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Stage&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">primaryStage&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Group&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">root&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Group&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Scene&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">scene&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Scene&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">root&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">400&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">300&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Color&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">GRAY&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">primaryStage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setScene&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">scene&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">primaryStage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">show&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item></channel></rss>

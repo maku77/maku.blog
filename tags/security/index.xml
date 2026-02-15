@@ -1,20 +1,152 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>security on まくろぐ</title><link>https://maku.blog/tags/security/</link><description>Recent content in security on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 22 Jan 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/security/index.xml" rel="self" type="application/rss+xml"/><item><title>電子証明書（SSL 証明書）申請用の CSR ファイルを作成する</title><link>https://maku.blog/p/vntjjaw/</link><pubDate>Mon, 22 Jan 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vntjjaw/</guid><description>CSR ファイルとは Web サーバーで HTTPS 通信を可能にするには、SSL 証明書を Web サーバーに設定する必要があります。 SSL 証明書は具体的には、Web サーバーの公開鍵に CA 認証局の電子署名を付けたものです。 SSL 証明書を CA 認証局に発行してもらうときに必要になるのが CSR: Certificate Signing Request（証明書署名要求） ファイルです。
-参考: 電子署名と電子証明書の基礎 CA 認証局にもよりますが、DNS 経由でのドメインへのアクセス が可能であれば、SSL 証明書を申請することができます。 Web サーバーの立ち上げは後回しでよいということです。
-CSR ファイル作成のポイント CSR ファイルには、Web サーバー用の公開鍵と、申請者の情報（ディスティングイッシュネーム）を含める必要があります。
-CSR ファイル (.csr) を作成するには、対象となる Web サーバーで使用する秘密鍵が必要です（ただし、生成される CSR に含まれるのは公開鍵の方です）。秘密鍵と CSR ファイルの作成には openssl コマンドを使用します。 CSR に含める公開鍵は、そのサーバー専用 のものである必要があります。別のサーバー用に発行されている証明書で使われている公開鍵を使い回すことはできません。つまり、秘密鍵もそのサーバー専用のものを作るということです。ワイルドカード証明書でない場合は、サブドメインごとに秘密鍵＆証明書を作ることになります。 電子証明書の更新時には、毎回新しい秘密鍵を作成 してしまえば OK です（Web サーバーに設定し直す必要はありますが）。特に推奨されるわけではありませんが、CSR のディスティングイッシュネーム（Common Name や Organization）が変化しないケースでは、秘密鍵を使い回すことが可能です。 CSR ファイルを作成する 秘密鍵ファイルを作成する CSR ファイルを作成するには、サーバー用の秘密鍵が必要になるので、まずは openssl コマンドで秘密鍵を作成します。
-秘密鍵の作成 $ openssl genrsa -out example.</description></item><item><title>セキュリティ雑多メモ: STRIDE による脅威分類</title><link>https://maku.blog/p/p7ngweu/</link><pubDate>Sun, 08 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p7ngweu/</guid><description>STRIDE は Microsoft が提唱した脅威分類で、情報セキュリティにおける主要な攻撃を示すための頭字語です。
-S: Spoofing of Identity（アイデンティティの偽装） 他のユーザーや何らかのエンティティになりすましてシステムにアクセスすること。 T: Tampering with Data（データの改ざん） データやコードを不正に変更することによって、そのシステムやデータの信頼性や正確性を損ねること。 R: Repudiation（否認） 実行されたアクションやトランザクションを実行していないと主張し、責任を免れようとすること。 I: Information Disclosure（情報漏洩） 機密情報を不正な手段で漏らし、権限のない者がアクセスできるようにすること。 D: Denial of Service（サービス拒否） 合法的なユーザーの利用を妨げるため、サービスの提供を妨害すること。 E: Elevation of Privilege（特権昇格） 正当な権限を持たない者が権限を取得することでシステムを不正に操作すること。 参考: Threats - Microsoft Threat Modeling Tool - Azure | Microsoft Learn</description></item><item><title>セキュリティ雑多メモ: 脆弱性の分類とデータベース</title><link>https://maku.blog/p/m8688y4/</link><pubDate>Tue, 04 Jul 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m8688y4/</guid><description>大規模なソフトウェア開発プロジェクトにおいて脆弱性を体系的に扱うには、それらの分類方法や、脆弱性データベースの存在を認識しておく必要があります。
-セキュリティマネジメントには「既知」と「未知」のものがある 既知の脆弱性 (known vulnerabilities) 開発時、出荷時などにすでに発見されている脆弱性。管理は容易。 未知の脆弱性 (unknown vulnerabilities) 定期的なチェックの仕組み を導入して発見する必要がある。 脆弱性データベース 各種プログラミング言語用に配布されているライブラリで脆弱性が発見されると、下記のような脆弱性データベースに登録されて公開されます。
-NVD: National Vulnerability Database NIST（アメリカ国立標準技術研究所）が管理している脆弱性データベースです。 GitHub Advisory Database GitHub が管理している脆弱性データベースです。いろいろなデータベースを横断的に検索できるので便利です（参考: GitHub Advisory Database について）。 JVN: Japan Vulnerability Notes 脆弱性 ID と指標 CVE: 脆弱性の識別子 脆弱性の ID 体系としては、CVE-ID が有名です。 NVD で管理されている脆弱性には、一意の CVE: Common Vulnerabilities and Exposures（共通脆弱性識別子） という ID が割り当てられています（CVE-2022-0123 のような形式）。 これにより、脆弱性の報告、追跡、共有が簡単になります。
-CWE: 脆弱性のカテゴリ CWE: Common Weakness Enumeration（共通脆弱性タイプ一覧） という脆弱性カテゴリも定義されています。
-CVSS: 脆弱性の深刻度 脆弱性の深刻度を評価するための、CVSS: Common Vulnerability Scoring System（共通脆弱性評価システム） という枠組みが定義されており、脆弱性の影響、機密性、可用性、完全性、およびその他の要因を評価して、それぞれの脆弱性に 0 ～ 10 の CVSS スコアが割り当てられています。 CVSS スコアにより、組織は脆弱性を優先順位付けして対処することができます。</description></item><item><title>SBOM（ソフトウェア部品表）とは</title><link>https://maku.blog/p/bw9qjeu/</link><pubDate>Sun, 23 Jan 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bw9qjeu/</guid><description>ソフトウェア開発の世界で、SBOM という用語がよく出てくるようになったので簡単にまとめておきます。
-SBOM とは SBOM とは、ソフトウェア製品の部品表（Software Bill of Materials）の略称で、ソフトウェア製品が構成されている部品のリストを指します。 SBOM は、ソフトウェア製品がどのように構成されているかを明確にするために使用されます。 2021 年 5 月の米国大統領令に SBOM の作成と脆弱性対策を義務付ける条項 が盛り込まれました。
-SBOM の目的 SBOM を作成することにより、以下のような恩恵を得ることができます。
-セキュリティ向上（セキュリティ・マネージメント）: SBOM を利用することで、ソフトウェア製品がどのような部品から構成されているかを正確に把握することができ、悪意のある部品が含まれているかどうかを特定することができます。 規制遵守（コンプライアンス・マネージメント）: SBOM は、製品のライセンス情報、サードパーティー製品の使用状況、およびその他の規制要件に関する情報を提供するため、規制遵守に役立ちます。 品質向上: SBOM は、ソフトウェア製品がどのように構成されているかを明確にするため、品質管理プロセスの改善に役立ちます。 SBOM の代表的なフォーマット SPDX: Software Package Data Exchange 標準: ISO/IEC 5962:2021 サポート団体: The Linux Foundation SPDX Group CycloneDX: CycloneDX specification サポート団体: OWASP Foundation SWID: Software Identification Tags 標準: ISO/IEC 19770-2:2015 GitHub から SBOM を出力する GitHub で管理しているプロジェクトであれば、GitHub の Web サイト上で SBOM ファイル（SPDX 形式）を出力することができます。</description></item><item><title>電子署名と電子証明書の基礎</title><link>https://maku.blog/p/fzwyf7z/</link><pubDate>Fri, 28 Sep 2012 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fzwyf7z/</guid><description>電子署名と電子証明書の話がごっちゃになってることが多いので、まとめておきます。
-電子署名（デジタル署名）(digital signature) 「電子署名」とは、送信するデータに付加されるもので、そのデータの作成者やデータが改ざんされていないことをを確認するためのものです。 別の言い方をすると、受け取ったデータが第三者によって作られた 偽物でないことを確認するための印 です。
-以下のような手順で、データが偽物でないかを確認します。
-データ送信側の「電子署名の作成」手順 送信するデータのメッセージダイジェスト（ハッシュ値）を求める。 メッセージダイジェストを非公開鍵 (private key) で暗号化し、「電子署名」とする。 データ送信時には、データと「電子署名」を一緒に送る。 データ受信側の「電子署名の確認」手順 受信したデータのメッセージダイジェスト（ハッシュ値）を求める。 受信した「電子署名」を「送信者の公開鍵」で復号化し、メッセージダイジェストに戻す。 1 と 2 のメッセージダイジェストが等しければ、本人が作成したデータだと分かる。 上記の手順からも分かるように、一般的に「電子署名」の仕組みには、公開鍵暗号方式 が用いられます。 問題は、「送信者の公開鍵」の交換方法が定義されていないことです。 偽物の公開鍵が使われると、なりすましができてしまいます。 データの受信者は、何らかの方法で「本物の送信者の公開鍵」を取得しなければいけません。
-もちろん、公開鍵を手渡しで渡すことができれば安全ですが、不特定多数のサーバーとの通信のたびにそんなことはやっていられません。 そこで、公開鍵が本物であるかを証明するための、「電子証明書」が必要になってきます。 電子証明書の仕組みを使うと、通信相手の Web サーバーから、直接そのサーバーの公開鍵を取得できるようになります。
-電子証明書（デジタル証明書) (digital certificate) 電子証明書とは？ 公開鍵が偽物であると、公開鍵暗号方式は意味をなさなくなるため、公開鍵の正当性を証明することが重要になってきます。 電子証明書は、ある公開鍵が本物であることを証明する ためのものです。 大まかに書いてしまうと、公開鍵を次のようにパッケージングしたものです。
-電子証明書 = 公開鍵 &amp;#43; 本物の公開鍵であることを示す署名 電子証明書の発行（公開鍵への署名） 電子証明書は、公開鍵が本物であることを示すためのものですが、その電子証明書自体が本物であることを示すために、末尾に電子署名 が付加されます。 その署名は、公開鍵を作成したユーザが行うこともあるし（オレオレ証明書）、信頼のおける第三者が行うこともあります。 通常は、信頼のおける第三者機関である 認証局 (CA: Certificate Authority) が電子証明書への署名を行い、電子証明書の発行を行います。
-☝️ CA の署名は本物か 電子証明書は、そこに含まれている公開鍵が正しいものかどうかを、CA 署名で確認できるようにしたものですが、その CA 署名自体が本物なのかという問題があります。 CA 署名の真正性も電子証明書によって確かめます。 Windows や macOS などの OS には、有名どころの CA の電子証明書（ルート CA 証明書）があらかじめインストールされており、サーバー証明書内の CA 署名が本物であるかを調べられるようになっています（参考: macOS で利用できるルート証明書の一覧）。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Security on まくろぐ</title><link>https://maku.blog/tags/security/</link><description>Recent content in Security on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 22 Jan 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/security/index.xml" rel="self" type="application/rss+xml"/><item><title>電子証明書（SSL 証明書）申請用の CSR ファイルを作成する</title><link>https://maku.blog/p/vntjjaw/</link><pubDate>Mon, 22 Jan 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vntjjaw/</guid><description>&lt;h2 id="csr-ファイルとは">CSR ファイルとは&lt;/h2>
+&lt;p>Web サーバーで HTTPS 通信を可能にするには、SSL 証明書を Web サーバーに設定する必要があります。
+SSL 証明書は具体的には、Web サーバーの公開鍵に CA 認証局の電子署名を付けたものです。
+SSL 証明書を CA 認証局に発行してもらうときに必要になるのが &lt;strong>CSR: Certificate Signing Request（証明書署名要求）&lt;/strong> ファイルです。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/fzwyf7z/">電子署名と電子証明書の基礎&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>CA 認証局にもよりますが、&lt;strong>DNS 経由でのドメインへのアクセス&lt;/strong> が可能であれば、SSL 証明書を申請することができます。
+Web サーバーの立ち上げは後回しでよいということです。&lt;/p>
+&lt;h2 id="csr-ファイル作成のポイント">CSR ファイル作成のポイント&lt;/h2>
+&lt;p>CSR ファイルには、Web サーバー用の公開鍵と、申請者の情報（ディスティングイッシュネーム）を含める必要があります。&lt;/p>
+&lt;ul>
+&lt;li>CSR ファイル (&lt;code>.csr&lt;/code>) を作成するには、対象となる Web サーバーで使用する秘密鍵が必要です（ただし、生成される CSR に含まれるのは公開鍵の方です）。秘密鍵と CSR ファイルの作成には &lt;strong>&lt;code>openssl&lt;/code>&lt;/strong> コマンドを使用します。&lt;/li>
+&lt;li>CSR に含める公開鍵は、&lt;strong>そのサーバー専用&lt;/strong> のものである必要があります。別のサーバー用に発行されている証明書で使われている公開鍵を使い回すことはできません。つまり、秘密鍵もそのサーバー専用のものを作るということです。ワイルドカード証明書でない場合は、サブドメインごとに秘密鍵＆証明書を作ることになります。&lt;/li>
+&lt;li>電子証明書の更新時には、&lt;strong>毎回新しい秘密鍵を作成&lt;/strong> してしまえば OK です（Web サーバーに設定し直す必要はありますが）。特に推奨されるわけではありませんが、CSR のディスティングイッシュネーム（Common Name や Organization）が変化しないケースでは、秘密鍵を使い回すことが可能です。&lt;/li>
+&lt;/ul>
+&lt;h2 id="csr-ファイルを作成する">CSR ファイルを作成する&lt;/h2>
+&lt;h3 id="秘密鍵ファイルを作成する">秘密鍵ファイルを作成する&lt;/h3>
+&lt;p>CSR ファイルを作成するには、サーバー用の秘密鍵が必要になるので、まずは &lt;code>openssl&lt;/code> コマンドで秘密鍵を作成します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">秘密鍵の作成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> openssl genrsa -out example.com-2024.key
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ここでは、秘密鍵のファイル名は &lt;code>example.com-2024.key&lt;/code> としていますが、このように &lt;strong>ホスト名と作成した年の情報&lt;/strong> を含めておくと管理しやすくなります。
+出力される秘密鍵は、デフォルトでは次のような &lt;a href="https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail">PEM 形式&lt;/a> のテキストファイルになっています。&lt;/p></description></item><item><title>セキュリティ雑多メモ: STRIDE による脅威分類</title><link>https://maku.blog/p/p7ngweu/</link><pubDate>Sun, 08 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p7ngweu/</guid><description>&lt;p>&lt;strong>STRIDE&lt;/strong> は Microsoft が提唱した脅威分類で、情報セキュリティにおける主要な攻撃を示すための頭字語です。&lt;/p>
+&lt;dl>
+&lt;dt>S: Spoofing of Identity（アイデンティティの偽装）&lt;/dt>
+&lt;dd>他のユーザーや何らかのエンティティになりすましてシステムにアクセスすること。&lt;/dd>
+&lt;dt>T: Tampering with Data（データの改ざん）&lt;/dt>
+&lt;dd>データやコードを不正に変更することによって、そのシステムやデータの信頼性や正確性を損ねること。&lt;/dd>
+&lt;dt>R: Repudiation（否認）&lt;/dt>
+&lt;dd>実行されたアクションやトランザクションを実行していないと主張し、責任を免れようとすること。&lt;/dd>
+&lt;dt>I: Information Disclosure（情報漏洩）&lt;/dt>
+&lt;dd>機密情報を不正な手段で漏らし、権限のない者がアクセスできるようにすること。&lt;/dd>
+&lt;dt>D: Denial of Service（サービス拒否）&lt;/dt>
+&lt;dd>合法的なユーザーの利用を妨げるため、サービスの提供を妨害すること。&lt;/dd>
+&lt;dt>E: Elevation of Privilege（特権昇格）&lt;/dt>
+&lt;dd>正当な権限を持たない者が権限を取得することでシステムを不正に操作すること。&lt;/dd>
+&lt;/dl>
+&lt;ul>
+&lt;li>参考: &lt;a href="https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-threats">Threats - Microsoft Threat Modeling Tool - Azure | Microsoft Learn&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>セキュリティ雑多メモ: 脆弱性の分類とデータベース</title><link>https://maku.blog/p/m8688y4/</link><pubDate>Tue, 04 Jul 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m8688y4/</guid><description>&lt;p>大規模なソフトウェア開発プロジェクトにおいて脆弱性を体系的に扱うには、それらの分類方法や、脆弱性データベースの存在を認識しておく必要があります。&lt;/p>
+&lt;h2 id="セキュリティマネジメントには既知と未知のものがある">セキュリティマネジメントには「既知」と「未知」のものがある&lt;/h2>
+&lt;dl>
+&lt;dt>既知の脆弱性 (known vulnerabilities)&lt;/dt>
+&lt;dd>開発時、出荷時などにすでに発見されている脆弱性。管理は容易。&lt;/dd>
+&lt;dt>未知の脆弱性 (unknown vulnerabilities)&lt;/dt>
+&lt;dd>&lt;strong>定期的なチェックの仕組み&lt;/strong> を導入して発見する必要がある。&lt;/dd>
+&lt;/dl>
+&lt;h2 id="脆弱性データベース">脆弱性データベース&lt;/h2>
+&lt;p>各種プログラミング言語用に配布されているライブラリで脆弱性が発見されると、下記のような脆弱性データベースに登録されて公開されます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://nvd.nist.gov/">NVD: National Vulnerability Database&lt;/a>
+&lt;ul>
+&lt;li>NIST（アメリカ国立標準技術研究所）が管理している脆弱性データベースです。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="https://github.com/advisories/">GitHub Advisory Database&lt;/a>
+&lt;ul>
+&lt;li>GitHub が管理している脆弱性データベースです。いろいろなデータベースを横断的に検索できるので便利です（参考: &lt;a href="https://docs.github.com/ja/code-security/security-advisories/global-security-advisories/about-the-github-advisory-database">GitHub Advisory Database について&lt;/a>）。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="https://jvn.jp/">JVN: Japan Vulnerability Notes&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="脆弱性-id-と指標">脆弱性 ID と指標&lt;/h2>
+&lt;h3 id="cve-脆弱性の識別子">CVE: 脆弱性の識別子&lt;/h3>
+&lt;p>脆弱性の ID 体系としては、&lt;a href="https://cve.mitre.org/">CVE-ID&lt;/a> が有名です。
+NVD で管理されている脆弱性には、一意の &lt;strong>CVE: Common Vulnerabilities and Exposures（共通脆弱性識別子）&lt;/strong> という ID が割り当てられています（&lt;code>CVE-2022-0123&lt;/code> のような形式）。
+これにより、脆弱性の報告、追跡、共有が簡単になります。&lt;/p>
+&lt;h3 id="cwe-脆弱性のカテゴリ">CWE: 脆弱性のカテゴリ&lt;/h3>
+&lt;p>&lt;strong>CWE: Common Weakness Enumeration（共通脆弱性タイプ一覧）&lt;/strong> という脆弱性カテゴリも定義されています。&lt;/p>
+&lt;h3 id="cvss-脆弱性の深刻度">CVSS: 脆弱性の深刻度&lt;/h3>
+&lt;p>脆弱性の深刻度を評価するための、&lt;strong>CVSS: Common Vulnerability Scoring System（共通脆弱性評価システム）&lt;/strong> という枠組みが定義されており、脆弱性の影響、機密性、可用性、完全性、およびその他の要因を評価して、それぞれの脆弱性に 0 ～ 10 の CVSS スコアが割り当てられています。
+CVSS スコアにより、組織は脆弱性を優先順位付けして対処することができます。&lt;/p></description></item><item><title>SBOM（ソフトウェア部品表）とは</title><link>https://maku.blog/p/bw9qjeu/</link><pubDate>Sun, 23 Jan 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bw9qjeu/</guid><description>&lt;p>ソフトウェア開発の世界で、&lt;strong>SBOM&lt;/strong> という用語がよく出てくるようになったので簡単にまとめておきます。&lt;/p>
+&lt;h2 id="sbom-とは">SBOM とは&lt;/h2>
+&lt;p>SBOM とは、ソフトウェア製品の部品表（Software Bill of Materials）の略称で、ソフトウェア製品が構成されている部品のリストを指します。
+SBOM は、ソフトウェア製品がどのように構成されているかを明確にするために使用されます。
+&lt;strong>2021 年 5 月の米国大統領令に SBOM の作成と脆弱性対策を義務付ける条項&lt;/strong> が盛り込まれました。&lt;/p>
+&lt;h2 id="sbom-の目的">SBOM の目的&lt;/h2>
+&lt;p>SBOM を作成することにより、以下のような恩恵を得ることができます。&lt;/p>
+&lt;ul>
+&lt;li>セキュリティ向上（セキュリティ・マネージメント）: SBOM を利用することで、ソフトウェア製品がどのような部品から構成されているかを正確に把握することができ、悪意のある部品が含まれているかどうかを特定することができます。&lt;/li>
+&lt;li>規制遵守（コンプライアンス・マネージメント）: SBOM は、製品のライセンス情報、サードパーティー製品の使用状況、およびその他の規制要件に関する情報を提供するため、規制遵守に役立ちます。&lt;/li>
+&lt;li>品質向上: SBOM は、ソフトウェア製品がどのように構成されているかを明確にするため、品質管理プロセスの改善に役立ちます。&lt;/li>
+&lt;/ul>
+&lt;h2 id="sbom-の代表的なフォーマット">SBOM の代表的なフォーマット&lt;/h2>
+&lt;ul>
+&lt;li>&lt;strong>SPDX&lt;/strong>: Software Package Data Exchange
+&lt;ul>
+&lt;li>標準: ISO/IEC 5962:2021&lt;/li>
+&lt;li>サポート団体: The Linux Foundation SPDX Group&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>CycloneDX&lt;/strong>: CycloneDX specification
+&lt;ul>
+&lt;li>サポート団体: OWASP Foundation&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>SWID&lt;/strong>: Software Identification Tags
+&lt;ul>
+&lt;li>標準: ISO/IEC 19770-2:2015&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="github-から-sbom-を出力する">GitHub から SBOM を出力する&lt;/h2>
+&lt;p>GitHub で管理しているプロジェクトであれば、GitHub の Web サイト上で SBOM ファイル（SPDX 形式）を出力することができます。&lt;/p></description></item><item><title>電子署名と電子証明書の基礎</title><link>https://maku.blog/p/fzwyf7z/</link><pubDate>Fri, 28 Sep 2012 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fzwyf7z/</guid><description>&lt;p>電子署名と電子証明書の話がごっちゃになってることが多いので、まとめておきます。&lt;/p>
+&lt;h2 id="電子署名デジタル署名digital-signature">電子署名（デジタル署名）(digital signature)&lt;/h2>
+&lt;p>「電子署名」とは、送信するデータに付加されるもので、そのデータの作成者やデータが改ざんされていないことをを確認するためのものです。
+別の言い方をすると、受け取ったデータが第三者によって作られた &lt;strong>偽物でないことを確認するための印&lt;/strong> です。&lt;/p>
+&lt;p>以下のような手順で、データが偽物でないかを確認します。&lt;/p>
+&lt;ul>
+&lt;li>データ送信側の「電子署名の作成」手順
+&lt;ol>
+&lt;li>送信するデータのメッセージダイジェスト（ハッシュ値）を求める。&lt;/li>
+&lt;li>メッセージダイジェストを非公開鍵 (private key) で暗号化し、「電子署名」とする。&lt;/li>
+&lt;li>データ送信時には、データと「電子署名」を一緒に送る。&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>データ受信側の「電子署名の確認」手順
+&lt;ol>
+&lt;li>受信したデータのメッセージダイジェスト（ハッシュ値）を求める。&lt;/li>
+&lt;li>受信した「電子署名」を「送信者の公開鍵」で復号化し、メッセージダイジェストに戻す。&lt;/li>
+&lt;li>1 と 2 のメッセージダイジェストが等しければ、本人が作成したデータだと分かる。&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ul>
+&lt;p>上記の手順からも分かるように、一般的に「電子署名」の仕組みには、&lt;strong>公開鍵暗号方式&lt;/strong> が用いられます。
+問題は、「送信者の公開鍵」の交換方法が定義されていないことです。
+偽物の公開鍵が使われると、なりすましができてしまいます。
+データの受信者は、何らかの方法で「&lt;strong>本物の送信者の公開鍵&lt;/strong>」を取得しなければいけません。&lt;/p>
+&lt;p>もちろん、公開鍵を手渡しで渡すことができれば安全ですが、不特定多数のサーバーとの通信のたびにそんなことはやっていられません。
+そこで、公開鍵が本物であるかを証明するための、「&lt;strong>電子証明書&lt;/strong>」が必要になってきます。
+電子証明書の仕組みを使うと、通信相手の Web サーバーから、直接そのサーバーの公開鍵を取得できるようになります。&lt;/p>
+&lt;h2 id="電子証明書デジタル証明書-digital-certificate">電子証明書（デジタル証明書) (digital certificate)&lt;/h2>
+&lt;h3 id="電子証明書とは">電子証明書とは？&lt;/h3>
+&lt;p>公開鍵が偽物であると、公開鍵暗号方式は意味をなさなくなるため、公開鍵の正当性を証明することが重要になってきます。
+&lt;strong>電子証明書は、ある公開鍵が本物であることを証明する&lt;/strong> ためのものです。
+大まかに書いてしまうと、公開鍵を次のようにパッケージングしたものです。&lt;/p>
+&lt;div style="text-align:center; font-weight:bold;">電子証明書 = 公開鍵 &amp;#43; 本物の公開鍵であることを示す署名&lt;/div>
+
+&lt;h3 id="電子証明書の発行公開鍵への署名">電子証明書の発行（公開鍵への署名）&lt;/h3>
+&lt;p>電子証明書は、公開鍵が本物であることを示すためのものですが、その電子証明書自体が本物であることを示すために、&lt;strong>末尾に電子署名&lt;/strong> が付加されます。
+その署名は、公開鍵を作成したユーザが行うこともあるし（オレオレ証明書）、信頼のおける第三者が行うこともあります。
+通常は、信頼のおける第三者機関である &lt;strong>認証局 (CA: Certificate Authority)&lt;/strong> が電子証明書への署名を行い、電子証明書の発行を行います。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ CA の署名は本物か&lt;/span>
+ &lt;span class="xNote_body">&lt;p>電子証明書は、そこに含まれている公開鍵が正しいものかどうかを、CA 署名で確認できるようにしたものですが、その CA 署名自体が本物なのかという問題があります。
+CA 署名の真正性も電子証明書によって確かめます。
+Windows や macOS などの OS には、有名どころの CA の電子証明書（ルート CA 証明書）があらかじめインストールされており、サーバー証明書内の CA 署名が本物であるかを調べられるようになっています（参考: &lt;a href="https://support.apple.com/ja-jp/HT202858">macOS で利用できるルート証明書の一覧&lt;/a>）。&lt;/p></description></item></channel></rss>

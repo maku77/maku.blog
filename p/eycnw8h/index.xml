@@ -1,34 +1,343 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>VS Code の設定メモ on まくろぐ</title><link>https://maku.blog/p/eycnw8h/</link><description>Recent content in VS Code の設定メモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 10 Feb 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/eycnw8h/index.xml" rel="self" type="application/rss+xml"/><item><title>VS Code の設定ファイルの場所 (settings.json)</title><link>https://maku.blog/p/tfq2cnw/</link><pubDate>Sun, 11 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tfq2cnw/</guid><description>ユーザー設定とワークスペース設定 VS Code の設定画面は Ctrl(Cmd) + , で起動できますが、ここで行った設定は、settings.json というユーザー設定ファイル（あるいはワークスペース設定ファイル）に保存されます。 このファイルの内容と設定画面の内容は連動しているので、設定はどちらで行ってもいいのですが、慣れてくると setttings.json を直接編集した方がすばやく設定を行えます。
-ユーザー設定ファイル VS Code のユーザー設定ファイル (settings.json) は、OS ごとに下記のディレクトリに保存され、全ての VS Code インスタンス（ワークスペース）に共通の設定として使用されます。
-OS ユーザー設定ファイルのパス Windows %APPDATA%\Code\User\settings.json macOS $HOME/Library/Application Support/Code/User/settings.json Linux $HOME/.config/Code/User/settings.json ワークスペース設定ファイル ワークスペースごとの設定は、プロジェクトのルートディレクトリの .vscode ディレクトリに保存されます。
-&amp;lt;プロジェクトルート&amp;gt;/.vscode/settings.json ワークスペース設定は、前述のユーザー設定よりも優先されます（同じ設定項目の値が上書きされます）。 .vscode ディレクトリを Git にコミットしておけば、チーム内で VS Code の設定を共有できます。 .vscode ディレクトリには、プロジェクトのタスク設定ファイル (tasks.json) なども格納されます。
-設定ファイルのサンプル settings.json ファイルの拡張子は .json ですが、JavaScript 形式のコメントを記述できるようになっています (JSON with Comments)。
-settings.json の例 // Place your settings in this file to overwrite the default settings { &amp;#34;breadcrumbs.</description></item><item><title>VS Code で Kaggle 用の勉強環境を作る（Jupyter 拡張）</title><link>https://maku.blog/p/ma86izp/</link><pubDate>Mon, 10 Feb 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ma86izp/</guid><description>何をするか？ 機械学習のコンペティションを開催している Kaggle のサイトでは、Web ブラウザから利用可能な Notebook 機能が提供されています。 これを使うとブラウザ上で直接 Python のコードを書いて実行できるのですが、やっぱり使い慣れた Visual Studio Code 環境上で作業したいと思ったので、VS Code 上に Jupyter Notebook の環境を作っていきます。
-Python の実行環境についてはインストール済みであることを前提とします。 Python がまだインストールされていない場合は、pyenv などでインストール するとよいです。
-Jupyter 拡張のインストール まずは、Microsoft 純正の Python 拡張 と Jupyter 拡張 をインストールします。 下記サイトの Install ボタンを押すか、VS Code の拡張機能画面から検索してインストールできます。
-Python - Visual Studio Marketplace Jupyter - Visual Studio Marketplace Kaggle 用の仮想環境 (venv) venv の作成 VS Code 上の Jupyter Notebook で Python コードを実行するには、pip コマンドで Python カーネル (ipykernel) をインストールしておく必要があります。 また、機械学習系の実装では numpy や pandas などのライブラリも必要になってきます。 ここでは、ホームディレクトリに Python の仮想環境ディレクトリ (~/.</description></item><item><title>VS Code で Python 用の Linter ＆フォーマッターの Ruff を使う</title><link>https://maku.blog/p/6hnm4hy/</link><pubDate>Thu, 19 Sep 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6hnm4hy/</guid><description>Ruff とは Ruff は Python 用の Lint &amp;amp; Format ツールで、Rust で記述されているため非常に高速に動作します。 Ruff だけで Lint やフォーマットをまとめてかけることができる ため、次のようなツールを個別にインストールする必要がなくなります。
-Flake8（Linter） Black（フォーマッター） isort（import 文のソート） これまで、Python コードに Lint や Format をかける場合は、複数のツールを組み合わせて使うのが主流で、効率的な処理が行われているとは言いにくい状況でした。 例えば、広く使われている Lint ツールに Flake8 がありますが、これは pyflakes や pycodestyle の組み合わせであり、内部で何度もファイルの読み込みやパースが行われるため処理に時間がかかっていました。 Ruff は様々な処理が一度で済むように実装されています。 同様に広く使われているフォーマットツールとして Black がありますが、よくよく考えると、Black でフォーマット済みのコードを別の Lint ツール (Flake8) でスタイルチェックするのは無駄です。 Ruff で Lint とフォーマットの処理を一括で行うのは理にかなっています。
-ちなみに、Ruff の開発元である Astral 社は、Python 用のパッケージマネージャ（プロジェクト管理ツール）である uv も公開しています。 こちらも Rust で実装されており、高速かつ使いやすいのでオススメです。
-参考: Python プロジェクト用の爆速パッケージマネージャ uv を導入する - まくまく Python ノート VS Code に Ruff 拡張をインストールする Visual Studio Code で Ruff を使うには、下記の公式拡張をインストールするだけです。 ruff コマンドを別途インストールする必要はありません。</description></item><item><title>VS Code で YAML ファイルの構文をチェックする（YAML 拡張）</title><link>https://maku.blog/p/c7sp7ut/</link><pubDate>Wed, 19 Apr 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/c7sp7ut/</guid><description>YAML 拡張とは？ VS Code の YAML 拡張 (redhat.vscode-yaml) をインストールすると、スキーマ定義に基づいて、YAML ファイルの記述内容が正しいかをチェックすることができます。 スキーマ定義を JSON スキーマファイル の形で作成し、YAML ファイルの先頭に次のようなコメントを記述することで適用できます。
-YAML ファイルの先頭に追加 # yaml-language-server: $schema=./schema.json YAML ファイルの構文チェックなのに JSON スキーマ？と思うかもしれませんが、YAML と JSON のデータ形式には互換性があるので、スキーマは JSON スキーマでよいんですね。
-スキーマによる YAML ファイルの構文チェック 公開スキーマファイルを参照する スキーマファイルは、インターネット上に公開されているものを URL で指定できるようになっています。 有名どころの設定ファイルのスキーマは、下記のサイトに一覧があるので、いろいろなプロジェクトからそのまま利用できます。
-JSON Schema Store Ansible Playbook など、内容が複雑になりがちな YAML ファイルに設定しておくと役に立ちそうです。
-playbook.yml（の先頭に記述する） # yaml-language-server: $schema=https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json GitHub Actions のワークフローファイル (.github/workflows/*.yml) などは、そのファイルパスから、どのスキーマを使用すればいいかを推測できるので、上記のようなコメント行すら記述せずに自動的に GitHub Actions 用のスキーマ を適用してくれます。 つまり、VS Code に YAML 拡張をインストールするだけで、GitHub Actions のワークフローファイルの構文チェックが有効になります。 便利！
-独自定義したスキーマファイルを参照する アプリケーション独自の設定ファイルやデータファイルを YAML 形式で作成する場合は、そのスキーマも独自であることが多いので、専用の JSON スキーマファイルを作成することになるでしょう。 例えば、次の JSON スキーマファイルでは、ユーザー情報を表現するためのスキーマを定義しています（コメントを記述できるようにするために、拡張子を .</description></item><item><title>VS Code で YAML ファイルをソートする（YAML Sort 拡張）</title><link>https://maku.blog/p/2apzood/</link><pubDate>Wed, 19 Apr 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2apzood/</guid><description>YAML Sort の概要 VS Code に YAML Sort 拡張 をインストールすると、YAML ファイルの内容をキー名でソートすることができます。 主にソート用に使うものですが、YAML フォーマッターとしても利用できます。 次のような簡単なカスタマイズを行うこともできます。
-指定したキーを優先的に上から並べる 1 階層目の各キーの間に空白行を入れる リスト要素をソートする YAML Sort の使い方 YAML Sort のページで Install ボタンを押すだけで、VS Code への拡張のインストールは完了です。 ここでは、次のような YAML ファイルをソートしてみます。
-sample.yml（ソート前） root2: ccc: 300 aaa: 100 bbb: 200 root1: fruits: - grape - apple - banana animals: [&amp;#39;wolf&amp;#39;, &amp;#39;fox&amp;#39;, &amp;#39;dolphin&amp;#39;, &amp;#39;eagle&amp;#39;] VS Code で YAML ファイルを開いた状態で、コマンドパレットを開いて (Ctrl/Cmd + Shift + P)、YAML Sort: Sort YAML を選択すると、YAML ファイルの内容がソートされます。
-sample.yml（ソート後） --- root1: animals: [&amp;#39;wolf&amp;#39;, &amp;#39;fox&amp;#39;, &amp;#39;dolphin&amp;#39;, &amp;#39;eagle&amp;#39;] fruits: - grape - apple - banana root2: aaa: 100 bbb: 200 ccc: 300 先頭行に自動でセパレーター (---) が挿入され、すべてのキーがアルファベット順にソートされていることが分かります。 キー間の空白行はすべて削除されています。 一方で、リスト要素は自動ではソートされないようです（順番が意味を持つことがあるので当然ですが）。</description></item><item><title>VS Code で Python 用のフォーマッター (Black) を使う</title><link>https://maku.blog/p/4oybku6/</link><pubDate>Sat, 13 Nov 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4oybku6/</guid><description>何をするか？ Visual Studio Code に Python 拡張 を入れることで、Python コードの編集（自動補完など）ができるようになりますが、コードの自動フォーマットを行うには、フォーマッターを別途インストールしておく必要があります（いろんなフォーマッターがあるため）。
-Python のフォーマッターとしては、autopep8 や yapf などもありますが、ここでは、最近人気がある Black を VS Code の自動フォーマッターとして設定します。 Facebook や Dropbox、Mozilla などでも導入されており、採用実績としては申し分なさそうです。
-☝️ 頑固なフォーマッター Black は自分自身を The uncompromising code formatter と説明しています。 ようするに、「私が定義する設定に従いなさい」という意味で、ユーザーにほとんど設定の余地を残していません（行の長さ程度は設定できます）。 このようにすることで、チーム内でのフォーマット論争を防ぐ効果があります。 TypeScript (JavaScript) でよく使われている Prettier フォーマッターも同様の思想で作られており、ほとんど設定ができないようになっています（こちらは opinionated という単語を使っています）。
-参考: TypeScript コードを Prettier で自動整形する （2023-06 追記）Python 拡張とは別に、Black Formatter 拡張 が単独で提供されています。 この拡張には black コマンドがバンドルされているため、別途外部コマンドとして black をインストール (pip install black) する必要がありません。 VS Code での開発が前提であれば、Black Formatter 拡張を使うのが手っ取り早いです。 ここでは、下記の 2 種類の方法を説明します。
-方法1: Python 拡張 ＋ Black Formatter 拡張を使う方法 方法2: Python 拡張から外部の black コマンドを使う方法 Python 拡張と Black Formatter 拡張は、両方とも Microsoft 公式の拡張なので、将来的には統合されるかもしれません。</description></item><item><title>VS Code の Explorer で特定のファイルやディレクトリを非表示にする (files.exclude)</title><link>https://maku.blog/p/raku5dn/</link><pubDate>Sat, 24 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/raku5dn/</guid><description>VS Code のエクスプローラービューは、サイドバー上にプロジェクト内のファイル一覧を表示してくれる便利な機能ですが、編集対象ではないファイルまで表示されていると地味に邪魔だったりします。 例えば、Node.js アプリの node_modules ディレクトリなどは常に表示されていてもあまり役に立たないかもしれません。
-図: 不要なディレクトリが表示されている このような場合は、設定ファイル (settings.json) の files.exclude プロパティで非表示にしたいファイルやディレクトリのパターンを指定します。
-settings.json { // Explorer で非表示にするもの &amp;#34;files.exclude&amp;#34;: { &amp;#34;**/.next&amp;#34;: true, // Next.js サーバーのキャッシュ &amp;#34;**/node_modules&amp;#34;: true, &amp;#34;out&amp;#34;: true // Next.js の export 先 }, // その他の設定... } 上記のようにパターンに out と指定すると、トップディレクトリの out という名前のファイルおよびディレクトリが非表示になります。 **/node_modules と指定すると、任意の階層の node_modules という名前のファイルおよびディレクトリが非表示になります。 末尾にスラッシュ (/) を付けるのは何も効果がないようです。 グロブパターン（** など）の詳細な指定方法は、Advanced search options のドキュメントが参考になります。
-図: 指定したディレクトリが非表示になった ちなみに、デフォルト設定では次のようなファイルとディレクトリが非表示になります。
-{ // Configure glob patterns for excluding files and folders. // For example, the file Explorer decides which files and folders // to show or hide based on this setting.</description></item><item><title>VS Code のフォーマッターで自動整形する (editor.formatOnSave)</title><link>https://maku.blog/p/qcoz9ju/</link><pubDate>Wed, 14 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qcoz9ju/</guid><description>VS Code には、標準で各種言語用のフォーマッターが搭載されており、JavaScript、TypeScript、JSON、HTML などのコードを自動整形することができます。
-手動でフォーマッターを起動する ファイル全体をフォーマット (editor.action.formatDocument) コマンドパレット1 を使う場合: Format Document を選択 ショートカットキーを使う場合: (Windows) Shift + Alt + F (macOS) Shift + Option + F 選択中の行をフォーマット (editor.action.formatSelection) コマンドパレット1 を使う場合: Format Selection を選択 ショートカットキーを使う場合: (Windows) Ctrl + K → Ctrl + F (macOS) Cmd + K → Cmd + F ファイル保存時などに自動でフォーマットする 下記の設定をしておくと、ファイル保存時や、コードの編集中に自動的にフォーマッターを起動することができます。 設定ファイル (settings.json) の場所に関しては、こちらの記事 を参考にしてください。
-全ての種類のファイルで自動フォーマットする場合 settings.json { // 自動フォーマット設定 &amp;#34;editor.formatOnSave&amp;#34;: true, // 保存時にフォーマット &amp;#34;editor.formatOnType&amp;#34;: true, // 入力中（改行時）にフォーマット &amp;#34;editor.formatOnPaste&amp;#34;: true, // ペースト時にフォーマット // その他.</description></item><item><title>VS Code で行末の空白（半角スペース）を自動で削除する (files.trimTrailingWhitespace)</title><link>https://maku.blog/p/j6jv7it/</link><pubDate>Tue, 28 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j6jv7it/</guid><description>Visual Studio Code で次のように設定しておくと、ファイル保存時に、行末の余計なスペースを自動で削除してくれます。
-settings.json で設定する方法 settings.json { &amp;#34;files.trimTrailingWhitespace&amp;#34;: true, // ... } Markdown ファイル (.md) は、行末の 2 つのスペースが改行の意味を持っていたりします。 そのような場合はスペースが削除されてしまうと都合が悪いので、次のように言語別設定で markdown の場合のみ無効化しておきます。
-{ &amp;#34;files.trimTrailingWhitespace&amp;#34;: true, &amp;#34;[markdown]&amp;#34;: { &amp;#34;files.trimTrailingWhitespace&amp;#34;: false }, // ... } 参考: settings.json について 設定画面で設定する方法 Ctrl + , で設定画面を開く（macOS の場合は Cmd + ,） trim で検索して Trim Trailing Whitespace にチェックを入れる</description></item><item><title>VS Code の Vim プラグインで OS のクリップボードと同期する (vim.useSystemClipboard)</title><link>https://maku.blog/p/tb6s2ck/</link><pubDate>Mon, 16 Mar 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tb6s2ck/</guid><description>Vim エディタ使いにとって、Visual Studio Code の Vim プラグイン はほぼ必須の機能になっています。
-Vim - Visual Studio Marketplace デフォルトでは、y キーによるヤンクバッファ（Vim 用語では unnamed register）のコピーが、OS のクリップボードと同期されません。 次のように Vim プラグインの設定を行っておく、OS のクリップボードと同期してくれるようになります。
-settings.json で設定する方法 settings.json { &amp;#34;vim.useSystemClipboard&amp;#34;: true, // OS のクリップボードと同期 // ... } 参考: settings.json について 設定画面で設定する方法 Cmd + ,（Windows では Ctrl + ,）で設定メニューを開く Vim: Use System Clipboard の項目にチェックを入れる これで、アプリ間をまたいだコピー＆ペーストを行うことができるようになります。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>VS Code の設定メモ on まくろぐ</title><link>https://maku.blog/p/eycnw8h/</link><description>Recent content in VS Code の設定メモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sat, 15 Feb 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/eycnw8h/index.xml" rel="self" type="application/rss+xml"/><item><title>VS Code の設定ファイルの場所 (settings.json)</title><link>https://maku.blog/p/tfq2cnw/</link><pubDate>Sun, 11 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tfq2cnw/</guid><description>&lt;h2 id="ユーザー設定とワークスペース設定">ユーザー設定とワークスペース設定&lt;/h2>
+&lt;p>VS Code の設定画面は &lt;code>Ctrl(Cmd) + ,&lt;/code> で起動できますが、ここで行った設定は、&lt;strong>&lt;code>settings.json&lt;/code>&lt;/strong> というユーザー設定ファイル（あるいはワークスペース設定ファイル）に保存されます。
+このファイルの内容と設定画面の内容は連動しているので、設定はどちらで行ってもいいのですが、慣れてくると &lt;code>setttings.json&lt;/code> を直接編集した方がすばやく設定を行えます。&lt;/p>
+&lt;h3 id="ユーザー設定ファイル">ユーザー設定ファイル&lt;/h3>
+&lt;p>VS Code のユーザー設定ファイル (&lt;code>settings.json&lt;/code>) は、OS ごとに下記のディレクトリに保存され、全ての VS Code インスタンス（ワークスペース）に共通の設定として使用されます。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>OS&lt;/th>
+ &lt;th>ユーザー設定ファイルのパス&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>Windows&lt;/td>
+ &lt;td>&lt;strong>&lt;code>%APPDATA%\Code\User\settings.json&lt;/code>&lt;/strong>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>macOS&lt;/td>
+ &lt;td>&lt;strong>&lt;code>$HOME/Library/Application Support/Code/User/settings.json&lt;/code>&lt;/strong>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>Linux&lt;/td>
+ &lt;td>&lt;strong>&lt;code>$HOME/.config/Code/User/settings.json&lt;/code>&lt;/strong>&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h3 id="ワークスペース設定ファイル">ワークスペース設定ファイル&lt;/h3>
+&lt;p>ワークスペースごとの設定は、プロジェクトのルートディレクトリの &lt;code>.vscode&lt;/code> ディレクトリに保存されます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>&amp;lt;プロジェクトルート&amp;gt;/.vscode/settings.json&lt;/code>&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;p>ワークスペース設定は、前述のユーザー設定よりも優先されます（同じ設定項目の値が上書きされます）。
+&lt;code>.vscode&lt;/code> ディレクトリを Git にコミットしておけば、チーム内で VS Code の設定を共有できます。
+&lt;code>.vscode&lt;/code> ディレクトリには、プロジェクトのタスク設定ファイル (&lt;code>tasks.json&lt;/code>) なども格納されます。&lt;/p>
+&lt;h2 id="設定ファイルのサンプル">設定ファイルのサンプル&lt;/h2>
+&lt;p>&lt;code>settings.json&lt;/code> ファイルの拡張子は &lt;code>.json&lt;/code> ですが、JavaScript 形式のコメントを記述できるようになっています (JSON with Comments)。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">settings.json の例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Place your settings in this file to overwrite the default settings
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;breadcrumbs.enabled&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;editor.fontSize&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">14&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;editor.minimap.enabled&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;editor.renderControlCharacters&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;editor.tabSize&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;files.trimTrailingWhitespace&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;terminal.integrated.tabs.enabled&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;typescript.updateImportsOnFileMove.enabled&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;always&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;vim.useSystemClipboard&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;workbench.startupEditor&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;newUntitledFile&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="settingsjson-を素早く開く">settings.json を素早く開く&lt;/h2>
+&lt;h3 id="コマンドパレットから開く">コマンドパレットから開く&lt;/h3>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="600" height="113" src="../../p/tfq2cnw/img-002_hu11458529284298036739.png" alt="/p/tfq2cnw/img-002.png" />
+&lt;/figure>
+
+&lt;p>コマンドパレット (&lt;code>Ctrl/Cmd + Shift + P&lt;/code>) から、&lt;strong>&lt;code>Open Settings (JSON)&lt;/code>&lt;/strong> という項目を選択することで、&lt;code>settings.json&lt;/code> ファイルを直接開くことができます。
+コマンドパレットに &lt;code>settings json&lt;/code> と入力すると、この項目を素早く見つけられます。
+&lt;code>Open Settings (JSON)&lt;/code> が「ユーザー設定ファイル」で、&lt;code>Open Workspace Settings (JSON)&lt;/code> が「ワークスペース設定ファイル」です。
+もう一つの、&lt;code>Open Default Settings (JSON)&lt;/code> はデフォルトの設定値一覧が記述されたファイルであり、ユーザーが変更するものではありません（後述）。&lt;/p></description></item><item><title>VS Code で Kaggle 用の勉強環境を作る（Jupyter 拡張）</title><link>https://maku.blog/p/ma86izp/</link><pubDate>Mon, 10 Feb 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ma86izp/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>機械学習のコンペティションを開催している &lt;a href="https://www.kaggle.com/">Kaggle&lt;/a> のサイトでは、Web ブラウザから利用可能な Notebook 機能が提供されています。
+これを使うとブラウザ上で直接 Python のコードを書いて実行できるのですが、やっぱり使い慣れた Visual Studio Code 環境上で作業したいと思ったので、VS Code 上に Jupyter Notebook の環境を作っていきます。&lt;/p>
+&lt;p>Python の実行環境についてはインストール済みであることを前提とします。
+Python がまだインストールされていない場合は、&lt;a href="https://maku77.github.io/p/x4z298a/">&lt;code>pyenv&lt;/code> などでインストール&lt;/a> するとよいです。&lt;/p>
+&lt;h2 id="jupyter-拡張のインストール">Jupyter 拡張のインストール&lt;/h2>
+&lt;p>まずは、Microsoft 純正の &lt;strong>Python 拡張&lt;/strong> と &lt;strong>Jupyter 拡張&lt;/strong> をインストールします。
+下記サイトの Install ボタンを押すか、VS Code の拡張機能画面から検索してインストールできます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">Python - Visual Studio Marketplace&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter">Jupyter - Visual Studio Marketplace&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="kaggle-用の仮想環境-venv">Kaggle 用の仮想環境 (venv)&lt;/h2>
+&lt;h3 id="venv-の作成">venv の作成&lt;/h3>
+&lt;p>VS Code 上の Jupyter Notebook で Python コードを実行するには、&lt;code>pip&lt;/code> コマンドで Python カーネル (&lt;strong>&lt;code>ipykernel&lt;/code>&lt;/strong>) をインストールしておく必要があります。
+また、機械学習系の実装では &lt;strong>&lt;code>numpy&lt;/code>&lt;/strong> や &lt;strong>&lt;code>pandas&lt;/code>&lt;/strong> などのライブラリも必要になってきます。
+ここでは、ホームディレクトリに Python の仮想環境ディレクトリ (&lt;strong>&lt;code>~/.venv/kaggle&lt;/code>&lt;/strong>) を作成し、そこに各ライブラリをインストールすることにします。&lt;/p></description></item><item><title>VS Code で Python 用の Linter ＆フォーマッターの Ruff を使う</title><link>https://maku.blog/p/6hnm4hy/</link><pubDate>Thu, 19 Sep 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6hnm4hy/</guid><description>&lt;h2 id="ruff-とは">Ruff とは&lt;/h2>
+&lt;p>&lt;a href="https://docs.astral.sh/ruff/">Ruff&lt;/a> は Python 用の Lint &amp;amp; Format ツールで、Rust で記述されているため非常に高速に動作します。
+&lt;strong>Ruff だけで Lint やフォーマットをまとめてかけることができる&lt;/strong> ため、次のようなツールを個別にインストールする必要がなくなります。&lt;/p>
+&lt;ul>
+&lt;li>Flake8（Linter）&lt;/li>
+&lt;li>Black（フォーマッター）&lt;/li>
+&lt;li>isort（import 文のソート）&lt;/li>
+&lt;/ul>
+&lt;p>これまで、Python コードに Lint や Format をかける場合は、複数のツールを組み合わせて使うのが主流で、効率的な処理が行われているとは言いにくい状況でした。
+例えば、広く使われている Lint ツールに Flake8 がありますが、これは &lt;code>pyflakes&lt;/code> や &lt;code>pycodestyle&lt;/code> の組み合わせであり、内部で何度もファイルの読み込みやパースが行われるため処理に時間がかかっていました。
+Ruff は様々な処理が一度で済むように実装されています。
+同様に広く使われているフォーマットツールとして Black がありますが、よくよく考えると、Black でフォーマット済みのコードを別の Lint ツール (Flake8) でスタイルチェックするのは無駄です。
+Ruff で Lint とフォーマットの処理を一括で行うのは理にかなっています。&lt;/p>
+&lt;p>ちなみに、Ruff の開発元である Astral 社は、Python 用のパッケージマネージャ（プロジェクト管理ツール）である &lt;code>uv&lt;/code> も公開しています。
+こちらも Rust で実装されており、高速かつ使いやすいのでオススメです。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="https://maku77.github.io/p/fjsfjpw/">Python プロジェクト用の爆速パッケージマネージャ uv を導入する - まくまく Python ノート&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="vs-code-に-ruff-拡張をインストールする">VS Code に Ruff 拡張をインストールする&lt;/h2>
+&lt;p>Visual Studio Code で Ruff を使うには、下記の公式拡張をインストールするだけです。
+&lt;code>ruff&lt;/code> コマンドを別途インストールする必要はありません。&lt;/p></description></item><item><title>VS Code で YAML ファイルの構文をチェックする（YAML 拡張）</title><link>https://maku.blog/p/c7sp7ut/</link><pubDate>Wed, 19 Apr 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/c7sp7ut/</guid><description>&lt;h2 id="yaml-拡張とは">YAML 拡張とは？&lt;/h2>
+&lt;p>VS Code の &lt;a href="https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml">YAML 拡張 (redhat.vscode-yaml)&lt;/a> をインストールすると、スキーマ定義に基づいて、YAML ファイルの記述内容が正しいかをチェックすることができます。
+スキーマ定義を &lt;a href="https://json-schema.org/">JSON スキーマファイル&lt;/a> の形で作成し、YAML ファイルの先頭に次のようなコメントを記述することで適用できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">YAML ファイルの先頭に追加&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># yaml-language-server: $schema=./schema.json&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>YAML ファイルの構文チェックなのに JSON スキーマ？と思うかもしれませんが、YAML と JSON のデータ形式には互換性があるので、スキーマは JSON スキーマでよいんですね。&lt;/p>
+&lt;h2 id="スキーマによる-yaml-ファイルの構文チェック">スキーマによる YAML ファイルの構文チェック&lt;/h2>
+&lt;h3 id="公開スキーマファイルを参照する">公開スキーマファイルを参照する&lt;/h3>
+&lt;p>スキーマファイルは、インターネット上に公開されているものを URL で指定できるようになっています。
+有名どころの設定ファイルのスキーマは、下記のサイトに一覧があるので、いろいろなプロジェクトからそのまま利用できます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://www.schemastore.org/json/">JSON Schema Store&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Ansible Playbook など、内容が複雑になりがちな YAML ファイルに設定しておくと役に立ちそうです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">playbook.yml（の先頭に記述する）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># yaml-language-server: $schema=https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>GitHub Actions のワークフローファイル (&lt;code>.github/workflows/*.yml&lt;/code>) などは、そのファイルパスから、どのスキーマを使用すればいいかを推測できるので、上記のようなコメント行すら記述せずに自動的に &lt;a href="https://json.schemastore.org/github-workflow.json">GitHub Actions 用のスキーマ&lt;/a> を適用してくれます。
+つまり、VS Code に YAML 拡張をインストールするだけで、GitHub Actions のワークフローファイルの構文チェックが有効になります。
+便利！&lt;/p>
+&lt;h3 id="独自定義したスキーマファイルを参照する">独自定義したスキーマファイルを参照する&lt;/h3>
+&lt;p>アプリケーション独自の設定ファイルやデータファイルを YAML 形式で作成する場合は、そのスキーマも独自であることが多いので、専用の JSON スキーマファイルを作成することになるでしょう。
+例えば、次の JSON スキーマファイルでは、ユーザー情報を表現するためのスキーマを定義しています（コメントを記述できるようにするために、拡張子を &lt;code>.jsonc&lt;/code> としています）。&lt;/p></description></item><item><title>VS Code で YAML ファイルをソートする（YAML Sort 拡張）</title><link>https://maku.blog/p/2apzood/</link><pubDate>Wed, 19 Apr 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2apzood/</guid><description>&lt;h2 id="yaml-sort-の概要">YAML Sort の概要&lt;/h2>
+&lt;p>VS Code に &lt;a href="https://marketplace.visualstudio.com/items?itemName=PascalReitermann93.vscode-yaml-sort">YAML Sort 拡張&lt;/a> をインストールすると、YAML ファイルの内容をキー名でソートすることができます。
+主にソート用に使うものですが、YAML フォーマッターとしても利用できます。
+次のような簡単なカスタマイズを行うこともできます。&lt;/p>
+&lt;ul>
+&lt;li>指定したキーを優先的に上から並べる&lt;/li>
+&lt;li>1 階層目の各キーの間に空白行を入れる&lt;/li>
+&lt;li>リスト要素をソートする&lt;/li>
+&lt;/ul>
+&lt;h2 id="yaml-sort-の使い方">YAML Sort の使い方&lt;/h2>
+&lt;p>&lt;a href="https://marketplace.visualstudio.com/items?itemName=PascalReitermann93.vscode-yaml-sort">YAML Sort&lt;/a> のページで &lt;code>Install&lt;/code> ボタンを押すだけで、VS Code への拡張のインストールは完了です。
+ここでは、次のような YAML ファイルをソートしてみます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">sample.yml（ソート前）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">root2&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ccc&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">300&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">aaa&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">100&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">bbb&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">200&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">root1&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">fruits&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">grape&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">apple&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">banana&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">animals&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;wolf&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;fox&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;dolphin&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;eagle&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>VS Code で YAML ファイルを開いた状態で、コマンドパレットを開いて (&lt;strong>&lt;code>Ctrl/Cmd + Shift + P&lt;/code>&lt;/strong>)、&lt;strong>&lt;code>YAML Sort: Sort YAML&lt;/code>&lt;/strong> を選択すると、YAML ファイルの内容がソートされます。&lt;/p></description></item><item><title>VS Code で Python 用のフォーマッター (Black) を使う</title><link>https://maku.blog/p/4oybku6/</link><pubDate>Sat, 13 Nov 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4oybku6/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Visual Studio Code に &lt;a href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">Python 拡張&lt;/a> を入れることで、Python コードの編集（自動補完など）ができるようになりますが、コードの自動フォーマットを行うには、フォーマッターを別途インストールしておく必要があります（いろんなフォーマッターがあるため）。&lt;/p>
+&lt;p>Python のフォーマッターとしては、autopep8 や yapf などもありますが、ここでは、最近人気がある &lt;a href="https://black.readthedocs.io/">Black&lt;/a> を VS Code の自動フォーマッターとして設定します。
+Facebook や Dropbox、Mozilla などでも導入されており、採用実績としては申し分なさそうです。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ 頑固なフォーマッター&lt;/span>
+ &lt;span class="xNote_body">&lt;p>Black は自分自身を The &lt;strong>uncompromising&lt;/strong> code formatter と説明しています。
+ようするに、「私が定義する設定に従いなさい」という意味で、ユーザーにほとんど設定の余地を残していません（行の長さ程度は設定できます）。
+このようにすることで、チーム内でのフォーマット論争を防ぐ効果があります。
+TypeScript (JavaScript) でよく使われている Prettier フォーマッターも同様の思想で作られており、ほとんど設定ができないようになっています（こちらは &lt;strong>opinionated&lt;/strong> という単語を使っています）。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/au8iu6u">TypeScript コードを Prettier で自動整形する&lt;/a>&lt;/li>
+&lt;/ul>&lt;/span>
+&lt;/div>
+&lt;p>（2023-06 追記）Python 拡張とは別に、&lt;a href="https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter">Black Formatter 拡張&lt;/a> が単独で提供されています。
+この拡張には &lt;code>black&lt;/code> コマンドがバンドルされているため、別途外部コマンドとして &lt;code>black&lt;/code> をインストール (&lt;code>pip install black&lt;/code>) する必要がありません。
+VS Code での開発が前提であれば、Black Formatter 拡張を使うのが手っ取り早いです。
+ここでは、下記の 2 種類の方法を説明します。&lt;/p>
+&lt;ul>
+&lt;li>方法1: Python 拡張 ＋ Black Formatter 拡張を使う方法&lt;/li>
+&lt;li>方法2: Python 拡張から外部の &lt;code>black&lt;/code> コマンドを使う方法&lt;/li>
+&lt;/ul>
+&lt;p>Python 拡張と Black Formatter 拡張は、両方とも Microsoft 公式の拡張なので、将来的には統合されるかもしれません。&lt;/p></description></item><item><title>VS Code の Explorer で特定のファイルやディレクトリを非表示にする (files.exclude)</title><link>https://maku.blog/p/raku5dn/</link><pubDate>Sat, 24 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/raku5dn/</guid><description>&lt;p>VS Code のエクスプローラービューは、サイドバー上にプロジェクト内のファイル一覧を表示してくれる便利な機能ですが、編集対象ではないファイルまで表示されていると地味に邪魔だったりします。
+例えば、Node.js アプリの &lt;code>node_modules&lt;/code> ディレクトリなどは常に表示されていてもあまり役に立たないかもしれません。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="650" height="168" src="../../p/raku5dn/img-001_hu7902920124065211656.png" alt="/p/raku5dn/img-001.png" />
+ &lt;figcaption>図: 不要なディレクトリが表示されている&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>このような場合は、&lt;a href="../../p/tfq2cnw">設定ファイル (settings.json)&lt;/a> の &lt;strong>&lt;code>files.exclude&lt;/code>&lt;/strong> プロパティで非表示にしたいファイルやディレクトリのパターンを指定します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">settings.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Explorer で非表示にするもの
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s2">&amp;#34;files.exclude&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;**/.next&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// Next.js サーバーのキャッシュ
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s2">&amp;#34;**/node_modules&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;out&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span> &lt;span class="c1">// Next.js の export 先
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// その他の設定...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のようにパターンに &lt;code>out&lt;/code> と指定すると、トップディレクトリの &lt;code>out&lt;/code> という名前のファイルおよびディレクトリが非表示になります。
+&lt;code>**/node_modules&lt;/code> と指定すると、任意の階層の &lt;code>node_modules&lt;/code> という名前のファイルおよびディレクトリが非表示になります。
+末尾にスラッシュ (&lt;code>/&lt;/code>) を付けるのは何も効果がないようです。
+グロブパターン（&lt;code>**&lt;/code> など）の詳細な指定方法は、&lt;a href="https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options">Advanced search options&lt;/a> のドキュメントが参考になります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="650" height="165" src="../../p/raku5dn/img-002_hu6658635797785175006.png" alt="/p/raku5dn/img-002.png" />
+ &lt;figcaption>図: 指定したディレクトリが非表示になった&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>ちなみに、&lt;a href="https://code.visualstudio.com/docs/getstarted/settings#_default-settings">デフォルト設定&lt;/a>では次のようなファイルとディレクトリが非表示になります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Configure glob patterns for excluding files and folders.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// For example, the file Explorer decides which files and folders
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// to show or hide based on this setting.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// Refer to the `search.exclude` setting to define search specific excludes.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s2">&amp;#34;files.exclude&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;**/.git&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;**/.svn&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;**/.hg&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;**/CVS&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;**/.DS_Store&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>VS Code のフォーマッターで自動整形する (editor.formatOnSave)</title><link>https://maku.blog/p/qcoz9ju/</link><pubDate>Wed, 14 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/qcoz9ju/</guid><description>&lt;p>VS Code には、標準で各種言語用のフォーマッターが搭載されており、JavaScript、TypeScript、JSON、HTML などのコードを自動整形することができます。&lt;/p>
+&lt;h2 id="手動でフォーマッターを起動する">手動でフォーマッターを起動する&lt;/h2>
+&lt;h3 id="ファイル全体をフォーマット-editoractionformatdocument">ファイル全体をフォーマット (editor.action.formatDocument)&lt;/h3>
+&lt;ul>
+&lt;li>コマンドパレット&lt;sup id="fnref:1">&lt;a href="#fn:1" class="footnote-ref" role="doc-noteref">1&lt;/a>&lt;/sup> を使う場合: &lt;strong>Format Document&lt;/strong> を選択&lt;/li>
+&lt;li>ショートカットキーを使う場合:
+&lt;ul>
+&lt;li>(Windows) &lt;strong>&lt;code>Shift + Alt + F&lt;/code>&lt;/strong>&lt;/li>
+&lt;li>(macOS) &lt;strong>&lt;code>Shift + Option + F&lt;/code>&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="選択中の行をフォーマット-editoractionformatselection">選択中の行をフォーマット (editor.action.formatSelection)&lt;/h3>
+&lt;ul>
+&lt;li>コマンドパレット&lt;sup id="fnref1:1">&lt;a href="#fn:1" class="footnote-ref" role="doc-noteref">1&lt;/a>&lt;/sup> を使う場合: &lt;strong>Format Selection&lt;/strong> を選択&lt;/li>
+&lt;li>ショートカットキーを使う場合:
+&lt;ul>
+&lt;li>(Windows) &lt;strong>&lt;code>Ctrl + K → Ctrl + F&lt;/code>&lt;/strong>&lt;/li>
+&lt;li>(macOS) &lt;strong>&lt;code>Cmd + K → Cmd + F&lt;/code>&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="ファイル保存時などに自動でフォーマットする">ファイル保存時などに自動でフォーマットする&lt;/h2>
+&lt;p>下記の設定をしておくと、ファイル保存時や、コードの編集中に自動的にフォーマッターを起動することができます。
+設定ファイル (&lt;code>settings.json&lt;/code>) の場所に関しては、&lt;a href="../../p/tfq2cnw">こちらの記事&lt;/a> を参考にしてください。&lt;/p>
+&lt;h3 id="全ての種類のファイルで自動フォーマットする場合">全ての種類のファイルで自動フォーマットする場合&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">settings.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 自動フォーマット設定
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s2">&amp;#34;editor.formatOnSave&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// 保存時にフォーマット
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s2">&amp;#34;editor.formatOnType&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// 入力中（改行時）にフォーマット
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s2">&amp;#34;editor.formatOnPaste&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// ペースト時にフォーマット
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// その他...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>フォーマッターによっては、保存時のフォーマット (&lt;code>editor.formatOnSave&lt;/code>) にしか対応していません。&lt;/p></description></item><item><title>VS Code で行末の空白（半角スペース）を自動で削除する (files.trimTrailingWhitespace)</title><link>https://maku.blog/p/j6jv7it/</link><pubDate>Tue, 28 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j6jv7it/</guid><description>&lt;p>Visual Studio Code で次のように設定しておくと、ファイル保存時に、行末の余計なスペースを自動で削除してくれます。&lt;/p>
+&lt;h2 id="settingsjson-で設定する方法">settings.json で設定する方法&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">settings.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;files.trimTrailingWhitespace&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Markdown ファイル (&lt;code>.md&lt;/code>) は、行末の 2 つのスペースが改行の意味を持っていたりします。
+そのような場合はスペースが削除されてしまうと都合が悪いので、次のように言語別設定で &lt;code>markdown&lt;/code> の場合のみ無効化しておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;files.trimTrailingWhitespace&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="s2">&amp;#34;[markdown]&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="s2">&amp;#34;files.trimTrailingWhitespace&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/tfq2cnw">settings.json について&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="設定画面で設定する方法">設定画面で設定する方法&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="600" height="452" src="../../p/j6jv7it/img-001_hu10625312331549752222.png" alt="/p/j6jv7it/img-001.png" />
+&lt;/figure>
+
+&lt;ol>
+&lt;li>&lt;code>Ctrl + ,&lt;/code> で設定画面を開く（macOS の場合は &lt;code>Cmd + ,&lt;/code>）&lt;/li>
+&lt;li>&lt;code>trim&lt;/code> で検索して &lt;strong>&lt;code>Trim Trailing Whitespace&lt;/code>&lt;/strong> にチェックを入れる&lt;/li>
+&lt;/ol></description></item><item><title>VS Code の Vim プラグインで OS のクリップボードと同期する (vim.useSystemClipboard)</title><link>https://maku.blog/p/tb6s2ck/</link><pubDate>Mon, 16 Mar 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tb6s2ck/</guid><description>&lt;p>Vim エディタ使いにとって、Visual Studio Code の &lt;a href="https://marketplace.visualstudio.com/items?itemName=vscodevim.vim">Vim プラグイン&lt;/a> はほぼ必須の機能になっています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://marketplace.visualstudio.com/items?itemName=vscodevim.vim">Vim - Visual Studio Marketplace&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>デフォルトでは、&lt;code>y&lt;/code> キーによるヤンクバッファ（Vim 用語では unnamed register）のコピーが、OS のクリップボードと同期されません。
+次のように Vim プラグインの設定を行っておく、OS のクリップボードと同期してくれるようになります。&lt;/p>
+&lt;h2 id="settingsjson-で設定する方法">settings.json で設定する方法&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">settings.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;vim.useSystemClipboard&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// OS のクリップボードと同期
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/tfq2cnw">settings.json について&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="設定画面で設定する方法">設定画面で設定する方法&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="700" height="241" src="../../p/tb6s2ck/img-001_hu7725746900286559756.png" alt="/p/tb6s2ck/img-001.png" />
+&lt;/figure>
+
+&lt;ol>
+&lt;li>&lt;strong>&lt;code>Cmd + ,&lt;/code>&lt;/strong>（Windows では &lt;code>Ctrl + ,&lt;/code>）で設定メニューを開く&lt;/li>
+&lt;li>&lt;strong>&lt;code>Vim: Use System Clipboard&lt;/code>&lt;/strong> の項目にチェックを入れる&lt;/li>
+&lt;/ol>
+&lt;p>これで、アプリ間をまたいだコピー＆ペーストを行うことができるようになります。&lt;/p></description></item></channel></rss>

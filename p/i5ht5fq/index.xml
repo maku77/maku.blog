@@ -1,11 +1,178 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Next.js のコンポーネントとレイアウト on まくろぐ</title><link>https://maku.blog/p/i5ht5fq/</link><description>Recent content in Next.js のコンポーネントとレイアウト on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 10 Aug 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/i5ht5fq/index.xml" rel="self" type="application/rss+xml"/><item><title>Next.js で各ページの head 要素をカスタマイズする (next/head)</title><link>https://maku.blog/p/rdr4fq2/</link><pubDate>Tue, 04 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rdr4fq2/</guid><description>Next.js で各ページの head 要素をカスタマイズしたいときは、Next.js の Head コンポーネント を使用して、必要な値のみを設定していきます。 典型的なのは、次のような title 要素の設定です。
-// import Head from &amp;#39;next/head&amp;#39; &amp;lt;Head&amp;gt; &amp;lt;title&amp;gt;Page Title&amp;lt;/title&amp;gt; &amp;lt;/Head&amp;gt; ちなみに、head 要素ではなく、html 要素の属性値などを設定したいときは、pages/_document.tsx ファイルを作成します。</description></item><item><title>Next.js で全ページ共通のレイアウトを定義する（Layout コンポーネント）</title><link>https://maku.blog/p/dxamw8i/</link><pubDate>Tue, 04 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dxamw8i/</guid><description>Next.js で Web サイトに見た目の統一感を持たせるには、Layout コンポーネントを作成して、全てのページのベースレイアウトとして使用するようにします。 Next.js の仕組みというより、React コンポーネントを作成するときの慣例のようなもので、コンポーネントに Layout という名前を付けるのも多くの人がその名前を使っているだけです。
-Layout コンポーネントを定義する Layout コンポーネントを定義するために、次のようなファイルをプロジェクト内に作成します。 {children} の部分には、Layout 要素以下に配置した子要素が展開されることになります。
-components/Layout.tsx import { ReactNode } from &amp;#39;react&amp;#39; type Props = { children: ReactNode; } export function Layout({ children, ...props }: Props) { return &amp;lt;div {...props}&amp;gt;{children}&amp;lt;/div&amp;gt; } この Layout コンポーネントを使用するには、各ページのコンポーネント実装において、ルート要素として配置します。
-pages/about.tsx import Head from &amp;#39;next/head&amp;#39; import Link from &amp;#39;next/link&amp;#39; import { Layout } from &amp;#39;../components/Layout&amp;#39; export default () =&amp;gt; ( &amp;lt;Layout&amp;gt; &amp;lt;Head&amp;gt; &amp;lt;title&amp;gt;About me&amp;lt;/title&amp;gt; &amp;lt;/Head&amp;gt; &amp;lt;h1&amp;gt;About me&amp;lt;/h1&amp;gt; &amp;lt;Link href=&amp;#34;/&amp;#34;&amp;gt; &amp;lt;a&amp;gt;Back to home&amp;lt;/a&amp;gt; &amp;lt;/Link&amp;gt; &amp;lt;/Layout&amp;gt; ) Layout コンポーネントに CSS を適用する styled-jsx で直接スタイルを埋め込む方法 styled-jsx の仕組み を使って、コンポーネントの定義内に直接 CSS を埋め込んでしまう方法です。</description></item><item><title>Next.js アプリでのリンク方法まとめ（mui/Material-UI との連携なども） (next/link, next/router)</title><link>https://maku.blog/p/vgs4dnw/</link><pubDate>Tue, 10 Aug 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vgs4dnw/</guid><description>アプリ内ページへのリンク（基本） // import Link from &amp;#39;next/link&amp;#39; &amp;lt;Link href=&amp;#34;/about&amp;#34;&amp;gt;About us&amp;lt;/Link&amp;gt; Next.js でアプリ内部で閉じるページリンクを張るには、next/link モジュールを使用します。 上記のようにすると、pages/about.tsx ページコンポーネントが生成するページへのリンクになります。
-☝️ a 要素は必要ない Next.js 12 以前は Link 要素の下に明示的に a 要素を配置する必要がありました。 これは、HTML 的に正しく a 要素を配置するためでしたが、Next.js 13 では自動的に a 要素を挿入するようになったので、a 要素の記述は必要ありません。 遷移前の履歴を置き換える replace オプション &amp;lt;Link href=&amp;#34;/about&amp;#34; replace&amp;gt; 上記のように replace オプションを指定すると、ページ遷移前の URL がブラウザの履歴に残りません（戻るキーで戻らなくなります）。
-外部リンク https:// で始まる外部リンクを出力したい場合は、&amp;lt;a&amp;gt; コンポーネントをそのまま使用します。 next/link（や react-router) が提供する Link コンポーネントは、アプリ内のルーティング用なので使えません。 外部リンクを開く場合は、安全性のために一律で rel=&amp;quot;noopener noreferrer&amp;quot; を付けましょう。 リンククリック時に必ず別タブで開きたいときは、target=&amp;quot;_blank&amp;quot; を指定してください。
-&amp;lt;a href=&amp;#34;https://example.com/&amp;#34; target=&amp;#34;_blank&amp;#34; rel=&amp;#34;noopener noreferrer&amp;#34;&amp;gt; Website title &amp;lt;/a&amp;gt; mui (Material-UI) を採用したサイトの場合は、a の代わりに mui が提供する Link コンポーネントを使用することで、サイト内のデザインを統一することができます。 next/link が提供する Link コンポーネントと混同しないように、次のように別名 (MuiLink) を付けて使用すると分かりやすくなります。</description></item><item><title>Next.js の Image コンポーネントで画像を表示する (next/image)</title><link>https://maku.blog/p/fw7gpx7/</link><pubDate>Thu, 06 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fw7gpx7/</guid><description>Image コンポーネントの特徴 Next.js が提供している Image コンポーネント (next/image) を使用すると、image 要素をそのまま配置するのに比べて次のような恩恵を受けられます。
-遅延ロード (Lazy loading) Web ブラウザでその画像がビューポート内（画面内）に入って来たときに初めてダウンロードされるようになります。大きなページの末尾部分に配置された画像が、無駄にダウンロードされてしまうのを防ぐことができます。 画像の最適化 アクセスしてきたクライアントに応じて画像ファイルを最適化して配信します。例えば、圧縮効率のよい WebP フォーマットなどに変換してくれます。リクエスト時にサーバーサイドでオンデマンドで最適化するため、Image コンポーネントを使うことでビルド時間が伸びてしまうことはありません。外部サーバーの画像を間接的に表示する場合も最適化できます。 レスポンシブ 画面サイズに応じたレスポンシブ表示 (CSS) がデフォルトで行われます。 画像最適化に関しては、Next.js サーバー上でホスティングしているときしか動作しないといった制約がありますが、遅延ローディングがデフォルトで有効になるのは便利です。
-Image コンポーネントの基本的な使い方 次のサンプルコンポーネントでは、Image コンポーネントを使って /public/images/avatar.png ファイルを表示しています。
-components/Avatar.tsx import Image from &amp;#39;next/image&amp;#39; export const Avatar: React.FC = () =&amp;gt; ( &amp;lt;Image src=&amp;#34;/images/avatar.png&amp;#34; width={64} height={64} alt=&amp;#34;My avatar&amp;#34; /&amp;gt; ) ☝️ public ディレクトリ public ディレクトリ以下に配置したファイルは、Web サイトへのアクセス時には、ルートパス (/) からの相対パスで参照できるようになります。 public ディレクトリは、必ず Next.js プロジェクトのルートディレクトリに配置する必要があります。 .ts、.tsx ファイルは src ディレクトリ以下にも配置できますが、public ディレクトリは必ずルートに置かなければいけません。 width や height プロパティを明示しておくと、画像のロード前にそのサイズの枠が確保されることになります。 これは、CLS (Cumulative Layout Shift) を発生させないために重要です。 表示サイズがあらかじめ決まっていないと、画像ロード後にレイアウトがガクッとずれたりして UX が低下します。 Google によるサイト評価でも CLS スコアは重要視されています。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Next.js のコンポーネントとレイアウト on まくろぐ</title><link>https://maku.blog/p/i5ht5fq/</link><description>Recent content in Next.js のコンポーネントとレイアウト on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sat, 19 Nov 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/i5ht5fq/index.xml" rel="self" type="application/rss+xml"/><item><title>Next.js で各ページの head 要素をカスタマイズする (next/head)</title><link>https://maku.blog/p/rdr4fq2/</link><pubDate>Tue, 04 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rdr4fq2/</guid><description>&lt;p>Next.js で各ページの &lt;code>head&lt;/code> 要素をカスタマイズしたいときは、Next.js の &lt;a href="https://nextjs.org/docs/api-reference/next/head">Head コンポーネント&lt;/a> を使用して、必要な値のみを設定していきます。
+典型的なのは、次のような &lt;code>title&lt;/code> 要素の設定です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// import Head from &amp;#39;next/head&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Head&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Page&lt;/span> &lt;span class="nx">Title&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Head&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ちなみに、&lt;code>head&lt;/code> 要素ではなく、&lt;code>html&lt;/code> 要素の属性値などを設定したいときは、&lt;code>pages/_document.tsx&lt;/code> ファイルを作成します。&lt;/p></description></item><item><title>Next.js で全ページ共通のレイアウトを定義する（Layout コンポーネント）</title><link>https://maku.blog/p/dxamw8i/</link><pubDate>Tue, 04 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dxamw8i/</guid><description>&lt;p>Next.js で Web サイトに見た目の統一感を持たせるには、&lt;code>Layout&lt;/code> コンポーネントを作成して、全てのページのベースレイアウトとして使用するようにします。
+Next.js の仕組みというより、React コンポーネントを作成するときの慣例のようなもので、コンポーネントに &lt;code>Layout&lt;/code> という名前を付けるのも多くの人がその名前を使っているだけです。&lt;/p>
+&lt;h2 id="layout-コンポーネントを定義する">Layout コンポーネントを定義する&lt;/h2>
+&lt;p>&lt;code>Layout&lt;/code> コンポーネントを定義するために、次のようなファイルをプロジェクト内に作成します。
+&lt;strong>&lt;code>{children}&lt;/code>&lt;/strong> の部分には、&lt;code>Layout&lt;/code> 要素以下に配置した子要素が展開されることになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/Layout.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">ReactNode&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">Props&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">children&lt;/span>: &lt;span class="kt">ReactNode&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">Layout&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">children&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">...&lt;/span>&lt;span class="nx">props&lt;/span> &lt;span class="p">}&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">Props&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="na">...props&lt;/span>&lt;span class="p">}&amp;gt;{&lt;/span>&lt;span class="nx">children&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この &lt;code>Layout&lt;/code> コンポーネントを使用するには、各ページのコンポーネント実装において、ルート要素として配置します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">pages/about.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">Head&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next/head&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">Link&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next/link&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">Layout&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;../components/Layout&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Layout&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Head&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">About&lt;/span> &lt;span class="nx">me&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Head&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">About&lt;/span> &lt;span class="nx">me&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Link&lt;/span> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">a&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Back&lt;/span> &lt;span class="nx">to&lt;/span> &lt;span class="nx">home&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">a&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Link&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Layout&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="layout-コンポーネントに-css-を適用する">Layout コンポーネントに CSS を適用する&lt;/h2>
+&lt;h3 id="styled-jsx-で直接スタイルを埋め込む方法">styled-jsx で直接スタイルを埋め込む方法&lt;/h3>
+&lt;p>&lt;a href="../../p/pbp2dpy">styled-jsx の仕組み&lt;/a> を使って、コンポーネントの定義内に直接 CSS を埋め込んでしまう方法です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/Layout.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">ReactNode&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">Props&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">children&lt;/span>: &lt;span class="kt">ReactNode&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">Layout&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">children&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">...&lt;/span>&lt;span class="nx">props&lt;/span> &lt;span class="p">}&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">Props&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">style&lt;/span> &lt;span class="na">jsx&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="sb">`
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> .container {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> max-width: 36rem;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> padding: 0 1rem;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> margin: 3rem auto 6rem;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> background: #eee;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> `&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">className&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;container&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="na">...props&lt;/span>&lt;span class="p">}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nx">children&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="css-modules-の仕組みで別ファイルにスタイル定義する方法">CSS Modules の仕組みで別ファイルにスタイル定義する方法&lt;/h3>
+&lt;p>&lt;a href="../../p/seq2cmw">CSS Modules の仕組み&lt;/a> で、&lt;code>Layout&lt;/code> コンポーネント用の CSS ファイルを作成してインポートする方法です。&lt;/p></description></item><item><title>Next.js アプリでのリンク方法まとめ（mui/Material-UI との連携なども） (next/link, next/router)</title><link>https://maku.blog/p/vgs4dnw/</link><pubDate>Tue, 10 Aug 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vgs4dnw/</guid><description>&lt;h2 id="アプリ内ページへのリンク基本">アプリ内ページへのリンク（基本）&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// import Link from &amp;#39;next/link&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Link&lt;/span> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/about&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">About&lt;/span> &lt;span class="nx">us&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Link&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Next.js でアプリ内部で閉じるページリンクを張るには、&lt;a href="https://nextjs.org/docs/api-reference/next/link">next/link&lt;/a> モジュールを使用します。
+上記のようにすると、&lt;code>pages/about.tsx&lt;/code> ページコンポーネントが生成するページへのリンクになります。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ a 要素は必要ない&lt;/span>
+ &lt;span class="xNote_body">Next.js 12 以前は &lt;code>Link&lt;/code> 要素の下に明示的に &lt;code>a&lt;/code> 要素を配置する必要がありました。
+これは、HTML 的に正しく &lt;code>a&lt;/code> 要素を配置するためでしたが、Next.js 13 では自動的に &lt;code>a&lt;/code> 要素を挿入するようになったので、&lt;code>a&lt;/code> 要素の記述は必要ありません。&lt;/span>
+&lt;/div>
+&lt;h3 id="遷移前の履歴を置き換える-replace-オプション">遷移前の履歴を置き換える replace オプション&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Link&lt;/span> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/about&amp;#34;&lt;/span> &lt;span class="na">replace&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のように &lt;strong>&lt;code>replace&lt;/code>&lt;/strong> オプションを指定すると、ページ遷移前の URL がブラウザの履歴に残りません（戻るキーで戻らなくなります）。&lt;/p>
+&lt;h2 id="外部リンク">外部リンク&lt;/h2>
+&lt;p>&lt;code>https://&lt;/code> で始まる外部リンクを出力したい場合は、&lt;code>&amp;lt;a&amp;gt;&lt;/code> コンポーネントをそのまま使用します。
+&lt;code>next/link&lt;/code>（や &lt;code>react-router&lt;/code>) が提供する &lt;code>Link&lt;/code> コンポーネントは、アプリ内のルーティング用なので使えません。
+外部リンクを開く場合は、安全性のために一律で &lt;code>rel=&amp;quot;noopener noreferrer&amp;quot;&lt;/code> を付けましょう。
+リンククリック時に必ず別タブで開きたいときは、&lt;code>target=&amp;quot;_blank&amp;quot;&lt;/code> を指定してください。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">a&lt;/span> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;https://example.com/&amp;#34;&lt;/span> &lt;span class="na">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;_blank&amp;#34;&lt;/span> &lt;span class="na">rel&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;noopener noreferrer&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Website&lt;/span> &lt;span class="nx">title&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">a&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>mui (Material-UI) を採用したサイトの場合は、&lt;code>a&lt;/code> の代わりに mui が提供する &lt;code>Link&lt;/code> コンポーネントを使用することで、サイト内のデザインを統一することができます。
+&lt;code>next/link&lt;/code> が提供する &lt;code>Link&lt;/code> コンポーネントと混同しないように、次のように別名 (&lt;code>MuiLink&lt;/code>) を付けて使用すると分かりやすくなります。&lt;/p></description></item><item><title>Next.js の Image コンポーネントで画像を表示する (next/image)</title><link>https://maku.blog/p/fw7gpx7/</link><pubDate>Thu, 06 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fw7gpx7/</guid><description>&lt;h2 id="image-コンポーネントの特徴">Image コンポーネントの特徴&lt;/h2>
+&lt;p>Next.js が提供している &lt;a href="https://nextjs.org/docs/api-reference/next/image">Image コンポーネント (&lt;code>next/image&lt;/code>)&lt;/a> を使用すると、&lt;code>image&lt;/code> 要素をそのまま配置するのに比べて次のような恩恵を受けられます。&lt;/p>
+&lt;ul>
+&lt;li>遅延ロード (Lazy loading)
+&lt;ul>
+&lt;li>Web ブラウザでその画像がビューポート内（画面内）に入って来たときに初めてダウンロードされるようになります。大きなページの末尾部分に配置された画像が、無駄にダウンロードされてしまうのを防ぐことができます。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>画像の最適化
+&lt;ul>
+&lt;li>アクセスしてきたクライアントに応じて画像ファイルを最適化して配信します。例えば、圧縮効率のよい WebP フォーマットなどに変換してくれます。リクエスト時にサーバーサイドでオンデマンドで最適化するため、&lt;code>Image&lt;/code> コンポーネントを使うことでビルド時間が伸びてしまうことはありません。外部サーバーの画像を間接的に表示する場合も最適化できます。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>レスポンシブ
+&lt;ul>
+&lt;li>画面サイズに応じたレスポンシブ表示 (CSS) がデフォルトで行われます。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>画像最適化に関しては、Next.js サーバー上でホスティングしているときしか動作しないといった制約がありますが、遅延ローディングがデフォルトで有効になるのは便利です。&lt;/p>
+&lt;h2 id="image-コンポーネントの基本的な使い方">Image コンポーネントの基本的な使い方&lt;/h2>
+&lt;p>次のサンプルコンポーネントでは、&lt;code>Image&lt;/code> コンポーネントを使って &lt;strong>&lt;code>/public/images/avatar.png&lt;/code>&lt;/strong> ファイルを表示しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/Avatar.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">Image&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next/image&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">Avatar&lt;/span>: &lt;span class="kt">React.FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Image&lt;/span> &lt;span class="na">src&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/images/avatar.png&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="mi">64&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="mi">64&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="na">alt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;My avatar&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ public ディレクトリ&lt;/span>
+ &lt;span class="xNote_body">&lt;code>public&lt;/code> ディレクトリ以下に配置したファイルは、Web サイトへのアクセス時には、ルートパス (&lt;code>/&lt;/code>) からの相対パスで参照できるようになります。
+&lt;code>public&lt;/code> ディレクトリは、必ず Next.js プロジェクトのルートディレクトリに配置する必要があります。
+&lt;code>.ts&lt;/code>、&lt;code>.tsx&lt;/code> ファイルは &lt;code>src&lt;/code> ディレクトリ以下にも配置できますが、&lt;code>public&lt;/code> ディレクトリは必ずルートに置かなければいけません。&lt;/span>
+&lt;/div>
+&lt;p>&lt;code>width&lt;/code> や &lt;code>height&lt;/code> プロパティを明示しておくと、画像のロード前にそのサイズの枠が確保されることになります。
+これは、&lt;a href="https://web.dev/cls/">CLS (Cumulative Layout Shift)&lt;/a> を発生させないために重要です。
+表示サイズがあらかじめ決まっていないと、画像ロード後にレイアウトがガクッとずれたりして UX が低下します。
+Google によるサイト評価でも CLS スコアは重要視されています。&lt;/p>
+&lt;h2 id="image-コンポーネントによる画像の拡大縮小">Image コンポーネントによる画像の拡大・縮小&lt;/h2>
+&lt;h3 id="指定したサイズに拡大縮小-width-height">指定したサイズに拡大・縮小 (width, height)&lt;/h3>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="300" height="150" src="../../p/fw7gpx7/img-001_hu1780983531491017964.png" alt="/p/fw7gpx7/img-001.png" />
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Image&lt;/span> &lt;span class="na">src&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/images/sample.png&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="mi">300&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="mi">150&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>一番基本的な使い方です。
+&lt;code>Image&lt;/code> コンポーネント内に表示される画像は、デフォルトで &lt;code>Image&lt;/code> コンポーネント自体のサイズ、つまり、&lt;code>width&lt;/code>、&lt;code>height&lt;/code> プロパティで指定したサイズに拡大・縮小されて表示されます。
+画像ファイルのアスペクト比を考慮して指定しないと、上の例のように変形して表示されてしまうので注意してください。&lt;/p></description></item></channel></rss>

@@ -1,15 +1,141 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ansible 応用 on まくろぐ</title><link>https://maku.blog/p/5j4jygw/</link><description>Recent content in Ansible 応用 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 29 Aug 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/5j4jygw/index.xml" rel="self" type="application/rss+xml"/><item><title>Ansible で facts 情報を表示する</title><link>https://maku.blog/p/zw7emu3/</link><pubDate>Mon, 29 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/zw7emu3/</guid><description>Ansible の Playbook を実行すると、最初にリモートホストの情報 (Ansible facts) の収集が行われます。 ここには、OS の情報や IP アドレスの情報などが含まれており、タスクの中でこれらの情報を参照することができます。 実際に Ansible facts にどのような情報が含まれているかは、次のような Playbook で確認することができます。
-show-facts.yml - hosts: all gather_facts: true tasks: - name: Show facts ansible.builtin.debug: var: ansible_facts 実行結果（抜粋） TASK [Show facts] ********************************* ok: [example.com] =&amp;gt; { &amp;#34;ansible_facts&amp;#34;: { &amp;#34;all_ipv4_addresses&amp;#34;: [ &amp;#34;172.xxx.xx.xx&amp;#34;, &amp;#34;160.xxx.xx.xx&amp;#34; ], &amp;#34;all_ipv6_addresses&amp;#34;: [ &amp;#34;xxxx:xxxx:xxxx:xxx:xxx:xxx:xx:xx&amp;#34;, &amp;#34;xxxx::x:xxxx:xxxx:xxxx&amp;#34; ], ... ansible_facts 変数の値がからっぽになってしまう場合は、gather_facts: false と指定していないか確認してください。
-ansible_facts オブジェクトの個々のプロパティを参照するには次のようにします。
-- name: Show architecture ansible.builtin.debug: msg: &amp;#34;Architecture: {{ ansible_architecture }}&amp;#34;</description></item><item><title>Ansible タスク例: Docker と Docker Compose をインストールする</title><link>https://maku.blog/p/8k4j2gw/</link><pubDate>Sun, 28 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8k4j2gw/</guid><description>何をするか？ 下記の Docker のインストールマニュアルに従い、Ansible で Ubuntu 22.04 に Docker の実行環境をセットアップします。
-Install Docker Engine on Ubuntu | Docker Documentation Playbook の例 次の YAML ファイルは、Docker の公式サイトのインストール手順をほぼそのまま Playbook 化したものです。 この Playbook を ansible-playbook で実行することで、Docker (+ Docker Compose) のインストール、および Docker デーモンの起動まで完了します。
-install-docker.yml - hosts: all gather_facts: false become: true tasks: - name: Install APT packages to use a repository over HTTPS ansible.builtin.apt: pkg: - ca-certificates - curl - gnupg - lsb-release update_cache: yes cache_valid_time: 86400 # cache for 1 day - name: Create APT&amp;#39;s keyrings directory ansible.</description></item><item><title>Docker コンテナで Ansible のテストベッド環境を用意する</title><link>https://maku.blog/p/csctaq7/</link><pubDate>Mon, 18 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/csctaq7/</guid><description>何をするか ansible-playbook を使って何らかの Linux 環境のセットアップを自動化するとき、Playbook のテスト用に使い捨ての Docker コンテナ（テストベッド環境）があると便利です。
-Ansible には、Playbook 実行後の冪等性を保つという性質がありますが、一度 Playbook を実行してしまうと元の状態に戻すことはできません。 一方通行の冪等性はあっても、可逆性はないということですね。 Playbook を試行錯誤して作っている段階では、何度も ansible-playbook を実行することになるので、本当にその Playbook がまっさらな状態の OS に対して適用できるのか不安になってきます（冪等性があるので理論的には動作するはずですが）。 異なるディストリビューションに対して実行できるのか試したくなることもあります。
-ここでは、Ansible のテストベッド環境として Docker コンテナを作成し、各種 Ansible コマンド (ansible / ansible-playbook) で制御してみます。
-テストベッド用のコンテナを起動する Ansible は一般的にはマネージドノードに SSH 接続して Playbook を実行しますが、実は Docker コンテナに直接接続することもできます。 つまり、テストベッド用の Docker コンテナには、sshd (OpenSSH) などのサービスをわざわざインストールする必要はありません。
-ただし、Ansible マネージドノードの要件として、Python3 だけはインストールしておく必要があります。 次の Dockerfile では、Ubuntu を親イメージとして、Python3 だけ追加しています。
-Dockerfile FROM ubuntu:22.04 # Python3 のインストール RUN apt update &amp;amp;&amp;amp; apt install --no-install-recommends -y python3 Dockerfile をビルドして、testbed イメージを作成します。</description></item><item><title>Docker で Ansible の実行環境用のコンテナを作成する</title><link>https://maku.blog/p/euevcs8/</link><pubDate>Sat, 02 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/euevcs8/</guid><description>何をするか？ Ansible の実行環境は Python がインストールされている環境であれば比較的簡単にインストールできますが、Docker の実行環境があれば、ホスト環境に何もインストールせずに Ansible の実行環境を手に入れることができます（もちろんコンテナは作る必要はありますが）。
-Docker Hub を見ると、Alpine Linux ベースの Ansible 実行環境用イメージ alpine/ansible があるようですが、ここでは Dockerfile を使って自分でイメージを作成することにします。
-Ansible 実行環境用イメージを作成する Dockerfile で Alpine Linux ベースの Ansible 実行環境を定義します。
-Dockerfile FROM alpine:3 WORKDIR /app # --no-cache を付けることで /var/cache/apk 以下にキャッシュが残るのを防ぐ # --update-cache を付けることで先に apk update するのと同じ効果になる RUN apk --no-cache --update-cache add ansible openssh sshpass APK (Alpine Package Keeper) で次のようなパッケージをインストールしています。
-ansible &amp;hellip; Ansible Community パッケージ（ansible コマンドや ansible-playbook コマンドなど） openssh &amp;hellip; ssh コマンドのため sshpass &amp;hellip; ターゲットホストにパスワード認証 (--ask-pass) で接続するときのため Ansible Community パッケージ (ansible) ではなく、Ansible Core (ansible-core) を使うようにすれば、イメージサイズは 500MB 弱から 80MB 程度に削減できますが、サイズを気にしなくてよいなら Ansible Community パッケージを使っておいた方が楽です。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ansible 応用 on まくろぐ</title><link>https://maku.blog/p/5j4jygw/</link><description>Recent content in Ansible 応用 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 29 Aug 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/5j4jygw/index.xml" rel="self" type="application/rss+xml"/><item><title>Ansible で facts 情報を表示する</title><link>https://maku.blog/p/zw7emu3/</link><pubDate>Mon, 29 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/zw7emu3/</guid><description>&lt;p>Ansible の Playbook を実行すると、最初にリモートホストの情報 (&lt;a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_vars_facts.html#vars-and-facts">Ansible facts&lt;/a>) の収集が行われます。
+ここには、OS の情報や IP アドレスの情報などが含まれており、タスクの中でこれらの情報を参照することができます。
+実際に Ansible facts にどのような情報が含まれているかは、次のような Playbook で確認することができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">show-facts.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">- &lt;span class="nt">hosts&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">all&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">gather_facts&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">tasks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Show facts&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible.builtin.debug&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">var&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ansible_facts&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行結果（抜粋）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">TASK [Show facts] *********************************
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ok: [example.com] =&amp;gt; {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;ansible_facts&amp;#34;: {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;all_ipv4_addresses&amp;#34;: [
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;172.xxx.xx.xx&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;160.xxx.xx.xx&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ],
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;all_ipv6_addresses&amp;#34;: [
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;xxxx:xxxx:xxxx:xxx:xxx:xxx:xx:xx&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;xxxx::x:xxxx:xxxx:xxxx&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ],
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ...&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>ansible_facts&lt;/code> 変数の値がからっぽになってしまう場合は、&lt;code>gather_facts: false&lt;/code> と指定していないか確認してください。&lt;/p>
+&lt;p>&lt;code>ansible_facts&lt;/code> オブジェクトの個々のプロパティを参照するには次のようにします。&lt;/p></description></item><item><title>Ansible タスク例: Docker と Docker Compose をインストールする</title><link>https://maku.blog/p/8k4j2gw/</link><pubDate>Sun, 28 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8k4j2gw/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>下記の Docker のインストールマニュアルに従い、Ansible で Ubuntu 22.04 に Docker の実行環境をセットアップします。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.docker.com/engine/install/ubuntu/">Install Docker Engine on Ubuntu | Docker Documentation&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="playbook-の例">Playbook の例&lt;/h2>
+&lt;p>次の YAML ファイルは、Docker の公式サイトのインストール手順をほぼそのまま Playbook 化したものです。
+この Playbook を &lt;code>ansible-playbook&lt;/code> で実行することで、Docker (+ Docker Compose) のインストール、および Docker デーモンの起動まで完了します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">install-docker.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">- &lt;span class="nt">hosts&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">all&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">gather_facts&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">become&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">tasks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Install APT packages to use a repository over HTTPS&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible.builtin.apt&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">pkg&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">ca-certificates&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">curl&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">gnupg&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">lsb-release&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">update_cache&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">yes&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">cache_valid_time&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">86400&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># cache for 1 day&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Create APT&amp;#39;s keyrings directory&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible.builtin.file&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">path&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/etc/apt/keyrings&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">state&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">directory&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Add Docker&amp;#39;s official GPG key&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible.builtin.shell&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">cmd&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">creates&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/etc/apt/keyrings/docker.gpg&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Setup the repository&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible.builtin.shell&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">cmd&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> echo &amp;#34;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> | sudo tee /etc/apt/sources.list.d/docker.list &amp;gt; /dev/null&lt;/span>&lt;span class="w"> 
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">creates&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/etc/apt/sources.list.d/docker.list&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Install Docker&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible.builtin.apt&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">pkg&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">docker-ce&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">docker-ce-cli&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">containerd.io&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">docker-compose-plugin&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">update_cache&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">yes&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Start Docker&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible.builtin.service&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">docker&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">state&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">started&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>本質的にやりたいことは、最後の方のステップの &lt;code>Install Docker&lt;/code> と &lt;code>Start Docker&lt;/code> だけなのですが、その前に APT 用の GPG キーの取得などを行うので若干長くなっています。&lt;/p></description></item><item><title>Docker コンテナで Ansible のテストベッド環境を用意する</title><link>https://maku.blog/p/csctaq7/</link><pubDate>Mon, 18 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/csctaq7/</guid><description>&lt;h2 id="何をするか">何をするか&lt;/h2>
+&lt;p>&lt;code>ansible-playbook&lt;/code> を使って何らかの Linux 環境のセットアップを自動化するとき、Playbook のテスト用に使い捨ての Docker コンテナ（テストベッド環境）があると便利です。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/csctaq7/img-001.drawio.svg" alt="/p/csctaq7/img-001.drawio.svg" />
+&lt;/figure>
+
+&lt;p>Ansible には、Playbook 実行後の冪等性を保つという性質がありますが、一度 Playbook を実行してしまうと元の状態に戻すことはできません。
+一方通行の冪等性はあっても、可逆性はないということですね。
+Playbook を試行錯誤して作っている段階では、何度も &lt;code>ansible-playbook&lt;/code> を実行することになるので、本当にその Playbook がまっさらな状態の OS に対して適用できるのか不安になってきます（冪等性があるので理論的には動作するはずですが）。
+異なるディストリビューションに対して実行できるのか試したくなることもあります。&lt;/p>
+&lt;p>ここでは、Ansible のテストベッド環境として Docker コンテナを作成し、各種 Ansible コマンド (&lt;code>ansible&lt;/code> / &lt;code>ansible-playbook&lt;/code>) で制御してみます。&lt;/p>
+&lt;h2 id="テストベッド用のコンテナを起動する">テストベッド用のコンテナを起動する&lt;/h2>
+&lt;p>Ansible は一般的にはマネージドノードに SSH 接続して Playbook を実行しますが、実は Docker コンテナに直接接続することもできます。
+つまり、テストベッド用の Docker コンテナには、sshd (OpenSSH) などのサービスをわざわざインストールする必要はありません。&lt;/p>
+&lt;p>ただし、Ansible マネージドノードの要件として、Python3 だけはインストールしておく必要があります。
+次の &lt;code>Dockerfile&lt;/code> では、Ubuntu を親イメージとして、Python3 だけ追加しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Dockerfile&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-docker" data-lang="docker">&lt;span class="line">&lt;span class="cl">&lt;span class="k">FROM&lt;/span>&lt;span class="s"> ubuntu:22.04&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># Python3 のインストール&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">RUN&lt;/span> apt update &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> apt install --no-install-recommends -y python3&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>Dockerfile&lt;/code> をビルドして、&lt;code>testbed&lt;/code> イメージを作成します。&lt;/p></description></item><item><title>Docker で Ansible の実行環境用のコンテナを作成する</title><link>https://maku.blog/p/euevcs8/</link><pubDate>Sat, 02 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/euevcs8/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Ansible の実行環境は Python がインストールされている環境であれば比較的簡単にインストールできますが、Docker の実行環境があれば、ホスト環境に何もインストールせずに Ansible の実行環境を手に入れることができます（もちろんコンテナは作る必要はありますが）。&lt;/p>
+&lt;p>Docker Hub を見ると、Alpine Linux ベースの Ansible 実行環境用イメージ &lt;a href="https://hub.docker.com/r/alpine/ansible">alpine/ansible&lt;/a> があるようですが、ここでは &lt;code>Dockerfile&lt;/code> を使って自分でイメージを作成することにします。&lt;/p>
+&lt;h2 id="ansible-実行環境用イメージを作成する">Ansible 実行環境用イメージを作成する&lt;/h2>
+&lt;p>&lt;code>Dockerfile&lt;/code> で Alpine Linux ベースの Ansible 実行環境を定義します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Dockerfile&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-docker" data-lang="docker">&lt;span class="line">&lt;span class="cl">&lt;span class="k">FROM&lt;/span>&lt;span class="s"> alpine:3&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">WORKDIR&lt;/span>&lt;span class="s"> /app&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># --no-cache を付けることで /var/cache/apk 以下にキャッシュが残るのを防ぐ&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># --update-cache を付けることで先に apk update するのと同じ効果になる&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">RUN&lt;/span> apk --no-cache --update-cache add ansible openssh sshpass&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>APK (Alpine Package Keeper) で次のようなパッケージをインストールしています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>ansible&lt;/code> &amp;hellip; Ansible Community パッケージ（&lt;code>ansible&lt;/code> コマンドや &lt;code>ansible-playbook&lt;/code> コマンドなど）&lt;/li>
+&lt;li>&lt;code>openssh&lt;/code> &amp;hellip; &lt;code>ssh&lt;/code> コマンドのため&lt;/li>
+&lt;li>&lt;code>sshpass&lt;/code> &amp;hellip; ターゲットホストにパスワード認証 (&lt;code>--ask-pass&lt;/code>) で接続するときのため&lt;/li>
+&lt;/ul>
+&lt;p>Ansible Community パッケージ (&lt;code>ansible&lt;/code>) ではなく、Ansible Core (&lt;code>ansible-core&lt;/code>) を使うようにすれば、イメージサイズは 500MB 弱から 80MB 程度に削減できますが、サイズを気にしなくてよいなら Ansible Community パッケージを使っておいた方が楽です。&lt;/p></description></item></channel></rss>

@@ -1,9 +1,95 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Docker 関連メモ on まくろぐ</title><link>https://maku.blog/p/dj28oy5/</link><description>Recent content in Docker 関連メモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sun, 02 Oct 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/dj28oy5/index.xml" rel="self" type="application/rss+xml"/><item><title>Go アプリを実行する軽量な Docker コンテナイメージを作成する</title><link>https://maku.blog/p/wbtbr8o/</link><pubDate>Sun, 02 Oct 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wbtbr8o/</guid><description>何をするか？ Go 言語 (Golang) で簡単な Web サーバーを作成して、それを動かす軽量な Docker コンテナイメージを作成します。 Dockerfile には マルチステージのビルド構成 を適用し、Go 言語アプリのビルドと、実行イメージのビルドのステージを分けます。 実行用のコンテナイメージとしては、Alpine Linux ベースと、scratch ベースの 2 種類のイメージを作成してみます。
-Golang は軽量なシングルバイナリを生成するのに適した言語で、Docker イメージの生成にも向いています。 Node.js などでイメージを作ろうとすると、Hello World でも 100MB 超えになってしまいますが、Golang を使えば、その 1/10 程度のサイズのイメージを生成できます。 軽量のイメージを作れるようになると、頻繁なビルドとデプロイを気兼ねなく行えるようになります。
-Golang アプリを準備する Golang で作るアプリは何でもよいのですが、ここでは Golang 標準の net/http パッケージを使って、Hello World というレスポンスを返すだけの簡単な Web サーバーアプリを用意します。
-まずは、お馴染みの go.mod の作成から。
-$ mkdir hello &amp;amp;&amp;amp; cd hello $ go mod init hello あとは、次のような main.go ファイルを作成すれば完成です。
-main.go package main import ( &amp;#34;log&amp;#34; &amp;#34;net/http&amp;#34; ) func main() { http.</description></item><item><title>TypeScript を使った Node.js アプリを Docker コンテナ化する</title><link>https://maku.blog/p/ehxgwt4/</link><pubDate>Fri, 29 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ehxgwt4/</guid><description>何をするか？ TypeScript + Node.js で作成したサーバーアプリを、Docker コンテナ化する話です。 サーバーアプリは Express で簡単な Hello レスポンスを返すようなものを用意します。 Docker イメージビルド用の Dockerfile ファイルは、マルチステージビルドの構成にして、最終的な実行イメージができるだけ小さくなるようにします（それでも Node.js アプリだと、どうしても 100MB 超えになってしまいますが）。 NPM パッケージの管理には yarn を使わず、シンプルに npm だけでいきます。
-Node.js アプリの用意 Node.js アプリは何でもよいのですが、ここでは Express で簡単な Web サーバーを作ることにします。
-TypeScript プロジェクトのセットアップ $ npm init --yes # package.json を生成 $ npm install express $ npm install --save-dev typescript @types/express @types/node $ npx tsc --init # tsconfig.json を生成 package.json に、TypeScript のビルドと、サーバー起動のための NPM スクリプトを追加しておきます。
-package.json（抜粋） &amp;#34;scripts&amp;#34;: { &amp;#34;build&amp;#34;: &amp;#34;tsc&amp;#34;, &amp;#34;start&amp;#34;: &amp;#34;node out/index.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Docker 関連メモ on まくろぐ</title><link>https://maku.blog/p/dj28oy5/</link><description>Recent content in Docker 関連メモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 02 Oct 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/dj28oy5/index.xml" rel="self" type="application/rss+xml"/><item><title>Go アプリを実行する軽量な Docker コンテナイメージを作成する</title><link>https://maku.blog/p/wbtbr8o/</link><pubDate>Sun, 02 Oct 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wbtbr8o/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Go 言語 (Golang) で簡単な Web サーバーを作成して、それを動かす軽量な Docker コンテナイメージを作成します。
+&lt;code>Dockerfile&lt;/code> には &lt;strong>マルチステージのビルド構成&lt;/strong> を適用し、Go 言語アプリのビルドと、実行イメージのビルドのステージを分けます。
+実行用のコンテナイメージとしては、&lt;strong>Alpine Linux&lt;/strong> ベースと、&lt;strong>scratch&lt;/strong> ベースの 2 種類のイメージを作成してみます。&lt;/p>
+&lt;p>Golang は軽量なシングルバイナリを生成するのに適した言語で、Docker イメージの生成にも向いています。
+Node.js などでイメージを作ろうとすると、Hello World でも 100MB 超えになってしまいますが、Golang を使えば、その 1/10 程度のサイズのイメージを生成できます。
+軽量のイメージを作れるようになると、頻繁なビルドとデプロイを気兼ねなく行えるようになります。&lt;/p>
+&lt;h2 id="golang-アプリを準備する">Golang アプリを準備する&lt;/h2>
+&lt;p>Golang で作るアプリは何でもよいのですが、ここでは Golang 標準の &lt;code>net/http&lt;/code> パッケージを使って、&lt;code>Hello World&lt;/code> というレスポンスを返すだけの簡単な Web サーバーアプリを用意します。&lt;/p>
+&lt;p>まずは、お馴染みの &lt;code>go.mod&lt;/code> の作成から。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mkdir hello &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nb">cd&lt;/span> hello
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> go mod init hello
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>あとは、次のような &lt;code>main.go&lt;/code> ファイルを作成すれば完成です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">main.go&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;log&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;net/http&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">http&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">HandleFunc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;/&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">w&lt;/span> &lt;span class="nx">http&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ResponseWriter&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">_&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">http&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Request&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">w&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Write&lt;/span>&lt;span class="p">([]&lt;/span>&lt;span class="nb">byte&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Hello World&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Fatal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">http&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">ListenAndServe&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;:8080&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;strong>&lt;code>go run .&lt;/code>&lt;/strong> でサーバーを起動して、Web ブラウザーなどで &lt;code>http://localhost:8080&lt;/code> にアクセスすれば、&lt;code>Hello World&lt;/code> というレスポンスが返ってくることを確認できます。&lt;/p></description></item><item><title>TypeScript を使った Node.js アプリを Docker コンテナ化する</title><link>https://maku.blog/p/ehxgwt4/</link><pubDate>Fri, 29 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ehxgwt4/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>TypeScript + Node.js で作成したサーバーアプリを、Docker コンテナ化する話です。
+サーバーアプリは &lt;a href="https://expressjs.com/">Express&lt;/a> で簡単な Hello レスポンスを返すようなものを用意します。
+Docker イメージビルド用の &lt;code>Dockerfile&lt;/code> ファイルは、マルチステージビルドの構成にして、最終的な実行イメージができるだけ小さくなるようにします（それでも Node.js アプリだと、どうしても 100MB 超えになってしまいますが）。
+NPM パッケージの管理には &lt;code>yarn&lt;/code> を使わず、シンプルに &lt;code>npm&lt;/code> だけでいきます。&lt;/p>
+&lt;h2 id="nodejs-アプリの用意">Node.js アプリの用意&lt;/h2>
+&lt;p>Node.js アプリは何でもよいのですが、ここでは Express で簡単な Web サーバーを作ることにします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">TypeScript プロジェクトのセットアップ&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm init --yes &lt;span class="c1"># package.json を生成&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install express
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install --save-dev typescript @types/express @types/node
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npx tsc --init &lt;span class="c1"># tsconfig.json を生成&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>package.json&lt;/code> に、TypeScript のビルドと、サーバー起動のための NPM スクリプトを追加しておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">package.json（抜粋）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;scripts&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;tsc&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;start&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;node out/index.js&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-249175638" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-249175638">package.json（全体）&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;myapp&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;1.0.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;author&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;maku&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;private&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;license&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;UNLICENSED&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;scripts&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;tsc&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;start&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;node out/index.js&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;devDependencies&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;@types/express&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^4.17.13&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;@types/node&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^18.6.2&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;typescript&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^4.7.4&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;dependencies&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;express&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^4.18.1&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+&lt;p>&lt;code>tsconfig.json&lt;/code> の内容は次のような感じで、&lt;strong>&lt;code>src&lt;/code>&lt;/strong> ディレクトリ以下の &lt;code>*.ts&lt;/code> ファイルをトランスパイルして &lt;strong>&lt;code>out&lt;/code>&lt;/strong> ディレクトリに出力するようにしておきます。
+これは、ビルド前の &lt;code>.ts&lt;/code> ファイルと、ビルド後の &lt;code>.js&lt;/code> ファイルが混ざらないようにするためです。&lt;/p></description></item></channel></rss>

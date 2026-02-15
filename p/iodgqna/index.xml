@@ -1,34 +1,395 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux ネットワーク関連メモ on まくろぐ</title><link>https://maku.blog/p/iodgqna/</link><description>Recent content in Linux ネットワーク関連メモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 28 Nov 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/iodgqna/index.xml" rel="self" type="application/rss+xml"/><item><title>Linuxコマンド: curl コマンドのチートシート</title><link>https://maku.blog/p/2sv4bqw/</link><pubDate>Tue, 28 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2sv4bqw/</guid><description>コマンド 説明 curl --help all 詳細なヘルプを表示 curl https://example.com GET リクエスト curl -i https://example.com レスポンスヘッダーも表示 curl -I https://example.com レスポンスヘッダーだけ表示 curl -v https://example.com 冗長表示（リクエストとレスポンスのヘッダーを確認可能） curl -H &amp;quot;Authorization: Bearer TOKEN&amp;quot; https://example.com リクエストヘッダーの指定 curl -b &amp;quot;cookie1=value1; cookie2=value2&amp;quot; http://example.com クッキーの指定 curl -A &amp;quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64)&amp;quot; http://example.com ユーザーエージェントの指定 curl -L http://example.com リダイレクト (302) レスポンスを自動処理 curl -O https://example.com/file.txt ファイルのダウンロード（同名で保存） curl -o hoge.txt https://example.com/file.txt ファイルのダウンロード（別名で保存） curl -# -O http://example.com/largefile.zip ダウンロードの進捗を表示 curl -r 0-100 http://example.com/file.txt -o partial.</description></item><item><title>Linuxコマンド: ポートを開いているプロセスを調べる (lsof)</title><link>https://maku.blog/p/i7zokcv/</link><pubDate>Sat, 19 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/i7zokcv/</guid><description>迷ったらとりあえずコレ 次のように実行すると、TCP でポートを開いて LISTEN 状態になっているプロセスのコマンド名や PID の一覧を表示できます。
-開いている TCP ポートの一覧を表示 $ lsof -i tcp -s tcp:listen -P COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME ControlCe 604 maku 24u IPv4 0xbf4647db74c55935 0t0 TCP *:7000 (LISTEN) ControlCe 604 maku 25u IPv6 0x27a96e6374c5592c 0t0 TCP *:7000 (LISTEN) ControlCe 604 maku 26u IPv4 0xbf46527374c55935 0t0 TCP *:5000 (LISTEN) ControlCe 604 maku 27u IPv6 0x27a9756374c5592c 0t0 TCP *:5000 (LISTEN) deno 8572 maku 14u IPv4 0xbc6a127374c55935 0t0 TCP *:8000 (LISTEN) hugo 10971 maku 6u IPv4 0xbcba127374c55935 0t0 TCP localhost:50001 (LISTEN) hugo 10975 maku 6u IPv4 0xbd35a81374c55935 0t0 TCP localhost:50002 (LISTEN) ruby 52070 maku 9u IPv4 0xbf461d7b74c55935 0t0 TCP localhost:4000 (LISTEN) ruby 52070 maku 12u IPv4 0xbd38681374c55935 0t0 TCP localhost:35729 (LISTEN) node 65924 maku 38u IPv6 0x27a9356374c5592c 0t0 TCP localhost:5173 (LISTEN) Dropbox 68519 maku 114u IPv4 0xbc67e81374c55935 0t0 TCP *:17500 (LISTEN) Dropbox 68519 maku 115u IPv6 0x27a8836374c5592c 0t0 TCP *:17500 (LISTEN) サーバー系の開発をしていると、開いているポートがどんどん増えていくので、次のような ports エイリアスを定義しておくと便利です。</description></item><item><title>Linuxコマンド: TCP/TDP ポートの通信状態を確認する (ss)</title><link>https://maku.blog/p/sg2m6wm/</link><pubDate>Tue, 05 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/sg2m6wm/</guid><description>関連コマンド: ip コマンド
-ss コマンドとは Linux の ss コマンド (socket statistics) は、TCP ポートや UDP ポートの通信状態を確認するためのコマンドで、過去に使われていた net-tools パッケージの netstat コマンドの後継です。 Cent OS 7 ではデフォルトで ss コマンドが採用されています。
-APT の iproute2 パッケージをインストールすると、ss コマンドを使用できるようになります。
-ss コマンドのインストール $ apt update # パッケージリストの更新 $ apt install -y iproute2 iptable2 パッケージをインストールすると、一緒に ip コマンド などもインストールされます。
-ss サブコマンド コマンド 説明 対応する旧コマンド ss -nat TCP ポートの通信状態を確認 netstat -nat ss -nlt LISTEN（待ち受け）状態の TCP ポートを確認 netstat -nlt ss -nau UDP ポートの通信状態を確認UDP ソケットの State カラムは UNCONN と表示される netstat -nau</description></item><item><title>Linuxコマンド: ip コマンドの使い方</title><link>https://maku.blog/p/p7q7n4i/</link><pubDate>Thu, 16 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p7q7n4i/</guid><description>関連コマンド: ss コマンド
-ip コマンドとは Linux の ip コマンドを使うと、ネットワークデバイスやルーティングテーブル、ARP テーブルなどの確認・設定を行うことができます。 過去に net-tools パッケージで提供されていた、ifconfig、route、arp、netstat コマンドは deprecated（非推奨）扱いになっています。
-ip コマンドをインストールする ip コマンドは APT の iproute2 パッケージに含まれています。 Docker の Ubuntu コンテナなどで ip コマンドが見つからない場合は、次のようにインストールできます。
-$ apt update # パッケージリストの更新 $ apt install -y iproute2 iproute2 パッケージには、ip コマンド以外にもいろいろなコマンドが含まれています（参考: iproute2 に含まれるファイルのリスト ─ Debian / archlinux）。
-iproute2 のインストールで使えるようになるコマンド arpd - userspace arp daemon
-bridge - show / manipulate bridge addresses and devices
-devlink - Devlink tool
-ip - show / manipulate routing, devices, policy routing and tunnels</description></item><item><title>Linuxメモ: Bluetooth 関連コマンドのメモ (hciconfig, bluetoothctl)</title><link>https://maku.blog/p/ter3doz/</link><pubDate>Sun, 20 Feb 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ter3doz/</guid><description>Bluetooth デバイスの情報を表示する (hciconfig) hciconfig は、Bluetooth デバイスの情報表示や設定を行うためのコマンドです。 HCI プロトコルで Bluetooth コントローラーと通信します。 hciconfig コマンドが見つからない場合は、bluez パッケージをインストールします。
-Ubuntu への bluez パッケージのインストール $ apt update &amp;amp;&amp;amp; apt install -y bluez Bluetooth のデバイス名には hci0 や hci1 といった名前が付けられ、hciconfig コマンドでそれらの一覧を表示することができます。 次の実行例は、Raspberry Pi 4 に USB Bluetooth ドングルを接続した状態で hciconfig コマンドを実行したときの結果です（アドレスは一部伏せてます）。
-$ hciconfig hci1: Type: Primary Bus: USB BD Address: 00:E0:4C:XX:XX:XX ACL MTU: 1021:6 SCO MTU: 255:12 UP RUNNING RX bytes:2186 acl:0 sco:0 events:105 errors:0 TX bytes:12322 acl:0 sco:0 commands:105 errors:0 hci0: Type: Primary Bus: UART BD Address: DC:A6:32:XX:XX:XX ACL MTU: 1021:8 SCO MTU: 64:1 UP RUNNING RX bytes:1514 acl:0 sco:0 events:90 errors:0 TX bytes:2061 acl:0 sco:0 commands:90 errors:0 USB ドングルの Bluetooth デバイスが hci1 (Bus: USB)、Raspberry Pi 4 組み込みの Bluetooth デバイスが hci0 (Bus: UART) として認識されているのが分かります。 hciconfig コマンドに -a (--all) オプションをつけて実行すると、詳細情報を表示できます。</description></item><item><title>Linuxメモ: Netplan で Ubuntu のネットワーク設定を行う</title><link>https://maku.blog/p/7q3dnx8/</link><pubDate>Thu, 20 Jan 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7q3dnx8/</guid><description>Netplan とは Netplan は Linux のネットワーク設定を簡潔な YAML ファイルで行う仕組みで、Ubuntu 18.04 以降（正確には 17 以降）で採用されています。 昔の Ubuntu/Debian で使用されていた /etc/network/interfaces という設定ファイルはもう使われていません。
-実際のネットワーク管理は、バックエンドで動作する NetworkManager や systemd-networkd といったネットワークデーモンが行うのですが、Netplan は YAML 設定ファイルの内容を適切な形に変換して、これらのネットワークデーモンに渡してくれます。 つまり、バックエンドでどのようなネットワークデーモンが動いているかを意識せずに、統一されたわかりやすい YAML ファイルでネットワーク設定を行うことができます。
-Netplan は次のように振る舞います。
-システム起動時に Netplan が設定ファイル (/etc/netplan/*.yaml) を読み込んで、各ネットワークデーモン用の設定値を /run 以下へ書き出す 各ネットワークデーモンが渡された情報に基づいてネットワーク設定を行う 図: netplan.io のサイトより バックエンドのネットワークデーモンとして何を使うかは、設定ファイルの renderer 部分で指定できるようになっていますが、デフォルトでは次のように動作します。
-Wifi や 無線 WAN/LTE の設定 &amp;hellip; NetworkManager に渡される それ以外のネットワーク（有線LANなど）の設定 &amp;hellip; networkd に渡される よって、通常はどのネットワークデーモンを使うかを明示する必要はありません。
-設定ファイルの読み込まれる順序 Netplan はすべての /etc/netplan/*.yaml ファイルを読み込みます。 複数のファイルが存在する場合は、ファイル名のアルファベット順に読み込まれ、後に読み込まれたファイルの設定値が優先的に使用されます。 例えば、
-/etc/netplan/50-cloud-init.yaml /etc/netplan/99-custom.yaml というファイルがある場合、50-cloud-init.yaml で設定された値は 99-custom.yaml の設定値によって上書きされます。</description></item><item><title>Raspberry Pi に Ubuntu 20.04 を入れて WiFi 接続できるようにする</title><link>https://maku.blog/p/n9kv7gq/</link><pubDate>Thu, 20 Jan 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n9kv7gq/</guid><description>ひょんなことから、Ubuntu Server の入った Raspberry Pi 4 が必要になったので、セットアップ手順をメモしておきます。 なんか昔より簡単にインストールできるようになっててビックリしました。
-何をするか？ ここでは、Raspberry Pi 4 Model B に Ubuntu 20.04 をインストールして、Wi-Fi 経由の SSH ログインができるところまでセットアップします。 なお、有線 LAN では一度も接続せずに Wi-Fi 接続できるようにします。 ただし、初期設定のために HDMI でのディスプレイ出力は必要になります。
-準備するもの Raspberry Pi 4 （たぶん別のバージョンでもOK） SD カードに OS をインストールするための PC HDMI ケーブルとディスプレイと USB キーボード SD カードに OS をインストール 公式の Raspberry Pi Imager というソフトウェアを使うと、ものすごく簡単に SD カードに各種 OS をインストールできます。 Raspberry Pi Imager を起動したら、次のようにポチポチやっていくだけでインストール完了です。
-Operating System の項目で、Other general purpose OS → Ubuntu → Ubuntu Server 20.</description></item><item><title>Linuxコマンド: curl コマンドの使用例（GET/POST リクエスト、ファイルのダウンロード）</title><link>https://maku.blog/p/phdp2do/</link><pubDate>Fri, 03 Apr 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/phdp2do/</guid><description>curl コマンドは URL を指定してサーバー上のリソースにアクセスするためのコマンドで、Web API のテストや、ファイルのダウンロードに使用できます。 昔は curl コマンドは Linux 用のコマンドという認識でしたが、Windows 10 には標準搭載されるようになりました。 curl は様々なプロトコルで通信できますが、主に HTTP/HTTPS が使用されます。
-参考: curl コマンドのチートシート curl コマンドでファイルをダウンロードする curl コマンドはデフォルトではダウンロードしたファイルを標準出力に出力します。 -o（小文字のオー）オプションや、-O（大文字のオー）オプションを指定することで、ファイルに保存する ことができます。 同時に -L オプションを指定しておくと、リダイレクトレスポンスを自動処理してくれます。
-ダウンロード元と同名で保存 (-O) sample.zip という名前で保存 $ curl -L -O http://example.com/sample.zip 別名で保存 (-o) # カレントディレクトリに foo.zip という名前で保存 $ curl -L -o foo.zip http://example.com/sample.zip # 保存先を絶対パスで指定することも可能 $ curl -L -o /tmp/foo.zip http://example.com/sample.zip curl コマンドで GET/POST リクエストを送信する REST API などのテストに curl コマンドを利用できます。
-GET リクエスト 特にオプションを指定しなければ、HTTP の GET リクエストが送信されます。</description></item><item><title>Linuxコマンド: rsync コマンドで2つのディレクトリを同期する</title><link>https://maku.blog/p/c3s7wyx/</link><pubDate>Sun, 01 Dec 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/c3s7wyx/</guid><description>（Windows の場合は、WinSCP をコマンドラインで利用すると同じようなことを実現できます）。
-rsync でディレクトリごとコピーする rsync コマンドを使って、src ディレクトリの内容を dst ディレクトリにコピーするには下記のように実行します。
-例: src ディレクトリを dst ディレクトリにコピー $ rsync -av src/ dst # src ディレクトリの「中身」を dst ディレクトリ内へコピー $ rsync -av src dst # src ディレクトリを dst ディレクトリ内へコピー -a オプションは、パーミッションやタイムスタンプなどの情報を維持しつつ、ディレクトリを再帰的にコピーする指定をまとめて行うための archive オプションです。 -v オプションは転送情報などを出力する verbose オプションです。
-上記例のように、ソースディレクトリの 最後にスラッシュをつけるかつけないかで意味が変わってくる ので注意してください。 2番目のように実行すると、結果として ./dst/src というディレクトリが作成されることになります。
-コピー元にないファイルを削除する (--delete) rsync コマンドはデフォルトでは、コピー先ディレクトリのファイルを削除することはありません。 コピー元 (src) に存在しないファイルを、コピー先 (dst) から削除したいときは、明示的に --delete オプションを付けて実行します。 つまり、2つのディレクトリを同じ内容にしたい（同期したい）のであれば、--delete オプションを付けて実行する必要があります。
-例: src の内容を dst に同期させる（src に存在しないファイルは dst から削除する） $ rsync -av --delete src/ dst 指定した拡張子のファイルだけコピーする (--include) 特定の種類のファイル（png ファイルなど）だけをコピーしたいときは、--include オプションと --exclude を組み合わせて以下のような感じで指定します。</description></item><item><title>Linuxコマンド: scp コマンドでファイルやディレクトリを転送する</title><link>https://maku.blog/p/buvv4fz/</link><pubDate>Sat, 09 Nov 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/buvv4fz/</guid><description>ここでは、scp を使ったファイル転送の方法を示していますが、ディレクトリ単位のファイルコピーやバックアップを行いたい場合は、rsync コマンドを使用したほうが効率的です。
-ファイル送信 $ scp &amp;lt;localFile&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteFile&amp;gt; ファイル受信 $ scp &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteFile&amp;gt; &amp;lt;localFile&amp;gt; 例: リモートのホームディレクトリ内のファイルを取得 $ scp maku@maku.example.com:hello.txt hello.txt remoteFile の指定は、ホームディレクトリからの相対パスで OK です。
-ディレクトリ送信 $ scp -r &amp;lt;localDir&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteDir&amp;gt; ディレクトリ受信 $ scp -r &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteDir&amp;gt; &amp;lt;localDir&amp;gt; 例: ホームディレクトリの sample ディレクトリを丸ごとダウンロード $ scp -r maku@maku.example.com:sample .</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux ネットワーク関連メモ on まくろぐ</title><link>https://maku.blog/p/iodgqna/</link><description>Recent content in Linux ネットワーク関連メモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Tue, 28 Nov 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/iodgqna/index.xml" rel="self" type="application/rss+xml"/><item><title>Linuxコマンド: curl コマンドのチートシート</title><link>https://maku.blog/p/2sv4bqw/</link><pubDate>Tue, 28 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2sv4bqw/</guid><description>&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>コマンド&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>curl --help all&lt;/code>&lt;/td>
+ &lt;td>詳細なヘルプを表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl https://example.com&lt;/code>&lt;/td>
+ &lt;td>GET リクエスト&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -i https://example.com&lt;/code>&lt;/td>
+ &lt;td>レスポンスヘッダーも表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -I https://example.com&lt;/code>&lt;/td>
+ &lt;td>レスポンスヘッダーだけ表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -v https://example.com&lt;/code>&lt;/td>
+ &lt;td>冗長表示（リクエストとレスポンスのヘッダーを確認可能）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -H &amp;quot;Authorization: Bearer TOKEN&amp;quot; https://example.com&lt;/code>&lt;/td>
+ &lt;td>リクエストヘッダーの指定&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -b &amp;quot;cookie1=value1; cookie2=value2&amp;quot; http://example.com&lt;/code>&lt;/td>
+ &lt;td>クッキーの指定&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -A &amp;quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64)&amp;quot; http://example.com&lt;/code>&lt;/td>
+ &lt;td>ユーザーエージェントの指定&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -L http://example.com&lt;/code>&lt;/td>
+ &lt;td>リダイレクト (302) レスポンスを自動処理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -O https://example.com/file.txt&lt;/code>&lt;/td>
+ &lt;td>ファイルのダウンロード（同名で保存）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -o hoge.txt https://example.com/file.txt&lt;/code>&lt;/td>
+ &lt;td>ファイルのダウンロード（別名で保存）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -# -O http://example.com/largefile.zip&lt;/code>&lt;/td>
+ &lt;td>ダウンロードの進捗を表示&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -r 0-100 http://example.com/file.txt -o partial.txt&lt;/code>&lt;/td>
+ &lt;td>ファイルの一部だけダウンロード&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -u user:pass --basic http://example.com&lt;/code>&lt;/td>
+ &lt;td>BASIC 認証（&lt;code>--basic&lt;/code> は省略可）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -u user:pass --digest http://example.com&lt;/code>&lt;/td>
+ &lt;td>Digest 認証&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -k https://example.com&lt;/code>&lt;/td>
+ &lt;td>サーバー証明書の検証を無視&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl --interface eth0 http://example.com&lt;/code>&lt;/td>
+ &lt;td>使用するネットワークインタフェースを指定&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl --connect-timeout 0.15 http://example.com&lt;/code>&lt;/td>
+ &lt;td>タイムアウトの指定（秒単位）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -X POST http://example.com&lt;/code>&lt;/td>
+ &lt;td>POST リクエスト（データ送信しないときはメソッドの明示が必要）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -d &amp;quot;param1=value1&amp;amp;param2=value2&amp;quot; http://example.com&lt;/code>&lt;/td>
+ &lt;td>POST でデータ送信&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl --data-urlencode &amp;quot;...&amp;quot; http://example.com&lt;/code>&lt;/td>
+ &lt;td>POST でデータ送信（URL エンコード有り）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -H &amp;quot;Content-Type: application/json&amp;quot; -d '{&amp;quot;key&amp;quot;:&amp;quot;value&amp;quot;}' https://example.com&lt;/code>&lt;/td>
+ &lt;td>POST でデータ送信（JSON 形式）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -X POST -F &amp;quot;file=@/path/to/file.txt&amp;quot; http://example.com/upload&lt;/code>&lt;/td>
+ &lt;td>POST でファイルのアップロード&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -X DELETE http://example.com/resource&lt;/code>&lt;/td>
+ &lt;td>DELETE リクエスト&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -4 https://example.com&lt;/code>&lt;/td>
+ &lt;td>IPv4 の使用を強制&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -6 https://example.com&lt;/code>&lt;/td>
+ &lt;td>IPv6 の使用を強制&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -x {proxy}:{port} https://example.com&lt;/code>&lt;/td>
+ &lt;td>プロキシ経由でのアクセス&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -X CUSTOMMETHOD http://example.com&lt;/code>&lt;/td>
+ &lt;td>独自の HTTP メソッドを指定&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -u user:pass -O ftp://example.com/file.txt&lt;/code>&lt;/td>
+ &lt;td>FTP サーバーからファイルをダウンロード&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -u user:pass ftp://example.com/dir&lt;/code>&lt;/td>
+ &lt;td>FTP サーバーのディレクトリ内のファイル一覧&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>curl -T file.txt -u user:pass --ftp-create-dirs -ssl ftp://example.com&lt;/code>&lt;/td>
+ &lt;td>FTP サーバーへのアップロード&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;ul>
+&lt;li>テスト用のサーバーとして &lt;code>https://httpbin.org&lt;/code> を使うと便利です。どのようなリクエストが送信されたかを、JSON レスポンスとして返してくれます。
+&lt;ul>
+&lt;li>GET メソッド用アドレス: &lt;code>https://httpbin.org/get&lt;/code>&lt;/li>
+&lt;li>POST メソッド用アドレス: &lt;code>https://httpbin.org/post&lt;/code>&lt;/li>
+&lt;li>DELETE メソッド用アドレス: &lt;code>https://httpbin.org/delete&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Windows のコマンドプロンプトではシングルクォートがうまく扱えないので、入れ子になったダブルクォートをエスケープする必要があります。
+&lt;ul>
+&lt;li>Linux の場合: &lt;code>-d '{&amp;quot;key&amp;quot;:&amp;quot;value&amp;quot;}'&lt;/code>&lt;/li>
+&lt;li>Windows の場合: &lt;code>-d &amp;quot;{\&amp;quot;key\&amp;quot;:\&amp;quot;value\&amp;quot;}&amp;quot;&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item><item><title>Linuxコマンド: ポートを開いているプロセスを調べる (lsof)</title><link>https://maku.blog/p/i7zokcv/</link><pubDate>Sat, 19 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/i7zokcv/</guid><description>&lt;h2 id="迷ったらとりあえずコレ">迷ったらとりあえずコレ&lt;/h2>
+&lt;p>次のように実行すると、TCP でポートを開いて LISTEN 状態になっているプロセスのコマンド名や PID の一覧を表示できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">開いている TCP ポートの一覧を表示&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> lsof -i tcp -s tcp:listen -P
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ControlCe 604 maku 24u IPv4 0xbf4647db74c55935 0t0 TCP *:7000 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ControlCe 604 maku 25u IPv6 0x27a96e6374c5592c 0t0 TCP *:7000 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ControlCe 604 maku 26u IPv4 0xbf46527374c55935 0t0 TCP *:5000 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ControlCe 604 maku 27u IPv6 0x27a9756374c5592c 0t0 TCP *:5000 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">deno 8572 maku 14u IPv4 0xbc6a127374c55935 0t0 TCP *:8000 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">hugo 10971 maku 6u IPv4 0xbcba127374c55935 0t0 TCP localhost:50001 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">hugo 10975 maku 6u IPv4 0xbd35a81374c55935 0t0 TCP localhost:50002 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ruby 52070 maku 9u IPv4 0xbf461d7b74c55935 0t0 TCP localhost:4000 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ruby 52070 maku 12u IPv4 0xbd38681374c55935 0t0 TCP localhost:35729 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">node 65924 maku 38u IPv6 0x27a9356374c5592c 0t0 TCP localhost:5173 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">Dropbox 68519 maku 114u IPv4 0xbc67e81374c55935 0t0 TCP *:17500 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">Dropbox 68519 maku 115u IPv6 0x27a8836374c5592c 0t0 TCP *:17500 (LISTEN)
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>サーバー系の開発をしていると、開いているポートがどんどん増えていくので、次のような &lt;strong>&lt;code>ports&lt;/code>&lt;/strong> エイリアスを定義しておくと便利です。&lt;/p></description></item><item><title>Linuxコマンド: TCP/TDP ポートの通信状態を確認する (ss)</title><link>https://maku.blog/p/sg2m6wm/</link><pubDate>Tue, 05 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/sg2m6wm/</guid><description>&lt;p>関連コマンド: &lt;a href="../../p/p7q7n4i/">ip コマンド&lt;/a>&lt;/p>
+&lt;h2 id="ss-コマンドとは">ss コマンドとは&lt;/h2>
+&lt;p>Linux の &lt;strong>&lt;code>ss&lt;/code>&lt;/strong> コマンド (socket statistics) は、TCP ポートや UDP ポートの通信状態を確認するためのコマンドで、過去に使われていた &lt;code>net-tools&lt;/code> パッケージの &lt;code>netstat&lt;/code> コマンドの後継です。
+Cent OS 7 ではデフォルトで &lt;code>ss&lt;/code> コマンドが採用されています。&lt;/p>
+&lt;p>APT の &lt;code>iproute2&lt;/code> パッケージをインストールすると、&lt;code>ss&lt;/code> コマンドを使用できるようになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ss コマンドのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> apt update &lt;span class="c1"># パッケージリストの更新&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> apt install -y iproute2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>iptable2&lt;/code> パッケージをインストールすると、一緒に &lt;a href="../../p/p7q7n4i/">ip コマンド&lt;/a> などもインストールされます。&lt;/p>
+&lt;h2 id="ss-サブコマンド">ss サブコマンド&lt;/h2>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>コマンド&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;th>対応する旧コマンド&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>ss -nat&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>TCP ポートの通信状態を確認&lt;/td>
+ &lt;td>&lt;code>netstat -nat&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>ss -nlt&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>LISTEN（待ち受け）状態の TCP ポートを確認&lt;/td>
+ &lt;td>&lt;code>netstat -nlt&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>ss -nau&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>UDP ポートの通信状態を確認&lt;br/>UDP ソケットの &lt;code>State&lt;/code> カラムは &lt;code>UNCONN&lt;/code> と表示される&lt;/td>
+ &lt;td>&lt;code>netstat -nau&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table></description></item><item><title>Linuxコマンド: ip コマンドの使い方</title><link>https://maku.blog/p/p7q7n4i/</link><pubDate>Thu, 16 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p7q7n4i/</guid><description>&lt;p>関連コマンド: &lt;a href="../../p/sg2m6wm/">ss コマンド&lt;/a>&lt;/p>
+&lt;h2 id="ip-コマンドとは">ip コマンドとは&lt;/h2>
+&lt;p>Linux の &lt;strong>&lt;code>ip&lt;/code>&lt;/strong> コマンドを使うと、ネットワークデバイスやルーティングテーブル、ARP テーブルなどの確認・設定を行うことができます。
+過去に &lt;code>net-tools&lt;/code> パッケージで提供されていた、&lt;code>ifconfig&lt;/code>、&lt;code>route&lt;/code>、&lt;code>arp&lt;/code>、&lt;code>netstat&lt;/code> コマンドは deprecated（非推奨）扱いになっています。&lt;/p>
+&lt;h2 id="ip-コマンドをインストールする">ip コマンドをインストールする&lt;/h2>
+&lt;p>&lt;strong>&lt;code>ip&lt;/code>&lt;/strong> コマンドは APT の &lt;strong>&lt;code>iproute2&lt;/code>&lt;/strong> パッケージに含まれています。
+Docker の Ubuntu コンテナなどで &lt;code>ip&lt;/code> コマンドが見つからない場合は、次のようにインストールできます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> apt update &lt;span class="c1"># パッケージリストの更新&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> apt install -y iproute2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>iproute2 パッケージには、&lt;code>ip&lt;/code> コマンド以外にもいろいろなコマンドが含まれています（参考: iproute2 に含まれるファイルのリスト ─ &lt;a href="https://packages.debian.org/sid/amd64/iproute2/filelist">Debian&lt;/a> / &lt;a href="https://archlinux.org/packages/core/x86_64/iproute2/files/">archlinux&lt;/a>）。&lt;/p>
+&lt;div class="xAccordion">
+ &lt;input id="id-879615234" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-879615234">iproute2 のインストールで使えるようになるコマンド&lt;/label>
+ &lt;div class="xAccordion_body">
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>arpd&lt;/code> - userspace arp daemon&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>bridge&lt;/code> - show / manipulate bridge addresses and devices&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>devlink&lt;/code> - Devlink tool&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>&lt;code>ip&lt;/code>&lt;/strong> - show / manipulate routing, devices, policy routing and tunnels&lt;/p></description></item><item><title>Linuxメモ: Bluetooth 関連コマンドのメモ (hciconfig, bluetoothctl)</title><link>https://maku.blog/p/ter3doz/</link><pubDate>Sun, 20 Feb 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ter3doz/</guid><description>&lt;h2 id="bluetooth-デバイスの情報を表示する-hciconfig">Bluetooth デバイスの情報を表示する (hciconfig)&lt;/h2>
+&lt;p>&lt;strong>&lt;code>hciconfig&lt;/code>&lt;/strong> は、Bluetooth デバイスの情報表示や設定を行うためのコマンドです。
+HCI プロトコルで Bluetooth コントローラーと通信します。
+&lt;code>hciconfig&lt;/code> コマンドが見つからない場合は、&lt;strong>&lt;code>bluez&lt;/code>&lt;/strong> パッケージをインストールします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Ubuntu への bluez パッケージのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> apt update &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> apt install -y bluez
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Bluetooth のデバイス名には &lt;code>hci0&lt;/code> や &lt;code>hci1&lt;/code> といった名前が付けられ、&lt;code>hciconfig&lt;/code> コマンドでそれらの一覧を表示することができます。
+次の実行例は、Raspberry Pi 4 に USB Bluetooth ドングルを接続した状態で &lt;code>hciconfig&lt;/code> コマンドを実行したときの結果です（アドレスは一部伏せてます）。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> hciconfig
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">hci1: Type: Primary Bus: USB
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> BD Address: 00:E0:4C:XX:XX:XX ACL MTU: 1021:6 SCO MTU: 255:12
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> UP RUNNING
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> RX bytes:2186 acl:0 sco:0 events:105 errors:0
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> TX bytes:12322 acl:0 sco:0 commands:105 errors:0
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">hci0: Type: Primary Bus: UART
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> BD Address: DC:A6:32:XX:XX:XX ACL MTU: 1021:8 SCO MTU: 64:1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> UP RUNNING
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> RX bytes:1514 acl:0 sco:0 events:90 errors:0
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> TX bytes:2061 acl:0 sco:0 commands:90 errors:0
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>USB ドングルの Bluetooth デバイスが &lt;code>hci1&lt;/code> (Bus: USB)、Raspberry Pi 4 組み込みの Bluetooth デバイスが &lt;code>hci0&lt;/code> (Bus: UART) として認識されているのが分かります。
+&lt;code>hciconfig&lt;/code> コマンドに &lt;code>-a (--all)&lt;/code> オプションをつけて実行すると、詳細情報を表示できます。&lt;/p></description></item><item><title>Linuxメモ: Netplan で Ubuntu のネットワーク設定を行う</title><link>https://maku.blog/p/7q3dnx8/</link><pubDate>Thu, 20 Jan 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7q3dnx8/</guid><description>&lt;h2 id="netplan-とは">Netplan とは&lt;/h2>
+&lt;p>&lt;a href="https://netplan.io">Netplan&lt;/a> は Linux のネットワーク設定を簡潔な YAML ファイルで行う仕組みで、Ubuntu 18.04 以降（正確には 17 以降）で採用されています。
+昔の Ubuntu/Debian で使用されていた &lt;code>/etc/network/interfaces&lt;/code> という設定ファイルはもう使われていません。&lt;/p>
+&lt;p>実際のネットワーク管理は、バックエンドで動作する NetworkManager や systemd-networkd といったネットワークデーモンが行うのですが、Netplan は YAML 設定ファイルの内容を適切な形に変換して、これらのネットワークデーモンに渡してくれます。
+つまり、バックエンドでどのようなネットワークデーモンが動いているかを意識せずに、統一されたわかりやすい YAML ファイルでネットワーク設定を行うことができます。&lt;/p>
+&lt;p>Netplan は次のように振る舞います。&lt;/p>
+&lt;ol>
+&lt;li>システム起動時に Netplan が設定ファイル (&lt;code>/etc/netplan/*.yaml&lt;/code>) を読み込んで、各ネットワークデーモン用の設定値を &lt;code>/run&lt;/code> 以下へ書き出す&lt;/li>
+&lt;li>各ネットワークデーモンが渡された情報に基づいてネットワーク設定を行う&lt;/li>
+&lt;/ol>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="300" height="auto" src="../../p/7q3dnx8/img-001.svg" alt="/p/7q3dnx8/img-001.svg" />
+ &lt;figcaption>図: netplan.io のサイトより&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>バックエンドのネットワークデーモンとして何を使うかは、設定ファイルの &lt;code>renderer&lt;/code> 部分で指定できるようになっていますが、デフォルトでは次のように動作します。&lt;/p>
+&lt;ul>
+&lt;li>Wifi や 無線 WAN/LTE の設定 &amp;hellip; NetworkManager に渡される&lt;/li>
+&lt;li>それ以外のネットワーク（有線LANなど）の設定 &amp;hellip; networkd に渡される&lt;/li>
+&lt;/ul>
+&lt;p>よって、通常はどのネットワークデーモンを使うかを明示する必要はありません。&lt;/p>
+&lt;h2 id="設定ファイルの読み込まれる順序">設定ファイルの読み込まれる順序&lt;/h2>
+&lt;p>Netplan はすべての &lt;strong>&lt;code>/etc/netplan/*.yaml&lt;/code>&lt;/strong> ファイルを読み込みます。
+複数のファイルが存在する場合は、ファイル名のアルファベット順に読み込まれ、後に読み込まれたファイルの設定値が優先的に使用されます。
+例えば、&lt;/p>
+&lt;ul>
+&lt;li>/etc/netplan/50-cloud-init.yaml&lt;/li>
+&lt;li>/etc/netplan/99-custom.yaml&lt;/li>
+&lt;/ul>
+&lt;p>というファイルがある場合、&lt;code>50-cloud-init.yaml&lt;/code> で設定された値は &lt;code>99-custom.yaml&lt;/code> の設定値によって上書きされます。&lt;/p></description></item><item><title>Raspberry Pi に Ubuntu 20.04 を入れて WiFi 接続できるようにする</title><link>https://maku.blog/p/n9kv7gq/</link><pubDate>Thu, 20 Jan 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n9kv7gq/</guid><description>&lt;p>ひょんなことから、Ubuntu Server の入った Raspberry Pi 4 が必要になったので、セットアップ手順をメモしておきます。
+なんか昔より簡単にインストールできるようになっててビックリしました。&lt;/p>
+&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ここでは、Raspberry Pi 4 Model B に Ubuntu 20.04 をインストールして、Wi-Fi 経由の SSH ログインができるところまでセットアップします。
+なお、有線 LAN では一度も接続せずに Wi-Fi 接続できるようにします。
+ただし、初期設定のために HDMI でのディスプレイ出力は必要になります。&lt;/p>
+&lt;ul>
+&lt;li>準備するもの
+&lt;ol>
+&lt;li>Raspberry Pi 4 （たぶん別のバージョンでもOK）&lt;/li>
+&lt;li>SD カードに OS をインストールするための PC&lt;/li>
+&lt;li>HDMI ケーブルとディスプレイと USB キーボード&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="sd-カードに-os-をインストール">SD カードに OS をインストール&lt;/h2>
+&lt;p>公式の &lt;a href="https://www.raspberrypi.com/software/">Raspberry Pi Imager&lt;/a> というソフトウェアを使うと、ものすごく簡単に SD カードに各種 OS をインストールできます。
+Raspberry Pi Imager を起動したら、次のようにポチポチやっていくだけでインストール完了です。&lt;/p>
+&lt;ol>
+&lt;li>Operating System の項目で、&lt;code>Other general purpose OS&lt;/code> → &lt;code>Ubuntu&lt;/code> → &lt;code>Ubuntu Server 20.04 LTS (64-bit server OS)&lt;/code> のように選択&lt;/li>
+&lt;li>Storage の項目で、書き込み対象の SD カードを選択&lt;/li>
+&lt;li>WRITE ボタンを押してしばらく待つ&lt;/li>
+&lt;/ol>
+&lt;p>あとは、この SD カードを Raspberry Pi に挿入して電源を入れれば Ubuntu OS が起動します。
+お手軽すぎる。。。&lt;/p></description></item><item><title>Linuxコマンド: curl コマンドの使用例（GET/POST リクエスト、ファイルのダウンロード）</title><link>https://maku.blog/p/phdp2do/</link><pubDate>Fri, 03 Apr 2015 00:00:00 +0900</pubDate><guid>https://maku.blog/p/phdp2do/</guid><description>&lt;p>&lt;code>curl&lt;/code> コマンドは URL を指定してサーバー上のリソースにアクセスするためのコマンドで、Web API のテストや、ファイルのダウンロードに使用できます。
+昔は &lt;code>curl&lt;/code> コマンドは Linux 用のコマンドという認識でしたが、Windows 10 には標準搭載されるようになりました。
+&lt;code>curl&lt;/code> は様々なプロトコルで通信できますが、主に HTTP/HTTPS が使用されます。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/2sv4bqw/">curl コマンドのチートシート&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="curl-コマンドでファイルをダウンロードする">curl コマンドでファイルをダウンロードする&lt;/h2>
+&lt;p>curl コマンドはデフォルトではダウンロードしたファイルを標準出力に出力します。
+&lt;strong>&lt;code>-o&lt;/code>&lt;/strong>（小文字のオー）オプションや、&lt;strong>&lt;code>-O&lt;/code>&lt;/strong>（大文字のオー）オプションを指定することで、&lt;strong>ファイルに保存する&lt;/strong> ことができます。
+同時に &lt;strong>&lt;code>-L&lt;/code>&lt;/strong> オプションを指定しておくと、リダイレクトレスポンスを自動処理してくれます。&lt;/p>
+&lt;h3 id="ダウンロード元と同名で保存--o">ダウンロード元と同名で保存 (-O)&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">sample.zip という名前で保存&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> curl -L -O http://example.com/sample.zip
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="別名で保存--o">別名で保存 (-o)&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">#&lt;/span> カレントディレクトリに foo.zip という名前で保存
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> curl -L -o foo.zip http://example.com/sample.zip
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="gp">#&lt;/span> 保存先を絶対パスで指定することも可能
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> curl -L -o /tmp/foo.zip http://example.com/sample.zip
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="curl-コマンドで-getpost-リクエストを送信する">curl コマンドで GET/POST リクエストを送信する&lt;/h2>
+&lt;p>REST API などのテストに &lt;code>curl&lt;/code> コマンドを利用できます。&lt;/p>
+&lt;h3 id="get-リクエスト">GET リクエスト&lt;/h3>
+&lt;p>特にオプションを指定しなければ、HTTP の GET リクエストが送信されます。&lt;/p></description></item><item><title>Linuxコマンド: rsync コマンドで2つのディレクトリを同期する</title><link>https://maku.blog/p/c3s7wyx/</link><pubDate>Sun, 01 Dec 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/c3s7wyx/</guid><description>&lt;p>（Windows の場合は、&lt;a href="../../p/eqrmt6x">WinSCP をコマンドラインで利用する&lt;/a>と同じようなことを実現できます）。&lt;/p>
+&lt;h2 id="rsync-でディレクトリごとコピーする">rsync でディレクトリごとコピーする&lt;/h2>
+&lt;p>&lt;code>rsync&lt;/code> コマンドを使って、&lt;code>src&lt;/code> ディレクトリの内容を &lt;code>dst&lt;/code> ディレクトリにコピーするには下記のように実行します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例: src ディレクトリを dst ディレクトリにコピー&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ rsync -av src/ dst # src ディレクトリの「中身」を dst ディレクトリ内へコピー
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ rsync -av src dst # src ディレクトリを dst ディレクトリ内へコピー&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;strong>&lt;code>-a&lt;/code>&lt;/strong> オプションは、パーミッションやタイムスタンプなどの情報を維持しつつ、ディレクトリを再帰的にコピーする指定をまとめて行うための archive オプションです。
+&lt;strong>&lt;code>-v&lt;/code>&lt;/strong> オプションは転送情報などを出力する verbose オプションです。&lt;/p>
+&lt;p>上記例のように、ソースディレクトリの &lt;strong>最後にスラッシュをつけるかつけないかで意味が変わってくる&lt;/strong> ので注意してください。
+2番目のように実行すると、結果として &lt;code>./dst/src&lt;/code> というディレクトリが作成されることになります。&lt;/p>
+&lt;h3 id="コピー元にないファイルを削除する---delete">コピー元にないファイルを削除する (--delete)&lt;/h3>
+&lt;p>&lt;code>rsync&lt;/code> コマンドはデフォルトでは、コピー先ディレクトリのファイルを削除することはありません。
+コピー元 (&lt;code>src&lt;/code>) に存在しないファイルを、コピー先 (&lt;code>dst&lt;/code>) から削除したいときは、明示的に &lt;strong>&lt;code>--delete&lt;/code>&lt;/strong> オプションを付けて実行します。
+つまり、2つのディレクトリを同じ内容にしたい（同期したい）のであれば、&lt;code>--delete&lt;/code> オプションを付けて実行する必要があります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例: src の内容を dst に同期させる（src に存在しないファイルは dst から削除する）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ rsync -av --delete src/ dst&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="指定した拡張子のファイルだけコピーする---include">指定した拡張子のファイルだけコピーする (--include)&lt;/h3>
+&lt;p>特定の種類のファイル（png ファイルなど）だけをコピーしたいときは、&lt;strong>&lt;code>--include&lt;/code>&lt;/strong> オプションと &lt;strong>&lt;code>--exclude&lt;/code>&lt;/strong> を組み合わせて以下のような感じで指定します。&lt;/p></description></item><item><title>Linuxコマンド: scp コマンドでファイルやディレクトリを転送する</title><link>https://maku.blog/p/buvv4fz/</link><pubDate>Sat, 09 Nov 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/buvv4fz/</guid><description>&lt;p>ここでは、&lt;code>scp&lt;/code> を使ったファイル転送の方法を示していますが、ディレクトリ単位のファイルコピーやバックアップを行いたい場合は、&lt;a href="../../p/c3s7wyx">rsync&lt;/a> コマンドを使用したほうが効率的です。&lt;/p>
+&lt;h2 id="ファイル送信">ファイル送信&lt;/h2>
+&lt;pre tabindex="0">&lt;code>$ scp &amp;lt;localFile&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteFile&amp;gt;
+&lt;/code>&lt;/pre>&lt;h2 id="ファイル受信">ファイル受信&lt;/h2>
+&lt;pre tabindex="0">&lt;code>$ scp &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteFile&amp;gt; &amp;lt;localFile&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例: リモートのホームディレクトリ内のファイルを取得&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ scp maku@maku.example.com:hello.txt hello.txt&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>remoteFile の指定は、ホームディレクトリからの相対パスで OK です。&lt;/p>
+&lt;h2 id="ディレクトリ送信">ディレクトリ送信&lt;/h2>
+&lt;pre tabindex="0">&lt;code>$ scp -r &amp;lt;localDir&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteDir&amp;gt;
+&lt;/code>&lt;/pre>&lt;h2 id="ディレクトリ受信">ディレクトリ受信&lt;/h2>
+&lt;pre tabindex="0">&lt;code>$ scp -r &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteDir&amp;gt; &amp;lt;localDir&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例: ホームディレクトリの sample ディレクトリを丸ごとダウンロード&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ scp -r maku@maku.example.com:sample .&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item></channel></rss>

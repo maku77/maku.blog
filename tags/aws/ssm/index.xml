@@ -1,11 +1,129 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS/SSM on まくろぐ</title><link>https://maku.blog/tags/aws/ssm/</link><description>Recent content in AWS/SSM on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><atom:link href="https://maku.blog/tags/aws/ssm/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS SSM のポリシーステートメントの記述例</title><link>https://maku.blog/p/s3o57jv/</link><pubDate>Fri, 15 Oct 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/s3o57jv/</guid><description>参考: AppSync / Lambda
-パラメーターの説明情報の取得 すべてのパラメーターの説明情報を取得できるようにする { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;ssm:DescribeParameters&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;*&amp;#34; } ] } ssm:DescribeParameters は、SSM パラメーターストアに格納されたパラメーターの説明情報を取得する権限です。 この権限だけでは、パラメーターの「値」自体は取得できないことに注意してください。
-パラメーターの値の取得 prod- で始まるパラメーターの値を取得できるようにする { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;ssm:GetParameter*&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;arn:aws:ssm:&amp;lt;Region&amp;gt;:&amp;lt;Account&amp;gt;:parameter/prod-*&amp;#34; } ] } パラメーターの Get 系アクションには、GetParameter/GetParameters/GetParameterHistory/GetParametersByPath など いろいろある ため、上記のように ssm:GetParameter* とワイルドカード指定しておくと確実に取得できるようになります。 GetParameter だけだと、パラメーターの一覧取得などが許可されません。
-パラメーターの追加・削除 prod- で始まるパラメーターの追加と削除を許可する { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;ssm:PutParameter&amp;#34;, &amp;#34;ssm:DeleteParameter&amp;#34;, &amp;#34;ssm:DeleteParameters&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;arn:aws:ssm:&amp;lt;Region&amp;gt;:&amp;lt;Account&amp;gt;:parameter/prod-*&amp;#34; } ] } 暗号化されたパラメーター (SecureString) の取得 暗号化された prod- で始まるパラメーターを読み込む { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;ssm:GetParameter*&amp;#34; ], &amp;#34;Resource&amp;#34;: [ &amp;#34;arn:aws:ssm:&amp;lt;Region&amp;gt;:&amp;lt;Account&amp;gt;:parameter/prod-*&amp;#34; ] }, { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;kms:Decrypt&amp;#34; ], &amp;#34;Resource&amp;#34;: [ &amp;#34;arn:aws:kms:&amp;lt;Region&amp;gt;:&amp;lt;Account&amp;gt;:key/&amp;lt;KmsKey&amp;gt;&amp;#34; ] } ] } SSM パラメーターストアに SecureString タイプとして格納されたパラメーターは、KMS キーによって暗号化されています。 このパラメーターの値を取得するには、ssm:GetParameter* によるパラメーター読み取り権限と、kms:Decrypt による複合化の権限が必要です。</description></item><item><title>AWS SSM のポリシーステートメントの記述例</title><link>https://maku.blog/p/s3o57jv/</link><pubDate>Fri, 15 Oct 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/s3o57jv/</guid><description>参考: AppSync / Lambda
-パラメーターの説明情報の取得 すべてのパラメーターの説明情報を取得できるようにする { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;ssm:DescribeParameters&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;*&amp;#34; } ] } ssm:DescribeParameters は、SSM パラメーターストアに格納されたパラメーターの説明情報を取得する権限です。 この権限だけでは、パラメーターの「値」自体は取得できないことに注意してください。
-パラメーターの値の取得 prod- で始まるパラメーターの値を取得できるようにする { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;ssm:GetParameter*&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;arn:aws:ssm:&amp;lt;Region&amp;gt;:&amp;lt;Account&amp;gt;:parameter/prod-*&amp;#34; } ] } パラメーターの Get 系アクションには、GetParameter/GetParameters/GetParameterHistory/GetParametersByPath など いろいろある ため、上記のように ssm:GetParameter* とワイルドカード指定しておくと確実に取得できるようになります。 GetParameter だけだと、パラメーターの一覧取得などが許可されません。
-パラメーターの追加・削除 prod- で始まるパラメーターの追加と削除を許可する { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;ssm:PutParameter&amp;#34;, &amp;#34;ssm:DeleteParameter&amp;#34;, &amp;#34;ssm:DeleteParameters&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;arn:aws:ssm:&amp;lt;Region&amp;gt;:&amp;lt;Account&amp;gt;:parameter/prod-*&amp;#34; } ] } 暗号化されたパラメーター (SecureString) の取得 暗号化された prod- で始まるパラメーターを読み込む { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;ssm:GetParameter*&amp;#34; ], &amp;#34;Resource&amp;#34;: [ &amp;#34;arn:aws:ssm:&amp;lt;Region&amp;gt;:&amp;lt;Account&amp;gt;:parameter/prod-*&amp;#34; ] }, { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;kms:Decrypt&amp;#34; ], &amp;#34;Resource&amp;#34;: [ &amp;#34;arn:aws:kms:&amp;lt;Region&amp;gt;:&amp;lt;Account&amp;gt;:key/&amp;lt;KmsKey&amp;gt;&amp;#34; ] } ] } SSM パラメーターストアに SecureString タイプとして格納されたパラメーターは、KMS キーによって暗号化されています。 このパラメーターの値を取得するには、ssm:GetParameter* によるパラメーター読み取り権限と、kms:Decrypt による複合化の権限が必要です。</description></item><item><title>AWS SSM をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/aug76s5/</link><pubDate>Wed, 13 Oct 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/aug76s5/</guid><description>パラメーターストアにパラメーターを格納する (ssm put-parameter) String（文字列） /myapp/param1 という名前のパラメーターとして value1 を格納 $ aws ssm put-parameter --name /myapp/param1 \ --value &amp;#34;value1&amp;#34; --type String \ --tags &amp;#34;Key=key1,Value=value1&amp;#34; 既存のパラメーターの値を更新する場合は、--overwrite オプションが必要です（Version 情報がインクリメントされます）。
-/myapp/param1 の値を value2 に書き換え $ aws ssm put-parameter --name /myapp/param1 \ --value &amp;#34;value2&amp;#34; --type String --overwrite Tier: Standard Version: 2 SecureString（暗号化された文字列） デフォルトの AWS マネージドキーを使って暗号化 $ aws ssm put-parameter --name /myapp/param1 \ --value &amp;#34;secret_value&amp;#34; --type SecureString デフォルトのキーは、アカウントで共通のものになります。
-作成した KMS キーを使って暗号化 $ aws ssm put-parameter --name /myapp/param1 \ --value &amp;#34;secret_value&amp;#34; --type SecureString \ --key-id &amp;#34;&amp;lt;KeyId&amp;gt;&amp;#34; \ KeyId は次のいずれかの形式で指定できます。</description></item><item><title>AWS SSM をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/aug76s5/</link><pubDate>Wed, 13 Oct 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/aug76s5/</guid><description>パラメーターストアにパラメーターを格納する (ssm put-parameter) String（文字列） /myapp/param1 という名前のパラメーターとして value1 を格納 $ aws ssm put-parameter --name /myapp/param1 \ --value &amp;#34;value1&amp;#34; --type String \ --tags &amp;#34;Key=key1,Value=value1&amp;#34; 既存のパラメーターの値を更新する場合は、--overwrite オプションが必要です（Version 情報がインクリメントされます）。
-/myapp/param1 の値を value2 に書き換え $ aws ssm put-parameter --name /myapp/param1 \ --value &amp;#34;value2&amp;#34; --type String --overwrite Tier: Standard Version: 2 SecureString（暗号化された文字列） デフォルトの AWS マネージドキーを使って暗号化 $ aws ssm put-parameter --name /myapp/param1 \ --value &amp;#34;secret_value&amp;#34; --type SecureString デフォルトのキーは、アカウントで共通のものになります。
-作成した KMS キーを使って暗号化 $ aws ssm put-parameter --name /myapp/param1 \ --value &amp;#34;secret_value&amp;#34; --type SecureString \ --key-id &amp;#34;&amp;lt;KeyId&amp;gt;&amp;#34; \ KeyId は次のいずれかの形式で指定できます。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS/SSM on まくろぐ</title><link>https://maku.blog/tags/aws/ssm/</link><description>Recent content in AWS/SSM on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Fri, 15 Oct 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/aws/ssm/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS SSM のポリシーステートメントの記述例</title><link>https://maku.blog/p/s3o57jv/</link><pubDate>Fri, 15 Oct 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/s3o57jv/</guid><description>&lt;p>参考: &lt;a href="../../../p/cexcpyc/">AppSync&lt;/a> / &lt;a href="../../../p/yn7hqx8/">Lambda&lt;/a>&lt;/p>
+&lt;h2 id="パラメーターの説明情報の取得">パラメーターの説明情報の取得&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">すべてのパラメーターの説明情報を取得できるようにする&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2012-10-17&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Statement&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;ssm:DescribeParameters&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;strong>&lt;code>ssm:DescribeParameters&lt;/code>&lt;/strong> は、SSM パラメーターストアに格納されたパラメーターの説明情報を取得する権限です。
+この権限だけでは、パラメーターの「値」自体は取得できないことに注意してください。&lt;/p>
+&lt;h2 id="パラメーターの値の取得">パラメーターの値の取得&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">prod- で始まるパラメーターの値を取得できるようにする&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2012-10-17&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Statement&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;ssm:GetParameter*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;arn:aws:ssm:&amp;lt;Region&amp;gt;:&amp;lt;Account&amp;gt;:parameter/prod-*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>パラメーターの Get 系アクションには、GetParameter/GetParameters/GetParameterHistory/GetParametersByPath など &lt;a href="https://docs.aws.amazon.com/ja_jp/systems-manager/latest/userguide/sysman-paramstore-access.html">いろいろある&lt;/a> ため、上記のように &lt;strong>&lt;code>ssm:GetParameter*&lt;/code>&lt;/strong> とワイルドカード指定しておくと確実に取得できるようになります。
+&lt;code>GetParameter&lt;/code> だけだと、パラメーターの一覧取得などが許可されません。&lt;/p>
+&lt;h2 id="パラメーターの追加削除">パラメーターの追加・削除&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">prod- で始まるパラメーターの追加と削除を許可する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2012-10-17&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Statement&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;ssm:PutParameter&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;ssm:DeleteParameter&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;ssm:DeleteParameters&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;arn:aws:ssm:&amp;lt;Region&amp;gt;:&amp;lt;Account&amp;gt;:parameter/prod-*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="暗号化されたパラメーター-securestring-の取得">暗号化されたパラメーター (SecureString) の取得&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">暗号化された prod- で始まるパラメーターを読み込む&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2012-10-17&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Statement&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;ssm:GetParameter*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;arn:aws:ssm:&amp;lt;Region&amp;gt;:&amp;lt;Account&amp;gt;:parameter/prod-*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;kms:Decrypt&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;arn:aws:kms:&amp;lt;Region&amp;gt;:&amp;lt;Account&amp;gt;:key/&amp;lt;KmsKey&amp;gt;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>SSM パラメーターストアに SecureString タイプとして格納されたパラメーターは、KMS キーによって暗号化されています。
+このパラメーターの値を取得するには、&lt;strong>&lt;code>ssm:GetParameter*&lt;/code>&lt;/strong> によるパラメーター読み取り権限と、&lt;strong>&lt;code>kms:Decrypt&lt;/code>&lt;/strong> による複合化の権限が必要です。&lt;/p></description></item><item><title>AWS SSM をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/aug76s5/</link><pubDate>Wed, 13 Oct 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/aug76s5/</guid><description>&lt;h2 id="パラメーターストアにパラメーターを格納する-ssm-put-parameter">パラメーターストアにパラメーターを格納する (ssm put-parameter)&lt;/h2>
+&lt;h3 id="string文字列">String（文字列）&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">/myapp/param1 という名前のパラメーターとして value1 を格納&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws ssm put-parameter --name /myapp/param1 \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --value &amp;#34;value1&amp;#34; --type String \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --tags &amp;#34;Key=key1,Value=value1&amp;#34;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>既存のパラメーターの値を更新する場合は、&lt;strong>&lt;code>--overwrite&lt;/code>&lt;/strong> オプションが必要です（Version 情報がインクリメントされます）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">/myapp/param1 の値を value2 に書き換え&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws ssm put-parameter --name /myapp/param1 \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --value &amp;#34;value2&amp;#34; --type String --overwrite
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Tier: Standard
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Version: 2&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="securestring暗号化された文字列">SecureString（暗号化された文字列）&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">デフォルトの AWS マネージドキーを使って暗号化&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws ssm put-parameter --name /myapp/param1 \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --value &amp;#34;secret_value&amp;#34; --type SecureString&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>デフォルトのキーは、アカウントで共通のものになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">作成した KMS キーを使って暗号化&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws ssm put-parameter --name /myapp/param1 \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --value &amp;#34;secret_value&amp;#34; --type SecureString \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --key-id &amp;#34;&amp;lt;KeyId&amp;gt;&amp;#34; \&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>KeyId&lt;/code> は次のいずれかの形式で指定できます。&lt;/p></description></item></channel></rss>

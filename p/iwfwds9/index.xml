@@ -1,3 +1,147 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux のシステム管理 on まくろぐ</title><link>https://maku.blog/p/iwfwds9/</link><description>Recent content in Linux のシステム管理 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sun, 17 Jul 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/iwfwds9/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux で起動しているサービスの一覧を表示する</title><link>https://maku.blog/p/co7n5jy/</link><pubDate>Sun, 17 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/co7n5jy/</guid><description>pstree コマンドを使う方法 $ pstree systemd─┬─ModemManager───2*[{ModemManager}] ├─acpid ├─2*[agetty] ├─cron ├─dbus-daemon ├─fail2ban-server───4*[{fail2ban-server}] ├─irqbalance───{irqbalance} ├─multipathd───6*[{multipathd}] ├─networkd-dispat ├─ntpd───{ntpd} ├─packagekitd───2*[{packagekitd}] ├─polkitd───2*[{polkitd}] ├─rsyslogd───3*[{rsyslogd}] ├─snapd───10*[{snapd}] ├─sshd───sshd───sh───pstree ├─sshd───sshd───sshd ├─systemd───(sd-pam) ├─systemd-journal ├─systemd-logind ├─systemd-network ├─systemd-resolve ├─systemd-udevd ├─udisksd───4*[{udisksd}] └─unattended-upgr───{unattended-upgr} systemd で各種サービスが動作していることを確認できます。
-systemctl コマンドを使う方法 $ systemctl list-unit-files --type=service UNIT FILE STATE VENDOR PRESET acpid.service enabled enabled apparmor.service enabled enabled apport-autoreport.service static - apport-forward@.service static - apport.service generated - apt-daily-upgrade.service static - apt-daily.service static - autovt@.service alias - blk-availability.service enabled enabled bolt.service static - cloud-config.</description></item><item><title>Linux ディストリビューションのバージョンの調べ方まとめ</title><link>https://maku.blog/p/vdweubq/</link><pubDate>Sat, 09 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vdweubq/</guid><description>Linux ディストリビューションのバージョン情報を調べる方法はいくつかありますが、/etc/os-release ファイルの内容を見るのが簡単です。
-/etc/os-release ファイル Ubuntu 22.04 の場合 $ cat /etc/os-release PRETTY_NAME=&amp;#34;Ubuntu 22.04 LTS&amp;#34; NAME=&amp;#34;Ubuntu&amp;#34; VERSION_ID=&amp;#34;22.04&amp;#34; VERSION=&amp;#34;22.04 (Jammy Jellyfish)&amp;#34; VERSION_CODENAME=jammy ID=ubuntu ID_LIKE=debian HOME_URL=&amp;#34;https://www.ubuntu.com/&amp;#34; SUPPORT_URL=&amp;#34;https://help.ubuntu.com/&amp;#34; BUG_REPORT_URL=&amp;#34;https://bugs.launchpad.net/ubuntu/&amp;#34; PRIVACY_POLICY_URL=&amp;#34;https://www.ubuntu.com/legal/terms-and-policies/privacy-policy&amp;#34; UBUNTU_CODENAME=jammy Debian 11 の場合 $ cat /etc/os-release PRETTY_NAME=&amp;#34;Debian GNU/Linux 11 (bullseye)&amp;#34; NAME=&amp;#34;Debian GNU/Linux&amp;#34; VERSION_ID=&amp;#34;11&amp;#34; VERSION=&amp;#34;11 (bullseye)&amp;#34; VERSION_CODENAME=bullseye ID=debian HOME_URL=&amp;#34;https://www.debian.org/&amp;#34; SUPPORT_URL=&amp;#34;https://www.debian.org/support&amp;#34; BUG_REPORT_URL=&amp;#34;https://bugs.debian.org/&amp;#34; Rocky Linux 8.6 の場合 $ cat /etc/os-release NAME=&amp;#34;Rocky Linux&amp;#34; VERSION=&amp;#34;8.6 (Green Obsidian)&amp;#34; ID=&amp;#34;rocky&amp;#34; ID_LIKE=&amp;#34;rhel centos fedora&amp;#34; VERSION_ID=&amp;#34;8.6&amp;#34; PLATFORM_ID=&amp;#34;platform:el8&amp;#34; PRETTY_NAME=&amp;#34;Rocky Linux 8.6 (Green Obsidian)&amp;#34; ANSI_COLOR=&amp;#34;0;32&amp;#34; CPE_NAME=&amp;#34;cpe:/o:rocky:rocky:8:GA&amp;#34; HOME_URL=&amp;#34;https://rockylinux.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux のシステム管理 on まくろぐ</title><link>https://maku.blog/p/iwfwds9/</link><description>Recent content in Linux のシステム管理 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 17 Jul 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/iwfwds9/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux で起動しているサービスの一覧を表示する</title><link>https://maku.blog/p/co7n5jy/</link><pubDate>Sun, 17 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/co7n5jy/</guid><description>&lt;h2 id="pstree-コマンドを使う方法">pstree コマンドを使う方法&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> pstree
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">systemd─┬─ModemManager───2*[{ModemManager}]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─acpid
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─2*[agetty]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─cron
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─dbus-daemon
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─fail2ban-server───4*[{fail2ban-server}]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─irqbalance───{irqbalance}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─multipathd───6*[{multipathd}]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─networkd-dispat
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─ntpd───{ntpd}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─packagekitd───2*[{packagekitd}]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─polkitd───2*[{polkitd}]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─rsyslogd───3*[{rsyslogd}]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─snapd───10*[{snapd}]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─sshd───sshd───sh───pstree
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─sshd───sshd───sshd
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─systemd───(sd-pam)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─systemd-journal
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─systemd-logind
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─systemd-network
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─systemd-resolve
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─systemd-udevd
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ├─udisksd───4*[{udisksd}]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> └─unattended-upgr───{unattended-upgr}
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>systemd&lt;/code> で各種サービスが動作していることを確認できます。&lt;/p>
+&lt;h2 id="systemctl-コマンドを使う方法">systemctl コマンドを使う方法&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> systemctl list-unit-files --type&lt;span class="o">=&lt;/span>service
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">UNIT FILE STATE VENDOR PRESET
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">acpid.service enabled enabled
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">apparmor.service enabled enabled
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">apport-autoreport.service static -
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">apport-forward@.service static -
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">apport.service generated -
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">apt-daily-upgrade.service static -
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">apt-daily.service static -
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">autovt@.service alias -
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">blk-availability.service enabled enabled
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">bolt.service static -
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">cloud-config.service enabled enabled
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">cloud-final.service enabled enabled
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">cloud-init-hotplugd.service static -
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">...（省略）...
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> systemctl status
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="service-コマンドを使う方法">service コマンドを使う方法&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> service --status-all
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">...（省略）...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> [ + ] resolvconf
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> [ - ] rsync
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> [ - ] screen-cleanup
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> [ + ] ssh
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> [ + ] udev
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> [ + ] ufw
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">...（省略）...
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>記号の意味:&lt;/p></description></item><item><title>Linux ディストリビューションのバージョンの調べ方まとめ</title><link>https://maku.blog/p/vdweubq/</link><pubDate>Sat, 09 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vdweubq/</guid><description>&lt;p>Linux ディストリビューションのバージョン情報を調べる方法はいくつかありますが、&lt;strong>&lt;code>/etc/os-release&lt;/code>&lt;/strong> ファイルの内容を見るのが簡単です。&lt;/p>
+&lt;h2 id="etcos-release-ファイル">/etc/os-release ファイル&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Ubuntu 22.04 の場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> cat /etc/os-release
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PRETTY_NAME=&amp;#34;Ubuntu 22.04 LTS&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">NAME=&amp;#34;Ubuntu&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">VERSION_ID=&amp;#34;22.04&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">VERSION=&amp;#34;22.04 (Jammy Jellyfish)&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">VERSION_CODENAME=jammy
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ID=ubuntu
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ID_LIKE=debian
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">HOME_URL=&amp;#34;https://www.ubuntu.com/&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">SUPPORT_URL=&amp;#34;https://help.ubuntu.com/&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BUG_REPORT_URL=&amp;#34;https://bugs.launchpad.net/ubuntu/&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PRIVACY_POLICY_URL=&amp;#34;https://www.ubuntu.com/legal/terms-and-policies/privacy-policy&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">UBUNTU_CODENAME=jammy
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Debian 11 の場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> cat /etc/os-release
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PRETTY_NAME=&amp;#34;Debian GNU/Linux 11 (bullseye)&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">NAME=&amp;#34;Debian GNU/Linux&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">VERSION_ID=&amp;#34;11&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">VERSION=&amp;#34;11 (bullseye)&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">VERSION_CODENAME=bullseye
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ID=debian
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">HOME_URL=&amp;#34;https://www.debian.org/&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">SUPPORT_URL=&amp;#34;https://www.debian.org/support&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BUG_REPORT_URL=&amp;#34;https://bugs.debian.org/&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Rocky Linux 8.6 の場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> cat /etc/os-release
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">NAME=&amp;#34;Rocky Linux&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">VERSION=&amp;#34;8.6 (Green Obsidian)&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ID=&amp;#34;rocky&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ID_LIKE=&amp;#34;rhel centos fedora&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">VERSION_ID=&amp;#34;8.6&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PLATFORM_ID=&amp;#34;platform:el8&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PRETTY_NAME=&amp;#34;Rocky Linux 8.6 (Green Obsidian)&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ANSI_COLOR=&amp;#34;0;32&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">CPE_NAME=&amp;#34;cpe:/o:rocky:rocky:8:GA&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">HOME_URL=&amp;#34;https://rockylinux.org/&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BUG_REPORT_URL=&amp;#34;https://bugs.rockylinux.org/&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ROCKY_SUPPORT_PRODUCT=&amp;#34;Rocky Linux&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ROCKY_SUPPORT_PRODUCT_VERSION=&amp;#34;8&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">REDHAT_SUPPORT_PRODUCT=&amp;#34;Rocky Linux&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">REDHAT_SUPPORT_PRODUCT_VERSION=&amp;#34;8&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">AlmaLinux 8.6 の場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> cat /etc/os-release
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">NAME=&amp;#34;AlmaLinux&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">VERSION=&amp;#34;8.6 (Sky Tiger)&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ID=&amp;#34;almalinux&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ID_LIKE=&amp;#34;rhel centos fedora&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">VERSION_ID=&amp;#34;8.6&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PLATFORM_ID=&amp;#34;platform:el8&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">PRETTY_NAME=&amp;#34;AlmaLinux 8.6 (Sky Tiger)&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ANSI_COLOR=&amp;#34;0;34&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">LOGO=&amp;#34;fedora-logo-icon&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">CPE_NAME=&amp;#34;cpe:/o:almalinux:almalinux:8::baseos&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">HOME_URL=&amp;#34;https://almalinux.org/&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">DOCUMENTATION_URL=&amp;#34;https://wiki.almalinux.org/&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">BUG_REPORT_URL=&amp;#34;https://bugs.almalinux.org/&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ALMALINUX_MANTISBT_PROJECT=&amp;#34;AlmaLinux-8&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">ALMALINUX_MANTISBT_PROJECT_VERSION=&amp;#34;8.6&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">REDHAT_SUPPORT_PRODUCT=&amp;#34;AlmaLinux&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">REDHAT_SUPPORT_PRODUCT_VERSION=&amp;#34;8.6&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="etcsystem-release-ファイル">/etc/system-release ファイル&lt;/h2>
+&lt;p>Red Hat 系 Linux において簡潔なバージョン情報が格納されたファイルです。
+&lt;strong>&lt;code>/etc/system-release&lt;/code>&lt;/strong> ファイルは、ディストリビューションごとに次のようなファイルへのシンボリックリンクになっています。&lt;/p></description></item></channel></rss>

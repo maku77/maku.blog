@@ -1,12 +1,238 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ESLint on まくろぐ</title><link>https://maku.blog/tags/eslint/</link><description>Recent content in ESLint on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 19 Jul 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/eslint/index.xml" rel="self" type="application/rss+xml"/><item><title>TypeScript プロジェクトに ESLint を導入する</title><link>https://maku.blog/p/xz9iry9/</link><pubDate>Thu, 20 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xz9iry9/</guid><description>ESLint とは ESLint は JavaScript/TypeScript 向けの Lint ツール（静的解析ツール）です。 プロジェクト内のソースコードに対して eslint コマンドを実行することで、コーディングルールに従っていない部分や、不具合の原因になりそうな部分を検出してくれます。
-☝️ eslint vs tslint もともと TypeScript 用には tslint という Lint ツールが提供されていましたが、Microsoft の TypeScript チームが eslint への統合を 公式に発表 してから（2019年以降）は、TypeScript においても eslint が事実上の標準 Lint ツールとなっています。参考: TypeScript の ESLint 対応プロジェクト ESLint のインストール eslint コマンドは npm でインストールできます。 TypeScript プロジェクトのディレクトリ内で、次のように開発用にインストールすることが推奨されています（package.json は作成済みだと想定します）。
-ESLint のインストール $ npm install eslint --save-dev ESLint の初期設定 eslint コマンドを実行するためには、設定ファイル .eslintrc.{js,yml,json} を作成しておく必要があります。
-設定ファイルの生成 $ npx eslint --init 上記のように実行すると、ウィザード形式でどのような用途に使用するかを質問されるので、順番に答えていくだけで設定ファイルを生成できます。 最後にその構成に必要なモジュールをまとめてインストールできます。 ここでは、eslint v7.26.0 における表示例を示しています。</description></item><item><title>ESLint の設定ファイル (.eslintrc) の各プロパティの意味を理解する</title><link>https://maku.blog/p/j6iu7it/</link><pubDate>Sat, 22 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j6iu7it/</guid><description>何を説明するか 下記は、TypeScript を使った React アプリ実装用に用意した ESLint 設定ファイル (.eslint.yml) の例です。 トップレベルのプロパティとして、env や extends などがありますが、これらが何を意味しているかをざっと説明します。
-.eslint.yml（例） root: true env: browser: true es2021: true parser: &amp;#39;@typescript-eslint/parser&amp;#39; parserOptions: ecmaVersion: 2021 project: ./tsconfig.json plugins: - react - react-hooks - &amp;#39;@typescript-eslint&amp;#39; extends: - eslint:recommended - plugin:react/recommended - plugin:react-hooks/recommended - plugin:@typescript-eslint/recommended - plugin:@typescript-eslint/recommended-requiring-type-checking rules: react/react-in-jsx-scope: off 各プロパティの説明 root: true ESLint は、実行時のカレントディレクトリを起点にして、上位のディレクトリの設定ファイル (.eslintrc.*) を探していきます。 root: true の指定があると、この検索の振る舞いをそこで停止できます。 プロジェクトのトップディレクトリに置く .eslintrc.* には、この指定をしておくとよいです。
-env: 実行環境の指示 どのようなグローバルオブジェクトを宣言なしで参照可能にするかを ESLint に知らせるための設定です。 例えば、Web ブラウザ上で動作させる JavaScript コードであれば browser、Node.</description></item><item><title>ESLint + Prettier の設定方法まとめ</title><link>https://maku.blog/p/yfow6dk/</link><pubDate>Sun, 23 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yfow6dk/</guid><description>ここでは、とにかく混乱しがちな ESLint + Prettier の設定方法をまとめておきます。 まず、基本的な構成として、TypeScript (with React) の Lint をかけられるようにして、必要に応じて Airbnb スタイル を追加で設定する、という流れにしたいと思います。
-TypeScript プロジェクトの準備 前提条件として、TypeScript (+ React) のプロジェクト自体は作成済みとします。 何も準備できていなければ、Next.js の create-next-app コマンドを使うと簡単に作成できます（typescript および @types/node、@types/react、@types/react-dom などの型情報が導入された状態のプロジェクトが作成されます）。
-2 つやり方あるけど、大体中身は同じ # テンプレートを使う方法 $ create-next-app myapp --example with-typescript # typescript オプションを使う方法 $ create-next-app myapp --typescript 参考 Next.js で HelloWorld（プロジェクト作成からサーバー起動まで） Next.js のプロジェクトを TypeScript 化する Prettier + ESLint の基本設定 (for TypeScript with React) 必要なパッケージのインストール # Prettier 本体 $ yarn add --dev --exact prettier # ESLint 本体 $ yarn add --dev eslint # ESLint 用のプラグインおよび共有設定 $ yarn add --dev @typescript-eslint/eslint-plugin $ yarn add --dev @typescript-eslint/parser $ yarn add --dev eslint-plugin-react $ yarn add --dev eslint-plugin-react-hooks $ yarn add --dev eslint-config-prettier # npm スクリプトの並列実行用 $ yarn add --dev npm-run-all npm の場合 # Prettier 本体 $ npm install prettier --save-dev --save-exact # ESLint 本体 $ npm install eslint --save-dev # ESLint 用のプラグインおよび共有設定 $ npm install @typescript-eslint/eslint-plugin --save-dev $ npm install @typescript-eslint/parser --save-dev $ npm install eslint-plugin-react --save-dev $ npm install eslint-plugin-react-hooks --save-dev $ npm install eslint-config-prettier --save-dev # npm スクリプトの並列実行用 $ npm install npm-run-all --save-dev .</description></item><item><title>ESLint (4) ESLint の設定方法まとめ (for Next.js 11)</title><link>https://maku.blog/p/dexgg8o/</link><pubDate>Mon, 19 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dexgg8o/</guid><description>Next.js 11 が ESLint を組み込みサポート Next.js 11 で ESLint を Next.js が組み込みでサポートしました。 これで、create-next-app で新規作成するアプリでは、ESLint に関してもゼロコンフィグで next eslint とするだけで実行できるようになります。
-ただ、ESLint には色々な共有設定 (config) があるわけで、Next.js がデフォルトで設定してくれているもの以外（TypeScript や Prettier 関連）は自分で設定する必要があります。 ここでは、Next.js 11 がデフォルトで提供する .eslintrc にそれらの設定を追加します。
-Next.js 11 デフォルトの ESLint 設定 Next.js 11 が生成する .eslintrc ファイルは次のようなシンプルなものです。
-.eslintrc { &amp;#34;extends&amp;#34;: [&amp;#34;next&amp;#34;, &amp;#34;next/core-web-vitals&amp;#34;] } 問題はこれらがどのような共有設定を含んでいるかですが、eslint-config-next のコードを見ると、次のような感じになっています。
-module.exports = { extends: [ &amp;#39;plugin:react/recommended&amp;#39;, &amp;#39;plugin:react-hooks/recommended&amp;#39;, &amp;#39;plugin:@next/next/recommended&amp;#39;, ], // ... } React 系の共有設定はここに含まれているので、&amp;quot;extends&amp;quot;: [&amp;quot;next&amp;quot;] だけでカバーできそうです。 公式ドキュメントの ESLint - Base Configuration にも同様の説明が書かれています。 逆に、TypeScript 関連や、Prettier 関連の共有設定は自分で追加しなければいけません。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ESLint on まくろぐ</title><link>https://maku.blog/tags/eslint/</link><description>Recent content in ESLint on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 19 Jul 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/eslint/index.xml" rel="self" type="application/rss+xml"/><item><title>TypeScript プロジェクトに ESLint を導入する</title><link>https://maku.blog/p/xz9iry9/</link><pubDate>Thu, 20 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xz9iry9/</guid><description>&lt;h2 id="eslint-とは">ESLint とは&lt;/h2>
+&lt;p>&lt;a href="https://eslint.org/">ESLint&lt;/a> は JavaScript/TypeScript 向けの Lint ツール（静的解析ツール）です。
+プロジェクト内のソースコードに対して &lt;strong>&lt;code>eslint&lt;/code>&lt;/strong> コマンドを実行することで、コーディングルールに従っていない部分や、不具合の原因になりそうな部分を検出してくれます。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ eslint vs tslint&lt;/span>
+ &lt;span class="xNote_body">もともと TypeScript 用には &lt;code>tslint&lt;/code> という Lint ツールが提供されていましたが、Microsoft の TypeScript チームが &lt;code>eslint&lt;/code> への統合を &lt;a href="https://eslint.org/blog/2019/01/future-typescript-eslint">公式に発表&lt;/a> してから（2019年以降）は、TypeScript においても &lt;code>eslint&lt;/code> が事実上の標準 Lint ツールとなっています。参考: &lt;a href="https://typescript-eslint.io/">TypeScript の ESLint 対応プロジェクト&lt;/a>&lt;/span>
+&lt;/div>
+&lt;h2 id="eslint-のインストール">ESLint のインストール&lt;/h2>
+&lt;p>&lt;code>eslint&lt;/code> コマンドは &lt;code>npm&lt;/code> でインストールできます。
+TypeScript プロジェクトのディレクトリ内で、次のように開発用にインストールすることが推奨されています（&lt;code>package.json&lt;/code> は作成済みだと想定します）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ESLint のインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install eslint --save-dev&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="eslint-の初期設定">ESLint の初期設定&lt;/h2>
+&lt;p>&lt;code>eslint&lt;/code> コマンドを実行するためには、設定ファイル &lt;strong>&lt;code>.eslintrc.{js,yml,json}&lt;/code>&lt;/strong> を作成しておく必要があります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">設定ファイルの生成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npx eslint --init&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のように実行すると、ウィザード形式でどのような用途に使用するかを質問されるので、順番に答えていくだけで設定ファイルを生成できます。
+最後にその構成に必要なモジュールをまとめてインストールできます。
+ここでは、eslint v7.26.0 における表示例を示しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">質問1&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">? How would you like to use ESLint? …
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> To check syntax only
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> To check syntax and find problems
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">❯ To check syntax, find problems, and enforce code style&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ここでは「構文チェック」「問題の発見」「スタイル強制」をすべて行いたいので、カーソルキーで一番下の項目を選んで &lt;code>Enter&lt;/code> キーを押します。&lt;/p></description></item><item><title>ESLint の設定ファイル (.eslintrc) の各プロパティの意味を理解する</title><link>https://maku.blog/p/j6iu7it/</link><pubDate>Sat, 22 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j6iu7it/</guid><description>&lt;h2 id="何を説明するか">何を説明するか&lt;/h2>
+&lt;p>下記は、TypeScript を使った React アプリ実装用に用意した ESLint 設定ファイル (&lt;code>.eslint.yml&lt;/code>) の例です。
+トップレベルのプロパティとして、&lt;code>env&lt;/code> や &lt;code>extends&lt;/code> などがありますが、これらが何を意味しているかをざっと説明します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.eslint.yml（例）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">root&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">env&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">browser&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">es2021&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">parser&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;@typescript-eslint/parser&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">parserOptions&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ecmaVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">2021&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">project&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">./tsconfig.json&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">plugins&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">react&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">react-hooks&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s1">&amp;#39;@typescript-eslint&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">extends&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">eslint:recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:react/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:react-hooks/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:@typescript-eslint/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:@typescript-eslint/recommended-requiring-type-checking&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">rules&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">react/react-in-jsx-scope&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">off&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="各プロパティの説明">各プロパティの説明&lt;/h2>
+&lt;h3 id="root-true">&lt;code>root: true&lt;/code>&lt;/h3>
+&lt;p>ESLint は、実行時のカレントディレクトリを起点にして、上位のディレクトリの設定ファイル (&lt;code>.eslintrc.*&lt;/code>) を探していきます。
+&lt;code>root: true&lt;/code> の指定があると、この検索の振る舞いをそこで停止できます。
+プロジェクトのトップディレクトリに置く &lt;code>.eslintrc.*&lt;/code> には、この指定をしておくとよいです。&lt;/p>
+&lt;h3 id="env-実行環境の指示">&lt;code>env&lt;/code>: 実行環境の指示&lt;/h3>
+&lt;p>どのようなグローバルオブジェクトを宣言なしで参照可能にするかを ESLint に知らせるための設定です。
+例えば、Web ブラウザ上で動作させる JavaScript コードであれば &lt;code>browser&lt;/code>、Node.js 環境で動作させるコードであれば &lt;code>node&lt;/code> を &lt;code>true&lt;/code> に設定します。
+内部的には、選択した環境ごとに &lt;code>globals&lt;/code> オプションの設定が行われます。&lt;/p></description></item><item><title>ESLint + Prettier の設定方法まとめ</title><link>https://maku.blog/p/yfow6dk/</link><pubDate>Sun, 23 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yfow6dk/</guid><description>&lt;p>ここでは、とにかく混乱しがちな &lt;strong>ESLint + Prettier&lt;/strong> の設定方法をまとめておきます。
+まず、基本的な構成として、&lt;strong>TypeScript (with React)&lt;/strong> の Lint をかけられるようにして、&lt;strong>必要に応じて Airbnb スタイル&lt;/strong> を追加で設定する、という流れにしたいと思います。&lt;/p>
+&lt;h2 id="typescript-プロジェクトの準備">TypeScript プロジェクトの準備&lt;/h2>
+&lt;p>前提条件として、TypeScript (+ React) のプロジェクト自体は作成済みとします。
+何も準備できていなければ、Next.js の &lt;code>create-next-app&lt;/code> コマンドを使うと簡単に作成できます（&lt;code>typescript&lt;/code> および &lt;code>@types/node&lt;/code>、&lt;code>@types/react&lt;/code>、&lt;code>@types/react-dom&lt;/code> などの型情報が導入された状態のプロジェクトが作成されます）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">2 つやり方あるけど、大体中身は同じ&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl"># テンプレートを使う方法
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ create-next-app myapp --example with-typescript
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># typescript オプションを使う方法
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ create-next-app myapp --typescript&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;aside style="display: flex; border: thin dashed gray;">
+&lt;div style="align-self: stretch; writing-mode: vertical-lr; text-align: center; letter-spacing: 0.2em; color: #666; border-right: thin dashed gray; padding: 0.4em 0; line-height: 1.5;">参考&lt;/div>
+&lt;div style="align-self: center; padding: 0.6em 0; line-height: 1.2 !important;">&lt;ul>
+&lt;li>&lt;a href="../../p/ubmu3bj">Next.js で HelloWorld（プロジェクト作成からサーバー起動まで）&lt;/a>&lt;/li>
+&lt;li>&lt;a href="../../p/ny9fmty">Next.js のプロジェクトを TypeScript 化する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/aside>
+&lt;h2 id="prettier--eslint-の基本設定-for-typescript-with-react">Prettier + ESLint の基本設定 (for TypeScript with React)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">必要なパッケージのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl"># Prettier 本体
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev --exact prettier
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ESLint 本体
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev eslint
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ESLint 用のプラグインおよび共有設定
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev @typescript-eslint/eslint-plugin
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev @typescript-eslint/parser
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev eslint-plugin-react
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev eslint-plugin-react-hooks
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev eslint-config-prettier
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># npm スクリプトの並列実行用
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev npm-run-all&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-987236451" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-987236451">npm の場合&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl"># Prettier 本体
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install prettier --save-dev --save-exact
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ESLint 本体
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install eslint --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ESLint 用のプラグインおよび共有設定
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install @typescript-eslint/eslint-plugin --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install @typescript-eslint/parser --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install eslint-plugin-react --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install eslint-plugin-react-hooks --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install eslint-config-prettier --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># npm スクリプトの並列実行用
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install npm-run-all --save-dev&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.prettierrc（必要に応じて Prettier フォーマット設定）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">semi&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 行末のセミコロンは省略する&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">singleQuote&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 引用符にはシングルクォートを使う&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.prettierignore（Prettier の無視設定）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">.next/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">build/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">*.html&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.eslintrc.yml（ESLint 設定）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">root&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">env&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">browser&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">es2021&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">extends&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">eslint:recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:react/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:react-hooks/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:@typescript-eslint/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:@typescript-eslint/recommended-requiring-type-checking&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">prettier&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">parser&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;@typescript-eslint/parser&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">parserOptions&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ecmaVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">12&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ecmaFeatures&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">jsx&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">project&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">./tsconfig.json&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">plugins&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">react&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">react-hooks&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;@typescript-eslint&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">rules&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">react/react-in-jsx-scope&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">off&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">package.json（npm スクリプト設定）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">scripts&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;lint&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;run-p -c -l lint:**&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;lint:prettier&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;prettier --check .&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;lint:eslint&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;eslint . --ext .ts,.tsx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;lint:tsc&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;tsc&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;fix&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;run-s -l fix:**&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;fix:prettier&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;prettier --write .&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;fix:eslint&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;eslint . --ext .ts,.tsx --fix&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、次のようにして Prettier + ESLint による Lint チェックと自動修正をかけられるようになります。&lt;/p></description></item><item><title>ESLint (4) ESLint の設定方法まとめ (for Next.js 11)</title><link>https://maku.blog/p/dexgg8o/</link><pubDate>Mon, 19 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dexgg8o/</guid><description>&lt;h2 id="nextjs-11-が-eslint-を組み込みサポート">Next.js 11 が ESLint を組み込みサポート&lt;/h2>
+&lt;p>&lt;a href="https://nextjs.org/docs/basic-features/eslint">Next.js 11 で ESLint を Next.js が組み込みでサポートしました&lt;/a>。
+これで、&lt;code>create-next-app&lt;/code> で新規作成するアプリでは、ESLint に関してもゼロコンフィグで &lt;code>next eslint&lt;/code> とするだけで実行できるようになります。&lt;/p>
+&lt;p>ただ、ESLint には色々な共有設定 (config) があるわけで、Next.js がデフォルトで設定してくれているもの以外（TypeScript や Prettier 関連）は自分で設定する必要があります。
+ここでは、Next.js 11 がデフォルトで提供する &lt;code>.eslintrc&lt;/code> にそれらの設定を追加します。&lt;/p>
+&lt;h2 id="nextjs-11-デフォルトの-eslint-設定">Next.js 11 デフォルトの ESLint 設定&lt;/h2>
+&lt;p>Next.js 11 が生成する &lt;code>.eslintrc&lt;/code> ファイルは次のようなシンプルなものです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.eslintrc&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;extends&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;next&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;next/core-web-vitals&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>問題はこれらがどのような共有設定を含んでいるかですが、&lt;a href="https://github.com/vercel/next.js/blob/canary/packages/eslint-config-next/index.js">eslint-config-next&lt;/a> のコードを見ると、次のような感じになっています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">module&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">exports&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">extends&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;plugin:react/recommended&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;plugin:react-hooks/recommended&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;plugin:@next/next/recommended&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>React 系の共有設定はここに含まれているので、&lt;code>&amp;quot;extends&amp;quot;: [&amp;quot;next&amp;quot;]&lt;/code> だけでカバーできそうです。
+&lt;a href="https://nextjs.org/docs/basic-features/eslint#base-configuration">公式ドキュメントの ESLint - Base Configuration&lt;/a> にも同様の説明が書かれています。
+逆に、TypeScript 関連や、Prettier 関連の共有設定は自分で追加しなければいけません。&lt;/p>
+&lt;h2 id="eslint-設定を追加する">ESLint 設定を追加する&lt;/h2>
+&lt;p>ここでは、下記のような ESLint extends 設定を手動で追加してやります。&lt;/p></description></item></channel></rss>

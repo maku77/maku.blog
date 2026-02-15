@@ -1,6 +1,32 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>IGDB on まくろぐ</title><link>https://maku.blog/tags/igdb/</link><description>Recent content in IGDB on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 24 Oct 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/igdb/index.xml" rel="self" type="application/rss+xml"/><item><title>IGDB API でゲーム情報のデータベースにアクセスしてみる</title><link>https://maku.blog/p/mu7gqya/</link><pubDate>Mon, 24 Oct 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mu7gqya/</guid><description>IGDB は、世の中の（ビデオ）ゲームの情報をデータベースとして集約しようとしている壮大なプロジェクトで、現在 Twitch が運営しています。 この情報には IGDB API という Web API でアクセスできるようになっていて、簡単に試す程度なら無料で利用できます。 ちょっと試してみたのでメモに残しておきます。 とりあえず、curl コマンドで API のレスポンスを確認するところまで。
-大まかには、Twitch developers console でアプリクライアントを登録し、アクセストークンを発行して API を叩く、という流れになります。
-Twitch アカウントを登録する IGDB API を使うには、Twitch developers コンソールでアプリケーション（クライアント）の登録が必要です。 このサイトにサインインするには、Twitch のアカウントが必要 なので、下記から作成します。 すでに Twitch アカウントを持っている場合は、そのまま使えます。
-Twitch Developers - Login さらに、API を使用する場合は、さらに二段階認証の設定が必須になっているので、次のような感じでたどって設定しておきます。 メールアドレスや電話番号を登録すれば二段階認証を有効化できます。
-Twitch - 設定 - セキュリティとプライバシー アプリケーションを登録してクライアント ID とシークレットを発行する Twitch developers コンソール の アプリ管理画面 でアプリを登録すると、クライアント ID とシークレットキーを取得できます。
-アプリケーションを登録 ボタンをクリック 名前: 適当な名前を入力（グローバルに一意な名前じゃないといけないっぽい） OAuthのリダイレクトURL: 決まっていないなら http://localhost:3000 などを入力しておけば OK カテゴリー: プルダウンから適当に選択（Website Integration など） 作成 ボタンを押して完了 作成されたアプリの 管理 ボタンをクリック 新しい秘密 ボタンを押してクライアントシークレットを発行 上記の手順で、IGDB API を呼び出すためのクライアント ID とシークレットを確認できます。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>IGDB on まくろぐ</title><link>https://maku.blog/tags/igdb/</link><description>Recent content in IGDB on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 24 Oct 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/igdb/index.xml" rel="self" type="application/rss+xml"/><item><title>IGDB API でゲーム情報のデータベースにアクセスしてみる</title><link>https://maku.blog/p/mu7gqya/</link><pubDate>Mon, 24 Oct 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mu7gqya/</guid><description>&lt;p>&lt;a href="https://www.igdb.com/">IGDB&lt;/a> は、世の中の（ビデオ）ゲームの情報をデータベースとして集約しようとしている壮大なプロジェクトで、現在 Twitch が運営しています。
+この情報には &lt;a href="https://api-docs.igdb.com/">IGDB API&lt;/a> という Web API でアクセスできるようになっていて、簡単に試す程度なら無料で利用できます。
+ちょっと試してみたのでメモに残しておきます。
+とりあえず、&lt;code>curl&lt;/code> コマンドで API のレスポンスを確認するところまで。&lt;/p>
+&lt;p>大まかには、Twitch developers console でアプリクライアントを登録し、アクセストークンを発行して API を叩く、という流れになります。&lt;/p>
+&lt;h2 id="twitch-アカウントを登録する">Twitch アカウントを登録する&lt;/h2>
+&lt;p>IGDB API を使うには、Twitch developers コンソールでアプリケーション（クライアント）の登録が必要です。
+このサイトにサインインするには、&lt;strong>Twitch のアカウントが必要&lt;/strong> なので、下記から作成します。
+すでに Twitch アカウントを持っている場合は、そのまま使えます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://dev.twitch.tv/login">Twitch Developers - Login&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>さらに、API を使用する場合は、さらに二段階認証の設定が必須になっているので、次のような感じでたどって設定しておきます。
+メールアドレスや電話番号を登録すれば二段階認証を有効化できます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://www.twitch.tv/settings/security">Twitch - 設定 - セキュリティとプライバシー&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="アプリケーションを登録してクライアント-id-とシークレットを発行する">アプリケーションを登録してクライアント ID とシークレットを発行する&lt;/h2>
+&lt;p>&lt;a href="https://dev.twitch.tv/console/">Twitch developers コンソール&lt;/a> の &lt;a href="https://dev.twitch.tv/console/apps/">アプリ管理画面&lt;/a> でアプリを登録すると、クライアント ID とシークレットキーを取得できます。&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>&lt;code>アプリケーションを登録&lt;/code>&lt;/strong> ボタンをクリック
+&lt;ul>
+&lt;li>&lt;code>名前&lt;/code>: 適当な名前を入力（グローバルに一意な名前じゃないといけないっぽい）&lt;/li>
+&lt;li>&lt;code>OAuthのリダイレクトURL&lt;/code>: 決まっていないなら &lt;code>http://localhost:3000&lt;/code> などを入力しておけば OK&lt;/li>
+&lt;li>&lt;code>カテゴリー&lt;/code>: プルダウンから適当に選択（Website Integration など）&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>&lt;code>作成&lt;/code>&lt;/strong> ボタンを押して完了&lt;/li>
+&lt;li>作成されたアプリの &lt;strong>&lt;code>管理&lt;/code>&lt;/strong> ボタンをクリック&lt;/li>
+&lt;li>&lt;strong>&lt;code>新しい秘密&lt;/code>&lt;/strong> ボタンを押してクライアントシークレットを発行&lt;/li>
+&lt;/ol>
+&lt;p>上記の手順で、IGDB API を呼び出すためのクライアント ID とシークレットを確認できます。&lt;/p></description></item></channel></rss>

@@ -1,8 +1,37 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Go on まくろぐ</title><link>https://maku.blog/tags/go/</link><description>Recent content in Go on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Wed, 18 May 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/go/index.xml" rel="self" type="application/rss+xml"/><item><title>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）</title><link>https://maku.blog/p/ij4jv9k/</link><pubDate>Wed, 18 May 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ij4jv9k/</guid><description>何をするか？ ここでは、Go 言語用の gRPC ライブラリである gRPC-Go (google.golang.org/grpc) を使って、簡単な gRPC サーバーとクライアントを作ってみます。 通信用のスタブコードなどは、protoc コマンド (Protocl Buffers Compiler) で .proto ファイルから自動生成するので、あらかじめ protoc コマンドをインストールしておいてください。
-参考: protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler) protoc コマンドで Go 言語用のコードを生成するには、protoc-gen-go プラグインと protoc-gen-go-grpc プラグインをインストールしておく必要があります。 前者がシリアライズ用のコード、後者が gRPC 用のスタブコードを生成するための protoc プラグインです。
-# バージョンを指定してインストールする方法（推奨） $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2 # 最新バージョンをインストールする方法 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest プロジェクトの作成と gRPC-Go のインストール まずは Go 言語用のプロジェクトを作成します。 モジュール名は com.example/grpc-sample としていますが、GitHub で管理する予定であれば、リポジトリ名に合わせて github.</description></item><item><title>Go 言語で AWS SDK を使う開発環境を整える</title><link>https://maku.blog/p/xnogqgm/</link><pubDate>Mon, 11 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xnogqgm/</guid><description>何をするか？ ここでは、Go 言語用の AWS SDK V2 をセットアップして、各種 AWS サービス用の API を呼び出す準備をします。
-Go 言語は Google が開発したプログラミング言語で、ライブラリインポートの手軽さや、生成された実行バイナリの実行速度に定評があるため、今後も利用ユーザーは増えていきそうです。
-参考: Go 言語とは？／Go をインストールする | まくまくHugo/Goノート Go の実行環境は Go のインストーラー で簡単にインストールできます。 これ以降の説明では、Go の実行環境はインストール済みであると想定しています。
-テスト用の Go プロジェクトを作成する Go プロジェクト用に適当なディレクトリを作成し、その中で go mod init コマンドを実行して go.mod （依存関係などが保存されるファイル）を作成しておきます。 このファイルが存在するディレクトリを、Go はモジュールとして認識します。
-$ mkdir aws-study $ cd aws-study $ go mod init aws-study 上記の例では、go mod init の引数（モジュールパス）を aws-study としましたが、GitHub リポジトリで管理する前提であれば、github.com/&amp;lt;user&amp;gt;/aws-study のようなモジュールパスを指定するようにしてください。 これで、Go 言語プロジェクトの準備完了です。
-AWS SDK でコンフィグ情報を参照してみる AWS SDK を使って AWS のサービスにアクセスするには、認証情報として IAM ユーザーの「アクセスキー ID」や「シークレットアクセスキー」などが必要になります。 これらは、一般的には AWS CLI の aws configure コマンドによって、~/.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Go on まくろぐ</title><link>https://maku.blog/tags/go/</link><description>Recent content in Go on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Wed, 18 May 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/go/index.xml" rel="self" type="application/rss+xml"/><item><title>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）</title><link>https://maku.blog/p/ij4jv9k/</link><pubDate>Wed, 18 May 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ij4jv9k/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ここでは、Go 言語用の gRPC ライブラリである &lt;a href="https://pkg.go.dev/google.golang.org/grpc">gRPC-Go (google.golang.org/grpc)&lt;/a> を使って、簡単な gRPC サーバーとクライアントを作ってみます。
+通信用のスタブコードなどは、&lt;strong>&lt;code>protoc&lt;/code>&lt;/strong> コマンド (Protocl Buffers Compiler) で &lt;code>.proto&lt;/code> ファイルから自動生成するので、あらかじめ &lt;code>protoc&lt;/code> コマンドをインストールしておいてください。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/37e6uck/">protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>protoc&lt;/code> コマンドで Go 言語用のコードを生成するには、&lt;strong>&lt;code>protoc-gen-go&lt;/code>&lt;/strong> プラグインと &lt;strong>&lt;code>protoc-gen-go-grpc&lt;/code>&lt;/strong> プラグインをインストールしておく必要があります。
+前者がシリアライズ用のコード、後者が gRPC 用のスタブコードを生成するための &lt;code>protoc&lt;/code> プラグインです。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">#&lt;/span> バージョンを指定してインストールする方法（推奨）
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="gp">#&lt;/span> 最新バージョンをインストールする方法
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="プロジェクトの作成と-grpc-go-のインストール">プロジェクトの作成と gRPC-Go のインストール&lt;/h2>
+&lt;p>まずは Go 言語用のプロジェクトを作成します。
+モジュール名は &lt;code>com.example/grpc-sample&lt;/code> としていますが、GitHub で管理する予定であれば、リポジトリ名に合わせて &lt;code>github.com/&amp;lt;USER&amp;gt;/grpc-sample&lt;/code> のような名前にしてください。
+これが、プロジェクト内で作成する Go パッケージをインポートするときのプレフィックスになります。&lt;/p></description></item><item><title>Go 言語で AWS SDK を使う開発環境を整える</title><link>https://maku.blog/p/xnogqgm/</link><pubDate>Mon, 11 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xnogqgm/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ここでは、Go 言語用の AWS SDK V2 をセットアップして、各種 AWS サービス用の API を呼び出す準備をします。&lt;/p>
+&lt;p>Go 言語は Google が開発したプログラミング言語で、ライブラリインポートの手軽さや、生成された実行バイナリの実行速度に定評があるため、今後も利用ユーザーは増えていきそうです。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="https://maku77.github.io/hugo/go/what-is-go.html">Go 言語とは？／Go をインストールする | まくまくHugo/Goノート&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Go の実行環境は &lt;a href="https://go.dev/doc/install">Go のインストーラー&lt;/a> で簡単にインストールできます。
+これ以降の説明では、Go の実行環境はインストール済みであると想定しています。&lt;/p>
+&lt;h2 id="テスト用の-go-プロジェクトを作成する">テスト用の Go プロジェクトを作成する&lt;/h2>
+&lt;p>Go プロジェクト用に適当なディレクトリを作成し、その中で &lt;strong>&lt;code>go mod init&lt;/code>&lt;/strong> コマンドを実行して &lt;strong>&lt;code>go.mod&lt;/code>&lt;/strong> （依存関係などが保存されるファイル）を作成しておきます。
+このファイルが存在するディレクトリを、Go はモジュールとして認識します。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mkdir aws-study
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> &lt;span class="nb">cd&lt;/span> aws-study
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> go mod init aws-study
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>上記の例では、&lt;code>go mod init&lt;/code> の引数（モジュールパス）を &lt;code>aws-study&lt;/code> としましたが、GitHub リポジトリで管理する前提であれば、&lt;strong>&lt;code>github.com/&amp;lt;user&amp;gt;/aws-study&lt;/code>&lt;/strong> のようなモジュールパスを指定するようにしてください。
+これで、Go 言語プロジェクトの準備完了です。&lt;/p>
+&lt;h2 id="aws-sdk-でコンフィグ情報を参照してみる">AWS SDK でコンフィグ情報を参照してみる&lt;/h2>
+&lt;p>AWS SDK を使って AWS のサービスにアクセスするには、認証情報として IAM ユーザーの「アクセスキー ID」や「シークレットアクセスキー」などが必要になります。
+これらは、一般的には AWS CLI の &lt;code>aws configure&lt;/code> コマンドによって、&lt;code>~/.aws/credentials&lt;/code> や &lt;code>~/.aws/config&lt;/code> に保存された情報です。&lt;/p></description></item></channel></rss>

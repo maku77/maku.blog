@@ -1,29 +1,487 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>.proto ファイルの書き方 on まくろぐ</title><link>https://maku.blog/p/yakoi7q/</link><description>Recent content in .proto ファイルの書き方 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Fri, 16 Dec 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/yakoi7q/index.xml" rel="self" type="application/rss+xml"/><item><title>protobuf (.proto) ファイルのコーディングスタイル</title><link>https://maku.blog/p/esbs9o5/</link><pubDate>Tue, 17 May 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/esbs9o5/</guid><description>.proto ファイルでメッセージやサービスを定義するときのコーディング規約をまとめておきます。 Google が Style Guide として指針をまとめていますが、プロジェクト内に既に .proto ファイルがある場合は、一貫性を保つように記述するのがよいとされています。
-.proto ファイルの例 syntax = &amp;#34;proto3&amp;#34;; package endpoints.examples.bookstore; option java_multiple_files = true; option java_outer_classname = &amp;#34;BookstoreProto&amp;#34;; option java_package = &amp;#34;com.google.endpoints.examples.bookstore&amp;#34;; import &amp;#34;google/protobuf/empty.proto&amp;#34;; service Bookstore { rpc ListShelves(google.protobuf.Empty) returns (ListShelvesResponse) {} rpc CreateShelf(CreateShelfRequest) returns (Shelf) {} rpc GetShelf(GetShelfRequest) returns (Shelf) {} rpc DeleteShelf(DeleteShelfRequest) returns (google.protobuf.Empty) {} rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {} rpc CreateBook(CreateBookRequest) returns (Book) {} rpc GetBook(GetBookRequest) returns (Book) {} rpc DeleteBook(DeleteBookRequest) returns (google.</description></item><item><title>.proto の文法: メッセージ型 (message)</title><link>https://maku.blog/p/7h3hu8k/</link><pubDate>Tue, 13 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7h3hu8k/</guid><description>メッセージ型とは Protocol Buffers の メッセージ型 は、基本的なデータ構造を表すもので、.proto ファイルの中で message キーワードを使って定義します。 メッセージ型は、プログラミング言語でいうところの構造体に相当するものです。
-message SearchRequest { string query = 1; int32 page_number = 2; int32 result_per_page = 3; } Go 言語のコードに変換した場合の例 変換コマンド $ protoc --go_out=. --go_opt=Msample.proto=message sample.proto sample.pb.go（抜粋） type SearchRequest struct { // ... Query string `protobuf:&amp;#34;bytes,1,opt,name=query,proto3&amp;#34; json:&amp;#34;query,omitempty&amp;#34;` PageNumber int32 `protobuf:&amp;#34;varint,2,opt,name=page_number,json=pageNumber,proto3&amp;#34; json:&amp;#34;page_number,omitempty&amp;#34;` ResultPerPage int32 `protobuf:&amp;#34;varint,3,opt,name=result_per_page,json=resultPerPage,proto3&amp;#34; json:&amp;#34;result_per_page,omitempty&amp;#34;` } 自動生成されたコードの型情報には、.proto で明示的に定義したフィールド以外の情報も含まれています。 それらの情報は、各種 protobuf ライブラリが内部的に使用します。
-上記の SearchRequest というメッセージ型は 3 つのフィールド（文字列 1 つと数値 2 つ）を持っています。 ここでは、protobuf が標準で用意している スカラー型 の string と int32 を使っていますが、他のメッセージ型や列挙型、マップ型などのフィールドとして定義することもできます。 このあたりは、一般的なプログラミング言語と同様です。 各フィールドの末尾には、フィールドを一意に特定する整数である フィールド番号 を割り当てる必要があります。</description></item><item><title>.proto の文法: フィールド番号について</title><link>https://maku.blog/p/w7xkvnb/</link><pubDate>Tue, 13 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/w7xkvnb/</guid><description>フィールド番号の基本 Protocol Buffers の .proto ファイルの型定義では、各フィールドの末尾に フィールド番号 を割り当てておく必要があります。
-フィールド番号の割り当て例 message SearchRequest { string query = 1; int32 page_number = 2; int32 result_per_page = 3; } = 記号が使われていますが、そのフィールドに値を代入しているわけではないので注意してください。 Protocol Buffers は、メッセージ送信用にデータをシリアライズ（バイナリ化）するとき、フィールド名の代わりにこのフィールド番号を使用します。 これにより、Protocol Buffers は効率的なデータ転送を実現しています。
-フィールド番号は 1 以上の整数（最大値は 229-1 = 536,870,911）で、メッセージの定義内（同じ階層）で一意になっている必要があります。 必ずしも 1、2、3 のように連番で割り当てる必要はなく、ほぼ任意の数値を割り当てることができますが、19000 ～ 19999 の値は使えません。 これらは、Protocol Buffers ライブラリが内部実装用に予約している値です。 これらの不正な値を使用していると、protoc コマンドなどでコンパイルしようとしたときにエラーになります。
-データをシリアライズするとき、フィールド番号 1～15 の数値は、わずか 1 バイトのデータに変換されるため、頻繁に使用するフィールドには 1～15 のフィールド番号を割り当てておくと効率的な通信を行えます。 とはいえ、フィールド番号が 16～2047 であっても、2 バイトのデータで表現できるので、シビアな通信速度が求められている環境でなければそれほど気にする必要はないでしょう。
-reserved と deprecated reserved 一度割り当てたフィールド番号は、将来にわたって変更してはいけません。 なぜなら、過去のバージョンの .proto を使って実装されたアプリケーションは、古い .proto で割り当てられたフィールド番号で通信しようとするためです。 同じフィールド番号で異なるデータが送られてきたら、アプリケーションはうまく動作しなくなってしまいます。 .</description></item><item><title>.proto の文法: スカラー型の一覧</title><link>https://maku.blog/p/bi5jyer/</link><pubDate>Tue, 13 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bi5jyer/</guid><description>Protocol Buffers の .proto ファイルの中で使用可能なスカラー型と、各言語の型の対応表です。 スカラー型は、メッセージ型 の各フィールドの型として使用できます。
-protobuf C++ Java/Kotlin Go Dart double double double float64 double float float float float32 double int32 int32 int int32 int int64 int64 long int64 Int64 uint32 uint32 int uint32 int uint64 uint64 long uint64 Int64 sint32 int32 int int32 int sint64 int64 long int64 Int64 fixed32 uint32 int uint32 int fixed64 uint64 long uint64 Int64 sfixed32 int32 int int32 int sfixed64 int64 long int64 Int64 bool bool boolean bool bool string string String string String bytes string ByteString []byte List 次のような repeated フィールドは、配列やリスト（Golang ではスライス）に相当するコードに置き換えられます。</description></item><item><title>.proto の文法: repeated ラベル（フィールドを配列にする）</title><link>https://maku.blog/p/b2q2jmh/</link><pubDate>Fri, 16 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/b2q2jmh/</guid><description>Protocol Buffers (protobuf) のフィールドを配列／リスト扱いにするには、.proto ファイルのフィールド定義の先頭に repeated ラベルを付加します。 次の FindBookResponse メッセージ型は、Book 配列のフィールドを持っています。
-books.proto（抜粋） message FindBookResponse { repeated Book books = 1; } message Book { string title = 1; } repeated ラベルを付けたフィールドの名前は複数形にしましょう（上記例の場合は books）。
-Protocol Buffers では repeated を連続させた多次元配列は定義できませんが、任意のメッセージ型に repeated を付けることはできるので、そのメッセージ型の中に repeated フィールドを配置すれば、多次元配列と同様のデータを表現することができます。
-repeated ラベルは、oneof フィールドに付加することはできません。
-参考: .proto の文法: oneof 型</description></item><item><title>.proto の文法: optional ラベル（フィールドを省略可能にする）</title><link>https://maku.blog/p/sp9q7o5/</link><pubDate>Thu, 15 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/sp9q7o5/</guid><description>.proto のフィールドを省略可能にする (option) Protocol Buffers（.proto ファイル）のフィールド定義で optional というラベルを付けると、そのフィールドへの値のセットがオプショナルであることを示すことができます。 optional ラベルは、protoc コンパイラの v3.15.0 以降で使用できます。
-sample.proto syntax = &amp;#34;proto3&amp;#34;; option go_package = &amp;#34;github.com/maku77/myapp/pb&amp;#34;; message SampleMessage { string message = 1; // 通常のフィールド optional string description = 2; // 省略可能なフィールド } 例えば、上記のような .proto ファイルから、次のように Golang コードを生成すると、
-$ protoc --go_out=. --go_opt=paths=source_relative sample.proto 次のような SampleMessage 型のコードが生成されます。
-sample.pb.go type SampleMessage struct { state protoimpl.MessageState sizeCache protoimpl.SizeCache unknownFields protoimpl.UnknownFields Message string `protobuf:&amp;#34;bytes,1,opt,name=message,proto3&amp;#34; json:&amp;#34;message,omitempty&amp;#34;` // 通常のフィールド Description *string `protobuf:&amp;#34;bytes,2,opt,name=description,proto3,oneof&amp;#34; json:&amp;#34;description,omitempty&amp;#34;` // 省略可能なフィールド } Golang の場合は、オプショナルな string フィールドは、*string として表現されるようですね。</description></item><item><title>.proto の文法: oneof 型</title><link>https://maku.blog/p/vxixbp3/</link><pubDate>Wed, 14 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vxixbp3/</guid><description>Protocol Buffers の oneof 型 は、定義したフィールドのうち、いずれか 1 つのフィールドのみに値が格納されていることを示す型です。 次の SampleMessage メッセージ型は、1 つの oneof 型フィールド status を持っています。
-message SampleMessage { string content = 1; oneof status { int32 status_code = 2; string status_name = 3; } } 上記の oneof ブロックには status_code フィールドと status_name フィールドが定義されていますが、これらのいずれかのフィールドに値が格納されることを示しています。 実際にどのフィールドに値が格納されているかを調べる方法は、各言語の protobuf ライブラリ実装によって異なります。 下記は C++ の例です。
-SampleMessage message; message.set_status_code(123); if (message.has_status_code()) { // ... } oneof のフィールドに値をセットすると、同じ oneof に含まれる他のフィールドの値はクリアされることに注意してください。
-oneof フィールドに、repeated ラベル や optional ラベル を設定することはできません。</description></item><item><title>.proto の文法: マップ型 (map)</title><link>https://maku.blog/p/xpbnycm/</link><pubDate>Wed, 14 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xpbnycm/</guid><description>Protocol Buffers でマップ型のフィールドを定義するには、map&amp;lt;key_type, value_type&amp;gt; という形式で型を指定します。 次の SampleMessage メッセージ型は、string 型のキーと Project 型の値を持つマップフィールドを定義しています。
-sample.proto（map 型フィールドの例） message SampleMessage { // ... map&amp;lt;string, Project&amp;gt; projects = 3; } message Project { // ... } キーの型 (key_type) には、整数あるいは文字列 を指定することができます。 浮動小数点数 (float, double) やバイトデータ (bytes) を key_type にすることはできません。
-値の型 (value_type) としては、ほぼすべての型 を指定できますが、マップ型だけは value_type にすることはできません。 つまり、マップのマップは表現できないことになるのですが、value_type として他のメッセージ型を持たせることができるので（上記の例では Project）、実際にはほぼ同様の情報を表現できます。
-あと、あまり困ることはないでしょうが、Protocol Buffers ではマップの配列（リスト）は表現できません（つまり、repeated map&amp;lt;xxx, yyy&amp;gt; とはできません）。</description></item><item><title>.proto の文法: 列挙型 (enum)</title><link>https://maku.blog/p/p5wjbwq/</link><pubDate>Wed, 14 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p5wjbwq/</guid><description>列挙型とは Protocol Buffers の 列挙型 は、取り得る値が、あらかじめ定義された定数の中からのみ選択可能であることを示す型で、.proto ファイルの中で enum キーワードを使って定義します。 列挙型は、ひとことで言うと、複数の定数をグルーピングする機能です。 下記の例では、Corpus という列挙型を定義し、SearchRequest メッセージ型のフィールドとして使用しています。
-sample.proto enum Corpus { CORPUS_UNSPECIFIED = 0; CORPUS_UNIVERSAL = 1; CORPUS_WEB = 2; CORPUS_IMAGES = 3; CORPUS_LOCAL = 4; CORPUS_NEWS = 5; CORPUS_PRODUCTS = 6; CORPUS_VIDEO = 7; } message SearchRequest { string query = 1; int32 page_number = 2; int32 result_per_page = 3; Corpus corpus = 4; } .proto のコーディングスタイル では、すべての列挙値の名前には、型名に相当するプレフィックス を付けるべしとされています（上記の CORPUS_ の部分）。 型名が 3 語以上で構成されていたりして長い場合は、略称のプレフィックスが使われることもあるようです。</description></item><item><title>.proto の文法: 別の .proto ファイルをインポートする (import)</title><link>https://maku.blog/p/e8yeofc/</link><pubDate>Wed, 14 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/e8yeofc/</guid><description>.proto ファイルをインポートする (import) Protocol Buffers の .proto 内で import ステートメントを使用すると、他の .proto ファイルの内容を取り込むことができます。 次の例では、main.proto から other.proto の内容をインポートして、OtherMessage というメッセージ型を参照しています。
-proto/message/main.proto（インポートする側） syntax = &amp;#34;proto3&amp;#34;; option go_package = &amp;#34;github.com/maku77/myapp/message&amp;#34;; import &amp;#34;message/other.proto&amp;#34;; message MainMessage { OtherMessage other = 1; } proto/message/other.proto（インポートされる側） syntax = &amp;#34;proto3&amp;#34;; option go_package = &amp;#34;github.com/maku77/myapp/message&amp;#34;; message OtherMessage { string content = 1; } インポートのパスは、デフォルトでは protoc コマンドを実行したディレクトリからの相対パスで指定します。 起点となるディレクトリを変更したい場合は、protoc コマンドの --proto_path オプションで、.proto ファイルを配置したルートディレクトリを指定します。
-.proto ファイルが proto ディレクトリ以下にある場合 $ protoc --go_out=. --go_opt=paths=source_relative --proto_path=proto message/main.proto 上記のように実行すると、proto/message/main.proto ファイル（およびそこからインポートされているファイル）を入力情報として、message/main.</description></item><item><title>.proto の文法: サービス型 (service)</title><link>https://maku.blog/p/napwb4e/</link><pubDate>Tue, 13 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/napwb4e/</guid><description>Protoco Buffers の サービス型 は、クライアントとサーバー間の通信方法 (RPC メソッド群) を定義するための型で、.proto ファイルの中で service キーワードを使って定義します。
-次の例では、Echo メソッドを持つ EchoService サービス型を定義しています。
-// Echo メソッドを持つ EchoService の定義 service EchoService { rpc Echo (EchoRequest) returns (EchoResponse); } // Echo に送るリクエストメッセージの定義 message EchoRequest { string message = 1; optional string payload = 2; } // Echo が返すレスポンスメッセージの定義 message EchoResponse { string message = 1; } 引数と戻り値の方には、上記のように単一のメッセージ型を指定します。 スカラー型を指定することはできないので、単一の値を渡したいときも、独自のメッセージ型を用意する必要があります。 慣例として、引数の型には Request、戻り値の型には Response というサフィックスを付けます。
-引数や戻り値が存在しない場合は、Google が用意している google.protobuf.Empty 型を使用することができます。
-import &amp;#34;google/protobuf/empty.proto&amp;#34;; service HelloService { rpc Hello(google.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>.proto ファイルの書き方 on まくろぐ</title><link>https://maku.blog/p/yakoi7q/</link><description>Recent content in .proto ファイルの書き方 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Fri, 16 Dec 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/yakoi7q/index.xml" rel="self" type="application/rss+xml"/><item><title>protobuf (.proto) ファイルのコーディングスタイル</title><link>https://maku.blog/p/esbs9o5/</link><pubDate>Tue, 17 May 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/esbs9o5/</guid><description>&lt;p>&lt;code>.proto&lt;/code> ファイルでメッセージやサービスを定義するときのコーディング規約をまとめておきます。
+Google が &lt;a href="https://developers.google.com/protocol-buffers/docs/style">Style Guide&lt;/a> として指針をまとめていますが、プロジェクト内に既に &lt;code>.proto&lt;/code> ファイルがある場合は、一貫性を保つように記述するのがよいとされています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.proto ファイルの例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="n">syntax&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;proto3&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kn">package&lt;/span> &lt;span class="nn">endpoints&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">examples.bookstore&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">option&lt;/span> &lt;span class="n">java_multiple_files&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">option&lt;/span> &lt;span class="n">java_outer_classname&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;BookstoreProto&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">option&lt;/span> &lt;span class="n">java_package&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;com.google.endpoints.examples.bookstore&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">import&lt;/span> &lt;span class="s">&amp;#34;google/protobuf/empty.proto&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kd">service&lt;/span> &lt;span class="n">Bookstore&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">rpc&lt;/span> &lt;span class="n">ListShelves&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">google.protobuf.Empty&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">returns&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">ListShelvesResponse&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">rpc&lt;/span> &lt;span class="n">CreateShelf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">CreateShelfRequest&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">returns&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Shelf&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">rpc&lt;/span> &lt;span class="n">GetShelf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">GetShelfRequest&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">returns&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Shelf&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">rpc&lt;/span> &lt;span class="n">DeleteShelf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">DeleteShelfRequest&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">returns&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">google.protobuf.Empty&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">rpc&lt;/span> &lt;span class="n">ListBooks&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ListBooksRequest&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">returns&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">ListBooksResponse&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">rpc&lt;/span> &lt;span class="n">CreateBook&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">CreateBookRequest&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">returns&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Book&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">rpc&lt;/span> &lt;span class="n">GetBook&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">GetBookRequest&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">returns&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Book&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">rpc&lt;/span> &lt;span class="n">DeleteBook&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">DeleteBookRequest&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">returns&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">google.protobuf.Empty&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kd">message&lt;/span> &lt;span class="nc">Shelf&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">int64&lt;/span> &lt;span class="n">id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">theme&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kd">message&lt;/span> &lt;span class="nc">Book&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">int64&lt;/span> &lt;span class="n">id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">author&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">title&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kd">enum&lt;/span> &lt;span class="n">FooBar&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">FOO_BAR_UNSPECIFIED&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">FOO_BAR_FIRST_VALUE&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">FOO_BAR_SECOND_VALUE&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="全般">全般&lt;/h2>
+&lt;ul>
+&lt;li>&lt;code>.proto&lt;/code> ファイル名はすべて小文字 + アンダースコア（例: &lt;strong>&lt;code>lower_snake_case.proto&lt;/code>&lt;/strong>）&lt;/li>
+&lt;li>&lt;code>.proto&lt;/code> ファイルは、&lt;strong>&lt;code>proto&lt;/code>&lt;/strong> という独立したディレクトリに入れて、別のソースコードとは分けて管理する（参考: &lt;a href="https://developers.google.com/protocol-buffers/docs/proto3#location">File location&lt;/a>）
+&lt;ul>
+&lt;li>言語に依存したディレクトリ階層に配置することは推奨されていません。例えば、Java のパッケージ階層に合わせて &lt;code>.proto&lt;/code> ファイルを配置すると、Java ではわかりやすいと感じるかもしれませんが、他の言語で使おうとしたときにその階層構造が意味を持たないことがあります。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>1 行は &lt;strong>80 文字&lt;/strong> まで&lt;/li>
+&lt;li>インデントはスペース &lt;strong>2 文字&lt;/strong>&lt;/li>
+&lt;li>文字列リテラルは &lt;strong>ダブルクォート&lt;/strong> で囲む（例: &lt;code>&amp;quot;Hoge&amp;quot;&lt;/code>）&lt;/li>
+&lt;/ul>
+&lt;h2 id="proto-の構成">.proto の構成&lt;/h2>
+&lt;p>&lt;code>.proto&lt;/code> ファイルの内容は次のような順番で記述します。&lt;/p></description></item><item><title>.proto の文法: メッセージ型 (message)</title><link>https://maku.blog/p/7h3hu8k/</link><pubDate>Tue, 13 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7h3hu8k/</guid><description>&lt;h2 id="メッセージ型とは">メッセージ型とは&lt;/h2>
+&lt;p>Protocol Buffers の &lt;strong>メッセージ型&lt;/strong> は、基本的なデータ構造を表すもので、&lt;code>.proto&lt;/code> ファイルの中で &lt;strong>&lt;code>message&lt;/code>&lt;/strong> キーワードを使って定義します。
+メッセージ型は、プログラミング言語でいうところの構造体に相当するものです。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">message&lt;/span> &lt;span class="nc">SearchRequest&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">query&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">int32&lt;/span> &lt;span class="n">page_number&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">int32&lt;/span> &lt;span class="n">result_per_page&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="xAccordion">
+ &lt;input id="id-379841652" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-379841652">Go 言語のコードに変換した場合の例&lt;/label>
+ &lt;div class="xAccordion_body">
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">変換コマンド&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> protoc --go_out&lt;span class="o">=&lt;/span>. --go_opt&lt;span class="o">=&lt;/span>Msample.proto&lt;span class="o">=&lt;/span>message sample.proto
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">sample.pb.go（抜粋）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">type&lt;/span> &lt;span class="nx">SearchRequest&lt;/span> &lt;span class="kd">struct&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>	&lt;span class="nx">Query&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="s">`protobuf:&amp;#34;bytes,1,opt,name=query,proto3&amp;#34; json:&amp;#34;query,omitempty&amp;#34;`&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">PageNumber&lt;/span> &lt;span class="kt">int32&lt;/span> &lt;span class="s">`protobuf:&amp;#34;varint,2,opt,name=page_number,json=pageNumber,proto3&amp;#34; json:&amp;#34;page_number,omitempty&amp;#34;`&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">ResultPerPage&lt;/span> &lt;span class="kt">int32&lt;/span> &lt;span class="s">`protobuf:&amp;#34;varint,3,opt,name=result_per_page,json=resultPerPage,proto3&amp;#34; json:&amp;#34;result_per_page,omitempty&amp;#34;`&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+&lt;p>自動生成されたコードの型情報には、&lt;code>.proto&lt;/code> で明示的に定義したフィールド以外の情報も含まれています。
+それらの情報は、各種 protobuf ライブラリが内部的に使用します。&lt;/p>
+ &lt;/div>
+&lt;/div>
+&lt;p>上記の &lt;code>SearchRequest&lt;/code> というメッセージ型は 3 つのフィールド（文字列 1 つと数値 2 つ）を持っています。
+ここでは、protobuf が標準で用意している &lt;a href="../../p/bi5jyer/">スカラー型&lt;/a> の &lt;code>string&lt;/code> と &lt;code>int32&lt;/code> を使っていますが、他のメッセージ型や列挙型、マップ型などのフィールドとして定義することもできます。
+このあたりは、一般的なプログラミング言語と同様です。
+各フィールドの末尾には、フィールドを一意に特定する整数である &lt;a href="../../p/w7xkvnb/">フィールド番号&lt;/a> を割り当てる必要があります。&lt;/p>
+&lt;h3 id="配列を示す-repeated-ラベル">配列を示す repeated ラベル&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="k">repeated&lt;/span> &lt;span class="kt">float&lt;/span> &lt;span class="n">prices&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// Golang なら []float32 になる
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">repeated&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">snippets&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// Golang なら []string になる
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>フィールドの定義に &lt;strong>&lt;code>repeated&lt;/code>&lt;/strong> ラベルを付けると、配列やリスト（Golang ではスライス）を表すフィールドとして扱われます。&lt;/p></description></item><item><title>.proto の文法: フィールド番号について</title><link>https://maku.blog/p/w7xkvnb/</link><pubDate>Tue, 13 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/w7xkvnb/</guid><description>&lt;h2 id="フィールド番号の基本">フィールド番号の基本&lt;/h2>
+&lt;p>Protocol Buffers の &lt;code>.proto&lt;/code> ファイルの型定義では、各フィールドの末尾に &lt;strong>&lt;code>フィールド番号&lt;/code>&lt;/strong> を割り当てておく必要があります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">フィールド番号の割り当て例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">message&lt;/span> &lt;span class="nc">SearchRequest&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">query&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">int32&lt;/span> &lt;span class="n">page_number&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">int32&lt;/span> &lt;span class="n">result_per_page&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>=&lt;/code> 記号が使われていますが、そのフィールドに値を代入しているわけではないので注意してください。
+Protocol Buffers は、メッセージ送信用にデータをシリアライズ（バイナリ化）するとき、フィールド名の代わりにこのフィールド番号を使用します。
+これにより、Protocol Buffers は効率的なデータ転送を実現しています。&lt;/p>
+&lt;p>フィールド番号は &lt;strong>1 以上の整数&lt;/strong>（最大値は 2&lt;sup>29&lt;/sup>-1 = 536,870,911）で、メッセージの定義内（同じ階層）で一意になっている必要があります。
+必ずしも 1、2、3 のように連番で割り当てる必要はなく、ほぼ任意の数値を割り当てることができますが、&lt;strong>19000 ～ 19999 の値は使えません&lt;/strong>。
+これらは、Protocol Buffers ライブラリが内部実装用に予約している値です。
+これらの不正な値を使用していると、&lt;code>protoc&lt;/code> コマンドなどでコンパイルしようとしたときにエラーになります。&lt;/p>
+&lt;p>データをシリアライズするとき、フィールド番号 1～15 の数値は、わずか 1 バイトのデータに変換されるため、頻繁に使用するフィールドには 1～15 のフィールド番号を割り当てておくと効率的な通信を行えます。
+とはいえ、フィールド番号が 16～2047 であっても、2 バイトのデータで表現できるので、シビアな通信速度が求められている環境でなければそれほど気にする必要はないでしょう。&lt;/p>
+&lt;h2 id="reserved-と-deprecated">reserved と deprecated&lt;/h2>
+&lt;h3 id="reserved">reserved&lt;/h3>
+&lt;p>&lt;strong>一度割り当てたフィールド番号は、将来にわたって変更してはいけません。&lt;/strong>
+なぜなら、過去のバージョンの &lt;code>.proto&lt;/code> を使って実装されたアプリケーションは、古い &lt;code>.proto&lt;/code> で割り当てられたフィールド番号で通信しようとするためです。
+同じフィールド番号で異なるデータが送られてきたら、アプリケーションはうまく動作しなくなってしまいます。
+&lt;code>.proto&lt;/code> を更新して非推奨になったフィールドを削除するときは、フィールド番号やフィールド名を使いまわしてしまわないように、&lt;strong>&lt;code>reserved&lt;/code>&lt;/strong> キーワードを使って次のように定義しておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">フィールド番号の予約&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">enum&lt;/span> &lt;span class="n">Foo&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">reserved&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span> &lt;span class="k">to&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">40&lt;/span> &lt;span class="k">to&lt;/span> &lt;span class="k">max&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">reserved&lt;/span> &lt;span class="s">&amp;#34;FOO_AAA&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;FOO_BBB&amp;#34;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この例では、&lt;code>2&lt;/code>、&lt;code>5～10&lt;/code>、&lt;code>40～最大値&lt;/code> のフィールド番号の使用と、&lt;code>FOO_AAA&lt;/code> と &lt;code>FOO_BBB&lt;/code> というフィールド名（この例の場合は列挙値）の使用を制限しています。
+1 つの &lt;code>reserved&lt;/code> 行では、数値のリストあるいは文字列のリストのどちらかしか定義できないので、上記のように 2 行に分けて定義する必要があります。
+&lt;code>reserved&lt;/code> キーワードは、その名前が示しているように、将来的にこれらのフィールド番号を使うために「予約」しておく、という用途でも使用できます。&lt;/p></description></item><item><title>.proto の文法: スカラー型の一覧</title><link>https://maku.blog/p/bi5jyer/</link><pubDate>Tue, 13 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bi5jyer/</guid><description>&lt;p>Protocol Buffers の &lt;code>.proto&lt;/code> ファイルの中で使用可能なスカラー型と、各言語の型の対応表です。
+スカラー型は、&lt;a href="../../p/7h3hu8k/">メッセージ型&lt;/a> の各フィールドの型として使用できます。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>protobuf&lt;/th>
+ &lt;th>C++&lt;/th>
+ &lt;th>Java/Kotlin&lt;/th>
+ &lt;th>Go&lt;/th>
+ &lt;th>Dart&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>double&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>double&lt;/code>&lt;/td>
+ &lt;td>&lt;code>double&lt;/code>&lt;/td>
+ &lt;td>&lt;code>float64&lt;/code>&lt;/td>
+ &lt;td>&lt;code>double&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>float&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>float&lt;/code>&lt;/td>
+ &lt;td>&lt;code>float&lt;/code>&lt;/td>
+ &lt;td>&lt;code>float32&lt;/code>&lt;/td>
+ &lt;td>&lt;code>double&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>int32&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>int32&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int32&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>int64&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>int64&lt;/code>&lt;/td>
+ &lt;td>&lt;code>long&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int64&lt;/code>&lt;/td>
+ &lt;td>&lt;code>Int64&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>uint32&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>uint32&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int&lt;/code>&lt;/td>
+ &lt;td>&lt;code>uint32&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>uint64&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>uint64&lt;/code>&lt;/td>
+ &lt;td>&lt;code>long&lt;/code>&lt;/td>
+ &lt;td>&lt;code>uint64&lt;/code>&lt;/td>
+ &lt;td>&lt;code>Int64&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>sint32&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>int32&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int32&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>sint64&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>int64&lt;/code>&lt;/td>
+ &lt;td>&lt;code>long&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int64&lt;/code>&lt;/td>
+ &lt;td>&lt;code>Int64&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>fixed32&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>uint32&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int&lt;/code>&lt;/td>
+ &lt;td>&lt;code>uint32&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>fixed64&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>uint64&lt;/code>&lt;/td>
+ &lt;td>&lt;code>long&lt;/code>&lt;/td>
+ &lt;td>&lt;code>uint64&lt;/code>&lt;/td>
+ &lt;td>&lt;code>Int64&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>sfixed32&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>int32&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int32&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>sfixed64&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>int64&lt;/code>&lt;/td>
+ &lt;td>&lt;code>long&lt;/code>&lt;/td>
+ &lt;td>&lt;code>int64&lt;/code>&lt;/td>
+ &lt;td>&lt;code>Int64&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>bool&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>bool&lt;/code>&lt;/td>
+ &lt;td>&lt;code>boolean&lt;/code>&lt;/td>
+ &lt;td>&lt;code>bool&lt;/code>&lt;/td>
+ &lt;td>&lt;code>bool&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>string&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>string&lt;/code>&lt;/td>
+ &lt;td>&lt;code>String&lt;/code>&lt;/td>
+ &lt;td>&lt;code>string&lt;/code>&lt;/td>
+ &lt;td>&lt;code>String&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>&lt;code>bytes&lt;/code>&lt;/strong>&lt;/td>
+ &lt;td>&lt;code>string&lt;/code>&lt;/td>
+ &lt;td>&lt;code>ByteString&lt;/code>&lt;/td>
+ &lt;td>&lt;code>[]byte&lt;/code>&lt;/td>
+ &lt;td>&lt;code>List&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;p>次のような &lt;strong>&lt;code>repeated&lt;/code>&lt;/strong> フィールドは、配列やリスト（Golang ではスライス）に相当するコードに置き換えられます。&lt;/p></description></item><item><title>.proto の文法: repeated ラベル（フィールドを配列にする）</title><link>https://maku.blog/p/b2q2jmh/</link><pubDate>Fri, 16 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/b2q2jmh/</guid><description>&lt;p>Protocol Buffers (protobuf) のフィールドを配列／リスト扱いにするには、&lt;code>.proto&lt;/code> ファイルのフィールド定義の先頭に &lt;strong>&lt;code>repeated&lt;/code>&lt;/strong> ラベルを付加します。
+次の &lt;code>FindBookResponse&lt;/code> メッセージ型は、&lt;code>Book&lt;/code> 配列のフィールドを持っています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">books.proto（抜粋）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">message&lt;/span> &lt;span class="nc">FindBookResponse&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">repeated&lt;/span> &lt;span class="n">Book&lt;/span> &lt;span class="n">books&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kd">message&lt;/span> &lt;span class="nc">Book&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">title&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>repeated&lt;/code> ラベルを付けたフィールドの名前は複数形にしましょう（上記例の場合は &lt;code>books&lt;/code>）。&lt;/p>
+&lt;p>Protocol Buffers では &lt;code>repeated&lt;/code> を連続させた多次元配列は定義できませんが、任意のメッセージ型に &lt;code>repeated&lt;/code> を付けることはできるので、そのメッセージ型の中に &lt;code>repeated&lt;/code> フィールドを配置すれば、多次元配列と同様のデータを表現することができます。&lt;/p>
+&lt;p>&lt;code>repeated&lt;/code> ラベルは、&lt;code>oneof&lt;/code> フィールドに付加することはできません。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/vxixbp3/">.proto の文法: oneof 型&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>.proto の文法: optional ラベル（フィールドを省略可能にする）</title><link>https://maku.blog/p/sp9q7o5/</link><pubDate>Thu, 15 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/sp9q7o5/</guid><description>&lt;h2 id="proto-のフィールドを省略可能にする-option">.proto のフィールドを省略可能にする (option)&lt;/h2>
+&lt;p>Protocol Buffers（&lt;code>.proto&lt;/code> ファイル）のフィールド定義で &lt;strong>&lt;code>optional&lt;/code>&lt;/strong> というラベルを付けると、そのフィールドへの値のセットがオプショナルであることを示すことができます。
+&lt;code>optional&lt;/code> ラベルは、&lt;code>protoc&lt;/code> コンパイラの v3.15.0 以降で使用できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">sample.proto&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="n">syntax&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;proto3&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">option&lt;/span> &lt;span class="n">go_package&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;github.com/maku77/myapp/pb&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kd">message&lt;/span> &lt;span class="nc">SampleMessage&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="kd">message&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 通常のフィールド
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">optional&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">description&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 省略可能なフィールド
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>例えば、上記のような &lt;code>.proto&lt;/code> ファイルから、次のように Golang コードを生成すると、&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> protoc --go_out&lt;span class="o">=&lt;/span>. --go_opt&lt;span class="o">=&lt;/span>&lt;span class="nv">paths&lt;/span>&lt;span class="o">=&lt;/span>source_relative sample.proto
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>次のような &lt;code>SampleMessage&lt;/code> 型のコードが生成されます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">sample.pb.go&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">type&lt;/span> &lt;span class="nx">SampleMessage&lt;/span> &lt;span class="kd">struct&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">state&lt;/span> &lt;span class="nx">protoimpl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">MessageState&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">sizeCache&lt;/span> &lt;span class="nx">protoimpl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">SizeCache&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">unknownFields&lt;/span> &lt;span class="nx">protoimpl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">UnknownFields&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">Message&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="s">`protobuf:&amp;#34;bytes,1,opt,name=message,proto3&amp;#34; json:&amp;#34;message,omitempty&amp;#34;`&lt;/span> &lt;span class="c1">// 通常のフィールド
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="c1">&lt;/span>	&lt;span class="nx">Description&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="s">`protobuf:&amp;#34;bytes,2,opt,name=description,proto3,oneof&amp;#34; json:&amp;#34;description,omitempty&amp;#34;`&lt;/span> &lt;span class="c1">// 省略可能なフィールド
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Golang の場合は、オプショナルな &lt;code>string&lt;/code> フィールドは、&lt;code>*string&lt;/code> として表現されるようですね。&lt;/p>
+&lt;p>データの受信側で、実際にフィールドに値がセットされているかを調べる方法は、各言語の protobuf ライブラリによって異なります。
+例えば、C++ の場合は、&lt;code>has_description()&lt;/code> というメソッドで &lt;code>description&lt;/code> フィールドに値がセットされているかどうかを調べることができます。
+これは、&lt;a href="../../p/vxixbp3/">oneof フィールド&lt;/a> に値がセットされていることを調べる方法と同様です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">各言語での optional フィールドの存在確認&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">if (m.has_foo()) {...} // C++ の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">if (m.HasFoo) {...} // C# の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">if m.Foo != nil {...} // Go の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">if (m.hasFoo()) {...} // Java の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">if (m.hasFoo()) {...} // Javascript の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">if m.HasField(&amp;#39;foo&amp;#39;): // Python の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">if m.has_foo? // Ruby の場合&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="おまけデフォルト値と-field-presence">（おまけ）デフォルト値と Field presence&lt;/h2>
+&lt;p>Protocol Buffers では、バイナリ化したデータ形式のこと &lt;strong>wire 形式&lt;/strong> と読んでいます。
+例えば、ファイルへの保存時や、gRPC のリクエスト送信時に使われるときのデータ形式です。
+Protocol Buffers では、フィールドの型ごとに下記のようなデフォルト値が定義されており、データを wire 形式にシリアライズするときに、これらの &lt;strong>デフォルト値を保存しない&lt;/strong> ようになっています（ネットワークなどで送信されません）。&lt;/p></description></item><item><title>.proto の文法: oneof 型</title><link>https://maku.blog/p/vxixbp3/</link><pubDate>Wed, 14 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vxixbp3/</guid><description>&lt;p>Protocol Buffers の &lt;strong>oneof 型&lt;/strong> は、定義したフィールドのうち、いずれか 1 つのフィールドのみに値が格納されていることを示す型です。
+次の &lt;code>SampleMessage&lt;/code> メッセージ型は、1 つの &lt;code>oneof&lt;/code> 型フィールド &lt;code>status&lt;/code> を持っています。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">message&lt;/span> &lt;span class="nc">SampleMessage&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">content&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">oneof&lt;/span> &lt;span class="n">status&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">int32&lt;/span> &lt;span class="n">status_code&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">status_name&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>上記の &lt;code>oneof&lt;/code> ブロックには &lt;code>status_code&lt;/code> フィールドと &lt;code>status_name&lt;/code> フィールドが定義されていますが、これらのいずれかのフィールドに値が格納されることを示しています。
+実際にどのフィールドに値が格納されているかを調べる方法は、各言語の protobuf ライブラリ実装によって異なります。
+下記は C++ の例です。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">SampleMessage&lt;/span> &lt;span class="n">message&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">message&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">set_status_code&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">123&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">message&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">has_status_code&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>oneof&lt;/code> のフィールドに値をセットすると、同じ &lt;code>oneof&lt;/code> に含まれる他のフィールドの値はクリアされることに注意してください。&lt;/p>
+&lt;p>&lt;code>oneof&lt;/code> フィールドに、&lt;a href="../../p/b2q2jmh/">&lt;code>repeated&lt;/code> ラベル&lt;/a> や &lt;a href="../../p/sp9q7o5/">&lt;code>optional&lt;/code> ラベル&lt;/a> を設定することはできません。&lt;/p></description></item><item><title>.proto の文法: マップ型 (map)</title><link>https://maku.blog/p/xpbnycm/</link><pubDate>Wed, 14 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xpbnycm/</guid><description>&lt;p>Protocol Buffers でマップ型のフィールドを定義するには、&lt;strong>&lt;code>map&amp;lt;key_type, value_type&amp;gt;&lt;/code>&lt;/strong> という形式で型を指定します。
+次の &lt;code>SampleMessage&lt;/code> メッセージ型は、&lt;code>string&lt;/code> 型のキーと &lt;code>Project&lt;/code> 型の値を持つマップフィールドを定義しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">sample.proto（map 型フィールドの例）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">message&lt;/span> &lt;span class="nc">SampleMessage&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">map&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Project&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="n">projects&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kd">message&lt;/span> &lt;span class="nc">Project&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;strong>キーの型 (&lt;code>key_type&lt;/code>) には、整数あるいは文字列&lt;/strong> を指定することができます。
+浮動小数点数 (&lt;code>float&lt;/code>, &lt;code>double&lt;/code>) やバイトデータ (&lt;code>bytes&lt;/code>) を &lt;code>key_type&lt;/code> にすることはできません。&lt;/p>
+&lt;p>&lt;strong>値の型 (&lt;code>value_type&lt;/code>) としては、ほぼすべての型&lt;/strong> を指定できますが、マップ型だけは &lt;code>value_type&lt;/code> にすることはできません。
+つまり、マップのマップは表現できないことになるのですが、&lt;code>value_type&lt;/code> として他のメッセージ型を持たせることができるので（上記の例では &lt;code>Project&lt;/code>）、実際にはほぼ同様の情報を表現できます。&lt;/p>
+&lt;p>あと、あまり困ることはないでしょうが、Protocol Buffers ではマップの配列（リスト）は表現できません（つまり、&lt;code>repeated map&amp;lt;xxx, yyy&amp;gt;&lt;/code> とはできません）。&lt;/p></description></item><item><title>.proto の文法: 列挙型 (enum)</title><link>https://maku.blog/p/p5wjbwq/</link><pubDate>Wed, 14 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/p5wjbwq/</guid><description>&lt;h2 id="列挙型とは">列挙型とは&lt;/h2>
+&lt;p>Protocol Buffers の &lt;strong>列挙型&lt;/strong> は、取り得る値が、あらかじめ定義された定数の中からのみ選択可能であることを示す型で、&lt;code>.proto&lt;/code> ファイルの中で &lt;strong>&lt;code>enum&lt;/code>&lt;/strong> キーワードを使って定義します。
+列挙型は、ひとことで言うと、複数の定数をグルーピングする機能です。
+下記の例では、&lt;code>Corpus&lt;/code> という列挙型を定義し、&lt;code>SearchRequest&lt;/code> メッセージ型のフィールドとして使用しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">sample.proto&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">enum&lt;/span> &lt;span class="n">Corpus&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">CORPUS_UNSPECIFIED&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">CORPUS_UNIVERSAL&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">CORPUS_WEB&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">CORPUS_IMAGES&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">CORPUS_LOCAL&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">CORPUS_NEWS&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">CORPUS_PRODUCTS&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">CORPUS_VIDEO&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">7&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kd">message&lt;/span> &lt;span class="nc">SearchRequest&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">query&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">int32&lt;/span> &lt;span class="n">page_number&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">int32&lt;/span> &lt;span class="n">result_per_page&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">Corpus&lt;/span> &lt;span class="n">corpus&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;a href="../../p/esbs9o5/">.proto のコーディングスタイル&lt;/a> では、すべての列挙値の名前には、&lt;strong>型名に相当するプレフィックス&lt;/strong> を付けるべしとされています（上記の &lt;code>CORPUS_&lt;/code> の部分）。
+型名が 3 語以上で構成されていたりして長い場合は、略称のプレフィックスが使われることもあるようです。&lt;/p>
+&lt;p>&lt;strong>0 という値にマップされるものには、サフィックスとして &lt;code>_UNSPECIFIED&lt;/code>&lt;/strong> を付けるよう推奨されています（上記の &lt;code>CORPUS_UNSPECIFIED&lt;/code>）。
+これは、コーディングスタイルという観点だけではなく、&lt;code>proto2&lt;/code> との互換性確保の理由もあります。&lt;/p>
+&lt;p>列挙型の定数値には、32 ビット整数の範囲内で値を割り当てあることができますが、&lt;strong>負の値は非効率&lt;/strong> なので使うべきではないとされています。&lt;/p>
+&lt;h2 id="エイリアス値の定義-allow_alias">エイリアス値の定義 (allow_alias)&lt;/h2>
+&lt;p>列挙値はデフォルトでは同じ値を持つことはできませんが、次のように &lt;strong>&lt;code>allow_alias&lt;/code>&lt;/strong> オプションを &lt;code>true&lt;/code> に設定することでエイリアス（別名）を定義できるようになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">エイリアスの定義&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">enum&lt;/span> &lt;span class="n">EnumAllowingAlias&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">option&lt;/span> &lt;span class="n">allow_alias&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">EAA_UNSPECIFIED&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">EAA_STARTED&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">EAA_RUNNING&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">EAA_FINISHED&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記の &lt;code>EAA_RUNNING&lt;/code> は、&lt;code>EAA_STARTED&lt;/code> のエイリアスとして使用することができます。&lt;/p></description></item><item><title>.proto の文法: 別の .proto ファイルをインポートする (import)</title><link>https://maku.blog/p/e8yeofc/</link><pubDate>Wed, 14 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/e8yeofc/</guid><description>&lt;h2 id="proto-ファイルをインポートする-import">.proto ファイルをインポートする (import)&lt;/h2>
+&lt;p>Protocol Buffers の &lt;code>.proto&lt;/code> 内で &lt;strong>&lt;code>import&lt;/code>&lt;/strong> ステートメントを使用すると、他の &lt;code>.proto&lt;/code> ファイルの内容を取り込むことができます。
+次の例では、&lt;code>main.proto&lt;/code> から &lt;code>other.proto&lt;/code> の内容をインポートして、&lt;code>OtherMessage&lt;/code> というメッセージ型を参照しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">proto/message/main.proto（インポートする側）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="n">syntax&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;proto3&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">option&lt;/span> &lt;span class="n">go_package&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;github.com/maku77/myapp/message&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">import&lt;/span> &lt;span class="s">&amp;#34;message/other.proto&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kd">message&lt;/span> &lt;span class="nc">MainMessage&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="n">OtherMessage&lt;/span> &lt;span class="n">other&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">proto/message/other.proto（インポートされる側）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="n">syntax&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;proto3&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">option&lt;/span> &lt;span class="n">go_package&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;github.com/maku77/myapp/message&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kd">message&lt;/span> &lt;span class="nc">OtherMessage&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">content&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>インポートのパスは、デフォルトでは &lt;code>protoc&lt;/code> コマンドを実行したディレクトリからの相対パスで指定します。
+起点となるディレクトリを変更したい場合は、&lt;code>protoc&lt;/code> コマンドの &lt;strong>&lt;code>--proto_path&lt;/code>&lt;/strong> オプションで、&lt;code>.proto&lt;/code> ファイルを配置したルートディレクトリを指定します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.proto ファイルが proto ディレクトリ以下にある場合&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> protoc --go_out&lt;span class="o">=&lt;/span>. --go_opt&lt;span class="o">=&lt;/span>&lt;span class="nv">paths&lt;/span>&lt;span class="o">=&lt;/span>source_relative --proto_path&lt;span class="o">=&lt;/span>proto message/main.proto
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のように実行すると、&lt;code>proto/message/main.proto&lt;/code> ファイル（およびそこからインポートされているファイル）を入力情報として、&lt;code>message/main.pb.go&lt;/code> が生成されます。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/37e6uck/">protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)&lt;/a>&lt;/li>
+&lt;li>参考: &lt;a href="../../p/ij4jv9k/">Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="インポートした内容を再公開する-import-public">インポートした内容を再公開する (import public)&lt;/h2>
+&lt;p>別の &lt;code>.proto&lt;/code> ファイルをインポートするときに、&lt;strong>&lt;code>import public&lt;/code>&lt;/strong> を使用すると、インポートした内容（メッセージ型の定義など）を自分自身が定義しているかのように公開することができます。
+以下の例では、&lt;code>main.proto&lt;/code> は &lt;code>other1.proto&lt;/code> しかインポートしていませんが、間接的に &lt;code>other2.proto&lt;/code> で定義している &lt;code>Other2Message&lt;/code> メッセージ型を参照しています。&lt;/p></description></item><item><title>.proto の文法: サービス型 (service)</title><link>https://maku.blog/p/napwb4e/</link><pubDate>Tue, 13 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/napwb4e/</guid><description>&lt;p>Protoco Buffers の &lt;strong>サービス型&lt;/strong> は、クライアントとサーバー間の通信方法 (RPC メソッド群) を定義するための型で、&lt;code>.proto&lt;/code> ファイルの中で &lt;strong>&lt;code>service&lt;/code>&lt;/strong> キーワードを使って定義します。&lt;/p>
+&lt;p>次の例では、&lt;code>Echo&lt;/code> メソッドを持つ &lt;code>EchoService&lt;/code> サービス型を定義しています。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Echo メソッドを持つ EchoService の定義
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">service&lt;/span> &lt;span class="n">EchoService&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">rpc&lt;/span> &lt;span class="n">Echo&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">EchoRequest&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">returns&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">EchoResponse&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c1">// Echo に送るリクエストメッセージの定義
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">message&lt;/span> &lt;span class="nc">EchoRequest&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="kd">message&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">optional&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">payload&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c1">// Echo が返すレスポンスメッセージの定義
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">message&lt;/span> &lt;span class="nc">EchoResponse&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="kd">message&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>引数と戻り値の方には、上記のように単一のメッセージ型を指定します。
+スカラー型を指定することはできないので、単一の値を渡したいときも、独自のメッセージ型を用意する必要があります。
+慣例として、引数の型には &lt;strong>&lt;code>Request&lt;/code>&lt;/strong>、戻り値の型には &lt;strong>&lt;code>Response&lt;/code>&lt;/strong> というサフィックスを付けます。&lt;/p>
+&lt;p>引数や戻り値が存在しない場合は、Google が用意している &lt;a href="https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/empty.proto">&lt;strong>&lt;code>google.protobuf.Empty&lt;/code>&lt;/strong>&lt;/a> 型を使用することができます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="k">import&lt;/span> &lt;span class="s">&amp;#34;google/protobuf/empty.proto&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kd">service&lt;/span> &lt;span class="n">HelloService&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">rpc&lt;/span> &lt;span class="n">Hello&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">google.protobuf.Empty&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">returns&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">google.protobuf.Empty&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>ただ、将来的に何らかの値を渡す可能性がある場合は、独自の空っぽのメッセージ型を定義しておくのがよいでしょう。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-proto" data-lang="proto">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">service&lt;/span> &lt;span class="n">HelloService&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="k">rpc&lt;/span> &lt;span class="n">Hello&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">HelloRequest&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">returns&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">HelloResponse&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kd">message&lt;/span> &lt;span class="nc">HelloRequest&lt;/span> &lt;span class="p">{}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="kd">message&lt;/span> &lt;span class="nc">HelloResponse&lt;/span> &lt;span class="p">{}&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>RPC の通信プロトコルは、独自で実装してしまうことも可能ですが、多くの場合は Google が作った &lt;strong>gRPC&lt;/strong> というプロトコルを使います。
+というより、gRPC による通信を実現するために、Protocol Buffers (protobuf) によるシリアライズを使用することになるというケースが多いと思います。
+&lt;code>protoc&lt;/code> コマンド本体には、gRPC 用のスタブコードを生成する機能は入っていないので、&lt;code>protoc&lt;/code> のプラグイン（&lt;code>protoc-gen-go-grpc&lt;/code> など）を入れてコード生成することになります。&lt;/p></description></item></channel></rss>

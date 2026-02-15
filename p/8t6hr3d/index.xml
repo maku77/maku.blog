@@ -1,10 +1,166 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ansible のメモ on まくろぐ</title><link>https://maku.blog/p/8t6hr3d/</link><description>Recent content in Ansible のメモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 29 Aug 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/8t6hr3d/index.xml" rel="self" type="application/rss+xml"/><item><title>Ansible とは？ Ansible をインストールする</title><link>https://maku.blog/p/m7ju6fq/</link><pubDate>Sat, 22 Oct 2016 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m7ju6fq/</guid><description>Ansible とは？ Ansible は、2012 年に Michael DeHaan 氏によって公開されたコンフィギュレーションツールです。 Ansible を実行するホスト自身の構成を行うこともできるし、複数のホストに対して一括して設定することもできます。 Chef や Puppet に比べて、導入や設定が容易という特徴があります。
-類似ツールの比較 ツール名 公開日 作者 作成言語 構成管理ファイル Ansible 2012 年 Michael DeHaan 氏 Python 製 Playbook Chef 2009 年 Adam Jacob 氏 Ruby + Erlang 製 クックブック Puppet 2005 年 Luke Kanies 氏 Ruby 製 マニフェスト Ansible の特徴 ツール自体は Python で記述されています。 コントロールされる側のホスト（マネージドノード）には、Python と SSH さえ入っていればよく、導入が非常に容易です。コントロールする側のホスト（コントロールノード）から、SSH で Python スクリプトを流し込んで実行するという手法です。 複数のホストをプッシュ型でコントロールするので、大量のホスト（数千）の制御も問題なく行えます（複数のホストで並列にコンフィギュレーションが実行される）。ansible-pull というツールを導入すれば、プル型で動作させることも可能です（リモートホストがプロキシ環境内にある場合など）。 設定・構成情報は YAML 形式のテキストファイル (Playbook) で記述します。 Playbook で定義する各種処理（タスク）はモジュールによって提供されており、モジュール自身は様々な言語で実装することが可能 です（200 を超える組み込みモジュールは Python で記述されています）。 実行後の状態に関して冪等性（べきとうせい）が保証されており、何度実行しても同じ状態になるようになっています。Playbook には、「期待する状態」を「宣言的」に記載します。処理手順ではなく、目指すべき姿を定義するということです。 どのような環境でも実行可能な汎用的な Playbook を記述するというよりは、自分たちの組織用にカスタマイズされた Playbook を作成するという用途に向いています。たとえば、apt と yum のどっちのパッケージ管理ツールが使えるのかなどは意識して記述する必要があります。 Ansible の要件 VPS などのリモートサーバーを Ansible で制御できるようにするには、少なくとも対象のサーバー（マネージドノード）に SSH 接続できるようになっていて、Python がインストールされている必要があります。 これは、Ansible が SSH で Python スクリプトを流し込んで、ターゲット上で実行するという仕組みになっているからです。</description></item><item><title>Ansible で Hello World</title><link>https://maku.blog/p/uhu7hs4/</link><pubDate>Thu, 17 Feb 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uhu7hs4/</guid><description>インベントリーファイルを作る Ansible で制御したいホストは、インベントリーファイル (inventory file) に列挙しておく必要があります。 これは、想定外のホストを操作してしまうのを防ぐための安全策です。 デフォルトでは、インベントーリファイルとして /etc/ansible/hosts というファイルが読み込まれます。 コマンドラインオプション (-i) などで、読み込むファイルを指定する こともできます。
-/etc/ansible/hosts（記述例） localhost 192.168.1.20 host.example.com インベントリーファイル内では、上記のように「ホスト名」や「IP アドレス」で制御対象のホスト (managed node) を列挙します。 ここでは、3 つのホストを Ansible のコマンド（ansible や ansible-playbook）で制御できるようにしています。 localhost 以外のホストは、SSH で接続できる状態になっている必要があります（参考: SSH 関連記事）。
-ansible コマンドで ping モジュールを実行してみる 最初のステップとして、ansible コマンドで ping モジュールを実行してみます。 ping モジュールは Ansible の組み込みモジュールとして提供されており、ターゲットホストへの接続確認のために使われます。 いわゆる Linux の ping コマンド (ICMP ping) ではないことに注意してください。
-準備として、次のようなインベントリーファイル (hosts.ini) をカレントディレクトリに作成しておきます。
-hosts.ini（インベントリーファイル） localhost 192.168.1.20 ローカルホストを制御する まずは、localhost に対して（自分自身を制御対象として）、ping モジュールを実行してみます。 ansible コマンドを実行するときは、第 1 パラメータで制御対象とするホスト名を指定します。 前述の通り、指定するホスト名はインベントリーファイル内に列挙されているものの中から選びます。 次のように実行して SUCCESS 表示が出れば成功です（python コマンドのパスに関する警告が出るかもしれませんが、ひとまず無視しておいて大丈夫です）。</description></item><item><title>Ansible で VPS を設定するための準備</title><link>https://maku.blog/p/2yahqx6/</link><pubDate>Sun, 07 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2yahqx6/</guid><description>何をするか？ ConoHa VPS などの VPS を借りてサーバーをセットアップしようとすると、多くの手順が必要になります。 そんなとき、最初から Ansible で環境構築するようにしておけば、セットアップ手順を Ansible Playbook でドキュメント化することができ、サーバーの再構築が容易になります。
-ここでは、初期状態の VPS サーバー（root 接続のみ可能な状態）に、ansible というユーザーを追加し、Ansible で VPS を制御するための環境を整えます。
-前提条件 コントロールノード側（手元の PC）には、あらかじめ Ansible の実行環境がインストールされているものとします（参考: Ansible をインストールする）。 マネージドノード側（VPS サーバー）にはパスワードで SSH 接続することが可能で、Python3 の実行環境がインストールされているものとします。最新の Ubuntu であれば、これらのソフトウェアは最初から使えるはずです。 多くの場合、VPS を使い始めた直後は、root ユーザーで直接 SSH 接続できるようになっていると思います。 今回の手順で、Ansible による接続ができるようになった後は、SSH デーモンの設定を変更して、root ユーザーでの直接接続を禁止するようにしておくと安全です。 もちろん、この設定には Ansible を使うことができます。
-セットアップの流れ ここでは、VPS に ansible というユーザーを作成し、Ansible で制御できるようにセットアップします。
-VPS に ansible ユーザーを作成する ansible ユーザーを sudoers に登録する VPS に ansible ユーザーで SSH 接続できるようにする （おまけ）Ansible で SSH デーモンの設定を変更しておく root ユーザーで直接 SSH 接続すれば専用のユーザーを作成する必要はないのですが、それは sshd の運用上望ましくない ので却下とします。</description></item><item><title>Ansible 関連用語</title><link>https://maku.blog/p/a9twaog/</link><pubDate>Wed, 13 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/a9twaog/</guid><description>モジュール Ansible で使う機能の単位。例えば、ansible.builtin.systemd など。 プレイブック中の各プレイで指定するタスクリストは、モジュールを指定して定義していきます。 インベントリ コントロール対象とするマネージドノードの一覧ファイル。 INI 形式、あるいは YAML 形式で記述します。 シンプルに記述したければ INI 形式、階層構造を明確にしたければ YAML 形式を使います。 ホスト変数 インベントリで定義したホストに対して設定する変数。 インベントリファイルから分離して、host_vars ディレクトリ内の YAML ファイルに記述することもできます。 グループ変数 インベントリで定義したグループに対して設定する変数。 インベントリファイルから分離して、group_vars ディレクトリ内の YAML ファイルに記述することもできます。 インベントリプラグイン (inventory plugins) Ansible 本体にインベントリの機能を提供しているプラグイン。 INI ファイル用の ansible.builtin.ini や、YAML ファイル用の ansible.builtin.yaml などがあります。 他にも動的にインベントリを生成するものもあります。 参考: Index of all Inventory Plugins — Ansible Documentation プレイブック (playbook) マネージドノードに対する処理内容を YAML 形式で定義したもの。 プレイブックは、複数のプレイ (Play) で構成されており、プレイは複数のタスクで構成されています (Playbook ◇─ Play ◇─ Task)。 プラグイン Ansible 本体に対して機能を追加する仕組み。 参考: Indexes of all modules and plugins — Ansible Documentation コントロールノード (control node)、コントローラーノード (controller node) ansible コマンドや ansible-playbook コマンドを実行するホスト、つまり Ansible を使って対象のシステムの制御を行うマシンを指します。 管理対象ノード (managed node)、ターゲットホスト (target host) Ansible のコントロール対象となるホストのこと。コントロールノード側で Inventory として管理されます。 ansible.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ansible のメモ on まくろぐ</title><link>https://maku.blog/p/8t6hr3d/</link><description>Recent content in Ansible のメモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 07 Aug 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/8t6hr3d/index.xml" rel="self" type="application/rss+xml"/><item><title>Ansible とは？ Ansible をインストールする</title><link>https://maku.blog/p/m7ju6fq/</link><pubDate>Sat, 22 Oct 2016 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m7ju6fq/</guid><description>&lt;h2 id="ansible-とは">Ansible とは？&lt;/h2>
+&lt;p>Ansible は、2012 年に Michael DeHaan 氏によって公開されたコンフィギュレーションツールです。
+Ansible を実行するホスト自身の構成を行うこともできるし、複数のホストに対して一括して設定することもできます。
+Chef や Puppet に比べて、導入や設定が容易という特徴があります。&lt;/p>
+&lt;h3 id="類似ツールの比較">類似ツールの比較&lt;/h3>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>ツール名&lt;/th>
+ &lt;th>公開日&lt;/th>
+ &lt;th>作者&lt;/th>
+ &lt;th>作成言語&lt;/th>
+ &lt;th>構成管理ファイル&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;strong>Ansible&lt;/strong>&lt;/td>
+ &lt;td>2012 年&lt;/td>
+ &lt;td>Michael DeHaan 氏&lt;/td>
+ &lt;td>Python 製&lt;/td>
+ &lt;td>Playbook&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>Chef&lt;/td>
+ &lt;td>2009 年&lt;/td>
+ &lt;td>Adam Jacob 氏&lt;/td>
+ &lt;td>Ruby + Erlang 製&lt;/td>
+ &lt;td>クックブック&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>Puppet&lt;/td>
+ &lt;td>2005 年&lt;/td>
+ &lt;td>Luke Kanies 氏&lt;/td>
+ &lt;td>Ruby 製&lt;/td>
+ &lt;td>マニフェスト&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h3 id="ansible-の特徴">Ansible の特徴&lt;/h3>
+&lt;ul>
+&lt;li>ツール自体は Python で記述されています。&lt;/li>
+&lt;li>コントロールされる側のホスト（マネージドノード）には、&lt;strong>Python と SSH さえ入っていればよく&lt;/strong>、導入が非常に容易です。コントロールする側のホスト（コントロールノード）から、SSH で Python スクリプトを流し込んで実行するという手法です。&lt;/li>
+&lt;li>複数のホストをプッシュ型でコントロールするので、大量のホスト（数千）の制御も問題なく行えます（複数のホストで並列にコンフィギュレーションが実行される）。ansible-pull というツールを導入すれば、プル型で動作させることも可能です（リモートホストがプロキシ環境内にある場合など）。&lt;/li>
+&lt;li>&lt;strong>設定・構成情報は YAML 形式のテキストファイル (Playbook)&lt;/strong> で記述します。&lt;/li>
+&lt;li>Playbook で定義する各種処理（タスク）はモジュールによって提供されており、&lt;strong>モジュール自身は様々な言語で実装することが可能&lt;/strong> です（200 を超える組み込みモジュールは Python で記述されています）。&lt;/li>
+&lt;li>実行後の状態に関して冪等性（べきとうせい）が保証されており、何度実行しても同じ状態になるようになっています。Playbook には、「期待する状態」を「宣言的」に記載します。処理手順ではなく、目指すべき姿を定義するということです。&lt;/li>
+&lt;li>どのような環境でも実行可能な汎用的な Playbook を記述するというよりは、自分たちの組織用にカスタマイズされた Playbook を作成するという用途に向いています。たとえば、apt と yum のどっちのパッケージ管理ツールが使えるのかなどは意識して記述する必要があります。&lt;/li>
+&lt;/ul>
+&lt;h2 id="ansible-の要件">Ansible の要件&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="250" height="auto" src="../../p/m7ju6fq/img-001.drawio.svg" alt="/p/m7ju6fq/img-001.drawio.svg" />
+&lt;/figure>
+
+&lt;p>VPS などのリモートサーバーを Ansible で制御できるようにするには、少なくとも対象のサーバー（マネージドノード）に SSH 接続できるようになっていて、Python がインストールされている必要があります。
+これは、Ansible が SSH で Python スクリプトを流し込んで、ターゲット上で実行するという仕組みになっているからです。&lt;/p></description></item><item><title>Ansible で Hello World</title><link>https://maku.blog/p/uhu7hs4/</link><pubDate>Thu, 17 Feb 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uhu7hs4/</guid><description>&lt;h2 id="インベントリーファイルを作る">インベントリーファイルを作る&lt;/h2>
+&lt;p>Ansible で制御したいホストは、&lt;strong>インベントリーファイル (inventory file)&lt;/strong> に列挙しておく必要があります。
+これは、想定外のホストを操作してしまうのを防ぐための安全策です。
+デフォルトでは、インベントーリファイルとして &lt;strong>&lt;code>/etc/ansible/hosts&lt;/code>&lt;/strong> というファイルが読み込まれます。
+コマンドラインオプション (&lt;code>-i&lt;/code>) などで、&lt;a href="../../p/eycnx9i">読み込むファイルを指定する&lt;/a> こともできます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">/etc/ansible/hosts（記述例）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="na">localhost&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">192.168.1.20&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">host.example.com&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>インベントリーファイル内では、上記のように「ホスト名」や「IP アドレス」で制御対象のホスト (managed node) を列挙します。
+ここでは、3 つのホストを Ansible のコマンド（&lt;code>ansible&lt;/code> や &lt;code>ansible-playbook&lt;/code>）で制御できるようにしています。
+&lt;code>localhost&lt;/code> 以外のホストは、SSH で接続できる状態になっている必要があります（参考: &lt;a href="../../p/gwnatcs/">SSH 関連記事&lt;/a>）。&lt;/p>
+&lt;h2 id="ansible-コマンドで-ping-モジュールを実行してみる">ansible コマンドで ping モジュールを実行してみる&lt;/h2>
+&lt;p>最初のステップとして、&lt;code>ansible&lt;/code> コマンドで &lt;strong>&lt;code>ping&lt;/code>&lt;/strong> モジュールを実行してみます。
+&lt;code>ping&lt;/code> モジュールは Ansible の組み込みモジュールとして提供されており、ターゲットホストへの接続確認のために使われます。
+いわゆる Linux の &lt;code>ping&lt;/code> コマンド (ICMP ping) ではないことに注意してください。&lt;/p>
+&lt;p>準備として、次のようなインベントリーファイル (&lt;code>hosts.ini&lt;/code>) をカレントディレクトリに作成しておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">hosts.ini（インベントリーファイル）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="na">localhost&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">192.168.1.20&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="ローカルホストを制御する">ローカルホストを制御する&lt;/h3>
+&lt;p>まずは、&lt;code>localhost&lt;/code> に対して（自分自身を制御対象として）、&lt;code>ping&lt;/code> モジュールを実行してみます。
+&lt;code>ansible&lt;/code> コマンドを実行するときは、第 1 パラメータで制御対象とするホスト名を指定します。
+前述の通り、指定するホスト名はインベントリーファイル内に列挙されているものの中から選びます。
+次のように実行して SUCCESS 表示が出れば成功です（&lt;code>python&lt;/code> コマンドのパスに関する警告が出るかもしれませんが、ひとまず無視しておいて大丈夫です）。&lt;/p></description></item><item><title>Ansible で VPS を設定するための準備</title><link>https://maku.blog/p/2yahqx6/</link><pubDate>Sun, 07 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2yahqx6/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8C+FN831U+50+4YR6O2" rel="nofollow">ConoHa VPS&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=3NCT8C+FN831U+50+4YR6O2" alt="">
+ などの VPS を借りてサーバーをセットアップしようとすると、多くの手順が必要になります。
+そんなとき、最初から Ansible で環境構築するようにしておけば、セットアップ手順を Ansible Playbook でドキュメント化することができ、サーバーの再構築が容易になります。&lt;/p>
+&lt;p>ここでは、初期状態の VPS サーバー（&lt;code>root&lt;/code> 接続のみ可能な状態）に、&lt;code>ansible&lt;/code> というユーザーを追加し、Ansible で VPS を制御するための環境を整えます。&lt;/p>
+&lt;h3 id="前提条件">前提条件&lt;/h3>
+&lt;ul>
+&lt;li>コントロールノード側（手元の PC）には、あらかじめ Ansible の実行環境がインストールされているものとします（参考: &lt;a href="../../p/m7ju6fq/">Ansible をインストールする&lt;/a>）。&lt;/li>
+&lt;li>マネージドノード側（VPS サーバー）にはパスワードで SSH 接続することが可能で、Python3 の実行環境がインストールされているものとします。最新の Ubuntu であれば、これらのソフトウェアは最初から使えるはずです。&lt;/li>
+&lt;/ul>
+&lt;p>多くの場合、VPS を使い始めた直後は、root ユーザーで直接 SSH 接続できるようになっていると思います。
+今回の手順で、Ansible による接続ができるようになった後は、SSH デーモンの設定を変更して、root ユーザーでの直接接続を禁止するようにしておくと安全です。
+もちろん、この設定には Ansible を使うことができます。&lt;/p>
+&lt;h3 id="セットアップの流れ">セットアップの流れ&lt;/h3>
+&lt;p>ここでは、VPS に &lt;code>ansible&lt;/code> というユーザーを作成し、Ansible で制御できるようにセットアップします。&lt;/p>
+&lt;ol>
+&lt;li>VPS に &lt;code>ansible&lt;/code> ユーザーを作成する&lt;/li>
+&lt;li>&lt;code>ansible&lt;/code> ユーザーを sudoers に登録する&lt;/li>
+&lt;li>VPS に &lt;code>ansible&lt;/code> ユーザーで SSH 接続できるようにする&lt;/li>
+&lt;li>（おまけ）Ansible で SSH デーモンの設定を変更しておく&lt;/li>
+&lt;/ol>
+&lt;p>&lt;code>root&lt;/code> ユーザーで直接 SSH 接続すれば専用のユーザーを作成する必要はないのですが、それは &lt;a href="../../p/42cmu5d/">sshd の運用上望ましくない&lt;/a> ので却下とします。&lt;/p></description></item><item><title>Ansible 関連用語</title><link>https://maku.blog/p/a9twaog/</link><pubDate>Wed, 13 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/a9twaog/</guid><description>&lt;dl>
+&lt;dt>モジュール&lt;/dt>
+&lt;dd>Ansible で使う機能の単位。例えば、&lt;code>ansible.builtin.systemd&lt;/code> など。
+プレイブック中の各プレイで指定するタスクリストは、モジュールを指定して定義していきます。&lt;/dd>
+&lt;dt>インベントリ&lt;/dt>
+&lt;dd>コントロール対象とするマネージドノードの一覧ファイル。
+INI 形式、あるいは YAML 形式で記述します。
+シンプルに記述したければ INI 形式、階層構造を明確にしたければ YAML 形式を使います。&lt;/dd>
+&lt;dt>ホスト変数&lt;/dt>
+&lt;dd>インベントリで定義したホストに対して設定する変数。
+インベントリファイルから分離して、&lt;code>host_vars&lt;/code> ディレクトリ内の YAML ファイルに記述することもできます。&lt;/dd>
+&lt;dt>グループ変数&lt;/dt>
+&lt;dd>インベントリで定義したグループに対して設定する変数。
+インベントリファイルから分離して、&lt;code>group_vars&lt;/code> ディレクトリ内の YAML ファイルに記述することもできます。&lt;/dd>
+&lt;dt>インベントリプラグイン (inventory plugins)&lt;/dt>
+&lt;dd>Ansible 本体にインベントリの機能を提供しているプラグイン。
+INI ファイル用の &lt;code>ansible.builtin.ini&lt;/code> や、YAML ファイル用の &lt;code>ansible.builtin.yaml&lt;/code> などがあります。
+他にも動的にインベントリを生成するものもあります。
+参考: &lt;a href="https://docs.ansible.com/ansible/latest/collections/index_inventory.html">Index of all Inventory Plugins — Ansible Documentation&lt;/a>&lt;/dd>
+&lt;dt>プレイブック (playbook)&lt;/dt>
+&lt;dd>マネージドノードに対する処理内容を YAML 形式で定義したもの。
+プレイブックは、複数のプレイ (Play) で構成されており、プレイは複数のタスクで構成されています (Playbook ◇─ Play ◇─ Task)。&lt;/dd>
+&lt;dt>プラグイン&lt;/dt>
+&lt;dd>Ansible 本体に対して機能を追加する仕組み。
+参考: &lt;a href="https://docs.ansible.com/ansible/latest/collections/all_plugins.html">Indexes of all modules and plugins — Ansible Documentation&lt;/a>&lt;/dd>
+&lt;dt>コントロールノード (control node)、コントローラーノード (controller node)&lt;/dt>
+&lt;dd>&lt;code>ansible&lt;/code> コマンドや &lt;code>ansible-playbook&lt;/code> コマンドを実行するホスト、つまり Ansible を使って対象のシステムの制御を行うマシンを指します。&lt;/dd>
+&lt;dt>管理対象ノード (managed node)、ターゲットホスト (target host)&lt;/dt>
+&lt;dd>Ansible のコントロール対象となるホストのこと。コントロールノード側で Inventory として管理されます。&lt;/dd>
+&lt;dt>ansible.cfg&lt;/dt>
+&lt;dd>Ansible 本体に対する設定ファイルで、INI 形式で記述します。
+デフォルトで参照するインベントリファイル名や、SSH 接続時のホスト名登録の省略、といった設定を行えます。
+参考: [/p/pamv6gq/](ansible.cfg ファイルの検索順序)&lt;/dd>
+&lt;dt>コレクション&lt;/dt>
+&lt;dd>Ansible コンテンツの配布形式で、プラグインやモジュール、Playbook などをまとめたもの。
+ドット (&lt;code>.&lt;/code>) で区切られた名前が付けられています（例: &lt;code>ansible.utils&lt;/code>）。
+Ansible 本体 (ansible-core) に内蔵されているコレクションには、&lt;code>ansible.builtin&lt;/code> という名前が付けられています。
+モジュールはさらにドットを付けた名前で表現されます。
+例えば、&lt;code>ansible.builtin&lt;/code> コレクションには、&lt;code>ansible.builtin.systemd&lt;/code> モジュールが含まれています。&lt;/dd>
+&lt;dt>Ansible Galaxy&lt;/dt>
+&lt;dd>コミュニティがコレクションを配布しているところ。
+参考: &lt;a href="https://galaxy.ansible.com/">https://galaxy.ansible.com/&lt;/a>&lt;/dd>
+&lt;dt>FQCN (Fully Qualified Collection Name)&lt;/dt>
+&lt;dd>モジュールやプラグインの名前を、コレクション名を含む完全な名前で表現したもの。
+例えば、&lt;code>ansible.windows&lt;/code> コレクションの &lt;code>win_command&lt;/code> モジュールの FQCN は &lt;code>ansible.windows.win_command&lt;/code> になります。&lt;/dd>
+&lt;dt>アドホックモード&lt;/dt>
+&lt;dd>Playbook を使わず、コマンドラインから直接モジュールを呼び出す方法。&lt;/dd>
+&lt;dt>チェックモード&lt;/dt>
+&lt;dd>このモードで Ansible を実行すると、実際にはホストに変更を加えず、どのような結果になるかを確認できます（一般に dry run と呼ばれるものです）。&lt;/dd>
+&lt;dt>ハンドラー&lt;/dt>
+&lt;dd>システムに変更が加えられたときに実行される処理。&lt;/dd>
+&lt;dt>Ansible ロール&lt;/dt>
+&lt;dd>自己完結型の特殊な Playbook で、複雑なオーケストレーションを完了するために必要なタスク、変数、構成テンプレート、およびその他のサポートファイルとともに移動させることができます。
+コレクションには複数のロールを含むことができます。&lt;/dd>
+&lt;/dl></description></item></channel></rss>

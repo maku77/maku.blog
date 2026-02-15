@@ -1,21 +1,434 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Material-UI on まくろぐ</title><link>https://maku.blog/tags/material-ui/</link><description>Recent content in Material-UI on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Wed, 10 Aug 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/material-ui/index.xml" rel="self" type="application/rss+xml"/><item><title>MUI で GitHub のようなリソース削除の確認ダイアログを作る（AreYouSure ダイアログ）</title><link>https://maku.blog/p/cbuan5h/</link><pubDate>Wed, 10 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cbuan5h/</guid><description>何を作るか？ GitHub や AWS などで、何らかのリソースを削除するときに、次のような確認ダイアログが表示されることがあります。
-図: GitHub のリポジトリ削除時の確認ダイアログ ユーザーは、削除対象のリソース名をタイピングするまで、削除ボタンを押すことができません。 これは、不用意にリソースを削除してしまわないための措置で、このようなダイアログは様々な場所で活用できます。 ここでは、MUI (Material-UI) で同様のリソース削除確認ダイアログ (AreYouSureDialog) の実装例を紹介します。 コードをシンプルにするために、表示テキストをハードコーディングしていますが、props に切り出せば汎用的な確認ダイアログとして使えるはずです。
-AreYouSureDialog を実装する 完成時のイメージはこんな感じです。 UI のベースは、MUI の Dialog コンポーネントです。
-ダイアログコンポーネントの実装 components/AreYouSureDialog.tsx import { FC, useCallback, useState } from &amp;#39;react&amp;#39; import { Button, Dialog, DialogContent, DialogContentText, DialogTitle, TextField, Typography, IconButton, } from &amp;#39;@mui/material&amp;#39; import CloseIcon from &amp;#39;@mui/icons-material/Close&amp;#39; /** ダイアログコンポーネントの props の型定義 */ type Props = { /** ダイアログを表示するなら true */ open: boolean /** 操作対象のリソース名（= ユーザーに入力させるテキスト） */ targetName: string /** * ダイアログを閉じるべきときに呼び出されます。 * * ユーザーが処理を承認したときは、submit の値が true となり、 * 捜査対象のリソース名が targetName に格納されます。 */ onClose?</description></item><item><title>MUI のスナックバーを簡単に表示できるようにする (@mui/material/Snackbar)</title><link>https://maku.blog/p/jbv7gox/</link><pubDate>Mon, 25 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/jbv7gox/</guid><description>何をするか？ React 用の UI ライブラリである mui（旧: Material-UI）が提供している Snackbar コンポーネント を使うと、次のようなスナックバーを表示することができます。
-ただ、MUI はあくまで UI ライブラリなので、表示の制御は React コンポーネントのステート管理の仕組み（useState など）を使って自力で行わなければいけません。 ただメッセージを表示したいだけなのに、ステート管理とか面倒です。 ここでは、MUI のスナックバーを簡単に表示できるようなフック関数 (useSnackbar) を作成してみます。 使い方のイメージは次のような感じです。
-pages/sample.tsx import { NextPage } from &amp;#39;next&amp;#39; import { Button } from &amp;#39;@mui/material&amp;#39; import { useSnackbar } from &amp;#39;../libs/snackbar/Snackbar&amp;#39; const SamplePage: NextPage = () =&amp;gt; { const { showSnackbar } = useSnackbar() return ( &amp;lt;Button onClick={() =&amp;gt; showSnackbar(&amp;#39;This is an error message!&amp;#39;, &amp;#39;error&amp;#39;)}&amp;gt; Show &amp;lt;/Button&amp;gt; ) } export default SamplePage 任意の React コンポーネント（あるいは Next.</description></item><item><title>MUI でカスタムコンポーネントに sx プロパティを渡せるようにする</title><link>https://maku.blog/p/5e4cikn/</link><pubDate>Wed, 15 Dec 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5e4cikn/</guid><description>何をするか？ MUI (Material-UI) ver.5 以降では、各コンポーネントのスタイル設定に便利な sx props を使うことができます。
-The sx prop - MUI MUI コンポーネントをラップするようなカスタムコンポーネントを作成するときは、カスタムコンポーネント経由で sx props を渡せるようにしておくと、利用するときにマージン設定などを簡単に行えて便利です。
-実装例 下記は、sx props を渡せるようにした CustomButton コンポーネントの実装例です。 sx props の値は、MUI の Button コンポーネントにそのまま渡しています。 型情報として SxProps&amp;lt;Theme&amp;gt; を使うところがポイントです。
-src/components/CustomButton.tsx import { FC, ReactNode } from &amp;#39;react&amp;#39; import Button from &amp;#39;@mui/material/Button&amp;#39; import { SxProps, Theme } from &amp;#39;@mui/material/styles&amp;#39; type Props = { children: ReactNode sx?: SxProps&amp;lt;Theme&amp;gt; } export const CustomButton: FC&amp;lt;Props&amp;gt; = ({ children, sx }) =&amp;gt; { return ( &amp;lt;Button variant=&amp;#34;contained&amp;#34; sx={sx}&amp;gt; {children} &amp;lt;/Button&amp;gt; ) } これで、次のように sx prop 流のマージン設定などを行えるようになります。</description></item><item><title>Next.js のページコンポーネントが Client と Server どちらで実行されているか調べる (isServer, isClient, NoSsr)</title><link>https://maku.blog/p/m7is4dn/</link><pubDate>Fri, 13 Aug 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m7is4dn/</guid><description>Next.js のページコンポネント (src/pages/*.tsx) の関数は、静的な HTML ファイルを生成するためにビルド時にも実行されます（参考: Next.js のプリレンダリング機能を使用する）。 従来の React による SPA アプリはクライアントサイド JavaScript でしか実行されないので、同じような感覚で実装していると振る舞いの違いでハマることがあります。 例えば、ページコンポーネントから次のように window オブジェクトを参照しようとすると、Next.js によるプリレンダリング時にエラーになります。 これは、window オブジェクトは、Web ブラウザ上で JavaScript を実行しているときにしか存在しないからです。
-src/pages/hello.tsx import { FC } from &amp;#39;react&amp;#39; const HelloPage: FC = () =&amp;gt; { console.log(window.location) // ReferenceError: window is not defined return &amp;lt;h1&amp;gt;Hello&amp;lt;/h1&amp;gt; } 逆に言うと、実行時に window オブジェクトが存在しているかどうかを調べることによって、ページコンポーネント内のコードが、どのタイミングで実行されているかを判別できます。
-const isClient = () =&amp;gt; typeof window !== &amp;#39;undefined&amp;#39; // const isServer = () =&amp;gt; typeof window === &amp;#39;undefined&amp;#39; const HelloPage: FC = () =&amp;gt; { if (isClient()) { console.</description></item><item><title>Next.js アプリでのリンク方法まとめ（mui/Material-UI との連携なども） (next/link, next/router)</title><link>https://maku.blog/p/vgs4dnw/</link><pubDate>Tue, 10 Aug 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vgs4dnw/</guid><description>アプリ内ページへのリンク（基本） // import Link from &amp;#39;next/link&amp;#39; &amp;lt;Link href=&amp;#34;/about&amp;#34;&amp;gt;About us&amp;lt;/Link&amp;gt; Next.js でアプリ内部で閉じるページリンクを張るには、next/link モジュールを使用します。 上記のようにすると、pages/about.tsx ページコンポーネントが生成するページへのリンクになります。
-☝️ a 要素は必要ない Next.js 12 以前は Link 要素の下に明示的に a 要素を配置する必要がありました。 これは、HTML 的に正しく a 要素を配置するためでしたが、Next.js 13 では自動的に a 要素を挿入するようになったので、a 要素の記述は必要ありません。 遷移前の履歴を置き換える replace オプション &amp;lt;Link href=&amp;#34;/about&amp;#34; replace&amp;gt; 上記のように replace オプションを指定すると、ページ遷移前の URL がブラウザの履歴に残りません（戻るキーで戻らなくなります）。
-外部リンク https:// で始まる外部リンクを出力したい場合は、&amp;lt;a&amp;gt; コンポーネントをそのまま使用します。 next/link（や react-router) が提供する Link コンポーネントは、アプリ内のルーティング用なので使えません。 外部リンクを開く場合は、安全性のために一律で rel=&amp;quot;noopener noreferrer&amp;quot; を付けましょう。 リンククリック時に必ず別タブで開きたいときは、target=&amp;quot;_blank&amp;quot; を指定してください。
-&amp;lt;a href=&amp;#34;https://example.com/&amp;#34; target=&amp;#34;_blank&amp;#34; rel=&amp;#34;noopener noreferrer&amp;#34;&amp;gt; Website title &amp;lt;/a&amp;gt; mui (Material-UI) を採用したサイトの場合は、a の代わりに mui が提供する Link コンポーネントを使用することで、サイト内のデザインを統一することができます。 next/link が提供する Link コンポーネントと混同しないように、次のように別名 (MuiLink) を付けて使用すると分かりやすくなります。</description></item><item><title>MUI コンポーネント (v4) に独自のスタイルを設定する (makeStyles)</title><link>https://maku.blog/p/cw9ju6f/</link><pubDate>Sun, 06 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cw9ju6f/</guid><description>この記事では、MUI v4 以前の makeStyles() 関数を使ったカスタムスタイル設定方法を説明しています。 MUI v5 以降のカスタムスタイル設定では sx prop や styled() 関数を使用しますので、下記の記事を参照してください。
-参考: MUI コンポーネントに独自のスタイルを設定する（v5 以降の sx prop、styled 関数を使う方法） Material-UI コンポーネントのスタイル設定 Material-UI が提供する各種コンポーネントには、表示スタイルを切り替えるためのプロパティが用意されています。 例えば、Button コンポーネント は variant や color プロパティで見た目を切り替えることができます。
-&amp;lt;Button&amp;gt;Default&amp;lt;/Button&amp;gt; &amp;lt;Button variant=&amp;#34;contained&amp;#34; color=&amp;#34;primary&amp;#34;&amp;gt;Primary&amp;lt;/Button&amp;gt; &amp;lt;Button variant=&amp;#34;contained&amp;#34; color=&amp;#34;secondary&amp;#34;&amp;gt;Secondary&amp;lt;/Button&amp;gt; &amp;lt;Button variant=&amp;#34;outlined&amp;#34; disabled&amp;gt;Disabled&amp;lt;/Button&amp;gt; 多くのケースでは、この仕組みで十分にスタイル設定できるのですが、デフォルトのスタイルから外れた表示をしたり、div 要素など Material-UI 以外のコンポーネントに対して独自の CSS を適用したいことがあります。 このような場合、コンポーネントの実装ファイル内に直接 CSS コードを記述してスタイルをカスタマイズできます（JavaScript 内に記述するので CSS-in-JS と呼びます）。 React の世界では色々な CSS 参照方法がありますが、Material-UI は次のような理由で CSS-in-JS な記述方法を採用しています。
-現在のテーマ設定に基づいたスタイル設定を行える（例: 基準スペースの2倍のマージンを設定する） コンポーネントの props の値を使って動的にスタイル設定できる（例: &amp;lt;MyButton color=&amp;quot;vivid&amp;quot;&amp;gt; で派手な色のスタイルを設定する） フックによるスタイル設定 (makeStyle) Material-UI で、コンポーネントに独自スタイルを設定する方法としては、主に次の 3 種類の方法が用意されています。</description></item><item><title>Next.js で Material-UI を使う</title><link>https://maku.blog/p/s6djqw3/</link><pubDate>Wed, 02 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/s6djqw3/</guid><description>Material-UI は、マテリアルデザインを提供する React コンポーネントライブラリです。
-Material-UI のインストール Material-UI のコアパッケージ (@material-ui/core) は、npm コマンドで簡単にインストールできます。 マテリアルデザイン系のアイコン を使いたい場合は、@material-ui/icons パッケージもインストールしておきます。
-### yarn の場合 $ yarn add @material-ui/core $ yarn add @material-ui/icons ### npm の場合 $ npm install @material-ui/core $ npm install @material-ui/icons Next.js の create-next-app コマンドでプロジェクトを作成済みであれば、これだけで Material-UI コンポーネントを使う準備は完了です。 Material-UI のデフォルトテーマは Roboto フォントを使用する ので、次のようなコードを head 要素内に記述する必要がありますが、これは後述の _document.tsx で設定します。
-&amp;lt;link rel=&amp;#34;stylesheet&amp;#34; href=&amp;#34;https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;amp;display=swap&amp;#34; /&amp;gt; Material-UI は font weight に 300/400/500/700 のいずれかを使用するので、上記のように読み込むデータを制限することで、ロード時間を削減できます。
-Material-UI のコンポーネントを使ってみる Material-UI のインストールができたら、あとは、各コンポーネントの実装ファイルから import するだけで使用できます。 次の例では、Button コンポーネントと、ButtonGroup コンポーネントを使っています。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Material-UI on まくろぐ</title><link>https://maku.blog/tags/material-ui/</link><description>Recent content in Material-UI on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sat, 19 Nov 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/material-ui/index.xml" rel="self" type="application/rss+xml"/><item><title>MUI で GitHub のようなリソース削除の確認ダイアログを作る（AreYouSure ダイアログ）</title><link>https://maku.blog/p/cbuan5h/</link><pubDate>Wed, 10 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cbuan5h/</guid><description>&lt;h2 id="何を作るか">何を作るか？&lt;/h2>
+&lt;p>GitHub や AWS などで、何らかのリソースを削除するときに、次のような確認ダイアログが表示されることがあります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="537" height="459" src="../../p/cbuan5h/img-001.png" alt="/p/cbuan5h/img-001.png" />
+ &lt;figcaption>図: GitHub のリポジトリ削除時の確認ダイアログ&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>ユーザーは、削除対象のリソース名をタイピングするまで、削除ボタンを押すことができません。
+これは、不用意にリソースを削除してしまわないための措置で、このようなダイアログは様々な場所で活用できます。
+ここでは、MUI (Material-UI) で同様のリソース削除確認ダイアログ (&lt;code>AreYouSureDialog&lt;/code>) の実装例を紹介します。
+コードをシンプルにするために、表示テキストをハードコーディングしていますが、props に切り出せば汎用的な確認ダイアログとして使えるはずです。&lt;/p>
+&lt;h2 id="areyousuredialog-を実装する">AreYouSureDialog を実装する&lt;/h2>
+&lt;p>完成時のイメージはこんな感じです。
+UI のベースは、&lt;a href="https://mui.com/material-ui/react-dialog/">MUI の Dialog コンポーネント&lt;/a>です。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="623" height="272" src="../../p/cbuan5h/img-002.png" alt="/p/cbuan5h/img-002.png" />
+&lt;/figure>
+
+&lt;h3 id="ダイアログコンポーネントの実装">ダイアログコンポーネントの実装&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/AreYouSureDialog.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">FC&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">useCallback&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">useState&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Button&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Dialog&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">DialogContent&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">DialogContentText&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">DialogTitle&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">TextField&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Typography&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">IconButton&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@mui/material&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">CloseIcon&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@mui/icons-material/Close&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/** ダイアログコンポーネントの props の型定義 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">Props&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/** ダイアログを表示するなら true */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">open&lt;/span>: &lt;span class="kt">boolean&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/** 操作対象のリソース名（= ユーザーに入力させるテキスト） */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">targetName&lt;/span>: &lt;span class="kt">string&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * ダイアログを閉じるべきときに呼び出されます。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> *
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * ユーザーが処理を承認したときは、submit の値が true となり、
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * 捜査対象のリソース名が targetName に格納されます。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">onClose&lt;/span>&lt;span class="o">?:&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">submit&lt;/span>: &lt;span class="kt">boolean&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">targetName?&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="k">void&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * ユーザーに確認を促すダイアログコンポーネントです。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * ユーザーは提示されたテキストを入力することで、承認ボタンを押せるようになります。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">AreYouSureDialog&lt;/span>: &lt;span class="kt">FC&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Props&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">open&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">targetName&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">onClose&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">Props&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 削除ボタンを有効にするか
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">submitAvailable&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setSubmitAvailable&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ユーザー入力に応じて、削除ボタンの有効・無効を切り替える
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">handleInputChange&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useCallback&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="nx">input&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">setSubmitAvailable&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">input&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="nx">targetName&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="nx">targetName&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setSubmitAvailable&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ダイアログを閉じるときの処理（クライアント側へコールバックする）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">handleClose&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useCallback&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="nx">submit&lt;/span>: &lt;span class="kt">boolean&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">targetName?&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">setSubmitAvailable&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">onClose&lt;/span>&lt;span class="o">?&lt;/span>&lt;span class="p">.(&lt;/span>&lt;span class="nx">submit&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">targetName&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="nx">onClose&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setSubmitAvailable&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Dialog&lt;/span> &lt;span class="na">open&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">open&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="na">onClose&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">handleClose&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="p">)}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">DialogTitle&lt;/span> &lt;span class="na">sx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{{&lt;/span> &lt;span class="nx">m&lt;/span>: &lt;span class="kt">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">p&lt;/span>: &lt;span class="kt">2&lt;/span> &lt;span class="p">}}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="err">本当に削除しますか？&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">IconButton&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">aria-label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;close&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onClick&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">handleClose&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="p">)}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">position&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;absolute&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">right&lt;/span>: &lt;span class="kt">8&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">top&lt;/span>: &lt;span class="kt">8&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">color&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">theme&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">theme&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">palette&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">grey&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">500&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">CloseIcon&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">IconButton&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">DialogTitle&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">DialogContent&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">DialogContentText&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Typography&lt;/span> &lt;span class="na">gutterBottom&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="nx">targetName&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="s1">&amp;#39; &amp;#39;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="err">を削除すると、リソースに紐づくすべての情報が削除されます。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="err">この処理を取り消すことはできません。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Typography&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Typography&lt;/span> &lt;span class="na">gutterBottom&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="err">本当に削除するのであれば、&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="nx">targetName&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">b&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="err">と入力してください。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Typography&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">DialogContentText&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">TextField&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">autoFocus&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">autoComplete&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;off&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">size&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;small&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">margin&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;dense&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">fullWidth&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onChange&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">handleInputChange&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">target&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">value&lt;/span>&lt;span class="p">)}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">disabled&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="nx">submitAvailable&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;contained&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;error&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{{&lt;/span> &lt;span class="nx">width&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;100%&amp;#39;&lt;/span> &lt;span class="p">}}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onClick&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">handleClose&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">targetName&lt;/span>&lt;span class="p">)}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="err">本当にこのリソースを削除します！&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">DialogContent&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Dialog&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>props&lt;/code> の &lt;code>targetName&lt;/code> で渡されるテキストが、ユーザーに入力してもらうテキストになります。
+ユーザーが入力エリアでタイピングするたびに &lt;code>handleInputChange&lt;/code> が呼び出され、入力内容が &lt;code>targetName&lt;/code> の値と等しくなったときに削除ボタンを有効化しています。&lt;/p></description></item><item><title>MUI のスナックバーを簡単に表示できるようにする (@mui/material/Snackbar)</title><link>https://maku.blog/p/jbv7gox/</link><pubDate>Mon, 25 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/jbv7gox/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>React 用の UI ライブラリである mui（旧: Material-UI）が提供している &lt;a href="https://mui.com/material-ui/react-snackbar/">Snackbar コンポーネント&lt;/a> を使うと、次のようなスナックバーを表示することができます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="343" height="93" src="../../p/jbv7gox/img-001.png" alt="/p/jbv7gox/img-001.png" />
+&lt;/figure>
+
+&lt;p>ただ、MUI はあくまで UI ライブラリなので、表示の制御は React コンポーネントのステート管理の仕組み（&lt;code>useState&lt;/code> など）を使って自力で行わなければいけません。
+ただメッセージを表示したいだけなのに、ステート管理とか面倒です。
+ここでは、MUI のスナックバーを簡単に表示できるようなフック関数 (&lt;code>useSnackbar&lt;/code>) を作成してみます。
+使い方のイメージは次のような感じです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">pages/sample.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">NextPage&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">Button&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@mui/material&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">useSnackbar&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;../libs/snackbar/Snackbar&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">SamplePage&lt;/span>: &lt;span class="kt">NextPage&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">showSnackbar&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useSnackbar&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span> &lt;span class="na">onClick&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">showSnackbar&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;This is an error message!&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;error&amp;#39;&lt;/span>&lt;span class="p">)}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Show&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="nx">SamplePage&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>任意の React コンポーネント（あるいは Next.js のページ）から、上記のように &lt;code>useSnackbar&lt;/code> フック関数を呼び出して、返された &lt;code>showSnackbar&lt;/code> 関数を呼び出すだけです。
+なお、以下の実装では React のコンテキストの仕組み（グローバル変数的なもの）をふんだんに利用しているので、そのあたりは下記記事を参考にすると理解しやすいと思います。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/qoz8fow/">React Context で複数のコンポーネント間でデータを共有する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="スナックバー用の-ui-コンポーネントの作成">スナックバー用の UI コンポーネントの作成&lt;/h2>
+&lt;p>まずはスナックバーを表示するための UI コンポーネントを作成しておきます。
+コンポーネント名は MUI の &lt;code>Snackbar&lt;/code> と被らないように、&lt;code>GlobalSnackbar&lt;/code> としました（&lt;code>AppSnackbar&lt;/code> でもいいかも）。
+実装はほぼ &lt;a href="https://mui.com/material-ui/react-snackbar/">MUI の Snackbar ドキュメント&lt;/a> からの流用ですが、props で &lt;code>onClose&lt;/code> ハンドラの登録や、色の指定を行えるようにしています。&lt;/p></description></item><item><title>MUI でカスタムコンポーネントに sx プロパティを渡せるようにする</title><link>https://maku.blog/p/5e4cikn/</link><pubDate>Wed, 15 Dec 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5e4cikn/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>MUI (Material-UI) ver.5 以降では、各コンポーネントのスタイル設定に便利な &lt;strong>&lt;code>sx&lt;/code>&lt;/strong> props を使うことができます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://mui.com/system/the-sx-prop/">The sx prop - MUI&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>MUI コンポーネントをラップするようなカスタムコンポーネントを作成するときは、カスタムコンポーネント経由で &lt;code>sx&lt;/code> props を渡せるようにしておくと、利用するときにマージン設定などを簡単に行えて便利です。&lt;/p>
+&lt;h2 id="実装例">実装例&lt;/h2>
+&lt;p>下記は、&lt;code>sx&lt;/code> props を渡せるようにした &lt;code>CustomButton&lt;/code> コンポーネントの実装例です。
+&lt;code>sx&lt;/code> props の値は、MUI の &lt;code>Button&lt;/code> コンポーネントにそのまま渡しています。
+型情報として &lt;strong>&lt;code>SxProps&amp;lt;Theme&amp;gt;&lt;/code>&lt;/strong> を使うところがポイントです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/components/CustomButton.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">FC&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ReactNode&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">Button&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@mui/material/Button&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">SxProps&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">Theme&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@mui/material/styles&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">Props&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">children&lt;/span>: &lt;span class="kt">ReactNode&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">sx?&lt;/span>: &lt;span class="kt">SxProps&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Theme&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">CustomButton&lt;/span>: &lt;span class="kt">FC&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Props&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">children&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">sx&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;contained&amp;#34;&lt;/span> &lt;span class="na">sx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">sx&lt;/span>&lt;span class="p">}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nx">children&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、次のように &lt;code>sx&lt;/code> prop 流のマージン設定などを行えるようになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/pages/index.tsx（抜粋）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">CustomButton&lt;/span> &lt;span class="na">sx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{{&lt;/span> &lt;span class="nx">m&lt;/span>: &lt;span class="kt">2&lt;/span> &lt;span class="p">}}&amp;gt;&lt;/span>&lt;span class="nx">Hello&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">CustomButton&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のカスタムコンポーネントの実装例では、&lt;code>sx&lt;/code> props の値を &lt;code>Button&lt;/code> コンポーネントに渡していますが、複数要素から構成されるカスタムコンポーネントの場合は、次のように最上のコンテナ系コンポーネント（&lt;code>Box&lt;/code> や &lt;code>Stack&lt;/code> など）の &lt;code>sx&lt;/code> props に渡した方がよいでしょう。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/components/CustomButton.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">FC&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ReactNode&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">Button&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@mui/material/Button&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">Stack&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@mui/material/Stack&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">Typography&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@mui/material/Typography&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">SxProps&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">Theme&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@mui/material/styles&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">type&lt;/span> &lt;span class="nx">Props&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">children&lt;/span>: &lt;span class="kt">ReactNode&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">sx?&lt;/span>: &lt;span class="kt">SxProps&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Theme&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">CustomButton&lt;/span>: &lt;span class="kt">FC&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Props&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">children&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">sx&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Stack&lt;/span> &lt;span class="na">direction&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;row&amp;#34;&lt;/span> &lt;span class="na">spacing&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="na">alignItems&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;center&amp;#34;&lt;/span> &lt;span class="na">sx&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">sx&lt;/span>&lt;span class="p">}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;contained&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="nx">children&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Typography&lt;/span> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;subtitle2&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Amazing&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Typography&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Stack&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>Next.js のページコンポーネントが Client と Server どちらで実行されているか調べる (isServer, isClient, NoSsr)</title><link>https://maku.blog/p/m7is4dn/</link><pubDate>Fri, 13 Aug 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m7is4dn/</guid><description>&lt;p>Next.js のページコンポネント (&lt;code>src/pages/*.tsx&lt;/code>) の関数は、静的な HTML ファイルを生成するためにビルド時にも実行されます（参考: &lt;a href="../../p/iv4agnt">Next.js のプリレンダリング機能を使用する&lt;/a>）。
+従来の React による SPA アプリはクライアントサイド JavaScript でしか実行されないので、同じような感覚で実装していると振る舞いの違いでハマることがあります。
+例えば、ページコンポーネントから次のように &lt;code>window&lt;/code> オブジェクトを参照しようとすると、Next.js によるプリレンダリング時にエラーになります。
+これは、&lt;code>window&lt;/code> オブジェクトは、Web ブラウザ上で JavaScript を実行しているときにしか存在しないからです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/pages/hello.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">FC&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">HelloPage&lt;/span>: &lt;span class="kt">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">window&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// ReferenceError: window is not defined
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Hello&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>逆に言うと、実行時に &lt;code>window&lt;/code> オブジェクトが存在しているかどうかを調べることによって、ページコンポーネント内のコードが、どのタイミングで実行されているかを判別できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line hl">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">isClient&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="k">typeof&lt;/span> &lt;span class="nb">window&lt;/span> &lt;span class="o">!==&lt;/span> &lt;span class="s1">&amp;#39;undefined&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// const isServer = () =&amp;gt; typeof window === &amp;#39;undefined&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">HelloPage&lt;/span>: &lt;span class="kt">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">isClient&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;これはクライアントサイド JS として実行されているよ！&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">window&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">alert&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;だから alert も使えるよ！&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Hello&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ちなみに、React フックの &lt;code>useEffect&lt;/code> で設定したコールバック関数は、DOM 要素のレンダリング後に実行されるものなので、クライアントサイドでのみ実行されることが保証されています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">HelloPage&lt;/span>: &lt;span class="kt">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ここであれば window オブジェクトは確実に参照できる
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">window&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span> &lt;span class="p">[])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Hello&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">h1&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>JSX コードで記述した部分も、Next.js のサーバーサイドビルド時と、クライアントサイド JS の両方で実行されます。
+クライアントサイドでのみレンダリングしたい部分は、上記で定義した &lt;code>isClient&lt;/code> 関数を使って次のように記述します。&lt;/p></description></item><item><title>Next.js アプリでのリンク方法まとめ（mui/Material-UI との連携なども） (next/link, next/router)</title><link>https://maku.blog/p/vgs4dnw/</link><pubDate>Tue, 10 Aug 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vgs4dnw/</guid><description>&lt;h2 id="アプリ内ページへのリンク基本">アプリ内ページへのリンク（基本）&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// import Link from &amp;#39;next/link&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Link&lt;/span> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/about&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">About&lt;/span> &lt;span class="nx">us&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Link&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Next.js でアプリ内部で閉じるページリンクを張るには、&lt;a href="https://nextjs.org/docs/api-reference/next/link">next/link&lt;/a> モジュールを使用します。
+上記のようにすると、&lt;code>pages/about.tsx&lt;/code> ページコンポーネントが生成するページへのリンクになります。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ a 要素は必要ない&lt;/span>
+ &lt;span class="xNote_body">Next.js 12 以前は &lt;code>Link&lt;/code> 要素の下に明示的に &lt;code>a&lt;/code> 要素を配置する必要がありました。
+これは、HTML 的に正しく &lt;code>a&lt;/code> 要素を配置するためでしたが、Next.js 13 では自動的に &lt;code>a&lt;/code> 要素を挿入するようになったので、&lt;code>a&lt;/code> 要素の記述は必要ありません。&lt;/span>
+&lt;/div>
+&lt;h3 id="遷移前の履歴を置き換える-replace-オプション">遷移前の履歴を置き換える replace オプション&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Link&lt;/span> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/about&amp;#34;&lt;/span> &lt;span class="na">replace&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のように &lt;strong>&lt;code>replace&lt;/code>&lt;/strong> オプションを指定すると、ページ遷移前の URL がブラウザの履歴に残りません（戻るキーで戻らなくなります）。&lt;/p>
+&lt;h2 id="外部リンク">外部リンク&lt;/h2>
+&lt;p>&lt;code>https://&lt;/code> で始まる外部リンクを出力したい場合は、&lt;code>&amp;lt;a&amp;gt;&lt;/code> コンポーネントをそのまま使用します。
+&lt;code>next/link&lt;/code>（や &lt;code>react-router&lt;/code>) が提供する &lt;code>Link&lt;/code> コンポーネントは、アプリ内のルーティング用なので使えません。
+外部リンクを開く場合は、安全性のために一律で &lt;code>rel=&amp;quot;noopener noreferrer&amp;quot;&lt;/code> を付けましょう。
+リンククリック時に必ず別タブで開きたいときは、&lt;code>target=&amp;quot;_blank&amp;quot;&lt;/code> を指定してください。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">a&lt;/span> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;https://example.com/&amp;#34;&lt;/span> &lt;span class="na">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;_blank&amp;#34;&lt;/span> &lt;span class="na">rel&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;noopener noreferrer&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Website&lt;/span> &lt;span class="nx">title&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">a&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>mui (Material-UI) を採用したサイトの場合は、&lt;code>a&lt;/code> の代わりに mui が提供する &lt;code>Link&lt;/code> コンポーネントを使用することで、サイト内のデザインを統一することができます。
+&lt;code>next/link&lt;/code> が提供する &lt;code>Link&lt;/code> コンポーネントと混同しないように、次のように別名 (&lt;code>MuiLink&lt;/code>) を付けて使用すると分かりやすくなります。&lt;/p></description></item><item><title>MUI コンポーネント (v4) に独自のスタイルを設定する (makeStyles)</title><link>https://maku.blog/p/cw9ju6f/</link><pubDate>Sun, 06 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cw9ju6f/</guid><description>&lt;p>この記事では、MUI v4 以前の &lt;code>makeStyles()&lt;/code> 関数を使ったカスタムスタイル設定方法を説明しています。
+MUI v5 以降のカスタムスタイル設定では &lt;code>sx prop&lt;/code> や &lt;code>styled()&lt;/code> 関数を使用しますので、下記の記事を参照してください。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/87p5o2d/">MUI コンポーネントに独自のスタイルを設定する（v5 以降の sx prop、styled 関数を使う方法）&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="material-ui-コンポーネントのスタイル設定">Material-UI コンポーネントのスタイル設定&lt;/h2>
+&lt;p>Material-UI が提供する各種コンポーネントには、表示スタイルを切り替えるためのプロパティが用意されています。
+例えば、&lt;a href="https://material-ui.com/components/buttons/">Button コンポーネント&lt;/a> は &lt;code>variant&lt;/code> や &lt;code>color&lt;/code> プロパティで見た目を切り替えることができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Default&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;contained&amp;#34;&lt;/span> &lt;span class="na">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;primary&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Primary&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;contained&amp;#34;&lt;/span> &lt;span class="na">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;secondary&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Secondary&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;outlined&amp;#34;&lt;/span> &lt;span class="na">disabled&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Disabled&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>多くのケースでは、この仕組みで十分にスタイル設定できるのですが、デフォルトのスタイルから外れた表示をしたり、&lt;code>div&lt;/code> 要素など Material-UI 以外のコンポーネントに対して独自の CSS を適用したいことがあります。
+このような場合、コンポーネントの実装ファイル内に直接 CSS コードを記述してスタイルをカスタマイズできます（JavaScript 内に記述するので &lt;strong>CSS-in-JS&lt;/strong> と呼びます）。
+React の世界では色々な CSS 参照方法がありますが、Material-UI は次のような理由で CSS-in-JS な記述方法を採用しています。&lt;/p>
+&lt;ul>
+&lt;li>現在のテーマ設定に基づいたスタイル設定を行える（例: 基準スペースの2倍のマージンを設定する）&lt;/li>
+&lt;li>コンポーネントの &lt;code>props&lt;/code> の値を使って動的にスタイル設定できる（例: &lt;code>&amp;lt;MyButton color=&amp;quot;vivid&amp;quot;&amp;gt;&lt;/code> で派手な色のスタイルを設定する）&lt;/li>
+&lt;/ul>
+&lt;h2 id="フックによるスタイル設定-makestyle">フックによるスタイル設定 (makeStyle)&lt;/h2>
+&lt;p>Material-UI で、コンポーネントに独自スタイルを設定する方法としては、主に次の 3 種類の方法が用意されています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://material-ui.com/styles/basics/#hook-api">Hook API&lt;/a>
+&lt;ul>
+&lt;li>&lt;code>makeStyle&lt;/code> 関数で生成したフック関数をコンポーネント内で呼び出す方法。一番よく使われてる。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="https://material-ui.com/styles/basics/#styled-components-api">Styled components API&lt;/a>
+&lt;ul>
+&lt;li>既存のコンポーネント (&lt;code>Button&lt;/code> など）をラップする形で、スタイルを適用したコンポーネント（&lt;code>MyButton&lt;/code> など）を作成する方法。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="https://material-ui.com/styles/basics/#higher-order-component-api">Higher-order component API&lt;/a>
+&lt;ul>
+&lt;li>Styled components に似てるけど、HoC の仕組みでスタイル設定したコンポーネントを作成する方法。ちょっとわかりにくい。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>ここでは、一番メジャーで分かりやすい、フックを利用したスタイル設定方法を紹介します。
+次の例では、Material-UI の &lt;code>Button&lt;/code> コンポーネントに、独自の CSS スタイル（&lt;code>customButton&lt;/code> クラス）を適用しています。&lt;/p></description></item><item><title>Next.js で Material-UI を使う</title><link>https://maku.blog/p/s6djqw3/</link><pubDate>Wed, 02 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/s6djqw3/</guid><description>&lt;figure class="xImage">
+ &lt;img style="" width="1832" height="442" src="../../p/s6djqw3/img-001.png" alt="/p/s6djqw3/img-001.png" />
+&lt;/figure>
+
+&lt;p>&lt;a href="https://material-ui.com/">Material-UI&lt;/a> は、マテリアルデザインを提供する React コンポーネントライブラリです。&lt;/p>
+&lt;h2 id="material-ui-のインストール">Material-UI のインストール&lt;/h2>
+&lt;p>Material-UI のコアパッケージ (&lt;code>@material-ui/core&lt;/code>) は、&lt;code>npm&lt;/code> コマンドで簡単にインストールできます。
+&lt;a href="https://material-ui.com/components/icons/">マテリアルデザイン系のアイコン&lt;/a> を使いたい場合は、&lt;code>@material-ui/icons&lt;/code> パッケージもインストールしておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">### yarn の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add @material-ui/core
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add @material-ui/icons
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">### npm の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install @material-ui/core
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install @material-ui/icons&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Next.js の &lt;code>create-next-app&lt;/code> コマンドでプロジェクトを作成済みであれば、これだけで Material-UI コンポーネントを使う準備は完了です。
+Material-UI のデフォルトテーマは &lt;a href="https://material-ui.com/components/typography/#general">Roboto フォントを使用する&lt;/a> ので、次のようなコードを &lt;code>head&lt;/code> 要素内に記述する必要がありますが、これは後述の &lt;code>_document.tsx&lt;/code> で設定します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">link&lt;/span> &lt;span class="na">rel&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;stylesheet&amp;#34;&lt;/span> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;amp;display=swap&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Material-UI は font weight に 300/400/500/700 のいずれかを使用するので、上記のように読み込むデータを制限することで、ロード時間を削減できます。&lt;/p>
+&lt;h2 id="material-ui-のコンポーネントを使ってみる">Material-UI のコンポーネントを使ってみる&lt;/h2>
+&lt;p>Material-UI のインストールができたら、あとは、各コンポーネントの実装ファイルから &lt;code>import&lt;/code> するだけで使用できます。
+次の例では、&lt;a href="https://material-ui.com/components/buttons/">Button&lt;/a> コンポーネントと、&lt;a href="https://material-ui.com/components/button-group/">ButtonGroup&lt;/a> コンポーネントを使っています。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="524" height="97" src="../../p/s6djqw3/img-002_hu17258122955497817817.png" alt="/p/s6djqw3/img-002.png" />
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">pages/index.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">Button&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ButtonGroup&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@material-ui/core&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">Home() {&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">style&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{{&lt;/span> &lt;span class="nx">margin&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;0.5em&amp;#39;&lt;/span> &lt;span class="p">}}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;contained&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Default&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="s1">&amp;#39; &amp;#39;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;contained&amp;#34;&lt;/span> &lt;span class="na">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;primary&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Primary&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="s1">&amp;#39; &amp;#39;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;contained&amp;#34;&lt;/span> &lt;span class="na">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;secondary&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Secondary&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="s1">&amp;#39; &amp;#39;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;contained&amp;#34;&lt;/span> &lt;span class="na">disabled&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Disabled&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;{&lt;/span>&lt;span class="s1">&amp;#39; &amp;#39;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;contained&amp;#34;&lt;/span> &lt;span class="na">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;primary&amp;#34;&lt;/span> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;https://google.com/&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">LINK&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">style&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{{&lt;/span> &lt;span class="nx">margin&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;0.5em&amp;#39;&lt;/span> &lt;span class="p">}}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">ButtonGroup&lt;/span> &lt;span class="na">variant&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;contained&amp;#34;&lt;/span> &lt;span class="na">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;primary&amp;#34;&lt;/span> &lt;span class="na">aria-label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;contained primary button group&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">One&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Two&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Three&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">Button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">ButtonGroup&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="nextjs-用の-app--document-コンポーネント設定">Next.js 用の App / Document コンポーネント設定&lt;/h2>
+&lt;p>Material-UI を Next.js アプリから使用する場合は、サーバーサイドレンダリングとの兼ね合いで、&lt;strong>&lt;code>pages/_app.tsx&lt;/code>&lt;/strong> と &lt;strong>&lt;code>pages/_document.tsx&lt;/code>&lt;/strong> を作成して、スタイル定義の処理順序を制御しておく必要があります。
+これを入れておかないと、&lt;a href="../../p/cw9ju6f">makeStyle などを使ったスタイル設定&lt;/a> がうまく反映されず、次のようなエラーになったりします。&lt;/p></description></item></channel></rss>

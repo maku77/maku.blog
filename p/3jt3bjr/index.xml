@@ -1,24 +1,241 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS DynamoDB 関連記事 on まくろぐ</title><link>https://maku.blog/p/3jt3bjr/</link><description>Recent content in AWS DynamoDB 関連記事 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 02 Nov 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/3jt3bjr/index.xml" rel="self" type="application/rss+xml"/><item><title>DynamoDB を Node.js で操作する（SDK ver.3 の場合）</title><link>https://maku.blog/p/5mv5dkt/</link><pubDate>Tue, 02 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5mv5dkt/</guid><description>ここでは、Node.js 用の AWS SDK ver.3 を使って Amazon DynamoDB を操作する方法を説明します。 TypeScript の基本的な環境構築 は終わっているものとします。
-DynamoDB 用の Node.js SDK (ver.3) をインストールする まずは、AWS SDK version 3 の DynamoDB 用パッケージをインストールします。 DynamoDB を操作するときに主に次のようなクライアントクラスを使用するのですが、後者の DynamoDBDocumentClient の方は、前者の DynamoDBClient インスタンスをラップして扱いやすくするためのクラスなので、必要に応じてインストールしてください（主にテーブル内のアイテムを扱うときに便利です）。
-DynamoDBClient DynamoDB を扱うための基本クラス（DB クライアントと呼ばれる） @aws-sdk/client-dynamodb パッケージが必要 DynamoDBDocumentClient 上記を扱いやすくするためのクラス（Document クライアントと呼ばれる） @aws-sdk/lib-dynamodb パッケージが必要 @aws-sdk/util-dynamodb パッケージも必要っぽい ### yarn の場合 $ yarn add @aws-sdk/client-dynamodb $ yarn add @aws-sdk/lib-dynamodb @aws-sdk/util-dynamodb # Document クライアント ### npm の場合 $ npm install @aws-sdk/client-dynamodb $ npm install @aws-sdk/lib-dynamodb @aws-sdk/util-dynamodb # Document クライアント これで、TypeScript コードから次のようにパッケージ内のクラスをインポートできるようになります。</description></item><item><title>DynamoDB を Node.js で操作する（SDK ver.2 の場合）</title><link>https://maku.blog/p/8t7iu6g/</link><pubDate>Sat, 01 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8t7iu6g/</guid><description>ここでは、Node.js 用の AWS SDK ver.2 を使って Amazon DynamoDB を操作する方法を説明します。 TypeScript の基本的な環境構築 は終わっているものとします。
-SDK ver.3 を使う方法はこちらの記事 を参照してください。 基本的には ver.3 の使用が推奨されていますが、AWS の Lambda 実行環境は現時点（2021年5月）でも ver.2 がインストールされていたりするので、ver.2 の需要はまだあると思います。
-Dynamo DB 用の SDK (ver.2) をインストールする AWS SDK version 2 で DynamoDB を扱うには、次のように AWS SDK パッケージ全体をインストールする必要があります（version 3 では DynamoDB サービスなどのパッケージを個別にインストールできます）。
-$ npm install aws-sdk --save これで、TypeScript コードから次のように SDK モジュールをインポートできるようになります。
-import * as AWS from &amp;#39;aws-sdk&amp;#39;; AWS.DynamoDB だけ参照したければ、次のようにインポートできます。
-import { DynamoDB } from &amp;#39;aws-sdk&amp;#39;; DynamoDB インスタンスの生成 基本 DynamoDB の API を呼び出すには、まずは AWS.</description></item><item><title>DynamoDB を Python で操作する (boto3)</title><link>https://maku.blog/p/wht5epz/</link><pubDate>Tue, 02 Nov 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wht5epz/</guid><description>（AWS SDK を使うときは、aws configure によるアクセスキーの設定は完了しているものと想定します）
-Boto3 のインストール Python 用の AWS SDK として Boto3 が用意されているので、これをインストールして使います。 PC のグローバル環境を汚さないように、venv による仮想環境を作って作業する ことをオススメします。
-まず、仮想環境を作ってそこに入ります。
-$ mkdir myapp &amp;amp;&amp;amp; cd myapp # アプリ用のディレクトリを作成 $ python3 -m venv .venv # 仮想環境の作成 $ source .venv/bin/activate # 仮想環境に入る 仮想環境 (.venv) 内に boto3 パッケージをインストールします。
-(.venv) $ python3 -m pip install boto3 これで準備完了です。簡単！
-高レベル API と低レベル API Boto3 の API は、抽象度の高い API と、低い API の二種類が用意されています。
-高レベル API（リソース API） 各 AWS リソースを、オブジェクト指向なコードで扱うことができる。boto3.resource(リソース名) でインスタンスを取得できる。（参考: Resources） 低レベル API（クライアント API） AWS のサービス API と 1:1 で対応する構成になっており、各種 API の戻り値は単純な dict オブジェクト。boto3.</description></item><item><title>DynamoDB 用のポリシー設定例</title><link>https://maku.blog/p/gk6jx9k/</link><pubDate>Mon, 28 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gk6jx9k/</guid><description>あるテーブルに対するすべての操作を可能にする { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Sid&amp;#34;: &amp;#34;AllAPIActionsOnBooks&amp;#34;, &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: &amp;#34;dynamodb:*&amp;#34;, &amp;#34;Resource&amp;#34;: &amp;#34;arn:aws:dynamodb:us-west-2:123456789012:table/Books&amp;#34; } ] } Action に dynamodb:* というワイルド―カードを指定することで、DynamoDB のすべての API を使った操作を可能にしています。 通常は、特定のアクションのみを許可すべきです。
-あるテーブルの読み取りを行えるようにする { &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Sid&amp;#34;: &amp;#34;DescribeQueryScanBooksTable&amp;#34;, &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;dynamodb:DescribeTable&amp;#34;, &amp;#34;dynamodb:Query&amp;#34;, &amp;#34;dynamodb:Scan&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;arn:aws:dynamodb:us-west-2:123456789012:table/Books&amp;#34; } ] } このポリシーステートメントは、アカウント 123456789012 が所有する Books テーブルの読み取り（Query や Scan）が可能であることを示します。
-下記は、もう少し可能な操作を増やしたバージョンです。
-{ &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Sid&amp;#34;: &amp;#34;ReadOnlyAPIActionsOnBooks&amp;#34;, &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;dynamodb:GetItem&amp;#34;, &amp;#34;dynamodb:BatchGetItem&amp;#34;, &amp;#34;dynamodb:DescribeTable&amp;#34;, &amp;#34;dynamodb:Query&amp;#34;, &amp;#34;dynamodb:Scan&amp;#34;, &amp;#34;dynamodb:ConditionCheckItem&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;arn:aws:dynamodb:us-west-2:123456789012:table/Books&amp;#34; } ] }</description></item><item><title>DynamoDB の未整理・雑多メモ</title><link>https://maku.blog/p/38bpqjp/</link><pubDate>Wed, 16 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/38bpqjp/</guid><description> DynamoDB のテーブルは リージョンごとに独立 して存在する。例えば、us-east-2 リージョンの People テーブルと、us-west-2 リージョンの People テーブルは別物として扱われる。 DyanmoDB のテーブル名、属性名は CamelCase にするのが公式っぽい（-、_、. といった記号も使える） プライマリキー DynamoDB の プライマリキーの型 は、文字列／数値／バイナリ、といったスカラ値のみが使える。 DynamoDB のプライマリキーは 1 つ or 2 つ 1 つの場合 &amp;hellip; パーティションキーのみ（一意な ID） 2 つの場合 &amp;hellip; パーティションキー + ソートキー（パーティションが同じであれば、同じ物理ストレージ内にソートキー値でソートされた形で項目が保持される） DynamoDB のテーブルは、プライマリキーとなる属性以外はスキーマレスなので、テーブル作成時はプライマリーキー属性のみ定義すればよい。それ以外の部分には入れ子構造のデータも自由に入れられる。 DynamoDB に項目を追加するときに バイナリ型属性 の値を渡すときは、Base64 エンコードして渡す必要がある。 RCU の消費 基本的にクエリ (Query) は合計サイズ 4KB ごとに 1RCU 消費する。 GetItem の場合は、1 件ごとに 1RCU 消費する。 100 件以上とか大量に PutItem するときは、BatchWrite の仕組みを使うとめっちゃ速くなる。複数の要求をバッファリングして通信回数を減らしてくれるぽい。具体的な使い方は、各 SDK の API ドキュメントを参照。</description></item><item><title>DynamoDB Local で DynamoDB のローカルテスト環境を作る</title><link>https://maku.blog/p/rdq4eq2/</link><pubDate>Tue, 23 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rdq4eq2/</guid><description>DynamoDB Local とは DynamoDB Local を使うと、Amazon DynamoDB サービスを模倣するローカルサーバーを立ち上げることができます。 DynamoDB Local サーバーは、デフォルトでは http://localhost:8000 で起動し、ここに対して AWS CLI や AWS SDK で接続して操作します。
-DynamoDB ウェブサービスで複雑なデータ処理を行うときは、あらかじめ DynamoDB Local を使ってテストを行っておくと安心です。 DynamoDB の操作のために試行錯誤しても AWS の利用料金がかかることはありません。
-DynamoDB Local のインストール 実行ファイルのダウンロード DynamoDB Local には、Java の実行ファイル (JAR) や、それを含む Docker コンテナとして提供されています。 Java のインストールされた環境では、JAR ファイルをダウンロードして起動するのが手っ取り早いです。 下記から ZIP ファイルでダウンロードできます。
-DynamoDB Local のダウンロード ダウンロードした ZIP ファイルを展開すると、次のような構成のディレクトリが展開されます。
-アーカイブの内容 dynamodb_local_latest/ +-- DynamoDBLocal_lib/ ... 本体が使う依存ライブラリ +-- DynamoDBLocal.jar ... 本体 +-- その他のドキュメント 起動に必要なのは、DynamoDBLocal_lib ディレクトリと DynamoDBLocal.jar だけなので、この 2 つを任意のディレクトリにコピーします。 ここでは、次のようなディレクトリにコピーすることにします（Windows であれば、$HOME は %USERPROFILE% に置き換えてください）。</description></item><item><title>DynamoDB をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/zkzamw8/</link><pubDate>Mon, 22 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/zkzamw8/</guid><description>テーブルを作成する (dynamodb create-table) aws dynamodb create-table --table-name &amp;lt;テーブル名&amp;gt; ... DynamoDB のテーブルを作成するときは、少なくともプライマリキーの設定や、課金モードの設定が必要になるので、少しだけコマンドが長くなります。
-次の例では、DynamoDB に MusicCollection というテーブルを作成します。 Artist というパーティションキー (KeyType=HASH) と、Artist というソートキー (KeyType=RANGE) を定義しています。 課金体系は「プロビジョンドモード」で最小構成になるよう設定しています。
-テーブル生成 (PartitionKey &amp;#43; SortKey) $ aws dynamodb create-table \ --table-name MusicCollection \ --attribute-definitions AttributeName=Artist,AttributeType=S AttributeName=SongTitle,AttributeType=S \ --key-schema AttributeName=Artist,KeyType=HASH AttributeName=SongTitle,KeyType=RANGE \ --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 パーティションキーのみで良い場合（ソートキーなし）は、次のような感じになります。
-テーブル生成 (PartitionKey) $ aws dynamodb create-table \ --table-name MusicCollection \ --attribute-definitions AttributeName=Artist,AttributeType=S \ --key-schema AttributeName=Artist,KeyType=HASH \ --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 キャパシティモード（課金体系）をオンデマンド（本当にアクセスした分だけの支払い）にするには、--billing-mode PAY_PER_REQUEST オプションを指定し、プロビジョン設定 (--provisioned-throughput) を省略します。 一定間隔でそれなりにアクセスがある場合は、プロビジョンドモード (PROVISIONED) にして常時稼働の形にしておいた方が総合的に安くなるようですが、テスト用途で作成する場合などは PAY_PER_REQUEST にしておくのが無難かと思います。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS DynamoDB 関連記事 on まくろぐ</title><link>https://maku.blog/p/3jt3bjr/</link><description>Recent content in AWS DynamoDB 関連記事 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Tue, 02 Nov 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/3jt3bjr/index.xml" rel="self" type="application/rss+xml"/><item><title>DynamoDB を Node.js で操作する（SDK ver.3 の場合）</title><link>https://maku.blog/p/5mv5dkt/</link><pubDate>Tue, 02 Mar 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/5mv5dkt/</guid><description>&lt;p>ここでは、Node.js 用の AWS SDK ver.3 を使って Amazon DynamoDB を操作する方法を説明します。
+&lt;a href="../../p/taiqx6d">TypeScript の基本的な環境構築&lt;/a> は終わっているものとします。&lt;/p>
+&lt;h2 id="dynamodb-用の-nodejs-sdk-ver3-をインストールする">DynamoDB 用の Node.js SDK (ver.3) をインストールする&lt;/h2>
+&lt;p>まずは、AWS SDK version 3 の DynamoDB 用パッケージをインストールします。
+DynamoDB を操作するときに主に次のようなクライアントクラスを使用するのですが、後者の &lt;code>DynamoDBDocumentClient&lt;/code> の方は、前者の &lt;code>DynamoDBClient&lt;/code> インスタンスをラップして扱いやすくするためのクラスなので、必要に応じてインストールしてください（主にテーブル内のアイテムを扱うときに便利です）。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-dynamodb/index.html">DynamoDBClient&lt;/a>
+&lt;ul>
+&lt;li>DynamoDB を扱うための基本クラス（DB クライアントと呼ばれる）&lt;/li>
+&lt;li>&lt;strong>&lt;code>@aws-sdk/client-dynamodb&lt;/code>&lt;/strong> パッケージが必要&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/modules/_aws_sdk_lib_dynamodb.html">DynamoDBDocumentClient&lt;/a>
+&lt;ul>
+&lt;li>上記を扱いやすくするためのクラス（Document クライアントと呼ばれる）&lt;/li>
+&lt;li>&lt;strong>&lt;code>@aws-sdk/lib-dynamodb&lt;/code>&lt;/strong> パッケージが必要&lt;/li>
+&lt;li>&lt;strong>&lt;code>@aws-sdk/util-dynamodb&lt;/code>&lt;/strong> パッケージも必要っぽい&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">### yarn の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add @aws-sdk/client-dynamodb
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add @aws-sdk/lib-dynamodb @aws-sdk/util-dynamodb # Document クライアント
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">### npm の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install @aws-sdk/client-dynamodb
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install @aws-sdk/lib-dynamodb @aws-sdk/util-dynamodb # Document クライアント&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、TypeScript コードから次のようにパッケージ内のクラスをインポートできるようになります。&lt;/p></description></item><item><title>DynamoDB を Node.js で操作する（SDK ver.2 の場合）</title><link>https://maku.blog/p/8t7iu6g/</link><pubDate>Sat, 01 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8t7iu6g/</guid><description>&lt;p>ここでは、Node.js 用の AWS SDK ver.2 を使って Amazon DynamoDB を操作する方法を説明します。
+&lt;a href="../../p/taiqx6d">TypeScript の基本的な環境構築&lt;/a> は終わっているものとします。&lt;/p>
+&lt;p>&lt;a href="../../p/5mv5dkt">SDK ver.3 を使う方法はこちらの記事&lt;/a> を参照してください。
+基本的には ver.3 の使用が推奨されていますが、AWS の Lambda 実行環境は現時点（2021年5月）でも ver.2 がインストールされていたりするので、ver.2 の需要はまだあると思います。&lt;/p>
+&lt;h2 id="dynamo-db-用の-sdk-ver2-をインストールする">Dynamo DB 用の SDK (ver.2) をインストールする&lt;/h2>
+&lt;p>AWS SDK version 2 で DynamoDB を扱うには、次のように AWS SDK パッケージ全体をインストールする必要があります（version 3 では DynamoDB サービスなどのパッケージを個別にインストールできます）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install aws-sdk --save&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、TypeScript コードから次のように SDK モジュールをインポートできるようになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">AWS&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;aws-sdk&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>AWS.DynamoDB&lt;/code> だけ参照したければ、次のようにインポートできます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">DynamoDB&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;aws-sdk&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="dynamodb-インスタンスの生成">DynamoDB インスタンスの生成&lt;/h2>
+&lt;h3 id="基本">基本&lt;/h3>
+&lt;p>DynamoDB の API を呼び出すには、まずは &lt;a href="https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html">AWS.DynamoDB&lt;/a> インスタンスを生成する必要があります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">AWS&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;aws-sdk&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">dynamoDb&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">AWS&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">DynamoDB&lt;/span>&lt;span class="p">();&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="接続設定-config">接続設定 (config)&lt;/h3>
+&lt;p>&lt;a href="https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#constructor-property">DynamoDB コンストランクタ&lt;/a> の引数でオプションオブジェクトを渡すと、接続先のリージョンやエンドポイントを設定することができます。
+例えば、エンドポイントを &lt;code>http://localhost:8000&lt;/code> に設定すれば、&lt;a href="../../p/rdq4eq2">DynamoDB Local&lt;/a> によるテスト用サーバに接続できます。&lt;/p></description></item><item><title>DynamoDB を Python で操作する (boto3)</title><link>https://maku.blog/p/wht5epz/</link><pubDate>Tue, 02 Nov 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wht5epz/</guid><description>&lt;p>（AWS SDK を使うときは、&lt;a href="https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-configure-quickstart.html">aws configure&lt;/a> によるアクセスキーの設定は完了しているものと想定します）&lt;/p>
+&lt;h2 id="boto3-のインストール">Boto3 のインストール&lt;/h2>
+&lt;p>Python 用の AWS SDK として &lt;a href="https://aws.amazon.com/jp/sdk-for-python/">Boto3&lt;/a> が用意されているので、これをインストールして使います。
+PC のグローバル環境を汚さないように、&lt;a href="https://maku77.github.io/python/env/venv.html">venv による仮想環境を作って作業する&lt;/a> ことをオススメします。&lt;/p>
+&lt;p>まず、仮想環境を作ってそこに入ります。&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ mkdir myapp &amp;amp;&amp;amp; cd myapp # アプリ用のディレクトリを作成
+$ python3 -m venv .venv # 仮想環境の作成
+$ source .venv/bin/activate # 仮想環境に入る
+&lt;/code>&lt;/pre>&lt;p>仮想環境 (&lt;code>.venv&lt;/code>) 内に &lt;strong>&lt;code>boto3&lt;/code>&lt;/strong> パッケージをインストールします。&lt;/p>
+&lt;pre tabindex="0">&lt;code>(.venv) $ python3 -m pip install boto3
+&lt;/code>&lt;/pre>&lt;p>これで準備完了です。簡単！&lt;/p>
+&lt;h2 id="高レベル-api-と低レベル-api">高レベル API と低レベル API&lt;/h2>
+&lt;p>Boto3 の API は、抽象度の高い API と、低い API の二種類が用意されています。&lt;/p>
+&lt;dl>
+&lt;dt>高レベル API（リソース API）&lt;/dt>
+&lt;dd>各 AWS リソースを、オブジェクト指向なコードで扱うことができる。&lt;code>boto3.resource(リソース名)&lt;/code> でインスタンスを取得できる。（参考: &lt;a href="https://boto3.amazonaws.com/v1/documentation/api/latest/guide/resources.html">Resources&lt;/a>）&lt;/dd>
+&lt;dt>低レベル API（クライアント API）&lt;/dt>
+&lt;dd>AWS のサービス API と 1:1 で対応する構成になっており、各種 API の戻り値は単純な dict オブジェクト。&lt;code>boto3.client(リソース名)&lt;/code> でインスタンスを取得できる。（参考: &lt;a href="https://boto3.amazonaws.com/v1/documentation/api/latest/guide/clients.html">Low-level clients&lt;/a>、&lt;a href="https://boto3.amazonaws.com/v1/documentation/api/latest/reference/core/session.html#boto3.session.Session.client">client 関数&lt;/a>）&lt;/dd>
+&lt;/dl>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">boto3&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 高レベル API を使うとき&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">dynamodb&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">boto3&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">resource&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;dynamodb&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 低レベル API を使うとき&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">dynamodb_client&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">boto3&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">client&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;dynamodb&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>リソース API は、内部でクライアント API を使って実装されています。&lt;/p></description></item><item><title>DynamoDB 用のポリシー設定例</title><link>https://maku.blog/p/gk6jx9k/</link><pubDate>Mon, 28 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gk6jx9k/</guid><description>&lt;h2 id="あるテーブルに対するすべての操作を可能にする">あるテーブルに対するすべての操作を可能にする&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2012-10-17&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Statement&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Sid&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;AllAPIActionsOnBooks&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;dynamodb:*&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;arn:aws:dynamodb:us-west-2:123456789012:table/Books&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>Action&lt;/code> に &lt;code>dynamodb:*&lt;/code> というワイルド―カードを指定することで、DynamoDB のすべての API を使った操作を可能にしています。
+通常は、特定のアクションのみを許可すべきです。&lt;/p>
+&lt;h2 id="あるテーブルの読み取りを行えるようにする">あるテーブルの読み取りを行えるようにする&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2012-10-17&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Statement&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Sid&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;DescribeQueryScanBooksTable&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;dynamodb:DescribeTable&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;dynamodb:Query&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;dynamodb:Scan&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;arn:aws:dynamodb:us-west-2:123456789012:table/Books&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このポリシーステートメントは、アカウント &lt;code>123456789012&lt;/code> が所有する &lt;code>Books&lt;/code> テーブルの読み取り（Query や Scan）が可能であることを示します。&lt;/p>
+&lt;p>下記は、もう少し可能な操作を増やしたバージョンです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Version&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2012-10-17&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Statement&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Sid&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;ReadOnlyAPIActionsOnBooks&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Effect&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Action&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;dynamodb:GetItem&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;dynamodb:BatchGetItem&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;dynamodb:DescribeTable&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;dynamodb:Query&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;dynamodb:Scan&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;dynamodb:ConditionCheckItem&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Resource&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;arn:aws:dynamodb:us-west-2:123456789012:table/Books&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure></description></item><item><title>DynamoDB の未整理・雑多メモ</title><link>https://maku.blog/p/38bpqjp/</link><pubDate>Wed, 16 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/38bpqjp/</guid><description>&lt;ul>
+&lt;li>DynamoDB のテーブルは &lt;strong>リージョンごとに独立&lt;/strong> して存在する。例えば、&lt;code>us-east-2&lt;/code> リージョンの People テーブルと、&lt;code>us-west-2&lt;/code> リージョンの People テーブルは別物として扱われる。&lt;/li>
+&lt;li>DyanmoDB のテーブル名、&lt;strong>属性名は &lt;code>CamelCase&lt;/code>&lt;/strong> にするのが公式っぽい（&lt;code>-&lt;/code>、&lt;code>_&lt;/code>、&lt;code>.&lt;/code> といった記号も使える）&lt;/li>
+&lt;li>プライマリキー
+&lt;ul>
+&lt;li>DynamoDB の &lt;strong>プライマリキーの型&lt;/strong> は、文字列／数値／バイナリ、といったスカラ値のみが使える。&lt;/li>
+&lt;li>DynamoDB のプライマリキーは 1 つ or 2 つ
+&lt;ul>
+&lt;li>1 つの場合 &amp;hellip; パーティションキーのみ（一意な ID）&lt;/li>
+&lt;li>2 つの場合 &amp;hellip; パーティションキー + ソートキー（パーティションが同じであれば、同じ物理ストレージ内にソートキー値でソートされた形で項目が保持される）&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>DynamoDB のテーブルは、プライマリキーとなる属性以外はスキーマレスなので、テーブル作成時はプライマリーキー属性のみ定義すればよい。それ以外の部分には入れ子構造のデータも自由に入れられる。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>DynamoDB に項目を追加するときに &lt;strong>バイナリ型属性&lt;/strong> の値を渡すときは、&lt;strong>Base64&lt;/strong> エンコードして渡す必要がある。&lt;/li>
+&lt;li>RCU の消費
+&lt;ul>
+&lt;li>基本的にクエリ (Query) は合計サイズ &lt;strong>4KB ごとに 1RCU&lt;/strong> 消費する。&lt;/li>
+&lt;li>GetItem の場合は、&lt;strong>1 件ごとに 1RCU&lt;/strong> 消費する。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>100 件以上とか大量に PutItem するときは、BatchWrite の仕組みを使うとめっちゃ速くなる。複数の要求をバッファリングして通信回数を減らしてくれるぽい。具体的な使い方は、各 SDK の API ドキュメントを参照。&lt;/li>
+&lt;/ul></description></item><item><title>DynamoDB Local で DynamoDB のローカルテスト環境を作る</title><link>https://maku.blog/p/rdq4eq2/</link><pubDate>Tue, 23 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rdq4eq2/</guid><description>&lt;h2 id="dynamodb-local-とは">DynamoDB Local とは&lt;/h2>
+&lt;p>DynamoDB Local を使うと、Amazon DynamoDB サービスを模倣するローカルサーバーを立ち上げることができます。
+DynamoDB Local サーバーは、デフォルトでは &lt;code>http://localhost:8000&lt;/code> で起動し、ここに対して AWS CLI や AWS SDK で接続して操作します。&lt;/p>
+&lt;p>DynamoDB ウェブサービスで複雑なデータ処理を行うときは、あらかじめ DynamoDB Local を使ってテストを行っておくと安心です。
+DynamoDB の操作のために試行錯誤しても AWS の利用料金がかかることはありません。&lt;/p>
+&lt;h2 id="dynamodb-local-のインストール">DynamoDB Local のインストール&lt;/h2>
+&lt;h3 id="実行ファイルのダウンロード">実行ファイルのダウンロード&lt;/h3>
+&lt;p>DynamoDB Local には、Java の実行ファイル (JAR) や、それを含む Docker コンテナとして提供されています。
+Java のインストールされた環境では、JAR ファイルをダウンロードして起動するのが手っ取り早いです。
+下記から ZIP ファイルでダウンロードできます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html">DynamoDB Local のダウンロード&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>ダウンロードした ZIP ファイルを展開すると、次のような構成のディレクトリが展開されます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">アーカイブの内容&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">dynamodb_local_latest/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- DynamoDBLocal_lib/ ... 本体が使う依存ライブラリ
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- DynamoDBLocal.jar ... 本体
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- その他のドキュメント&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>起動に必要なのは、&lt;code>DynamoDBLocal_lib&lt;/code> ディレクトリと &lt;code>DynamoDBLocal.jar&lt;/code> だけなので、この 2 つを任意のディレクトリにコピーします。
+ここでは、次のようなディレクトリにコピーすることにします（Windows であれば、&lt;code>$HOME&lt;/code> は &lt;code>%USERPROFILE%&lt;/code> に置き換えてください）。&lt;/p></description></item><item><title>DynamoDB をコマンドライン (CLI) で操作する</title><link>https://maku.blog/p/zkzamw8/</link><pubDate>Mon, 22 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/zkzamw8/</guid><description>&lt;h2 id="テーブルを作成する-dynamodb-create-table">テーブルを作成する (dynamodb create-table)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">aws dynamodb create-table --table-name &amp;lt;テーブル名&amp;gt; ...&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>DynamoDB のテーブルを作成するときは、少なくともプライマリキーの設定や、課金モードの設定が必要になるので、少しだけコマンドが長くなります。&lt;/p>
+&lt;p>次の例では、DynamoDB に MusicCollection というテーブルを作成します。
+&lt;code>Artist&lt;/code> というパーティションキー (&lt;code>KeyType=HASH&lt;/code>) と、&lt;code>Artist&lt;/code> というソートキー (&lt;code>KeyType=RANGE&lt;/code>) を定義しています。
+課金体系は「プロビジョンドモード」で最小構成になるよう設定しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">テーブル生成 (PartitionKey &amp;#43; SortKey)&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws dynamodb create-table \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --table-name MusicCollection \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --attribute-definitions AttributeName=Artist,AttributeType=S AttributeName=SongTitle,AttributeType=S \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --key-schema AttributeName=Artist,KeyType=HASH AttributeName=SongTitle,KeyType=RANGE \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>パーティションキーのみで良い場合（ソートキーなし）は、次のような感じになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">テーブル生成 (PartitionKey)&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws dynamodb create-table \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --table-name MusicCollection \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --attribute-definitions AttributeName=Artist,AttributeType=S \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --key-schema AttributeName=Artist,KeyType=HASH \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>キャパシティモード（課金体系）をオンデマンド（本当にアクセスした分だけの支払い）にするには、&lt;strong>&lt;code>--billing-mode PAY_PER_REQUEST&lt;/code>&lt;/strong> オプションを指定し、プロビジョン設定 (&lt;code>--provisioned-throughput&lt;/code>) を省略します。
+一定間隔でそれなりにアクセスがある場合は、プロビジョンドモード (&lt;code>PROVISIONED&lt;/code>) にして常時稼働の形にしておいた方が総合的に安くなるようですが、テスト用途で作成する場合などは &lt;code>PAY_PER_REQUEST&lt;/code> にしておくのが無難かと思います。&lt;/p></description></item></channel></rss>

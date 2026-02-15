@@ -1,24 +1,323 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>機械学習/ディープラーニング on まくろぐ</title><link>https://maku.blog/tags/ml/</link><description>Recent content in 機械学習/ディープラーニング on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sun, 12 May 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/ml/index.xml" rel="self" type="application/rss+xml"/><item><title>機械学習メモ: 分類タスクの評価 ─ balanced accuracy</title><link>https://maku.blog/p/g6v9puz/</link><pubDate>Sun, 12 May 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/g6v9puz/</guid><description>機械学習の分類タスクにおける評価指標のひとつとして balanced accuracy があります（日本語だと加重平均正答率とかかな）。 balanced accuracy は、各クラスのデータ数に偏りがある場合に正答率 (accuracy) の計算に補正を加えます。
-balanced accuracy の計算方法 通常の正解率 (accuracy) の計算は次のようなシンプルなものです。
-$$ \operatorname{accuracy} = \frac{正解数 (r)}{データ数 (n)} $$
-例えば、10 個のデータのうち 8 個の予測に成功した場合は、accuracy は 0.8 (80%) になりますが、blanced accuracy の場合は、各クラスに属するデータの数の逆数を重みとした加重平均を取ります。
-$$ \operatorname{balanced accuracy} = \frac{1}{N} \sum_{i=1}^{N} \frac{r_i}{n_i} $$
-\( N \) &amp;hellip; クラス数 \( r_i \) &amp;hellip; クラス \( i \) に属すると正しく予測できたデータ数 \( n_i \) &amp;hellip; クラス \( i \) の（実際の）データ数 要するに、もともとたくさんのデータがあるクラスに属すると予測して正解したとしても、accuracy はあまり上がらないようにするということです。 逆に、少ししかデータがないクラスに属すると予測して正解すれば、accuracy は大きく上がります。 感覚としては、各クラスごとに個別に accuracy を求めてから平均するという感じです。</description></item><item><title>機械学習メモ: 多クラス分類の評価 ─ mean-f1, macro-f1, micro-f1</title><link>https://maku.blog/p/oegkg89/</link><pubDate>Sun, 12 May 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/oegkg89/</guid><description>多クラス分類用の F1 スコア 2 クラスの分類タスク（二値分類）の代表的な評価指標として F1 スコア がありますが、多クラスの分類タスクの評価指標としては、これを拡張した次のような指標を使います。 F1 スコアの平均をとったりするのですが、どのような単位で F1 スコアを計算するかが微妙に異なります。
-評価指標 説明 mean-F1 レコードごとに F1 スコアを求め、それらの平均をとります。 macro-F1 クラスごとに F1 スコアを求め、それらの平均をとります。 micro-F1 各レコードの各クラスに対する予測（陽性 or 陰性）が TP/TN/FP/FN のいずれであるかを求め、その混同行列をもとに F1 スコアを計算します。 これらの指標は、1 つのレコードに対して複数のラベルをつけるマルチラベル分類においてよく用いられます。 下記はマルチラベル分類のタスクにおいて、各種 F1 スコアを求める実装例です。 scikit-learn の f1_score() 関数の average 引数でどのロジックを用いるかを指定できます。
-scikit-learn でマルチラベル分類の F1 スコアを求める from sklearn.metrics import f1_score # サンプルデータ y_true = [[0, 1, 1], # レコード1の真のラベル (2, 3) [1, 1, 1]] # レコード2の真のラベル (1, 2, 3) y_pred = [[0, 1, 0], # レコード1の予測されたラベル (2) [1, 0, 1]] # レコード2の予測されたラベル (1, 3) print(&amp;#34; mean-F1:&amp;#34;, f1_score(y_true, y_pred, average=&amp;#34;samples&amp;#34;)) # 0.</description></item><item><title>機械学習メモ: 分類タスクの評価 ─ ROC カーブと AUC</title><link>https://maku.blog/p/ha99p76/</link><pubDate>Mon, 29 Apr 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ha99p76/</guid><description>ROC カーブとは ROC (Receiver Operating Characteristic) カーブ（曲線） は、二値分類モデルの性能を評価するためのグラフです。 陽性と陰性を判断するための閾値を変換させたときに、真陽性率 (TPR: True Positive Rate) と 偽陽性率 (FPR: False Positive Rate) がどのように変化するかプロットしたものです。
-（参考）TP/TN/FP/FN などの用語について → 混同行列と関連指標 真陽性率 (TPR) と 偽陽性率 (FPR) 真陽性率（＝再現率、Recall）は、陽性（正例）サンプルのうち、正しく陽性と予測できたものが何％あったかを示すもので、高いほど（1 に近いほど）よいです。
-$$ TPR \left( 真陽性率 \right) = \frac{TP}{TP + FN} $$
-偽陽性率は、陰性（負例）サンプルのうち、誤って陽性と予測してしまったものが何％あったかを示すもので、低いほど（0 に近いほど）よいです。
-$$ FPR \left( 偽陽性率 \right) = \frac{FP}{FP + TN} $$
-これらはトレードオフの関係にあり、陽性あるいは陰性と判断するための閾値を変化させたときに次のような感じで変化します。
-図: 一般的な ROC 曲線 このとき、どの閾値がよいかは一概には言えなくて、真陽性率を犠牲にしてでも偽陽性率を低くしたいのであれば閾値 A を選べばよいし、真陽性率をできるだけ高めたいのであれば閾値 C を選びます。 バランスよく選びたいのであれば閾値 B を選ぶことになります。
-AUC (Area Under the Curve) 二値分類モデルの性能を示すための指標として、AUC (Area Under the Curve) があります。 AUC は、ROC カーブの下の部分面積であり、大きいほど（1 に近いほど）よい性能だということを表します。 前述の通り、二値分類モデルで使用する閾値は、どの値がベストかは一概に決められないのですが、AUC を使えば、二値分類モデルの全体的な性能を客観的に示すことができます。</description></item><item><title>機械学習メモ: 分類タスクの評価 ─ 混同行列と 2 クラス分類の基本的な評価指標 (accuracy, error rate, recall, precision, f1-score, fβ-score)</title><link>https://maku.blog/p/9dveh3m/</link><pubDate>Sun, 21 Apr 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9dveh3m/</guid><description>混同行列 (confusion matrix) とは 混同行列 (confusion matrix) は、機械学習やパターン認識などの分野で使われる評価手法のひとつで、主に分類問題の性能を評価するために使用されます。 混同行列は、実際のデータが属するクラスと、モデル（分類器）が予測したクラスを比較することで、分類器の性能を可視化するのに役立ちます。
-図: 混同行列 混同行列は、予測モデルが予測したデータを下記の 4 種類に分けてカウントします。 陽性・陰性というのは、例えば、「病気の有無」や「本物・偽物」といった分類を示します。
-真陽性 (TP: True Positives) &amp;hellip; 陽性データのうち、モデルが正しく陽性と予測した数。 真陰性 (TN: True Negatives) &amp;hellip; 陰性データのうち、モデルが正しく陰性と予測した数。 偽陽性 (FP: False Positives) &amp;hellip; 陰性データのうち、モデルが誤って陽性と予測した数。 偽陰性 (FN: False Negatives) &amp;hellip; 陽性データのうち、モデルが誤って陰性と予測した数。 一般的には二値分類に使われますが、多クラスの分類でも利用されます。 混同行列をベースにして、分類問題の様々な評価指標を計算できます。
-正答率 (accuracy) と誤答率 (error rate) 再現率 (recall) と 適合率 (precision) F1 スコア、Fβ スコア マシューズ相関係数 (MCC) ここで、正答率 (accuracy) というのは、単純に「予測が当たった数／データ数」という計算で求められるものです。 例えば、10 個のデータを分類して、5 個のデータを正しく分類できれば、正答率 (accuracy) は50％です。
-でも、実世界の分類問題はこんな簡単に評価できるものではなかったりします。 典型的なのが疾患の有無の判断です。 実際に 100 人中 5 人が疾患を持っている場合、誰も疾患を持っていないと予測すれば、その予測モデルの精度は95％になります。 でもそんな予測モデルは役に立ちませんよね？ そうではなく、いかに間違いなく疾患を持っている人を見つけられるかが重要なはずです。 そこで必要になってくるのが、再現率、適合率、F1 スコアといった評価指標です。</description></item><item><title>読書メモ『Kaggleで勝つ データ分析の技術』</title><link>https://maku.blog/p/a7p6b2s/</link><pubDate>Mon, 01 Apr 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/a7p6b2s/</guid><description>Kaggleで勝つ データ分析の技術 門脇大輔、阪田隆司、保坂桂佑、平松雄司 技術評論社 ちょっとだけ古めの本だけど、Kaggle 本の中でも評価の高いデータ分析技術本です。 たしかによくまとまってて読みやすいですね。 以下まとめメモメモ。
-1. 分析コンペとは 分析コンペって何？ コンペとは 特徴量（変数、説明変数）を入力として 目的変数を予測する 学習データ（提供されるデータ）には上記の 1 と 2 が含まれ、テストデータには 1 だけが含まれる。 学習データのイメージ（入力とその答えがある） 123, 135, 74, 12, 301, 634 → 15 423, 562, 10, 44, 125, 988 → 31 904, 111, 64, 15, 877, 502 → 23 テストデータのイメージ（入力しかない） 335, 218, 66, 40, 226, 999 → ？ 590, 449, 59, 20, 633, 490 → ？ 771, 703, 12, 30, 550, 300 → ？ LB: Leaderboard 参加者はコンペ期間中にテストデータを使って予測した値を提出する。 システム側で テストデータの一部 だけを使ってスコアが計算され、Public Leaderboard として現在の順位が公開される。 コンペ期間が終了すると、テストデータの残りの部分を使ってスコアが計算され、Private Leaderboard として最終的な順位が発表される。 Shake up Public LB (Leader Board) と Private LB の順位が大きく入れ替わること。 チームマージ 他の参加者にリクエストを出してチームを組むこと。 コンペの終盤に多くのチームマージが行われることがある。 チームの人数上限は 5 名。 マージするチーム同士の合計提出回数は「1日の上限 x コンペ日数」を超えてはいけない。毎日上限まで予測値を Submit していると、チームマージできなくなるので注意。 分析コンペのプラットフォーム 主なプラットフォーム Kaggle (worldwide) 最も有名 世界中の企業、省庁、研究機関がコンペを開催 SIGNATE（日本） 日本語 日本国内の企業、省庁、研究機関がコンペを開催 TopCoder（worldwide） プログラミングコンテストのプラットフォームだが、分析コンペも開催されている カーネルコンペ 通常のコンペ &amp;hellip; 予測値を提出する。 カーネルコンペ &amp;hellip; Kernel (Notebook) に記述したコードを提出する。 Kernel 上で学習と予測の両方を実行するタイプと、予測だけを実行すればよいタイプがある（後者はモデルのバイナリをアップロードできるようになっている）。 分析コンペに参加してから終わるまで Join Competition ボタンからコンペに参加する 規約に同意する 1 日の Submit 数やチームメンバー数の上限。 Private Sharing（チームメンバー意外へのコード共有）はダメ。Kaggle の Discussion での共有は OK。 外部データの使用可否はコンペにより異なる。 データをダウンロードする 予測値を作成する ダウンロードしたデータを使ってモデルを作る テストデータに対する予測値を求める 予測値を提出する 提出サンプル（主に CSV 形式）と同じ形式の提出用ファイルを作成して Submit。１日の提出数上限に注意。 Public Leaderboard をチェックする テストデータの一部を使ってスコア計算した結果の順位が公開される。 最終予測値を選ぶ コンペの終了前に、最終評価に使う予測値を 2 つ選んで Use for Final Score にチェックを入れる。 自分で選ばないと、Public Leaderboard の中でスコアが高いものが選ばれる。 Private Leaderboard をチェックする 分析コンペが終了したら Private LB で最終順位を確認する。 多くの場合は終了と同時に発表されるが、発表までに時間がかかるものもある。 分析コンペに参加する意義 賞金、称号、ランキング データ分析の経験 データサイエンティストとの繋がり 就業機会 上位を目指すためのポイント 探索的データ分析 (EDA: Exploratory Data Analysis) まず優先すべきはデータの理解 可視化手法 棒グラフ、箱ひげ図、バイオリンプロット、散布図、折れ線グラフ ヒートマップ、ヒストグラム Q-Q プロット t-SNE、UMAP テーブルデータのコンペでは、よいデータを作れたかどうかで順位がきまる 2.</description></item><item><title>機械学習メモ: 回帰タスクの評価 ─ MAE, MSE, RMSE, MSLE, RMSLE, MAPE, 決定係数</title><link>https://maku.blog/p/psotadn/</link><pubDate>Tue, 06 May 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/psotadn/</guid><description>機械学習における回帰モデルは、目的変数となる数値を予測するためのモデルです。 よって、回帰モデルの精度は、真の値と予測値のズレをもとに計算されます（ズレが小さいほど精度がよい）。 その計算方法としては、単純にズレの平均値を求める方法（平均絶対誤差: MAE）や、二乗値や対数値を使う方法などいろいろあります。
-平均絶対誤差 (MAE: Mean Absolute Error) 平均絶対誤差 (MAE: Mean Absolute Error) は、実測値と予測値の「誤差の絶対値」をもとに算出します。
-$$ \text{MAE} = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i| $$
-\( y_i \) : 実測値 \( \hat{y_i} \) : 予測値 二乗誤差に比べると、外れ値の影響が小さいのが特徴すす。
-自力で計算する方法 import numpy as np import pandas as pd y_true = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0]) # 実測値 y_pred = pd.Series([0.8, 2.4, 2.5, 3.8, 7.2]) # 予測値 print(np.mean(np.abs(y_true - y_pred))) #=&amp;gt; 0.7 scikit-learn の mean_absolute_error 関数を使う方法 import numpy as np import pandas as pd from sklearn.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>機械学習/ディープラーニング on まくろぐ</title><link>https://maku.blog/tags/ml/</link><description>Recent content in 機械学習/ディープラーニング on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sat, 18 Jan 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/ml/index.xml" rel="self" type="application/rss+xml"/><item><title>機械学習メモ: 分類タスクの評価 ─ balanced accuracy</title><link>https://maku.blog/p/g6v9puz/</link><pubDate>Sun, 12 May 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/g6v9puz/</guid><description>&lt;p>機械学習の分類タスクにおける評価指標のひとつとして &lt;strong>balanced accuracy&lt;/strong> があります（日本語だと加重平均正答率とかかな）。
+balanced accuracy は、各クラスのデータ数に偏りがある場合に正答率 (accuracy) の計算に補正を加えます。&lt;/p>
+&lt;h2 id="balanced-accuracy-の計算方法">balanced accuracy の計算方法&lt;/h2>
+&lt;p>通常の正解率 (accuracy) の計算は次のようなシンプルなものです。&lt;/p>
+&lt;p>$$
+\operatorname{accuracy} = \frac{正解数 (r)}{データ数 (n)}
+$$&lt;/p>
+&lt;p>例えば、10 個のデータのうち 8 個の予測に成功した場合は、accuracy は 0.8 (80%) になりますが、blanced accuracy の場合は、各クラスに属するデータの数の逆数を重みとした加重平均を取ります。&lt;/p>
+&lt;p>$$
+\operatorname{balanced accuracy} = \frac{1}{N} \sum_{i=1}^{N} \frac{r_i}{n_i}
+$$&lt;/p>
+&lt;ul>
+&lt;li>\( N \) &amp;hellip; クラス数&lt;/li>
+&lt;li>\( r_i \) &amp;hellip; クラス \( i \) に属すると正しく予測できたデータ数&lt;/li>
+&lt;li>\( n_i \) &amp;hellip; クラス \( i \) の（実際の）データ数&lt;/li>
+&lt;/ul>
+&lt;p>要するに、もともとたくさんのデータがあるクラスに属すると予測して正解したとしても、accuracy はあまり上がらないようにするということです。
+逆に、少ししかデータがないクラスに属すると予測して正解すれば、accuracy は大きく上がります。
+感覚としては、各クラスごとに個別に accuracy を求めてから平均するという感じです。&lt;/p></description></item><item><title>機械学習メモ: 多クラス分類の評価 ─ mean-f1, macro-f1, micro-f1</title><link>https://maku.blog/p/oegkg89/</link><pubDate>Sun, 12 May 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/oegkg89/</guid><description>&lt;h2 id="多クラス分類用の-f1-スコア">多クラス分類用の F1 スコア&lt;/h2>
+&lt;p>2 クラスの分類タスク（二値分類）の代表的な評価指標として &lt;a href="../../p/9dveh3m/#f1-score">F1 スコア&lt;/a> がありますが、多クラスの分類タスクの評価指標としては、これを拡張した次のような指標を使います。
+F1 スコアの平均をとったりするのですが、どのような単位で F1 スコアを計算するかが微妙に異なります。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>評価指標&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;span style="white-space: nowrap">&lt;strong>mean-F1&lt;/strong>&lt;/span>&lt;/td>
+ &lt;td>レコードごとに F1 スコアを求め、それらの平均をとります。&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;span style="white-space: nowrap">&lt;strong>macro-F1&lt;/strong>&lt;/span>&lt;/td>
+ &lt;td>クラスごとに F1 スコアを求め、それらの平均をとります。&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;span style="white-space: nowrap">&lt;strong>micro-F1&lt;/strong>&lt;/span>&lt;/td>
+ &lt;td>各レコードの各クラスに対する予測（陽性 or 陰性）が TP/TN/FP/FN のいずれであるかを求め、その混同行列をもとに F1 スコアを計算します。&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;p>これらの指標は、1 つのレコードに対して複数のラベルをつけるマルチラベル分類においてよく用いられます。
+下記はマルチラベル分類のタスクにおいて、各種 F1 スコアを求める実装例です。
+scikit-learn の &lt;strong>&lt;code>f1_score()&lt;/code>&lt;/strong> 関数の &lt;strong>&lt;code>average&lt;/code>&lt;/strong> 引数でどのロジックを用いるかを指定できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">scikit-learn でマルチラベル分類の F1 スコアを求める&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">sklearn.metrics&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">f1_score&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># サンプルデータ&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">y_true&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="c1"># レコード1の真のラベル (2, 3)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]]&lt;/span> &lt;span class="c1"># レコード2の真のラベル (1, 2, 3)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">y_pred&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="c1"># レコード1の予測されたラベル (2)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]]&lt;/span> &lt;span class="c1"># レコード2の予測されたラベル (1, 3)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34; mean-F1:&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">f1_score&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">y_true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">y_pred&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">average&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;samples&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="c1"># 0.733&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;macro-F1:&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">f1_score&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">y_true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">y_pred&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">average&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;macro&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="c1"># 0.777&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;micro-F1:&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">f1_score&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">y_true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">y_pred&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">average&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;micro&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="c1"># 0.750&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="手作業で計算してみる">手作業で計算してみる&lt;/h2>
+&lt;p>それぞれのロジックをちゃんと理解するために、上記コード中のサンプルデータに関して手作業で計算してみます。&lt;/p></description></item><item><title>機械学習メモ: 分類タスクの評価 ─ ROC カーブと AUC</title><link>https://maku.blog/p/ha99p76/</link><pubDate>Mon, 29 Apr 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ha99p76/</guid><description>&lt;h2 id="roc-カーブとは">ROC カーブとは&lt;/h2>
+&lt;p>&lt;strong>ROC (Receiver Operating Characteristic) カーブ（曲線）&lt;/strong> は、二値分類モデルの性能を評価するためのグラフです。
+陽性と陰性を判断するための閾値を変換させたときに、&lt;strong>真陽性率 (TPR: True Positive Rate)&lt;/strong> と &lt;strong>偽陽性率 (FPR: False Positive Rate)&lt;/strong> がどのように変化するかプロットしたものです。&lt;/p>
+&lt;ul>
+&lt;li>（参考）TP/TN/FP/FN などの用語について → &lt;a href="../../p/9dveh3m/">混同行列と関連指標&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="真陽性率-tpr-と-偽陽性率-fpr">真陽性率 (TPR) と 偽陽性率 (FPR)&lt;/h2>
+&lt;p>真陽性率（＝再現率、Recall）は、陽性（正例）サンプルのうち、正しく陽性と予測できたものが何％あったかを示すもので、高いほど（1 に近いほど）よいです。&lt;/p>
+&lt;p>$$
+TPR \left( 真陽性率 \right) = \frac{TP}{TP + FN}
+$$&lt;/p>
+&lt;p>偽陽性率は、陰性（負例）サンプルのうち、誤って陽性と予測してしまったものが何％あったかを示すもので、低いほど（0 に近いほど）よいです。&lt;/p>
+&lt;p>$$
+FPR \left( 偽陽性率 \right) = \frac{FP}{FP + TN}
+$$&lt;/p>
+&lt;p>これらはトレードオフの関係にあり、陽性あるいは陰性と判断するための閾値を変化させたときに次のような感じで変化します。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="250" height="auto" src="../../p/ha99p76/img-001.drawio.svg" alt="/p/ha99p76/img-001.drawio.svg" />
+ &lt;figcaption>図: 一般的な ROC 曲線&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>このとき、どの閾値がよいかは一概には言えなくて、真陽性率を犠牲にしてでも偽陽性率を低くしたいのであれば閾値 A を選べばよいし、真陽性率をできるだけ高めたいのであれば閾値 C を選びます。
+バランスよく選びたいのであれば閾値 B を選ぶことになります。&lt;/p>
+&lt;h2 id="auc-area-under-the-curve">AUC (Area Under the Curve)&lt;/h2>
+&lt;p>二値分類モデルの性能を示すための指標として、&lt;strong>AUC (Area Under the Curve)&lt;/strong> があります。
+AUC は、ROC カーブの下の部分面積であり、大きいほど（1 に近いほど）よい性能だということを表します。
+前述の通り、二値分類モデルで使用する閾値は、どの値がベストかは一概に決められないのですが、AUC を使えば、二値分類モデルの全体的な性能を客観的に示すことができます。&lt;/p></description></item><item><title>機械学習メモ: 分類タスクの評価 ─ 混同行列と 2 クラス分類の基本的な評価指標 (accuracy, error rate, recall, precision, f1-score, fβ-score)</title><link>https://maku.blog/p/9dveh3m/</link><pubDate>Sun, 21 Apr 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9dveh3m/</guid><description>&lt;h2 id="混同行列-confusion-matrix-とは">混同行列 (confusion matrix) とは&lt;/h2>
+&lt;p>&lt;strong>混同行列 (confusion matrix)&lt;/strong> は、機械学習やパターン認識などの分野で使われる評価手法のひとつで、主に分類問題の性能を評価するために使用されます。
+混同行列は、実際のデータが属するクラスと、モデル（分類器）が予測したクラスを比較することで、分類器の性能を可視化するのに役立ちます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/9dveh3m/img-001.drawio.svg" alt="/p/9dveh3m/img-001.drawio.svg" />
+ &lt;figcaption>図: 混同行列&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>混同行列は、予測モデルが予測したデータを下記の 4 種類に分けてカウントします。
+陽性・陰性というのは、例えば、「病気の有無」や「本物・偽物」といった分類を示します。&lt;/p>
+&lt;ul>
+&lt;li>&lt;span style="color: #009933;">真陽性 (TP: True Positives)&lt;/span> &amp;hellip; 陽性データのうち、モデルが&lt;span style="color: #009933;">正しく陽性&lt;/span>と予測した数。&lt;/li>
+&lt;li>&lt;span style="color: #009933">真陰性 (TN: True Negatives)&lt;/span> &amp;hellip; 陰性データのうち、モデルが&lt;span style="color: #009933;">正しく陰性&lt;/span>と予測した数。&lt;/li>
+&lt;li>&lt;span style="color: #cc0066">偽陽性 (FP: False Positives)&lt;/span> &amp;hellip; 陰性データのうち、モデルが&lt;span style="color: #cc0066">誤って陽性&lt;/span>と予測した数。&lt;/li>
+&lt;li>&lt;span style="color: #cc0066">偽陰性 (FN: False Negatives)&lt;/span> &amp;hellip; 陽性データのうち、モデルが&lt;span style="color: #cc0066">誤って陰性&lt;/span>と予測した数。&lt;/li>
+&lt;/ul>
+&lt;p>一般的には二値分類に使われますが、多クラスの分類でも利用されます。
+混同行列をベースにして、分類問題の様々な評価指標を計算できます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="#accuracy">正答率 (accuracy) と誤答率 (error rate)&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#recall-precision">再現率 (recall) と 適合率 (precision)&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#f1-score">F1 スコア、Fβ スコア&lt;/a>&lt;/li>
+&lt;li>マシューズ相関係数 (MCC)&lt;/li>
+&lt;/ul>
+&lt;p>ここで、正答率 (accuracy) というのは、単純に「予測が当たった数／データ数」という計算で求められるものです。
+例えば、10 個のデータを分類して、5 個のデータを正しく分類できれば、正答率 (accuracy) は50％です。&lt;/p></description></item><item><title>読書メモ『Kaggleで勝つ データ分析の技術』</title><link>https://maku.blog/p/a7p6b2s/</link><pubDate>Mon, 01 Apr 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/a7p6b2s/</guid><description>&lt;div class="xAmazon">
+ &lt;a href="https://www.amazon.co.jp/exec/obidos/ASIN/B07YTDBC3Z/maku04-22/ref=nosim/" target="_blank">
+ &lt;div class="xAmazon_image">
+ &lt;img src="https://m.media-amazon.com/images/I/71kBM0KZSAL._SY522_.jpg" alt="Kaggleで勝つ データ分析の技術">
+ &lt;/div>
+ &lt;div class="xAmazon_info">
+ &lt;div class="xAmazon_info_title">Kaggleで勝つ データ分析の技術&lt;/div>
+ &lt;div class="xAmazon_info_author">門脇大輔、阪田隆司、保坂桂佑、平松雄司&lt;/div>
+ &lt;div class="xAmazon_info_publisher">技術評論社&lt;/div>
+ &lt;div class="xAmazon_info_icon">&lt;img src="data:image/gif;base64,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" alt="アマゾンのロゴ">&lt;/div>
+ &lt;/div>
+ &lt;/a>
+&lt;/div>
+
+&lt;p>ちょっとだけ古めの本だけど、Kaggle 本の中でも評価の高いデータ分析技術本です。
+たしかによくまとまってて読みやすいですね。
+以下まとめメモメモ。&lt;/p>
+&lt;h2 id="1-分析コンペとは">1. 分析コンペとは&lt;/h2>
+&lt;h3 id="分析コンペって何">分析コンペって何？&lt;/h3>
+&lt;ul>
+&lt;li>コンペとは
+&lt;ol>
+&lt;li>特徴量（変数、説明変数）を入力として&lt;/li>
+&lt;li>目的変数を予測する&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>学習データ（提供されるデータ）には上記の 1 と 2 が含まれ、テストデータには 1 だけが含まれる。
+&lt;ul>
+&lt;li>学習データのイメージ（入力とその答えがある）
+&lt;ul>
+&lt;li>123, 135, 74, 12, 301, 634 → 15&lt;/li>
+&lt;li>423, 562, 10, 44, 125, 988 → 31&lt;/li>
+&lt;li>904, 111, 64, 15, 877, 502 → 23&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>テストデータのイメージ（入力しかない）
+&lt;ul>
+&lt;li>335, 218, 66, 40, 226, 999 → ？&lt;/li>
+&lt;li>590, 449, 59, 20, 633, 490 → ？&lt;/li>
+&lt;li>771, 703, 12, 30, 550, 300 → ？&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>LB: Leaderboard&lt;/strong>
+&lt;ul>
+&lt;li>参加者はコンペ期間中にテストデータを使って予測した値を提出する。&lt;/li>
+&lt;li>システム側で &lt;strong>テストデータの一部&lt;/strong> だけを使ってスコアが計算され、&lt;strong>Public Leaderboard&lt;/strong> として現在の順位が公開される。&lt;/li>
+&lt;li>コンペ期間が終了すると、テストデータの残りの部分を使ってスコアが計算され、&lt;strong>Private Leaderboard&lt;/strong> として最終的な順位が発表される。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>Shake up&lt;/strong>
+&lt;ul>
+&lt;li>Public LB (Leader Board) と Private LB の順位が大きく入れ替わること。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>チームマージ
+&lt;ul>
+&lt;li>他の参加者にリクエストを出してチームを組むこと。&lt;/li>
+&lt;li>コンペの終盤に多くのチームマージが行われることがある。&lt;/li>
+&lt;li>チームの人数上限は 5 名。&lt;/li>
+&lt;li>マージするチーム同士の合計提出回数は「1日の上限 x コンペ日数」を超えてはいけない。毎日上限まで予測値を Submit していると、チームマージできなくなるので注意。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="分析コンペのプラットフォーム">分析コンペのプラットフォーム&lt;/h3>
+&lt;ul>
+&lt;li>主なプラットフォーム
+&lt;ul>
+&lt;li>Kaggle (worldwide)
+&lt;ul>
+&lt;li>最も有名&lt;/li>
+&lt;li>世界中の企業、省庁、研究機関がコンペを開催&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>SIGNATE（日本）
+&lt;ul>
+&lt;li>日本語&lt;/li>
+&lt;li>日本国内の企業、省庁、研究機関がコンペを開催&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>TopCoder（worldwide）
+&lt;ul>
+&lt;li>プログラミングコンテストのプラットフォームだが、分析コンペも開催されている&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>カーネルコンペ
+&lt;ul>
+&lt;li>通常のコンペ &amp;hellip; 予測値を提出する。&lt;/li>
+&lt;li>カーネルコンペ &amp;hellip; Kernel (Notebook) に記述したコードを提出する。
+&lt;ul>
+&lt;li>Kernel 上で学習と予測の両方を実行するタイプと、予測だけを実行すればよいタイプがある（後者はモデルのバイナリをアップロードできるようになっている）。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="分析コンペに参加してから終わるまで">分析コンペに参加してから終わるまで&lt;/h3>
+&lt;ol>
+&lt;li>&lt;strong>&lt;code>Join Competition&lt;/code>&lt;/strong> ボタンからコンペに参加する&lt;/li>
+&lt;li>規約に同意する
+&lt;ul>
+&lt;li>1 日の Submit 数やチームメンバー数の上限。&lt;/li>
+&lt;li>&lt;strong>Private Sharing&lt;/strong>（チームメンバー意外へのコード共有）はダメ。Kaggle の Discussion での共有は OK。&lt;/li>
+&lt;li>外部データの使用可否はコンペにより異なる。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>データをダウンロードする&lt;/li>
+&lt;li>予測値を作成する
+&lt;ol>
+&lt;li>ダウンロードしたデータを使ってモデルを作る&lt;/li>
+&lt;li>テストデータに対する予測値を求める&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>予測値を提出する
+&lt;ul>
+&lt;li>提出サンプル（主に CSV 形式）と同じ形式の提出用ファイルを作成して Submit。１日の提出数上限に注意。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Public Leaderboard をチェックする
+&lt;ul>
+&lt;li>テストデータの一部を使ってスコア計算した結果の順位が公開される。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>最終予測値を選ぶ
+&lt;ul>
+&lt;li>コンペの終了前に、最終評価に使う予測値を 2 つ選んで &lt;strong>&lt;code>Use for Final Score&lt;/code>&lt;/strong> にチェックを入れる。&lt;/li>
+&lt;li>自分で選ばないと、Public Leaderboard の中でスコアが高いものが選ばれる。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Private Leaderboard をチェックする
+&lt;ul>
+&lt;li>分析コンペが終了したら Private LB で最終順位を確認する。&lt;/li>
+&lt;li>多くの場合は終了と同時に発表されるが、発表までに時間がかかるものもある。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="分析コンペに参加する意義">分析コンペに参加する意義&lt;/h3>
+&lt;ul>
+&lt;li>賞金、称号、ランキング&lt;/li>
+&lt;li>データ分析の経験&lt;/li>
+&lt;li>データサイエンティストとの繋がり&lt;/li>
+&lt;li>就業機会&lt;/li>
+&lt;/ul>
+&lt;h3 id="上位を目指すためのポイント">上位を目指すためのポイント&lt;/h3>
+&lt;ul>
+&lt;li>探索的データ分析 (EDA: Exploratory Data Analysis)
+&lt;ul>
+&lt;li>まず優先すべきはデータの理解&lt;/li>
+&lt;li>可視化手法
+&lt;ul>
+&lt;li>棒グラフ、箱ひげ図、バイオリンプロット、散布図、折れ線グラフ&lt;/li>
+&lt;li>ヒートマップ、ヒストグラム&lt;/li>
+&lt;li>Q-Q プロット&lt;/li>
+&lt;li>&lt;strong>t-SNE&lt;/strong>、&lt;strong>UMAP&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>テーブルデータのコンペでは、よいデータを作れたかどうかで順位がきまる&lt;/li>
+&lt;/ul>
+&lt;h2 id="2-タスクと評価指標">2. タスクと評価指標&lt;/h2>
+&lt;h3 id="分析コンペにおけるタスクの種類">分析コンペにおけるタスクの種類&lt;/h3>
+&lt;p>タスクの種類ごとに評価指標がいろいろある。&lt;/p></description></item><item><title>機械学習メモ: 回帰タスクの評価 ─ MAE, MSE, RMSE, MSLE, RMSLE, MAPE, 決定係数</title><link>https://maku.blog/p/psotadn/</link><pubDate>Tue, 06 May 2014 00:00:00 +0900</pubDate><guid>https://maku.blog/p/psotadn/</guid><description>&lt;p>機械学習における回帰モデルは、目的変数となる数値を予測するためのモデルです。
+よって、回帰モデルの精度は、真の値と予測値のズレをもとに計算されます（ズレが小さいほど精度がよい）。
+その計算方法としては、単純にズレの平均値を求める方法（平均絶対誤差: MAE）や、二乗値や対数値を使う方法などいろいろあります。&lt;/p>
+&lt;h2 id="平均絶対誤差-mae-mean-absolute-error">平均絶対誤差 (MAE: Mean Absolute Error)&lt;/h2>
+&lt;p>&lt;strong>平均絶対誤差 (MAE: Mean Absolute Error)&lt;/strong> は、実測値と予測値の「誤差の絶対値」をもとに算出します。&lt;/p>
+&lt;p>$$
+\text{MAE} = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|
+$$&lt;/p>
+&lt;div style="text-align: right">
+ \( y_i \) : 実測値&lt;br/>
+ \( \hat{y_i} \) : 予測値
+&lt;/div>
+&lt;p>二乗誤差に比べると、外れ値の影響が小さいのが特徴すす。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">自力で計算する方法&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">numpy&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">np&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pandas&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">pd&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">y_true&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Series&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">2.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">3.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">4.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">5.0&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="c1"># 実測値&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">y_pred&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Series&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="mf">0.8&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">2.4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">2.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">3.8&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">7.2&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="c1"># 予測値&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">mean&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">abs&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">y_true&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">y_pred&lt;/span>&lt;span class="p">)))&lt;/span> &lt;span class="c1">#=&amp;gt; 0.7&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">scikit-learn の mean_absolute_error 関数を使う方法&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">numpy&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">np&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pandas&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">pd&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">sklearn.metrics&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">mean_absolute_error&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">y_true&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Series&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="mf">1.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">2.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">3.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">4.0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">5.0&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="c1"># 実測値&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">y_pred&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Series&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="mf">0.8&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">2.4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">2.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">3.8&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">7.2&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="c1"># 予測値&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mean_absolute_error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">y_true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">y_pred&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="c1">#=&amp;gt; 0.7&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="平均二乗誤差-mse-mean-squared-error">平均二乗誤差 (MSE: Mean Squared Error)&lt;/h2>
+&lt;p>&lt;strong>平均二乗誤差 (MSE: Mean Squared Error)&lt;/strong> は、実測値と予測値のずれの二乗を足し合わせて平均をとったものです。&lt;/p></description></item></channel></rss>

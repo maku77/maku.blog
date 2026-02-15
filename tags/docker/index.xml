@@ -1,41 +1,300 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Docker on まくろぐ</title><link>https://maku.blog/tags/docker/</link><description>Recent content in Docker on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 12 Feb 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/docker/index.xml" rel="self" type="application/rss+xml"/><item><title>nginx-proxy コンテナで簡単にリバースプロキシを立ち上げる</title><link>https://maku.blog/p/kos367z/</link><pubDate>Mon, 12 Feb 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/kos367z/</guid><description>nginx-proxy は Docker コンテナ用のリバースプロキシ Docker コンテナイメージの nginx-proxy を使うと、複数の Docker コンテナ用のリバースプロキシを簡単に立ち上げることができます。
-例えば、1 つの VPS サーバー上で複数の Docker コンテナー（例えば Web サーバー）を立ち上げるような場合は、次のような感じで入り口にリバースプロキシを配置し、そこから各 Web サーバーにアクセスを振り分ける構成にします。 ここでは、aaa.example.com と bbb.example.com というサブドメインにより、プロキシ先を振り分けるようにしていますが、example.com というベースドメインを使うこともできます。
-図: nginx-proxy によるリバースプロキシでコンテナーを繋ぐ もともと Nginx でリバースプロキシを設定するのはそれほど難しくはないのですが、どうしてもその背後にあるコンテナーの設定がリバースプロキシ側の設定に染み出してしまいます。 また、リバースプロキシ用のコンテナーを最後に起動するという手順の複雑さもあります。
-参考: Nginx でバーチャルホストを設定する（リバースプロキシ） 参考: Docker Compose でリバースプロキシを立てて別の Docker Compose 内のコンテナに接続する - まくまく Docker ノート nginx-proxy によるリバースプロキシを起動しておくと、背後でコンテナーを起動するだけで、自動的にリバースプロキシのエントリに追加してくれます。 nginx-proxy には次のような利点があります。
-背後の Docker コンテナの存在を意識しなくてよい（同一の Docker ネットーワーク内のコンテナ起動を検出して、自動的にリバースプロキシ設定に反映してくれます） 各サブドメイン用の SSL 設定（HTTPS 対応）を自動で行ってくれる（acme-companion を組み合わせて使用することで、Let&amp;rsquo;s Encrypt による SSL 証明書の取得を自動化できます） リバースプロキシの設定更新が自動化されているので、Web アプリ用の Docker コンテナーを簡単に追加・削除できます。
-事前準備 nginx-proxy の設定を行う前に、サブドメイン用の DNS 設定や、80/443 ポートの解放などを行っておく必要があります。 ネットワーク的に繋がらないとどうしようもないですからね。</description></item><item><title>Docker で MongoDB サーバーを立ち上げる</title><link>https://maku.blog/p/y6zgrg2/</link><pubDate>Wed, 18 Jan 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/y6zgrg2/</guid><description>Docker のオフィシャルイメージとして、mongo イメージが公開されています。
-mongo - Official Image | Docker Hub このイメージには、MongoDB サーバー (mongod) や、MongoDB クライアント (mongosh) が含まれており、コマンドを省略してコンテナを起動すると、デフォルトで MongoDB サーバーが立ち上がります。
-MongoDB サーバーのコンテナを起動する 次のように mongo コンテナを起動すると、ローカルホスト上で MongoDB サーバーを立ち上げたのと同様に振舞います。
-$ docker container run --rm -d -p 27017:27017 --name mongo mongo オプションの意味:
---rm &amp;hellip; コンテナを停止したときにコンテナを削除します。コンテナを削除したくなければ、このオプションは外してください。 -d &amp;hellip; デーモンをバックグラウンドで動作させます。 -p 27107:27017 &amp;hellip; ローカルホストの 27107 ポートへのアクセスを、コンテナ内の MongoDB サーバーの 27107 ポートへ転送します。 --name mongo &amp;hellip; 起動するコンテナに mongo という名前を付けます。 mongo &amp;hellip; Docker イメージとして mongo:latest を使用します（デフォルトで :latest が使われます)。 次のようにして、mongo コンテナが起動していることを確認できます。</description></item><item><title>Go アプリを実行する軽量な Docker コンテナイメージを作成する</title><link>https://maku.blog/p/wbtbr8o/</link><pubDate>Sun, 02 Oct 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wbtbr8o/</guid><description>何をするか？ Go 言語 (Golang) で簡単な Web サーバーを作成して、それを動かす軽量な Docker コンテナイメージを作成します。 Dockerfile には マルチステージのビルド構成 を適用し、Go 言語アプリのビルドと、実行イメージのビルドのステージを分けます。 実行用のコンテナイメージとしては、Alpine Linux ベースと、scratch ベースの 2 種類のイメージを作成してみます。
-Golang は軽量なシングルバイナリを生成するのに適した言語で、Docker イメージの生成にも向いています。 Node.js などでイメージを作ろうとすると、Hello World でも 100MB 超えになってしまいますが、Golang を使えば、その 1/10 程度のサイズのイメージを生成できます。 軽量のイメージを作れるようになると、頻繁なビルドとデプロイを気兼ねなく行えるようになります。
-Golang アプリを準備する Golang で作るアプリは何でもよいのですが、ここでは Golang 標準の net/http パッケージを使って、Hello World というレスポンスを返すだけの簡単な Web サーバーアプリを用意します。
-まずは、お馴染みの go.mod の作成から。
-$ mkdir hello &amp;amp;&amp;amp; cd hello $ go mod init hello あとは、次のような main.go ファイルを作成すれば完成です。
-main.go package main import ( &amp;#34;log&amp;#34; &amp;#34;net/http&amp;#34; ) func main() { http.</description></item><item><title>Ansible タスク例: Docker と Docker Compose をインストールする</title><link>https://maku.blog/p/8k4j2gw/</link><pubDate>Sun, 28 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8k4j2gw/</guid><description>何をするか？ 下記の Docker のインストールマニュアルに従い、Ansible で Ubuntu 22.04 に Docker の実行環境をセットアップします。
-Install Docker Engine on Ubuntu | Docker Documentation Playbook の例 次の YAML ファイルは、Docker の公式サイトのインストール手順をほぼそのまま Playbook 化したものです。 この Playbook を ansible-playbook で実行することで、Docker (+ Docker Compose) のインストール、および Docker デーモンの起動まで完了します。
-install-docker.yml - hosts: all gather_facts: false become: true tasks: - name: Install APT packages to use a repository over HTTPS ansible.builtin.apt: pkg: - ca-certificates - curl - gnupg - lsb-release update_cache: yes cache_valid_time: 86400 # cache for 1 day - name: Create APT&amp;#39;s keyrings directory ansible.</description></item><item><title>GitHub Actions でコンテナイメージをビルドして Docker Hub へ push する</title><link>https://maku.blog/p/v9r8o5k/</link><pubDate>Fri, 26 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/v9r8o5k/</guid><description>何をするか？ Docker イメージを作成するための Dockerfile を GitHub のリポジトリで管理しているとします。 ここでは、GitHub Actions のワークフローを作成して、GitHub リポジトリにコードを push したときに次のような処理が自動で実行されるようにします。
-Dockerfile を使ってイメージをビルド Docker Hub にイメージを push 前提条件として、Docker Hub のアカウントは作成済みとします。
-Dockerfile の準備 GitHub のリポジトリを作成して、ルートディレクトリに次のような Dockerfile をコミット＆プッシュしておきます。
-Dockerfile FROM alpine:3 CMD [&amp;#34;echo&amp;#34;, &amp;#34;Hello World&amp;#34;] 上記のサンプルコードは、軽量の Alpine Linux で Hello World と出力するだけの Dockerfile ですが、もちろん好きなように記述していただいて構いません。
-GitHub Actions の Secrets 情報を登録 GitHub Actions から Docker Hub にイメージをプッシュできるようにするため、GitHub リポジトリの Secrets 情報として、Docker Hub のユーザー名およびアクセストークンを登録しておきます。
-Docker Hub のアクセストークンは次のように発行できます。
-Docker Hub にサインイン 右上のユーザー名をクリックして、Account Settings を選択 Security → New Access Token と選択して、トークンの説明文を入力 Access Token description: Deploy hello world など適当に入力 Access permissions: 少なくとも Read, Write を付ける Generate ボタンを押して生成 これで、次のような感じのアクセストークンが発行されるので、どこかにコピーしておきます（後から確認することはできません）。</description></item><item><title>TypeScript を使った Node.js アプリを Docker コンテナ化する</title><link>https://maku.blog/p/ehxgwt4/</link><pubDate>Fri, 29 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ehxgwt4/</guid><description>何をするか？ TypeScript + Node.js で作成したサーバーアプリを、Docker コンテナ化する話です。 サーバーアプリは Express で簡単な Hello レスポンスを返すようなものを用意します。 Docker イメージビルド用の Dockerfile ファイルは、マルチステージビルドの構成にして、最終的な実行イメージができるだけ小さくなるようにします（それでも Node.js アプリだと、どうしても 100MB 超えになってしまいますが）。 NPM パッケージの管理には yarn を使わず、シンプルに npm だけでいきます。
-Node.js アプリの用意 Node.js アプリは何でもよいのですが、ここでは Express で簡単な Web サーバーを作ることにします。
-TypeScript プロジェクトのセットアップ $ npm init --yes # package.json を生成 $ npm install express $ npm install --save-dev typescript @types/express @types/node $ npx tsc --init # tsconfig.json を生成 package.json に、TypeScript のビルドと、サーバー起動のための NPM スクリプトを追加しておきます。
-package.json（抜粋） &amp;#34;scripts&amp;#34;: { &amp;#34;build&amp;#34;: &amp;#34;tsc&amp;#34;, &amp;#34;start&amp;#34;: &amp;#34;node out/index.</description></item><item><title>Docker コンテナで Ansible のテストベッド環境を用意する</title><link>https://maku.blog/p/csctaq7/</link><pubDate>Mon, 18 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/csctaq7/</guid><description>何をするか ansible-playbook を使って何らかの Linux 環境のセットアップを自動化するとき、Playbook のテスト用に使い捨ての Docker コンテナ（テストベッド環境）があると便利です。
-Ansible には、Playbook 実行後の冪等性を保つという性質がありますが、一度 Playbook を実行してしまうと元の状態に戻すことはできません。 一方通行の冪等性はあっても、可逆性はないということですね。 Playbook を試行錯誤して作っている段階では、何度も ansible-playbook を実行することになるので、本当にその Playbook がまっさらな状態の OS に対して適用できるのか不安になってきます（冪等性があるので理論的には動作するはずですが）。 異なるディストリビューションに対して実行できるのか試したくなることもあります。
-ここでは、Ansible のテストベッド環境として Docker コンテナを作成し、各種 Ansible コマンド (ansible / ansible-playbook) で制御してみます。
-テストベッド用のコンテナを起動する Ansible は一般的にはマネージドノードに SSH 接続して Playbook を実行しますが、実は Docker コンテナに直接接続することもできます。 つまり、テストベッド用の Docker コンテナには、sshd (OpenSSH) などのサービスをわざわざインストールする必要はありません。
-ただし、Ansible マネージドノードの要件として、Python3 だけはインストールしておく必要があります。 次の Dockerfile では、Ubuntu を親イメージとして、Python3 だけ追加しています。
-Dockerfile FROM ubuntu:22.04 # Python3 のインストール RUN apt update &amp;amp;&amp;amp; apt install --no-install-recommends -y python3 Dockerfile をビルドして、testbed イメージを作成します。</description></item><item><title>Docker コンテナで Nginx サーバーを立ち上げる</title><link>https://maku.blog/p/99qo8zf/</link><pubDate>Wed, 13 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/99qo8zf/</guid><description>何をするか？ VPS などで Web アプリをホスティングする場合、各種サーバーを Docker コンテナとして立ち上げるようにすると OS 環境をクリーンに保てます。 特に、1 つのホスト（VPS サーバー）で複数の Web アプリを提供するような場合は、各アプリをコンテナで構成することで、関係ないアプリの設定が混ざってしまうのを防げます。 もちろん、Azure Container Instances や AWS Fargate といったコンテナ実行用のクラウドサービスを使えば、より独立した環境を構築できるのですが、これらのサービスは個人が趣味で使うにはまだまだ高価なので、VPS などの環境で Docker コンテナを立ち上げることには価値があります。
-ここでは、Nginx サーバーを Docker コンテナとして立ち上げる方法を示します。 Docker Hub で公開されている Nginx イメージ は、デフォルトでコンテナ内の /usr/share/nginx/html ディレクトリに配置されたコンテンツを公開するようになっています。 大きく分けて、次の 2 つのいずれかの方法で簡単にコンテンツを公開できます。
-bind マウントで Docker ホスト側のコンテンツを参照する方法 コンテンツを含んだコンテナイメージを作成する方法 以下、それぞれの方法を順番に見ていきます。
-bind マウントで Docker ホスト側のコンテンツを参照する方法 Nginx のコンテナを起動するときに、Docker ホスト側のコンテンツディレクトリを bind マウントして、コンテナの /usr/share/nginx/html ディレクトリとして参照できるようにする方法です。
-まず、簡単なコンテンツファイルとして次のような HTML ファイルを用意しておきます。
-public/index.html &amp;lt;html&amp;gt;Hello&amp;lt;/html&amp;gt; あとは、docker container run コマンドで nginx コンテナを起動するだけです。
-$ docker container run --rm -d -p 8000:80 -v &amp;#34;$(pwd)/public&amp;#34;:/usr/share/nginx/html --name web nginx 各引数は次のような意味を持っています。</description></item><item><title>Docker で Ansible の実行環境用のコンテナを作成する</title><link>https://maku.blog/p/euevcs8/</link><pubDate>Sat, 02 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/euevcs8/</guid><description>何をするか？ Ansible の実行環境は Python がインストールされている環境であれば比較的簡単にインストールできますが、Docker の実行環境があれば、ホスト環境に何もインストールせずに Ansible の実行環境を手に入れることができます（もちろんコンテナは作る必要はありますが）。
-Docker Hub を見ると、Alpine Linux ベースの Ansible 実行環境用イメージ alpine/ansible があるようですが、ここでは Dockerfile を使って自分でイメージを作成することにします。
-Ansible 実行環境用イメージを作成する Dockerfile で Alpine Linux ベースの Ansible 実行環境を定義します。
-Dockerfile FROM alpine:3 WORKDIR /app # --no-cache を付けることで /var/cache/apk 以下にキャッシュが残るのを防ぐ # --update-cache を付けることで先に apk update するのと同じ効果になる RUN apk --no-cache --update-cache add ansible openssh sshpass APK (Alpine Package Keeper) で次のようなパッケージをインストールしています。
-ansible &amp;hellip; Ansible Community パッケージ（ansible コマンドや ansible-playbook コマンドなど） openssh &amp;hellip; ssh コマンドのため sshpass &amp;hellip; ターゲットホストにパスワード認証 (--ask-pass) で接続するときのため Ansible Community パッケージ (ansible) ではなく、Ansible Core (ansible-core) を使うようにすれば、イメージサイズは 500MB 弱から 80MB 程度に削減できますが、サイズを気にしなくてよいなら Ansible Community パッケージを使っておいた方が楽です。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Docker on まくろぐ</title><link>https://maku.blog/tags/docker/</link><description>Recent content in Docker on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 04 Mar 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/docker/index.xml" rel="self" type="application/rss+xml"/><item><title>nginx-proxy コンテナで簡単にリバースプロキシを立ち上げる</title><link>https://maku.blog/p/kos367z/</link><pubDate>Mon, 12 Feb 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/kos367z/</guid><description>&lt;h2 id="nginx-proxy-は-docker-コンテナ用のリバースプロキシ">nginx-proxy は Docker コンテナ用のリバースプロキシ&lt;/h2>
+&lt;p>Docker コンテナイメージの &lt;a href="https://github.com/nginx-proxy/nginx-proxy">nginx-proxy&lt;/a> を使うと、複数の Docker コンテナ用のリバースプロキシを簡単に立ち上げることができます。&lt;/p>
+&lt;p>例えば、1 つの VPS サーバー上で複数の Docker コンテナー（例えば Web サーバー）を立ち上げるような場合は、次のような感じで入り口にリバースプロキシを配置し、そこから各 Web サーバーにアクセスを振り分ける構成にします。
+ここでは、&lt;code>aaa.example.com&lt;/code> と &lt;code>bbb.example.com&lt;/code> というサブドメインにより、プロキシ先を振り分けるようにしていますが、&lt;code>example.com&lt;/code> というベースドメインを使うこともできます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="750" height="auto" src="../../p/kos367z/img-001.drawio.svg" alt="/p/kos367z/img-001.drawio.svg" />
+ &lt;figcaption>図: nginx-proxy によるリバースプロキシでコンテナーを繋ぐ&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>もともと Nginx でリバースプロキシを設定するのはそれほど難しくはないのですが、どうしてもその背後にあるコンテナーの設定がリバースプロキシ側の設定に染み出してしまいます。
+また、リバースプロキシ用のコンテナーを最後に起動するという手順の複雑さもあります。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/q8tw6c4/">Nginx でバーチャルホストを設定する（リバースプロキシ）&lt;/a>&lt;/li>
+&lt;li>参考: &lt;a href="https://maku77.github.io/p/5f2j2hz/">Docker Compose でリバースプロキシを立てて別の Docker Compose 内のコンテナに接続する - まくまく Docker ノート&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>nginx-proxy&lt;/code> によるリバースプロキシを起動しておくと、背後でコンテナーを起動するだけで、自動的にリバースプロキシのエントリに追加してくれます。
+&lt;code>nginx-proxy&lt;/code> には次のような利点があります。&lt;/p>
+&lt;ul>
+&lt;li>背後の Docker コンテナの存在を意識しなくてよい（同一の Docker ネットーワーク内のコンテナ起動を検出して、自動的にリバースプロキシ設定に反映してくれます）&lt;/li>
+&lt;li>各サブドメイン用の SSL 設定（HTTPS 対応）を自動で行ってくれる（&lt;a href="https://github.com/nginx-proxy/acme-companion">acme-companion&lt;/a> を組み合わせて使用することで、Let&amp;rsquo;s Encrypt による SSL 証明書の取得を自動化できます）&lt;/li>
+&lt;/ul>
+&lt;p>リバースプロキシの設定更新が自動化されているので、Web アプリ用の Docker コンテナーを簡単に追加・削除できます。&lt;/p>
+&lt;h2 id="事前準備">事前準備&lt;/h2>
+&lt;p>&lt;code>nginx-proxy&lt;/code> の設定を行う前に、サブドメイン用の DNS 設定や、80/443 ポートの解放などを行っておく必要があります。
+ネットワーク的に繋がらないとどうしようもないですからね。&lt;/p></description></item><item><title>Docker で MongoDB サーバーを立ち上げる</title><link>https://maku.blog/p/y6zgrg2/</link><pubDate>Wed, 18 Jan 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/y6zgrg2/</guid><description>&lt;p>Docker のオフィシャルイメージとして、&lt;strong>&lt;code>mongo&lt;/code>&lt;/strong> イメージが公開されています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://hub.docker.com/_/mongo">mongo - Official Image | Docker Hub&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>このイメージには、MongoDB サーバー (&lt;code>mongod&lt;/code>) や、MongoDB クライアント (&lt;code>mongosh&lt;/code>) が含まれており、コマンドを省略してコンテナを起動すると、デフォルトで MongoDB サーバーが立ち上がります。&lt;/p>
+&lt;h2 id="mongodb-サーバーのコンテナを起動する">MongoDB サーバーのコンテナを起動する&lt;/h2>
+&lt;p>次のように &lt;code>mongo&lt;/code> コンテナを起動すると、ローカルホスト上で MongoDB サーバーを立ち上げたのと同様に振舞います。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> docker container run --rm -d -p 27017:27017 --name mongo mongo
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>オプションの意味:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>--rm&lt;/code>&lt;/strong> &amp;hellip; コンテナを停止したときにコンテナを削除します。コンテナを削除したくなければ、このオプションは外してください。&lt;/li>
+&lt;li>&lt;strong>&lt;code>-d&lt;/code>&lt;/strong> &amp;hellip; デーモンをバックグラウンドで動作させます。&lt;/li>
+&lt;li>&lt;strong>&lt;code>-p 27107:27017&lt;/code>&lt;/strong> &amp;hellip; ローカルホストの &lt;code>27107&lt;/code> ポートへのアクセスを、コンテナ内の MongoDB サーバーの &lt;code>27107&lt;/code> ポートへ転送します。&lt;/li>
+&lt;li>&lt;strong>&lt;code>--name mongo&lt;/code>&lt;/strong> &amp;hellip; 起動するコンテナに &lt;code>mongo&lt;/code> という名前を付けます。&lt;/li>
+&lt;li>&lt;strong>&lt;code>mongo&lt;/code>&lt;/strong> &amp;hellip; Docker イメージとして &lt;code>mongo:latest&lt;/code> を使用します（デフォルトで &lt;code>:latest&lt;/code> が使われます)。&lt;/li>
+&lt;/ul>
+&lt;p>次のようにして、&lt;code>mongo&lt;/code> コンテナが起動していることを確認できます。&lt;/p></description></item><item><title>Go アプリを実行する軽量な Docker コンテナイメージを作成する</title><link>https://maku.blog/p/wbtbr8o/</link><pubDate>Sun, 02 Oct 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wbtbr8o/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Go 言語 (Golang) で簡単な Web サーバーを作成して、それを動かす軽量な Docker コンテナイメージを作成します。
+&lt;code>Dockerfile&lt;/code> には &lt;strong>マルチステージのビルド構成&lt;/strong> を適用し、Go 言語アプリのビルドと、実行イメージのビルドのステージを分けます。
+実行用のコンテナイメージとしては、&lt;strong>Alpine Linux&lt;/strong> ベースと、&lt;strong>scratch&lt;/strong> ベースの 2 種類のイメージを作成してみます。&lt;/p>
+&lt;p>Golang は軽量なシングルバイナリを生成するのに適した言語で、Docker イメージの生成にも向いています。
+Node.js などでイメージを作ろうとすると、Hello World でも 100MB 超えになってしまいますが、Golang を使えば、その 1/10 程度のサイズのイメージを生成できます。
+軽量のイメージを作れるようになると、頻繁なビルドとデプロイを気兼ねなく行えるようになります。&lt;/p>
+&lt;h2 id="golang-アプリを準備する">Golang アプリを準備する&lt;/h2>
+&lt;p>Golang で作るアプリは何でもよいのですが、ここでは Golang 標準の &lt;code>net/http&lt;/code> パッケージを使って、&lt;code>Hello World&lt;/code> というレスポンスを返すだけの簡単な Web サーバーアプリを用意します。&lt;/p>
+&lt;p>まずは、お馴染みの &lt;code>go.mod&lt;/code> の作成から。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> mkdir hello &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nb">cd&lt;/span> hello
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> go mod init hello
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>あとは、次のような &lt;code>main.go&lt;/code> ファイルを作成すれば完成です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">main.go&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;log&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="s">&amp;#34;net/http&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">http&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">HandleFunc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;/&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">w&lt;/span> &lt;span class="nx">http&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ResponseWriter&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">_&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">http&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Request&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nx">w&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Write&lt;/span>&lt;span class="p">([]&lt;/span>&lt;span class="nb">byte&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Hello World&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Fatal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">http&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">ListenAndServe&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;:8080&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;strong>&lt;code>go run .&lt;/code>&lt;/strong> でサーバーを起動して、Web ブラウザーなどで &lt;code>http://localhost:8080&lt;/code> にアクセスすれば、&lt;code>Hello World&lt;/code> というレスポンスが返ってくることを確認できます。&lt;/p></description></item><item><title>Ansible タスク例: Docker と Docker Compose をインストールする</title><link>https://maku.blog/p/8k4j2gw/</link><pubDate>Sun, 28 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8k4j2gw/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>下記の Docker のインストールマニュアルに従い、Ansible で Ubuntu 22.04 に Docker の実行環境をセットアップします。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.docker.com/engine/install/ubuntu/">Install Docker Engine on Ubuntu | Docker Documentation&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="playbook-の例">Playbook の例&lt;/h2>
+&lt;p>次の YAML ファイルは、Docker の公式サイトのインストール手順をほぼそのまま Playbook 化したものです。
+この Playbook を &lt;code>ansible-playbook&lt;/code> で実行することで、Docker (+ Docker Compose) のインストール、および Docker デーモンの起動まで完了します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">install-docker.yml&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">- &lt;span class="nt">hosts&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">all&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">gather_facts&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">become&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">tasks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Install APT packages to use a repository over HTTPS&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible.builtin.apt&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">pkg&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">ca-certificates&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">curl&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">gnupg&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">lsb-release&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">update_cache&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">yes&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">cache_valid_time&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">86400&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># cache for 1 day&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Create APT&amp;#39;s keyrings directory&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible.builtin.file&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">path&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/etc/apt/keyrings&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">state&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">directory&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Add Docker&amp;#39;s official GPG key&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible.builtin.shell&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">cmd&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">creates&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/etc/apt/keyrings/docker.gpg&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Setup the repository&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible.builtin.shell&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">cmd&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> echo &amp;#34;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> | sudo tee /etc/apt/sources.list.d/docker.list &amp;gt; /dev/null&lt;/span>&lt;span class="w"> 
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">creates&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/etc/apt/sources.list.d/docker.list&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Install Docker&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible.builtin.apt&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">pkg&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">docker-ce&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">docker-ce-cli&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">containerd.io&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">docker-compose-plugin&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">update_cache&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">yes&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Start Docker&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ansible.builtin.service&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">docker&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">state&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">started&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>本質的にやりたいことは、最後の方のステップの &lt;code>Install Docker&lt;/code> と &lt;code>Start Docker&lt;/code> だけなのですが、その前に APT 用の GPG キーの取得などを行うので若干長くなっています。&lt;/p></description></item><item><title>GitHub Actions でコンテナイメージをビルドして Docker Hub へ push する</title><link>https://maku.blog/p/v9r8o5k/</link><pubDate>Fri, 26 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/v9r8o5k/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Docker イメージを作成するための &lt;code>Dockerfile&lt;/code> を GitHub のリポジトリで管理しているとします。
+ここでは、GitHub Actions のワークフローを作成して、GitHub リポジトリにコードを push したときに次のような処理が自動で実行されるようにします。&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>Dockerfile&lt;/code> を使ってイメージをビルド&lt;/li>
+&lt;li>Docker Hub にイメージを push&lt;/li>
+&lt;/ol>
+&lt;p>前提条件として、Docker Hub のアカウントは作成済みとします。&lt;/p>
+&lt;h2 id="dockerfile-の準備">Dockerfile の準備&lt;/h2>
+&lt;p>GitHub のリポジトリを作成して、ルートディレクトリに次のような &lt;code>Dockerfile&lt;/code> をコミット＆プッシュしておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Dockerfile&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-dockerfile" data-lang="dockerfile">&lt;span class="line">&lt;span class="cl">&lt;span class="k">FROM&lt;/span>&lt;span class="s"> alpine:3&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">CMD&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;echo&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Hello World&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のサンプルコードは、軽量の Alpine Linux で Hello World と出力するだけの &lt;code>Dockerfile&lt;/code> ですが、もちろん好きなように記述していただいて構いません。&lt;/p>
+&lt;h2 id="github-actions-の-secrets-情報を登録">GitHub Actions の Secrets 情報を登録&lt;/h2>
+&lt;p>GitHub Actions から Docker Hub にイメージをプッシュできるようにするため、GitHub リポジトリの Secrets 情報として、Docker Hub のユーザー名およびアクセストークンを登録しておきます。&lt;/p>
+&lt;p>Docker Hub のアクセストークンは次のように発行できます。&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://hub.docker.com">Docker Hub&lt;/a> にサインイン&lt;/li>
+&lt;li>右上のユーザー名をクリックして、&lt;code>Account Settings&lt;/code> を選択&lt;/li>
+&lt;li>&lt;code>Security&lt;/code> → &lt;code>New Access Token&lt;/code> と選択して、トークンの説明文を入力
+&lt;ul>
+&lt;li>&lt;code>Access Token description&lt;/code>: Deploy hello world など適当に入力&lt;/li>
+&lt;li>&lt;code>Access permissions&lt;/code>: 少なくとも Read, Write を付ける&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Generate&lt;/code> ボタンを押して生成&lt;/li>
+&lt;/ol>
+&lt;p>これで、次のような感じのアクセストークンが発行されるので、どこかにコピーしておきます（後から確認することはできません）。&lt;/p></description></item><item><title>TypeScript を使った Node.js アプリを Docker コンテナ化する</title><link>https://maku.blog/p/ehxgwt4/</link><pubDate>Fri, 29 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ehxgwt4/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>TypeScript + Node.js で作成したサーバーアプリを、Docker コンテナ化する話です。
+サーバーアプリは &lt;a href="https://expressjs.com/">Express&lt;/a> で簡単な Hello レスポンスを返すようなものを用意します。
+Docker イメージビルド用の &lt;code>Dockerfile&lt;/code> ファイルは、マルチステージビルドの構成にして、最終的な実行イメージができるだけ小さくなるようにします（それでも Node.js アプリだと、どうしても 100MB 超えになってしまいますが）。
+NPM パッケージの管理には &lt;code>yarn&lt;/code> を使わず、シンプルに &lt;code>npm&lt;/code> だけでいきます。&lt;/p>
+&lt;h2 id="nodejs-アプリの用意">Node.js アプリの用意&lt;/h2>
+&lt;p>Node.js アプリは何でもよいのですが、ここでは Express で簡単な Web サーバーを作ることにします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">TypeScript プロジェクトのセットアップ&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm init --yes &lt;span class="c1"># package.json を生成&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install express
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install --save-dev typescript @types/express @types/node
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npx tsc --init &lt;span class="c1"># tsconfig.json を生成&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>package.json&lt;/code> に、TypeScript のビルドと、サーバー起動のための NPM スクリプトを追加しておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">package.json（抜粋）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;scripts&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;tsc&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;start&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;node out/index.js&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-249175638" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-249175638">package.json（全体）&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;myapp&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;1.0.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;author&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;maku&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;private&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;license&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;UNLICENSED&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;scripts&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;tsc&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;start&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;node out/index.js&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;devDependencies&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;@types/express&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^4.17.13&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;@types/node&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^18.6.2&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;typescript&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^4.7.4&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;dependencies&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;express&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;^4.18.1&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+&lt;p>&lt;code>tsconfig.json&lt;/code> の内容は次のような感じで、&lt;strong>&lt;code>src&lt;/code>&lt;/strong> ディレクトリ以下の &lt;code>*.ts&lt;/code> ファイルをトランスパイルして &lt;strong>&lt;code>out&lt;/code>&lt;/strong> ディレクトリに出力するようにしておきます。
+これは、ビルド前の &lt;code>.ts&lt;/code> ファイルと、ビルド後の &lt;code>.js&lt;/code> ファイルが混ざらないようにするためです。&lt;/p></description></item><item><title>Docker コンテナで Ansible のテストベッド環境を用意する</title><link>https://maku.blog/p/csctaq7/</link><pubDate>Mon, 18 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/csctaq7/</guid><description>&lt;h2 id="何をするか">何をするか&lt;/h2>
+&lt;p>&lt;code>ansible-playbook&lt;/code> を使って何らかの Linux 環境のセットアップを自動化するとき、Playbook のテスト用に使い捨ての Docker コンテナ（テストベッド環境）があると便利です。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/csctaq7/img-001.drawio.svg" alt="/p/csctaq7/img-001.drawio.svg" />
+&lt;/figure>
+
+&lt;p>Ansible には、Playbook 実行後の冪等性を保つという性質がありますが、一度 Playbook を実行してしまうと元の状態に戻すことはできません。
+一方通行の冪等性はあっても、可逆性はないということですね。
+Playbook を試行錯誤して作っている段階では、何度も &lt;code>ansible-playbook&lt;/code> を実行することになるので、本当にその Playbook がまっさらな状態の OS に対して適用できるのか不安になってきます（冪等性があるので理論的には動作するはずですが）。
+異なるディストリビューションに対して実行できるのか試したくなることもあります。&lt;/p>
+&lt;p>ここでは、Ansible のテストベッド環境として Docker コンテナを作成し、各種 Ansible コマンド (&lt;code>ansible&lt;/code> / &lt;code>ansible-playbook&lt;/code>) で制御してみます。&lt;/p>
+&lt;h2 id="テストベッド用のコンテナを起動する">テストベッド用のコンテナを起動する&lt;/h2>
+&lt;p>Ansible は一般的にはマネージドノードに SSH 接続して Playbook を実行しますが、実は Docker コンテナに直接接続することもできます。
+つまり、テストベッド用の Docker コンテナには、sshd (OpenSSH) などのサービスをわざわざインストールする必要はありません。&lt;/p>
+&lt;p>ただし、Ansible マネージドノードの要件として、Python3 だけはインストールしておく必要があります。
+次の &lt;code>Dockerfile&lt;/code> では、Ubuntu を親イメージとして、Python3 だけ追加しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Dockerfile&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-docker" data-lang="docker">&lt;span class="line">&lt;span class="cl">&lt;span class="k">FROM&lt;/span>&lt;span class="s"> ubuntu:22.04&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># Python3 のインストール&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">RUN&lt;/span> apt update &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> apt install --no-install-recommends -y python3&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>Dockerfile&lt;/code> をビルドして、&lt;code>testbed&lt;/code> イメージを作成します。&lt;/p></description></item><item><title>Docker コンテナで Nginx サーバーを立ち上げる</title><link>https://maku.blog/p/99qo8zf/</link><pubDate>Wed, 13 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/99qo8zf/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>VPS などで Web アプリをホスティングする場合、各種サーバーを Docker コンテナとして立ち上げるようにすると OS 環境をクリーンに保てます。
+特に、1 つのホスト（VPS サーバー）で複数の Web アプリを提供するような場合は、各アプリをコンテナで構成することで、関係ないアプリの設定が混ざってしまうのを防げます。
+もちろん、Azure Container Instances や AWS Fargate といったコンテナ実行用のクラウドサービスを使えば、より独立した環境を構築できるのですが、これらのサービスは個人が趣味で使うにはまだまだ高価なので、VPS などの環境で Docker コンテナを立ち上げることには価値があります。&lt;/p>
+&lt;p>ここでは、Nginx サーバーを Docker コンテナとして立ち上げる方法を示します。
+Docker Hub で公開されている &lt;a href="https://hub.docker.com/_/nginx">Nginx イメージ&lt;/a> は、デフォルトでコンテナ内の &lt;strong>&lt;code>/usr/share/nginx/html&lt;/code>&lt;/strong> ディレクトリに配置されたコンテンツを公開するようになっています。
+大きく分けて、次の 2 つのいずれかの方法で簡単にコンテンツを公開できます。&lt;/p>
+&lt;ul>
+&lt;li>bind マウントで Docker ホスト側のコンテンツを参照する方法&lt;/li>
+&lt;li>コンテンツを含んだコンテナイメージを作成する方法&lt;/li>
+&lt;/ul>
+&lt;p>以下、それぞれの方法を順番に見ていきます。&lt;/p>
+&lt;h2 id="bind-マウントで-docker-ホスト側のコンテンツを参照する方法">bind マウントで Docker ホスト側のコンテンツを参照する方法&lt;/h2>
+&lt;p>Nginx のコンテナを起動するときに、Docker ホスト側のコンテンツディレクトリを bind マウントして、コンテナの &lt;code>/usr/share/nginx/html&lt;/code> ディレクトリとして参照できるようにする方法です。&lt;/p>
+&lt;p>まず、簡単なコンテンツファイルとして次のような HTML ファイルを用意しておきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">public/index.html&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>Hello&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>あとは、&lt;code>docker container run&lt;/code> コマンドで nginx コンテナを起動するだけです。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> docker container run --rm -d -p 8000:80 -v &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="k">$(&lt;/span>&lt;span class="nb">pwd&lt;/span>&lt;span class="k">)&lt;/span>&lt;span class="s2">/public&amp;#34;&lt;/span>:/usr/share/nginx/html --name web nginx
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>各引数は次のような意味を持っています。&lt;/p></description></item><item><title>Docker で Ansible の実行環境用のコンテナを作成する</title><link>https://maku.blog/p/euevcs8/</link><pubDate>Sat, 02 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/euevcs8/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Ansible の実行環境は Python がインストールされている環境であれば比較的簡単にインストールできますが、Docker の実行環境があれば、ホスト環境に何もインストールせずに Ansible の実行環境を手に入れることができます（もちろんコンテナは作る必要はありますが）。&lt;/p>
+&lt;p>Docker Hub を見ると、Alpine Linux ベースの Ansible 実行環境用イメージ &lt;a href="https://hub.docker.com/r/alpine/ansible">alpine/ansible&lt;/a> があるようですが、ここでは &lt;code>Dockerfile&lt;/code> を使って自分でイメージを作成することにします。&lt;/p>
+&lt;h2 id="ansible-実行環境用イメージを作成する">Ansible 実行環境用イメージを作成する&lt;/h2>
+&lt;p>&lt;code>Dockerfile&lt;/code> で Alpine Linux ベースの Ansible 実行環境を定義します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Dockerfile&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-docker" data-lang="docker">&lt;span class="line">&lt;span class="cl">&lt;span class="k">FROM&lt;/span>&lt;span class="s"> alpine:3&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">WORKDIR&lt;/span>&lt;span class="s"> /app&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># --no-cache を付けることで /var/cache/apk 以下にキャッシュが残るのを防ぐ&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># --update-cache を付けることで先に apk update するのと同じ効果になる&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">RUN&lt;/span> apk --no-cache --update-cache add ansible openssh sshpass&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>APK (Alpine Package Keeper) で次のようなパッケージをインストールしています。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>ansible&lt;/code> &amp;hellip; Ansible Community パッケージ（&lt;code>ansible&lt;/code> コマンドや &lt;code>ansible-playbook&lt;/code> コマンドなど）&lt;/li>
+&lt;li>&lt;code>openssh&lt;/code> &amp;hellip; &lt;code>ssh&lt;/code> コマンドのため&lt;/li>
+&lt;li>&lt;code>sshpass&lt;/code> &amp;hellip; ターゲットホストにパスワード認証 (&lt;code>--ask-pass&lt;/code>) で接続するときのため&lt;/li>
+&lt;/ul>
+&lt;p>Ansible Community パッケージ (&lt;code>ansible&lt;/code>) ではなく、Ansible Core (&lt;code>ansible-core&lt;/code>) を使うようにすれば、イメージサイズは 500MB 弱から 80MB 程度に削減できますが、サイズを気にしなくてよいなら Ansible Community パッケージを使っておいた方が楽です。&lt;/p></description></item></channel></rss>

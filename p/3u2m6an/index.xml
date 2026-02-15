@@ -1,14 +1,85 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Azure AppServices のメモ on まくろぐ</title><link>https://maku.blog/p/3u2m6an/</link><description>Recent content in Azure AppServices のメモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Wed, 25 Mar 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/3u2m6an/index.xml" rel="self" type="application/rss+xml"/><item><title>Azure: デプロイスロットでリリース時のダウンタイムをなくす（Blue-Green デプロイメント）</title><link>https://maku.blog/p/bog7iq8/</link><pubDate>Wed, 12 Feb 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bog7iq8/</guid><description>なぜデプロイスロットが必要か？ App Service を作成すると、デフォルトでは運用スロット (production slot) がひとつだけ作成され、Azure Repos や GitHub からのアプリケーションのデプロイ先として使用されます。
-アクセスの少ないアプリケーションであればこれでも問題ありませんが、デプロイ後にサーバー上でのビルド処理（ウォームアップ）が走るようなケースでは、少なからずダウンタイムが発生してしまいます。
-このようなダウンタイムの発生を防ぐために、ステージング用のスロット (staging slot) を用意し、そこでのウォームアップが完了した後で運用スロット (production slot) と入れ替えるという方法を取ります。
-GitHub or AzureRepos ─デプロイ→ staging スロット ↑ (スワップ) ↓ production スロット このようにサーバーインスタンス（ここではスロット）を 2 つ用意して、内容をスワップ（実際はアドレスをスワップ）することで運用環境を瞬間的に入れ替える手法を Blue-Green デプロイメント とか、A/B アップデートと呼びます。
-Azure の App Service は、 デプロイスロット (Deployment slots) という機能名で、Blue-Green デプロイメントをサポートしています。
-図: App Service の Deployments slots 設定 デプロイスロットを使ったスワップ運用には次のような利点があります。
-ステージング環境 (staging slot) で事前に動作検証できる 運用環境 (production slot) のダウンタイムをほぼゼロにできる 運用環境 (production slot) で問題が発生したら、再度スワップして前のバージョンに戻すことができる App Service にステージング環境用のデプロイスロットを追加する デプロイスロットの作成 まず、App Service に新しくステージング環境用のデプロイスロット (Deployment slots) を作成します。 対象となる App Service のリソースを選択し、次のように選択するとデプロイスロットの追加ダイアログが開きます。</description></item><item><title>Azure: Node.js アプリを App Service へデプロイする（Kudu ビルド編）</title><link>https://maku.blog/p/wx3fvib/</link><pubDate>Wed, 09 Oct 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wx3fvib/</guid><description>Azure App Service には、デプロイセンター という仕組みがあり、そこからソースコードのビルドからデプロイまでの自動化の設定を行うことができます。 簡単に言うと、Azure Repos や GitHub のリポジトリに最新の JavaScript コードをコミットするだけで、最新の Node.js アプリが自動で立ち上がるようになります。
-ビルドの仕組みとしては、クラウド上の Azure Pipelines を使ったり、ローカルでビルドしてしまってからデプロイする方法があります。 App Service には Kudu エンジン が組み込まれており、デプロイ時に自動で実行されるスクリプトを使って簡易的なビルド処理を行うこともできます。
-はじめに（用語定義） Azure ではデプロイ処理を構成するコンポーネントを下記のような名前で呼んでいます。
-デプロイソース GitHub や Azure Repos など。 ソースコードが置いてある場所（リポジトリ）のこと。 Azure App Service は手軽なデプロイソースとして OneDrive や Dropbox などのフォルダ共有サービスを設定することもできますが、本格的な運用で使用することは推奨されていません。 ビルドパイプライン（ビルドプロバイダー） Azure Pipelines など。デプロイソースからソースコードを取得し、一連のビルド処理を行う仕組み。 App Service には組み込みで Kudu エンジンが搭載されており、デフォルトではデプロイ時にこの Kudu エンジンによって npm install などが実行されるようになっています。 また、デプロイ時に実行する カスタムスクリプトを .deployment ファイルで定義する こともできます。 これらの仕組みだけで十分であれば、Azure Pipelines を使う必要はありません。 デプロイメカニズム ビルドしたアプリを Azure App Service などに配置するためのアクション。Kudu エンジンや FTP (SFTP)、WebDeploy などのデプロイメカニズムが提供されています。 リポジトリの準備 (Azure Repos) ここでは、Azure Repos に Git リポジトリを作成し、そこに Node.</description></item><item><title>Azure: App Service の Node.js アプリのエントリポイントはどこで定義されているか？</title><link>https://maku.blog/p/3u4hj7h/</link><pubDate>Tue, 08 Oct 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3u4hj7h/</guid><description>Node.js アプリのエントリポイントの指定 Azure App Service で Node.js アプリをテンプレートから作成すると、うまいことルートに配置された index.js が起動してくれます。 この仕組みがブラックボックスな感じで気持ち悪いので調べてみたところ、このエントリポイントの指定は web.config ファイルにあるようです。
-web.config（抜粋） &amp;lt;add name=&amp;#34;iisnode&amp;#34; path=&amp;#34;index.js&amp;#34; verb=&amp;#34;*&amp;#34; modules=&amp;#34;iisnode&amp;#34;/&amp;gt; Windows ベースの App Service で Node.js アプリを動作させる場合、Windows の Web サーバーである IIS 上で動作する iisnode という Node.js 実装が使用されます。 IIS が起動するときに設定ファイルである web.config が読み込まれ、上記の設定により iisnode がエントリポイント index.js を使って起動するという流れになります。 なので、作成している Node.js アプリのエントリポイント（メインの JS ファイル）が変わった場合は、この web.config ファイルを修正する必要があります。
-あと、このような仕組みのため、web.config ファイルは必ずアプリを構成する JS ファイルと一緒にデプロイしないといけないということも分かります。 上記の設定のままであれば、デプロイ先のルートディレクトリに、少なくとも下記の 2 ファイルが配置されていなければいけません。
-web.config （IIS の設定ファイル） index.js （上記ファイルで指定されたエントリポイント） なぜ紛らわしいのか？ Node.js アプリを開発するとき、通常は package.json の start スクリプトとしてエントリポイントを指定します。
-package.json（抜粋） { &amp;#34;scripts&amp;#34;: { &amp;#34;start&amp;#34;: &amp;#34;node index.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Azure AppServices のメモ on まくろぐ</title><link>https://maku.blog/p/3u2m6an/</link><description>Recent content in Azure AppServices のメモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Wed, 12 Feb 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/3u2m6an/index.xml" rel="self" type="application/rss+xml"/><item><title>Azure: デプロイスロットでリリース時のダウンタイムをなくす（Blue-Green デプロイメント）</title><link>https://maku.blog/p/bog7iq8/</link><pubDate>Wed, 12 Feb 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bog7iq8/</guid><description>&lt;h2 id="なぜデプロイスロットが必要か">なぜデプロイスロットが必要か？&lt;/h2>
+&lt;p>App Service を作成すると、デフォルトでは運用スロット (production slot) がひとつだけ作成され、Azure Repos や GitHub からのアプリケーションのデプロイ先として使用されます。&lt;/p>
+&lt;p>アクセスの少ないアプリケーションであればこれでも問題ありませんが、デプロイ後にサーバー上でのビルド処理（ウォームアップ）が走るようなケースでは、少なからずダウンタイムが発生してしまいます。&lt;/p>
+&lt;p>このようなダウンタイムの発生を防ぐために、ステージング用のスロット (staging slot) を用意し、そこでのウォームアップが完了した後で運用スロット (production slot) と入れ替えるという方法を取ります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">GitHub or
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">AzureRepos ─デプロイ→ staging スロット
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ↑
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> (スワップ)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ↓
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> production スロット&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このようにサーバーインスタンス（ここではスロット）を 2 つ用意して、内容をスワップ（実際はアドレスをスワップ）することで運用環境を瞬間的に入れ替える手法を &lt;strong>Blue-Green デプロイメント&lt;/strong> とか、A/B アップデートと呼びます。&lt;/p>
+&lt;p>Azure の App Service は、 &lt;strong>デプロイスロット (Deployment slots)&lt;/strong> という機能名で、Blue-Green デプロイメントをサポートしています。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="400" height="344" src="../../p/bog7iq8/img-001_hu13106140891720566047.png" alt="/p/bog7iq8/img-001.png" />
+ &lt;figcaption>図: App Service の Deployments slots 設定&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>デプロイスロットを使ったスワップ運用には次のような利点があります。&lt;/p>
+&lt;ol>
+&lt;li>ステージング環境 (staging slot) で事前に動作検証できる&lt;/li>
+&lt;li>運用環境 (production slot) のダウンタイムをほぼゼロにできる&lt;/li>
+&lt;li>運用環境 (production slot) で問題が発生したら、再度スワップして前のバージョンに戻すことができる&lt;/li>
+&lt;/ol>
+&lt;h2 id="app-service-にステージング環境用のデプロイスロットを追加する">App Service にステージング環境用のデプロイスロットを追加する&lt;/h2>
+&lt;h3 id="デプロイスロットの作成">デプロイスロットの作成&lt;/h3>
+&lt;p>まず、App Service に新しくステージング環境用のデプロイスロット (&lt;strong>Deployment slots&lt;/strong>) を作成します。
+対象となる App Service のリソースを選択し、次のように選択するとデプロイスロットの追加ダイアログが開きます。&lt;/p></description></item><item><title>Azure: Node.js アプリを App Service へデプロイする（Kudu ビルド編）</title><link>https://maku.blog/p/wx3fvib/</link><pubDate>Wed, 09 Oct 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/wx3fvib/</guid><description>&lt;p>Azure App Service には、&lt;strong>デプロイセンター&lt;/strong> という仕組みがあり、そこからソースコードのビルドからデプロイまでの自動化の設定を行うことができます。
+簡単に言うと、Azure Repos や GitHub のリポジトリに最新の JavaScript コードをコミットするだけで、最新の Node.js アプリが自動で立ち上がるようになります。&lt;/p>
+&lt;p>ビルドの仕組みとしては、クラウド上の Azure Pipelines を使ったり、ローカルでビルドしてしまってからデプロイする方法があります。
+App Service には &lt;a href="https://gihub.com/projectkudu/kudu/wiki">Kudu エンジン&lt;/a> が組み込まれており、デプロイ時に自動で実行されるスクリプトを使って簡易的なビルド処理を行うこともできます。&lt;/p>
+&lt;h2 id="はじめに用語定義">はじめに（用語定義）&lt;/h2>
+&lt;p>Azure ではデプロイ処理を構成するコンポーネントを下記のような名前で呼んでいます。&lt;/p>
+&lt;dl>
+&lt;dt>デプロイソース&lt;/dt>
+&lt;dd>GitHub や Azure Repos など。
+ソースコードが置いてある場所（リポジトリ）のこと。
+Azure App Service は手軽なデプロイソースとして OneDrive や Dropbox などのフォルダ共有サービスを設定することもできますが、本格的な運用で使用することは推奨されていません。&lt;/dd>
+&lt;dt>ビルドパイプライン（ビルドプロバイダー）&lt;/dt>
+&lt;dd>Azure Pipelines など。デプロイソースからソースコードを取得し、一連のビルド処理を行う仕組み。
+App Service には組み込みで Kudu エンジンが搭載されており、デフォルトではデプロイ時にこの Kudu エンジンによって &lt;code>npm install&lt;/code> などが実行されるようになっています。
+また、デプロイ時に実行する &lt;a href="https://github.com/projectkudu/kudu/wiki/Deployment-hooks">カスタムスクリプトを .deployment ファイルで定義する&lt;/a> こともできます。
+これらの仕組みだけで十分であれば、Azure Pipelines を使う必要はありません。&lt;/dd>
+&lt;dt>デプロイメカニズム&lt;/dt>
+&lt;dd>ビルドしたアプリを Azure App Service などに配置するためのアクション。Kudu エンジンや FTP (SFTP)、WebDeploy などのデプロイメカニズムが提供されています。&lt;/dd>
+&lt;/dl>
+&lt;h2 id="リポジトリの準備-azure-repos">リポジトリの準備 (Azure Repos)&lt;/h2>
+&lt;p>ここでは、Azure Repos に Git リポジトリを作成し、そこに Node.js アプリのコードをコミットしてあると想定します。
+GitHub でも大丈夫です。&lt;/p></description></item><item><title>Azure: App Service の Node.js アプリのエントリポイントはどこで定義されているか？</title><link>https://maku.blog/p/3u4hj7h/</link><pubDate>Tue, 08 Oct 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3u4hj7h/</guid><description>&lt;h2 id="nodejs-アプリのエントリポイントの指定">Node.js アプリのエントリポイントの指定&lt;/h2>
+&lt;p>Azure App Service で Node.js アプリをテンプレートから作成すると、うまいことルートに配置された &lt;code>index.js&lt;/code> が起動してくれます。
+この仕組みがブラックボックスな感じで気持ち悪いので調べてみたところ、この&lt;strong>エントリポイントの指定は &lt;code>web.config&lt;/code> ファイルにある&lt;/strong>ようです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">web.config（抜粋）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-xml" data-lang="xml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;add&lt;/span> &lt;span class="na">name=&lt;/span>&lt;span class="s">&amp;#34;iisnode&amp;#34;&lt;/span> &lt;span class="na">path=&lt;/span>&lt;span class="s">&amp;#34;index.js&amp;#34;&lt;/span> &lt;span class="na">verb=&lt;/span>&lt;span class="s">&amp;#34;*&amp;#34;&lt;/span> &lt;span class="na">modules=&lt;/span>&lt;span class="s">&amp;#34;iisnode&amp;#34;&lt;/span>&lt;span class="nt">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Windows ベースの App Service で Node.js アプリを動作させる場合、Windows の Web サーバーである IIS 上で動作する &lt;a href="https://github.com/Azure/iisnode">iisnode&lt;/a> という Node.js 実装が使用されます。
+IIS が起動するときに設定ファイルである &lt;code>web.config&lt;/code> が読み込まれ、上記の設定により &lt;code>iisnode&lt;/code> がエントリポイント &lt;code>index.js&lt;/code> を使って起動するという流れになります。
+なので、作成している Node.js アプリのエントリポイント（メインの JS ファイル）が変わった場合は、この &lt;code>web.config&lt;/code> ファイルを修正する必要があります。&lt;/p>
+&lt;p>あと、このような仕組みのため、&lt;code>web.config&lt;/code> ファイルは必ずアプリを構成する JS ファイルと一緒にデプロイしないといけないということも分かります。
+上記の設定のままであれば、デプロイ先のルートディレクトリに、少なくとも下記の 2 ファイルが配置されていなければいけません。&lt;/p>
+&lt;ul>
+&lt;li>web.config （IIS の設定ファイル）&lt;/li>
+&lt;li>index.js （上記ファイルで指定されたエントリポイント）&lt;/li>
+&lt;/ul>
+&lt;h2 id="なぜ紛らわしいのか">なぜ紛らわしいのか？&lt;/h2>
+&lt;p>Node.js アプリを開発するとき、通常は &lt;code>package.json&lt;/code> の &lt;code>start&lt;/code> スクリプトとしてエントリポイントを指定します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">package.json（抜粋）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;scripts&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;start&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;node index.js&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>こうすることで、&lt;code>npm start&lt;/code> と実行するだけで、&lt;code>index.js&lt;/code> をエントリポイントとして Node.js アプリが起動するようになっています。&lt;/p></description></item></channel></rss>

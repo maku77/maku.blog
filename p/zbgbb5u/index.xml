@@ -1,19 +1,150 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>PlantUML（テキストベースのUML作図ツール） on まくろぐ</title><link>https://maku.blog/p/zbgbb5u/</link><description>Recent content in PlantUML（テキストベースのUML作図ツール） on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Thu, 07 Mar 2019 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/zbgbb5u/index.xml" rel="self" type="application/rss+xml"/><item><title>PlantUML の基本（インストール〜画像ファイルへの保存）</title><link>https://maku.blog/p/opxhnho/</link><pubDate>Fri, 12 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/opxhnho/</guid><description>Graphviz のインストール PlantUML は図の生成のために内部で Graphviz の dot コマンドを使用するので、先に Graphviz をインストールしましょう。
-Graphviz - Graph Visualization Software ここでは、上記のサイトから ZIP ファイル graphviz-2.38.zip をダウンロードし、展開してできた release ディレクトリ内のファイル群を C:\app\graphviz-2.38 というディレクトリ内に配置するとします。 Graphviz に含まれる dot コマンドのパスを環境変数 GRAPHVIZ_DOT に設定すれば Graphviz のインストールは完了です（この環境変数を PlantUML が参照します）。
-環境変数 GRAPHVIZ_DOT の設定 GRAPHVIZ_DOT=C:\app\graphviz-2.38\bin\dot.exe PlantUML のインストール 下記から plantuml.jar をダウンロードして、適当なディレクトリに配置します。
-PlantUML - plantuml.jar のダウンロード ここでは、C:\app\plantuml\plantuml.jar というパスで配置することにします。 コマンドプロンプトから、下記のように実行して、特にエラーが発生しなければ OK です。
-実行テスト C:\&amp;gt; java -jar C:\app\plantuml\plantuml.jar -testdot The environment variable GRAPHVIZ_DOT has been set to C:\app\graphviz-2.38\bin\dot.exe Dot executable is C:\app\graphviz-2.</description></item><item><title>PlantUML でクラス図を作成する</title><link>https://maku.blog/p/tn6y85z/</link><pubDate>Thu, 07 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tn6y85z/</guid><description>クラスの箱を描く 基本 クラスの箱を描くには、class キーワードを使用します。 他にも、interface でインタフェース、abstract で抽象クラス、enum で列挙型を定義することができます。
-@startuml class クラス interface インタフェース abstract 抽象クラス enum 列挙型 @enduml クラス名にスペースや記号を含んでいる場合 クラス名やインタフェース名にスペースや記号を含めたい場合は、その文字列全体をダブルクォート &amp;quot;&amp;quot; で囲みます。 さらに、as で別名を付けておくと、あとから参照しやすくなります。
-@startuml class &amp;#34;This is a class A&amp;#34; as A class &amp;#34;This is a class B&amp;#34; as B A -&amp;gt; B @enduml ステレオタイプ クラス名の後ろに &amp;lt;&amp;lt;ステレオタイプ&amp;gt;&amp;gt; と記述することで、クラス名の上部に任意のステレオタイプを表示することができます。 独自のステレオタイプを表示することができますし、複数のステレオタイプを表示することもできます。
-@startuml interface インタフェース &amp;lt;&amp;lt;interface&amp;gt;&amp;gt; abstract 抽象クラス &amp;lt;&amp;lt;abstract&amp;gt;&amp;gt; class ほげほげ &amp;lt;&amp;lt;独自ステレオタイプ&amp;gt;&amp;gt; class へむへむ &amp;lt;&amp;lt;Serializable&amp;gt;&amp;gt; &amp;lt;&amp;lt;Model&amp;gt;&amp;gt; @enduml クラス名の横の記号を非表示にする クラス名の左側に表示される C の記号などを非表示するには、hide circle コマンドを使用します。 下記のようにすると、クラスやインタフェースの記号がすべて非表示になります。 インタフェースに &amp;lt;&amp;lt;inteface&amp;gt;&amp;gt; というステレオタイプを表示するのであれば、記号は冗長なので消しておいた方がよいかもしれません。</description></item><item><title>PlantUML でシーケンス図を作成する</title><link>https://maku.blog/p/n8p7qmw/</link><pubDate>Fri, 12 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n8p7qmw/</guid><description>シーケンス図は相互作用図 (interaction diagram) の代表的なダイアグラムです。 シーケンス図は、特定のユースケースに関するオブジェクトの典型例と、オブジェクト間のメッセージを示します。
-要素の並び順の制御 (participant) 必須の定義ではないですが、participant であらかじめ要素を列挙しておくと、その後のメッセージ定義の順序に関係なく、participant に並べた順に左から要素が配置されます。
-@startuml participant Class1 participant Class2 participant Class3 Class3 -&amp;gt; Class1 Class2 -&amp;gt; Class3 Class1 -&amp;gt; Class2 @enduml participant の代わりに actor というキーワードを使用すると、アクターのシンボルを表示することができます。
-@startuml actor Class1 participant Class2 participant Class3 Class3 -&amp;gt; Class1 Class2 -&amp;gt; Class3 Class1 -&amp;gt; Class2 @enduml 同期メッセージと非同期メッセージ、リターン オブジェクト間のメッセージは、下記のように描き分けることができます。
--&amp;gt;: 同期メッセージ --&amp;gt;: 戻り値（リターン） -&amp;raquo;`: 非同期メッセージ 同期メッセージには戻り値（リターン）(--&amp;gt;) がありますが、UML の仕様としては省略することができます。
-@startuml A -&amp;gt; B : 同期メッセージ A &amp;lt;-- B : リターン A -&amp;gt;&amp;gt; C : 非同期メッセージ @enduml ライフラインの活性区間 (activation) と終了 ライフラインの上に描かれる長方形は「活性区間 (activation)」で、その区間の間はオブジェクトがアクティブな状態になっていることを表します。 活性区間は、activate と deactivate で示します。</description></item><item><title>PlantUML でオブジェクト図を作成する</title><link>https://maku.blog/p/t7cfj92/</link><pubDate>Mon, 15 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t7cfj92/</guid><description>オブジェクト図はクラス図と同様の文法で記述することができます。 下記のページも参考にしてください。
-PlantUML でクラス図を作成する オブジェクト図の基本 オブジェクト図 (object diagram) は、システム内のオブジェクト群のある時点のスナップショットを表現します。 具体的なオブジェクト同士の関係を表現することができるため、複雑な依存関係を持つオブジェクト
-インスタンス名は下線付きで「インスタンス名：クラス名」という形式で記述します。 インスタンス名とクラス名はどちらか一方を省略して記述することもできますが、クラス名だけを記述する場合は、「：クラス名」のようにコロン部分だけは残して記述します。
-オブジェクト図は、メッセージなしのコミュニケーション図と考えることもできます。 ─『UMLモデリングのエッセンス第3版』マーチン・ファウラー
-PlantUML で登場させるオブジェクト群は、object キーワードを使って定義します。 as を使って別名を付けておくことができます。
-@startuml object object1 object &amp;#34;My second object&amp;#34; as o2 @enduml 関連の線を引く オブジェクト同士の依存関係を示すには、-- でオブジェクト名（あるいは別名）を繋ぎます。 代わりに .. を使用すると、破線 (dashed line) で繋ぐことができます。
-@startuml object object1 object &amp;#34;Second object&amp;#34; as o2 object &amp;#34;Third object&amp;#34; as o3 object &amp;#34;Fourth object&amp;#34; as o4 object1 -- o2 object1 -- o3 object1 -- o4 o2 .. o3 o3 .. o4 @enduml ハイフンやドットの数を 1 つに減らすことで、オブジェクトを横方向に配置することができます。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>PlantUML（テキストベースのUML作図ツール） on まくろぐ</title><link>https://maku.blog/p/zbgbb5u/</link><description>Recent content in PlantUML（テキストベースのUML作図ツール） on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Thu, 07 Mar 2019 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/zbgbb5u/index.xml" rel="self" type="application/rss+xml"/><item><title>PlantUML の基本（インストール〜画像ファイルへの保存）</title><link>https://maku.blog/p/opxhnho/</link><pubDate>Fri, 12 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/opxhnho/</guid><description>&lt;figure class="xImage">
+ &lt;img style="" width="200" height="auto" src="../../p/opxhnho/install1.svg" alt="/p/opxhnho/install1.svg" />
+&lt;/figure>
+
+&lt;h2 id="graphviz-のインストール">Graphviz のインストール&lt;/h2>
+&lt;p>PlantUML は図の生成のために&lt;strong>内部で Graphviz の dot コマンドを使用する&lt;/strong>ので、先に Graphviz をインストールしましょう。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://www.graphviz.org/">Graphviz - Graph Visualization Software&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>ここでは、上記のサイトから ZIP ファイル &lt;code>graphviz-2.38.zip&lt;/code> をダウンロードし、展開してできた &lt;code>release&lt;/code> ディレクトリ内のファイル群を &lt;code>C:\app\graphviz-2.38&lt;/code> というディレクトリ内に配置するとします。
+Graphviz に含まれる &lt;code>dot&lt;/code> コマンドのパスを環境変数 &lt;strong>&lt;code>GRAPHVIZ_DOT&lt;/code>&lt;/strong> に設定すれば Graphviz のインストールは完了です（この環境変数を PlantUML が参照します）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">環境変数 GRAPHVIZ_DOT の設定&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">GRAPHVIZ_DOT=C:\app\graphviz-2.38\bin\dot.exe&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="plantuml-のインストール">PlantUML のインストール&lt;/h2>
+&lt;p>下記から &lt;code>plantuml.jar&lt;/code> をダウンロードして、適当なディレクトリに配置します。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="http://plantuml.com/download">PlantUML - plantuml.jar のダウンロード&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>ここでは、&lt;code>C:\app\plantuml\plantuml.jar&lt;/code> というパスで配置することにします。
+コマンドプロンプトから、下記のように実行して、特にエラーが発生しなければ OK です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行テスト&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">C:\&amp;gt; java -jar C:\app\plantuml\plantuml.jar -testdot
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">The environment variable GRAPHVIZ_DOT has been set to C:\app\graphviz-2.38\bin\dot.exe
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Dot executable is C:\app\graphviz-2.38\bin\dot.exe
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Dot version: dot - graphviz version 2.38.0 (20140413.2041)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Installation seems OK. File generation OK&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="plantuml-コマンドを簡単に使えるようにする">plantuml コマンドを簡単に使えるようにする&lt;/h2>
+&lt;p>PlantUML を使って図を生成するために、毎回 &lt;code>java -jar plantuml.jar xxx&lt;/code> と入力するのは面倒なので、&lt;code>plantuml&lt;/code> というコマンドで一発で実行できるようにします。&lt;/p></description></item><item><title>PlantUML でクラス図を作成する</title><link>https://maku.blog/p/tn6y85z/</link><pubDate>Thu, 07 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tn6y85z/</guid><description>&lt;h2 id="クラスの箱を描く">クラスの箱を描く&lt;/h2>
+&lt;h3 id="基本">基本&lt;/h3>
+&lt;p>クラスの箱を描くには、&lt;strong>&lt;code>class&lt;/code>&lt;/strong> キーワードを使用します。
+他にも、&lt;strong>&lt;code>interface&lt;/code>&lt;/strong> でインタフェース、&lt;strong>&lt;code>abstract&lt;/code>&lt;/strong> で抽象クラス、&lt;strong>&lt;code>enum&lt;/code>&lt;/strong> で列挙型を定義することができます。&lt;/p>
+&lt;div style="border: solid 1px gray; padding: 0.5em 0; border: solid 1px #ccc; border-radius: 0.5em;">
+ &lt;div style="display: inline-block; width: 49%; text-align: center;">
+ &lt;img style="width:auto; height:auto" src="../../p/tn6y85z/box.svg" >
+ &lt;/div>
+ &lt;div style="display: inline-block; width: 49%; vertical-align: top; white-space: nowrap; overflow-wrap: break-word;">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">@startuml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">class クラス
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">interface インタフェース
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">abstract 抽象クラス
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">enum 列挙型
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@enduml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+
+&lt;h3 id="クラス名にスペースや記号を含んでいる場合">クラス名にスペースや記号を含んでいる場合&lt;/h3>
+&lt;p>クラス名やインタフェース名にスペースや記号を含めたい場合は、その文字列全体をダブルクォート &lt;strong>&lt;code>&amp;quot;&amp;quot;&lt;/code>&lt;/strong> で囲みます。
+さらに、&lt;strong>&lt;code>as&lt;/code>&lt;/strong> で別名を付けておくと、あとから参照しやすくなります。&lt;/p>
+&lt;div style="border: solid 1px gray; padding: 0.5em 0; border: solid 1px #ccc; border-radius: 0.5em;">
+ &lt;div style="display: inline-block; width: 49%; text-align: center;">
+ &lt;img style="width:350px; height:auto" src="../../p/tn6y85z/quoted.svg" >
+ &lt;/div>
+ &lt;div style="display: inline-block; width: 49%; vertical-align: top; white-space: nowrap; overflow-wrap: break-word;">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">@startuml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">class &amp;#34;This is a class A&amp;#34; as A
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">class &amp;#34;This is a class B&amp;#34; as B
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">A -&amp;gt; B
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@enduml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+
+&lt;h3 id="ステレオタイプ">ステレオタイプ&lt;/h3>
+&lt;p>クラス名の後ろに &lt;strong>&lt;code>&amp;lt;&amp;lt;ステレオタイプ&amp;gt;&amp;gt;&lt;/code>&lt;/strong> と記述することで、クラス名の上部に任意のステレオタイプを表示することができます。
+独自のステレオタイプを表示することができますし、複数のステレオタイプを表示することもできます。&lt;/p></description></item><item><title>PlantUML でシーケンス図を作成する</title><link>https://maku.blog/p/n8p7qmw/</link><pubDate>Fri, 12 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n8p7qmw/</guid><description>&lt;p>シーケンス図は相互作用図 (interaction diagram) の代表的なダイアグラムです。
+シーケンス図は、特定のユースケースに関するオブジェクトの典型例と、オブジェクト間のメッセージを示します。&lt;/p>
+&lt;h2 id="要素の並び順の制御-participant">要素の並び順の制御 (participant)&lt;/h2>
+&lt;p>必須の定義ではないですが、&lt;code>participant&lt;/code> であらかじめ要素を列挙しておくと、その後のメッセージ定義の順序に関係なく、&lt;code>participant&lt;/code> に並べた順に左から要素が配置されます。&lt;/p>
+&lt;div style="border: solid 1px gray; padding: 0.5em 0; border: solid 1px #ccc; border-radius: 0.5em;">
+ &lt;div style="display: inline-block; width: 49%; text-align: center;">
+ &lt;img style="width:auto; height:auto" src="../../p/n8p7qmw/participant.svg" >
+ &lt;/div>
+ &lt;div style="display: inline-block; width: 49%; vertical-align: top; white-space: nowrap; overflow-wrap: break-word;">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">@startuml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">participant Class1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">participant Class2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">participant Class3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Class3 -&amp;gt; Class1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Class2 -&amp;gt; Class3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Class1 -&amp;gt; Class2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@enduml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+
+&lt;p>&lt;code>participant&lt;/code> の代わりに &lt;strong>&lt;code>actor&lt;/code>&lt;/strong> というキーワードを使用すると、アクターのシンボルを表示することができます。&lt;/p>
+&lt;div style="border: solid 1px gray; padding: 0.5em 0; border: solid 1px #ccc; border-radius: 0.5em;">
+ &lt;div style="display: inline-block; width: 49%; text-align: center;">
+ &lt;img style="width:auto; height:auto" src="../../p/n8p7qmw/actor.svg" >
+ &lt;/div>
+ &lt;div style="display: inline-block; width: 49%; vertical-align: top; white-space: nowrap; overflow-wrap: break-word;">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">@startuml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">actor Class1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">participant Class2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">participant Class3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Class3 -&amp;gt; Class1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Class2 -&amp;gt; Class3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Class1 -&amp;gt; Class2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@enduml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+
+&lt;h2 id="同期メッセージと非同期メッセージリターン">同期メッセージと非同期メッセージ、リターン&lt;/h2>
+&lt;p>オブジェクト間のメッセージは、下記のように描き分けることができます。&lt;/p></description></item><item><title>PlantUML でオブジェクト図を作成する</title><link>https://maku.blog/p/t7cfj92/</link><pubDate>Mon, 15 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t7cfj92/</guid><description>&lt;p>オブジェクト図はクラス図と同様の文法で記述することができます。
+下記のページも参考にしてください。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/tn6y85z">PlantUML でクラス図を作成する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="オブジェクト図の基本">オブジェクト図の基本&lt;/h2>
+&lt;p>オブジェクト図 (object diagram) は、システム内のオブジェクト群のある時点のスナップショットを表現します。
+具体的なオブジェクト同士の関係を表現することができるため、複雑な依存関係を持つオブジェクト&lt;/p>
+&lt;p>インスタンス名は下線付きで「&lt;strong>&lt;u>インスタンス名：クラス名&lt;/u>&lt;/strong>」という形式で記述します。
+インスタンス名とクラス名はどちらか一方を省略して記述することもできますが、クラス名だけを記述する場合は、「&lt;strong>&lt;u>：クラス名&lt;/u>&lt;/strong>」のようにコロン部分だけは残して記述します。&lt;/p>
+&lt;blockquote>
+&lt;p>オブジェクト図は、メッセージなしのコミュニケーション図と考えることもできます。
+─『UMLモデリングのエッセンス第3版』マーチン・ファウラー&lt;/p>
+&lt;/blockquote>
+&lt;p>PlantUML で登場させるオブジェクト群は、&lt;strong>&lt;code>object&lt;/code>&lt;/strong> キーワードを使って定義します。
+&lt;code>as&lt;/code> を使って別名を付けておくことができます。&lt;/p>
+&lt;div style="border: solid 1px gray; padding: 0.5em 0; border: solid 1px #ccc; border-radius: 0.5em;">
+ &lt;div style="display: inline-block; width: 49%; text-align: center;">
+ &lt;img style="width:auto; height:auto" src="../../p/t7cfj92/object.svg" >
+ &lt;/div>
+ &lt;div style="display: inline-block; width: 49%; vertical-align: top; white-space: nowrap; overflow-wrap: break-word;">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">@startuml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object object1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object &amp;#34;My second object&amp;#34; as o2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@enduml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+
+&lt;h2 id="関連の線を引く">関連の線を引く&lt;/h2>
+&lt;p>オブジェクト同士の依存関係を示すには、&lt;code>--&lt;/code> でオブジェクト名（あるいは別名）を繋ぎます。
+代わりに &lt;code>..&lt;/code> を使用すると、破線 (dashed line) で繋ぐことができます。&lt;/p>
+&lt;div style="border: solid 1px gray; padding: 0.5em 0; border: solid 1px #ccc; border-radius: 0.5em;">
+ &lt;div style="display: inline-block; width: 49%; text-align: center;">
+ &lt;img style="width:auto; height:auto" src="../../p/t7cfj92/object-lines1.svg" >
+ &lt;/div>
+ &lt;div style="display: inline-block; width: 49%; vertical-align: top; white-space: nowrap; overflow-wrap: break-word;">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">@startuml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object object1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object &amp;#34;Second object&amp;#34; as o2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object &amp;#34;Third object&amp;#34; as o3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object &amp;#34;Fourth object&amp;#34; as o4
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object1 -- o2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object1 -- o3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object1 -- o4
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">o2 .. o3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">o3 .. o4
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@enduml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+
+&lt;p>ハイフンやドットの数を 1 つに減らすことで、オブジェクトを横方向に配置することができます。&lt;/p></description></item></channel></rss>

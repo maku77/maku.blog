@@ -1,17 +1,175 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Apollo Client 関連記事 on まくろぐ</title><link>https://maku.blog/p/uyw4qan/</link><description>Recent content in Apollo Client 関連記事 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Wed, 26 Oct 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/uyw4qan/index.xml" rel="self" type="application/rss+xml"/><item><title>Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマイズする</title><link>https://maku.blog/p/xa62yo4/</link><pubDate>Wed, 26 Oct 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xa62yo4/</guid><description>ApolloLink とは？ 図: Apollo Client の Link チェ―ン Apollo Client を使って GraphQL API を呼び出すとき、GraphQL サーバーに対して HTTP リクエストが送られるわけですが、Apollo Client は内部で Link チェーンというものを作って具体的な HTTP リクエストを構築します。 この構築処理を実装するものが Link オブジェクトであり、具体的には ApolloLink クラスのインスタンスです。 Link オブジェクトは図のように Link チェーンの形で連結して使用できるようになっており、通信内容を加工する一連のミドルウェア として機能します。 Link オブジェクトの用途としては、次のようなものがあります。
-HTTP リクエストヘッダの付加 認証情報の付加（authorization ヘッダー） GraphQL サーバーで独自定義したヘッダー アクセス先 URL（GraphQL エンドポイント）の切り替え デバッグログの出力 自動リトライ（参考: RetryLink） リクエスト回数をカウント サーバー応答速度（ラウンドトリップ時間）の計測 複数のクエリのバッチ送信（参考: BatchHttpLink） Persisted クエリ（参考: PersistedQueryLink） Link オブジェクトは任意の順序でチェーンできますが、末端の GraphQL サーバーに接続する部分は Teminating link として振る舞う必要があり、通常は HttpLink クラスのインスタンスを設定します。 HttpLink クラスは ApolloLink を継承して実装されています。
-ApolloClient に ApolloLink を設定する ApolloClient コンストラクタに渡すオブジェクトの link プロパティで、任意の ApolloLink インスタンスを設定できるようになっています。 下記は、GraphQL API のエンドポイントやリクエストヘッダーを設定する簡単な HttpLink を生成して設定する例です。</description></item><item><title>Apollo Client の fetchMore を自動で呼び出して GitHub GraphQL の100件制限を乗り越える (useAutoFetchMore)</title><link>https://maku.blog/p/w7igunc/</link><pubDate>Thu, 16 Sep 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/w7igunc/</guid><description>何をするか？ GitHub の GraphQL API で Issue 情報などを取得しようとすると、リソース制限 のため一度に 100 件までの情報しか取得できません。 Apollo Client が提供する useQuery や useLazyQuery などの React フック関数を使用すると、戻り値で返される fetchMore 関数を使って追加読み込み（ページネーション処理）を行うことができますが、この関数の使用例として提示されているものは、ユーザーによるボタンクリックなどを必要とするものばかりです。 ここでは、useQuery 実行後に自動で fetchMore を繰り返し呼び出して、100 件を超える情報を取得する方法の例を示します。
-fetchMore のための設定 前提として、Apollo Client の fetchMore 関数の基本的な使い方は理解しているものとします（下記記事などを参考にしてください）。
-Apollo Client の Pagenation 機能を使って GraphQL API を呼び出す 今回サンプルコードで使う GraphQL クエリには、次のような search コネクションが含まれていることを想定しています。 ページネーションの対象となるのは、この search コネクション部分です。
-query QueryIssues($cursor: String) { search(type: ISSUE, first: 100, after: $cursor, query: &amp;#34;...&amp;#34;) { ... } } そのため、ApolloClient に設定するキャッシュのフィールドポリシーとして、search フィールドの値が fetchMore 時にマージされるように設定しておきます。 cache オブジェクトの生成時に呼び出している relayStylePagination 関数あたりがポイントです。</description></item><item><title>Apollo CLI の codegen で GraphQL クエリレスポンスの TypeScript 型を自動生成する</title><link>https://maku.blog/p/bnrrqpn/</link><pubDate>Wed, 11 Aug 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bnrrqpn/</guid><description>何をするか TypeScript プロジェクトにおいて、Apollo Client の useQuery フックで GraphQL クエリ呼び出しを行っていると、レスポンスの型情報が any になってしまうことに悩むことになります。 例えば、GitHub の GraphQL クエリで、次のようにログイン中のユーザー情報を取得するとします。
-import { gql, useQuery } from &amp;#39;@apollo/client&amp;#39; export const QUERY_VIEWER = gql` query QueryViewer { viewer { login url avatarUrl } } ` const Viewer: FC = () =&amp;gt; { const { error, loading, data } = useQuery(QUERY_VIEWER) // ... } useQuery 関数の戻り値の data はデフォルトで any 型なので、そのままだと ESLint などに怒られることになります。
-Unsafe array destructuring of a tuple element with an any value @typescript-eslint/no-unsafe-assignment</description></item><item><title>Apollo Client の useQuery 呼び出し部分をカスタムフックで分離する</title><link>https://maku.blog/p/kmj7sdv/</link><pubDate>Mon, 30 Nov 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/kmj7sdv/</guid><description>Apollo Client で GraphQL クエリを実行するときは、カスタムフックとして useQuery 関数の呼び出し部分を抽出すると、コンポーネント側のコードをシンプルにすることができます。
-分離前のコード 次のサンプルコードでは、GraphQL クエリで GitHub のログインユーザー情報を取得して表示する Viewer コンポーネントを実装しています。 GraphQL のクエリ呼び出し部分や、取得したデータを ViewerData オブジェクトに詰める部分などが混在しており、あまり整理されているとは言えません。
-components/Viewer.tsx import { FC } from &amp;#39;react&amp;#39; import { gql, useQuery } from &amp;#39;@apollo/client&amp;#39; import { LoadingComponent } from &amp;#39;./LoadingComponent&amp;#39; import styles from &amp;#39;./Viewer.scss&amp;#39; const QUERY_VIEWER = gql` query QueryViewer { viewer { login url avatarUrl } } ` type ViewerData = { /** ログインID */ login: string /** ホームページのURL */ url: string /** アバター画像のURL */ avatarUrl: string } /** 「ユーザー情報」を表示するコンポーネント */ export const Viewer: FC = () =&amp;gt; { const {loading, error, data} = useQuery(QUERY_VIEWER) if (loading) return &amp;lt;LoadingComponent /&amp;gt; const viewer: ViewerData = data.</description></item><item><title>Apollo Client でクリック時に GraphQL クエリを実行する</title><link>https://maku.blog/p/m7ju6gr/</link><pubDate>Thu, 12 Nov 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m7ju6gr/</guid><description>図: useLazyQuery による GraphQL クエリ実行 はじめに Apollo Client の useQuery フックを使用すると、GraphQL を使って取得した情報を表示する React コンポーネントをシンプルに実装することができます。 useQuery フックによる GraphQL クエリは、React コンポーネントの表示時に実行されますが、代わりに useLazyQuery フックを使用すると、任意のタイミング、例えばボタンを押した時に GraphQL クエリを実行できるようになります。
-前提として、Apollo Client の useQuery の基本的な使い方は下記の記事などで理解しているものとし、ここでは、useLazyQuery フックの使い方を説明します。
-参考: Apollo Client で GitHub GraphQL API を使う (Node &amp;amp; React)&amp;quot; useQuery と useLazyQuery の違い 下記の抜粋コードは、useQuery 関数と useLazyQuery 関数の使い方の違いを表しています。
-// const GET_ISSUES = gql`...`; const {loading, error, data} = useQuery(GET_ISSUES); const [getIssues, {loading, error, data}] = useLazyQuery(GET_ISSUES); useQuery 関数は呼び出し直後に GraphQL クエリが実行され、その状態や結果が直ちに loading、error、data といった戻り値に格納されます。 一方 useLazyQuery 関数の場合は、戻り値の最初の要素として、クエリ実行関数が返されます（上記の例では getIssues にしてるけど、変数名は executeQuery とか何でも OK）。 GraphQL クエリを実行するには、このクエリ実行関数を呼び出す必要があるので、例えば次のようにボタン要素の onClick で呼び出すようにしておきます。 あとは、useQuery 関数の使い方と同様です。</description></item><item><title>Apollo Client の Pagenation 機能を使って GraphQL API を呼び出す</title><link>https://maku.blog/p/cu6eox7/</link><pubDate>Fri, 02 Oct 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cu6eox7/</guid><description>Apollo Client の Pagination 機能 GraphQL API では柔軟なクエリ発行が可能ですが、多数の要素を取得する場合は、Pagenation 処理 により何度かに分けて API 呼び出しを行う必要があります。 例えば、GitHub の GraphQL API では一度のクエリで取得可能な要素数は 100 件までであり、それを超える情報を取得する場合に Pagination 処理が必要です。
-Apollo Client には、GraphQL の Pagination 処理を簡単に扱うための仕組み（fetchMore 関数）が用意されています。
-参考: Pagination - Client (React) - Apollo GraphQL Docs と言っても、そこまで簡単ではないので、ここでは GitHub の GraphQL API における Pagination 処理の具体的な実装例を紹介します。
-Pagination の実装例（フィールドポリシーを使う方法） 次のサンプルコードは、GitHub の myorg/myrepo リポジトリの Issue リストを表示する IssueList コンポーネントの実装例です。 Issue の数が 100 件を超える場合は、「さらに読み込む」ボタンを表示し、このボタンが押されたときに Pagination 処理（fetchMore 関数）で次のデータを取得するようにしています。
-Apollo クライアントの useQuery 関数が返す fetchMore 関数を呼び出すと、再度 GraphQL クエリを実行することができます。 このとき、オプションで variables パラメータの値（クエリ変数）を変更できるので、Issue の読み出し開始位置を示す after の値を進めていくことで、100 件を超えるデータを順番に読み出すことができます。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Apollo Client 関連記事 on まくろぐ</title><link>https://maku.blog/p/uyw4qan/</link><description>Recent content in Apollo Client 関連記事 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Wed, 26 Oct 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/uyw4qan/index.xml" rel="self" type="application/rss+xml"/><item><title>Apollo Client の ApolloLink チェーンで HTTP リクエストをカスタマイズする</title><link>https://maku.blog/p/xa62yo4/</link><pubDate>Wed, 26 Oct 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xa62yo4/</guid><description>&lt;h2 id="apollolink-とは">ApolloLink とは？&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="600" height="auto" src="../../p/xa62yo4/img-001.drawio.svg" alt="/p/xa62yo4/img-001.drawio.svg" />
+ &lt;figcaption>図: Apollo Client の Link チェ―ン&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>Apollo Client を使って GraphQL API を呼び出すとき、GraphQL サーバーに対して HTTP リクエストが送られるわけですが、Apollo Client は内部で Link チェーンというものを作って具体的な HTTP リクエストを構築します。
+この構築処理を実装するものが Link オブジェクトであり、具体的には &lt;a href="https://github.com/apollographql/apollo-client/blob/main/src/link/core/ApolloLink.ts">ApolloLink&lt;/a> クラスのインスタンスです。
+Link オブジェクトは図のように Link チェーンの形で連結して使用できるようになっており、&lt;strong>通信内容を加工する一連のミドルウェア&lt;/strong> として機能します。
+Link オブジェクトの用途としては、次のようなものがあります。&lt;/p>
+&lt;ul>
+&lt;li>HTTP リクエストヘッダの付加
+&lt;ul>
+&lt;li>認証情報の付加（&lt;code>authorization&lt;/code> ヘッダー）&lt;/li>
+&lt;li>GraphQL サーバーで独自定義したヘッダー&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>アクセス先 URL（GraphQL エンドポイント）の切り替え&lt;/li>
+&lt;li>デバッグログの出力
+&lt;ul>
+&lt;li>自動リトライ（参考: &lt;a href="https://www.apollographql.com/docs/react/api/link/apollo-link-retry">RetryLink&lt;/a>）&lt;/li>
+&lt;li>リクエスト回数をカウント&lt;/li>
+&lt;li>サーバー応答速度（ラウンドトリップ時間）の計測&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>複数のクエリのバッチ送信（参考: &lt;a href="https://www.apollographql.com/docs/react/api/link/apollo-link-batch-http">BatchHttpLink&lt;/a>）&lt;/li>
+&lt;li>Persisted クエリ（参考: &lt;a href="https://www.apollographql.com/docs/react/api/link/persisted-queries">PersistedQueryLink&lt;/a>）&lt;/li>
+&lt;/ul>
+&lt;p>Link オブジェクトは任意の順序でチェーンできますが、末端の GraphQL サーバーに接続する部分は Teminating link として振る舞う必要があり、通常は &lt;a href="https://www.apollographql.com/docs/react/api/link/apollo-link-http/">HttpLink&lt;/a> クラスのインスタンスを設定します。
+&lt;code>HttpLink&lt;/code> クラスは &lt;code>ApolloLink&lt;/code> を継承して実装されています。&lt;/p>
+&lt;h2 id="apolloclient-に-apollolink-を設定する">ApolloClient に ApolloLink を設定する&lt;/h2>
+&lt;p>&lt;code>ApolloClient&lt;/code> コンストラクタに渡すオブジェクトの &lt;strong>&lt;code>link&lt;/code>&lt;/strong> プロパティで、任意の &lt;code>ApolloLink&lt;/code> インスタンスを設定できるようになっています。
+下記は、GraphQL API のエンドポイントやリクエストヘッダーを設定する簡単な &lt;code>HttpLink&lt;/code> を生成して設定する例です。&lt;/p></description></item><item><title>Apollo Client の fetchMore を自動で呼び出して GitHub GraphQL の100件制限を乗り越える (useAutoFetchMore)</title><link>https://maku.blog/p/w7igunc/</link><pubDate>Thu, 16 Sep 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/w7igunc/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>GitHub の GraphQL API で Issue 情報などを取得しようとすると、&lt;a href="https://docs.github.com/ja/graphql/overview/resource-limitations">リソース制限&lt;/a> のため一度に 100 件までの情報しか取得できません。
+Apollo Client が提供する &lt;code>useQuery&lt;/code> や &lt;code>useLazyQuery&lt;/code> などの React フック関数を使用すると、戻り値で返される &lt;code>fetchMore&lt;/code> 関数を使って追加読み込み（ページネーション処理）を行うことができますが、この関数の使用例として提示されているものは、ユーザーによるボタンクリックなどを必要とするものばかりです。
+ここでは、&lt;code>useQuery&lt;/code> 実行後に自動で &lt;code>fetchMore&lt;/code> を繰り返し呼び出して、100 件を超える情報を取得する方法の例を示します。&lt;/p>
+&lt;h2 id="fetchmore-のための設定">fetchMore のための設定&lt;/h2>
+&lt;p>前提として、Apollo Client の &lt;code>fetchMore&lt;/code> 関数の基本的な使い方は理解しているものとします（下記記事などを参考にしてください）。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/cu6eox7">Apollo Client の Pagenation 機能を使って GraphQL API を呼び出す&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>今回サンプルコードで使う GraphQL クエリには、次のような &lt;code>search&lt;/code> コネクションが含まれていることを想定しています。
+ページネーションの対象となるのは、この &lt;code>search&lt;/code> コネクション部分です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-graphql" data-lang="graphql">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">query&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">QueryIssues&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nv">$cursor&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">String&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="py">search&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kd">type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">ISSUE&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">first&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">100&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="py">after&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nv">$cursor&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nc">query&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;...&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">...&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>そのため、&lt;code>ApolloClient&lt;/code> に設定するキャッシュのフィールドポリシーとして、&lt;code>search&lt;/code> フィールドの値が &lt;code>fetchMore&lt;/code> 時にマージされるように設定しておきます。
+&lt;code>cache&lt;/code> オブジェクトの生成時に呼び出している &lt;code>relayStylePagination&lt;/code> 関数あたりがポイントです。&lt;/p></description></item><item><title>Apollo CLI の codegen で GraphQL クエリレスポンスの TypeScript 型を自動生成する</title><link>https://maku.blog/p/bnrrqpn/</link><pubDate>Wed, 11 Aug 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bnrrqpn/</guid><description>&lt;h2 id="何をするか">何をするか&lt;/h2>
+&lt;p>TypeScript プロジェクトにおいて、Apollo Client の &lt;code>useQuery&lt;/code> フックで GraphQL クエリ呼び出しを行っていると、レスポンスの型情報が &lt;code>any&lt;/code> になってしまうことに悩むことになります。
+例えば、GitHub の GraphQL クエリで、次のようにログイン中のユーザー情報を取得するとします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">gql&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">useQuery&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@apollo/client&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">QUERY_VIEWER&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">gql&lt;/span>&lt;span class="sb">`
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> query QueryViewer {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> viewer {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> login
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> url
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> avatarUrl
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">Viewer&lt;/span>: &lt;span class="kt">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">error&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">loading&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">data&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useQuery&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">QUERY_VIEWER&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>useQuery&lt;/code> 関数の戻り値の &lt;code>data&lt;/code> はデフォルトで &lt;code>any&lt;/code> 型なので、そのままだと ESLint などに怒られることになります。&lt;/p>
+&lt;blockquote>
+&lt;p>Unsafe array destructuring of a tuple element with an &lt;code>any&lt;/code> value @typescript-eslint/no-unsafe-assignment&lt;/p>
+&lt;/blockquote>
+&lt;p>これを解消するために、&lt;code>useQuery&lt;/code> 関数の型パラメーターで &lt;code>data&lt;/code> の型をセットできるのですが、&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">const { error, loading, data } = useQuery&amp;lt;ViewerData&amp;gt;(QUERY_VIEWER)&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>各クエリごとにこういった型情報を定義するのは面倒ですし、戻り値のオブジェクトが複雑だったりすると、型定義そのものが複雑で大変です。&lt;/p></description></item><item><title>Apollo Client の useQuery 呼び出し部分をカスタムフックで分離する</title><link>https://maku.blog/p/kmj7sdv/</link><pubDate>Mon, 30 Nov 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/kmj7sdv/</guid><description>&lt;p>Apollo Client で GraphQL クエリを実行するときは、カスタムフックとして &lt;code>useQuery&lt;/code> 関数の呼び出し部分を抽出すると、コンポーネント側のコードをシンプルにすることができます。&lt;/p>
+&lt;h2 id="分離前のコード">分離前のコード&lt;/h2>
+&lt;p>次のサンプルコードでは、GraphQL クエリで GitHub のログインユーザー情報を取得して表示する &lt;code>Viewer&lt;/code> コンポーネントを実装しています。
+GraphQL のクエリ呼び出し部分や、取得したデータを &lt;code>ViewerData&lt;/code> オブジェクトに詰める部分などが混在しており、あまり整理されているとは言えません。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/Viewer.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">FC&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">gql&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">useQuery&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;@apollo/client&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">LoadingComponent&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;./LoadingComponent&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">styles&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;./Viewer.scss&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">QUERY_VIEWER&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">gql&lt;/span>&lt;span class="sb">`
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> query QueryViewer {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> viewer {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> login
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> url
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> avatarUrl
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">type&lt;/span> &lt;span class="nx">ViewerData&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/** ログインID */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">login&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">string&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/** ホームページのURL */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">url&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">string&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/** アバター画像のURL */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">avatarUrl&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">string&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/** 「ユーザー情報」を表示するコンポーネント */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">Viewer&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">loading&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">error&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">data&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useQuery&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">QUERY_VIEWER&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">loading&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">LoadingComponent&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">viewer&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">ViewerData&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">viewer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">className&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">styles&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">container&lt;/span>&lt;span class="p">}&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">a&lt;/span> &lt;span class="na">href&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">viewer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">url&lt;/span>&lt;span class="p">}&amp;gt;&amp;lt;&lt;/span>&lt;span class="nt">img&lt;/span> &lt;span class="na">src&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">viewer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">avatarUrl&lt;/span>&lt;span class="p">}/&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">a&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>こんなときは、カスタムフックを作成して、GraphQL クエリを実行する部分や、その結果を加工する部分などを分離するとコンポーネント側のコードがシンプルになります。&lt;/p></description></item><item><title>Apollo Client でクリック時に GraphQL クエリを実行する</title><link>https://maku.blog/p/m7ju6gr/</link><pubDate>Thu, 12 Nov 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m7ju6gr/</guid><description>&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="624" height="170" src="../../p/m7ju6gr/img-001.gif" alt="/p/m7ju6gr/img-001.gif" />
+ &lt;figcaption>図: useLazyQuery による GraphQL クエリ実行&lt;/figcaption>
+&lt;/figure>
+
+&lt;h2 id="はじめに">はじめに&lt;/h2>
+&lt;p>Apollo Client の &lt;code>useQuery&lt;/code> フックを使用すると、GraphQL を使って取得した情報を表示する React コンポーネントをシンプルに実装することができます。
+&lt;code>useQuery&lt;/code> フックによる GraphQL クエリは、React コンポーネントの表示時に実行されますが、代わりに &lt;strong>&lt;code>useLazyQuery&lt;/code>&lt;/strong> フックを使用すると、任意のタイミング、例えばボタンを押した時に GraphQL クエリを実行できるようになります。&lt;/p>
+&lt;p>前提として、Apollo Client の &lt;code>useQuery&lt;/code> の基本的な使い方は下記の記事などで理解しているものとし、ここでは、&lt;code>useLazyQuery&lt;/code> フックの使い方を説明します。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/qcp2cnx">Apollo Client で GitHub GraphQL API を使う (Node &amp;amp; React)&amp;quot;&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="usequery-と-uselazyquery-の違い">useQuery と useLazyQuery の違い&lt;/h2>
+&lt;p>下記の抜粋コードは、&lt;code>useQuery&lt;/code> 関数と &lt;code>useLazyQuery&lt;/code> 関数の使い方の違いを表しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// const GET_ISSUES = gql`...`;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">loading&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">error&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">data&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useQuery&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">GET_ISSUES&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">getIssues&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">loading&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">error&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">data&lt;/span>&lt;span class="p">}]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useLazyQuery&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">GET_ISSUES&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>useQuery&lt;/code> 関数は呼び出し直後に GraphQL クエリが実行され、その状態や結果が直ちに &lt;code>loading&lt;/code>、&lt;code>error&lt;/code>、&lt;code>data&lt;/code> といった戻り値に格納されます。
+一方 &lt;code>useLazyQuery&lt;/code> 関数の場合は、戻り値の最初の要素として、クエリ実行関数が返されます（上記の例では &lt;code>getIssues&lt;/code> にしてるけど、変数名は &lt;code>executeQuery&lt;/code> とか何でも OK）。
+GraphQL クエリを実行するには、このクエリ実行関数を呼び出す必要があるので、例えば次のようにボタン要素の &lt;code>onClick&lt;/code> で呼び出すようにしておきます。
+あとは、&lt;code>useQuery&lt;/code> 関数の使い方と同様です。&lt;/p></description></item><item><title>Apollo Client の Pagenation 機能を使って GraphQL API を呼び出す</title><link>https://maku.blog/p/cu6eox7/</link><pubDate>Fri, 02 Oct 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cu6eox7/</guid><description>&lt;h2 id="apollo-client-の-pagination-機能">Apollo Client の Pagination 機能&lt;/h2>
+&lt;p>GraphQL API では柔軟なクエリ発行が可能ですが、多数の要素を取得する場合は、&lt;a href="https://graphql.org/learn/pagination/">Pagenation 処理&lt;/a> により何度かに分けて API 呼び出しを行う必要があります。
+例えば、GitHub の GraphQL API では一度のクエリで取得可能な要素数は 100 件までであり、それを超える情報を取得する場合に Pagination 処理が必要です。&lt;/p>
+&lt;p>Apollo Client には、GraphQL の Pagination 処理を簡単に扱うための仕組み（&lt;strong>&lt;code>fetchMore&lt;/code>&lt;/strong> 関数）が用意されています。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="https://www.apollographql.com/docs/react/data/pagination/">Pagination - Client (React) - Apollo GraphQL Docs&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>と言っても、そこまで簡単ではないので、ここでは GitHub の GraphQL API における Pagination 処理の具体的な実装例を紹介します。&lt;/p>
+&lt;h2 id="pagination-の実装例フィールドポリシーを使う方法">Pagination の実装例（フィールドポリシーを使う方法）&lt;/h2>
+&lt;p>次のサンプルコードは、GitHub の &lt;code>myorg/myrepo&lt;/code> リポジトリの Issue リストを表示する &lt;code>IssueList&lt;/code> コンポーネントの実装例です。
+Issue の数が 100 件を超える場合は、「さらに読み込む」ボタンを表示し、このボタンが押されたときに Pagination 処理（&lt;code>fetchMore&lt;/code> 関数）で次のデータを取得するようにしています。&lt;/p>
+&lt;p>Apollo クライアントの &lt;code>useQuery&lt;/code> 関数が返す &lt;code>fetchMore&lt;/code> 関数を呼び出すと、再度 GraphQL クエリを実行することができます。
+このとき、オプションで &lt;code>variables&lt;/code> パラメータの値（クエリ変数）を変更できるので、Issue の読み出し開始位置を示す &lt;code>after&lt;/code> の値を進めていくことで、100 件を超えるデータを順番に読み出すことができます。&lt;/p></description></item></channel></rss>

@@ -1,55 +1,1432 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>D3.js 関連記事 on まくろぐ</title><link>https://maku.blog/p/j3fmwym/</link><description>Recent content in D3.js 関連記事 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Thu, 30 Nov 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/j3fmwym/index.xml" rel="self" type="application/rss+xml"/><item><title>D3.js による SVG 描画の基本</title><link>https://maku.blog/p/v38nmhw/</link><pubDate>Tue, 08 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/v38nmhw/</guid><description>D3.js は、クライアントサイド JavaScript で SVG 描画を行うためのライブラリです。 素の JavaScript（バニラ JavaScript) だけでも svg 要素を動的に構築していくことはできますが、D3.js を使うことでよりシンプルな API を使って描画処理を記述することができます。 ここでは、D3.js で基礎的な SVG 描画を行う方法を紹介します。
-矩形を 1 つ追加する D3.js で矩形を描画するには、d3.select() で svg 要素を選択し（D3 セレクションオブジェクトを取得）、そこに append() メソッドで rect 要素を追加します。 そして、メソッドチェーンさせる形で attr() を呼び出し、rect の属性（サイズや色）を設定していきます。
-次の例では、svg 要素に緑色の矩形を 1 つ追加しています。 rect 要素の塗り潰し色は fill 属性で指定することに注意してください（CSS の "background" プロパティとは名前が異なります）。
-図: 矩形の表示 &amp;lt;svg id=&amp;#34;svg-wp3vzdr&amp;#34; width=&amp;#34;200&amp;#34; height=&amp;#34;100&amp;#34;&amp;gt;&amp;lt;/svg&amp;gt; &amp;lt;script&amp;gt; d3.select(&amp;#34;#svg-wp3vzdr&amp;#34;) // svg 要素を選択 .append(&amp;#34;rect&amp;#34;) // svg 内に rect 要素を追加 .attr(&amp;#34;x&amp;#34;, 10) // rect 要素の属性値を設定 .attr(&amp;#34;y&amp;#34;, 10) .</description></item><item><title>D3.js のデータ結合を理解する (1) data/enter/exit/join の基本</title><link>https://maku.blog/p/bp2btie/</link><pubDate>Sun, 01 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bp2btie/</guid><description>D3.js の宣言的なアプローチ D3.js を使ったビジュアライゼーションでは、配列データを描画要素と対応付ける（データ結合する）とき、次のようにメソッドをチェーンさせる記述方法がよく出てきます (selectAll() → data() → enter() → append())。
-D3.js コードのよくある書き方 const data = [1, 2, 3, 4, 5]; svg.selectAll(&amp;#34;circle&amp;#34;) .data(data) .enter() .append(&amp;#34;circle&amp;#34;) .attr(&amp;#34;cx&amp;#34;, (_d, i) =&amp;gt; i * 35 + 25) .attr(&amp;#34;cy&amp;#34;, 25) .attr(&amp;#34;r&amp;#34;, 10); 最初はとっつきにくいかもしれませんが、この記述方法は、D3.js が 宣言的プログラミング (Declarative Programming) のアプローチを採用した結果であり、これがあるからこそ D3.js のコードはシンプルに記述できるようになっています。
-「宣言的」という言葉は、「データが最終的にどのように表現されるべきか」 をコードで表現するアプローチを指します。 その表現に到達するための詳細な処理手順をコーディングする必要がなくなるため、コードが読みやすく、不具合が発生しにくくなります。
-D3.js によるデータ結合処理は、一般的に次のような流れで実装します。
-selectAll() メソッドで、データの結合先にする描画要素群のセレクションオブジェクトを作成する。この段階では、描画要素は存在しなくてもよい（初回の呼び出し時には描画要素数は 0）。 data() メソッドで、データ配列を上記の描画要素群にマッピングする。 3 種類のセレクション (enter/exit/update) に対する処理を定義する。 次に、3 種類のセレクションについて説明します。
-データ結合時の 3 つのセレクション D3.js のデータ結合では、次のような 3 種類のセレクションに分けて描画内容を定義します。
-セレクション 説明 enter セレクション 「データ数 ＞ 描画要素数」のときに、新しい描画要素を追加する処理 exit セレクション 「データ数 ＜ 描画要素数」のときに、不要な描画要素を削除する処理 update セレクション データが更新されたときに、既存の描画要素の表示を更新する処理 enter セクション 図: enter セレクションのイメージ enter セレクションは、データ数の方が既存の描画要素数よりも多いときに、追加すべき要素を参照するためのセレクションです。 要は、enter セレクションに対して、新しい描画要素を追加する処理 を定義すれば OK です。 enter セレクションを取得するには、data() メソッドの戻り値のセレクションオブジェクトに対して、enter() メソッドを呼び出します。</description></item><item><title>D3.js のデータ結合を理解する (2) データ配列の要素ごとに表示／非表示を切り替える</title><link>https://maku.blog/p/nxe97gx/</link><pubDate>Mon, 09 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nxe97gx/</guid><description>この記事は、D3.js のデータ結合まわりのメソッド (data/enter/exit/join) の基本を理解していることを前提としています。
-参考: D3.js のデータ結合を理解する (1) data/enter/exit/join の基本 D3.js でデータ配列の内容をプロットするとき、各要素の値を元にその要素を表示するか表示しないかを制御したいことがあります。 このようなケースでは、D3.js の仕組みで処理しようと考えがちですが、単純にデータ配列の要素をフィルタしてから、selection.data() でデータ結合してやれば OK です。
-次の例では、データ配列 (data) の enabled プロパティを見て、描画要素の表示／非表示を制御しています。 とはいっても、データ配列の要素を filter() メソッドで先にフィルタしているだけです。
-図: 表示の on/off 制御 const data = [ { pos: 1, color: &amp;#34;#f00&amp;#34;, enabled: true }, { pos: 2, color: &amp;#34;#0f0&amp;#34;, enabled: false }, { pos: 3, color: &amp;#34;#00f&amp;#34;, enabled: true }, ] // 先にデータ配列をフィルタしておく const filteredData = data.filter((d) =&amp;gt; d.enabled) d3.select(&amp;#34;#svg-6y3q&amp;#34;) .selectAll(&amp;#34;circle&amp;#34;) .data(filteredData, (d) =&amp;gt; d.</description></item><item><title>D3.js で円グラフを描画する (d3.pie)</title><link>https://maku.blog/p/v3g55wz/</link><pubDate>Thu, 30 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/v3g55wz/</guid><description>D3.js を使って円グラフを描画するには、d3.pie() と d3.arc() を組み合わせて使用します。
-d3.pie() 関数で扇形の角度を計算する D3.js の d3.pie() 関数を使うと、円グラフ (pie chart) やドーナツチャート (donut chart) を描画するための 角度を計算する関数オブジェクトを生成 できます。 生成した関数にデータ配列を渡すと、各データに対応する扇形部分の開始角度 (startAngle) と終了角度 (endAngle) を計算してくれます。 角度はラジアンで表現されるので、180° は 3.1415 になります。
-const data = [5, 3, 2] // 任意のデータ配列 const pie = d3.pie() // pie 関数の生成 const arcs = pie(data) // データ配列に角度情報を付加する console.log(args); [ { &amp;#34;data&amp;#34;: 5, &amp;#34;index&amp;#34;: 0, &amp;#34;value&amp;#34;: 5, &amp;#34;startAngle&amp;#34;: 0, &amp;#34;endAngle&amp;#34;: 3.141592653589793, &amp;#34;padAngle&amp;#34;: 0 }, { &amp;#34;data&amp;#34;: 3, &amp;#34;index&amp;#34;: 1, &amp;#34;value&amp;#34;: 3, &amp;#34;startAngle&amp;#34;: 3.</description></item><item><title>D3.js のコードに TypeScript の型注釈 (Type Annotation) をつける</title><link>https://maku.blog/p/jrqnujw/</link><pubDate>Sun, 05 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/jrqnujw/</guid><description>D3.js アプリを TypeScript で実装する場合、その型情報の扱いが若干難しいのでメモしておきます。
-D3.js の型情報のインストール D3.js の npm パッケージ d3 は TypeScript の型情報を含んでいないので、TypeScript コードで D3.js を使用するときは、別途 DefinitelyTyped が提供している @types/d3 パッケージをインストールしておく必要があります。 以下のコマンドを使用してインストールします。
-$ npm install d3 # D3.js 本体 $ npm install --save-dev @types/d3 # D3.js 用の型情報 D3 セレクションオブジェクトの型注釈 TypeScript で D3.js を使ったアプリを開発していると、最初につまずくのは select() や selectAll() メソッドで取得する D3 セレクションオブジェクトの型注釈だと思います。 この型情報は d3.Selection というインターフェースとして以下のように定義されています。
-d3.Selection 型の定義（抜粋） /** * A D3 Selection of elements. * * The first generic &amp;#34;GElement&amp;#34; refers to the type of the selected element(s).</description></item><item><title>D3.js でレイヤー用の g 要素を作成するユーティリティ関数 (layer)</title><link>https://maku.blog/p/298nhnq/</link><pubDate>Fri, 03 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/298nhnq/</guid><description>便利な layer 関数を実装する SVG の g 要素は、描画要素の表示順序を制御するためのレイヤーとして使われることがあります（参考: SVG の g 要素の使い方）。 D3.js でレイヤー構造を作るのは簡単で、次のように任意のセレクションオブジェクトの append() メソッドで g 要素を追加するだけです。
-function draw(data) { const svg = d3.select(&amp;#34;#mysvg&amp;#34;); const layer1 = svg.append(&amp;#34;g&amp;#34;); // 奥に表示するレイヤー const layer2 = svg.append(&amp;#34;g&amp;#34;); // 手前に表示するレイヤー // layer1 への描画 layer1.selectAll(&amp;#34;circle&amp;#34;) .data(data) .join(&amp;#34;circle&amp;#34;) .attr(&amp;#34;cx&amp;#34;, () =&amp;gt; Math.random() * 170 + 15) .attr(&amp;#34;cy&amp;#34;, () =&amp;gt; Math.random() * 40 + 15) .attr(&amp;#34;r&amp;#34;, 10) .attr(&amp;#34;fill&amp;#34;, &amp;#34;#00f9&amp;#34;) // layer2 への描画（省略） } 注意しなければいけないのは、上記のように直接 append() メソッドを呼び出す場合は、このコードが 1 度だけ実行されるようにしておくことです。 D3.</description></item><item><title>D3.js で SVG の右上に凡例 (legend) を表示する</title><link>https://maku.blog/p/ykjrz2b/</link><pubDate>Wed, 18 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ykjrz2b/</guid><description>D3.js を使用してデータを色分けしてプロットする場合、グラフの右上などに凡例（色の意味）を表示したくなります。 ここでは、色を管理するために d3.scaleOrdinal() を使用していると仮定し、凡例を表示する方法を説明します。 d3.scaleOrdinal() 関数についての詳細は、以下の記事をご参照ください。
-参考: D3.js のスケール関数: scaleOrdinal でカテゴリデータを別の値にマッピングする カラースケールから凡例に並べる項目を取り出す d3.scaleOrdinal() 関数で作成したスケール関数（下記例では color）に何らかのデータを引数で渡すと、そのデータに対応する色情報を返してくれます。
-import * as d3 from &amp;#39;d3&amp;#39;; // D3.js 組み込みのカラースケール const color = d3.scaleOrdinal(d3.schemeCategory10); const c1 = color(&amp;#39;A&amp;#39;); //=&amp;gt; &amp;#39;#1f77b4&amp;#39; const c2 = color(&amp;#39;B&amp;#39;); //=&amp;gt; &amp;#39;#ff7f0e&amp;#39; const c3 = color(&amp;#39;C&amp;#39;); //=&amp;gt; &amp;#39;#2ca02c&amp;#39; const c4 = color(&amp;#39;A&amp;#39;); //=&amp;gt; &amp;#39;#1f77b4&amp;#39; const c5 = color(&amp;#39;B&amp;#39;); //=&amp;gt; &amp;#39;#ff7f0e&amp;#39; 上記の例の場合、A、B、C という 3 種類のデータに対して、3 種類の色が割り当てられています。 このとき、カラースケール (color) の内部では、これまで入力された A、B、C というキー情報が管理されており、domain() メソッドを引数なしで呼び出すことで取り出すことができます。</description></item><item><title>D3.js の call メソッドを使ってメソッドチェーン処理をスマートに記述する</title><link>https://maku.blog/p/994xjma/</link><pubDate>Sun, 08 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/994xjma/</guid><description>call メソッドの基本 D3 セレクションオブジェクトの call() メソッドを使うと、任意の関数に自身のセレクションオブジェクト (this) を渡す形で呼び出すことができます。 下記コードの (A) と (B) は同じ振る舞いになります。
-&amp;lt;script&amp;gt; function setMessage(selection) { selection.text(&amp;#39;Hello&amp;#39;); } // (A) 普通の関数呼びだし // setMessage(d3.select(&amp;#39;#msg&amp;#39;)); // (B) call による関数呼び出し d3.select(&amp;#39;#msg&amp;#39;).call(setMessage); &amp;lt;/script&amp;gt; &amp;lt;div id=&amp;#39;msg&amp;#39;&amp;gt;&amp;lt;/div&amp;gt; call() メソッド呼び出し時の第 2 引数以降は、第 1 引数で指定した関数にパラメーターとして渡されます。
-function setMessage(selection, message) { selection.text(message); } d3.select(&amp;#39;#msg&amp;#39;) .call(setMessage, &amp;#39;Hello&amp;#39;); call メソッドの使いどころ selection.call() メソッドの戻り値は、呼び出し元のレシーバーである selection オブジェクト自身 (this) になります。 これは、つまり、selection オブジェクトに対するメソッドのチェーンを続けられるということです。
-例えば、次のように、svg 要素の D3 セレクションオブジェクトに対して複数の処理を行うコードを考えてみます。
-const data = [50, 100, 150]; const svg = d3.</description></item><item><title>D3.js のスケール関数: scaleOrdinal でカテゴリデータを別の値にマッピングする</title><link>https://maku.blog/p/73b94gi/</link><pubDate>Sat, 30 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/73b94gi/</guid><description>scaleOrdinal の基本 D3.js のスケールモジュール (d3-scale) が提供する scaleOrdinal() 関数を使用すると、カテゴリデータを別の値にマッピングする関数を簡単に作成することができます。
-☝️ カテゴリデータと数量データ カテゴリデータ (categorical data) というのは、統計学やデータ分析において使用されるデータ型のひとつで、通常、カテゴリを示すラベルや文字列で表現されます。 カテゴリデータは、定性データまたは質的データとも呼ばれます。 例えば、血液型や都道府県などがカテゴリデータです。
-一方、価格や身長のような 数量データ (quantitative data) は本来はカテゴリデータではありませんが、特定の範囲でグルーピングすることで、カテゴリ化することができます（価格(円) → 低価格／中価格／高価格）。 カテゴリ化することを離散化 (discretization) やビン化 (binning) と呼ぶこともあります。
-次の例では、AWS/Azure/GCP という入力値を、#ff9900/#0072c6/#db4437 というカラーコードに変換するスケール関数を作成しています。
-const colorScale = d3.scaleOrdinal() .domain([&amp;#34;AWS&amp;#34;, &amp;#34;Azure&amp;#34;, &amp;#34;GCP&amp;#34;]) // この入力が .range([&amp;#34;#ff9900&amp;#34;, &amp;#34;#0072c6&amp;#34;, &amp;#34;#db4437&amp;#34;]); // この出力にマッピングされる console.log(colorScale(&amp;#34;AWS&amp;#34;)); //=&amp;gt; &amp;#34;#ff9900&amp;#34; console.log(colorScale(&amp;#34;Azure&amp;#34;)); //=&amp;gt; &amp;#34;#0072c6&amp;#34; console.log(colorScale(&amp;#34;GCP&amp;#34;)); //=&amp;gt; &amp;#34;#db4437&amp;#34; 上記の例では、入力値をカラーコードの文字列にマッピングしていますが、描画要素の座標値やサイズなど、任意の型の値にマッピングできます。 次の例では、実際に 2 つのスケール関数を作成して、SVG の描画に使用しています。
-図: scaleOrdinal による色のマッピング 上記の実装コード &amp;lt;svg id=&amp;#34;svg-hfuouiw&amp;#34; width=&amp;#34;200&amp;#34; height=&amp;#34;80&amp;#34;&amp;gt;&amp;lt;/svg&amp;gt; &amp;lt;script&amp;gt; const svg = d3.</description></item><item><title>D3.js で矢印を表示する (defs, marker, marker-end)</title><link>https://maku.blog/p/gtg33no/</link><pubDate>Fri, 29 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gtg33no/</guid><description>marker 要素で矢印の形を定義する D3.js で line 要素や path 要素の先端に矢印を表示するには、marker 要素で矢印形状を定義して、それを line 要素などの marker-end 属性（あるいは marker-start 属性）にセットします。
-次の例では、2 つの circle 要素とそれらを結ぶ line 要素を配置し、line 要素の終端に矢印を表示しています。
-図: 矢印の表示 上記 SVG を出力するためのコード &amp;lt;svg id=&amp;#34;svg-h2cqngx&amp;#34; width=&amp;#34;120&amp;#34; height=&amp;#34;70&amp;#34;&amp;gt;&amp;lt;/svg&amp;gt; &amp;lt;script&amp;gt; // 始点と終点の座標 const p1 = { x: 20, y: 50 } const p2 = { x: 100, y: 20 } const MARKER_ID = &amp;#34;MyMarker&amp;#34; // マーカー (marker) を定義する function createMarker(selection) { selection.append(&amp;#34;defs&amp;#34;) .append(&amp;#34;marker&amp;#34;) .attr(&amp;#34;id&amp;#34;, MARKER_ID) .attr(&amp;#34;viewBox&amp;#34;, &amp;#34;0 0 2 2&amp;#34;) .</description></item><item><title>D3.js で描画要素をクリックしたときに選択状態にする</title><link>https://maku.blog/p/6sijufz/</link><pubDate>Mon, 25 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6sijufz/</guid><description>SVG 描画要素の選択状態を表現する D3.js で描画した要素（rect や circle など）をマウスクリックで選択できるようにすると、いろいろな操作を実現できます。
-選択された要素に紐づけられたデータ (datum) を、別の場所に詳細情報として表示する 選択された要素に対して、一連の操作を行う 問題は、どのように要素の選択状態を表現するかですが、ここでは、要素をクリックしたときに、CSS のクラス selected を動的に付加することで選択状態を表現してみます。
-次の例では、並んでいる丸をクリックすると見た目が変化します（選択状態を表現しています）。 逆に、別の丸の見た目はリセットされます。
-図: 丸をクリックして選択状態にする 実装コード &amp;lt;style&amp;gt; circle { cursor: pointer; } /* 選択された要素に付加するクラス */ .selected { fill: cyan; stroke: red; stroke-width: 5; cursor: default; } &amp;lt;/style&amp;gt; &amp;lt;svg id=&amp;#34;svg-uh6jd9p&amp;#34; width=&amp;#34;200&amp;#34; height=&amp;#34;50&amp;#34;&amp;gt;&amp;lt;/svg&amp;gt; &amp;lt;script&amp;gt; const svg = d3.select(&amp;#34;#svg-uh6jd9p&amp;#34;) const data = [{}, {}, {}] // データ数だけ circle 要素を追加 const circles = svg.selectAll(&amp;#34;circle&amp;#34;) .data(data) .join(&amp;#34;circle&amp;#34;) .attr(&amp;#34;cx&amp;#34;, (_d, i) =&amp;gt; i * 50 + 50) .</description></item><item><title>D3.js で描画内容をズームやパン操作できるようにする (d3-zoom)</title><link>https://maku.blog/p/w2xmuae/</link><pubDate>Fri, 22 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/w2xmuae/</guid><description>d3-zoom とは D3.js に組み込まれている d3-zoom モジュールは、下記のようなユーザー操作をハンドルためのモジュールです。
-マウスホイールによるズーム操作 マウスドラッグによるパン操作 タッチパネルのピンチイン、ピンチアウトによるズーム操作 タッチパネルのスワイプによるパン操作 d3-zoom によるイベントハンドリング処理は描画処理とは独立しているので、SVG や Canvas、スケール (d3-scale)、軸 (d3-axis) などと自在に組み合わせて使うことができます。
-d3-zoom の簡単な使用例 実装例 下記の svg 画像の中で、ドラッグやホイール操作を行うと、矩形のズームや移動を行うことができます。
-図: d3-zoom によるズーム／パン操作 実装コード &amp;lt;svg id=&amp;#34;svg-gh4oas2&amp;#34; width=&amp;#34;200&amp;#34; height=&amp;#34;100&amp;#34;&amp;gt;&amp;lt;/svg&amp;gt; &amp;lt;script&amp;gt; const svg = d3.select(&amp;#34;#svg-gh4oas2&amp;#34;) const topLayer = svg.append(&amp;#34;g&amp;#34;) // このレイヤーごと動かすことにする // 矩形を 1 つ追加 topLayer .append(&amp;#34;rect&amp;#34;) .attr(&amp;#34;x&amp;#34;, 80) .attr(&amp;#34;y&amp;#34;, 40) .attr(&amp;#34;width&amp;#34;, 40) .attr(&amp;#34;height&amp;#34;, 20) .attr(&amp;#34;fill&amp;#34;, &amp;#34;green&amp;#34;) svg.call(d3.zoom().on(&amp;#34;zoom&amp;#34;, zoomed)) // zoom behavior を登録する function zoomed(event) { // イベントが発生したらイベントオブジェクトの内容に従って transform するだけ topLayer.</description></item><item><title>D3.js による Force Simulation (3) 各ノードをドラッグして動かせるようにする</title><link>https://maku.blog/p/8dmb73t/</link><pubDate>Mon, 18 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8dmb73t/</guid><description>d3-drag モジュールとは D3.js は、マウスによるドラッグ操作や、タブレットなどでのタッチドラッグ操作を扱うための d3-drag モジュールを提供しています（d3 モジュールに内包されています）。 d3-drag は Force Simulation (d3-force) 用のモジュールではありませんが、よく d3-force と組み合わせて使用されます。 Force Simulation では、各ノードの座標値が tick イベントと連動して刻々と変化するため、ドラッグ中はノードの座標値をマウスカーソル位置に固定するなどの処理が必要です。
-参考: Force Simulation (d3-force) の基本 d3-drag の基本的な使い方 次のサンプルでは、svg 内の circle 要素をドラッグして動かせるようにしています。
-図: d3-drag によるノードのドラッグ ソースコード &amp;lt;svg id=&amp;#34;svg-p4vddjh&amp;#34; width=&amp;#34;300&amp;#34; height=&amp;#34;200&amp;#34;&amp;gt;&amp;lt;/svg&amp;gt; &amp;lt;script&amp;gt; const svg = d3.select(&amp;#34;#svg-p4vddjh&amp;#34;) const width = +svg.attr(&amp;#34;width&amp;#34;) const height = +svg.attr(&amp;#34;height&amp;#34;) // ノード配列 const nodesData = [{}, {}, {}, {}] // ノードを描画するための circle 要素を svg に追加しておく const circles = svg.</description></item><item><title>D3.js による Force Simulation (2) link force でノードを結合する</title><link>https://maku.blog/p/9ujohp6/</link><pubDate>Thu, 14 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9ujohp6/</guid><description>link force とは D3.js の Force simulation (d3-force) には様々なフォースを設定することができ、それにより各ノードの動き（レイアウト）を制御できるようになっています。 link force はそのようなフォースのひとつで、ノード間にリンク情報を設定することにより、バネのような力を発生させます。 接続された 2 つのノードのうち、一方の位置を動かすと、もう一方のノードが引っ張られて動くようになります。
-図: link force のイメージ 参考: Force Simulation (d3-force) の基本 link force の基本的な使い方 次の例では、4 つのノードに環状に繋がるような link force を設定しています（ここではリンクの可視化はしていません）。
-図: link force を設定したフォースシミュレーション ソースコード &amp;lt;svg id=&amp;#34;svg-a2f28wm&amp;#34; width=&amp;#34;300&amp;#34; height=&amp;#34;200&amp;#34;&amp;gt;&amp;lt;/svg&amp;gt; &amp;lt;script&amp;gt; const svg = d3.select(&amp;#34;#svg-a2f28wm&amp;#34;) const width = +svg.attr(&amp;#34;width&amp;#34;) const height = +svg.attr(&amp;#34;height&amp;#34;) // ノード配列 const nodesData = [{}, {}, {}, {}] // リンク配列 const linksData = [ { source: 0, target: 1 }, { source: 1, target: 2 }, { source: 2, target: 3 }, { source: 3, target: 0 }, ] // ノードを描画するための circle 要素を svg に追加しておく const circles = svg.</description></item><item><title>D3.js による Force Simulation (1) d3-force の基本</title><link>https://maku.blog/p/6kavdch/</link><pubDate>Wed, 13 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6kavdch/</guid><description>d3-force とは D3.js の Force Simulation (d3-force) モジュールは、粒子（ノード）間の引力を考慮した座標計算を行うためのライブラリです（d3 モジュールに含まれています）。 主に、ノードとエッジで表現されるネットワークモデルをビジュアライズするために利用されます。 d3-force によって逐次計算される座標をもとにノードやエッジを描画することで、レイアウトが収束していく過程をアニメーションさせて見せることができます。
-次の例では、d3-force を使って 5 つのノードの座標値を計算して、SVG の circle 要素として描画しています。
-図: d3-force によるレイアウト 実装コード &amp;lt;svg id=&amp;#34;#svg-gi3ajww&amp;#34; width=&amp;#34;300&amp;#34; height=&amp;#34;200&amp;#34;&amp;gt;&amp;lt;/svg&amp;gt; &amp;lt;script&amp;gt; const svg = d3.select(&amp;#34;#svg-gi3ajww&amp;#34;) const width = +svg.attr(&amp;#34;width&amp;#34;) const height = +svg.attr(&amp;#34;height&amp;#34;) // ノード配列（どんなオブジェクトでもよい） const nodesData = [{}, {}, {}, {}, {}] // ノードを描画するための circle 要素を svg に追加しておく const circles = svg.selectAll(&amp;#34;circle&amp;#34;) .data(nodesData) .join(&amp;#34;circle&amp;#34;) .attr(&amp;#34;r&amp;#34;, 10) .attr(&amp;#34;fill&amp;#34;, &amp;#34;blue&amp;#34;) // Simulation オブジェクトの作成とフォース設定 const simulation = d3.</description></item><item><title>D3.js でキーボードイベントを扱う (keydown)</title><link>https://maku.blog/p/6emds9m/</link><pubDate>Mon, 11 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6emds9m/</guid><description>D3.js でキーボードからの入力イベントを扱うコードのサンプルです。
-図: クリックしてから上下左右キーで動かす 次の例では、svg 要素でキーボードイベントをハンドルしています。 svg 要素がフォーカスされた状態でカーソルキー（上下左右）を入力すると、丸印 (circle) が上下左右に動きます。
-&amp;lt;svg id=&amp;#34;svg-z5a3fzu&amp;#34; width=&amp;#34;200&amp;#34; height=&amp;#34;100&amp;#34;&amp;gt;&amp;lt;/svg&amp;gt; &amp;lt;script&amp;gt; const svg = d3.select(&amp;#34;#svg-z5a3fzu&amp;#34;); // D3 Selection オブジェクトを取得 svg .on(&amp;#34;keydown&amp;#34;, handleKeyDown) // keydown イベントのハンドラーを設定 .attr(&amp;#34;tabindex&amp;#34;, 0) // フォーカスを当てられるようにする // .node().focus() // 自動でフォーカスする場合 // カーソルキーで動かせる丸を表示 const circle = svg.append(&amp;#34;circle&amp;#34;) .attr(&amp;#34;cx&amp;#34;, 100) .attr(&amp;#34;cy&amp;#34;, 50) .attr(&amp;#34;r&amp;#34;, 10) .attr(&amp;#34;fill&amp;#34;, &amp;#34;dodgerblue&amp;#34;) function handleKeyDown(event) { switch (event.code) { case &amp;#34;ArrowLeft&amp;#34;: circle.attr(&amp;#34;cx&amp;#34;, +circle.attr(&amp;#34;cx&amp;#34;) - 5) event.preventDefault(); break; case &amp;#34;ArrowRight&amp;#34;: circle.attr(&amp;#34;cx&amp;#34;, +circle.attr(&amp;#34;cx&amp;#34;) + 5) event.</description></item><item><title>D3.js でボタンなどの入力要素を扱う</title><link>https://maku.blog/p/s5zrgp3/</link><pubDate>Sun, 10 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/s5zrgp3/</guid><description>D3.js は主に SVG の描画に使われるライブラリですが、一般的な DOM 要素のイベントをハンドルするためにも使用できます。 ここでは、ボタンやテキスト入力要素を D3.js で扱う例を示します。
-次の例では、ボタン (button) をクリックしたときに、その独自属性 (data-color) にセットされた値を取り出しています。 この仕組みを利用すれば、ボタンを押したときに SVG の表示内容を切り替えるといったことが可能です。
-Green Yellow Red ボタンを押してみて
-&amp;lt;div id=&amp;#34;buttonContainer&amp;#34;&amp;gt; &amp;lt;button data-color=&amp;#34;g&amp;#34;&amp;gt;Green&amp;lt;/button&amp;gt; &amp;lt;button data-color=&amp;#34;y&amp;#34;&amp;gt;Yellow&amp;lt;/button&amp;gt; &amp;lt;button data-color=&amp;#34;r&amp;#34;&amp;gt;Red&amp;lt;/button&amp;gt; &amp;lt;p id=&amp;#34;message&amp;#34;&amp;gt;ボタンを押してみて&amp;lt;/p&amp;gt; &amp;lt;/div&amp;gt; &amp;lt;script type=&amp;#34;module&amp;#34;&amp;gt; import * as d3 from &amp;#34;https://cdn.jsdelivr.net/npm/d3@7/+esm&amp;#34;; d3.selectAll(&amp;#34;#buttonContainer button&amp;#34;) .on(&amp;#34;click&amp;#34;, function() { const color = d3.select(this).attr(&amp;#34;data-color&amp;#34;) d3.select(&amp;#34;#message&amp;#34;).text(`選択したカラーコード = ${color}`) }) &amp;lt;/script&amp;gt; 上記の例では、click ハンドラーの中で、d3.select() を使って D3 セレクションオブジェクトを生成していますが、次のように従来の DOM API だけを使って記述することも可能です。
-.on(&amp;#34;click&amp;#34;, (event) =&amp;gt; { const color = event.target.dataset[&amp;#34;color&amp;#34;] // button の data-color の値を取得 document.</description></item><item><title>D3.js で各要素から任意のデータを取り出す (datum)</title><link>https://maku.blog/p/8m4drzr/</link><pubDate>Sun, 10 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8m4drzr/</guid><description>図: D3 セレクションのデータを参照する D3 セレクションオブジェクトの datum() メソッドを使うと、任意のデータ（オブジェクト）を紐づけて、後から自由に参照できるようになります。 例えば、任意の要素上でマウスイベントが発生した場合に、その要素のデータを参照するというのが典型的な使用方法です。 D3 セレクションオブジェクトに紐づけられたデータを参照するときは、datum() メソッドを引数なしで呼び出します。 D3.js で複数要素をまとめて追加する際には data() メソッドを使用しますが、それでセットしたデータも datum() メソッドで参照することができます。
-下記の例では、3 つの circle 要素のデータとして、name プロパティと color プロパティを持つ独自のオブジェクトを紐づけています。
-&amp;lt;svg id=&amp;#34;svg-vmhww5v&amp;#34; w=&amp;#34;200&amp;#34; h=&amp;#34;100&amp;#34; /&amp;gt; &amp;lt;script&amp;gt; const svg = d3.select(&amp;#34;#svg-vmhww5v&amp;#34;); // 3 つの circle 要素に紐づけるデータ const data = [ { name: &amp;#34;circle-1&amp;#34;, color: &amp;#34;cyan&amp;#34; }, { name: &amp;#34;circle-2&amp;#34;, color: &amp;#34;yellow&amp;#34; }, { name: &amp;#34;circle-3&amp;#34;, color: &amp;#34;magenta&amp;#34; }, ]; // 情報表示用の text 要素 const text = svg.</description></item><item><title>D3.js でマウスイベントを扱う (click, mousemove, mouseover, mouseout)</title><link>https://maku.blog/p/ffz4v3w/</link><pubDate>Sat, 09 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ffz4v3w/</guid><description>D3.js でマウスイベントを扱うコードのサンプルです。
-click イベント 図: click イベントをハンドルする D3.js でマウスのクリックイベントをハンドルするには、D3 Selection オブジェクトに click イベントハンドラを追加します。 上記の svg 要素内でクリックすると、その座標にピンク色の円が表示されます。
-&amp;lt;svg id=&amp;#34;svg-vwuifrt&amp;#34; width=&amp;#34;200&amp;#34; height=&amp;#34;100&amp;#34; /&amp;gt; &amp;lt;script&amp;gt; const svg = d3.select(&amp;#34;#svg-vwuifrt&amp;#34;); // D3 Selection オブジェクトを取得 svg.on(&amp;#34;click&amp;#34;, (event) =&amp;gt; { const [x, y] = d3.pointer(event) svg.append(&amp;#34;circle&amp;#34;) .attr(&amp;#34;cx&amp;#34;, x) .attr(&amp;#34;cy&amp;#34;, y) .attr(&amp;#34;r&amp;#34;, 10) .attr(&amp;#34;fill&amp;#34;, &amp;#34;deeppink&amp;#34;) .style(&amp;#34;fill-opacity&amp;#34;, 0.5) }) &amp;lt;/script&amp;gt; event.clientX や event.clientY でマウスカーソルの座標値を取得してしまうと、ブラウザのクライアント領域全体の座標値になってしまうので、d3.point() で svg 要素内の座標値に変換するところがポイントです。
-mousemove イベント 図: mousemove イベントをハンドルする D3.js でマウスカーソルを動かしたときのイベントをハンドルするには、D3 Selection オブジェクトに mousemove イベントハンドラを追加します。 上記の svg 要素内でマウスカーソルを動かすと、現在の座標値を表示します。</description></item><item><title>D3.js チートシート</title><link>https://maku.blog/p/456eght/</link><pubDate>Fri, 08 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/456eght/</guid><description>D3 セレクションオブジェクトの取得 コード 説明 d3.select(&amp;quot;#foo&amp;quot;) 先頭要素のセレクションオブジェクトを取得 d3.selectAll(&amp;quot;rect&amp;quot;) すべての要素のセレクションオブジェクトを取得 d3.selectAll(&amp;quot;#foo rect) 入れ子構造でのクエリも可能 selection.select(&amp;quot;#foo&amp;quot;) セレクション以下から先頭要素のセレクションオブジェクトを取得 selection.select(&amp;quot;rect&amp;quot;) セレクション以下からすべての要素のセレクションオブジェクトを取得 selection.node()/nodes() セレクションから DOM 要素を取り出す 属性・クラス・CSS スタイルの設定 コード 説明 selection.attr(&amp;quot;cx&amp;quot;) 属性値の取得 selection.attr(&amp;quot;cx&amp;quot;, 10) 属性値の設定 selection.classed(&amp;quot;foo&amp;quot;) CSS クラスが付加されているか (true/false) の取得 selection.classed(&amp;quot;foo&amp;quot;, true) CSS クラスを付加する selection.classed(&amp;quot;foo bar&amp;quot;, true) CSS クラスを付加する（複数） selection.classed(&amp;quot;foo&amp;quot;, false) CSS クラスを取り除く selection.style(&amp;quot;color&amp;quot;) CSS スタイルのプロパティ値を取得 selection.style(&amp;quot;color&amp;quot;, &amp;quot;red&amp;quot;) CSS スタイルのプロパティ値を設定 selection.style({width:&amp;quot;100px&amp;quot;, height:&amp;quot;50px&amp;quot;}) オブジェクトでまとめて設定 selection.property(&amp;quot;checked&amp;quot;); チェックボックスの ON/OFF 状態を取得 (true/false) selection.property(&amp;quot;checked&amp;quot;, true); チェックボックスを ON にする selection.property(&amp;quot;checked&amp;quot;, false); チェックボックスを OFF にする 複数要素のセレクション要素に対して属性やクラス、スタイル設定を行うときは、第 2 引数で値の代わりにコールバック関数を指定することで、各要素に紐づけられたデータ (datum) に基づいた値を設定できます。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>D3.js 関連記事 on まくろぐ</title><link>https://maku.blog/p/j3fmwym/</link><description>Recent content in D3.js 関連記事 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 14 Jan 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/j3fmwym/index.xml" rel="self" type="application/rss+xml"/><item><title>D3.js による SVG 描画の基本</title><link>https://maku.blog/p/v38nmhw/</link><pubDate>Tue, 08 Aug 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/v38nmhw/</guid><description>&lt;p>&lt;a href="https://d3js.org/">D3.js&lt;/a> は、クライアントサイド JavaScript で SVG 描画を行うためのライブラリです。
+素の JavaScript（バニラ JavaScript) だけでも &lt;code>svg&lt;/code> 要素を動的に構築していくことはできますが、D3.js を使うことでよりシンプルな API を使って描画処理を記述することができます。
+ここでは、D3.js で基礎的な SVG 描画を行う方法を紹介します。&lt;/p>
+&lt;h2 id="矩形を-1-つ追加する">矩形を 1 つ追加する&lt;/h2>
+&lt;p>D3.js で矩形を描画するには、&lt;strong>&lt;code>d3.select()&lt;/code>&lt;/strong> で svg 要素を選択し（D3 セレクションオブジェクトを取得）、そこに &lt;strong>&lt;code>append()&lt;/code>&lt;/strong> メソッドで &lt;code>rect&lt;/code> 要素を追加します。
+そして、メソッドチェーンさせる形で &lt;strong>&lt;code>attr()&lt;/code>&lt;/strong> を呼び出し、&lt;code>rect&lt;/code> の属性（サイズや色）を設定していきます。&lt;/p>
+&lt;p>次の例では、svg 要素に緑色の矩形を 1 つ追加しています。
+&lt;code>rect&lt;/code> 要素の塗り潰し色は &lt;code>fill&lt;/code> 属性で指定することに注意してください（CSS の "background" プロパティとは名前が異なります）。&lt;/p>
+
+
+&lt;figure style="text-align: center;">
+ &lt;svg id="svg-wp3vzdr" width="200" height="100" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: 矩形の表示&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+d3.select("#svg-wp3vzdr")
+ .append("rect") // svg 内に rect 要素を追加
+ .attr("x", 10) // rect 要素の属性値を設定
+ .attr("y", 10)
+ .attr("width", 100)
+ .attr("height", 50)
+ .attr("fill", "green")
+
+});
+&lt;/script>
+
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;svg-wp3vzdr&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;200&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;100&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#svg-wp3vzdr&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// svg 要素を選択
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="nx">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;rect&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// svg 内に rect 要素を追加
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;x&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// rect 要素の属性値を設定
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;y&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;width&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">100&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;height&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">50&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fill&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;green&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>これは実質、次のような &lt;code>svg&lt;/code> 要素を構成していることになります。&lt;/p></description></item><item><title>D3.js のデータ結合を理解する (1) data/enter/exit/join の基本</title><link>https://maku.blog/p/bp2btie/</link><pubDate>Sun, 01 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bp2btie/</guid><description>&lt;h2 id="d3js-の宣言的なアプローチ">D3.js の宣言的なアプローチ&lt;/h2>
+&lt;p>D3.js を使ったビジュアライゼーションでは、配列データを描画要素と対応付ける（データ結合する）とき、次のようにメソッドをチェーンさせる記述方法がよく出てきます (&lt;strong>&lt;code>selectAll()&lt;/code> → &lt;code>data()&lt;/code> → &lt;code>enter()&lt;/code> → &lt;code>append()&lt;/code>&lt;/strong>)。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">D3.js コードのよくある書き方&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">selectAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">enter&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">_d&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">35&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">25&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cy&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">25&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;r&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">);&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>最初はとっつきにくいかもしれませんが、この記述方法は、D3.js が &lt;strong>宣言的プログラミング (Declarative Programming)&lt;/strong> のアプローチを採用した結果であり、これがあるからこそ D3.js のコードはシンプルに記述できるようになっています。&lt;/p>
+&lt;p>「宣言的」という言葉は、&lt;strong>「データが最終的にどのように表現されるべきか」&lt;/strong> をコードで表現するアプローチを指します。
+その表現に到達するための詳細な処理手順をコーディングする必要がなくなるため、コードが読みやすく、不具合が発生しにくくなります。&lt;/p>
+&lt;p>D3.js によるデータ結合処理は、一般的に次のような流れで実装します。&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>selectAll()&lt;/code> メソッドで、データの結合先にする描画要素群のセレクションオブジェクトを作成する。この段階では、描画要素は存在しなくてもよい（初回の呼び出し時には描画要素数は 0）。&lt;/li>
+&lt;li>&lt;code>data()&lt;/code> メソッドで、データ配列を上記の描画要素群にマッピングする。&lt;/li>
+&lt;li>3 種類のセレクション (enter/exit/update) に対する処理を定義する。&lt;/li>
+&lt;/ol>
+&lt;p>次に、3 種類のセレクションについて説明します。&lt;/p>
+&lt;h2 id="データ結合時の-3-つのセレクション">データ結合時の 3 つのセレクション&lt;/h2>
+&lt;p>D3.js のデータ結合では、次のような 3 種類のセレクションに分けて描画内容を定義します。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>セレクション&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;strong>enter&lt;/strong> セレクション&lt;/td>
+ &lt;td>「データ数 ＞ 描画要素数」のときに、新しい描画要素を追加する処理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>exit&lt;/strong> セレクション&lt;/td>
+ &lt;td>「データ数 ＜ 描画要素数」のときに、不要な描画要素を削除する処理&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>update&lt;/strong> セレクション&lt;/td>
+ &lt;td>データが更新されたときに、既存の描画要素の表示を更新する処理&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h3 id="enter-セクション">enter セクション&lt;/h3>
+
+
+&lt;figure style="text-align: center;">
+ &lt;svg id="svg-okmyid7" width="220" height="70" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: enter セレクションのイメージ&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+const dataBefore = [1, 2];
+const dataAfter = [1, 2, 3, 4, 5];
+const svg = d3.select("#svg-okmyid7");
+const dataGroup = svg.append("g");
+const elemGroup = svg.append("g");
+
+svg.append("text").attr("x", 10).attr("y", 25).attr("fill", "steelblue").text("Data");
+svg.append("text").attr("x", 10).attr("y", 55).attr("fill", "crimson").text("Elements");
+
+const dataCircles = dataGroup.selectAll("circle")
+ .data(dataAfter)
+ .join("circle")
+ .attr("fill", "steelblue")
+ .attr("cx", (_d, i) => i * 25 + 100)
+ .attr("cy", 20)
+ .attr("r", 10);
+
+function updateElem(data) {
+ elemGroup.selectAll("circle")
+ .data(data)
+ .join("circle")
+ .attr("fill", "crimson")
+ .attr("cx", (_d, i) => i * 25 + 100)
+ .attr("cy", 50)
+ .attr("r", 0)
+ .transition()
+ .delay((_d, i) => { if (i &lt;= dataBefore.length - 1) return 0; else return 300 * (i); })
+ .duration((_d, i) => { if (i &lt;= dataBefore.length - 1) return 0; else return 300; })
+ .attr("r", 10);
+}
+
+const startAnim = () => {
+ updateElem(dataBefore);
+ updateElem(dataAfter);
+ setTimeout(startAnim, 3000); // 繰り返し
+}
+
+startAnim();
+
+});
+&lt;/script>
+
+&lt;p>enter セレクションは、データ数の方が既存の描画要素数よりも多いときに、追加すべき要素を参照するためのセレクションです。
+要は、enter セレクションに対して、&lt;strong>新しい描画要素を追加する処理&lt;/strong> を定義すれば OK です。
+enter セレクションを取得するには、&lt;code>data()&lt;/code> メソッドの戻り値のセレクションオブジェクトに対して、&lt;strong>&lt;code>enter()&lt;/code>&lt;/strong> メソッドを呼び出します。&lt;/p></description></item><item><title>D3.js のデータ結合を理解する (2) データ配列の要素ごとに表示／非表示を切り替える</title><link>https://maku.blog/p/nxe97gx/</link><pubDate>Mon, 09 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nxe97gx/</guid><description>&lt;p>この記事は、D3.js のデータ結合まわりのメソッド (&lt;code>data&lt;/code>/&lt;code>enter&lt;/code>/&lt;code>exit&lt;/code>/&lt;code>join&lt;/code>) の基本を理解していることを前提としています。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/bp2btie/">D3.js のデータ結合を理解する (1) data/enter/exit/join の基本&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>D3.js でデータ配列の内容をプロットするとき、各要素の値を元にその要素を表示するか表示しないかを制御したいことがあります。
+このようなケースでは、D3.js の仕組みで処理しようと考えがちですが、単純にデータ配列の要素をフィルタしてから、&lt;code>selection.data()&lt;/code> でデータ結合してやれば OK です。&lt;/p>
+&lt;p>次の例では、データ配列 (&lt;code>data&lt;/code>) の &lt;code>enabled&lt;/code> プロパティを見て、描画要素の表示／非表示を制御しています。
+とはいっても、データ配列の要素を &lt;code>filter()&lt;/code> メソッドで先にフィルタしているだけです。&lt;/p>
+
+
+&lt;figure style="text-align: center;">
+ &lt;svg id="svg-6y3q" width="120" height="40" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: 表示の on/off 制御&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+const data = [
+ { pos: 1, color: "#f00", enabled: true },
+ { pos: 2, color: "#0f0", enabled: false },
+ { pos: 3, color: "#00f", enabled: true },
+]
+
+// 先にデータ配列をフィルタしておく
+const filteredData = data.filter((d) => d.enabled)
+
+d3.select("#svg-6y3q")
+ .selectAll("circle")
+ .data(filteredData, (d) => d.pos)
+ .join("circle")
+ .attr("cx", (d) => d.pos * 30)
+ .attr("cy", 20)
+ .attr("r", 10)
+ .attr("fill", (d) => d.color)
+
+});
+&lt;/script>
+
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">pos&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">color&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;#f00&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">enabled&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">pos&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">color&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;#0f0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">enabled&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">false&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">pos&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">color&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;#00f&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">enabled&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="c1">// 先にデータ配列をフィルタしておく
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">filteredData&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">filter&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">enabled&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#svg-6y3q&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">selectAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">filteredData&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">pos&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">pos&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">30&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cy&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;r&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fill&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">color&lt;/span>&lt;span class="p">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次の例では、この方法がうまく動作することを示すために、1 秒ごとにデータ配列の &lt;code>enable&lt;/code> フラグをランダムに入れ替えています。
+&lt;code>enabled=true&lt;/code> になったデータはアニメーションしながら表示され、&lt;code>enabled=false&lt;/code> になったデータはアニメーションしながら非表示になります。&lt;/p></description></item><item><title>D3.js で円グラフを描画する (d3.pie)</title><link>https://maku.blog/p/v3g55wz/</link><pubDate>Thu, 30 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/v3g55wz/</guid><description>&lt;p>D3.js を使って円グラフを描画するには、&lt;code>d3.pie()&lt;/code> と &lt;code>d3.arc()&lt;/code> を組み合わせて使用します。&lt;/p>
+&lt;h2 id="d3pie-関数で扇形の角度を計算する">d3.pie() 関数で扇形の角度を計算する&lt;/h2>
+&lt;p>D3.js の &lt;strong>&lt;code>d3.pie()&lt;/code>&lt;/strong> 関数を使うと、円グラフ (pie chart) やドーナツチャート (donut chart) を描画するための &lt;strong>角度を計算する関数オブジェクトを生成&lt;/strong> できます。
+生成した関数にデータ配列を渡すと、各データに対応する扇形部分の開始角度 (&lt;code>startAngle&lt;/code>) と終了角度 (&lt;code>endAngle&lt;/code>) を計算してくれます。
+角度はラジアンで表現されるので、180° は 3.1415 になります。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="c1">// 任意のデータ配列
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">pie&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">pie&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="c1">// pie 関数の生成
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">arcs&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">pie&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// データ配列に角度情報を付加する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">args&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;data&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;index&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;startAngle&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;endAngle&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">3.141592653589793&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;padAngle&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;data&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;index&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;startAngle&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">3.141592653589793&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;endAngle&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">5.026548245743669&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;padAngle&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;data&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;index&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;startAngle&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">5.026548245743669&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;endAngle&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">6.283185307179586&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;padAngle&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>任意のデータ配列を &lt;code>pie()&lt;/code> 関数に渡すと、上記のように &lt;code>startAngle&lt;/code>、&lt;code>endAngle&lt;/code> といった角度情報付きデータ配列を返してくれます。
+元のデータ配列の各要素は &lt;code>data&lt;/code> プロパティに格納されているので、これ以降は元のデータ配列の代わりにこの角度情報付きのデータ配列だけを使えばよいことになります（例えば、D3.js のコンポーネントの &lt;code>data()&lt;/code> メソッドにはこの配列を渡せばよい）。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ TypeScript を使う場合&lt;/span>
+ &lt;span class="xNote_body">&lt;p>TypeScript を使って、&lt;code>pie()&lt;/code> 関数に渡すデータ配列の型を指定するには次のようにします。
+配列型ではなく、個々の要素の型を指定することに注意してください。
+単一のデータであることを強調するために、data の単数系である datum という単語を使っています。&lt;/p></description></item><item><title>D3.js のコードに TypeScript の型注釈 (Type Annotation) をつける</title><link>https://maku.blog/p/jrqnujw/</link><pubDate>Sun, 05 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/jrqnujw/</guid><description>&lt;p>D3.js アプリを TypeScript で実装する場合、その型情報の扱いが若干難しいのでメモしておきます。&lt;/p>
+&lt;h2 id="d3js-の型情報のインストール">D3.js の型情報のインストール&lt;/h2>
+&lt;p>D3.js の npm パッケージ &lt;code>d3&lt;/code> は TypeScript の型情報を含んでいないので、TypeScript コードで D3.js を使用するときは、別途 DefinitelyTyped が提供している &lt;strong>&lt;code>@types/d3&lt;/code>&lt;/strong> パッケージをインストールしておく必要があります。
+以下のコマンドを使用してインストールします。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install d3 &lt;span class="c1"># D3.js 本体&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install --save-dev @types/d3 &lt;span class="c1"># D3.js 用の型情報&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="d3-セレクションオブジェクトの型注釈">D3 セレクションオブジェクトの型注釈&lt;/h2>
+&lt;p>TypeScript で D3.js を使ったアプリを開発していると、最初につまずくのは &lt;code>select()&lt;/code> や &lt;code>selectAll()&lt;/code> メソッドで取得する D3 セレクションオブジェクトの型注釈だと思います。
+この型情報は &lt;strong>&lt;code>d3.Selection&lt;/code>&lt;/strong> というインターフェースとして以下のように定義されています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">d3.Selection 型の定義（抜粋）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * A D3 Selection of elements.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> *
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * The first generic &amp;#34;GElement&amp;#34; refers to the type of the selected element(s).
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * The second generic &amp;#34;Datum&amp;#34; refers to the type of the datum of a selected element(s).
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * The third generic &amp;#34;PElement&amp;#34; refers to the type of the parent element(s) in the D3 selection.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * The fourth generic &amp;#34;PDatum&amp;#34; refers to the type of the datum of the parent element(s).
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">interface&lt;/span> &lt;span class="nx">Selection&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">GElement&lt;/span> &lt;span class="kr">extends&lt;/span> &lt;span class="nx">BaseType&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Datum&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">PElement&lt;/span> &lt;span class="kr">extends&lt;/span> &lt;span class="nx">BaseType&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">PDatum&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この型パラメーターは、選択した要素の型とデータの型、親要素の型とデータの型を表します。
+データというのは、&lt;code>data()&lt;/code>/&lt;code>datum()&lt;/code> メソッドで結びつけるオブジェクトのことを示しています。&lt;/p></description></item><item><title>D3.js でレイヤー用の g 要素を作成するユーティリティ関数 (layer)</title><link>https://maku.blog/p/298nhnq/</link><pubDate>Fri, 03 Nov 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/298nhnq/</guid><description>&lt;h2 id="便利な-layer-関数を実装する">便利な layer 関数を実装する&lt;/h2>
+&lt;p>SVG の &lt;code>g&lt;/code> 要素は、描画要素の表示順序を制御するためのレイヤーとして使われることがあります（参考: &lt;a href="../../p/rx9hdei/">SVG の g 要素の使い方&lt;/a>）。
+D3.js でレイヤー構造を作るのは簡単で、次のように任意のセレクションオブジェクトの &lt;code>append()&lt;/code> メソッドで &lt;code>g&lt;/code> 要素を追加するだけです。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">draw&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">svg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#mysvg&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">layer1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;g&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// 奥に表示するレイヤー
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">layer2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;g&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// 手前に表示するレイヤー
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// layer1 への描画
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">layer1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">selectAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nb">Math&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">random&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">170&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">15&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cy&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nb">Math&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">random&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">40&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">15&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;r&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fill&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;#00f9&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// layer2 への描画（省略）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意しなければいけないのは、上記のように直接 &lt;code>append()&lt;/code> メソッドを呼び出す場合は、このコードが 1 度だけ実行されるようにしておくことです。
+&lt;a href="../../p/bp2btie/">D3.js の &lt;code>data&lt;/code> メソッドによるデータ結合の仕組み&lt;/a> を使っていると、データ配列に変更があったときに、&lt;code>enter()&lt;/code> や &lt;code>append()&lt;/code> を組み合わせたコードを繰り返し呼び出すことになります。
+このとき、上記のように単純に &lt;code>append()&lt;/code> している部分まで呼び出してしまうと、&lt;code>g&lt;/code> 要素がどんどん増えていってしまいます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">draw&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">));&lt;/span> &lt;span class="c1">// 1 度目の描画でレイヤー用の g 要素を作成する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">draw&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">));&lt;/span> &lt;span class="c1">// データ変更後の再描画で余計な g 要素が作成されてしまう
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>次のユーティリティ関数 &lt;strong>&lt;code>layer()&lt;/code>&lt;/strong> は、このようなミスを防ぐために、レイヤー用の &lt;code>g&lt;/code> 要素がまだ追加されていない場合のみ &lt;code>append()&lt;/code> を実行するようにしています。&lt;/p></description></item><item><title>D3.js で SVG の右上に凡例 (legend) を表示する</title><link>https://maku.blog/p/ykjrz2b/</link><pubDate>Wed, 18 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ykjrz2b/</guid><description>&lt;p>D3.js を使用してデータを色分けしてプロットする場合、グラフの右上などに凡例（色の意味）を表示したくなります。
+ここでは、色を管理するために &lt;strong>&lt;code>d3.scaleOrdinal()&lt;/code>&lt;/strong> を使用していると仮定し、凡例を表示する方法を説明します。
+&lt;code>d3.scaleOrdinal()&lt;/code> 関数についての詳細は、以下の記事をご参照ください。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/73b94gi/">D3.js のスケール関数: scaleOrdinal でカテゴリデータを別の値にマッピングする&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="カラースケールから凡例に並べる項目を取り出す">カラースケールから凡例に並べる項目を取り出す&lt;/h2>
+&lt;p>&lt;code>d3.scaleOrdinal()&lt;/code> 関数で作成したスケール関数（下記例では &lt;code>color&lt;/code>）に何らかのデータを引数で渡すと、そのデータに対応する色情報を返してくれます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">as&lt;/span> &lt;span class="nx">d3&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;d3&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// D3.js 組み込みのカラースケール
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">color&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">scaleOrdinal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">schemeCategory10&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">c1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">color&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;A&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//=&amp;gt; &amp;#39;#1f77b4&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">c2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">color&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;B&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//=&amp;gt; &amp;#39;#ff7f0e&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">c3&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">color&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;C&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//=&amp;gt; &amp;#39;#2ca02c&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">c4&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">color&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;A&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//=&amp;gt; &amp;#39;#1f77b4&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">c5&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">color&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;B&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//=&amp;gt; &amp;#39;#ff7f0e&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>上記の例の場合、&lt;code>A&lt;/code>、&lt;code>B&lt;/code>、&lt;code>C&lt;/code> という 3 種類のデータに対して、3 種類の色が割り当てられています。
+このとき、カラースケール (&lt;code>color&lt;/code>) の内部では、これまで入力された &lt;code>A&lt;/code>、&lt;code>B&lt;/code>、&lt;code>C&lt;/code> というキー情報が管理されており、&lt;strong>&lt;code>domain()&lt;/code>&lt;/strong> メソッドを引数なしで呼び出すことで取り出すことができます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">color&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">domain&lt;/span>&lt;span class="p">());&lt;/span> &lt;span class="c1">//=&amp;gt; [&amp;#39;A&amp;#39;, &amp;#39;B&amp;#39;, &amp;#39;C&amp;#39;]
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>つまり、この配列データを凡例の項目として表示すればよいことになります。&lt;/p>
+&lt;h2 id="実装例">実装例&lt;/h2>
+
+
+&lt;figure style="text-align: center;">
+ &lt;svg id="svg-u25y" width="280" height="90" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: scaleOrdinal を使った凡例描画&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+/* 右上に凡例を描画する */
+function drawLegend(selection, colorScaler) {
+ const legendLayer = selection.append('g')
+ .style('transform', 'translate(calc(100% - 35px), 5px)') // 凡例全体を右上に表示
+ .attr('opacity', 0.8); // ちょっと透過させてみる
+
+ colorScaler.domain().forEach((val, i) => {
+ legendLayer.append('rect')
+ .attr('x', 0)
+ .attr('y', i * 14)
+ .attr('width', 15)
+ .attr('height', 10)
+ .attr('fill', colorScaler(val));
+ legendLayer.append('text')
+ .attr('x', 18)
+ .attr('y', i * 14)
+ .attr('font-size', 10)
+ .attr('dominant-baseline', 'hanging') // テキストを上寄せ
+ .attr('fill', colorScaler(val))
+ .text(val);
+ });
+}
+
+// 適当なデータを用意（同じキーのデータには同じ色が付く想定）
+const data = Array.from({ length: 10 }, () => ['A', 'B', 'C']).flat();
+
+// 組み込みのカラースケールを使用
+const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+const svg = d3.select('#svg-u25y');
+svg.selectAll('circle')
+ .data(data)
+ .join('circle')
+ .attr('cx', () => Math.random() * 200 + 15)
+ .attr('cy', () => Math.random() * 70 + 10)
+ .attr('r', (_d, i) => (i % 4) + 3)
+ .attr('fill', (d) => color(d))
+ .attr('opacity', 0.7);
+
+drawLegend(svg, color);
+
+});
+&lt;/script>
+
+&lt;p>下記の関数は、与えられた D3.js セレクションに対して、凡例を描画するための描画要素を追加します。
+ポイントは、カラースケールの &lt;code>domain()&lt;/code> メソッドを使って、凡例に表示すべき項目のリストを取り出しているところです。
+凡例自体の色指定にもカラースケールを利用しています。&lt;/p></description></item><item><title>D3.js の call メソッドを使ってメソッドチェーン処理をスマートに記述する</title><link>https://maku.blog/p/994xjma/</link><pubDate>Sun, 08 Oct 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/994xjma/</guid><description>&lt;h2 id="call-メソッドの基本">call メソッドの基本&lt;/h2>
+&lt;p>D3 セレクションオブジェクトの &lt;strong>&lt;code>call()&lt;/code>&lt;/strong> メソッドを使うと、任意の関数に自身のセレクションオブジェクト (&lt;code>this&lt;/code>) を渡す形で呼び出すことができます。
+下記コードの (A) と (B) は同じ振る舞いになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">setMessage&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">selection&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">selection&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Hello&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// (A) 普通の関数呼びだし
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="c1">// setMessage(d3.select(&amp;#39;#msg&amp;#39;));
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// (B) call による関数呼び出し
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;#msg&amp;#39;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">call&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">setMessage&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#39;msg&amp;#39;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>call()&lt;/code> メソッド呼び出し時の第 2 引数以降は、第 1 引数で指定した関数にパラメーターとして渡されます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">setMessage&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">selection&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">message&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">selection&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">message&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;#msg&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">call&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">setMessage&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;Hello&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="call-メソッドの使いどころ">call メソッドの使いどころ&lt;/h2>
+&lt;p>&lt;code>selection.call()&lt;/code> メソッドの戻り値は、呼び出し元のレシーバーである &lt;code>selection&lt;/code> オブジェクト自身 (&lt;code>this&lt;/code>) になります。
+これは、つまり、&lt;code>selection&lt;/code> オブジェクトに対するメソッドのチェーンを続けられるということです。&lt;/p>
+&lt;p>例えば、次のように、&lt;code>svg&lt;/code> 要素の D3 セレクションオブジェクトに対して複数の処理を行うコードを考えてみます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="mi">50&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">100&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">150&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">svg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;#mysvg&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// data 配列に基づいて circle 要素を追加
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">svg&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">selectAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;circle&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;circle&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;cx&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;cy&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;r&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;stroke&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;blue&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;fill&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;cyan&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// data 配列に基づいて rect 要素を追加
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">svg&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">selectAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;rect&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;rect&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;x&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">d&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;y&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">40&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;width&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;height&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;stroke&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;orange&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;fill&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;yellow&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>circle&lt;/code> 要素を追加する部分と、&lt;code>rect&lt;/code> 要素を追加する部分は、ひとまとまりの処理になっているので次のように関数化できそうです（TypeScript の型付きで記述しています）。&lt;/p></description></item><item><title>D3.js のスケール関数: scaleOrdinal でカテゴリデータを別の値にマッピングする</title><link>https://maku.blog/p/73b94gi/</link><pubDate>Sat, 30 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/73b94gi/</guid><description>&lt;h2 id="scaleordinal-の基本">scaleOrdinal の基本&lt;/h2>
+&lt;p>D3.js のスケールモジュール (&lt;code>d3-scale&lt;/code>) が提供する &lt;strong>&lt;code>scaleOrdinal()&lt;/code>&lt;/strong> 関数を使用すると、カテゴリデータを別の値にマッピングする関数を簡単に作成することができます。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ カテゴリデータと数量データ&lt;/span>
+ &lt;span class="xNote_body">&lt;p>&lt;strong>カテゴリデータ (categorical data)&lt;/strong> というのは、統計学やデータ分析において使用されるデータ型のひとつで、通常、カテゴリを示すラベルや文字列で表現されます。
+カテゴリデータは、定性データまたは質的データとも呼ばれます。
+例えば、血液型や都道府県などがカテゴリデータです。&lt;/p>
+&lt;p>一方、価格や身長のような &lt;strong>数量データ (quantitative data)&lt;/strong> は本来はカテゴリデータではありませんが、特定の範囲でグルーピングすることで、カテゴリ化することができます（価格(円) → 低価格／中価格／高価格）。
+カテゴリ化することを離散化 (discretization) やビン化 (binning) と呼ぶこともあります。&lt;/p>
+&lt;/span>
+&lt;/div>
+&lt;p>次の例では、&lt;code>AWS&lt;/code>/&lt;code>Azure&lt;/code>/&lt;code>GCP&lt;/code> という入力値を、&lt;code>#ff9900&lt;/code>/&lt;code>#0072c6&lt;/code>/&lt;code>#db4437&lt;/code> というカラーコードに変換するスケール関数を作成しています。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">colorScale&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">scaleOrdinal&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">domain&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s2">&amp;#34;AWS&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;Azure&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;GCP&amp;#34;&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="c1">// この入力が
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="nx">range&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s2">&amp;#34;#ff9900&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;#0072c6&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;#db4437&amp;#34;&lt;/span>&lt;span class="p">]);&lt;/span> &lt;span class="c1">// この出力にマッピングされる
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">colorScale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;AWS&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span> &lt;span class="c1">//=&amp;gt; &amp;#34;#ff9900&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">colorScale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;Azure&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span> &lt;span class="c1">//=&amp;gt; &amp;#34;#0072c6&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">colorScale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;GCP&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span> &lt;span class="c1">//=&amp;gt; &amp;#34;#db4437&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>上記の例では、入力値をカラーコードの文字列にマッピングしていますが、描画要素の座標値やサイズなど、任意の型の値にマッピングできます。
+次の例では、実際に 2 つのスケール関数を作成して、SVG の描画に使用しています。&lt;/p>
+
+
+&lt;figure style="text-align: center;">
+ &lt;svg id="svg-hfuouiw" width="200" height="80" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: scaleOrdinal による色のマッピング&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+const svg = d3.select("#svg-hfuouiw")
+
+const data = [
+ { brand: "aws", label: "Amazon Web Services" },
+ { brand: "azure", label: "Microsoft Azure" },
+ { brand: "gcp", lable: "Google Cloud Platform" },
+]
+
+const colorScale = d3.scaleOrdinal()
+ .domain(["aws", "azure", "gcp"])
+ .range(["#ff9900", "#0072c6", "#db4437"]);
+
+const xScale = d3.scaleOrdinal()
+ .domain(["aws", "azure", "gcp"])
+ .range([40, 100, 160]);
+
+svg.selectAll("circle")
+ .data(data)
+ .join("circle")
+ .attr("cx", (d) => xScale(d.brand))
+ .attr("cy", 40)
+ .attr("r", 20)
+ .attr("fill", (d) => colorScale(d.brand))
+
+});
+&lt;/script>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">上記の実装コード&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;svg-hfuouiw&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;200&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;80&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">svg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#svg-hfuouiw&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">brand&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;aws&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">label&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;Amazon Web Services&amp;#34;&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">brand&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;azure&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">label&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;Microsoft Azure&amp;#34;&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">brand&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;gcp&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">lable&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;Google Cloud Platform&amp;#34;&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">colorScale&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">scaleOrdinal&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">domain&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s2">&amp;#34;aws&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;azure&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;gcp&amp;#34;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">range&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s2">&amp;#34;#ff9900&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;#0072c6&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;#db4437&amp;#34;&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line hl">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">xScale&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">scaleOrdinal&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">domain&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s2">&amp;#34;aws&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;azure&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;gcp&amp;#34;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">range&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="mi">40&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">100&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">160&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">selectAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">xScale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">brand&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cy&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">40&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;r&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fill&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">colorScale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">brand&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="未知の値が入力されたとき">未知の値が入力されたとき&lt;/h2>
+&lt;p>スケール関数の入力値として、&lt;code>domain()&lt;/code> で指定されていない未知の値が渡された場合、&lt;code>range()&lt;/code> で設定した出力値が自動的にマッピングされていきます。
+次の例では、&lt;code>A&lt;/code>/&lt;code>B&lt;/code>/&lt;code>C&lt;/code>/&lt;code>D&lt;/code>/&lt;code>E&lt;/code> といった未知の入力値に対して、3 種類のカラー値を順番に割り当てています。
+同じ値が入力値として渡された場合、以前割り当てた値が返されることに注目してください。&lt;/p></description></item><item><title>D3.js で矢印を表示する (defs, marker, marker-end)</title><link>https://maku.blog/p/gtg33no/</link><pubDate>Fri, 29 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gtg33no/</guid><description>&lt;h2 id="marker-要素で矢印の形を定義する">marker 要素で矢印の形を定義する&lt;/h2>
+&lt;p>D3.js で &lt;code>line&lt;/code> 要素や &lt;code>path&lt;/code> 要素の先端に矢印を表示するには、&lt;strong>&lt;code>marker&lt;/code>&lt;/strong> 要素で矢印形状を定義して、それを &lt;code>line&lt;/code> 要素などの &lt;strong>&lt;code>marker-end&lt;/code>&lt;/strong> 属性（あるいは &lt;strong>&lt;code>marker-start&lt;/code>&lt;/strong> 属性）にセットします。&lt;/p>
+&lt;p>次の例では、2 つの &lt;code>circle&lt;/code> 要素とそれらを結ぶ &lt;code>line&lt;/code> 要素を配置し、&lt;code>line&lt;/code> 要素の終端に矢印を表示しています。&lt;/p>
+
+
+&lt;figure style="text-align: center;">
+ &lt;svg id="svg-h2cqngx" width="120" height="70" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: 矢印の表示&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+// 始点と終点の座標
+const p1 = { x: 20, y: 50 }
+const p2 = { x: 100, y: 20 }
+const MARKER_ID = "marker-1"
+
+// マーカー (marker) を定義する
+function createMarker(selection) {
+ selection.append("defs")
+ .append("marker")
+ .attr("id", MARKER_ID)
+ .attr("viewBox", "0 0 2 2")
+ .attr("refX", 3) // 始点、終点の丸記号と重ならないように調整
+ .attr("refY", 1)
+ .attr("markerWidth", 10)
+ .attr("markerHeight", 10)
+ .attr("orient", "auto")
+ .append("path")
+ .attr("d", "M0,0 L2,1 0,2 1,1 Z")
+ .attr("fill", "blue")
+}
+
+// 線 (line) を描画する
+function drawLine(selection, x1, y1, x2, y2) {
+ selection.append("line")
+ .attr("x1", x1)
+ .attr("y1", y1)
+ .attr("x2", x2)
+ .attr("y2", y2)
+ .attr("stroke", "blue")
+ .attr("marker-end", `url(#${MARKER_ID})`) // マーカーを線に割り当てる
+}
+
+// 円 (circle) を描画する
+function drawCircle(selection, x, y) {
+ selection.append("circle")
+ .attr("cx", x)
+ .attr("cy", y)
+ .attr("r", 5)
+ .attr("fill", "orange")
+}
+
+// SVG の各描画要素を作成する
+d3.select("#svg-h2cqngx")
+ .call(createMarker)
+ .call(drawLine, p1.x, p1.y, p2.x, p2.y)
+ .call(drawCircle, p1.x, p1.y)
+ .call(drawCircle, p2.x, p2.y)
+
+});
+&lt;/script>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">上記 SVG を出力するためのコード&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;svg-h2cqngx&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;120&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;70&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 始点と終点の座標
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">p1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">x&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">y&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">50&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">p2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">x&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">100&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">y&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">20&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">MARKER_ID&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;MyMarker&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// マーカー (marker) を定義する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">function&lt;/span> &lt;span class="nx">createMarker&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">selection&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">selection&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;defs&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;marker&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">MARKER_ID&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;viewBox&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;0 0 2 2&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;refX&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// 始点、終点の丸記号と重ならないように調整
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;refY&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;markerWidth&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;markerHeight&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;orient&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;auto&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;path&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;d&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;M0,0 L2,1 0,2 1,1 Z&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fill&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;blue&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 線 (line) を描画する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">function&lt;/span> &lt;span class="nx">drawLine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">selection&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">x1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">y1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">x2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">y2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">selection&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;line&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;x1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">x1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;y1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">y1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;x2&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">x2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;y2&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">y2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;stroke&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;blue&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;marker-end&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="sb">`url(#&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">MARKER_ID&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">)`&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// マーカーを線に割り当てる
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 円 (circle) を描画する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">function&lt;/span> &lt;span class="nx">drawCircle&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">selection&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">x&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">y&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">selection&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">x&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cy&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">y&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;r&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fill&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;orange&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// SVG の各描画要素を作成する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#svg-h2cqngx&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">call&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">createMarker&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">call&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">drawLine&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">p1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">x&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">p1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">y&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">p2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">x&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">p2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">y&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">call&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">drawCircle&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">p1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">x&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">p1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">y&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">call&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">drawCircle&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">p2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">x&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">p2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">y&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この仕組みは、D3.js というよりは SVG の仕組みなので、矢印形状の詳しい定義方法は下記記事を参考にしてください。&lt;/p></description></item><item><title>D3.js で描画要素をクリックしたときに選択状態にする</title><link>https://maku.blog/p/6sijufz/</link><pubDate>Mon, 25 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6sijufz/</guid><description>&lt;style>
+ circle {
+ cursor: pointer;
+ }
+ .selected-qpi7j9n {
+ fill: cyan;
+ stroke: red;
+ stroke-width: 5;
+ cursor: default;
+ }
+&lt;/style>
+&lt;h2 id="svg-描画要素の選択状態を表現する">SVG 描画要素の選択状態を表現する&lt;/h2>
+&lt;p>D3.js で描画した要素（&lt;code>rect&lt;/code> や &lt;code>circle&lt;/code> など）をマウスクリックで選択できるようにすると、いろいろな操作を実現できます。&lt;/p>
+&lt;ul>
+&lt;li>選択された要素に紐づけられたデータ (datum) を、別の場所に詳細情報として表示する&lt;/li>
+&lt;li>選択された要素に対して、一連の操作を行う&lt;/li>
+&lt;/ul>
+&lt;p>問題は、どのように要素の選択状態を表現するかですが、ここでは、要素をクリックしたときに、CSS のクラス &lt;code>selected&lt;/code> を動的に付加することで選択状態を表現してみます。&lt;/p>
+&lt;p>次の例では、並んでいる丸をクリックすると見た目が変化します（選択状態を表現しています）。
+逆に、別の丸の見た目はリセットされます。&lt;/p>
+
+
+&lt;figure style="text-align: center;">
+ &lt;svg id="svg-uh6jd9p" width="200" height="50" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: 丸をクリックして選択状態にする&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+const svg = d3.select("#svg-uh6jd9p")
+const data = [{}, {}, {}]
+
+// データ数だけ circle 要素を追加
+const circles = svg.selectAll("circle")
+ .data(data)
+ .join("circle")
+ .attr("cx", (_d, i) => i * 50 + 50)
+ .attr("cy", 25)
+ .attr("r", 15)
+ .attr("fill", "dodgerblue")
+
+circles.on("click", (event) => {
+ // 先にすべての circle 要素の selected クラスをクリアしておく
+ circles.classed("selected-qpi7j9n", false)
+
+ // 今回クリックされた circle 要素に selected クラスをセットする
+ d3.select(event.currentTarget)
+ .classed("selected-qpi7j9n", true)
+})
+
+});
+&lt;/script>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実装コード&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">circle&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">cursor&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">pointer&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c">/* 選択された要素に付加するクラス */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nc">selected&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fill&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">cyan&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">stroke&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">red&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">stroke-width&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">cursor&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">default&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;svg-uh6jd9p&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;200&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;50&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">svg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#svg-uh6jd9p&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[{},&lt;/span> &lt;span class="p">{},&lt;/span> &lt;span class="p">{}]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// データ数だけ circle 要素を追加
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">circles&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">selectAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">_d&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">50&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">50&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cy&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">25&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;r&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">15&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fill&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;dodgerblue&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">circles&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;click&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 先にすべての circle 要素の selected クラスをクリアしておく
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">circles&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">classed&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;selected&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 今回クリックされた circle 要素に selected クラスをセットする
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">currentTarget&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">classed&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;selected&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>click&lt;/code> イベントハンドラーの中では、D3 セレクションオブジェクトの &lt;strong>&lt;code>classed()&lt;/code>&lt;/strong> メソッドを使って CSS クラス (&lt;code>selected&lt;/code>) の on/off を切り替えています。
+このメソッドを使うと、特定の CSS クラスのみを on/off できるので便利です。&lt;/p></description></item><item><title>D3.js で描画内容をズームやパン操作できるようにする (d3-zoom)</title><link>https://maku.blog/p/w2xmuae/</link><pubDate>Fri, 22 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/w2xmuae/</guid><description>&lt;h2 id="d3-zoom-とは">d3-zoom とは&lt;/h2>
+&lt;p>D3.js に組み込まれている &lt;code>d3-zoom&lt;/code> モジュールは、下記のようなユーザー操作をハンドルためのモジュールです。&lt;/p>
+&lt;ul>
+&lt;li>マウスホイールによるズーム操作&lt;/li>
+&lt;li>マウスドラッグによるパン操作&lt;/li>
+&lt;li>タッチパネルのピンチイン、ピンチアウトによるズーム操作&lt;/li>
+&lt;li>タッチパネルのスワイプによるパン操作&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>d3-zoom&lt;/code> によるイベントハンドリング処理は描画処理とは独立しているので、SVG や Canvas、スケール (&lt;code>d3-scale&lt;/code>)、軸 (&lt;code>d3-axis&lt;/code>) などと自在に組み合わせて使うことができます。&lt;/p>
+&lt;h2 id="d3-zoom-の簡単な使用例">d3-zoom の簡単な使用例&lt;/h2>
+&lt;h3 id="実装例">実装例&lt;/h3>
+&lt;p>下記の &lt;code>svg&lt;/code> 画像の中で、ドラッグやホイール操作を行うと、矩形のズームや移動を行うことができます。&lt;/p>
+
+
+&lt;figure style="text-align: center;">
+ &lt;svg id="svg-gh4oas2" width="200" height="100" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: d3-zoom によるズーム／パン操作&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+const svg = d3.select("#svg-gh4oas2")
+const topLayer = svg.append("g")
+
+topLayer
+ .append("rect")
+ .attr("x", 80)
+ .attr("y", 40)
+ .attr("width", 40)
+ .attr("height", 20)
+ .attr("fill", "green")
+
+svg.call(d3.zoom().on("zoom", zoomed))
+
+function zoomed(event) {
+ topLayer.attr("transform", event.transform);
+}
+
+});
+&lt;/script>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実装コード&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;svg-gh4oas2&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;200&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;100&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">svg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#svg-gh4oas2&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">topLayer&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;g&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// このレイヤーごと動かすことにする
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 矩形を 1 つ追加
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">topLayer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;rect&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;x&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">80&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;y&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">40&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;width&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">40&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;height&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fill&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;green&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">call&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">zoom&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;zoom&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">zoomed&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="c1">// zoom behavior を登録する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">zoomed&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// イベントが発生したらイベントオブジェクトの内容に従って transform するだけ
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">topLayer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;transform&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">transform&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="zoom-オブジェクトの作成">zoom オブジェクトの作成&lt;/h3>
+&lt;p>&lt;code>d3-zoom&lt;/code> は次のような手順で使用します。&lt;/p></description></item><item><title>D3.js による Force Simulation (3) 各ノードをドラッグして動かせるようにする</title><link>https://maku.blog/p/8dmb73t/</link><pubDate>Mon, 18 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8dmb73t/</guid><description>&lt;h2 id="d3-drag-モジュールとは">d3-drag モジュールとは&lt;/h2>
+&lt;p>D3.js は、マウスによるドラッグ操作や、タブレットなどでのタッチドラッグ操作を扱うための &lt;code>d3-drag&lt;/code> モジュールを提供しています（&lt;code>d3&lt;/code> モジュールに内包されています）。
+&lt;code>d3-drag&lt;/code> は Force Simulation (&lt;code>d3-force&lt;/code>) 用のモジュールではありませんが、よく &lt;code>d3-force&lt;/code> と組み合わせて使用されます。
+Force Simulation では、各ノードの座標値が &lt;code>tick&lt;/code> イベントと連動して刻々と変化するため、ドラッグ中はノードの座標値をマウスカーソル位置に固定するなどの処理が必要です。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/6kavdch/">Force Simulation (d3-force) の基本&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="d3-drag-の基本的な使い方">d3-drag の基本的な使い方&lt;/h2>
+&lt;p>次のサンプルでは、&lt;code>svg&lt;/code> 内の &lt;code>circle&lt;/code> 要素をドラッグして動かせるようにしています。&lt;/p>
+
+
+&lt;figure style="text-align: center;">
+ &lt;svg id="svg-p4vddjh" width="300" height="200" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: d3-drag によるノードのドラッグ&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+const svg = d3.select("#svg-p4vddjh")
+const width = +svg.attr("width")
+const height = +svg.attr("height")
+
+// ノード配列
+const nodesData = [{}, {}, {}, {}]
+
+// ノードを描画するための circle 要素を svg に追加しておく
+const circles = svg.selectAll("circle")
+ .data(nodesData)
+ .join("circle")
+ .attr("r", 30)
+ .attr("fill", "blue")
+ .call(d3.drag()
+ .on("start", dragStarted)
+ .on("drag", dragged)
+ .on("end", dragEnded)
+ )
+
+// Simulation オブジェクトの作成とフォース設定
+const simulation = d3.forceSimulation()
+ .force("center", d3.forceCenter(width / 2, height / 2))
+ .force("charge", d3.forceManyBody().strength(1000))
+ .force("collide", d3.forceCollide().radius(30))
+
+// ドラッグ開始時のイベント
+function dragStarted(event, d) {
+ if(!event.active) simulation.alphaTarget(0.3).restart();
+ d.fx = d.x;
+ d.fy = d.y;
+}
+
+// ドラッグ中のイベント
+function dragged(event, d) {
+ d.fx = event.x;
+ d.fy = event.y;
+}
+
+// ドラッグ終了時のイベント
+function dragEnded(event, d) {
+ if(!event.active) simulation.alphaTarget(0);
+ d.fx = null;
+ d.fy = null;
+}
+
+// Simulation オブジェクトにノード配列をセットして tick イベントをハンドル開始
+simulation.nodes(nodesData).on("tick", tickHandler)
+
+// tick 毎のレイアウト
+function tickHandler() {
+ circles
+ .attr("cx", (d) => d.x)
+ .attr("cy", (d) => d.y)
+}
+
+});
+&lt;/script>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ソースコード&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;svg-p4vddjh&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;300&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;200&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">svg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#svg-p4vddjh&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">width&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">+&lt;/span>&lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;width&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">height&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">+&lt;/span>&lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;height&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ノード配列
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">nodesData&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[{},&lt;/span> &lt;span class="p">{},&lt;/span> &lt;span class="p">{},&lt;/span> &lt;span class="p">{}]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ノードを描画するための circle 要素を svg に追加しておく
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">circles&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">selectAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">nodesData&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;r&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">30&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fill&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;blue&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">call&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">drag&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;start&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">dragStarted&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;drag&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">dragged&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;end&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">dragEnded&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Simulation オブジェクトの作成とフォース設定
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">simulation&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forceSimulation&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">force&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;center&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forceCenter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">width&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">height&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">force&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;charge&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forceManyBody&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="nx">strength&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1000&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">force&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;collide&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forceCollide&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="nx">radius&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">30&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ドラッグ開始時のイベント
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">function&lt;/span> &lt;span class="nx">dragStarted&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">active&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nx">simulation&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">alphaTarget&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mf">0.3&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">restart&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">fx&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">x&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">fy&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">y&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ドラッグ中のイベント
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">function&lt;/span> &lt;span class="nx">dragged&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">fx&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">x&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">fy&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">y&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ドラッグ終了時のイベント
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">function&lt;/span> &lt;span class="nx">dragEnded&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">active&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nx">simulation&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">alphaTarget&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">fx&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">null&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">fy&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">null&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Simulation オブジェクトにノード配列をセットして tick イベントをハンドル開始
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">simulation&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">nodes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">nodesData&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;tick&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tickHandler&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// tick 毎のレイアウト
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">function&lt;/span> &lt;span class="nx">tickHandler&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">circles&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">x&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cy&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">y&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="ドラッグ挙動オブジェクトの作成">ドラッグ挙動オブジェクトの作成&lt;/h3>
+&lt;p>マウスによるドラッグ（およびタブレットでのタッチドラッグ）の挙動を定義するためのオブジェクトは、&lt;strong>&lt;code>d3.drag()&lt;/code>&lt;/strong> で生成することができます。
+このオブジェクトは、公式には drag behavior と呼ばれていますが、ここでは「ドラッグ挙動オブジェクト」と呼ぶことにします。
+作成したドラッグ挙動オブジェクトは、D3 セレクションオブジェクトの &lt;code>call()&lt;/code> メソッドに渡すことでアタッチできます。
+次のコードでは、&lt;code>circle&lt;/code> セレクションオブジェクトにドラッグ挙動オブジェクトをアタッチしています。&lt;/p></description></item><item><title>D3.js による Force Simulation (2) link force でノードを結合する</title><link>https://maku.blog/p/9ujohp6/</link><pubDate>Thu, 14 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9ujohp6/</guid><description>&lt;h2 id="link-force-とは">link force とは&lt;/h2>
+&lt;p>D3.js の Force simulation (&lt;code>d3-force&lt;/code>) には様々なフォースを設定することができ、それにより各ノードの動き（レイアウト）を制御できるようになっています。
+&lt;strong>link force&lt;/strong> はそのようなフォースのひとつで、ノード間にリンク情報を設定することにより、バネのような力を発生させます。
+接続された 2 つのノードのうち、一方の位置を動かすと、もう一方のノードが引っ張られて動くようになります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/9ujohp6/img-001.drawio.svg" alt="/p/9ujohp6/img-001.drawio.svg" />
+ &lt;figcaption>図: link force のイメージ&lt;/figcaption>
+&lt;/figure>
+
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/6kavdch/">Force Simulation (d3-force) の基本&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="link-force-の基本的な使い方">link force の基本的な使い方&lt;/h2>
+&lt;p>次の例では、4 つのノードに環状に繋がるような link force を設定しています（ここではリンクの可視化はしていません）。&lt;/p>
+
+
+&lt;figure style="text-align: center;">
+ &lt;svg id="svg-a2f28wm" width="300" height="200" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: link force を設定したフォースシミュレーション&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+const svg = d3.select("#svg-a2f28wm")
+const width = +svg.attr("width")
+const height = +svg.attr("height")
+
+// ノード配列
+const nodesData = [{}, {}, {}, {}]
+
+// リンク配列
+const linksData = [
+ { source: 0, target: 1 },
+ { source: 1, target: 2 },
+ { source: 2, target: 3 },
+ { source: 3, target: 0 },
+]
+
+// ノードを描画するための circle 要素を svg に追加しておく
+const circles = svg.selectAll("circle")
+ .data(nodesData)
+ .join("circle")
+ .attr("r", 10)
+ .attr("fill", "blue")
+
+// Simulation オブジェクトの作成とフォース設定
+const simulation = d3.forceSimulation()
+ .force("center", d3.forceCenter(width / 2, height / 2))
+ .force("charge", d3.forceManyBody().strength(-1000))
+ .force("link", d3.forceLink())
+
+// Simulation オブジェクトにノード配列をセットして tick イベントをハンドル開始
+simulation.nodes(nodesData).on("tick", tickHandler)
+simulation.force("link").links(linksData)
+
+// tick 毎のレイアウト
+function tickHandler() {
+ circles
+ .attr("cx", (d) => d.x)
+ .attr("cy", (d) => d.y)
+}
+
+});
+&lt;/script>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ソースコード&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;svg-a2f28wm&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;300&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;200&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">svg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#svg-a2f28wm&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">width&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">+&lt;/span>&lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;width&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">height&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">+&lt;/span>&lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;height&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ノード配列
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">nodesData&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[{},&lt;/span> &lt;span class="p">{},&lt;/span> &lt;span class="p">{},&lt;/span> &lt;span class="p">{}]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// リンク配列
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">linksData&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">source&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">target&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">source&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">target&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">source&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">target&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">3&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="nx">source&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">target&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ノードを描画するための circle 要素を svg に追加しておく
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">circles&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">selectAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">nodesData&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;r&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fill&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;blue&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Simulation オブジェクトの作成とフォース設定
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">simulation&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forceSimulation&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">force&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;center&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forceCenter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">width&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">height&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">force&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;charge&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forceManyBody&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="nx">strength&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1000&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">force&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;link&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forceLink&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Simulation オブジェクトにノード配列をセットして tick イベントをハンドル開始
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">simulation&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">nodes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">nodesData&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;tick&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tickHandler&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">simulation&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">force&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;link&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">links&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">linksData&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// tick 毎のレイアウト
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">function&lt;/span> &lt;span class="nx">tickHandler&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">circles&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">x&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cy&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">y&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ノード間のリンクを視覚的に表現するかどうかは実装者の判断に任されているので、必要に応じて &lt;code>svg&lt;/code> の &lt;code>line&lt;/code> 要素などで描画する必要があります（後述）。&lt;/p></description></item><item><title>D3.js による Force Simulation (1) d3-force の基本</title><link>https://maku.blog/p/6kavdch/</link><pubDate>Wed, 13 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6kavdch/</guid><description>&lt;h2 id="d3-force-とは">d3-force とは&lt;/h2>
+&lt;p>D3.js の &lt;a href="https://d3js.org/d3-force">Force Simulation (&lt;code>d3-force&lt;/code>)&lt;/a> モジュールは、粒子（ノード）間の引力を考慮した座標計算を行うためのライブラリです（&lt;code>d3&lt;/code> モジュールに含まれています）。
+主に、ノードとエッジで表現されるネットワークモデルをビジュアライズするために利用されます。
+&lt;code>d3-force&lt;/code> によって逐次計算される座標をもとにノードやエッジを描画することで、レイアウトが収束していく過程をアニメーションさせて見せることができます。&lt;/p>
+&lt;p>次の例では、&lt;code>d3-force&lt;/code> を使って 5 つのノードの座標値を計算して、SVG の &lt;code>circle&lt;/code> 要素として描画しています。&lt;/p>
+
+
+&lt;figure style="text-align: center;">
+ &lt;svg id="svg-gi3ajww" width="300" height="200" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: d3-force によるレイアウト&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+const svg = d3.select("#svg-gi3ajww")
+const width = +svg.attr("width")
+const height = +svg.attr("height")
+
+// ノード配列（どんなオブジェクトでもよい）
+const nodesData = [{}, {}, {}, {}, {}]
+
+// ノードを描画するための circle 要素を svg に追加しておく
+const circles = svg.selectAll("circle")
+ .data(nodesData)
+ .join("circle")
+ .attr("r", 10)
+ .attr("fill", "blue")
+
+// Simulation オブジェクトの作成とフォース設定
+const simulation = d3.forceSimulation()
+ .force("center", d3.forceCenter(width / 2, height / 2))
+ .force("charge", d3.forceManyBody().strength(-10))
+
+// Simulation オブジェクトにノード配列をセットして tick イベントをハンドル開始
+simulation.nodes(nodesData).on("tick", tickHandler)
+
+function tickHandler() {
+ circles
+ .attr("cx", (d) => d.x)
+ .attr("cy", (d) => d.y)
+}
+
+});
+&lt;/script>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実装コード&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;#svg-gi3ajww&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;300&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;200&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">svg&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">svg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#svg-gi3ajww&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">width&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">+&lt;/span>&lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;width&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">height&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">+&lt;/span>&lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;height&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ノード配列（どんなオブジェクトでもよい）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">nodesData&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[{},&lt;/span> &lt;span class="p">{},&lt;/span> &lt;span class="p">{},&lt;/span> &lt;span class="p">{},&lt;/span> &lt;span class="p">{}]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ノードを描画するための circle 要素を svg に追加しておく
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">circles&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">selectAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">nodesData&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">join&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;r&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fill&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;blue&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Simulation オブジェクトの作成とフォース設定
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">simulation&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forceSimulation&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">force&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;center&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forceCenter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">width&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">height&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">force&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;charge&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">forceManyBody&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="nx">strength&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Simulation オブジェクトにノード配列をセットして tick イベントをハンドル開始
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nx">simulation&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">nodes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">nodesData&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;tick&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tickHandler&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">tickHandler&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">circles&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">x&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// d3-force が求めた X 座標をそのまま採用
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cy&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">d&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">d&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">y&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">// d3-force が求めた Y 座標をそのまま採用
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="force-simulation-の使い方の概要">Force Simulation の使い方の概要&lt;/h2>
+&lt;p>Force Simulation (&lt;code>d3-force&lt;/code>) で各ノードの座標値計算を行うには、次のような手順を踏みます。&lt;/p></description></item><item><title>D3.js でキーボードイベントを扱う (keydown)</title><link>https://maku.blog/p/6emds9m/</link><pubDate>Mon, 11 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/6emds9m/</guid><description>&lt;p>D3.js でキーボードからの入力イベントを扱うコードのサンプルです。&lt;/p>
+
+
+&lt;figure style="text-align: center;">
+ &lt;svg id="svg-z5a3fzu" width="200" height="100" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: クリックしてから上下左右キーで動かす&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+const svg = d3.select("#svg-z5a3fzu"); // D3 Selection オブジェクトを取得
+
+svg
+ .on("keydown", handleKeyDown) // keydown イベントのハンドラーを設定
+ .attr("tabindex", 0) // フォーカスを当てられるようにする
+ // .node().focus() // 自動でフォーカスする場合
+
+// カーソルキーで動かせる丸を表示
+const circle = svg.append("circle")
+ .attr("cx", 100)
+ .attr("cy", 50)
+ .attr("r", 10)
+ .attr("fill", "dodgerblue")
+
+function handleKeyDown(event) {
+ switch (event.code) {
+ case "ArrowLeft":
+ circle.attr("cx", +circle.attr("cx") - 5)
+ event.preventDefault();
+ break;
+ case "ArrowRight":
+ circle.attr("cx", +circle.attr("cx") + 5)
+ event.preventDefault();
+ break;
+ case "ArrowUp":
+ circle.attr("cy", +circle.attr("cy") - 5)
+ event.preventDefault();
+ break;
+ case "ArrowDown":
+ circle.attr("cy", +circle.attr("cy") + 5)
+ event.preventDefault();
+ break;
+ }
+}
+
+});
+&lt;/script>
+
+&lt;p>次の例では、&lt;code>svg&lt;/code> 要素でキーボードイベントをハンドルしています。
+&lt;code>svg&lt;/code> 要素がフォーカスされた状態でカーソルキー（上下左右）を入力すると、丸印 (&lt;code>circle&lt;/code>) が上下左右に動きます。&lt;/p></description></item><item><title>D3.js でボタンなどの入力要素を扱う</title><link>https://maku.blog/p/s5zrgp3/</link><pubDate>Sun, 10 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/s5zrgp3/</guid><description>&lt;p>D3.js は主に SVG の描画に使われるライブラリですが、一般的な DOM 要素のイベントをハンドルするためにも使用できます。
+ここでは、ボタンやテキスト入力要素を D3.js で扱う例を示します。&lt;/p>
+&lt;p>次の例では、ボタン (&lt;code>button&lt;/code>) をクリックしたときに、その独自属性 (&lt;code>data-color&lt;/code>) にセットされた値を取り出しています。
+この仕組みを利用すれば、ボタンを押したときに SVG の表示内容を切り替えるといったことが可能です。&lt;/p>
+&lt;center>
+&lt;div id="buttonContainer" style="border: thin solid lightgray; width: 15em; max-width: 100%; padding: 0.5em; display: inline-block; border-radius: 0.3rem;">
+ &lt;button data-color="g">Green&lt;/button>
+ &lt;button data-color="y">Yellow&lt;/button>
+ &lt;button data-color="r">Red&lt;/button>
+ &lt;p id="message">ボタンを押してみて&lt;/p>
+&lt;/div>
+&lt;/center>
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+d3.selectAll("#buttonContainer button")
+ .on("click", function() {
+ const color = d3.select(this).attr("data-color")
+ d3.select("#message").text(`選択したカラーコード = ${color}`)
+ })
+&lt;/script>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;buttonContainer&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span> &lt;span class="na">data-color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;g&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>Green&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span> &lt;span class="na">data-color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;y&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>Yellow&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">button&lt;/span> &lt;span class="na">data-color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;r&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>Red&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">button&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;message&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>ボタンを押してみて&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;module&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">as&lt;/span> &lt;span class="nx">d3&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s2">&amp;#34;https://cdn.jsdelivr.net/npm/d3@7/+esm&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">selectAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#buttonContainer button&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;click&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kd">function&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">color&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;data-color&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#message&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">text&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`選択したカラーコード = &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">color&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>上記の例では、&lt;code>click&lt;/code> ハンドラーの中で、&lt;code>d3.select()&lt;/code> を使って D3 セレクションオブジェクトを生成していますが、次のように従来の DOM API だけを使って記述することも可能です。&lt;/p></description></item><item><title>D3.js で各要素から任意のデータを取り出す (datum)</title><link>https://maku.blog/p/8m4drzr/</link><pubDate>Sun, 10 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8m4drzr/</guid><description>&lt;figure style="text-align: center;">
+ &lt;svg id="svg-vmhww5v" width="200" height="100" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: D3 セレクションのデータを参照する&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+const svg = d3.select("#svg-vmhww5v");
+
+// 3 つの circle 要素に紐づけるデータ
+const data = [
+ { name: "circle-1", color: "cyan" },
+ { name: "circle-2", color: "yellow" },
+ { name: "circle-3", color: "magenta" },
+];
+
+// 情報表示用の text 要素
+const text = svg.append("text")
+ .attr("x", "50%")
+ .attr("y", "20")
+ .attr("text-anchor", "middle")
+ .text("円に触れてみて！")
+
+svg
+ .selectAll("circle")
+ .data(data) // ここでセットしたデータはあとから参照できる
+ .join("circle")
+ .attr("cx", (_d, i) => 65 * i + 35)
+ .attr("cy", 60)
+ .attr("r", 30)
+ .attr("fill", (d) => d.color)
+ .on("mouseover", handleMouseOver)
+ .on("mouseout", handleMouseOut)
+
+function handleMouseOver(event) {
+ const d = d3.select(event.currentTarget).datum() // カーソル位置の要素のデータを参照
+ // const d = d3.select(this).datum()
+ text.text(`${d.name}, ${d.color}`) // 情報表示
+}
+
+function handleMouseOut() {
+ text.text("")
+}
+
+});
+&lt;/script>
+
+&lt;p>D3 セレクションオブジェクトの &lt;strong>&lt;code>datum()&lt;/code>&lt;/strong> メソッドを使うと、任意のデータ（オブジェクト）を紐づけて、後から自由に参照できるようになります。
+例えば、任意の要素上でマウスイベントが発生した場合に、その要素のデータを参照するというのが典型的な使用方法です。
+D3 セレクションオブジェクトに紐づけられたデータを参照するときは、&lt;code>datum()&lt;/code> メソッドを引数なしで呼び出します。
+D3.js で複数要素をまとめて追加する際には &lt;code>data()&lt;/code> メソッドを使用しますが、それでセットしたデータも &lt;code>datum()&lt;/code> メソッドで参照することができます。&lt;/p></description></item><item><title>D3.js でマウスイベントを扱う (click, mousemove, mouseover, mouseout)</title><link>https://maku.blog/p/ffz4v3w/</link><pubDate>Sat, 09 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ffz4v3w/</guid><description>&lt;p>D3.js でマウスイベントを扱うコードのサンプルです。&lt;/p>
+&lt;h2 id="click-イベント">click イベント&lt;/h2>
+
+
+&lt;figure style="text-align: center;">
+ &lt;svg id="svg-vwuifrt" width="200" height="100" style="border: solid gray 0.5px">&lt;/svg>
+ &lt;figcaption>図: click イベントをハンドルする&lt;/figcaption>
+&lt;/figure>
+
+&lt;script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+window.addEventListener("DOMContentLoaded", () => {
+ 
+const svg = d3.select("#svg-vwuifrt"); // D3 Selection オブジェクトを取得
+
+svg.on("click", (event) => {
+ const [x, y] = d3.pointer(event)
+ svg.append("circle")
+ .attr("cx", x)
+ .attr("cy", y)
+ .attr("r", 10)
+ .attr("fill", "deeppink")
+ .style("fill-opacity", 0.5)
+})
+
+});
+&lt;/script>
+
+&lt;p>D3.js でマウスのクリックイベントをハンドルするには、D3 Selection オブジェクトに &lt;strong>&lt;code>click&lt;/code>&lt;/strong> イベントハンドラを追加します。
+上記の svg 要素内でクリックすると、その座標にピンク色の円が表示されます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">svg&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;svg-vwuifrt&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;200&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;100&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">svg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;#svg-vwuifrt&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// D3 Selection オブジェクトを取得
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">on&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;click&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">x&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">y&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">d3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">pointer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">svg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;circle&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">x&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;cy&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">y&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;r&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">attr&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fill&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;deeppink&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="nx">style&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;fill-opacity&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.5&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>event.clientX&lt;/code> や &lt;code>event.clientY&lt;/code> でマウスカーソルの座標値を取得してしまうと、ブラウザのクライアント領域全体の座標値になってしまうので、&lt;strong>&lt;code>d3.point()&lt;/code>&lt;/strong> で &lt;code>svg&lt;/code> 要素内の座標値に変換するところがポイントです。&lt;/p></description></item><item><title>D3.js チートシート</title><link>https://maku.blog/p/456eght/</link><pubDate>Fri, 08 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/456eght/</guid><description>&lt;h2 id="d3-セレクションオブジェクトの取得">D3 セレクションオブジェクトの取得&lt;/h2>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>コード&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>d3.select(&amp;quot;#foo&amp;quot;)&lt;/code>&lt;/td>
+ &lt;td>先頭要素のセレクションオブジェクトを取得&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>d3.selectAll(&amp;quot;rect&amp;quot;)&lt;/code>&lt;/td>
+ &lt;td>すべての要素のセレクションオブジェクトを取得&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>d3.selectAll(&amp;quot;#foo rect)&lt;/code>&lt;/td>
+ &lt;td>入れ子構造でのクエリも可能&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.select(&amp;quot;#foo&amp;quot;)&lt;/code>&lt;/td>
+ &lt;td>セレクション以下から先頭要素のセレクションオブジェクトを取得&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.select(&amp;quot;rect&amp;quot;)&lt;/code>&lt;/td>
+ &lt;td>セレクション以下からすべての要素のセレクションオブジェクトを取得&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.node()&lt;/code>/&lt;code>nodes()&lt;/code>&lt;/td>
+ &lt;td>セレクションから DOM 要素を取り出す&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="属性クラスcss-スタイルの設定">属性・クラス・CSS スタイルの設定&lt;/h2>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>コード&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>selection.attr(&amp;quot;cx&amp;quot;)&lt;/code>&lt;/td>
+ &lt;td>属性値の取得&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.attr(&amp;quot;cx&amp;quot;, 10)&lt;/code>&lt;/td>
+ &lt;td>属性値の設定&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.classed(&amp;quot;foo&amp;quot;)&lt;/code>&lt;/td>
+ &lt;td>CSS クラスが付加されているか (true/false) の取得&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.classed(&amp;quot;foo&amp;quot;, true)&lt;/code>&lt;/td>
+ &lt;td>CSS クラスを付加する&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.classed(&amp;quot;foo bar&amp;quot;, true)&lt;/code>&lt;/td>
+ &lt;td>CSS クラスを付加する（複数）&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.classed(&amp;quot;foo&amp;quot;, false)&lt;/code>&lt;/td>
+ &lt;td>CSS クラスを取り除く&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.style(&amp;quot;color&amp;quot;)&lt;/code>&lt;/td>
+ &lt;td>CSS スタイルのプロパティ値を取得&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.style(&amp;quot;color&amp;quot;, &amp;quot;red&amp;quot;)&lt;/code>&lt;/td>
+ &lt;td>CSS スタイルのプロパティ値を設定&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.style({width:&amp;quot;100px&amp;quot;, height:&amp;quot;50px&amp;quot;})&lt;/code>&lt;/td>
+ &lt;td>オブジェクトでまとめて設定&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.property(&amp;quot;checked&amp;quot;);&lt;/code>&lt;/td>
+ &lt;td>チェックボックスの ON/OFF 状態を取得 (true/false)&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.property(&amp;quot;checked&amp;quot;, true);&lt;/code>&lt;/td>
+ &lt;td>チェックボックスを ON にする&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>selection.property(&amp;quot;checked&amp;quot;, false);&lt;/code>&lt;/td>
+ &lt;td>チェックボックスを OFF にする&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;p>複数要素のセレクション要素に対して属性やクラス、スタイル設定を行うときは、第 2 引数で値の代わりにコールバック関数を指定することで、各要素に紐づけられたデータ (&lt;code>datum&lt;/code>) に基づいた値を設定できます。&lt;/p></description></item></channel></rss>

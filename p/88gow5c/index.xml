@@ -1,12 +1,76 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>gRPC / Protocol Buffers 関連メモ on まくろぐ</title><link>https://maku.blog/p/88gow5c/</link><description>Recent content in gRPC / Protocol Buffers 関連メモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Fri, 16 Dec 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/88gow5c/index.xml" rel="self" type="application/rss+xml"/><item><title>Protocol Buffers の .proto ファイルから API ドキュメントを自動生成する (protoc-gen-doc)</title><link>https://maku.blog/p/ikw7gpz/</link><pubDate>Tue, 29 Nov 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ikw7gpz/</guid><description>protoc-gen-doc とは？ David Muto 氏が公開している protoc-gen-doc という protoc コマンドのプラグインを使用すると、.proto ファイルから、HTML 形式や Markdown 形式のドキュメントを自動生成することができます。 複数の .proto ファイルの内容をまとめて 1 つのページとして出力してくれるので、シンプルで見通しのよいドキュメントになります。
-生成されたドキュメントの例: HTML 形式 / Markdown 形式 / JSON 形式
-protoc-gen-doc は protoc コマンドのプラグインとして動作するのですが、実行環境が Docker イメージとして提供されているので、docker コマンド一発で、簡単に .proto ファイルからドキュメントを生成できます。 もちろん、protoc コマンドと protoc-gen-doc を両方インストールして実行することもできますが、Docker を使った方が断然お手軽です。
-Protocol Buffers Compiler（protoc コマンド）に関しては、こちらを参考にしてください。
-.proto ファイルからのドキュメント生成 protoc-gen-doc コマンドの基本 protoc-gen-doc の Docker イメージを使って、.proto ファイルからドキュメントを生成してみます。 Docker の実行環境は、Docker Desktop などでインストールしてください。 .proto ファイルが手元になければ、とりあえず下記のファイルをダウンロードして試せます。
-Vehicle.proto（サンプル .proto ファイル） proto/Vehicle.proto のように、proto ディレクトリに格納すれば準備完了です。 あとは次のように実行すると、docs ディレクトリに index.html ファイルが生成されます。</description></item><item><title>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）</title><link>https://maku.blog/p/ij4jv9k/</link><pubDate>Wed, 18 May 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ij4jv9k/</guid><description>何をするか？ ここでは、Go 言語用の gRPC ライブラリである gRPC-Go (google.golang.org/grpc) を使って、簡単な gRPC サーバーとクライアントを作ってみます。 通信用のスタブコードなどは、protoc コマンド (Protocl Buffers Compiler) で .proto ファイルから自動生成するので、あらかじめ protoc コマンドをインストールしておいてください。
-参考: protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler) protoc コマンドで Go 言語用のコードを生成するには、protoc-gen-go プラグインと protoc-gen-go-grpc プラグインをインストールしておく必要があります。 前者がシリアライズ用のコード、後者が gRPC 用のスタブコードを生成するための protoc プラグインです。
-# バージョンを指定してインストールする方法（推奨） $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2 # 最新バージョンをインストールする方法 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest プロジェクトの作成と gRPC-Go のインストール まずは Go 言語用のプロジェクトを作成します。 モジュール名は com.example/grpc-sample としていますが、GitHub で管理する予定であれば、リポジトリ名に合わせて github.</description></item><item><title>protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)</title><link>https://maku.blog/p/37e6uck/</link><pubDate>Wed, 20 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/37e6uck/</guid><description>Protcol Buffers とは プロトコルバッファー (Protocol Buffers、または protobuf) は、Google が開発した、構造化したデータをシリアライズするためのフォーマットです。 同じく Google が開発した gRPC 通信プラットフォームで採用されており、XML や JSON などのテキストベースの API より効率的な通信を行うことができるという特徴を持っています。
-データをコンパクトに表現できるため、通信やパース処理が高速 強い型付けを行うことでき、サーバー、クライアントの安全なコーディングが可能 定義変更時の互換性を考慮したフォーマット OS やプログラミング言語などに非依存 データ構造やサービス形式の定義は、.proto 拡張子を持つ プロトコル定義ファイル (Proto Definition file) で行います。 この .proto ファイルを protoc コマンド（プロトコルバッファーコンパイラ）でコンパイルすると、各言語用のソースコードを生成することができます。
-図: protoc コマンドによるコード生成 protoc コマンドは各種プログラミング言語用のコードを生成するわけですが、そのためには、protoc コマンド本体 と 各言語用のプラグイン（protoc-gen-go など）がインストールされている必要があります。 C++ や C#、Kotlin、Python、Ruby などのコード生成は組み込みで対応していますが、Go 言語用のプラグインなどは別途インストールする必要があります。
-protoc 本体のインストール protoc コマンド (Protocol Buffers Compiler) は、Linux（Ubuntu 系）や macOS ではパッケージマネージャーを使ってインストールしてしまうのが簡単です。 インストールするパッケージの名前は protobuf や protobuf-compiler であることに注意してください。
-macOS (Homebrew) の場合 $ brew install protobuf # インストール $ brew upgrade protobuf # バージョン更新 Linux (apt) の場合 $ apt install -y protobuf-compiler プリビルド版を使う場合 あるいは、各 OS 用のバイナリを GitHub のリリースページ からダウンロードし、protoc コマンドにパスを通します。 例えば、Windows であれば protoc-3.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>gRPC / Protocol Buffers 関連メモ on まくろぐ</title><link>https://maku.blog/p/88gow5c/</link><description>Recent content in gRPC / Protocol Buffers 関連メモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Tue, 29 Nov 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/88gow5c/index.xml" rel="self" type="application/rss+xml"/><item><title>Protocol Buffers の .proto ファイルから API ドキュメントを自動生成する (protoc-gen-doc)</title><link>https://maku.blog/p/ikw7gpz/</link><pubDate>Tue, 29 Nov 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ikw7gpz/</guid><description>&lt;h2 id="protoc-gen-doc-とは">protoc-gen-doc とは？&lt;/h2>
+&lt;p>David Muto 氏が公開している &lt;a href="https://github.com/pseudomuto/protoc-gen-doc">protoc-gen-doc&lt;/a> という &lt;code>protoc&lt;/code> コマンドのプラグインを使用すると、&lt;code>.proto&lt;/code> ファイルから、HTML 形式や Markdown 形式のドキュメントを自動生成することができます。
+複数の &lt;code>.proto&lt;/code> ファイルの内容をまとめて 1 つのページとして出力してくれるので、シンプルで見通しのよいドキュメントになります。&lt;/p>
+&lt;p>生成されたドキュメントの例: &lt;a href="https://rawgit.com/pseudomuto/protoc-gen-doc/master/examples/doc/example.html">HTML 形式&lt;/a> / &lt;a href="https://github.com/pseudomuto/protoc-gen-doc/blob/master/examples/doc/example.md">Markdown 形式&lt;/a> / &lt;a href="https://github.com/pseudomuto/protoc-gen-doc/blob/master/examples/doc/example.json">JSON 形式&lt;/a>&lt;/p>
+&lt;p>&lt;code>protoc-gen-doc&lt;/code> は &lt;code>protoc&lt;/code> コマンドのプラグインとして動作するのですが、実行環境が Docker イメージとして提供されているので、&lt;strong>docker コマンド一発で、簡単に .proto ファイルからドキュメントを生成できます&lt;/strong>。
+もちろん、&lt;code>protoc&lt;/code> コマンドと &lt;code>protoc-gen-doc&lt;/code> を両方インストールして実行することもできますが、Docker を使った方が断然お手軽です。&lt;/p>
+&lt;p>Protocol Buffers Compiler（&lt;code>protoc&lt;/code> コマンド）に関しては、&lt;a href="../../p/37e6uck/">こちらを参考にしてください&lt;/a>。&lt;/p>
+&lt;h2 id="proto-ファイルからのドキュメント生成">.proto ファイルからのドキュメント生成&lt;/h2>
+&lt;h3 id="protoc-gen-doc-コマンドの基本">protoc-gen-doc コマンドの基本&lt;/h3>
+&lt;p>&lt;code>protoc-gen-doc&lt;/code> の Docker イメージを使って、&lt;code>.proto&lt;/code> ファイルからドキュメントを生成してみます。
+Docker の実行環境は、&lt;a href="https://www.docker.com/products/docker-desktop/">Docker Desktop&lt;/a> などでインストールしてください。
+&lt;code>.proto&lt;/code> ファイルが手元になければ、とりあえず下記のファイルをダウンロードして試せます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/ikw7gpz/Vehicle.proto">Vehicle.proto（サンプル .proto ファイル）&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>proto/Vehicle.proto&lt;/code> のように、&lt;strong>&lt;code>proto&lt;/code>&lt;/strong> ディレクトリに格納すれば準備完了です。
+あとは次のように実行すると、&lt;code>docs&lt;/code> ディレクトリに &lt;code>index.html&lt;/code> ファイルが生成されます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">HTML 形式のドキュメント (docs/index.html) を生成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ docker container run --rm \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -v $(pwd)/docs:/out \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -v $(pwd)/proto:/protos \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pseudomuto/protoc-gen-doc --doc_opt=html,index.html&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>protoc-gen-doc&lt;/code> は、デフォルトでコンテナ内の &lt;strong>&lt;code>/protos&lt;/code>&lt;/strong> ディレクトリにある &lt;code>.proto&lt;/code> ファイルを読み込んで、コンテナ内の &lt;strong>&lt;code>/out&lt;/code>&lt;/strong> ディレクトリに出力しようとします。
+なので、&lt;code>docker container run&lt;/code> コマンドに指定しているマウントオプション (&lt;strong>&lt;code>-v&lt;/code>&lt;/strong>) は、次のような意味になります。&lt;/p></description></item><item><title>Go 言語で gRPC 通信してみる（Echo サーバー＆クライアント）</title><link>https://maku.blog/p/ij4jv9k/</link><pubDate>Wed, 18 May 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ij4jv9k/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ここでは、Go 言語用の gRPC ライブラリである &lt;a href="https://pkg.go.dev/google.golang.org/grpc">gRPC-Go (google.golang.org/grpc)&lt;/a> を使って、簡単な gRPC サーバーとクライアントを作ってみます。
+通信用のスタブコードなどは、&lt;strong>&lt;code>protoc&lt;/code>&lt;/strong> コマンド (Protocl Buffers Compiler) で &lt;code>.proto&lt;/code> ファイルから自動生成するので、あらかじめ &lt;code>protoc&lt;/code> コマンドをインストールしておいてください。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/37e6uck/">protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>protoc&lt;/code> コマンドで Go 言語用のコードを生成するには、&lt;strong>&lt;code>protoc-gen-go&lt;/code>&lt;/strong> プラグインと &lt;strong>&lt;code>protoc-gen-go-grpc&lt;/code>&lt;/strong> プラグインをインストールしておく必要があります。
+前者がシリアライズ用のコード、後者が gRPC 用のスタブコードを生成するための &lt;code>protoc&lt;/code> プラグインです。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">#&lt;/span> バージョンを指定してインストールする方法（推奨）
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="gp">#&lt;/span> 最新バージョンをインストールする方法
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="プロジェクトの作成と-grpc-go-のインストール">プロジェクトの作成と gRPC-Go のインストール&lt;/h2>
+&lt;p>まずは Go 言語用のプロジェクトを作成します。
+モジュール名は &lt;code>com.example/grpc-sample&lt;/code> としていますが、GitHub で管理する予定であれば、リポジトリ名に合わせて &lt;code>github.com/&amp;lt;USER&amp;gt;/grpc-sample&lt;/code> のような名前にしてください。
+これが、プロジェクト内で作成する Go パッケージをインポートするときのプレフィックスになります。&lt;/p></description></item><item><title>protoc コマンドで .proto ファイルをコンパイルする (Protocol Buffers Compiler)</title><link>https://maku.blog/p/37e6uck/</link><pubDate>Wed, 20 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/37e6uck/</guid><description>&lt;h2 id="protcol-buffers-とは">Protcol Buffers とは&lt;/h2>
+&lt;p>プロトコルバッファー (Protocol Buffers、または protobuf) は、Google が開発した、構造化したデータをシリアライズするためのフォーマットです。
+同じく Google が開発した &lt;strong>gRPC&lt;/strong> 通信プラットフォームで採用されており、XML や JSON などのテキストベースの API より効率的な通信を行うことができるという特徴を持っています。&lt;/p>
+&lt;ul>
+&lt;li>データをコンパクトに表現できるため、通信やパース処理が高速&lt;/li>
+&lt;li>強い型付けを行うことでき、サーバー、クライアントの安全なコーディングが可能&lt;/li>
+&lt;li>定義変更時の互換性を考慮したフォーマット&lt;/li>
+&lt;li>OS やプログラミング言語などに非依存&lt;/li>
+&lt;/ul>
+&lt;p>データ構造やサービス形式の定義は、&lt;strong>&lt;code>.proto&lt;/code>&lt;/strong> 拡張子を持つ &lt;strong>プロトコル定義ファイル (Proto Definition file)&lt;/strong> で行います。
+この &lt;code>.proto&lt;/code> ファイルを &lt;strong>&lt;code>protoc&lt;/code>&lt;/strong> コマンド（プロトコルバッファーコンパイラ）でコンパイルすると、各言語用のソースコードを生成することができます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/37e6uck/img-001.drawio.svg" alt="/p/37e6uck/img-001.drawio.svg" />
+ &lt;figcaption>図: protoc コマンドによるコード生成&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>&lt;code>protoc&lt;/code> コマンドは各種プログラミング言語用のコードを生成するわけですが、そのためには、&lt;strong>protoc コマンド本体&lt;/strong> と &lt;strong>各言語用のプラグイン&lt;/strong>（&lt;code>protoc-gen-go&lt;/code> など）がインストールされている必要があります。
+C++ や C#、Kotlin、Python、Ruby などのコード生成は組み込みで対応していますが、Go 言語用のプラグインなどは別途インストールする必要があります。&lt;/p>
+&lt;h2 id="protoc-本体のインストール">protoc 本体のインストール&lt;/h2>
+&lt;p>&lt;strong>&lt;code>protoc&lt;/code>&lt;/strong> コマンド (Protocol Buffers Compiler) は、Linux（Ubuntu 系）や macOS ではパッケージマネージャーを使ってインストールしてしまうのが簡単です。
+インストールするパッケージの名前は &lt;strong>&lt;code>protobuf&lt;/code>&lt;/strong> や &lt;strong>&lt;code>protobuf-compiler&lt;/code>&lt;/strong> であることに注意してください。&lt;/p>
+&lt;h3 id="macos-homebrew-の場合">macOS (Homebrew) の場合&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> brew install protobuf &lt;span class="c1"># インストール&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> brew upgrade protobuf &lt;span class="c1"># バージョン更新&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="linux-apt-の場合">Linux (apt) の場合&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> apt install -y protobuf-compiler
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="プリビルド版を使う場合">プリビルド版を使う場合&lt;/h3>
+&lt;p>あるいは、各 OS 用のバイナリを &lt;a href="https://github.com/protocolbuffers/protobuf/releases">GitHub のリリースページ&lt;/a> からダウンロードし、&lt;code>protoc&lt;/code> コマンドにパスを通します。
+例えば、Windows であれば &lt;code>protoc-3.20.0-win64.zip&lt;/code> などをダウンロードします。&lt;/p></description></item></channel></rss>

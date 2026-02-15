@@ -1,15 +1,127 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux のユーザー管理 on まくろぐ</title><link>https://maku.blog/p/qt6fox7/</link><description>Recent content in Linux のユーザー管理 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Fri, 05 Aug 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/qt6fox7/index.xml" rel="self" type="application/rss+xml"/><item><title>Linuxメモ: ユーザーのデフォルトシェルを変更する (chsh)</title><link>https://maku.blog/p/cqaq7n4/</link><pubDate>Fri, 05 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cqaq7n4/</guid><description>ユーザーが Linux にログインしたときに起動するデフォルトシェルは、chsh (change login shell) コマンドで変更することができます。
-カレントユーザーのログインシェルを /bin/bash に変更する $ chsh -s /bin/bash -s オプションではシェルのフルパスを指定する必要があることに注意してください。 例えば、Bash を使いたければ、bash ではなく /bin/bash と入力します。 -s オプションを省略すると、インタラクティブにシェルのパスを入力できます。
-参考 Linux のユーザーを管理する (useradd, userdel, passwd) ユーザーを追加する (useradd) ときに、ついでにログインシェルを指定できます。 現在のシステムで選択可能なシェルの一覧は、/etc/shells ファイルで確認できます。
-/etc/shells（Ubuntu 22.04 の場合） # /etc/shells: valid login shells /bin/sh /bin/bash /usr/bin/bash /bin/rbash /usr/bin/rbash /usr/bin/sh /bin/dash /usr/bin/dash /usr/bin/tmux /usr/bin/screen ユーザーごとのログインシェルが現在どう設定されているかは、/etc/passwd ファイルで確認できます。
-$ cat /etc/passwd ...（省略）... maku:x:1000:1000::/home/maku:/bin/bash</description></item><item><title>Linuxメモ: sudo で管理者権限でコマンド実行できるようにする (/etc/sudoers, visudo)</title><link>https://maku.blog/p/h5v6gqz/</link><pubDate>Sun, 10 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/h5v6gqz/</guid><description>sudo とは？ Linux の sudo コマンドは、一時的に root ユーザー（あるいは任意のユーザー）としてコマンドを実行できるようにするためのコマンドです。 システムの管理者的な立場の人であっても、常に root ユーザーとして作業するのはリスクがあるため、必要に応じて sudo でコマンド実行することが推奨されています。
-sudo コマンドは、次のような形で実行します。
-$ sudo ＜管理者権限が必要なコマンド＞ 例えば、/etc/shadow ファイルの閲覧は root ユーザーにしか許可されていませんが、カレントユーザーが sudoers（後述）に登録されていれば、次のようにして読み込むことができます。
-$ sudo cat /etc/shadow [sudo] password for maku: （カレントユーザーのパスワードを入力） APT パッケージのインストールでも sudo はよく使われますね。
-$ sudo apt install ansible [sudo] password for maku: （カレントユーザーのパスワードを入力） sudo 経由でコマンドを実行するときにパスワードの入力を求められますが、このとき入力するパスワードは root のものではなく、カレントユーザーのパスワードであることに注意してください（OpenSUSE の場合は例外的に root のパスワード）。 つまり、sudo は一般ユーザーが自分のパスワードで実行権限を切り替えてコマンドを実行する仕組みであり、sudoers の設定は慎重に行わなければいけません。
-/etc/sudoers ファイルと visudo コマンド /etc/sudoers ファイル どのユーザーが、どのコマンドを、どのユーザーとして実行できるかを管理しているのが /etc/sudoers ファイルです。 ただし、このファイルは次のように編集ができないよう権限設定されており、直接エディタで開いて編集することはできません。
-$ ls -l /etc/sudoers -r--r----- 1 root root 1671 Feb 8 17:41 /etc/sudoers visudo コマンド /etc/sudoers ファイルを編集するには、特別に用意された visudo コマンドを使用する必要があります。 次のように実行すれば、デフォルトエディタで /etc/sudoers ファイルを開くことができます。</description></item><item><title>Linuxメモ: Linux のユーザーを管理する (useradd, userdel, passwd)</title><link>https://maku.blog/p/7m5k3hx/</link><pubDate>Sat, 09 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7m5k3hx/</guid><description>Linux をインストールしたばかりの状態では、通常は特権ユーザーの root でログインできる状態になっています。 システム管理以外の日常的な作業には、useradd コマンドで作成した一般ユーザーを用います。
-ユーザーを作成する (useradd) 新しいユーザーを作成するには、useradd コマンドを使用します。 -m オプションを指定することで、ユーザーのホームディレクトリを同時に作成することができます。
-ユーザー maku を作成する # useradd maku （ユーザーを作成するだけ） # useradd -m maku （ホームディレクトリを同時に作成する） # useradd -m -s /bin/bash maku （さらに、ログインシェルを設定する） # useradd -m -s /bin/bash -G admin maku （さらに、admin グループに所属させる） オプションの意味 -m &amp;hellip; ユーザーのホームディレクトリを同時に作成します -s /bin/bash &amp;hellip; ログインシェルを /bin/bash に設定します。省略した場合は、/etc/default/useradd ファイルで定義されているシェルが設定されます（Ubuntu 22.04 の場合は /bin/sh ですが、dash へのシンボリックリンクです）。ユーザー生成後にログインシェルを変更したい場合は、chsh コマンド を使用します。 -G admin &amp;hellip; ユーザーを admin グループに所属させます（admin は Debian/Ubuntu で管理者を表すグループです）。グループの制御 はユーザー作成後にも行うことができます。 /etc/passwd ファイルを見ると、ユーザーが追加されていることを確認できます。 デフォルトでは、最初に作成したユーザーのユーザー ID は 1000 になります（その後追加するユーザーは、1001、1002、1003 となります）。</description></item><item><title>Linuxメモ: Linux のグループを管理する (groupadd, groupdel, gpasswd)</title><link>https://maku.blog/p/uexfvcs/</link><pubDate>Mon, 04 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uexfvcs/</guid><description>グループの作成と削除 (groupadd, groupdel) Linux でグループを作成／削除するには、groupadd および groupdel コマンドを使用します。 グループ作成時にグループ ID（数値）が自動的に割り当てられますが、-g オプションで明示することもできます。
-グループ admin を作成する $ sudo groupadd admin # グループ ID は自動で割り当てる $ sudo groupadd -g 1234 admin # グループ ID を明示する グループ admin を削除する $ sudo groupdel admin ☝️ プライマリ・グループ useradd コマンドでユーザーを作成すると、デフォルトでそのユーザーは、ユーザー名と同じ名前のグループに所属することになります。 このグループをプライマリ・グループと呼びます。 例えば、useradd maku でユーザー maku を作成すると、同時に maku というプライマリ・グループが作成されます。 groupdel コマンドでプライマリ・グループを削除することはできません。 グループにユーザーを追加する (gpasswd) Linux のグループに既存のユーザーを追加／削除するには、gpasswd コマンドを使用します。
-グループ admin にユーザー maku を追加する $ sudo gpasswd -a maku admin Adding user maku to group admin グループ admin からユーザー maku を削除する $ sudo gpasswd -d maku admin これらの設定を反映させるには、そのユーザーでログインし直す必要があります。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux のユーザー管理 on まくろぐ</title><link>https://maku.blog/p/qt6fox7/</link><description>Recent content in Linux のユーザー管理 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Fri, 05 Aug 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/qt6fox7/index.xml" rel="self" type="application/rss+xml"/><item><title>Linuxメモ: ユーザーのデフォルトシェルを変更する (chsh)</title><link>https://maku.blog/p/cqaq7n4/</link><pubDate>Fri, 05 Aug 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cqaq7n4/</guid><description>&lt;p>ユーザーが Linux にログインしたときに起動するデフォルトシェルは、&lt;strong>&lt;code>chsh&lt;/code>&lt;/strong> (change login shell) コマンドで変更することができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">カレントユーザーのログインシェルを /bin/bash に変更する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> chsh -s /bin/bash
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>-s&lt;/code> オプションではシェルのフルパスを指定する必要があることに注意してください。
+例えば、Bash を使いたければ、&lt;code>bash&lt;/code> ではなく &lt;code>/bin/bash&lt;/code> と入力します。
+&lt;code>-s&lt;/code> オプションを省略すると、インタラクティブにシェルのパスを入力できます。&lt;/p>
+&lt;aside style="display: flex; border: thin dashed gray;">
+&lt;div style="align-self: stretch; writing-mode: vertical-lr; text-align: center; letter-spacing: 0.2em; color: #666; border-right: thin dashed gray; padding: 0.4em 0; line-height: 1.5;">参考&lt;/div>
+&lt;div style="align-self: center; padding: 0.6em 0; line-height: 1.2 !important;">&lt;ul>
+&lt;li>&lt;a href="../../p/7m5k3hx/">Linux のユーザーを管理する (useradd, userdel, passwd)&lt;/a>
+&lt;ul>
+&lt;li>ユーザーを追加する (&lt;code>useradd&lt;/code>) ときに、ついでにログインシェルを指定できます。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/aside>
+&lt;p>現在のシステムで選択可能なシェルの一覧は、&lt;strong>&lt;code>/etc/shells&lt;/code>&lt;/strong> ファイルで確認できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">/etc/shells（Ubuntu 22.04 の場合）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># /etc/shells: valid login shells&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/bin/sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/bin/bash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/usr/bin/bash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/bin/rbash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/usr/bin/rbash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/usr/bin/sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/bin/dash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/usr/bin/dash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/usr/bin/tmux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/usr/bin/screen&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ユーザーごとのログインシェルが現在どう設定されているかは、&lt;strong>&lt;code>/etc/passwd&lt;/code>&lt;/strong> ファイルで確認できます。&lt;/p></description></item><item><title>Linuxメモ: sudo で管理者権限でコマンド実行できるようにする (/etc/sudoers, visudo)</title><link>https://maku.blog/p/h5v6gqz/</link><pubDate>Sun, 10 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/h5v6gqz/</guid><description>&lt;h2 id="sudo-とは">sudo とは？&lt;/h2>
+&lt;p>Linux の &lt;strong>&lt;code>sudo&lt;/code>&lt;/strong> コマンドは、一時的に &lt;code>root&lt;/code> ユーザー（あるいは任意のユーザー）としてコマンドを実行できるようにするためのコマンドです。
+システムの管理者的な立場の人であっても、常に &lt;code>root&lt;/code> ユーザーとして作業するのはリスクがあるため、必要に応じて &lt;code>sudo&lt;/code> でコマンド実行することが推奨されています。&lt;/p>
+&lt;p>&lt;code>sudo&lt;/code> コマンドは、次のような形で実行します。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo ＜管理者権限が必要なコマンド＞
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>例えば、&lt;code>/etc/shadow&lt;/code> ファイルの閲覧は &lt;code>root&lt;/code> ユーザーにしか許可されていませんが、カレントユーザーが &lt;code>sudoers&lt;/code>（後述）に登録されていれば、次のようにして読み込むことができます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo cat /etc/shadow
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">[sudo] password for maku: （カレントユーザーのパスワードを入力）
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>APT パッケージのインストールでも &lt;code>sudo&lt;/code> はよく使われますね。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo apt install ansible
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">[sudo] password for maku: （カレントユーザーのパスワードを入力）
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>sudo&lt;/code> 経由でコマンドを実行するときにパスワードの入力を求められますが、このとき入力するパスワードは &lt;code>root&lt;/code> のものではなく、カレントユーザーのパスワードであることに注意してください（OpenSUSE の場合は例外的に &lt;code>root&lt;/code> のパスワード）。
+つまり、&lt;code>sudo&lt;/code> は一般ユーザーが自分のパスワードで実行権限を切り替えてコマンドを実行する仕組みであり、&lt;code>sudoers&lt;/code> の設定は慎重に行わなければいけません。&lt;/p>
+&lt;h2 id="etcsudoers-ファイルと-visudo-コマンド">/etc/sudoers ファイルと visudo コマンド&lt;/h2>
+&lt;h3 id="etcsudoers-ファイル">/etc/sudoers ファイル&lt;/h3>
+&lt;p>どのユーザーが、どのコマンドを、どのユーザーとして実行できるかを管理しているのが &lt;strong>&lt;code>/etc/sudoers&lt;/code>&lt;/strong> ファイルです。
+ただし、このファイルは次のように編集ができないよう権限設定されており、直接エディタで開いて編集することはできません。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> ls -l /etc/sudoers
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">-r--r----- 1 root root 1671 Feb 8 17:41 /etc/sudoers
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="visudo-コマンド">visudo コマンド&lt;/h3>
+&lt;p>&lt;code>/etc/sudoers&lt;/code> ファイルを編集するには、特別に用意された &lt;strong>&lt;code>visudo&lt;/code>&lt;/strong> コマンドを使用する必要があります。
+次のように実行すれば、デフォルトエディタで &lt;code>/etc/sudoers&lt;/code> ファイルを開くことができます。&lt;/p></description></item><item><title>Linuxメモ: Linux のユーザーを管理する (useradd, userdel, passwd)</title><link>https://maku.blog/p/7m5k3hx/</link><pubDate>Sat, 09 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7m5k3hx/</guid><description>&lt;p>Linux をインストールしたばかりの状態では、通常は特権ユーザーの &lt;code>root&lt;/code> でログインできる状態になっています。
+システム管理以外の日常的な作業には、&lt;code>useradd&lt;/code> コマンドで作成した一般ユーザーを用います。&lt;/p>
+&lt;h2 id="ユーザーを作成する-useradd">ユーザーを作成する (useradd)&lt;/h2>
+&lt;p>新しいユーザーを作成するには、&lt;strong>&lt;code>useradd&lt;/code>&lt;/strong> コマンドを使用します。
+&lt;code>-m&lt;/code> オプションを指定することで、ユーザーのホームディレクトリを同時に作成することができます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ユーザー maku を作成する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl"># useradd maku （ユーザーを作成するだけ）
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># useradd -m maku （ホームディレクトリを同時に作成する）
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># useradd -m -s /bin/bash maku （さらに、ログインシェルを設定する）
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># useradd -m -s /bin/bash -G admin maku （さらに、admin グループに所属させる）&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;ul>
+&lt;li>オプションの意味
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>-m&lt;/code>&lt;/strong> &amp;hellip; ユーザーのホームディレクトリを同時に作成します&lt;/li>
+&lt;li>&lt;strong>&lt;code>-s /bin/bash&lt;/code>&lt;/strong> &amp;hellip; ログインシェルを &lt;code>/bin/bash&lt;/code> に設定します。省略した場合は、&lt;code>/etc/default/useradd&lt;/code> ファイルで定義されているシェルが設定されます（Ubuntu 22.04 の場合は &lt;code>/bin/sh&lt;/code> ですが、&lt;code>dash&lt;/code> へのシンボリックリンクです）。ユーザー生成後にログインシェルを変更したい場合は、&lt;a href="../../p/cqaq7n4/">&lt;code>chsh&lt;/code> コマンド&lt;/a> を使用します。&lt;/li>
+&lt;li>&lt;strong>&lt;code>-G admin&lt;/code>&lt;/strong> &amp;hellip; ユーザーを &lt;code>admin&lt;/code> グループに所属させます（&lt;code>admin&lt;/code> は Debian/Ubuntu で管理者を表すグループです）。&lt;a href="../../p/uexfvcs/">グループの制御&lt;/a> はユーザー作成後にも行うことができます。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>&lt;code>/etc/passwd&lt;/code>&lt;/strong> ファイルを見ると、ユーザーが追加されていることを確認できます。
+デフォルトでは、最初に作成したユーザーのユーザー ID は 1000 になります（その後追加するユーザーは、1001、1002、1003 となります）。&lt;/p></description></item><item><title>Linuxメモ: Linux のグループを管理する (groupadd, groupdel, gpasswd)</title><link>https://maku.blog/p/uexfvcs/</link><pubDate>Mon, 04 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/uexfvcs/</guid><description>&lt;h2 id="グループの作成と削除-groupadd-groupdel">グループの作成と削除 (groupadd, groupdel)&lt;/h2>
+&lt;p>Linux でグループを作成／削除するには、&lt;strong>&lt;code>groupadd&lt;/code>&lt;/strong> および &lt;strong>&lt;code>groupdel&lt;/code>&lt;/strong> コマンドを使用します。
+グループ作成時にグループ ID（数値）が自動的に割り当てられますが、&lt;code>-g&lt;/code> オプションで明示することもできます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">グループ admin を作成する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo groupadd admin &lt;span class="c1"># グループ ID は自動で割り当てる&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo groupadd -g &lt;span class="m">1234&lt;/span> admin &lt;span class="c1"># グループ ID を明示する&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">グループ admin を削除する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo groupdel admin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ プライマリ・グループ&lt;/span>
+ &lt;span class="xNote_body">&lt;code>useradd&lt;/code> コマンドでユーザーを作成すると、デフォルトでそのユーザーは、ユーザー名と同じ名前のグループに所属することになります。
+このグループをプライマリ・グループと呼びます。
+例えば、&lt;code>useradd maku&lt;/code> でユーザー &lt;code>maku&lt;/code> を作成すると、同時に &lt;code>maku&lt;/code> というプライマリ・グループが作成されます。
+&lt;code>groupdel&lt;/code> コマンドでプライマリ・グループを削除することはできません。&lt;/span>
+&lt;/div>
+&lt;h2 id="グループにユーザーを追加する-gpasswd">グループにユーザーを追加する (gpasswd)&lt;/h2>
+&lt;p>Linux のグループに既存のユーザーを追加／削除するには、&lt;strong>&lt;code>gpasswd&lt;/code>&lt;/strong> コマンドを使用します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">グループ admin にユーザー maku を追加する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo gpasswd -a maku admin
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">Adding user maku to group admin
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">グループ admin からユーザー maku を削除する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo gpasswd -d maku admin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これらの設定を反映させるには、そのユーザーでログインし直す必要があります。&lt;/p></description></item></channel></rss>

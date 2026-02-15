@@ -1,6 +1,66 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Basic 認証 on まくろぐ</title><link>https://maku.blog/tags/basic-%E8%AA%8D%E8%A8%BC/</link><description>Recent content in Basic 認証 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 11 Feb 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/basic-%E8%AA%8D%E8%A8%BC/index.xml" rel="self" type="application/rss+xml"/><item><title>Svelte 入門: サーバー Hooks で Basic 認証を実装する</title><link>https://maku.blog/p/mem8u54/</link><pubDate>Tue, 11 Feb 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mem8u54/</guid><description>Hooks とは SvelteKit には Hooks の仕組みが提供されており、特にサーバー Hooks を定義することで、任意のリクエストに割り込んで処理を行うことができます。 例えば、各ルートのハンドラーが呼び出される前に、次のような処理を行うことができます。
-リクエストのログを取る リクエストの内容を変更する（リダイレクトなど） リクエストを拒否する（アクセス制御） 後続の処理のためにデータを付加する（Cookie に基づくユーザー情報など） この記事では、サーバー Hooks の利用例として、簡単な Basic 認証 を実装する方法を解説します。
-図: Chrome の Basic 認証ダイアログ 管理者にしかアクセスできないページを手っ取り早く作りたい場合などに便利ですが、Basic 認証はセキュアな認証方式ではないので、あくまで Hooks の使い方の例と考えてください。 本番環境に認証・認可の仕組みを導入する場合は、OAuth などのよりセキュアな方式を検討してください。
-サーバー Hooks の基本 サーバー Hooks を定義するのはとても簡単で、SvelteKit のプロジェクト内に src/hooks.server.ts（あるいは .js）を作成し、handle 関数をエクスポートするだけです。 ファイル名を間違えると、Hooks が正しく動作しないので注意してください（特に hook でなく hooks であることに注意）。
-次の サーバー Hooks 実装では、リクエストイベントの内容をコンソールに出力しています。
-src/hooks.server.ts import type { Handle } from &amp;#39;@sveltejs/kit&amp;#39;; export const handle: Handle = async ({ event, resolve }) =&amp;gt; { console.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Basic 認証 on まくろぐ</title><link>https://maku.blog/tags/basic-%E8%AA%8D%E8%A8%BC/</link><description>Recent content in Basic 認証 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Tue, 11 Feb 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/basic-%E8%AA%8D%E8%A8%BC/index.xml" rel="self" type="application/rss+xml"/><item><title>Svelte 入門: サーバー Hooks で Basic 認証を実装する</title><link>https://maku.blog/p/mem8u54/</link><pubDate>Tue, 11 Feb 2025 00:00:00 +0900</pubDate><guid>https://maku.blog/p/mem8u54/</guid><description>&lt;h2 id="hooks-とは">Hooks とは&lt;/h2>
+&lt;p>SvelteKit には &lt;a href="https://svelte.dev/docs/kit/hooks">Hooks の仕組み&lt;/a>が提供されており、特にサーバー Hooks を定義することで、任意のリクエストに割り込んで処理を行うことができます。
+例えば、各ルートのハンドラーが呼び出される前に、次のような処理を行うことができます。&lt;/p>
+&lt;ul>
+&lt;li>リクエストのログを取る&lt;/li>
+&lt;li>リクエストの内容を変更する（リダイレクトなど）&lt;/li>
+&lt;li>リクエストを拒否する（アクセス制御）&lt;/li>
+&lt;li>後続の処理のためにデータを付加する（Cookie に基づくユーザー情報など）&lt;/li>
+&lt;/ul>
+&lt;p>この記事では、サーバー Hooks の利用例として、簡単な &lt;strong>Basic 認証&lt;/strong> を実装する方法を解説します。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="310" height="240" src="../../p/mem8u54/img-001_hu746487663595535000.png" alt="/p/mem8u54/img-001.png" />
+ &lt;figcaption>図: Chrome の Basic 認証ダイアログ&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>管理者にしかアクセスできないページを手っ取り早く作りたい場合などに便利ですが、Basic 認証はセキュアな認証方式ではないので、あくまで Hooks の使い方の例と考えてください。
+本番環境に認証・認可の仕組みを導入する場合は、OAuth などのよりセキュアな方式を検討してください。&lt;/p>
+&lt;h2 id="サーバー-hooks-の基本">サーバー Hooks の基本&lt;/h2>
+&lt;p>サーバー Hooks を定義するのはとても簡単で、SvelteKit のプロジェクト内に &lt;strong>&lt;code>src/hooks.server.ts&lt;/code>&lt;/strong>（あるいは &lt;code>.js&lt;/code>）を作成し、&lt;strong>&lt;code>handle&lt;/code>&lt;/strong> 関数をエクスポートするだけです。
+ファイル名を間違えると、Hooks が正しく動作しないので注意してください（特に &lt;code>hook&lt;/code> でなく &lt;code>hooks&lt;/code> であることに注意）。&lt;/p>
+&lt;p>次の サーバー Hooks 実装では、リクエストイベントの内容をコンソールに出力しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/hooks.server.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">Handle&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;@sveltejs/kit&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">handle&lt;/span>: &lt;span class="kt">Handle&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">resolve&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">JSON&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">stringify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">undefined&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="kr">const&lt;/span> &lt;span class="nx">response&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">resolve&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="k">return&lt;/span> &lt;span class="nx">response&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-392467185" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-392467185">出力例&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;cookies&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;locals&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;params&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;request&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;route&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;/&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;url&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;http://localhost:5173/&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;isDataRequest&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nt">&amp;#34;isSubRequest&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+&lt;p>&lt;code>handle&lt;/code> 関数には、&lt;strong>&lt;code>event&lt;/code>&lt;/strong> オブジェクト (&lt;a href="https://svelte.dev/docs/kit/@sveltejs-kit#RequestEvent">RequestEvent&lt;/a>) と、&lt;strong>&lt;code>resolve&lt;/code>&lt;/strong> 関数が渡されます。
+&lt;code>resolve&lt;/code> 関数は、各ルートに対応するレンダラーを呼び出して、その結果を &lt;code>Response&lt;/code> オブジェクトとして返す関数です。
+よって、上記のコードのように単純に &lt;code>resolve(event)&lt;/code> とすると、デフォルトのレンダリング処理を行った結果を返すことになります。&lt;/p></description></item></channel></rss>

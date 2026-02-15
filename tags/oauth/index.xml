@@ -1,9 +1,47 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>OAuth on まくろぐ</title><link>https://maku.blog/tags/oauth/</link><description>Recent content in OAuth on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 18 Aug 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/oauth/index.xml" rel="self" type="application/rss+xml"/><item><title>GitHub OAuth トークンを取得する (1) 処理の流れを理解する</title><link>https://maku.blog/p/ubkt3ai/</link><pubDate>Sun, 16 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ubkt3ai/</guid><description>GitHub の OAuth トークンとは GitHub API を使って GitHub 上の情報（リポジトリ情報やユーザー情報）を取得するには、GitHub によって発行されるアクセストークンが必要です。 GitHub API ver.3 (REST API) ではアクセストークンを必要としない API もありましたが、GitHub API ver.4 (GraphQL API) では必ずアクセストークンが必要です。
-アクセストークンにはいくつか種類があり、GitHub の Web サイト上で作成する パーソナルアクセストークン や、Web アプリの OAuth プロセスで取得する OAuth アクセストークン などがあります。 アクセストークンの取得方法は異なりますが、いずれも取得した後は同じように使用できます。
-パーソナルアクセストークン : ユーザーが GitHub サイト上で作成 OAuth アクセストークン : Web アプリ内の OAuth プロセスで取得 通常、Web アプリから GitHub API を使用する場合は、後者の OAuth を使用してアクセストークンの取得を自動化します。 ここでは、GitHub の OAuth アクセストークン取得の流れを、実装コードを示しながら説明していきます。
-GitHub の OAuth の流れ (Web application flow) Web アプリから OAuth トークンを取得するまでの流れはざっと次のような感じになります。</description></item><item><title>GitHub OAuth トークンを取得する (2) Azure Functions 経由で取得する</title><link>https://maku.blog/p/ar2bjs2/</link><pubDate>Tue, 18 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ar2bjs2/</guid><description>何をするか？ ここでは、静的な Web サイト（の JavaScript) から、GitHub の OAuth トークンを取得できるようにしてみます。 この処理を実装すると、GitHub と連携した Web アプリを、GitHub Pages や Azure Static Web Apps などの、静的サイト用のホスティングサービス上で公開できるようになります。 汎用的な Web サーバー（VPSなど）でホスティングする場合と比べ、非常に安価に運用することができます。
-前提知識として、下記の GitHub の OAuth トークン取得の流れを理解しているものとします。
-参考: GitHub OAuth トークンを取得する (1) 処理の流れを理解する 静的な Web サイトから GitHub のアクセストークンを取得するときにネックになるのが、クロスオリジン通信 (CORS) の制約です。 また、GitHub のアクセストークンリクエストには、クライアントシークレット情報が必須であり（2020年、2021年現在）、これをクライアントサイドの JavaScript にハードコードするわけにはいきません。 よって、ブラウザ上で実行される JavaScript からは、実質アクセストークンの取得ができないので、何らかのバックエンドサーバーを介す形でアクセストークンを取得する必要があります。
-バックエンドサーバーはどのようなものでも構わないのですが、ここではサーバーレス環境である Azure Functions を使ってアクセストークンの取得機能を実装します。
-Azure Functions に関数を追加する Azure Functions に HTTP トリガーで起動する関数を追加し、GitHub の OAuth トークンを取得する処理を実装します。 まずは下記の記事を参考にして、Functions アプリ（プロジェクト）を作成してください。
-参考: Azure Functions で簡単な関数を作ってみる 作成する関数の仕様は次のとおりとします。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>OAuth on まくろぐ</title><link>https://maku.blog/tags/oauth/</link><description>Recent content in OAuth on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 30 Aug 2020 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/oauth/index.xml" rel="self" type="application/rss+xml"/><item><title>GitHub OAuth トークンを取得する (1) 処理の流れを理解する</title><link>https://maku.blog/p/ubkt3ai/</link><pubDate>Sun, 16 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ubkt3ai/</guid><description>&lt;h2 id="github-の-oauth-トークンとは">GitHub の OAuth トークンとは&lt;/h2>
+&lt;p>GitHub API を使って GitHub 上の情報（リポジトリ情報やユーザー情報）を取得するには、GitHub によって発行されるアクセストークンが必要です。
+GitHub API ver.3 (REST API) ではアクセストークンを必要としない API もありましたが、GitHub API ver.4 (GraphQL API) では必ずアクセストークンが必要です。&lt;/p>
+&lt;p>アクセストークンにはいくつか種類があり、GitHub の Web サイト上で作成する &lt;strong>パーソナルアクセストークン&lt;/strong> や、Web アプリの OAuth プロセスで取得する &lt;strong>OAuth アクセストークン&lt;/strong> などがあります。
+アクセストークンの取得方法は異なりますが、いずれも取得した後は同じように使用できます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;b>パーソナルアクセストークン&lt;/b>
+: ユーザーが GitHub サイト上で作成&lt;/li>
+&lt;li>&lt;b>OAuth アクセストークン&lt;/b>
+: Web アプリ内の OAuth プロセスで取得&lt;/li>
+&lt;/ul>
+&lt;p>通常、Web アプリから GitHub API を使用する場合は、後者の OAuth を使用してアクセストークンの取得を自動化します。
+ここでは、GitHub の OAuth アクセストークン取得の流れを、実装コードを示しながら説明していきます。&lt;/p>
+&lt;h2 id="github-の-oauth-の流れ-web-application-flow">GitHub の OAuth の流れ (Web application flow)&lt;/h2>
+&lt;p>Web アプリから OAuth トークンを取得するまでの流れはざっと次のような感じになります。&lt;/p></description></item><item><title>GitHub OAuth トークンを取得する (2) Azure Functions 経由で取得する</title><link>https://maku.blog/p/ar2bjs2/</link><pubDate>Tue, 18 Aug 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ar2bjs2/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ここでは、静的な Web サイト（の JavaScript) から、GitHub の OAuth トークンを取得できるようにしてみます。
+この処理を実装すると、GitHub と連携した Web アプリを、GitHub Pages や Azure Static Web Apps などの、静的サイト用のホスティングサービス上で公開できるようになります。
+汎用的な Web サーバー（VPSなど）でホスティングする場合と比べ、非常に安価に運用することができます。&lt;/p>
+&lt;p>前提知識として、下記の GitHub の OAuth トークン取得の流れを理解しているものとします。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/ubkt3ai">GitHub OAuth トークンを取得する (1) 処理の流れを理解する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>静的な Web サイトから GitHub のアクセストークンを取得するときにネックになるのが、クロスオリジン通信 (CORS) の制約です。
+また、GitHub のアクセストークンリクエストには、クライアントシークレット情報が必須であり（2020年、2021年現在）、これをクライアントサイドの JavaScript にハードコードするわけにはいきません。
+よって、ブラウザ上で実行される JavaScript からは、実質アクセストークンの取得ができないので、何らかのバックエンドサーバーを介す形でアクセストークンを取得する必要があります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="660" height="286" src="../../p/ar2bjs2/img-001.png" alt="/p/ar2bjs2/img-001.png" />
+&lt;/figure>
+
+&lt;p>バックエンドサーバーはどのようなものでも構わないのですが、ここではサーバーレス環境である &lt;strong>Azure Functions&lt;/strong> を使ってアクセストークンの取得機能を実装します。&lt;/p>
+&lt;h2 id="azure-functions-に関数を追加する">Azure Functions に関数を追加する&lt;/h2>
+&lt;p>Azure Functions に HTTP トリガーで起動する関数を追加し、GitHub の OAuth トークンを取得する処理を実装します。
+まずは下記の記事を参考にして、Functions アプリ（プロジェクト）を作成してください。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/vgt5g7f">Azure Functions で簡単な関数を作ってみる&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>作成する関数の仕様は次のとおりとします。&lt;/p>
+&lt;ul>
+&lt;li>HTTP GET リクエストのクエリ文字列で、OAuth アプリのクライアント ID (&lt;code>client_id&lt;/code>) と、GitHub から取得した一時コード (&lt;code>code&lt;/code>) を受け取る。&lt;/li>
+&lt;li>OAuth アプリのクライアントシークレット (&lt;code>client_secret&lt;/code>) は Functions アプリの環境変数（アプリケーション設定）で設定しておく（ハードコードしない）。&lt;/li>
+&lt;li>GitHub に対してアクセストークンの取得リクエスト (HTTP POST) を送り、その結果をクライアントへそのまま返す。ただし、クライアントから指定されたクライアント ID (&lt;code>client_id&lt;/code>) がそもそも不正な場合は、アクセストークンの取得は行わず、直ちに 400 (Bad Request) エラーを返す。&lt;/li>
+&lt;/ul>
+&lt;h3 id="環境変数の設定">環境変数の設定&lt;/h3>
+&lt;p>Functions アプリの &lt;strong>&lt;code>環境&lt;/code>&lt;/strong> → &lt;strong>&lt;code>構成&lt;/code>&lt;/strong> を開き、GitHub に登録した OAuth アプリの「クライアントID」と「クライアントシークレット」を登録してください。
+ここでは次のような名前で登録することにします。&lt;/p></description></item></channel></rss>

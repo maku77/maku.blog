@@ -1,14 +1,145 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>JSON on まくろぐ</title><link>https://maku.blog/tags/json/</link><description>Recent content in JSON on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 19 Sep 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/json/index.xml" rel="self" type="application/rss+xml"/><item><title>Svelte 入門: JSON ファイルをインポートして使う</title><link>https://maku.blog/p/pzrza7m/</link><pubDate>Tue, 19 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pzrza7m/</guid><description>Svelte (SvelteKit) アプリ内の Svelte コンポーネントや JavaScript/TypeScript ライブラリでは、JSON ファイルを import 文で簡単に読み込めるようになっています（正確には Vite の Static Asset Handling の仕組みを利用しています）。
-ここでは、サンプルデータとして下記のようなゲームソフト情報を含んだ JSON ファイルを用意します。 この JSON ファイルはビルド時にインポートするので、static ディレクトリではなく src ディレクトリのどこかに配置します（ここでは、lib/assets というディレクトリに配置しています）。
-src/lib/assets/games.json [ { &amp;#34;title&amp;#34;: &amp;#34;シャドウラン&amp;#34;, &amp;#34;date&amp;#34;: &amp;#34;1996-02-23&amp;#34;, &amp;#34;price&amp;#34;: 7800 }, { &amp;#34;title&amp;#34;: &amp;#34;トムキャットアレイ&amp;#34;, &amp;#34;date&amp;#34;: &amp;#34;1994-12-22&amp;#34;, &amp;#34;price&amp;#34;: 7800 }, { &amp;#34;title&amp;#34;: &amp;#34;真・女神転生&amp;#34;, &amp;#34;date&amp;#34;: &amp;#34;1994-02-25&amp;#34; } ] このファイルを Svelte コンポーネントから直接インポートしてもよいのですが、次のように明示的に TypeScript の型情報を付加するライブラリでラップしておくと便利かもしれません。
-src/lib/games.ts import rawJson from &amp;#39;$lib/assets/games.json&amp;#39;; /** ゲームソフトの情報 */ export type Game = { /** ゲームタイトル */ title: string; /** 発売日 */ date: string; /** 価格 */ price?</description></item><item><title>VS Code で YAML ファイルの構文をチェックする（YAML 拡張）</title><link>https://maku.blog/p/c7sp7ut/</link><pubDate>Wed, 19 Apr 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/c7sp7ut/</guid><description>YAML 拡張とは？ VS Code の YAML 拡張 (redhat.vscode-yaml) をインストールすると、スキーマ定義に基づいて、YAML ファイルの記述内容が正しいかをチェックすることができます。 スキーマ定義を JSON スキーマファイル の形で作成し、YAML ファイルの先頭に次のようなコメントを記述することで適用できます。
-YAML ファイルの先頭に追加 # yaml-language-server: $schema=./schema.json YAML ファイルの構文チェックなのに JSON スキーマ？と思うかもしれませんが、YAML と JSON のデータ形式には互換性があるので、スキーマは JSON スキーマでよいんですね。
-スキーマによる YAML ファイルの構文チェック 公開スキーマファイルを参照する スキーマファイルは、インターネット上に公開されているものを URL で指定できるようになっています。 有名どころの設定ファイルのスキーマは、下記のサイトに一覧があるので、いろいろなプロジェクトからそのまま利用できます。
-JSON Schema Store Ansible Playbook など、内容が複雑になりがちな YAML ファイルに設定しておくと役に立ちそうです。
-playbook.yml（の先頭に記述する） # yaml-language-server: $schema=https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json GitHub Actions のワークフローファイル (.github/workflows/*.yml) などは、そのファイルパスから、どのスキーマを使用すればいいかを推測できるので、上記のようなコメント行すら記述せずに自動的に GitHub Actions 用のスキーマ を適用してくれます。 つまり、VS Code に YAML 拡張をインストールするだけで、GitHub Actions のワークフローファイルの構文チェックが有効になります。 便利！
-独自定義したスキーマファイルを参照する アプリケーション独自の設定ファイルやデータファイルを YAML 形式で作成する場合は、そのスキーマも独自であることが多いので、専用の JSON スキーマファイルを作成することになるでしょう。 例えば、次の JSON スキーマファイルでは、ユーザー情報を表現するためのスキーマを定義しています（コメントを記述できるようにするために、拡張子を .</description></item><item><title>Deno で JSON ファイルを読み込む方法いろいろ</title><link>https://maku.blog/p/a83hr2b/</link><pubDate>Wed, 28 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/a83hr2b/</guid><description>Deno で JSON ファイルを読み込んで、JavaScript のオブジェクトとして参照できるようにするには、import で直接インポートする方法と、Deno.readTextFile で読み込んでから JSON.parse する方法があります。 ここでは、それぞれの方法で次のような JSON ファイルを読み込んでみます。
-books.json [ {&amp;#34;title&amp;#34;: &amp;#34;Title 1&amp;#34;, &amp;#34;author&amp;#34;: &amp;#34;Author 1&amp;#34;}, {&amp;#34;title&amp;#34;: &amp;#34;Title 2&amp;#34;, &amp;#34;author&amp;#34;: &amp;#34;Author 2&amp;#34;}, {&amp;#34;title&amp;#34;: &amp;#34;Title 3&amp;#34;} ] JSON モジュールとしてインポートする方法 Deno では、import 文で JSON ファイルを直接インポートできるようになっています。 JSON ファイルをインポートするときは、import assertions の機能を使って、JSON ファイルであることを明示する必要があります。
-import 文で静的インポート main.ts import books from &amp;#34;./books.json&amp;#34; assert { type: &amp;#34;json&amp;#34; }; for (const b of books) { console.log(`title: ${b.title}, author: ${b.author ?? &amp;#34;Unknown&amp;#34;}`); } 実行例 $ deno run main.</description></item><item><title>TypeScript で JSON オブジェクトに型情報を付加する</title><link>https://maku.blog/p/2hr3eqx/</link><pubDate>Sat, 26 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2hr3eqx/</guid><description>何が問題か？ JSON テキストファイルの内容を JSON.parse した結果や、fetch API のレスポンスを json() 関数にかけた結果は、型情報のない any 型のオブジェクトになります。 TypeScript コードから、このオブジェクトのプロパティを参照しようとすると、「定義されていないプロパティを参照している」という感じの ESLint エラーになってしまいます。 何より、型情報がないデータをそのまま扱おうとすると、VS Code などでプロパティ名の入力補完機能が働きません。
-ここでは、サンプルデータとして次のような JSON 形式の文字列を使うことにします。
-const jsonText = `{ &amp;#34;games&amp;#34;: [ { &amp;#34;title&amp;#34;: &amp;#34;Title1&amp;#34;, &amp;#34;genres&amp;#34;: [&amp;#34;ACT&amp;#34;] }, { &amp;#34;title&amp;#34;: &amp;#34;Title2&amp;#34;, &amp;#34;genres&amp;#34;: [&amp;#34;ACT&amp;#34;, &amp;#34;RPG&amp;#34;] }, { &amp;#34;title&amp;#34;: &amp;#34;Title3&amp;#34;, &amp;#34;genres&amp;#34;: [&amp;#34;STG&amp;#34;], &amp;#34;note&amp;#34;: &amp;#34;Fantastic shooting game&amp;#34; } ] } ` この JSON 文字列を JSON.parse 関数でオブジェクトに変換して、そのプロパティを参照しようとすると、ESLint がエラーを出します。
-// Unsafe assignment of an `any` value (@typescript-eslint/no-unsafe-assignment) const jsonObj = JSON.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>JSON on まくろぐ</title><link>https://maku.blog/tags/json/</link><description>Recent content in JSON on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Tue, 19 Sep 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/json/index.xml" rel="self" type="application/rss+xml"/><item><title>Svelte 入門: JSON ファイルをインポートして使う</title><link>https://maku.blog/p/pzrza7m/</link><pubDate>Tue, 19 Sep 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pzrza7m/</guid><description>&lt;p>Svelte (SvelteKit) アプリ内の Svelte コンポーネントや JavaScript/TypeScript ライブラリでは、JSON ファイルを &lt;strong>&lt;code>import&lt;/code>&lt;/strong> 文で簡単に読み込めるようになっています（正確には Vite の Static Asset Handling の仕組みを利用しています）。&lt;/p>
+&lt;p>ここでは、サンプルデータとして下記のようなゲームソフト情報を含んだ JSON ファイルを用意します。
+この JSON ファイルはビルド時にインポートするので、&lt;code>static&lt;/code> ディレクトリではなく &lt;code>src&lt;/code> ディレクトリのどこかに配置します（ここでは、&lt;code>lib/assets&lt;/code> というディレクトリに配置しています）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/assets/games.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;シャドウラン&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1996-02-23&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;price&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">7800&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;トムキャットアレイ&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1994-12-22&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;price&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">7800&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;真・女神転生&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">		&lt;span class="nt">&amp;#34;date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1994-02-25&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">]&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>このファイルを Svelte コンポーネントから直接インポートしてもよいのですが、次のように明示的に TypeScript の型情報を付加するライブラリでラップしておくと便利かもしれません。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/lib/games.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">rawJson&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;$lib/assets/games.json&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/** ゲームソフトの情報 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="nx">Game&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="cm">/** ゲームタイトル */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">title&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="cm">/** 発売日 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">date&lt;/span>: &lt;span class="kt">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="cm">/** 価格 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">	&lt;span class="nx">price?&lt;/span>: &lt;span class="kt">number&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 型情報を付けて games という名前で export する
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">games&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">rawJson&lt;/span> &lt;span class="kr">as&lt;/span> &lt;span class="nx">Game&lt;/span>&lt;span class="p">[];&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>実際には、明示的に型情報を付加しなくても、JSON ファイルの内容から自動的に型情報を推測してくれます。
+ただ、上記のように型情報を定義することで、ドキュメントテーションコメントを記述できたり、JSON ファイル内のデータが想定外の型で記述されているときに警告してくれるというメリットがあります。&lt;/p></description></item><item><title>VS Code で YAML ファイルの構文をチェックする（YAML 拡張）</title><link>https://maku.blog/p/c7sp7ut/</link><pubDate>Wed, 19 Apr 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/c7sp7ut/</guid><description>&lt;h2 id="yaml-拡張とは">YAML 拡張とは？&lt;/h2>
+&lt;p>VS Code の &lt;a href="https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml">YAML 拡張 (redhat.vscode-yaml)&lt;/a> をインストールすると、スキーマ定義に基づいて、YAML ファイルの記述内容が正しいかをチェックすることができます。
+スキーマ定義を &lt;a href="https://json-schema.org/">JSON スキーマファイル&lt;/a> の形で作成し、YAML ファイルの先頭に次のようなコメントを記述することで適用できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">YAML ファイルの先頭に追加&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># yaml-language-server: $schema=./schema.json&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>YAML ファイルの構文チェックなのに JSON スキーマ？と思うかもしれませんが、YAML と JSON のデータ形式には互換性があるので、スキーマは JSON スキーマでよいんですね。&lt;/p>
+&lt;h2 id="スキーマによる-yaml-ファイルの構文チェック">スキーマによる YAML ファイルの構文チェック&lt;/h2>
+&lt;h3 id="公開スキーマファイルを参照する">公開スキーマファイルを参照する&lt;/h3>
+&lt;p>スキーマファイルは、インターネット上に公開されているものを URL で指定できるようになっています。
+有名どころの設定ファイルのスキーマは、下記のサイトに一覧があるので、いろいろなプロジェクトからそのまま利用できます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://www.schemastore.org/json/">JSON Schema Store&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Ansible Playbook など、内容が複雑になりがちな YAML ファイルに設定しておくと役に立ちそうです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">playbook.yml（の先頭に記述する）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># yaml-language-server: $schema=https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>GitHub Actions のワークフローファイル (&lt;code>.github/workflows/*.yml&lt;/code>) などは、そのファイルパスから、どのスキーマを使用すればいいかを推測できるので、上記のようなコメント行すら記述せずに自動的に &lt;a href="https://json.schemastore.org/github-workflow.json">GitHub Actions 用のスキーマ&lt;/a> を適用してくれます。
+つまり、VS Code に YAML 拡張をインストールするだけで、GitHub Actions のワークフローファイルの構文チェックが有効になります。
+便利！&lt;/p>
+&lt;h3 id="独自定義したスキーマファイルを参照する">独自定義したスキーマファイルを参照する&lt;/h3>
+&lt;p>アプリケーション独自の設定ファイルやデータファイルを YAML 形式で作成する場合は、そのスキーマも独自であることが多いので、専用の JSON スキーマファイルを作成することになるでしょう。
+例えば、次の JSON スキーマファイルでは、ユーザー情報を表現するためのスキーマを定義しています（コメントを記述できるようにするために、拡張子を &lt;code>.jsonc&lt;/code> としています）。&lt;/p></description></item><item><title>Deno で JSON ファイルを読み込む方法いろいろ</title><link>https://maku.blog/p/a83hr2b/</link><pubDate>Wed, 28 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/a83hr2b/</guid><description>&lt;p>Deno で JSON ファイルを読み込んで、JavaScript のオブジェクトとして参照できるようにするには、&lt;code>import&lt;/code> で直接インポートする方法と、&lt;code>Deno.readTextFile&lt;/code> で読み込んでから &lt;code>JSON.parse&lt;/code> する方法があります。
+ここでは、それぞれの方法で次のような JSON ファイルを読み込んでみます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">books.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Title 1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;author&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Author 1&amp;#34;&lt;/span>&lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Title 2&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;author&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Author 2&amp;#34;&lt;/span>&lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Title 3&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">]&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="json-モジュールとしてインポートする方法">JSON モジュールとしてインポートする方法&lt;/h2>
+&lt;p>Deno では、&lt;strong>&lt;code>import&lt;/code>&lt;/strong> 文で JSON ファイルを直接インポートできるようになっています。
+JSON ファイルをインポートするときは、&lt;a href="https://github.com/tc39/proposal-import-assertions">import assertions&lt;/a> の機能を使って、JSON ファイルであることを明示する必要があります。&lt;/p>
+&lt;h3 id="import-文で静的インポート">import 文で静的インポート&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">main.ts&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="nx">books&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s2">&amp;#34;./books.json&amp;#34;&lt;/span> &lt;span class="nx">assert&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="kr">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;json&amp;#34;&lt;/span> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">b&lt;/span> &lt;span class="k">of&lt;/span> &lt;span class="nx">books&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sb">`title: &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">title&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">, author: &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">author&lt;/span> &lt;span class="o">??&lt;/span> &lt;span class="s2">&amp;#34;Unknown&amp;#34;&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> deno run main.ts
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">title: Title 1, author: Author 1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">title: Title 2, author: Author 2
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">title: Title 3, author: Unknown
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この方法では JSON ファイルが静的に読み込まれるため、次のような恩恵があります。&lt;/p>
+&lt;ul>
+&lt;li>JSON データから TypeScript の型情報を推測してくれるので、VS Code などで入力補完が効きます。&lt;/li>
+&lt;li>&lt;code>deno run&lt;/code> でのプログラム実行時に、&lt;code>--allow-read&lt;/code> を付加する必要がありません。&lt;/li>
+&lt;/ul>
+&lt;h3 id="import-関数で動的インポート">import 関数で動的インポート&lt;/h3>
+&lt;p>&lt;code>import&lt;/code> 文の代わりに &lt;code>import&lt;/code> 関数を使うと、動的に JSON ファイルを読み込むことができます。&lt;/p></description></item><item><title>TypeScript で JSON オブジェクトに型情報を付加する</title><link>https://maku.blog/p/2hr3eqx/</link><pubDate>Sat, 26 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/2hr3eqx/</guid><description>&lt;h2 id="何が問題か">何が問題か？&lt;/h2>
+&lt;p>JSON テキストファイルの内容を &lt;code>JSON.parse&lt;/code> した結果や、&lt;code>fetch&lt;/code> API のレスポンスを &lt;code>json()&lt;/code> 関数にかけた結果は、型情報のない &lt;code>any&lt;/code> 型のオブジェクトになります。
+TypeScript コードから、このオブジェクトのプロパティを参照しようとすると、「定義されていないプロパティを参照している」という感じの ESLint エラーになってしまいます。
+何より、型情報がないデータをそのまま扱おうとすると、VS Code などでプロパティ名の入力補完機能が働きません。&lt;/p>
+&lt;p>ここでは、サンプルデータとして次のような JSON 形式の文字列を使うことにします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">jsonText&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="sb">`{
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> &amp;#34;games&amp;#34;: [
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> &amp;#34;title&amp;#34;: &amp;#34;Title1&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> &amp;#34;genres&amp;#34;: [&amp;#34;ACT&amp;#34;]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> },
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> &amp;#34;title&amp;#34;: &amp;#34;Title2&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> &amp;#34;genres&amp;#34;: [&amp;#34;ACT&amp;#34;, &amp;#34;RPG&amp;#34;]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> },
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> &amp;#34;title&amp;#34;: &amp;#34;Title3&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> &amp;#34;genres&amp;#34;: [&amp;#34;STG&amp;#34;],
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> &amp;#34;note&amp;#34;: &amp;#34;Fantastic shooting game&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb"> ]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb">}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sb">`&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>この JSON 文字列を &lt;code>JSON.parse&lt;/code> 関数でオブジェクトに変換して、そのプロパティを参照しようとすると、ESLint がエラーを出します。&lt;/p></description></item></channel></rss>

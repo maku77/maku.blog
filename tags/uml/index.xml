@@ -1,34 +1,630 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>UML on まくろぐ</title><link>https://maku.blog/tags/uml/</link><description>Recent content in UML on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Thu, 07 Mar 2019 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/uml/index.xml" rel="self" type="application/rss+xml"/><item><title>PlantUML の基本（インストール〜画像ファイルへの保存）</title><link>https://maku.blog/p/opxhnho/</link><pubDate>Fri, 12 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/opxhnho/</guid><description>Graphviz のインストール PlantUML は図の生成のために内部で Graphviz の dot コマンドを使用するので、先に Graphviz をインストールしましょう。
-Graphviz - Graph Visualization Software ここでは、上記のサイトから ZIP ファイル graphviz-2.38.zip をダウンロードし、展開してできた release ディレクトリ内のファイル群を C:\app\graphviz-2.38 というディレクトリ内に配置するとします。 Graphviz に含まれる dot コマンドのパスを環境変数 GRAPHVIZ_DOT に設定すれば Graphviz のインストールは完了です（この環境変数を PlantUML が参照します）。
-環境変数 GRAPHVIZ_DOT の設定 GRAPHVIZ_DOT=C:\app\graphviz-2.38\bin\dot.exe PlantUML のインストール 下記から plantuml.jar をダウンロードして、適当なディレクトリに配置します。
-PlantUML - plantuml.jar のダウンロード ここでは、C:\app\plantuml\plantuml.jar というパスで配置することにします。 コマンドプロンプトから、下記のように実行して、特にエラーが発生しなければ OK です。
-実行テスト C:\&amp;gt; java -jar C:\app\plantuml\plantuml.jar -testdot The environment variable GRAPHVIZ_DOT has been set to C:\app\graphviz-2.38\bin\dot.exe Dot executable is C:\app\graphviz-2.</description></item><item><title>PlantUML でクラス図を作成する</title><link>https://maku.blog/p/tn6y85z/</link><pubDate>Thu, 07 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tn6y85z/</guid><description>クラスの箱を描く 基本 クラスの箱を描くには、class キーワードを使用します。 他にも、interface でインタフェース、abstract で抽象クラス、enum で列挙型を定義することができます。
-@startuml class クラス interface インタフェース abstract 抽象クラス enum 列挙型 @enduml クラス名にスペースや記号を含んでいる場合 クラス名やインタフェース名にスペースや記号を含めたい場合は、その文字列全体をダブルクォート &amp;quot;&amp;quot; で囲みます。 さらに、as で別名を付けておくと、あとから参照しやすくなります。
-@startuml class &amp;#34;This is a class A&amp;#34; as A class &amp;#34;This is a class B&amp;#34; as B A -&amp;gt; B @enduml ステレオタイプ クラス名の後ろに &amp;lt;&amp;lt;ステレオタイプ&amp;gt;&amp;gt; と記述することで、クラス名の上部に任意のステレオタイプを表示することができます。 独自のステレオタイプを表示することができますし、複数のステレオタイプを表示することもできます。
-@startuml interface インタフェース &amp;lt;&amp;lt;interface&amp;gt;&amp;gt; abstract 抽象クラス &amp;lt;&amp;lt;abstract&amp;gt;&amp;gt; class ほげほげ &amp;lt;&amp;lt;独自ステレオタイプ&amp;gt;&amp;gt; class へむへむ &amp;lt;&amp;lt;Serializable&amp;gt;&amp;gt; &amp;lt;&amp;lt;Model&amp;gt;&amp;gt; @enduml クラス名の横の記号を非表示にする クラス名の左側に表示される C の記号などを非表示するには、hide circle コマンドを使用します。 下記のようにすると、クラスやインタフェースの記号がすべて非表示になります。 インタフェースに &amp;lt;&amp;lt;inteface&amp;gt;&amp;gt; というステレオタイプを表示するのであれば、記号は冗長なので消しておいた方がよいかもしれません。</description></item><item><title>PlantUML でシーケンス図を作成する</title><link>https://maku.blog/p/n8p7qmw/</link><pubDate>Fri, 12 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n8p7qmw/</guid><description>シーケンス図は相互作用図 (interaction diagram) の代表的なダイアグラムです。 シーケンス図は、特定のユースケースに関するオブジェクトの典型例と、オブジェクト間のメッセージを示します。
-要素の並び順の制御 (participant) 必須の定義ではないですが、participant であらかじめ要素を列挙しておくと、その後のメッセージ定義の順序に関係なく、participant に並べた順に左から要素が配置されます。
-@startuml participant Class1 participant Class2 participant Class3 Class3 -&amp;gt; Class1 Class2 -&amp;gt; Class3 Class1 -&amp;gt; Class2 @enduml participant の代わりに actor というキーワードを使用すると、アクターのシンボルを表示することができます。
-@startuml actor Class1 participant Class2 participant Class3 Class3 -&amp;gt; Class1 Class2 -&amp;gt; Class3 Class1 -&amp;gt; Class2 @enduml 同期メッセージと非同期メッセージ、リターン オブジェクト間のメッセージは、下記のように描き分けることができます。
--&amp;gt;: 同期メッセージ --&amp;gt;: 戻り値（リターン） -&amp;raquo;`: 非同期メッセージ 同期メッセージには戻り値（リターン）(--&amp;gt;) がありますが、UML の仕様としては省略することができます。
-@startuml A -&amp;gt; B : 同期メッセージ A &amp;lt;-- B : リターン A -&amp;gt;&amp;gt; C : 非同期メッセージ @enduml ライフラインの活性区間 (activation) と終了 ライフラインの上に描かれる長方形は「活性区間 (activation)」で、その区間の間はオブジェクトがアクティブな状態になっていることを表します。 活性区間は、activate と deactivate で示します。</description></item><item><title>PlantUML でオブジェクト図を作成する</title><link>https://maku.blog/p/t7cfj92/</link><pubDate>Mon, 15 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t7cfj92/</guid><description>オブジェクト図はクラス図と同様の文法で記述することができます。 下記のページも参考にしてください。
-PlantUML でクラス図を作成する オブジェクト図の基本 オブジェクト図 (object diagram) は、システム内のオブジェクト群のある時点のスナップショットを表現します。 具体的なオブジェクト同士の関係を表現することができるため、複雑な依存関係を持つオブジェクト
-インスタンス名は下線付きで「インスタンス名：クラス名」という形式で記述します。 インスタンス名とクラス名はどちらか一方を省略して記述することもできますが、クラス名だけを記述する場合は、「：クラス名」のようにコロン部分だけは残して記述します。
-オブジェクト図は、メッセージなしのコミュニケーション図と考えることもできます。 ─『UMLモデリングのエッセンス第3版』マーチン・ファウラー
-PlantUML で登場させるオブジェクト群は、object キーワードを使って定義します。 as を使って別名を付けておくことができます。
-@startuml object object1 object &amp;#34;My second object&amp;#34; as o2 @enduml 関連の線を引く オブジェクト同士の依存関係を示すには、-- でオブジェクト名（あるいは別名）を繋ぎます。 代わりに .. を使用すると、破線 (dashed line) で繋ぐことができます。
-@startuml object object1 object &amp;#34;Second object&amp;#34; as o2 object &amp;#34;Third object&amp;#34; as o3 object &amp;#34;Fourth object&amp;#34; as o4 object1 -- o2 object1 -- o3 object1 -- o4 o2 .. o3 o3 .. o4 @enduml ハイフンやドットの数を 1 つに減らすことで、オブジェクトを横方向に配置することができます。</description></item><item><title>UML ダイアグラムの一覧と分類</title><link>https://maku.blog/p/yzs49gv/</link><pubDate>Tue, 23 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yzs49gv/</guid><description>構造図 (structual diagrams) クラス図: クラス、特性、関係 コンポーネント図: コンポーネントの構造と接続 コンポジット構造図（複合構造図）: クラスのランタイム分割 配置図: ノードへの成果物の配置 オブジェクト図: インスタンスの接続の基本例 パッケージ図: コンパイル時の階層構造 振る舞い図 (behavioral diagrams) アクティビティ図: 手続き的なまたは並行な振る舞い ユースケース図: ユーザーがシステムとどう対話（相互作用）するか ステートマシン図（状態マシン図）: オブジェクトの存続期間にイベントがオブジェクトに加える変更の内容 相互作用図 シーケンス図: オブジェクト間の相互作用（シーケンスを重視） コミュニケーション図: オブジェクト間の相互作用（リンクを重視）UML1ではコラボレーション図と呼ばれていた タイミング図: オブジェクト間の相互作用（タイミングを重視）(UML2) 相互作用概要図: シーケンス図とアクティビティ図を合わせたもの (UML2)</description></item><item><title>読書メモ『UMLモデリングのエッセンス第3版』マーチン・ファウラー</title><link>https://maku.blog/p/tc73ttt/</link><pubDate>Fri, 19 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tc73ttt/</guid><description>UMLモデリングのエッセンス第3版 マーチン・ファウラー 翔泳社 大きな仕様である UML の中で重要なポイントを簡潔にまとめた UML のバイブル的書籍です。 マーチンファウラーの名前は、『リファクタリング』や『アナリシスパターン』といった書籍で目にした人も多いでしょう。 長年オブジェクト指向に携わってきたファウラー氏のまとめたエッセンスに振れれば、UML の重要なポイントを効率よく一気に学ぶことができます。 本書は、UML を創ったスリーアミーゴ（Grady Booch、Ivar Jacobson、James Rumbaugh）の推薦図書でもあります。
-第1章: UMLの概要 UML の使い方に関する面倒な論争に対するアプローチとして、Steve Mellow と Martin Fowler は、UML の使い方を 3 種類のモードに分類している。
-スケッチ（もっとも一般的な使われ方） フォワードエンジニアリング: コードを記述する前に UML ダイアグラムを作成する。 リバースエンジニアリング: 既存のコードを理解する補助手段としてコードから UML ダイアグラムを作成する。 設計図面（blueprint。実装のため完全性を重視） プログラミング言語（Executable UML など。うまくいかず、流行らなかった） UML のユーザーは UML の本質はダイアグラムだと考えている人がほとんだが、UML の作成者は UML の本質はメタモデルであると考えている。ダイアグラムはメタモデルの表現にすぎない。
-細部までフォワードエンジニアリングされた設計図面はうまく扱うのが難しく、開発作業の遅れに繋がる。 サブシステムのインタフェースレベルで設計図面を作成するのは合理的だが、実装するのに合わせてインタフェースが変わることを想定しておく必要がある。 このような考えから、著者のマーチン・ファウラーは、UML をスケッチとして使用することを重視している。
-UMLダイアグラム一覧と分類 UMLダイアグラムが使用目的に適さない場合は、非UMLダイアグラムを積極的に使うべき。デシジョンテーブルや画面フロー図などは役に立つ。 まずクラス図とシーケンス図の基本形態に集中することをお勧めする。これらは最も一般的であり、最も便利なダイアグラムである。 第2章: 開発プロセス モデリング技術は、それがプロセスにどのように適合するかを理解しなければ、意味を成さない。UMLの使い方は、使用するプロセスのスタイルによってかなり異なる。 ウォーターフォール型プロセスでは、プロジェクトをアクティビティに基づいて分解する。要求分析、設計、コーディング、テストを順番に実行する。 反復型プロセスは、プロジェクトを機能のサブセットで分解する。1年間のプロジェクトでは、3ヵ月ごとの反復に分解することが考えられる。3ヵ月が終わるごとに、必要な機能の1/4がシステムに実装される。 Steve McConnell は、『ラピッドデベロップメント』 の中で、プロセスを組み合わせて使用する方法を説明している。最初の4ヵ月で要求分析と設計をウォーターフォール的に行い、コーディングとテストは2ヵ月の反復を4回繰り返す。 テストと統合は予測の難しいアクティビティであり、このような終了時期の見えにくいアクティビティをプロジェクトの最後に置かないことが重要。 経験から言うと、単体テストのコードは製品本体のコードと同程度の量が必要。 RUP (Rational Unified Process) RUP はプロセスと呼ばれているが、実際にはプロセスのフレームワークである。RUP はプロセスを説明するための語彙と柔軟な構造を提供する。 RUP は本質的に反復型プロセスであり、ウォーターフォール型は RUP の考え方に適合しない。 RUP は UP (Unified Process) に基づいた Rational 社の製品であると考えることができる。また、RUP と UP を同じものと考えることもできる。どちらも正しい。 反復型開発の最大の利点のひとつは、プロセスを頻繁に改良できること。 反復の最後に、チームでその反復を振り返り、次の3つのリスト (KPT) を作成するのがよい。 K: Keep（継続）: 有効に機能していて、今後も継続して行う事項 P: Problem（問題）: 有効に機能していない事項 T: Try（試み）: プロセスを改良するための変更 プロジェクトの最後、または主要なリリース時には、本格的にプロジェクトを振り返るのもよい。参考: https://en.</description></item><item><title>『オブジェクト開発の神髄 UML2.0を使ったアジャイルモデル駆動開発のすべて』スコット・W・アンブラー</title><link>https://maku.blog/p/9kuptdn/</link><pubDate>Wed, 18 Jul 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9kuptdn/</guid><description>オブジェクト開発の神髄 UML2.0を使ったアジャイルモデル駆動開発のすべて スコット・W・アンブラー 日経BP社 原題は『The Object Primer』。 スコット・アンブラーのフルライフサイクルオブジェクト指向テスト (FLOOT: Full Lifecycle Object-Oriented Testing) から、アジャイルな要求やアーキテクチャまでが、1 つにまとめられています。 実践 eXtreme プログラミングの共著者である Granville Miller は、「アジャイルになるとは、チームや自分自身に対する制約を取り払うこと」だと述べています。 本書ではその方法の神髄を学ぶことができます。
-下記、重要そうなところや、個人的にビビッと来たところのメモです。
-第1章: 最先端のソフトウェア開発 下記がアジャイルアライアンスのマニフェストであり、そこに集まった異なる方法論者全員に受け入れられたものである。 Individuals and interactions over processes and tools
-プロセスやツールよりも個人や相互作用 すばらしいプロセスやツールは重要だが、結局は人の協力関係がすべて。 Working software over comprehensive documentation
-わかりやすいドキュメントよりも動作するソフトウェア ドキュメントはシステムがなぜ、どのように構築されたか、どう使えばよいかを理解するためには重要。 Customer collaboration over contract negotiation
-契約上の駆け引きよりも顧客との協調 契約は重要だが、契約を結んだからといってコミュニケーションが必要なくなるわけではない。 Responding to change over following a plan
-計画を硬直的に守ることよりも変化への対応 プロジェクト計画は必要だが、柔軟でなければならない。ガントチャートを何枚も作成する必要はなく、非常に単純なものでよい。 自己組織化されたチームとは、チームのリーダーが開発メンバーの各自の役割や作業範囲を決めるのではなく、目標を共有するメンバーが共同作業を行う過程でチームの能力が最大限発揮されるようにメンバーの役割が自然に決まっていくようなチーム形態のこと。 成功を収めている組織は、大抵アジャイルなソフトウェア開発アプローチをとっているか、RUP または EUP を採用しているかのどちらかだ。RUP をアジャイルに使おうとしても現実には非常に困難（素材が多すぎてアジャイルなレベルまで切り詰められない）。アジャイルプロセスを取り入れたいなら、XP や FDD などを採用すべき。 MDA よりも、アジャイルモデル駆動開発 (AMDD: Agile Model-Driven Development) アプローチの方が、お絵かき式のモデリング方法に近く、現実的に大多数の開発者が採用できるアプローチである。 第2章: オブジェクト指向概念の基本 この章にはオブジェクト指向を知らない人のために、その概念について書かれています。</description></item><item><title>読書メモ『ワークブック形式で学ぶ UML オブジェクトモデリング─ユースケース駆動でソフトウェアを開発する』ダグ・ローゼンバーグ、ケンドール・スコット</title><link>https://maku.blog/p/d3ehztz/</link><pubDate>Wed, 18 Jul 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/d3ehztz/</guid><description>ワークブック形式で学ぶ UML オブジェクトモデリング ダグ・ローゼンバーグ、ケンドール・スコット ソフトバンククリエイティブ 「ユースケースと UML モデリングの例題がもっと必要だ」という声がきっかけになり書かれた本です。 ユースケースという抽象的な表現から、どのようなステップで具体的なコードにまで落とし込んでいくかが説明されています。 このような開発をユースケース駆動と呼んでおり、提唱者の Ivar Jacobson によると、ユースケース駆動は下記のように説明されています。
-システム機能を変更する場合は、適切なアクタとユースケースを再モデル化します。 システムアーキテクチャ全体は、ユーザの要求にそって構築されます。 すべてのモデルはトレースできるようにしておくと、新しい要求仕様が発生した際にもシステムの修正が可能になります。 ユーザに対し、変更したい部分（もしくは変更したいユースケース）の内容を確認し、ほかのモデルの中でどの部分を変更するかを見極めます。
-本書の著者、ダグ・ローゼンバーグはこれを以下のように簡単に解釈しています。
-ユーザマニュアルを書けば、コードも書ける。
-第1章: はじめに ここで用いる ICONIX プロセスは、重量級の RUP（ラショナル統一プロセス）と、軽量級の XP (eXtreme Programming) の間に位置する。具体的で理解しやすいユースケースが作成できるという点で、Ivar Jacobson が構想した「ユースケース駆動」の意味に一致している。 ソフトウェアプロジェクトの進捗はどれだけのコードを書いたかによって測定されることが多いので、プロジェクトはコーディングに移行しようとする。そして、モデリングが十分にできていない段階でコーディングが始まってしまう。 本書の目的は、ソフトウェアプロジェクトにおいて、よい仕事をするために通常必要と思われる UML（およびモデリング全般）の、最小限ではあるが、十分なサブセットを定義すること。 what（要求）と how（詳細）のギャップを埋めることが ICONIX プロセスの中心課題である。ロバストネス図を使って、あいまいで漠然としたユースケース（要求レベルのビュー）と、詳細で正確なシーケンス図（設計レベルのビュー）のギャップを解消する。ロバストネス図を使用せずにユースケースからシーケンス図を作成することは非常に難しい。ロバストネス分析は、要求と設計のギャップを解消するのにとても役に立つ。 ギャップの解消するためには、ロバストネス分析の中で、下記のような作業を並行して行っていく。 見落としていたオブジェクトを見つける。 データフローをトレースする際に、クラスに属性を追加する。 ロバストネス図を描きながら、ユースケース記述を更新し洗練する。 ドメインモデルで定義した「用語」を使ってロバストネス図を描く。 ユースケースモデル ⇔ ロバストネス図 ⇒ シーケンス図 図: ICONIX プロセス全体像 ICONIX プロセス: プロトタイプを作る（おそらく画面の簡単な描画）。 クライアントに誤りがないかを確認してもらう。 ユースケース図のユースケースを識別する。 ユースケース記述を書く。 ロバストネス分析でユースケース記述を洗練する。 第2章: ドメインモデリング ドメインモデリングでは、UML モデルの静的な部分の基礎を形成する。 ドメインモデルは実世界の問題空間オブジェクトを中心に構成するので、ソフトウェアの要求ほど頻繁には変化しない。 ドメインモデルは、ユースケースを記述する作業の初期段階で使用できる「用語集」の役割を果たす。 ドメインモデリングでは、属性と操作の把握には時間を費やさない。後の作業で明らかになった属性と操作を追加していけばよい。 ドメインモデリングでは、オブジェクト間の関係（汎化や集約）を識別することに焦点を当てる。 ソフトウェアが再利用できるかどうかは、このドメインモデリング作業にかかっている。 ドメインモデリングの誤りトップ10 ドメインモデリングのコツはすばやく作ること。ブラッシュアップは後のロバスト分析などの過程で行っていけばよい。</description></item><item><title>読書メモ『ダイアグラム別 UML 徹底活用』井上樹</title><link>https://maku.blog/p/xfgoaq3/</link><pubDate>Wed, 30 May 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xfgoaq3/</guid><description>ダイアグラム別UML徹底活用 第2版 井上 樹 翔泳社 （全13章）
-1章: モデリングのメリットを考える モデリングの連続の末にプログラムというモデルの最終形態に辿り着くことが、システムを開発するということ。 図によるモデル化のメリット 情報量が多い 理解しやすい 誤解が少ない UML2.0 について ダイアグラムが10種類から13種類に増加（コンポジット図、相互作用概要図、タイミング図）し、次のようなことをモデル化できるようになった。 複数のインスタンスを内包するクラスの内部構造 複数のインタラクションの時系列上の流れ 複数のインスタンス間でのメッセージのやり取りと、それに伴う状態変化 ダイアグラム名称の一部変更 ステートチャート図 → ステートマシン図 コラボレーション図 → コミュニケーション図 「フレーム」が追加され、ダイアグラム全体を囲んだ入り、一部を囲んで説明を加えることができるようになった。ダイアグラムの一部をフレームとして囲んだところを畳み込めば、大きなダイアグラムでも全体を見渡しやすくなる。 2章: ユースケース図の注意点と使いどころ ユースケースは、**「こういうものを作るんだ」**ということを明らかにするために描く。 関連を結んだアクター＝ユースケースの起動者ではない。関連はあくまで関わり合いがあることだけを示す。 UML2.0 におけるユースケースの変更点は、extend の関係に対してノートで条件を書けるようになったこと。 役立つユースケースにするには 目的／読者を確認する 名前付けに注意する 抽象度: 「一般会員」や「レジ係」というように文章に出てくるくらいの抽象度がよい。 正確性: 対象を明示する（例: 貸出→ビデオを貸し出す、返却→ビデオの返却を受け付ける） 表現の統一: 同じ意味を示す言葉は揃える（例: 「貸し出す」と「レンタルする」） 粒度を揃える 機能分割にしない: 機能単位で描くと粒度が細かくなりすぎて、そのモデル化した対象がどんなサービスを提供しているのかわからなくなってしまう。サービスで分割することを意識する。 ≪include≫は1段階まで: 2段階以上にするとアクターにとって意味のある粒度のユースケースになりにくい。 ≪include≫、≪extend≫、汎化関係を混同しない ≪include≫: ≪include≫先のユースケースは必ず必要になることを意味する。プログラムの関数呼び出しのような感じで、複数のユースケースから共有できる（例: ビデオを借りる─include→会員かどうかを確認する）。 ≪extend≫: ≪extend≫でベースになっているユースケースにサービスを付加した場合は、ベースとなるユースケースの実行には≪extend≫で定義したユースケースは必ずしも必要ない（例: ビデオを借りる←extend─カードで料金を払う）。逆に、≪extend≫で定義されたユースケースを実行するには、必ずベースのユースケースが必要になる。 汎化関係: 汎化関係は機能を追加するのではなく、概念だけ共通だがまったく新しいユースケースを定義する（例: ビデオを借りる←汎化─ビデオを宅配で借りる）。 ユースケース記述と合わせる: ユースケース図だけでは誤解を招きやすいので、ユースケース図を描いたら、ユースケース記述も合わせて作成する。ユースケース図とユースケース記述を合わせて**「ユースケースモデル」**と呼んだりする。 3章: ユースケース記述の注意点と使いどころ ユースケース記述の概要 ユースケース記述はシステム開発の初期にユースケース図と一緒に作られ、システム外部から（利用者から）見たときの振る舞いを明確にする。 特に担当者を入れ替えながら開発が進んでいくプロジェクトなどでは、開発者間でシステムイメージを共有できるということは重要。 ユースケース記述は書くのに非常に手間のかかる成果物だが、システム開発に一貫したゴールを与えることができるのは大きなメリット。ユースケースのレベルで再利用できるようになると、より楽をできるようになる。 ユースケース駆動開発 ユースケースは進捗を計るベースとして使用できる。ユースケースを一単位とすると、代替フローや例外フローが含まれているため、作業単位の粒度としては大きくなりすぎることがある。そのような場合、ユースケース記述に書かれた**「シナリオ」を作業単位とする**とよい。 ユースケース駆動開発では、ユースケースのシナリオごとに、(1)分析、(2)設計、(3)実装、(4)テストという作業を進めていく。ユースケースを実現できたかどうか（それぞれのステップが完了したかどうか）のポイントは下記の通り。 分析: 分析のクラス図に書かれているクラス群を使って、ユースケース記述に書かれたシナリオを実現する相互作用図（シーケンス図、コレボレーション図）を作ることができる 設計: 設計のクラス図に書かれているクラス群を使って、ユースケース記述に書かれたシナリオを実現する相互作用図（シーケンス図、コラボレーション図）を作ることができる 実装: シナリオを実現するためのプログラムが書けている テスト: シナリオに書いてある通りにシステムが動いている ユースケース記述のテストへの活用 ユースケース記述に書かれた振る舞いは、要求元と合意されたものとなるので、テストケースの元ネタとして使うことができる。 テストケースとシナリオは対応するものなので、テストを意識してシナリオリストを作成すると、テストケースの作成が容易になる。イベントフロー（メインフロー＋代替フロー＋例外フロー）の組み合わせを網羅する形でシナリオリストを作るのがコツ。 イベントフローは３種類 メインフロー: 正常に処理が進んだ場合。 代替フロー: 正常系の代わり（エラーが発生した場合など）。代替フローを実行した場合でも事後条件は満たされる。 例外フロー: ユースケースの実行を断念しなければならないような場合。例外フローを実行した場合は事後条件は満たされない。 ユースケース記述のポイント 厳密に漏れなく書く 曖昧性のない厳密な記述がされており、システムの振る舞いが具体的に理解できること。 ユースケース記述の作成と合わせて用語集を作成するとよい。 イベントフローの書き出しは「アクターは～」、「システムは～」と動作の主語を必ず書く。 システムで実現すべきことはすべてユースケースに書かれているようにする 仕様変更が発生した場合など、ユースケース記述はこまめにメンテナンスする。 細かくしすぎない エンドユーザにもわかるレベルで記述する（エンドユーザーと開発者が共有するものなので）。ユーザマニュアルのようなレベルを想定するとちょうどよい。 データベースのテーブルや、画面レイアウト、画面遷移を意識する記述が出てきたら危険。 イベントフローに「システムは～する」という記述が連続して 4 ～ 5 ステップ続いたら詳細になりすぎている可能性が高い。 危険なワード: DB、テーブル、クエリ、キー、ID、コネクション、チャネル、セッション、トランザクション、ロック、ボタン、クリック、入力欄、インタフェース 補足資料を使う 文章だけで記述するのではなく、アクティビティ図や、スケッチ、表なども併用すればよい。 空欄を作らない ユースケース記述のフォーマットには項目がたくさんあるが、空白状態で放置しない。「T.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>UML on まくろぐ</title><link>https://maku.blog/tags/uml/</link><description>Recent content in UML on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Thu, 07 Mar 2019 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/uml/index.xml" rel="self" type="application/rss+xml"/><item><title>PlantUML の基本（インストール〜画像ファイルへの保存）</title><link>https://maku.blog/p/opxhnho/</link><pubDate>Fri, 12 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/opxhnho/</guid><description>&lt;figure class="xImage">
+ &lt;img style="" width="200" height="auto" src="../../p/opxhnho/install1.svg" alt="/p/opxhnho/install1.svg" />
+&lt;/figure>
+
+&lt;h2 id="graphviz-のインストール">Graphviz のインストール&lt;/h2>
+&lt;p>PlantUML は図の生成のために&lt;strong>内部で Graphviz の dot コマンドを使用する&lt;/strong>ので、先に Graphviz をインストールしましょう。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://www.graphviz.org/">Graphviz - Graph Visualization Software&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>ここでは、上記のサイトから ZIP ファイル &lt;code>graphviz-2.38.zip&lt;/code> をダウンロードし、展開してできた &lt;code>release&lt;/code> ディレクトリ内のファイル群を &lt;code>C:\app\graphviz-2.38&lt;/code> というディレクトリ内に配置するとします。
+Graphviz に含まれる &lt;code>dot&lt;/code> コマンドのパスを環境変数 &lt;strong>&lt;code>GRAPHVIZ_DOT&lt;/code>&lt;/strong> に設定すれば Graphviz のインストールは完了です（この環境変数を PlantUML が参照します）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">環境変数 GRAPHVIZ_DOT の設定&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">GRAPHVIZ_DOT=C:\app\graphviz-2.38\bin\dot.exe&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="plantuml-のインストール">PlantUML のインストール&lt;/h2>
+&lt;p>下記から &lt;code>plantuml.jar&lt;/code> をダウンロードして、適当なディレクトリに配置します。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="http://plantuml.com/download">PlantUML - plantuml.jar のダウンロード&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>ここでは、&lt;code>C:\app\plantuml\plantuml.jar&lt;/code> というパスで配置することにします。
+コマンドプロンプトから、下記のように実行して、特にエラーが発生しなければ OK です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">実行テスト&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">C:\&amp;gt; java -jar C:\app\plantuml\plantuml.jar -testdot
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">The environment variable GRAPHVIZ_DOT has been set to C:\app\graphviz-2.38\bin\dot.exe
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Dot executable is C:\app\graphviz-2.38\bin\dot.exe
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Dot version: dot - graphviz version 2.38.0 (20140413.2041)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Installation seems OK. File generation OK&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="plantuml-コマンドを簡単に使えるようにする">plantuml コマンドを簡単に使えるようにする&lt;/h2>
+&lt;p>PlantUML を使って図を生成するために、毎回 &lt;code>java -jar plantuml.jar xxx&lt;/code> と入力するのは面倒なので、&lt;code>plantuml&lt;/code> というコマンドで一発で実行できるようにします。&lt;/p></description></item><item><title>PlantUML でクラス図を作成する</title><link>https://maku.blog/p/tn6y85z/</link><pubDate>Thu, 07 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tn6y85z/</guid><description>&lt;h2 id="クラスの箱を描く">クラスの箱を描く&lt;/h2>
+&lt;h3 id="基本">基本&lt;/h3>
+&lt;p>クラスの箱を描くには、&lt;strong>&lt;code>class&lt;/code>&lt;/strong> キーワードを使用します。
+他にも、&lt;strong>&lt;code>interface&lt;/code>&lt;/strong> でインタフェース、&lt;strong>&lt;code>abstract&lt;/code>&lt;/strong> で抽象クラス、&lt;strong>&lt;code>enum&lt;/code>&lt;/strong> で列挙型を定義することができます。&lt;/p>
+&lt;div style="border: solid 1px gray; padding: 0.5em 0; border: solid 1px #ccc; border-radius: 0.5em;">
+ &lt;div style="display: inline-block; width: 49%; text-align: center;">
+ &lt;img style="width:auto; height:auto" src="../../p/tn6y85z/box.svg" >
+ &lt;/div>
+ &lt;div style="display: inline-block; width: 49%; vertical-align: top; white-space: nowrap; overflow-wrap: break-word;">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">@startuml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">class クラス
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">interface インタフェース
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">abstract 抽象クラス
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">enum 列挙型
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@enduml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+
+&lt;h3 id="クラス名にスペースや記号を含んでいる場合">クラス名にスペースや記号を含んでいる場合&lt;/h3>
+&lt;p>クラス名やインタフェース名にスペースや記号を含めたい場合は、その文字列全体をダブルクォート &lt;strong>&lt;code>&amp;quot;&amp;quot;&lt;/code>&lt;/strong> で囲みます。
+さらに、&lt;strong>&lt;code>as&lt;/code>&lt;/strong> で別名を付けておくと、あとから参照しやすくなります。&lt;/p>
+&lt;div style="border: solid 1px gray; padding: 0.5em 0; border: solid 1px #ccc; border-radius: 0.5em;">
+ &lt;div style="display: inline-block; width: 49%; text-align: center;">
+ &lt;img style="width:350px; height:auto" src="../../p/tn6y85z/quoted.svg" >
+ &lt;/div>
+ &lt;div style="display: inline-block; width: 49%; vertical-align: top; white-space: nowrap; overflow-wrap: break-word;">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">@startuml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">class &amp;#34;This is a class A&amp;#34; as A
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">class &amp;#34;This is a class B&amp;#34; as B
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">A -&amp;gt; B
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@enduml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+
+&lt;h3 id="ステレオタイプ">ステレオタイプ&lt;/h3>
+&lt;p>クラス名の後ろに &lt;strong>&lt;code>&amp;lt;&amp;lt;ステレオタイプ&amp;gt;&amp;gt;&lt;/code>&lt;/strong> と記述することで、クラス名の上部に任意のステレオタイプを表示することができます。
+独自のステレオタイプを表示することができますし、複数のステレオタイプを表示することもできます。&lt;/p></description></item><item><title>PlantUML でシーケンス図を作成する</title><link>https://maku.blog/p/n8p7qmw/</link><pubDate>Fri, 12 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/n8p7qmw/</guid><description>&lt;p>シーケンス図は相互作用図 (interaction diagram) の代表的なダイアグラムです。
+シーケンス図は、特定のユースケースに関するオブジェクトの典型例と、オブジェクト間のメッセージを示します。&lt;/p>
+&lt;h2 id="要素の並び順の制御-participant">要素の並び順の制御 (participant)&lt;/h2>
+&lt;p>必須の定義ではないですが、&lt;code>participant&lt;/code> であらかじめ要素を列挙しておくと、その後のメッセージ定義の順序に関係なく、&lt;code>participant&lt;/code> に並べた順に左から要素が配置されます。&lt;/p>
+&lt;div style="border: solid 1px gray; padding: 0.5em 0; border: solid 1px #ccc; border-radius: 0.5em;">
+ &lt;div style="display: inline-block; width: 49%; text-align: center;">
+ &lt;img style="width:auto; height:auto" src="../../p/n8p7qmw/participant.svg" >
+ &lt;/div>
+ &lt;div style="display: inline-block; width: 49%; vertical-align: top; white-space: nowrap; overflow-wrap: break-word;">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">@startuml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">participant Class1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">participant Class2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">participant Class3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Class3 -&amp;gt; Class1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Class2 -&amp;gt; Class3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Class1 -&amp;gt; Class2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@enduml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+
+&lt;p>&lt;code>participant&lt;/code> の代わりに &lt;strong>&lt;code>actor&lt;/code>&lt;/strong> というキーワードを使用すると、アクターのシンボルを表示することができます。&lt;/p>
+&lt;div style="border: solid 1px gray; padding: 0.5em 0; border: solid 1px #ccc; border-radius: 0.5em;">
+ &lt;div style="display: inline-block; width: 49%; text-align: center;">
+ &lt;img style="width:auto; height:auto" src="../../p/n8p7qmw/actor.svg" >
+ &lt;/div>
+ &lt;div style="display: inline-block; width: 49%; vertical-align: top; white-space: nowrap; overflow-wrap: break-word;">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">@startuml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">actor Class1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">participant Class2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">participant Class3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Class3 -&amp;gt; Class1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Class2 -&amp;gt; Class3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Class1 -&amp;gt; Class2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@enduml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+
+&lt;h2 id="同期メッセージと非同期メッセージリターン">同期メッセージと非同期メッセージ、リターン&lt;/h2>
+&lt;p>オブジェクト間のメッセージは、下記のように描き分けることができます。&lt;/p></description></item><item><title>PlantUML でオブジェクト図を作成する</title><link>https://maku.blog/p/t7cfj92/</link><pubDate>Mon, 15 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/t7cfj92/</guid><description>&lt;p>オブジェクト図はクラス図と同様の文法で記述することができます。
+下記のページも参考にしてください。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/tn6y85z">PlantUML でクラス図を作成する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="オブジェクト図の基本">オブジェクト図の基本&lt;/h2>
+&lt;p>オブジェクト図 (object diagram) は、システム内のオブジェクト群のある時点のスナップショットを表現します。
+具体的なオブジェクト同士の関係を表現することができるため、複雑な依存関係を持つオブジェクト&lt;/p>
+&lt;p>インスタンス名は下線付きで「&lt;strong>&lt;u>インスタンス名：クラス名&lt;/u>&lt;/strong>」という形式で記述します。
+インスタンス名とクラス名はどちらか一方を省略して記述することもできますが、クラス名だけを記述する場合は、「&lt;strong>&lt;u>：クラス名&lt;/u>&lt;/strong>」のようにコロン部分だけは残して記述します。&lt;/p>
+&lt;blockquote>
+&lt;p>オブジェクト図は、メッセージなしのコミュニケーション図と考えることもできます。
+─『UMLモデリングのエッセンス第3版』マーチン・ファウラー&lt;/p>
+&lt;/blockquote>
+&lt;p>PlantUML で登場させるオブジェクト群は、&lt;strong>&lt;code>object&lt;/code>&lt;/strong> キーワードを使って定義します。
+&lt;code>as&lt;/code> を使って別名を付けておくことができます。&lt;/p>
+&lt;div style="border: solid 1px gray; padding: 0.5em 0; border: solid 1px #ccc; border-radius: 0.5em;">
+ &lt;div style="display: inline-block; width: 49%; text-align: center;">
+ &lt;img style="width:auto; height:auto" src="../../p/t7cfj92/object.svg" >
+ &lt;/div>
+ &lt;div style="display: inline-block; width: 49%; vertical-align: top; white-space: nowrap; overflow-wrap: break-word;">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">@startuml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object object1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object &amp;#34;My second object&amp;#34; as o2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@enduml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+
+&lt;h2 id="関連の線を引く">関連の線を引く&lt;/h2>
+&lt;p>オブジェクト同士の依存関係を示すには、&lt;code>--&lt;/code> でオブジェクト名（あるいは別名）を繋ぎます。
+代わりに &lt;code>..&lt;/code> を使用すると、破線 (dashed line) で繋ぐことができます。&lt;/p>
+&lt;div style="border: solid 1px gray; padding: 0.5em 0; border: solid 1px #ccc; border-radius: 0.5em;">
+ &lt;div style="display: inline-block; width: 49%; text-align: center;">
+ &lt;img style="width:auto; height:auto" src="../../p/t7cfj92/object-lines1.svg" >
+ &lt;/div>
+ &lt;div style="display: inline-block; width: 49%; vertical-align: top; white-space: nowrap; overflow-wrap: break-word;">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">@startuml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object object1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object &amp;#34;Second object&amp;#34; as o2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object &amp;#34;Third object&amp;#34; as o3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object &amp;#34;Fourth object&amp;#34; as o4
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object1 -- o2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object1 -- o3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">object1 -- o4
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">o2 .. o3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">o3 .. o4
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@enduml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+
+&lt;p>ハイフンやドットの数を 1 つに減らすことで、オブジェクトを横方向に配置することができます。&lt;/p></description></item><item><title>UML ダイアグラムの一覧と分類</title><link>https://maku.blog/p/yzs49gv/</link><pubDate>Tue, 23 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yzs49gv/</guid><description>&lt;h2 id="構造図-structual-diagrams">構造図 (structual diagrams)&lt;/h2>
+&lt;ol>
+&lt;li>&lt;b>クラス図&lt;/b>: クラス、特性、関係&lt;/li>
+&lt;li>&lt;b>コンポーネント図&lt;/b>: コンポーネントの構造と接続&lt;/li>
+&lt;li>&lt;b>コンポジット構造図（複合構造図）&lt;/b>: クラスのランタイム分割&lt;/li>
+&lt;li>&lt;b>配置図&lt;/b>: ノードへの成果物の配置&lt;/li>
+&lt;li>&lt;b>オブジェクト図&lt;/b>: インスタンスの接続の基本例&lt;/li>
+&lt;li>&lt;b>パッケージ図&lt;/b>: コンパイル時の階層構造&lt;/li>
+&lt;/ol>
+&lt;h2 id="振る舞い図-behavioral-diagrams">振る舞い図 (behavioral diagrams)&lt;/h2>
+&lt;ol>
+&lt;li>&lt;b>アクティビティ図&lt;/b>: 手続き的なまたは並行な振る舞い&lt;/li>
+&lt;li>&lt;b>ユースケース図&lt;/b>: ユーザーがシステムとどう対話（相互作用）するか&lt;/li>
+&lt;li>&lt;b>ステートマシン図（状態マシン図）&lt;/b>: オブジェクトの存続期間にイベントがオブジェクトに加える変更の内容&lt;/li>
+&lt;li>&lt;b>相互作用図&lt;/b>
+&lt;ol>
+&lt;li>&lt;b>シーケンス図&lt;/b>: オブジェクト間の相互作用（シーケンスを重視）&lt;/li>
+&lt;li>&lt;b>コミュニケーション図&lt;/b>: オブジェクト間の相互作用（リンクを重視）UML1ではコラボレーション図と呼ばれていた&lt;/li>
+&lt;li>&lt;b>タイミング図&lt;/b>: オブジェクト間の相互作用（タイミングを重視）(UML2)&lt;/li>
+&lt;li>&lt;b>相互作用概要図&lt;/b>: シーケンス図とアクティビティ図を合わせたもの (UML2)&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ol></description></item><item><title>読書メモ『UMLモデリングのエッセンス第3版』マーチン・ファウラー</title><link>https://maku.blog/p/tc73ttt/</link><pubDate>Fri, 19 Oct 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/tc73ttt/</guid><description>&lt;div class="xAmazon">
+ &lt;a href="https://www.amazon.co.jp/exec/obidos/ASIN/4798107956/maku04-22/ref=nosim/" target="_blank">
+ &lt;div class="xAmazon_image">
+ &lt;img src="https://images-na.ssl-images-amazon.com/images/I/51P6D4Q7T8L.jpg" alt="UMLモデリングのエッセンス第3版">
+ &lt;/div>
+ &lt;div class="xAmazon_info">
+ &lt;div class="xAmazon_info_title">UMLモデリングのエッセンス第3版&lt;/div>
+ &lt;div class="xAmazon_info_author">マーチン・ファウラー&lt;/div>
+ &lt;div class="xAmazon_info_publisher">翔泳社&lt;/div>
+ &lt;div class="xAmazon_info_icon">&lt;img src="data:image/gif;base64,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" alt="アマゾンのロゴ">&lt;/div>
+ &lt;/div>
+ &lt;/a>
+&lt;/div>
+&lt;p>大きな仕様である UML の中で重要なポイントを簡潔にまとめた UML のバイブル的書籍です。
+マーチンファウラーの名前は、『リファクタリング』や『アナリシスパターン』といった書籍で目にした人も多いでしょう。
+長年オブジェクト指向に携わってきたファウラー氏のまとめたエッセンスに振れれば、UML の重要なポイントを効率よく一気に学ぶことができます。
+本書は、UML を創ったスリーアミーゴ（Grady Booch、Ivar Jacobson、James Rumbaugh）の推薦図書でもあります。&lt;/p>
+&lt;h2 id="第1章-umlの概要">第1章: UMLの概要&lt;/h2>
+&lt;p>UML の使い方に関する面倒な論争に対するアプローチとして、Steve Mellow と Martin Fowler は、UML の使い方を 3 種類のモードに分類している。&lt;/p>
+&lt;ul>
+&lt;li>スケッチ（もっとも一般的な使われ方）
+&lt;ul>
+&lt;li>&lt;b>フォワードエンジニアリング&lt;/b>: コードを記述する前に UML ダイアグラムを作成する。&lt;/li>
+&lt;li>&lt;b>リバースエンジニアリング&lt;/b>: 既存のコードを理解する補助手段としてコードから UML ダイアグラムを作成する。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>設計図面（blueprint。実装のため完全性を重視）&lt;/li>
+&lt;li>プログラミング言語（Executable UML など。うまくいかず、流行らなかった）&lt;/li>
+&lt;/ul>
+&lt;p>UML のユーザーは UML の本質はダイアグラムだと考えている人がほとんだが、UML の作成者は &lt;strong>UML の本質はメタモデルである&lt;/strong>と考えている。ダイアグラムはメタモデルの表現にすぎない。&lt;/p>
+&lt;p>細部までフォワードエンジニアリングされた設計図面はうまく扱うのが難しく、開発作業の遅れに繋がる。
+サブシステムのインタフェースレベルで設計図面を作成するのは合理的だが、実装するのに合わせてインタフェースが変わることを想定しておく必要がある。
+このような考えから、著者のマーチン・ファウラーは、&lt;strong>UML をスケッチとして使用することを重視&lt;/strong>している。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="../../p/yzs49gv">UMLダイアグラム一覧と分類&lt;/a>&lt;/li>
+&lt;li>UMLダイアグラムが使用目的に適さない場合は、非UMLダイアグラムを積極的に使うべき。デシジョンテーブルや画面フロー図などは役に立つ。&lt;/li>
+&lt;li>まずクラス図とシーケンス図の基本形態に集中することをお勧めする。これらは最も一般的であり、最も便利なダイアグラムである。&lt;/li>
+&lt;/ul>
+&lt;h2 id="第2章-開発プロセス">第2章: 開発プロセス&lt;/h2>
+&lt;ul>
+&lt;li>モデリング技術は、それがプロセスにどのように適合するかを理解しなければ、意味を成さない。UMLの使い方は、使用するプロセスのスタイルによってかなり異なる。&lt;/li>
+&lt;li>&lt;b>ウォーターフォール型プロセス&lt;/b>では、プロジェクトをアクティビティに基づいて分解する。要求分析、設計、コーディング、テストを順番に実行する。&lt;/li>
+&lt;li>&lt;b>反復型プロセス&lt;/b>は、プロジェクトを機能のサブセットで分解する。1年間のプロジェクトでは、3ヵ月ごとの反復に分解することが考えられる。3ヵ月が終わるごとに、必要な機能の1/4がシステムに実装される。&lt;/li>
+&lt;li>Steve McConnell は、&lt;a target="_blank" href="https://www.amazon.co.jp/dp/4756108032?tag=maku04-22">『ラピッドデベロップメント』&lt;/a>
+の中で、プロセスを組み合わせて使用する方法を説明している。最初の4ヵ月で要求分析と設計をウォーターフォール的に行い、コーディングとテストは2ヵ月の反復を4回繰り返す。&lt;/li>
+&lt;li>&lt;strong>テストと統合は予測の難しいアクティビティであり、このような終了時期の見えにくいアクティビティをプロジェクトの最後に置かないことが重要&lt;/strong>。&lt;/li>
+&lt;li>経験から言うと、単体テストのコードは製品本体のコードと同程度の量が必要。&lt;/li>
+&lt;li>RUP (Rational Unified Process)
+&lt;ul>
+&lt;li>RUP はプロセスと呼ばれているが、実際にはプロセスのフレームワークである。RUP はプロセスを説明するための語彙と柔軟な構造を提供する。&lt;/li>
+&lt;li>RUP は本質的に反復型プロセスであり、ウォーターフォール型は RUP の考え方に適合しない。&lt;/li>
+&lt;li>RUP は UP (Unified Process) に基づいた Rational 社の製品であると考えることができる。また、RUP と UP を同じものと考えることもできる。どちらも正しい。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>反復型開発の最大の利点のひとつは、プロセスを頻繁に改良できること&lt;/strong>。&lt;/li>
+&lt;li>&lt;strong>反復の最後に、チームでその反復を振り返り、次の3つのリスト (KPT) を作成するのがよい&lt;/strong>。
+&lt;ul>
+&lt;li>&lt;b>K: Keep（継続）&lt;/b>: 有効に機能していて、今後も継続して行う事項&lt;/li>
+&lt;li>&lt;b>P: Problem（問題）&lt;/b>: 有効に機能していない事項&lt;/li>
+&lt;li>&lt;b>T: Try（試み）&lt;/b>: プロセスを改良するための変更&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>プロジェクトの最後、または主要なリリース時には、本格的にプロジェクトを振り返るのもよい。参考: &lt;a href="https://en.wikipedia.org/wiki/Retrospective">https://en.wikipedia.org/wiki/Retrospective&lt;/a>&lt;/li>
+&lt;li>要求分析で UML を使用する際の最大のリスクは、対象分野の専門家が理解できないダイアグラムを描いてしまうこと。専門家が理解できないダイアグラムは役に立たないだけでなく、開発チームに偽りの自信を植え付けてしまう。&lt;/li>
+&lt;li>詳細な文書は Javadoc のようにコードから生成されるべき。他の文書を追加するのは、重要な概念を強調するため。&lt;/li>
+&lt;li>&lt;strong>文書化する必要があるもっとも重要な事柄のひとつに、採用しなかった設計上の選択肢とその理由がある&lt;/strong>。これは最も忘れられがちだが、外部に対して文書化して提供できるものの中で最も実用的なものである。&lt;/li>
+&lt;/ul>
+&lt;h2 id="第3章-クラス図基本的要素">第3章: クラス図（基本的要素）&lt;/h2>
+&lt;ul>
+&lt;li>UML では、&lt;strong>特性 (feature)&lt;/strong> という用語をクラスのプロパティや操作を指す一般的な用語として使用する。&lt;/li>
+&lt;li>ソフトウェアを理解するためにクラス図を描く場合は、必ず振る舞いに関する何らかの技法と併用すべき。&lt;/li>
+&lt;/ul>
+&lt;h3 id="属性と関連">属性と関連&lt;/h3>
+&lt;ul>
+&lt;li>&lt;strong>属性と関連&lt;/strong>は、ダイアグラムではまったく異なるように見えるが、実際は同じもの。ダイアグラムにとってあまり重要でないものに関しては属性を使用し、重要なクラスにはクラスボックスを割り当てて関連で結ぶ。何を強調するかを基準にして選択すればよい。&lt;/li>
+&lt;li>&lt;strong>属性 (attribute)&lt;/strong> の完全な形式は以下の通り。必須の要素は「名前」だけ。
+&lt;ul>
+&lt;li>&lt;code>可視性 名前: タイプ 多重度 = デフォルト値 {プロパティ文字列}&lt;/code>&lt;/li>
+&lt;li>例: &lt;code>- name: String [1] = &amp;quot;Untitled&amp;quot; {readOnly}&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>関連 (association)&lt;/strong> は2つのクラスの間にある実線で、ソースクラスからターゲットクラスまで引かれる。属性とは異なり、関連では両端に多重度を表示できる。&lt;/li>
+&lt;li>多値の関連 (&lt;code>*&lt;/code>) において順序に意味がある場合は、関連端に &lt;strong>{ordered}&lt;/strong> を追加する。重複を許可する場合は &lt;strong>{nonunique}&lt;/strong> を追加する。順序に意味がなく一意でもないものには、{bag} のようにコレクションを示す名前が付けられることもある。&lt;/li>
+&lt;li>関連の両端で&lt;strong>誘導可能性矢印 (navigability arrows)&lt;/strong> を使用することで関連の双方向性がはっきりと示される。双方向関連を持つことを明確にするのであれば、両方向を向いた矢印を明示的に使用するのがオススメ。&lt;/li>
+&lt;/ul>
+&lt;h3 id="操作-operation">操作 (operation)&lt;/h3>
+&lt;ul>
+&lt;li>&lt;strong>操作 (operation)&lt;/strong> とは、クラスが自分で実行しなければいけないと知っているアクションのこと。完全な構文は以下の通り。
+&lt;ul>
+&lt;li>&lt;code>可視性 名前(パラメータリスト): 戻り値のタイプ {プロパティ文字列}&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>パラメータは属性と同様に下記のような構文で記述する。
+&lt;ul>
+&lt;li>&lt;code>方向 名前: タイプ = デフォルト値&lt;/code>&lt;/li>
+&lt;li>方向は、in、out、inout のいずれかで、デフォルトは in。&lt;/li>
+&lt;li>例: &lt;code>+ balanceOn(date: Date) : Money&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>問い合わせ操作と、更新操作
+&lt;ul>
+&lt;li>システムの状態を変更せずに（副作用を伴わずに）クラスから値を取得する操作を&lt;strong>問い合わせ (query)&lt;strong>と呼び、&lt;/strong>{query}&lt;/strong> というプロパティ文字列で表すことができる。&lt;/li>
+&lt;li>システムの状態を編こする操作は&lt;strong>更新 (modifier)&lt;/strong>、または&lt;strong>コマンド&lt;/strong>と呼ばれる。&lt;/li>
+&lt;li>厳密には、問い合わせ (query) と更新 (modifier) の違いは、観測可能な状態を変更するかどうか。&lt;/li>
+&lt;li>一般的には、modifier 操作は値を戻さないように記述するとよい。逆に、戻り値を持つ操作は状態を変更しない（問い合わせ (query)）であることが明確になる。→ &lt;strong>Meyer の command-Query 分離原則&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>操作とメソッドは次のように区別されて使用される。
+&lt;ul>
+&lt;li>&lt;b>操作 (operation)&lt;/b>: オブジェクトに対して起動されるもの（手続き宣言）。&lt;/li>
+&lt;li>&lt;b>メソッド (method)&lt;/b>: 手続きの本体。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>操作とメソッドはポリモルフィズムを扱う場合に異なってくる。同一のスーパータイプの操作 getPrice をオーバーライドする 3 つのサブタイプがあるとすると、1 つの操作とそれを実装する 3 つのメソッドがあることになる。&lt;/li>
+&lt;/ul>
+&lt;h3 id="汎化">汎化&lt;/h3>
+&lt;ul>
+&lt;li>サブタイプとサブクラス
+&lt;ul>
+&lt;li>&lt;b>サブタイプ&lt;/b>: 継承しているかどうかに関わらず、スーパータイプと置換可能であればサブタイプである。&lt;/li>
+&lt;li>&lt;b>サブクラス&lt;/b>: サブクラス化 (subclassing) は、通常の「継承」と同義語として使用される。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="依存関係">依存関係&lt;/h3>
+&lt;ul>
+&lt;li>依存関係は通常はキーワードなし使用されるが、より詳細に表現したいのであれば、次のような適切なキーワードを付加するとよい。
+&lt;ul>
+&lt;li>&lt;b>≪call≫&lt;/b>: ソースはターゲットの操作を呼び出す。&lt;/li>
+&lt;li>&lt;b>≪create≫&lt;/b>: ソースはターゲットのインスタンスを生成する。&lt;/li>
+&lt;li>&lt;b>≪derive≫&lt;/b>: ソースはターゲットから派生する。&lt;/li>
+&lt;li>&lt;b>≪instantiate≫&lt;/b>: ソースはターゲットのインスタンスである（ソースがクラスである場合は、そのクラス自体がクラスのインスタンスになり、ターゲットクラスはメタクラスになる）。&lt;/li>
+&lt;li>&lt;b>≪permit≫&lt;/b>: ターゲットはソースに対して、ターゲットのプライベート特性へのアクセスを許可する。&lt;/li>
+&lt;li>&lt;b>≪realizes≫&lt;/b>: ソースはターゲットで定義されたインタフェースまたは使用の実装である。&lt;/li>
+&lt;li>&lt;b>≪refine≫&lt;/b>: 異なる意味レベル間の関係を示す。例えば、ソースが設計クラスであり、ターゲットがそれに対応する分析クラスである場合など。&lt;/li>
+&lt;li>&lt;b>≪substitute≫&lt;/b>: ターゲットの代わりにソースを使用できる。&lt;/li>
+&lt;li>&lt;b>≪trace≫&lt;/b>: クラスに対する要求や、1つのモデルでの変更と他の場所での変更との関係などを追跡するのに使用する。&lt;/li>
+&lt;li>&lt;b>≪use≫&lt;/b>: ソースはその実装においてターゲットを必要とする。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>クラス図のすべての依存関係を表示しようとすることは無駄な試みである。依存関係は頻繁に変化する。&lt;strong>依存関係の理解と制御には、パッケージ図が最も適している&lt;/strong>。&lt;/li>
+&lt;/ul>
+&lt;h3 id="制約規則">制約規則&lt;/h3>
+&lt;ul>
+&lt;li>UML では、制約の記述に関して制限はない。中カッコ ({}) の中に入れるということが唯一の規則である。&lt;/li>
+&lt;li>名前の後ろにコロンをつけて、&lt;code>{近親結婚の禁止: 夫と妻は兄弟の関係であってはならない}&lt;/code> のように、成約に名前を付けることもできる。&lt;/li>
+&lt;/ul>
+&lt;h2 id="第4章-シーケンス図">第4章: シーケンス図&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>シーケンス図は&lt;strong>相互作用図 (interaction diagram)&lt;/strong> の中で最も一般的なもの。&lt;/p></description></item><item><title>『オブジェクト開発の神髄 UML2.0を使ったアジャイルモデル駆動開発のすべて』スコット・W・アンブラー</title><link>https://maku.blog/p/9kuptdn/</link><pubDate>Wed, 18 Jul 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9kuptdn/</guid><description>&lt;div class="xAmazon">
+ &lt;a href="https://www.amazon.co.jp/exec/obidos/ASIN/4822282376/maku04-22/ref=nosim/" target="_blank">
+ &lt;div class="xAmazon_image">
+ &lt;img src="https://images-na.ssl-images-amazon.com/images/I/51RhYKQT2qL.jpg" alt="オブジェクト開発の神髄 UML2.0を使ったアジャイルモデル駆動開発のすべて">
+ &lt;/div>
+ &lt;div class="xAmazon_info">
+ &lt;div class="xAmazon_info_title">オブジェクト開発の神髄 UML2.0を使ったアジャイルモデル駆動開発のすべて&lt;/div>
+ &lt;div class="xAmazon_info_author">スコット・W・アンブラー&lt;/div>
+ &lt;div class="xAmazon_info_publisher">日経BP社&lt;/div>
+ &lt;div class="xAmazon_info_icon">&lt;img src="data:image/gif;base64,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" alt="アマゾンのロゴ">&lt;/div>
+ &lt;/div>
+ &lt;/a>
+&lt;/div>
+&lt;p>原題は『The Object Primer』。
+スコット・アンブラーのフルライフサイクルオブジェクト指向テスト (FLOOT: Full Lifecycle Object-Oriented Testing) から、アジャイルな要求やアーキテクチャまでが、1 つにまとめられています。
+実践 eXtreme プログラミングの共著者である Granville Miller は、「アジャイルになるとは、チームや自分自身に対する制約を取り払うこと」だと述べています。
+本書ではその方法の神髄を学ぶことができます。&lt;/p>
+&lt;p>下記、重要そうなところや、個人的にビビッと来たところのメモです。&lt;/p>
+&lt;h2 id="第1章-最先端のソフトウェア開発">第1章: 最先端のソフトウェア開発&lt;/h2>
+&lt;ul>
+&lt;li>下記が&lt;a href="https://www.agilealliance.org">アジャイルアライアンス&lt;/a>のマニフェストであり、そこに集まった異なる方法論者全員に受け入れられたものである。
+&lt;ul>
+&lt;li>&lt;b>&lt;strong>Individuals and interactions&lt;/strong> over processes and tools&lt;/b>&lt;br>
+プロセスやツールよりも個人や相互作用
+&lt;ul>
+&lt;li>すばらしいプロセスやツールは重要だが、結局は人の協力関係がすべて。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;b>&lt;strong>Working software&lt;/strong> over comprehensive documentation&lt;/b>&lt;br>
+わかりやすいドキュメントよりも動作するソフトウェア
+&lt;ul>
+&lt;li>ドキュメントはシステムがなぜ、どのように構築されたか、どう使えばよいかを理解するためには重要。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;b>&lt;strong>Customer collaboration&lt;/strong> over contract negotiation&lt;/b>&lt;br>
+契約上の駆け引きよりも顧客との協調
+&lt;ul>
+&lt;li>契約は重要だが、契約を結んだからといってコミュニケーションが必要なくなるわけではない。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;b>&lt;strong>Responding to change&lt;/strong> over following a plan&lt;/b>&lt;br>
+計画を硬直的に守ることよりも変化への対応
+&lt;ul>
+&lt;li>プロジェクト計画は必要だが、柔軟でなければならない。ガントチャートを何枚も作成する必要はなく、非常に単純なものでよい。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>自己組織化されたチーム&lt;/strong>とは、チームのリーダーが開発メンバーの各自の役割や作業範囲を決めるのではなく、目標を共有するメンバーが共同作業を行う過程でチームの能力が最大限発揮されるようにメンバーの役割が自然に決まっていくようなチーム形態のこと。&lt;/li>
+&lt;li>成功を収めている組織は、大抵アジャイルなソフトウェア開発アプローチをとっているか、RUP または EUP を採用しているかのどちらかだ。RUP をアジャイルに使おうとしても現実には非常に困難（素材が多すぎてアジャイルなレベルまで切り詰められない）。アジャイルプロセスを取り入れたいなら、XP や FDD などを採用すべき。&lt;/li>
+&lt;li>MDA よりも、アジャイルモデル駆動開発 (AMDD: Agile Model-Driven Development) アプローチの方が、お絵かき式のモデリング方法に近く、現実的に大多数の開発者が採用できるアプローチである。&lt;/li>
+&lt;/ul>
+&lt;h2 id="第2章-オブジェクト指向概念の基本">第2章: オブジェクト指向概念の基本&lt;/h2>
+&lt;p>この章にはオブジェクト指向を知らない人のために、その概念について書かれています。&lt;/p></description></item><item><title>読書メモ『ワークブック形式で学ぶ UML オブジェクトモデリング─ユースケース駆動でソフトウェアを開発する』ダグ・ローゼンバーグ、ケンドール・スコット</title><link>https://maku.blog/p/d3ehztz/</link><pubDate>Wed, 18 Jul 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/d3ehztz/</guid><description>&lt;div class="xAmazon">
+ &lt;a href="https://www.amazon.co.jp/exec/obidos/ASIN/4797320192/maku04-22/ref=nosim/" target="_blank">
+ &lt;div class="xAmazon_image">
+ &lt;img src="https://images-na.ssl-images-amazon.com/images/I/515A56CF3EL.jpg" alt="ワークブック形式で学ぶ UML オブジェクトモデリング">
+ &lt;/div>
+ &lt;div class="xAmazon_info">
+ &lt;div class="xAmazon_info_title">ワークブック形式で学ぶ UML オブジェクトモデリング&lt;/div>
+ &lt;div class="xAmazon_info_author">ダグ・ローゼンバーグ、ケンドール・スコット&lt;/div>
+ &lt;div class="xAmazon_info_publisher">ソフトバンククリエイティブ&lt;/div>
+ &lt;div class="xAmazon_info_icon">&lt;img src="data:image/gif;base64,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" alt="アマゾンのロゴ">&lt;/div>
+ &lt;/div>
+ &lt;/a>
+&lt;/div>
+&lt;p>「ユースケースと UML モデリングの例題がもっと必要だ」という声がきっかけになり書かれた本です。
+ユースケースという抽象的な表現から、どのようなステップで具体的なコードにまで落とし込んでいくかが説明されています。
+このような開発を&lt;strong>ユースケース駆動&lt;/strong>と呼んでおり、提唱者の Ivar Jacobson によると、ユースケース駆動は下記のように説明されています。&lt;/p>
+&lt;blockquote>
+&lt;p>システム機能を変更する場合は、適切なアクタとユースケースを再モデル化します。
+システムアーキテクチャ全体は、ユーザの要求にそって構築されます。
+すべてのモデルはトレースできるようにしておくと、新しい要求仕様が発生した際にもシステムの修正が可能になります。
+ユーザに対し、変更したい部分（もしくは変更したいユースケース）の内容を確認し、ほかのモデルの中でどの部分を変更するかを見極めます。&lt;/p>
+&lt;/blockquote>
+&lt;p>本書の著者、ダグ・ローゼンバーグはこれを以下のように簡単に解釈しています。&lt;/p>
+&lt;blockquote>
+&lt;p>ユーザマニュアルを書けば、コードも書ける。&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="第1章-はじめに">第1章: はじめに&lt;/h2>
+&lt;ul>
+&lt;li>ここで用いる ICONIX プロセスは、重量級の RUP（ラショナル統一プロセス）と、軽量級の XP (eXtreme Programming) の間に位置する。具体的で理解しやすいユースケースが作成できるという点で、Ivar Jacobson が構想した「ユースケース駆動」の意味に一致している。&lt;/li>
+&lt;li>ソフトウェアプロジェクトの進捗はどれだけのコードを書いたかによって測定されることが多いので、プロジェクトはコーディングに移行しようとする。そして、モデリングが十分にできていない段階でコーディングが始まってしまう。&lt;/li>
+&lt;li>本書の目的は、ソフトウェアプロジェクトにおいて、よい仕事をするために通常必要と思われる UML（およびモデリング全般）の、最小限ではあるが、十分なサブセットを定義すること。&lt;/li>
+&lt;li>&lt;strong>what（要求）と how（詳細）のギャップを埋めることが ICONIX プロセスの中心課題&lt;/strong>である。&lt;strong>ロバストネス図&lt;/strong>を使って、あいまいで漠然としたユースケース（要求レベルのビュー）と、詳細で正確なシーケンス図（設計レベルのビュー）のギャップを解消する。ロバストネス図を使用せずにユースケースからシーケンス図を作成することは非常に難しい。ロバストネス分析は、要求と設計のギャップを解消するのにとても役に立つ。&lt;/li>
+&lt;li>ギャップの解消するためには、ロバストネス分析の中で、下記のような作業を並行して行っていく。
+&lt;ol>
+&lt;li>見落としていたオブジェクトを見つける。&lt;/li>
+&lt;li>データフローをトレースする際に、クラスに属性を追加する。&lt;/li>
+&lt;li>ロバストネス図を描きながら、ユースケース記述を更新し洗練する。&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>&lt;strong>ドメインモデル&lt;/strong>で定義した「用語」を使ってロバストネス図を描く。
+&lt;ul>
+&lt;li>ユースケースモデル ⇔ &lt;b>ロバストネス図&lt;/b> ⇒ シーケンス図&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="500" height="323" src="../../p/d3ehztz/uml-modeling-iconix_hu3267113539285579054.jpg" alt="/p/d3ehztz/uml-modeling-iconix.jpg" />
+ &lt;figcaption>図: ICONIX プロセス全体像&lt;/figcaption>
+&lt;/figure>
+
+&lt;ul>
+&lt;li>ICONIX プロセス:
+&lt;ol>
+&lt;li>プロトタイプを作る（おそらく画面の簡単な描画）。&lt;/li>
+&lt;li>クライアントに誤りがないかを確認してもらう。&lt;/li>
+&lt;li>ユースケース図のユースケースを識別する。&lt;/li>
+&lt;li>ユースケース記述を書く。&lt;/li>
+&lt;li>ロバストネス分析でユースケース記述を洗練する。&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="第2章-ドメインモデリング">第2章: ドメインモデリング&lt;/h2>
+&lt;ul>
+&lt;li>ドメインモデリングでは、UML モデルの静的な部分の基礎を形成する。&lt;/li>
+&lt;li>ドメインモデルは実世界の問題空間オブジェクトを中心に構成するので、ソフトウェアの要求ほど頻繁には変化しない。&lt;/li>
+&lt;li>ドメインモデルは、ユースケースを記述する作業の初期段階で使用できる「用語集」の役割を果たす。&lt;/li>
+&lt;li>ドメインモデリングでは、属性と操作の把握には時間を費やさない。後の作業で明らかになった属性と操作を追加していけばよい。&lt;/li>
+&lt;li>ドメインモデリングでは、オブジェクト間の関係（汎化や集約）を識別することに焦点を当てる。&lt;/li>
+&lt;li>ソフトウェアが再利用できるかどうかは、このドメインモデリング作業にかかっている。&lt;/li>
+&lt;/ul>
+&lt;h3 id="ドメインモデリングの誤りトップ10">ドメインモデリングの誤りトップ10&lt;/h3>
+&lt;p>ドメインモデリングのコツはすばやく作ること。ブラッシュアップは後のロバスト分析などの過程で行っていけばよい。&lt;/p>
+&lt;ol>
+&lt;li>&lt;b>無駄にデザインパターンを適用しようとする&lt;/b>&lt;br>
+ドメインモデリングは、パターンの観点から考え始めるべきではない。
+デザインパターンは、シーケンス図や設計レベルのクラス図で意識するもの。&lt;/li>
+&lt;li>&lt;b>ドメインクラスと RDB のテーブルを 1対1 にマッピングしようとする&lt;/b>&lt;br>
+データベースのテーブルは、ドメインクラス名のよい情報源になるが、ドメインモデルは、オブジェクトモデルのコンテキストで考えるべき。&lt;/li>
+&lt;li>&lt;b>フレンド関係やパラメータ化クラスのような実装の構成要素を登場させる&lt;/b>&lt;br>
+ドメインモデリングの焦点は、問題空間であるべき。&lt;/li>
+&lt;li>&lt;b>PortfolioManager のような直観的な名前でなく cPortMgrIntf のような名前を使用する&lt;/b>&lt;br>
+ドメインモデリングの目的のひとつは、プロジェクトの全員が重要な抽象名に合意することである。&lt;/li>
+&lt;li>&lt;b>問題空間をモデル化せず具体的な実装方法を考える&lt;/b>&lt;br>
+RDB やサーバのような特定の技術に依存する内容を含めるべきではない。&lt;/li>
+&lt;li>&lt;b>各 a part of 関連に集約とコンポジションのどちらを使うかを議論する&lt;/b>&lt;br>
+ドメインモデリングの段階では、とりあえず集約を使用しておけばよい。&lt;/li>
+&lt;li>&lt;b>要求を満たすかを確認する前に再利用性のための最適化を行う&lt;/b>&lt;br>
+ドメインモデリングではクラスに操作を割り当てるべきではなく、再利用を考える段階でもない。&lt;/li>
+&lt;li>&lt;b>ユースケースとシーケンス図を吟味せずにクラスに操作を割り当てる&lt;/b>&lt;br>
+ドメインモデルの段階では情報が十分ではないので、クラスに操作を割り当てるべきではない。&lt;/li>
+&lt;li>&lt;b>過度に名詞と動詞の分析を行う&lt;/b>&lt;br>
+オブジェクトの識別に没頭しすぎて、抽象度の低い抽象化にならないように。&lt;/li>
+&lt;li>&lt;b>関連に多重度を割り当てる&lt;/b>&lt;br>
+ドメインモデリングの段階では多重度を考えない方がよい。分析中毒の原因になる。&lt;/li>
+&lt;/ol></description></item><item><title>読書メモ『ダイアグラム別 UML 徹底活用』井上樹</title><link>https://maku.blog/p/xfgoaq3/</link><pubDate>Wed, 30 May 2018 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xfgoaq3/</guid><description>&lt;div class="xAmazon">
+ &lt;a href="https://www.amazon.co.jp/exec/obidos/ASIN/4798118443/maku04-22/ref=nosim/" target="_blank">
+ &lt;div class="xAmazon_image">
+ &lt;img src="https://images-na.ssl-images-amazon.com/images/I/81gVRJsq4cL.jpg" alt="ダイアグラム別UML徹底活用 第2版">
+ &lt;/div>
+ &lt;div class="xAmazon_info">
+ &lt;div class="xAmazon_info_title">ダイアグラム別UML徹底活用 第2版&lt;/div>
+ &lt;div class="xAmazon_info_author">井上 樹&lt;/div>
+ &lt;div class="xAmazon_info_publisher">翔泳社&lt;/div>
+ &lt;div class="xAmazon_info_icon">&lt;img src="data:image/gif;base64,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" alt="アマゾンのロゴ">&lt;/div>
+ &lt;/div>
+ &lt;/a>
+&lt;/div>
+&lt;p>（全13章）&lt;/p>
+&lt;h2 id="1章-モデリングのメリットを考える">1章: モデリングのメリットを考える&lt;/h2>
+&lt;ul>
+&lt;li>モデリングの連続の末にプログラムというモデルの最終形態に辿り着くことが、システムを開発するということ。&lt;/li>
+&lt;li>図によるモデル化のメリット
+&lt;ul>
+&lt;li>情報量が多い&lt;/li>
+&lt;li>理解しやすい&lt;/li>
+&lt;li>誤解が少ない&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>UML2.0 について
+&lt;ul>
+&lt;li>ダイアグラムが10種類から13種類に増加（コンポジット図、相互作用概要図、タイミング図）し、次のようなことをモデル化できるようになった。
+&lt;ul>
+&lt;li>複数のインスタンスを内包するクラスの内部構造&lt;/li>
+&lt;li>複数のインタラクションの時系列上の流れ&lt;/li>
+&lt;li>複数のインスタンス間でのメッセージのやり取りと、それに伴う状態変化&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ダイアグラム名称の一部変更
+&lt;ul>
+&lt;li>ステートチャート図 → ステートマシン図&lt;/li>
+&lt;li>コラボレーション図 → コミュニケーション図&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>「フレーム」が追加され、ダイアグラム全体を囲んだ入り、一部を囲んで説明を加えることができるようになった。ダイアグラムの一部をフレームとして囲んだところを畳み込めば、大きなダイアグラムでも全体を見渡しやすくなる。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="2章-ユースケース図の注意点と使いどころ">2章: ユースケース図の注意点と使いどころ&lt;/h2>
+&lt;ul>
+&lt;li>ユースケースは、**「こういうものを作るんだ」**ということを明らかにするために描く。&lt;/li>
+&lt;li>関連を結んだアクター＝ユースケースの起動者ではない。関連はあくまで関わり合いがあることだけを示す。&lt;/li>
+&lt;li>UML2.0 におけるユースケースの変更点は、extend の関係に対してノートで条件を書けるようになったこと。&lt;/li>
+&lt;/ul>
+&lt;h3 id="役立つユースケースにするには">役立つユースケースにするには&lt;/h3>
+&lt;ul>
+&lt;li>目的／読者を確認する&lt;/li>
+&lt;li>名前付けに注意する
+&lt;ul>
+&lt;li>抽象度: 「一般会員」や「レジ係」というように文章に出てくるくらいの抽象度がよい。&lt;/li>
+&lt;li>正確性: 対象を明示する（例: 貸出→ビデオを貸し出す、返却→ビデオの返却を受け付ける）&lt;/li>
+&lt;li>表現の統一: 同じ意味を示す言葉は揃える（例: 「貸し出す」と「レンタルする」）&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>粒度を揃える&lt;/li>
+&lt;li>機能分割にしない: 機能単位で描くと粒度が細かくなりすぎて、そのモデル化した対象がどんなサービスを提供しているのかわからなくなってしまう。サービスで分割することを意識する。&lt;/li>
+&lt;li>≪include≫は1段階まで: 2段階以上にするとアクターにとって意味のある粒度のユースケースになりにくい。&lt;/li>
+&lt;li>≪include≫、≪extend≫、汎化関係を混同しない
+&lt;ul>
+&lt;li>&lt;b>≪include≫&lt;/b>: ≪include≫先のユースケースは必ず必要になることを意味する。プログラムの関数呼び出しのような感じで、複数のユースケースから共有できる（例: ビデオを借りる─include→会員かどうかを確認する）。&lt;/li>
+&lt;li>&lt;b>≪extend≫&lt;/b>: ≪extend≫でベースになっているユースケースにサービスを付加した場合は、ベースとなるユースケースの実行には≪extend≫で定義したユースケースは必ずしも必要ない（例: ビデオを借りる←extend─カードで料金を払う）。逆に、≪extend≫で定義されたユースケースを実行するには、必ずベースのユースケースが必要になる。&lt;/li>
+&lt;li>&lt;b>汎化関係&lt;/b>: 汎化関係は機能を追加するのではなく、概念だけ共通だがまったく新しいユースケースを定義する（例: ビデオを借りる←汎化─ビデオを宅配で借りる）。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ユースケース記述と合わせる: ユースケース図だけでは誤解を招きやすいので、ユースケース図を描いたら、ユースケース記述も合わせて作成する。ユースケース図とユースケース記述を合わせて**「ユースケースモデル」**と呼んだりする。&lt;/li>
+&lt;/ul>
+&lt;h2 id="3章-ユースケース記述の注意点と使いどころ">3章: ユースケース記述の注意点と使いどころ&lt;/h2>
+&lt;h3 id="ユースケース記述の概要">ユースケース記述の概要&lt;/h3>
+&lt;ul>
+&lt;li>ユースケース記述は&lt;strong>システム開発の初期に&lt;/strong>ユースケース図と一緒に作られ、&lt;strong>システム外部から（利用者から）見たときの振る舞いを明確にする&lt;/strong>。&lt;/li>
+&lt;li>特に担当者を入れ替えながら開発が進んでいくプロジェクトなどでは、&lt;strong>開発者間でシステムイメージを共有&lt;/strong>できるということは重要。&lt;/li>
+&lt;li>ユースケース記述は書くのに非常に手間のかかる成果物だが、&lt;strong>システム開発に一貫したゴールを与える&lt;/strong>ことができるのは大きなメリット。&lt;strong>ユースケースのレベルで再利用&lt;/strong>できるようになると、より楽をできるようになる。&lt;/li>
+&lt;/ul>
+&lt;h3 id="ユースケース駆動開発">ユースケース駆動開発&lt;/h3>
+&lt;ul>
+&lt;li>ユースケースは&lt;strong>進捗を計るベースとして使用&lt;/strong>できる。ユースケースを一単位とすると、代替フローや例外フローが含まれているため、作業単位の粒度としては大きくなりすぎることがある。そのような場合、ユースケース記述に書かれた**「シナリオ」を作業単位とする**とよい。&lt;/li>
+&lt;li>ユースケース駆動開発では、ユースケースの&lt;strong>シナリオごとに、(1)分析、(2)設計、(3)実装、(4)テスト&lt;/strong>という作業を進めていく。ユースケースを実現できたかどうか（それぞれのステップが完了したかどうか）のポイントは下記の通り。
+&lt;ol>
+&lt;li>分析: &lt;strong>分析のクラス図に書かれているクラス群&lt;/strong>を使って、ユースケース記述に書かれたシナリオを実現する相互作用図（シーケンス図、コレボレーション図）を作ることができる&lt;/li>
+&lt;li>設計: &lt;strong>設計のクラス図に書かれているクラス群&lt;/strong>を使って、ユースケース記述に書かれたシナリオを実現する相互作用図（シーケンス図、コラボレーション図）を作ることができる&lt;/li>
+&lt;li>実装: シナリオを実現するためのプログラムが書けている&lt;/li>
+&lt;li>テスト: シナリオに書いてある通りにシステムが動いている&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="ユースケース記述のテストへの活用">ユースケース記述のテストへの活用&lt;/h3>
+&lt;ul>
+&lt;li>ユースケース記述に書かれた振る舞いは、&lt;strong>要求元と合意されたもの&lt;/strong>となるので、テストケースの元ネタとして使うことができる。&lt;/li>
+&lt;li>テストケースとシナリオは対応するものなので、テストを意識してシナリオリストを作成すると、テストケースの作成が容易になる。イベントフロー（メインフロー＋代替フロー＋例外フロー）の組み合わせを網羅する形でシナリオリストを作るのがコツ。&lt;/li>
+&lt;li>イベントフローは３種類
+&lt;ul>
+&lt;li>メインフロー: 正常に処理が進んだ場合。&lt;/li>
+&lt;li>代替フロー: 正常系の代わり（エラーが発生した場合など）。代替フローを実行した場合でも&lt;strong>事後条件は満たされる&lt;/strong>。&lt;/li>
+&lt;li>例外フロー: ユースケースの実行を断念しなければならないような場合。例外フローを実行した場合は&lt;strong>事後条件は満たされない&lt;/strong>。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="ユースケース記述のポイント">ユースケース記述のポイント&lt;/h3>
+&lt;ul>
+&lt;li>厳密に漏れなく書く
+&lt;ul>
+&lt;li>&lt;strong>曖昧性のない&lt;/strong>厳密な記述がされており、システムの振る舞いが具体的に理解できること。&lt;/li>
+&lt;li>ユースケース記述の作成と合わせて&lt;strong>用語集を作成する&lt;/strong>とよい。&lt;/li>
+&lt;li>イベントフローの書き出しは「アクターは～」、「システムは～」と動作の&lt;strong>主語を必ず書く&lt;/strong>。&lt;/li>
+&lt;li>&lt;strong>システムで実現すべきことはすべて&lt;/strong>ユースケースに書かれているようにする&lt;/li>
+&lt;li>仕様変更が発生した場合など、&lt;strong>ユースケース記述はこまめにメンテナンスする&lt;/strong>。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>細かくしすぎない
+&lt;ul>
+&lt;li>エンドユーザにもわかるレベルで記述する（エンドユーザーと開発者が共有するものなので）。&lt;strong>ユーザマニュアルのようなレベル&lt;/strong>を想定するとちょうどよい。&lt;/li>
+&lt;li>データベースのテーブルや、画面レイアウト、画面遷移を意識する記述が出てきたら危険。&lt;/li>
+&lt;li>イベントフローに「システムは～する」という記述が連続して 4 ～ 5 ステップ続いたら詳細になりすぎている可能性が高い。&lt;/li>
+&lt;li>&lt;strong>危険なワード&lt;/strong>: DB、テーブル、クエリ、キー、ID、コネクション、チャネル、セッション、トランザクション、ロック、ボタン、クリック、入力欄、インタフェース&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>補足資料を使う
+&lt;ul>
+&lt;li>文章だけで記述するのではなく、&lt;strong>アクティビティ図や、スケッチ、表&lt;/strong>なども併用すればよい。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>空欄を作らない
+&lt;ul>
+&lt;li>ユースケース記述のフォーマットには項目がたくさんあるが、空白状態で放置しない。&lt;strong>「T.B.D.」なのか「なし」なのかを明確に記述&lt;/strong>。T.B.D. であれば、期日と担当者を併記するとよい。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>書き続けない
+&lt;ul>
+&lt;li>システムを動かしてから見えてくる部分は少なからずある。決まっていない部分は T.B.D. として先の作業に進むことも必要。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>無理にユースケース記述で書かない
+&lt;ul>
+&lt;li>ユースケース記述に向いているのは、ユーザーとシステムのやりとりがあるインタラクティブシステム。&lt;/li>
+&lt;li>ユースケース記述に向いていないのは、フィードバック系のシステム（エアコンなど）や、複雑なアルゴリズムや計算式の記述。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="4章-クラス図基本編">4章: クラス図～基本編&lt;/h2>
+&lt;ul>
+&lt;li>クラス図はいろいろな場面で使用される。開発者は一般的に設計モデルを作成するのは得意だが、分析モデルを作成するのが苦手な傾向がある。
+&lt;ul>
+&lt;li>&lt;b>概念図&lt;/b>: 問題領域に&lt;strong>どのような概念が存在し、どのような構成になっているか&lt;/strong>を記述する。概念は用語集で定義されるが、それぞれのつながりを表すのが概念図としてのクラス図。開発の初期段階で作成する。&lt;/li>
+&lt;li>&lt;b>分析モデル&lt;/b>: システム&lt;strong>要求を満たすには何が必要か&lt;/strong>を表現する。分析モデルはあくまで意味レベルのモデルなので、設計モデルとは違い、&lt;strong>実現方法そのものは記述しない&lt;/strong>。システムの要件定義（ユースケースモデルの作成、日機能要求のリスト化）が終わった後に作成する。&lt;/li>
+&lt;li>&lt;b>設計モデル&lt;/b>: システムの作り方を表現する。実装レベルのクラス図。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>中央集権モデルになってしまわないようにモデリングできるとよい。&lt;/li>
+&lt;li>関連はただ線を引くだけではなく、その&lt;strong>関連の意味が分かるように「多重度」と「ロール名」を付ける&lt;/strong>。「ロール名」が思いつかない場合は、「関連名」を付けるとよい。&lt;/li>
+&lt;li>クラス図は、左から右、上から下へ自然に読んでいくことができるのが望ましい。&lt;/li>
+&lt;li>ユーザインタフェース、I/O、デバイスなどを表すクラスは端に配置するとよい。&lt;/li>
+&lt;/ul>
+&lt;h2 id="5章-クラス図応用編">5章: クラス図～応用編&lt;/h2>
+&lt;h3 id="実現関係">実現関係&lt;/h3>
+&lt;p>UML2.0 では、あるクラスの実現に必要なインタフェースを、Y字型のアイコンを使って明示できるようになった（インタフェースの要求）。&lt;/p></description></item></channel></rss>

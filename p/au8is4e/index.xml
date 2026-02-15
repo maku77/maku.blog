@@ -1,11 +1,93 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS CodeBuild のメモ on まくろぐ</title><link>https://maku.blog/p/au8is4e/</link><description>Recent content in AWS CodeBuild のメモ on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Mon, 22 Feb 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/au8is4e/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS CodeBuild をコマンドライン (CLI) から操作する</title><link>https://maku.blog/p/bwamw8i/</link><pubDate>Mon, 22 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bwamw8i/</guid><description>CodeBuild プロジェクトの一覧を取得する (codebuild list-projects) $ aws codebuild list-projects 例: すべてのプロジェクト名を取得 $ aws codebuild list-projects projects: - app1-codebuild - app2-codebuild - app3-codebuild 出力結果をソートするには、次のオプションが使用できます。
-sort-by &amp;hellip; NAME / CREATED_TIME / LAST_MODIFIED_TIME のいずれかを指定 sort-order .. ASCENDING / DESCENDING のいずれかを指定 例: 最近作られたプロジェクトを 5 件表示 $ aws codebuild list-projects --sort-by CREATED_TIME --sort-order DESCENDING --max-items 5 実行結果 NextToken: eyJuZXh0VG9rZW4iOiBudWxsLCAiYm90b190cnVuY2F0ZV9hbW91bnQiOiA1fQ== projects: - myapp25-codebuild - myapp24-codebuild - myapp23-codebuild - myapp22-codebuild - myapp21-codebuild NextToken は、続きのエントリを取得したいときに、--starting-token オプションで指定します。
-☝️ 出力形式 (YAML or JSON) を変えたいとき AWS CLI の出力形式は、デフォルトでは ~/.</description></item><item><title>AWS CodeBuild で Hello World（GitHub との連携）</title><link>https://maku.blog/p/xdnu3ah/</link><pubDate>Tue, 26 Jan 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xdnu3ah/</guid><description>何をやるか？ CodeBuild は AWS が提供するビルドサービスです。 例えば、GitHub に buildspec.yml というビルド方法を記述したファイルを置いておくと、GitHub へのコードプッシュ時に、その設定通りビルドを行ってくれます。 GitHub Actions や Azure Pipelines といったサービスと同様です。
-ここでは、CodeBuild 導入の第一歩として、次のような構成でセットアップしてみます。
-ソースプロバイダ : GitHub（の適当なテストリポジトリ） ビルド内容 : "Hello World" と echo 表示する つまり、テスト用の GitHub リポジトリに何らかのファイルをプッシュしたときに、CodeBuild によるビルドを開始するところまでです。
-ソースプロバイダとしては、GitHub だけではなく、AWS CodeCommit、Bitbucket、GitHub Enterpise といった Git リポジトリを選択できますが、おそらく GitHub が一番よく使われているので、ここでは GitHub を使うことにします。
-最初の一歩はできるだけ簡単に済ませることが肝心です！
-アカウントとリポジトリを準備する まず最低限の準備として、下記のアカウントは用意できているとします。
-AWS アカウント GitHub アカウント 次に、GitHub にテスト用の リポジトリを作成 しておきます。 ここでは、リポジトリ名は hello-codebuild とでもしておきます。 README.md を自動生成しておくと、後のテストが楽です。
-CodeBuild にビルドプロジェクトを作成する 次のようにして、CodeBuild に新規ビルドプロジェクトを作成します。
-AWS CodeBuild console を開きます。 ビルド (CodeBuild) → ビルドプロジェクト → ビルドプロジェクトを作成する と選択します。 以下のような内容を入力してビルドプロジェクトを作成します。 プロジェクト名 : build-hello（名前は自由） ソースプロバイダ : GitHub → 作成しておいた hello-codebuild リポジトリを指定 ウェブフック : コードの変更がこのレポジトリにプッシュされるたびに再構築する にチェックを入れる（これで GitHub へのプッシュ時にビルドトリガがかかります） 環境イメージ : マネージド型イメージ → Amazon Linux 2 → ランタイムやイメージは適当に選択 サービスロール : 新しいサービスロール → codebuild-build-hello-service-role（デフォルト） ビルド仕様 : buildspec ファイルを使用する 以下のような感じでビルドプロジェクトが作成されれば成功です。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS CodeBuild のメモ on まくろぐ</title><link>https://maku.blog/p/au8is4e/</link><description>Recent content in AWS CodeBuild のメモ on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Mon, 22 Feb 2021 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/au8is4e/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS CodeBuild をコマンドライン (CLI) から操作する</title><link>https://maku.blog/p/bwamw8i/</link><pubDate>Mon, 22 Feb 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bwamw8i/</guid><description>&lt;h2 id="codebuild-プロジェクトの一覧を取得する-codebuild-list-projects">CodeBuild プロジェクトの一覧を取得する (codebuild list-projects)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws codebuild list-projects&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例: すべてのプロジェクト名を取得&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws codebuild list-projects
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">projects:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- app1-codebuild
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- app2-codebuild
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- app3-codebuild&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>出力結果をソートするには、次のオプションが使用できます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>sort-by&lt;/code>&lt;/strong> &amp;hellip; &lt;code>NAME&lt;/code> / &lt;code>CREATED_TIME&lt;/code> / &lt;code>LAST_MODIFIED_TIME&lt;/code> のいずれかを指定&lt;/li>
+&lt;li>&lt;strong>&lt;code>sort-order&lt;/code>&lt;/strong> .. &lt;code>ASCENDING&lt;/code> / &lt;code>DESCENDING&lt;/code> のいずれかを指定&lt;/li>
+&lt;/ul>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">例: 最近作られたプロジェクトを 5 件表示&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ aws codebuild list-projects --sort-by CREATED_TIME --sort-order DESCENDING --max-items 5&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;div class="xAccordion">
+ &lt;input id="id-495237618" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-495237618">実行結果&lt;/label>
+ &lt;div class="xAccordion_body">
+&lt;figure class="xCodeBlock">
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">NextToken: eyJuZXh0VG9rZW4iOiBudWxsLCAiYm90b190cnVuY2F0ZV9hbW91bnQiOiA1fQ==
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">projects:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- myapp25-codebuild
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- myapp24-codebuild
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- myapp23-codebuild
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- myapp22-codebuild
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- myapp21-codebuild&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+&lt;p>&lt;code>NextToken&lt;/code> は、続きのエントリを取得したいときに、&lt;code>--starting-token&lt;/code> オプションで指定します。&lt;/p>
+ &lt;/div>
+&lt;/div>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ 出力形式 (YAML or JSON) を変えたいとき&lt;/span>
+ &lt;span class="xNote_body">&lt;p>AWS CLI の出力形式は、デフォルトでは &lt;code>~/.aws/config&lt;/code> ファイルの &lt;code>output&lt;/code> プロパティで指定されている出力形式が使用されます。
+明示的に出力形式を指定したい場合は、各コマンド実行時に &lt;code>--output yaml&lt;/code> や &lt;code>--output json&lt;/code> のようなオプション指定を行います。&lt;/p></description></item><item><title>AWS CodeBuild で Hello World（GitHub との連携）</title><link>https://maku.blog/p/xdnu3ah/</link><pubDate>Tue, 26 Jan 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xdnu3ah/</guid><description>&lt;h2 id="何をやるか">何をやるか？&lt;/h2>
+&lt;p>CodeBuild は AWS が提供するビルドサービスです。
+例えば、GitHub に &lt;code>buildspec.yml&lt;/code> というビルド方法を記述したファイルを置いておくと、GitHub へのコードプッシュ時に、その設定通りビルドを行ってくれます。
+GitHub Actions や Azure Pipelines といったサービスと同様です。&lt;/p>
+&lt;p>ここでは、CodeBuild 導入の第一歩として、次のような構成でセットアップしてみます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;b>ソースプロバイダ&lt;/b>
+: GitHub（の適当なテストリポジトリ）&lt;/li>
+&lt;li>&lt;b>ビルド内容&lt;/b>
+: "Hello World" と echo 表示する&lt;/li>
+&lt;/ul>
+&lt;p>つまり、テスト用の GitHub リポジトリに何らかのファイルをプッシュしたときに、CodeBuild によるビルドを開始するところまでです。&lt;/p>
+&lt;p>ソースプロバイダとしては、GitHub だけではなく、AWS CodeCommit、Bitbucket、GitHub Enterpise といった Git リポジトリを選択できますが、おそらく GitHub が一番よく使われているので、ここでは GitHub を使うことにします。&lt;/p>
+&lt;p>最初の一歩はできるだけ簡単に済ませることが肝心です！&lt;/p>
+&lt;h2 id="アカウントとリポジトリを準備する">アカウントとリポジトリを準備する&lt;/h2>
+&lt;p>まず最低限の準備として、下記のアカウントは用意できているとします。&lt;/p>
+&lt;ul>
+&lt;li>AWS アカウント&lt;/li>
+&lt;li>GitHub アカウント&lt;/li>
+&lt;/ul>
+&lt;p>次に、GitHub にテスト用の &lt;a href="https://github.com/new">リポジトリを作成&lt;/a> しておきます。
+ここでは、リポジトリ名は &lt;code>hello-codebuild&lt;/code> とでもしておきます。
+&lt;code>README.md&lt;/code> を自動生成しておくと、後のテストが楽です。&lt;/p>
+&lt;h2 id="codebuild-にビルドプロジェクトを作成する">CodeBuild にビルドプロジェクトを作成する&lt;/h2>
+&lt;p>次のようにして、CodeBuild に新規ビルドプロジェクトを作成します。&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://console.aws.amazon.com/codesuite/home">AWS CodeBuild console&lt;/a> を開きます。&lt;/li>
+&lt;li>&lt;code>ビルド (CodeBuild)&lt;/code> → &lt;code>ビルドプロジェクト&lt;/code> → &lt;code>ビルドプロジェクトを作成する&lt;/code> と選択します。&lt;/li>
+&lt;li>以下のような内容を入力してビルドプロジェクトを作成します。
+&lt;ul>
+&lt;li>&lt;b>プロジェクト名&lt;/b>
+: &lt;code>build-hello&lt;/code>（名前は自由）&lt;/li>
+&lt;li>&lt;b>ソースプロバイダ&lt;/b>
+: &lt;code>GitHub&lt;/code> → 作成しておいた &lt;code>hello-codebuild&lt;/code> リポジトリを指定&lt;/li>
+&lt;li>&lt;b>ウェブフック&lt;/b>
+: &lt;code>コードの変更がこのレポジトリにプッシュされるたびに再構築する&lt;/code> にチェックを入れる（これで GitHub へのプッシュ時にビルドトリガがかかります）&lt;/li>
+&lt;li>&lt;b>環境イメージ&lt;/b>
+: &lt;code>マネージド型イメージ&lt;/code> → &lt;code>Amazon Linux 2&lt;/code> → ランタイムやイメージは適当に選択&lt;/li>
+&lt;li>&lt;b>サービスロール&lt;/b>
+: &lt;code>新しいサービスロール&lt;/code> → &lt;code>codebuild-build-hello-service-role&lt;/code>（デフォルト）&lt;/li>
+&lt;li>&lt;b>ビルド仕様&lt;/b>
+: &lt;code>buildspec ファイルを使用する&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;p>以下のような感じでビルドプロジェクトが作成されれば成功です。&lt;/p></description></item></channel></rss>

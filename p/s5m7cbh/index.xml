@@ -1,21 +1,261 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Next.js のその他の記事 on まくろぐ</title><link>https://maku.blog/p/s5m7cbh/</link><description>Recent content in Next.js のその他の記事 on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Tue, 21 Mar 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/s5m7cbh/index.xml" rel="self" type="application/rss+xml"/><item><title>Next.js アプリに Google Analytics を設定する (next/script)</title><link>https://maku.blog/p/zycmw6f/</link><pubDate>Tue, 21 Mar 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/zycmw6f/</guid><description>何をするか？ Google Analytics で Web サイトのアクセス解析を行うには、次のような感じのコードを各ページに埋め込む必要があります。
-Google Analytics 用の埋め込みコード &amp;lt;!-- Google tag (gtag.js) --&amp;gt; &amp;lt;script async src=&amp;#34;https://www.googletagmanager.com/gtag/js?id=G-ABCDE12345&amp;#34;&amp;gt;&amp;lt;/script&amp;gt; &amp;lt;script&amp;gt; window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag(&amp;#39;js&amp;#39;, new Date()); gtag(&amp;#39;config&amp;#39;, &amp;#39;G-ABCDE12345&amp;#39;); &amp;lt;/script&amp;gt; ここでは、Next.js が提供する Script コンポーネント (next/script) を使用して、Next.js アプリに同等のコードを埋め込む方法を説明します。 HTML 標準の script ではなく、Next.js の Script コンポーネントを使用することで、Next.js アプリのレンダリング処理に合わせて実行タイミングを最適化できます。
-事前準備（Google Analitics でプロパティとデータストリームを追加する） 事前準備として、Google Analytics のサイトで、サイドバーの 管理 メニューから対象アプリ用に プロパティ を追加しておいてください。 さらに、そのプロパティに対して データストリーム を追加すると、Web サイトや Android アプリの利用状況を監視できるようになります。
-図: プロパティにデータストリームを追加する データストリームを追加すると、次のように 測定 ID が発行されます。 これが、前述の JavaScript コードで指定する ID になります。</description></item><item><title>Next.js で useState とローカルストレージ (localStorage) を連動させる</title><link>https://maku.blog/p/cwdyhec/</link><pubDate>Wed, 01 Dec 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cwdyhec/</guid><description>何をするか？ React (Next.js) の useState フックは、Web ページの状態を保持するものですが、ページのリロードや、ブラウザの再起動を行うと、その状態はリセットされてしまいます。
-一方、Web ブラウザに搭載されている localStorage や sessionStorage を使用すると、キー＆バリュー（両方とも文字列のみ）の形でデータを保存することができます。
-ここでは、これらを一緒に使うことで、useState で管理している状態をローカルストレージに保存・復帰できるようにしてみます。
-使い方のイメージ 例えば、Web サイト上でダークモードの On/Off を行うスイッチがあるとして、その状態をローカルストレージに保存できるようにしたいとします。
-図: ダークモード切り替えのイメージ ダークモードの状態は useDarkMode のようなカスタムフックを作成して、次のように扱えると便利です。
-src/pages/sample.tsx import { NextPage } from &amp;#39;next&amp;#39; import { useDarkMode } from &amp;#39;../hooks/useDarkMode&amp;#39; const SamplePage: NextPage = () =&amp;gt; { // 一見 useState と同様だが localStorage と連動している const [isDark, setDark] = useDarkMode(false) return ( &amp;lt;div style={{ width: &amp;#39;100vw&amp;#39;, height: &amp;#39;100vh&amp;#39;, color: isDark ? &amp;#39;white&amp;#39; : &amp;#39;black&amp;#39;, background: isDark ?</description></item><item><title>Next.js で開発環境で実行しているときに Web サイト上に dev 表示する (TargetEnvIndicator)</title><link>https://maku.blog/p/d4p4fr4/</link><pubDate>Fri, 29 Oct 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/d4p4fr4/</guid><description>何をするか？ Next.js (React) などで Web サイトの開発を行うとき、その開発フェーズに応じて、開発環境 (dev)、ステージング環境 (stg)、本番環境 (prod) などを分けてリリースしていくことが多いと思います。 このとき、ブラウザ上でどのフェーズのサイトを表示しているのかが分かるように、画面上に dev 環境 のようなインジケーターを表示すると便利です（上図）。
-ここでは、環境変数 NEXT_PUBLIC_TARGET_ENV の値が prod 以外のときに、上記のような表示をすることにします。
-参考: Next.js で環境変数を扱う (.env, NEXT_PUBLIC, NODE_ENV) 実装例 次のコンポーネント TargetEnvIndicator は、画面右下に環境名（例: dev 環境）を表示します。
-components/common/TargetEnvIndicator.tsx import { FC } from &amp;#39;react&amp;#39; /** * ビルド時のターゲット環境が `prod` 以外のときに、画面右下に環境名を表示します。 */ export const TargetEnvIndicator: FC = () =&amp;gt; { const target = process.env.NEXT_PUBLIC_TARGET_ENV ?? &amp;#39;dev&amp;#39; // 本番環境 (prod) の場合は何も表示しない if (target === &amp;#39;prod&amp;#39;) return null return ( &amp;lt;div style={{ position: &amp;#39;fixed&amp;#39;, right: 10, bottom: 10, padding: &amp;#39;0.</description></item><item><title>Next.js の public 以下のファイルのパスを正しく扱う</title><link>https://maku.blog/p/xjjbwes/</link><pubDate>Fri, 30 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xjjbwes/</guid><description>Next.js アプリでは、/public ディレクトリ以下に配置した静的リソースファイル（画像ファイルなど）は、次のような感じで URL のドメイン直下に配置されたファイルとして参照できるようになります。
-// import Image from &amp;#39;next/image&amp;#39; &amp;lt;Image src=&amp;#34;/me.png&amp;#34; alt=&amp;#34;Picture of the author&amp;#34; width={500} height={500} /&amp;gt; 仮に、作成した Web サイトを GitHub Pages の「プロジェクトサイト」として公開する場合は、https://username.github.io/reponame/ のように一階層深い URL パスがアプリのルートになりますが、next.config.js で次のようにベースパスを設定しておけば、Next.js の Image コンポーネントは正しいパス (/reponame/me.png) に補正して画像ファイルを参照してくれます。
-next.config.js const urlPrefix = &amp;#39;/reponame&amp;#39; module.exports = { // ... assetPrefix: urlPrefix, basePath: urlPrefix, trailingSlash: true, } 参考: Next.js アプリを GitHub Actions でビルドして GitHub Pages で公開する 一方で、Next.js が提供する Image コンポーネントなどを使わず、img 要素をそのまま使った場合、このような URL プレフィックスの付加は自動では行われず、画像が参照できなくなるという問題が発生します。
-画像が参照できなくなる &amp;lt;img src=&amp;#34;/me.png&amp;#34; alt=&amp;#34;Picture of the author&amp;#34; /&amp;gt; Vercel 以外のサーバーで Web サイトをホスティングする場合、Image コンポーネント (next/image) は使えないことが多いので、この問題には意外とよく遭遇します。 次のユーティリティ関数 url() は、public ディレクトリ以下のファイルを参照するときに、正しい URL に補正するための関数です。</description></item><item><title>Next.js アプリのディレクトリ構成を考える（Atomic Design と Presentational and Container Components）</title><link>https://maku.blog/p/4is2ahp/</link><pubDate>Tue, 13 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4is2ahp/</guid><description>Web サイトを構築するにあたって、よく参照されるコンポーネントの分類手法として、Atomic Design と Presetational and Container Components があります。
-Atomic Design &amp;hellip; UI の粒度と具体性によって 5 レベルに分類する Presentational and Container Components &amp;hellip; 「表示」と「振る舞い」の役割で分類する ここでは、それぞれに関して概要をざっと眺めた上で、Next.js プロジェクトにどんな形で適用していけばいいかを考えてみます。
-Atomic Design とは Web デザインにおける UI コンポーネントの分割粒度の考え方として、Brad Frost 氏の Atomic Design があります。
-Atomic Design - Brad Frost 氏のブログ記事 Atomic Design - 書籍版（Webで読めます） Atomic Design では、UI コンポーネントを粒度の小さい順に次のように分類します。
-図: Atomic Design の 5 つのレベル（Brad Frost 氏のブログより） Atoms（原子） &amp;hellip; これ以上分割できない単位（例: ラベル、入力、ボタン） Molecules（分子） &amp;hellip; 意味のある UI パーツ単位 （例: 検索フォーム (ラベル + 入力 + ボタン)） Organisms（有機体、生物） &amp;hellip; ページの一部分を構成する。Molecules をどう組み合わせるべきかという、アプリドメインの知識が入ってくる。 Templates（テンプレート） &amp;hellip; ページ全体のレイアウト。最初はプレースホルダーだらけかもしれないが、徐々に具体的な Organisms が配置されて最終形態に近づいていく。 Pages（ページ） &amp;hellip; Templates に具体的なデータを入れたもの（特定のページ）。 よく Organisms の扱いで迷うようですが、汎用性の側面から次のような感じで分類すると、プロジェクト内でコンポーネントを整理しやすくなります。 Pages に関しては、Templates に対してデータを流し込んだものなので、ここでは省略しています。</description></item><item><title>Next.js で環境変数を扱う (.env, NEXT_PUBLIC, NODE_ENV)</title><link>https://maku.blog/p/gbpeyov/</link><pubDate>Mon, 28 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gbpeyov/</guid><description>Next.js アプリ内での環境変数の振る舞い process.env の振る舞い Node.js の process.env による環境変数の参照が有効なのは、基本的には次のようなサーバーサイドで実行されるコード内のみです。
-ビルド時あるいはアクセス時に呼び出される getStaticPaths や getStaticProps 必ずアクセス時に呼び出される getServerSideProps 必ずアクセス時に呼び出される API ルートのハンドラ関数 (handler) src/pages/sample.tsx export const getStaticProps: GetStaticProps&amp;lt;PageProps&amp;gt; = async context =&amp;gt; { // このコードはビルド時に実行されるので環境変数を参照できる console.log(process.env.VAR_NAME) return { props: {} } } NEXT_PUBLIC プレフィックス ただし、例外として、NEXT_PUBLIC_ で始まる環境変数を process.env.NEXT_PUBLIC_XXX のように参照すると、next build によるビルド時に変数値がインライン展開されるので、クライアントサイドで実行されるコード（コンポーネントの実装内）から参照できます。
-src/pages/sample.tsx const SamplePage: FC = () =&amp;gt; { return &amp;lt;&amp;gt; &amp;lt;p&amp;gt;Public env: {process.env.NEXT_PUBLIC_ANALYTICS_ID}&amp;lt;/p&amp;gt; &amp;lt;p&amp;gt;Private env: {process.env.API_SECRET_KEY} （必ず空っぽ）&amp;lt;/p&amp;gt; &amp;lt;/&amp;gt; } 上記のようにすると、process.env.NEXT_PUBLIC_ANALYTICS_ID の部分には、ビルド時の環境変数 NEXT_PUBLIC_ANALYTICS_ID の値がそこに埋め込まれ、process.env.API_SECRET_KEY の方は必ず undefined になります（何も表示されない）。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Next.js のその他の記事 on まくろぐ</title><link>https://maku.blog/p/s5m7cbh/</link><description>Recent content in Next.js のその他の記事 on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Tue, 21 Mar 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/s5m7cbh/index.xml" rel="self" type="application/rss+xml"/><item><title>Next.js アプリに Google Analytics を設定する (next/script)</title><link>https://maku.blog/p/zycmw6f/</link><pubDate>Tue, 21 Mar 2023 00:00:00 +0900</pubDate><guid>https://maku.blog/p/zycmw6f/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Google Analytics で Web サイトのアクセス解析を行うには、次のような感じのコードを各ページに埋め込む必要があります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Google Analytics 用の埋め込みコード&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="c">&amp;lt;!-- Google tag (gtag.js) --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span> &lt;span class="na">async&lt;/span> &lt;span class="na">src&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;https://www.googletagmanager.com/gtag/js?id=G-ABCDE12345&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">window&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">dataLayer&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">window&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">dataLayer&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="p">[];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">function&lt;/span> &lt;span class="nx">gtag&lt;/span>&lt;span class="p">(){&lt;/span>&lt;span class="nx">dataLayer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">arguments&lt;/span>&lt;span class="p">);}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">gtag&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;js&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nb">Date&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">gtag&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;config&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;G-ABCDE12345&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ここでは、Next.js が提供する &lt;strong>&lt;code>Script&lt;/code>&lt;/strong> コンポーネント (&lt;strong>&lt;code>next/script&lt;/code>&lt;/strong>) を使用して、Next.js アプリに同等のコードを埋め込む方法を説明します。
+HTML 標準の &lt;code>script&lt;/code> ではなく、Next.js の &lt;code>Script&lt;/code> コンポーネントを使用することで、Next.js アプリのレンダリング処理に合わせて実行タイミングを最適化できます。&lt;/p>
+&lt;h2 id="事前準備google-analitics-でプロパティとデータストリームを追加する">事前準備（Google Analitics でプロパティとデータストリームを追加する）&lt;/h2>
+&lt;p>事前準備として、&lt;a href="https://analytics.google.com/">Google Analytics&lt;/a> のサイトで、サイドバーの &lt;strong>管理&lt;/strong> メニューから対象アプリ用に &lt;strong>プロパティ&lt;/strong> を追加しておいてください。
+さらに、そのプロパティに対して &lt;strong>データストリーム&lt;/strong> を追加すると、Web サイトや Android アプリの利用状況を監視できるようになります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1830" height="718" src="../../p/zycmw6f/img-001.png" alt="/p/zycmw6f/img-001.png" />
+ &lt;figcaption>図: プロパティにデータストリームを追加する&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>データストリームを追加すると、次のように &lt;strong>測定 ID&lt;/strong> が発行されます。
+これが、前述の JavaScript コードで指定する ID になります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="1952" height="634" src="../../p/zycmw6f/img-002.png" alt="/p/zycmw6f/img-002.png" />
+ &lt;figcaption>図: 測定 ID が発行された&lt;/figcaption>
+&lt;/figure>
+
+&lt;h2 id="nextjs-用の-analytics-コンポーネントを作成する">Next.js 用の Analytics コンポーネントを作成する&lt;/h2>
+&lt;p>下記の &lt;code>Analytics.tsx&lt;/code> は、Google Analytics 用のコードを埋め込むためのコンポーネントの実装例です。
+Google Analytics の測定 ID は、ホスティングサーバー（例えば Vercel）の環境変数 &lt;strong>&lt;code>NEXT_PUBLIC_ANALYTICS_ID&lt;/code>&lt;/strong> で設定することを想定しています（自サイト専用のコンポーネントにするなら、ハードコーディングしちゃっても大丈夫です）。&lt;/p></description></item><item><title>Next.js で useState とローカルストレージ (localStorage) を連動させる</title><link>https://maku.blog/p/cwdyhec/</link><pubDate>Wed, 01 Dec 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cwdyhec/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>React (Next.js) の &lt;code>useState&lt;/code> フックは、Web ページの状態を保持するものですが、ページのリロードや、ブラウザの再起動を行うと、その状態はリセットされてしまいます。&lt;/p>
+&lt;p>一方、Web ブラウザに搭載されている &lt;a href="https://developer.mozilla.org/ja/docs/Web/API/Window/localStorage">localStorage&lt;/a> や &lt;a href="https://developer.mozilla.org/ja/docs/Web/API/Window/sessionStorage">sessionStorage&lt;/a> を使用すると、キー＆バリュー（両方とも文字列のみ）の形でデータを保存することができます。&lt;/p>
+&lt;p>ここでは、これらを一緒に使うことで、&lt;code>useState&lt;/code> で管理している状態をローカルストレージに保存・復帰できるようにしてみます。&lt;/p>
+&lt;h2 id="使い方のイメージ">使い方のイメージ&lt;/h2>
+&lt;p>例えば、Web サイト上でダークモードの On/Off を行うスイッチがあるとして、その状態をローカルストレージに保存できるようにしたいとします。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="438" height="82" src="../../p/cwdyhec/img-001.png" alt="/p/cwdyhec/img-001.png" />
+ &lt;figcaption>図: ダークモード切り替えのイメージ&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>ダークモードの状態は &lt;code>useDarkMode&lt;/code> のようなカスタムフックを作成して、次のように扱えると便利です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/pages/sample.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">NextPage&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;next&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">useDarkMode&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;../hooks/useDarkMode&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">SamplePage&lt;/span>: &lt;span class="kt">NextPage&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 一見 useState と同様だが localStorage と連動している
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">isDark&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setDark&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useDarkMode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">style&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">width&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;100vw&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">height&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;100vh&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">color&lt;/span>: &lt;span class="kt">isDark&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="s1">&amp;#39;white&amp;#39;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;black&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">background&lt;/span>: &lt;span class="kt">isDark&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="s1">&amp;#39;black&amp;#39;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;white&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">label&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">input&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;checkbox&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">checked&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">isDark&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">onChange&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">setDark&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">target&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">checked&lt;/span>&lt;span class="p">)}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nx">isDark&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="s1">&amp;#39;DARKモードです&amp;#39;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;LIGHTモードです&amp;#39;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">label&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="nx">SamplePage&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="usedarkmode-の実装">useDarkMode の実装&lt;/h2>
+&lt;p>&lt;code>useState&lt;/code> による状態をローカルストレージと連動させるには、状態の初期化時に &lt;code>localStorage.getItem&lt;/code> で値をロード、状態の変更時に &lt;code>localStorage.setItem&lt;/code> で値をセーブ、とすればよさそうです。
+ただし、&lt;code>localStorage&lt;/code> オブジェクトは、クライアントサイド JS でしか参照できないため、Next.js などのサーバーサイドレンダリング時に値を参照しようとするとエラーになってしまいます。
+&lt;code>localStorage&lt;/code> の参照タイミングをうまく制御しながら、&lt;code>useState&lt;/code> フックと連携させなければいけません。&lt;/p></description></item><item><title>Next.js で開発環境で実行しているときに Web サイト上に dev 表示する (TargetEnvIndicator)</title><link>https://maku.blog/p/d4p4fr4/</link><pubDate>Fri, 29 Oct 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/d4p4fr4/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="590" height="168" src="../../p/d4p4fr4/img-001.png" alt="/p/d4p4fr4/img-001.png" />
+&lt;/figure>
+
+&lt;p>Next.js (React) などで Web サイトの開発を行うとき、その開発フェーズに応じて、開発環境 (dev)、ステージング環境 (stg)、本番環境 (prod) などを分けてリリースしていくことが多いと思います。
+このとき、ブラウザ上でどのフェーズのサイトを表示しているのかが分かるように、画面上に &lt;strong>dev 環境&lt;/strong> のようなインジケーターを表示すると便利です（上図）。&lt;/p>
+&lt;p>ここでは、環境変数 &lt;strong>&lt;code>NEXT_PUBLIC_TARGET_ENV&lt;/code>&lt;/strong> の値が &lt;strong>&lt;code>prod&lt;/code>&lt;/strong> 以外のときに、上記のような表示をすることにします。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/gbpeyov">Next.js で環境変数を扱う (.env, NEXT_PUBLIC, NODE_ENV)&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="実装例">実装例&lt;/h2>
+&lt;p>次のコンポーネント &lt;code>TargetEnvIndicator&lt;/code> は、画面右下に環境名（例: &lt;code>dev 環境&lt;/code>）を表示します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">components/common/TargetEnvIndicator.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">FC&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="kr">from&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * ビルド時のターゲット環境が `prod` 以外のときに、画面右下に環境名を表示します。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">TargetEnvIndicator&lt;/span>: &lt;span class="kt">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">target&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">process&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">env&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">NEXT_PUBLIC_TARGET_ENV&lt;/span> &lt;span class="o">??&lt;/span> &lt;span class="s1">&amp;#39;dev&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 本番環境 (prod) の場合は何も表示しない
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">target&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;prod&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="kc">null&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">div&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">style&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">position&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;fixed&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">right&lt;/span>: &lt;span class="kt">10&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">bottom&lt;/span>: &lt;span class="kt">10&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">padding&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;0.2em 0.6em&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">borderRadius&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;0.2em&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">fontSize&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;16pt&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">background&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;#f008&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">color&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;#fffd&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">zIndex&lt;/span>: &lt;span class="kt">1000&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="nx">target&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="err">環境&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">div&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ターゲット環境は環境変数 &lt;code>NEXT_PUBLIC_TARGET_ENV&lt;/code> で指定しますが、この環境変数が設定されていない場合は、デフォルトで「dev 環境」と表示します。&lt;/p></description></item><item><title>Next.js の public 以下のファイルのパスを正しく扱う</title><link>https://maku.blog/p/xjjbwes/</link><pubDate>Fri, 30 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xjjbwes/</guid><description>&lt;p>Next.js アプリでは、&lt;code>/public&lt;/code> ディレクトリ以下に配置した静的リソースファイル（画像ファイルなど）は、次のような感じで URL のドメイン直下に配置されたファイルとして参照できるようになります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// import Image from &amp;#39;next/image&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Image&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">src&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/me.png&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">alt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;Picture of the author&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="mi">500&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="mi">500&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>仮に、作成した Web サイトを GitHub Pages の「プロジェクトサイト」として公開する場合は、&lt;code>https://username.github.io/reponame/&lt;/code> のように一階層深い URL パスがアプリのルートになりますが、&lt;code>next.config.js&lt;/code> で次のようにベースパスを設定しておけば、Next.js の &lt;code>Image&lt;/code> コンポーネントは正しいパス (&lt;code>/reponame/me.png&lt;/code>) に補正して画像ファイルを参照してくれます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">next.config.js&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">urlPrefix&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;/reponame&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">module&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">exports&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">assetPrefix&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">urlPrefix&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">basePath&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">urlPrefix&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">trailingSlash&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/au8ju6g">Next.js アプリを GitHub Actions でビルドして GitHub Pages で公開する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>一方で、Next.js が提供する &lt;code>Image&lt;/code> コンポーネントなどを使わず、&lt;code>img&lt;/code> 要素をそのまま使った場合、このような URL プレフィックスの付加は自動では行われず、画像が参照できなくなるという問題が発生します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">画像が参照できなくなる&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">img&lt;/span> &lt;span class="na">src&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/me.png&amp;#34;&lt;/span> &lt;span class="na">alt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;Picture of the author&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Vercel 以外のサーバーで Web サイトをホスティングする場合、&lt;code>Image&lt;/code> コンポーネント (next/image) は使えないことが多いので、この問題には意外とよく遭遇します。
+次のユーティリティ関数 &lt;code>url()&lt;/code> は、&lt;code>public&lt;/code> ディレクトリ以下のファイルを参照するときに、正しい URL に補正するための関数です。&lt;/p></description></item><item><title>Next.js アプリのディレクトリ構成を考える（Atomic Design と Presentational and Container Components）</title><link>https://maku.blog/p/4is2ahp/</link><pubDate>Tue, 13 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/4is2ahp/</guid><description>&lt;p>Web サイトを構築するにあたって、よく参照されるコンポーネントの分類手法として、&lt;strong>Atomic Design&lt;/strong> と &lt;strong>Presetational and Container Components&lt;/strong> があります。&lt;/p>
+&lt;ul>
+&lt;li>Atomic Design &amp;hellip; UI の粒度と具体性によって 5 レベルに分類する&lt;/li>
+&lt;li>Presentational and Container Components &amp;hellip; 「表示」と「振る舞い」の役割で分類する&lt;/li>
+&lt;/ul>
+&lt;p>ここでは、それぞれに関して概要をざっと眺めた上で、Next.js プロジェクトにどんな形で適用していけばいいかを考えてみます。&lt;/p>
+&lt;h2 id="atomic-design-とは">Atomic Design とは&lt;/h2>
+&lt;p>Web デザインにおける UI コンポーネントの分割粒度の考え方として、Brad Frost 氏の &lt;strong>Atomic Design&lt;/strong> があります。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://bradfrost.com/blog/post/atomic-web-design/">Atomic Design - Brad Frost 氏のブログ記事&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://atomicdesign.bradfrost.com/table-of-contents/">Atomic Design - 書籍版（Webで読めます）&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Atomic Design では、UI コンポーネントを粒度の小さい順に次のように分類します。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="700" height="191" src="../../p/4is2ahp/img-001_hu4688837743272608693.png" alt="/p/4is2ahp/img-001.png" />
+ &lt;figcaption>図: Atomic Design の 5 つのレベル（Brad Frost 氏のブログより）&lt;/figcaption>
+&lt;/figure>
+
+&lt;ul>
+&lt;li>&lt;strong>Atoms（原子）&lt;/strong> &amp;hellip; これ以上分割できない単位（例: ラベル、入力、ボタン）&lt;/li>
+&lt;li>&lt;strong>Molecules（分子）&lt;/strong> &amp;hellip; 意味のある UI パーツ単位 （例: 検索フォーム (ラベル + 入力 + ボタン)）&lt;/li>
+&lt;li>&lt;strong>Organisms（有機体、生物）&lt;/strong> &amp;hellip; ページの一部分を構成する。Molecules をどう組み合わせるべきかという、アプリドメインの知識が入ってくる。&lt;/li>
+&lt;li>&lt;strong>Templates（テンプレート）&lt;/strong> &amp;hellip; ページ全体のレイアウト。最初はプレースホルダーだらけかもしれないが、徐々に具体的な Organisms が配置されて最終形態に近づいていく。&lt;/li>
+&lt;li>&lt;strong>Pages（ページ）&lt;/strong> &amp;hellip; Templates に具体的なデータを入れたもの（特定のページ）。&lt;/li>
+&lt;/ul>
+&lt;p>よく Organisms の扱いで迷うようですが、汎用性の側面から次のような感じで分類すると、プロジェクト内でコンポーネントを整理しやすくなります。
+Pages に関しては、Templates に対してデータを流し込んだものなので、ここでは省略しています。&lt;/p></description></item><item><title>Next.js で環境変数を扱う (.env, NEXT_PUBLIC, NODE_ENV)</title><link>https://maku.blog/p/gbpeyov/</link><pubDate>Mon, 28 Jun 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/gbpeyov/</guid><description>&lt;h2 id="nextjs-アプリ内での環境変数の振る舞い">Next.js アプリ内での環境変数の振る舞い&lt;/h2>
+&lt;h3 id="processenv-の振る舞い">process.env の振る舞い&lt;/h3>
+&lt;p>Node.js の &lt;strong>&lt;code>process.env&lt;/code>&lt;/strong> による環境変数の参照が有効なのは、基本的には次のようなサーバーサイドで実行されるコード内のみです。&lt;/p>
+&lt;ul>
+&lt;li>ビルド時あるいはアクセス時に呼び出される &lt;code>getStaticPaths&lt;/code> や &lt;code>getStaticProps&lt;/code>&lt;/li>
+&lt;li>必ずアクセス時に呼び出される &lt;code>getServerSideProps&lt;/code>&lt;/li>
+&lt;li>必ずアクセス時に呼び出される API ルートのハンドラ関数 (&lt;code>handler&lt;/code>)&lt;/li>
+&lt;/ul>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/pages/sample.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">getStaticProps&lt;/span>: &lt;span class="kt">GetStaticProps&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">PageProps&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kr">async&lt;/span> &lt;span class="nx">context&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// このコードはビルド時に実行されるので環境変数を参照できる
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">process&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">env&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">VAR_NAME&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">props&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{}&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="next_public-プレフィックス">NEXT_PUBLIC プレフィックス&lt;/h3>
+&lt;p>ただし、例外として、&lt;strong>&lt;code>NEXT_PUBLIC_&lt;/code>&lt;/strong> で始まる環境変数を &lt;code>process.env.NEXT_PUBLIC_XXX&lt;/code> のように参照すると、&lt;code>next build&lt;/code> によるビルド時に変数値がインライン展開されるので、クライアントサイドで実行されるコード（コンポーネントの実装内）から参照できます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">src/pages/sample.tsx&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-tsx" data-lang="tsx">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">SamplePage&lt;/span>: &lt;span class="kt">FC&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">&amp;lt;&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Public&lt;/span> &lt;span class="nx">env&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">process&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">env&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">NEXT_PUBLIC_ANALYTICS_ID&lt;/span>&lt;span class="p">}&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="nx">Private&lt;/span> &lt;span class="nx">env&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">process&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">env&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">API_SECRET_KEY&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="err">（必ず空っぽ）&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">p&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">&amp;lt;/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のようにすると、&lt;code>process.env.NEXT_PUBLIC_ANALYTICS_ID&lt;/code> の部分には、ビルド時の環境変数 &lt;code>NEXT_PUBLIC_ANALYTICS_ID&lt;/code> の値がそこに埋め込まれ、&lt;code>process.env.API_SECRET_KEY&lt;/code> の方は必ず &lt;code>undefined&lt;/code> になります（何も表示されない）。&lt;/p>
+&lt;p>サーバーサイドでしか参照しない環境変数（シークレットキーなど）には、&lt;code>NEXT_PUBLIC_&lt;/code> プレフィックスを付けないように注意してください。&lt;/p>
+&lt;h2 id="env-envlocal-ファイル">.env (.env.local) ファイル&lt;/h2>
+&lt;p>Next.js サーバーは、デフォルトでプロジェクトルートに配置した &lt;strong>&lt;code>.env&lt;/code>&lt;/strong> や &lt;strong>&lt;code>.env.local&lt;/code>&lt;/strong> といった名前のファイルを読み込んで、&lt;code>process.env.XXX&lt;/code> で参照可能な状態にしてくれます。
+ローカル開発中に、一時的にテスト用のリソースサーバーに繋ぎたいときなどに便利です。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.env.local&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">DB_HOST=localhost
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">DB_USER=myuser
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">DB_PASS=mypassword&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これらの設定ファイルの中では、次のように &lt;code>$VAR&lt;/code> という形の変数展開を行えるようになっています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">HOSTNAME=localhost
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PORT=8080
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">HOST=http://$HOSTNAME:$PORT&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>.local&lt;/code> サフィックスが付いている方のファイルは、「Git などにコミットしないファイルですよ」という Next.js での取り決めですね。
+Next.js は他にも実行環境に応じて色々な名前の環境設定ファイルを読み込むようになっています。
+下記は、どのファイルがどの環境で読み込まれるかの一覧です。&lt;/p></description></item></channel></rss>

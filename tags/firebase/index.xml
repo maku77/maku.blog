@@ -1,15 +1,345 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Firebase on まくろぐ</title><link>https://maku.blog/tags/firebase/</link><description>Recent content in Firebase on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sun, 05 Jun 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/firebase/index.xml" rel="self" type="application/rss+xml"/><item><title>Firebase Auth で admin ユーザーのみ Firestore に書き込みできるようにする</title><link>https://maku.blog/p/dw9jt4e/</link><pubDate>Sun, 13 Feb 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dw9jt4e/</guid><description>何をするか？ ユーザーデータの管理に Firestore を使うと、Web アプリやモバイルアプリから手軽にデータを読み書きできるので非常に便利です。 一方で、データの書き込み (write) を誰にでもできるようにしていると、大切なデータを勝手に書き換えられてしまいます。
-Firestore の危険なセキュリティルールの例 rules_version = &amp;#39;2&amp;#39;; service cloud.firestore { match /databases/{db}/documents { match /{doc=**} { allow read, write: if true; // 危険！ } } } ここでは、Firestore へのデータ書き込みを admin ユーザー（自分）だけに制限してみます。
-なお、FirebaseApp インスタンスの初期化 (initializeApp) や、Firebase Auth の導入 自体は完了しているものとします。 ユーザーごとにアクセス制御をしたいので、Firebase Auth による認証処理はほぼ必須になります。 とはいえ、Firebase アプリの認証まわりの実装はとても簡単で、最初に FirebaseApp インスタンスを初期化して、UI ライブラリ（react-firebaseui など）を使ってサインイン画面を出してユーザーにサインインさせるさせるだけです。 サインイン状態は Firebase が内部で管理してくれるので、Firestore API の呼び出し時には特に意識する必要はありません。 Firestore サービス側のセキュリティルールで、認証状態を意識した制限をかければよいだけです。
-何をもって admin ユーザーとするか？ Firestore のデータ書き込み (write) を admin ユーザーだけに制限するといっても、そもそも何をもって admin ユーザーとみなすのかという問題があります。 このあたりは、ひとことで言うと「自由」です。 例えば、次のようなやり方が考えられます。</description></item><item><title>Firebase CLI でコマンドラインから Firebase を操作する</title><link>https://maku.blog/p/pamw7hr/</link><pubDate>Sat, 08 Jan 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pamw7hr/</guid><description>Firebase CLI のインストール Firebase CLI をインストールすると、firebase というコマンドで Firebase の各種サービスを操作できるようになります。 インストール用に各 OS 用のバイナリが用意されていますが、どの OS でも共通で使える Node.js の npm でインストールすることをお勧めします。
-$ npm install -g firebase-tools Firebase CLI をバージョンアップしたいときも同じコマンドでいけます。 インストールが終わったら、firebase コマンドを実行できるか確認しておきます。
-$ firebase --version 10.0.1 firebase コマンドの使い方 firebase コマンドは、firebase &amp;lt;サブコマンド&amp;gt; という形で使用します。 firebase コマンドを引数なしで実行するとヘルプを表示できますが、公式サイトのコマンドリファレンス の方がわかりやすいです。 以下に、いくつかのサブコマンドを紹介しておきます。
-サインイン (firebase login) Firebase プロジェクトの情報を取得するには、まずは Firebase アカウントにサインインしておく必要があります。 次のように実行すると、Web ブラウザが開き、Firebase にサインインできます。
-$ firebase login サインインとアクセス権限が終わったら、Web ブラウザは閉じて大丈夫です。
-Firebase プロジェクトの一覧を取得する (projects:list) $ firebase projects:list ✔ Preparing the list of your Firebase projects ┌──────────────────────┬──────────────┬────────────────┬──────────────────────┐ │ Project Display Name │ Project ID │ Project Number │ Resource Location ID │ ├──────────────────────┼──────────────┼────────────────┼──────────────────────┤ │ MyApp1 │ myapp1-12345 │ 123456789001 │ asia-northeast1 │ ├──────────────────────┼──────────────┼────────────────┼──────────────────────┤ │ MyApp2 │ myapp2-12345 │ 123456789002 │ asia-northeast1 │ └──────────────────────┴──────────────┴────────────────┴──────────────────────┘ 2 project(s) total.</description></item><item><title>Firebase Admin SDK で Firebase の各種サービスを操作する</title><link>https://maku.blog/p/yfov4bi/</link><pubDate>Fri, 31 Dec 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yfov4bi/</guid><description>Firebase Admin SDK とは Firebase Admin SDK を使うと、Firebase の管理者（おそらくあなた）用に提供された API キーを使って、Firebase 上のデータを管理することができます。 例えば、ローカル PC にある JSON データを解析して Firestore データベースのドキュメントとして登録するといったことができます。
-Firebase Admin SDK がサポートしている言語としては、Node.js、Java、Python、Go、C# などがありますが、Node.js から順番に機能提供されていくようです。 ここでは Node.js (TypeScript) で Firestore の API を呼び出してみます。
-☝️ サーバーライブラリとクライアントライブラリ Firebase Admin SDK はしばしば サーバーライブラリ とも呼ばれます。 一方で、Web アプリやモバイルアプリなどで使う SDK は クライアントライブラリ と呼ばれ、Firebase が提供するセキュリティルールという仕組みでアクセス制御を行います。 具体的には、Firebase Auth などでユーザー認証を行うことで、各クライアントに対してアクセス権限を付与します。 これに対して、Firebase Admin SDK はあらかじめローカルに保持しているアクセスキーを使って API を呼び出すので、セキュリティルールを無視した特権アクセスが可能です。 秘密鍵のダウンロード Firebase Admin SDK を使って API 呼び出しを行うには、秘密鍵（API キー）を取得する必要があります。
-Firebase コンソール にサインインして、対象のプロジェクトを選択する。 プロジェクトの設定 を開き、サービスアカウント タブを選択する。 新しい秘密鍵の生成 をクリックして、秘密鍵ファイル (.</description></item><item><title>Next.js で Firebase: プロジェクトの作成と接続準備</title><link>https://maku.blog/p/73eq2cm/</link><pubDate>Sun, 26 Dec 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/73eq2cm/</guid><description>何をするか？ ここでは、Firebase を Next.js (React) ウェブアプリから使用するための準備 として、「Firebase プロジェクトの作成」「Next.js アプリの作成」「FirebaseApp インスタンスの初期化」までを行います。 なお、ここでは Firebase JS SDK ver.9 以降を対象とします（ver.8 以前は初期化方法が若干異なります）。
-Firebase サービスを使うと、Web アプリやモバイルアプリに必要なバックエンド環境を簡単に整えることができます。 例えば、Firebase は次のような機能を提供しており、小規模のアプリであれば無料の Spark プランで動かすことができます（参考: Firebase の料金プラン）。
-Firebase Authentication &amp;hellip; ユーザー管理と認証（ログイン UI もある） Firebase Hosting &amp;hellip; Web アプリのホスティング（独自ドメインにも対応） Cloud Firestore &amp;hellip; NoSQL データベース Cloud Function &amp;hellip; サーバレス関数 Cloud Storage for Firebase &amp;hellip; ファイル管理 Web アプリから上記のような機能にアクセスするには、まずは FirebaseApp インスタンスの設定（初期化）が必要になります。 以下では、Next.js アプリから各種 Firebase インスタンスにアクセスするところまでの準備を行います。
-Firebase プロジェクトの作成 Firebase コンソールにサインイン して、Firebase のプロジェクトを作成します。 プロジェクト名は、自分の Google アカウント内で一意の名前になっていれば OK です。 例えば、MyApp のような名前を付けて作成してください。 Google アナリティクスは有効にしなくても OK です。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Firebase on まくろぐ</title><link>https://maku.blog/tags/firebase/</link><description>Recent content in Firebase on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 05 Jun 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/firebase/index.xml" rel="self" type="application/rss+xml"/><item><title>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する</title><link>https://maku.blog/p/dtdtbr8/</link><pubDate>Sun, 05 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dtdtbr8/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Firestore はクライアントアプリから直接アクセスできることが利点ですが、多数のクライアントから複数のドキュメントを読み込んでいると、あっという間に無料枠を超えて高額な請求が発生してしまいます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/dtdtbr8/img-001.drawio.svg" alt="/p/dtdtbr8/img-001.drawio.svg" />
+ &lt;figcaption>図: 同じデータなのに何度もドキュメントの Read が発生する&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>&lt;a href="https://firebase.google.com/support/release-notes/js?hl=ja#version_820_-_december_11_2020">Firebase 8.2.0&lt;/a> でリリースされた &lt;a href="https://firebase.google.com/docs/firestore/bundles">Cloud Firestore Data Bundles&lt;/a> という仕組みを使用すると、Firestore から取得したデータ（クエリ結果）をバンドルというデータにまとめておいて、それを使いまわすことができます。
+データバンドルを CDN でキャッシュ、あるいはクライアントサイドでキャッシュすることにより、Firestore へのアクセスを発生させずに、あたかも Firestore からデータフェッチしたかのように動作させることが可能です。
+ユーザー数の多いアプリに導入すれば、大きなコスト削減につながります。&lt;/p>
+&lt;p>データバンドルは Cloud Functions を使って作成してしまうのが簡単です。
+下記のような構成にすれば、クライアントアプリは Firestore にアクセスする代わりにデータバンドルを取得して動作するようになります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/dtdtbr8/img-002.drawio.svg" alt="/p/dtdtbr8/img-002.drawio.svg" />
+ &lt;figcaption>図: Cloud Functions でバンドルを生成する&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>しかし、これだけでは複数のクライアントから Cloud Functions へのアクセスが発生してしまうので、結局はその都度 Firestore へのアクセスが発生してしまいます。
+各クライアントアプリではキャッシュが有効ですが、そのキャッシュでさえ、&lt;code>Ctrl(Cmd) + R&lt;/code> によるスーパーリロードで無視されてしまいます。
+そこで、次のようにさらに CDN (Firebase Hosting) を挟んでデータバンドルをキャッシュすることで、各クライアントからのアクセスで Cloud Functions が起動されてしまうのを防ぎます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/dtdtbr8/img-003.drawio.svg" alt="/p/dtdtbr8/img-003.drawio.svg" />
+ &lt;figcaption>図: CDN でバンドルをキャッシュする&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>この構成になっていれば、クライアントがいくら強制リロードしようが、CDN (Firebase Hosting) にキャッシュされたデータバンドルのみが参照されるようになります。
+Firestore へのアクセスが発生するのは、CDN 上のキャッシュが無効になったときのみです。
+クライアント側のキャッシュ時間や、CDN のキャッシュ時間は、Cloud Functions の関数が返すレスポンスヘッダ (&lt;code>Cache-Control&lt;/code>) で制御できます。&lt;/p></description></item><item><title>Firestore のデータバンドルを作成してドキュメントの読み込み回数を削減する</title><link>https://maku.blog/p/dtdtbr8/</link><pubDate>Sun, 05 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dtdtbr8/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Firestore はクライアントアプリから直接アクセスできることが利点ですが、多数のクライアントから複数のドキュメントを読み込んでいると、あっという間に無料枠を超えて高額な請求が発生してしまいます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/dtdtbr8/img-001.drawio.svg" alt="/p/dtdtbr8/img-001.drawio.svg" />
+ &lt;figcaption>図: 同じデータなのに何度もドキュメントの Read が発生する&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>&lt;a href="https://firebase.google.com/support/release-notes/js?hl=ja#version_820_-_december_11_2020">Firebase 8.2.0&lt;/a> でリリースされた &lt;a href="https://firebase.google.com/docs/firestore/bundles">Cloud Firestore Data Bundles&lt;/a> という仕組みを使用すると、Firestore から取得したデータ（クエリ結果）をバンドルというデータにまとめておいて、それを使いまわすことができます。
+データバンドルを CDN でキャッシュ、あるいはクライアントサイドでキャッシュすることにより、Firestore へのアクセスを発生させずに、あたかも Firestore からデータフェッチしたかのように動作させることが可能です。
+ユーザー数の多いアプリに導入すれば、大きなコスト削減につながります。&lt;/p>
+&lt;p>データバンドルは Cloud Functions を使って作成してしまうのが簡単です。
+下記のような構成にすれば、クライアントアプリは Firestore にアクセスする代わりにデータバンドルを取得して動作するようになります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/dtdtbr8/img-002.drawio.svg" alt="/p/dtdtbr8/img-002.drawio.svg" />
+ &lt;figcaption>図: Cloud Functions でバンドルを生成する&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>しかし、これだけでは複数のクライアントから Cloud Functions へのアクセスが発生してしまうので、結局はその都度 Firestore へのアクセスが発生してしまいます。
+各クライアントアプリではキャッシュが有効ですが、そのキャッシュでさえ、&lt;code>Ctrl(Cmd) + R&lt;/code> によるスーパーリロードで無視されてしまいます。
+そこで、次のようにさらに CDN (Firebase Hosting) を挟んでデータバンドルをキャッシュすることで、各クライアントからのアクセスで Cloud Functions が起動されてしまうのを防ぎます。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="" height="auto" src="../../p/dtdtbr8/img-003.drawio.svg" alt="/p/dtdtbr8/img-003.drawio.svg" />
+ &lt;figcaption>図: CDN でバンドルをキャッシュする&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>この構成になっていれば、クライアントがいくら強制リロードしようが、CDN (Firebase Hosting) にキャッシュされたデータバンドルのみが参照されるようになります。
+Firestore へのアクセスが発生するのは、CDN 上のキャッシュが無効になったときのみです。
+クライアント側のキャッシュ時間や、CDN のキャッシュ時間は、Cloud Functions の関数が返すレスポンスヘッダ (&lt;code>Cache-Control&lt;/code>) で制御できます。&lt;/p></description></item><item><title>Firebase の Cloud Functions で Hello World</title><link>https://maku.blog/p/fvevcs8/</link><pubDate>Sat, 04 Jun 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/fvevcs8/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Cloud Functions に関数をデプロイすると、Google Cloud Platform 上でサーバーレス関数として実行できるようになります（Amazon の AWS Lambda や、Microsoft の Azure Functions に相当するものです）。
+この関数は、次のように、様々なイベントをトリガーにして呼び出されます。&lt;/p>
+&lt;ul>
+&lt;li>HTTP でのアクセス&lt;/li>
+&lt;li>スケジュールされたタイミング&lt;/li>
+&lt;li>Firestore データベースの更新時&lt;/li>
+&lt;/ul>
+&lt;p>ここでは、HTTP によるアクセス時に &lt;code>Hello from Firebase!&lt;/code> というレスポンスを返すだけの関数を Cloud Functions に追加してみます。
+また、Firebase にデプロイする前に、エミュレーターでのローカルテストを行います。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ Firebase なのか GCP なのか&lt;/span>
+ &lt;span class="xNote_body">Cloud Functions は Firebase プロジェクトからも使用できますが、実体は GCP で提供されているサービスです。
+このようなサービスは他にもあり、Firebase のサービスのうち、頭に Cloud と付いてるものは実際には GCP が提供しています（例:「Cloud Firestore」「Cloud Functions」「Cloud Storage」）。&lt;/span>
+&lt;/div>
+&lt;h2 id="事前準備">事前準備&lt;/h2>
+&lt;p>最初に Firebase プロジェクトを作成し、Firebase CLI をインストールしておきます。
+既存の Firebase プロジェクトに Cloud Functions を追加する場合は、プロジェクトの作成は必要ありません。&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://firebase.google.com/">Firebase&lt;/a> のアカウントを作成します&lt;/li>
+&lt;li>&lt;a href="https://console.firebase.google.com/">Firebase コンソール&lt;/a> から新規プロジェクトを作成します
+&lt;ul>
+&lt;li>&lt;code>firebase&lt;/code> コマンドでもプロジェクトを作成できますが、上記サイトから作成してしまった方が楽です（名前の重複チェックなどをしてくれます）&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="../../p/pamw7hr/">Firebase CLI をインストール&lt;/a> して、&lt;code>firebase&lt;/code> コマンドを実行できるようにします&lt;/li>
+&lt;/ol>
+&lt;p>Firebase CLI をインストールしたら、次のように Firebase アカウントでサインインしておきます。&lt;/p></description></item><item><title>Firebase の Cloud Functions で定期的に Firestore の集計処理を行う</title><link>https://maku.blog/p/vgs4dox/</link><pubDate>Sun, 13 Mar 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vgs4dox/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Firestore データベースは、コレクションデータを手軽に格納していくのにはとても便利ですが、全データを集計するような処理は苦手です。
+例えば、各ドキュメントに付けられた「タグ」情報をすべて回収して、タグの一覧を生成したい場合、全てのドキュメントを read する必要があるため、ドキュメント数が Firebase の使用料金にダイレクトに効いてきます。
+もし、Firestore にドキュメントが追加されるたびに Cloud Functions を起動してこのような集計処理を行うと、凄まじい勢いで課金されてしまいます。&lt;/p>
+&lt;p>ここでは、Cloud Functions による &lt;strong>集計処理を定期的なスケジュールで起動する&lt;/strong> ことで、Firestore ドキュメントの read 処理を削減してみます。
+もちろん、リアルタイムな更新が必要なデータには使えませんが、カタログ的なデータであれば、定期的なデータ更新で間に合うケースは多いはずです。&lt;/p>
+&lt;h2 id="事前準備">事前準備&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a href="https://console.firebase.google.com/">Firebase コンソール&lt;/a> からテスト用のプロジェクトを作成してください。ここでは、自動生成されたアプリ ID を &lt;code>myapp-58138&lt;/code> とします。&lt;/li>
+&lt;li>Firestore データベースに &lt;code>books&lt;/code> コレクションを追加し、次のようなサンプルドキュメントを追加してください。&lt;code>tag&lt;/code> フィールドは本来は配列 (&lt;code>tags&lt;/code>) であるべきですが、ここではシンプル化のために文字列型のスカラデータとしています。
+&lt;ul>
+&lt;li>id: &lt;code>001&lt;/code> (title: &lt;code>Title1&lt;/code>, author: &lt;code>Author1&lt;/code>, tag: &lt;code>Tag1&lt;/code>)&lt;/li>
+&lt;li>id: &lt;code>002&lt;/code> (title: &lt;code>Title2&lt;/code>, author: &lt;code>Author2&lt;/code>, tag: &lt;code>Tag2&lt;/code>)&lt;/li>
+&lt;li>id: &lt;code>003&lt;/code> (title: &lt;code>Title3&lt;/code>, author: &lt;code>Author3&lt;/code>, tag: &lt;code>Tag3&lt;/code>)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="../../p/pamw7hr">Firebase CLI をインストール&lt;/a> して、&lt;code>firebase&lt;/code> コマンドを使用できるようにしてください。作成した関数を Cloud Functions にデプロイするために使います。&lt;/li>
+&lt;/ul>
+&lt;h2 id="プロジェクトの雛形の生成">プロジェクトの雛形の生成&lt;/h2>
+&lt;p>プロジェクト用のディレクトリを作成します。&lt;/p></description></item><item><title>Firebase の Cloud Functions で定期的に Firestore の集計処理を行う</title><link>https://maku.blog/p/vgs4dox/</link><pubDate>Sun, 13 Mar 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/vgs4dox/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>Firestore データベースは、コレクションデータを手軽に格納していくのにはとても便利ですが、全データを集計するような処理は苦手です。
+例えば、各ドキュメントに付けられた「タグ」情報をすべて回収して、タグの一覧を生成したい場合、全てのドキュメントを read する必要があるため、ドキュメント数が Firebase の使用料金にダイレクトに効いてきます。
+もし、Firestore にドキュメントが追加されるたびに Cloud Functions を起動してこのような集計処理を行うと、凄まじい勢いで課金されてしまいます。&lt;/p>
+&lt;p>ここでは、Cloud Functions による &lt;strong>集計処理を定期的なスケジュールで起動する&lt;/strong> ことで、Firestore ドキュメントの read 処理を削減してみます。
+もちろん、リアルタイムな更新が必要なデータには使えませんが、カタログ的なデータであれば、定期的なデータ更新で間に合うケースは多いはずです。&lt;/p>
+&lt;h2 id="事前準備">事前準備&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a href="https://console.firebase.google.com/">Firebase コンソール&lt;/a> からテスト用のプロジェクトを作成してください。ここでは、自動生成されたアプリ ID を &lt;code>myapp-58138&lt;/code> とします。&lt;/li>
+&lt;li>Firestore データベースに &lt;code>books&lt;/code> コレクションを追加し、次のようなサンプルドキュメントを追加してください。&lt;code>tag&lt;/code> フィールドは本来は配列 (&lt;code>tags&lt;/code>) であるべきですが、ここではシンプル化のために文字列型のスカラデータとしています。
+&lt;ul>
+&lt;li>id: &lt;code>001&lt;/code> (title: &lt;code>Title1&lt;/code>, author: &lt;code>Author1&lt;/code>, tag: &lt;code>Tag1&lt;/code>)&lt;/li>
+&lt;li>id: &lt;code>002&lt;/code> (title: &lt;code>Title2&lt;/code>, author: &lt;code>Author2&lt;/code>, tag: &lt;code>Tag2&lt;/code>)&lt;/li>
+&lt;li>id: &lt;code>003&lt;/code> (title: &lt;code>Title3&lt;/code>, author: &lt;code>Author3&lt;/code>, tag: &lt;code>Tag3&lt;/code>)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="../../p/pamw7hr">Firebase CLI をインストール&lt;/a> して、&lt;code>firebase&lt;/code> コマンドを使用できるようにしてください。作成した関数を Cloud Functions にデプロイするために使います。&lt;/li>
+&lt;/ul>
+&lt;h2 id="プロジェクトの雛形の生成">プロジェクトの雛形の生成&lt;/h2>
+&lt;p>プロジェクト用のディレクトリを作成します。&lt;/p></description></item><item><title>Firebase Auth で admin ユーザーのみ Firestore に書き込みできるようにする</title><link>https://maku.blog/p/dw9jt4e/</link><pubDate>Sun, 13 Feb 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dw9jt4e/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ユーザーデータの管理に Firestore を使うと、Web アプリやモバイルアプリから手軽にデータを読み書きできるので非常に便利です。
+一方で、データの書き込み (write) を誰にでもできるようにしていると、大切なデータを勝手に書き換えられてしまいます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Firestore の危険なセキュリティルールの例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">rules_version&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;2&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">service&lt;/span> &lt;span class="nx">cloud&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">firestore&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">match&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="nx">databases&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">db&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">documents&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">match&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">doc&lt;/span>&lt;span class="o">=**&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">allow&lt;/span> &lt;span class="nx">read&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">write&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 危険！
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ここでは、Firestore へのデータ書き込みを admin ユーザー（自分）だけに制限してみます。&lt;/p>
+&lt;p>なお、&lt;a href="../../p/73eq2cm">FirebaseApp インスタンスの初期化 (initializeApp)&lt;/a> や、&lt;a href="../../p/8t6gq2b">Firebase Auth の導入&lt;/a> 自体は完了しているものとします。
+ユーザーごとにアクセス制御をしたいので、Firebase Auth による認証処理はほぼ必須になります。
+とはいえ、Firebase アプリの認証まわりの実装はとても簡単で、最初に FirebaseApp インスタンスを初期化して、UI ライブラリ（&lt;code>react-firebaseui&lt;/code> など）を使ってサインイン画面を出してユーザーにサインインさせるさせるだけです。
+サインイン状態は Firebase が内部で管理してくれるので、Firestore API の呼び出し時には特に意識する必要はありません。
+Firestore サービス側のセキュリティルールで、認証状態を意識した制限をかければよいだけです。&lt;/p>
+&lt;h2 id="何をもって-admin-ユーザーとするか">何をもって admin ユーザーとするか？&lt;/h2>
+&lt;p>Firestore のデータ書き込み (write) を admin ユーザーだけに制限するといっても、そもそも何をもって admin ユーザーとみなすのかという問題があります。
+このあたりは、ひとことで言うと「自由」です。
+例えば、次のようなやり方が考えられます。&lt;/p>
+&lt;ul>
+&lt;li>特定のユーザー ID (UID) を持つユーザーを admin とみなす&lt;/li>
+&lt;li>Firestore の &lt;code>users&lt;/code> コレクション以下にユーザー情報（ドキュメント）を格納しておいて、そのドキュメントに &lt;code>admin: true&lt;/code> というデータが含まれていたら admin ユーザーとみなす&lt;/li>
+&lt;/ul>
+&lt;p>1 つ目の方法はちょっと横着なやり方ですが (^^；、とりあえず自分にだけ write 権限を与えておきたい、というときに手っ取り早いかもしれません。&lt;/p></description></item><item><title>Firestore ドキュメントを TypeScript のユーザー定義型オブジェクトに変換する (withConverter)</title><link>https://maku.blog/p/bw9kv6g/</link><pubDate>Sat, 12 Feb 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bw9kv6g/</guid><description>&lt;p>Firestore の JavaScript SDK でドキュメントを参照するときに、&lt;strong>&lt;code>withConverter&lt;/code>&lt;/strong> 関数を組み合わせて使用すると、ドキュメントの読み書きを行うときに、TypeScript のユーザーデータ型との変換処理を自動的に呼び出すことができます。&lt;/p>
+&lt;p>例えば、次のような &lt;code>Book&lt;/code> 型のデータを、Firestore の &lt;code>books&lt;/code> コレクションに保存するとします。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="kr">type&lt;/span> &lt;span class="nx">Book&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">id&lt;/span>: &lt;span class="kt">string&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">title&lt;/span>: &lt;span class="kt">string&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">price?&lt;/span>: &lt;span class="kt">number&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Firestore ドキュメントとユーザーデータ型の変換処理は、次のように &lt;a href="https://firebase.google.com/docs/reference/js/firestore_.firestoredataconverter">FirestoreDataConverter&lt;/a> インタフェースを実装する形で定義します。
+今回は &lt;code>Book&lt;/code> 型に &lt;code>id&lt;/code> プロパティを含めましたが、Firestore はドキュメントの ID をパス情報として表現するので、そのあたりの変換処理に注意する必要があります。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// import {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// DocumentData, FirestoreDataConverter, QueryDocumentSnapshot,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// SnapshotOptions, serverTimestamp } from &amp;#39;firebase/firestore&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * Firestore のドキュメントと Book オブジェクトの型変換を行います。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">bookConverter&lt;/span>: &lt;span class="kt">FirestoreDataConverter&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">Book&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * Book オブジェクトを Firestore ドキュメントデータへ変換します。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">toFirestore&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">book&lt;/span>: &lt;span class="kt">Book&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">DocumentData&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// id は Firestore のパスで表現されるのでドキュメントデータには含めない。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// 下記の updatedAt のように、自動で更新時刻のフィールドを追加することも可能。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">title&lt;/span>: &lt;span class="kt">book.title&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">price&lt;/span>: &lt;span class="kt">book.price&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">updatedAt&lt;/span>: &lt;span class="kt">serverTimestamp&lt;/span>&lt;span class="p">(),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * Firestore ドキュメントデータを Book オブジェクトへ変換します。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">fromFirestore&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">snapshot&lt;/span>: &lt;span class="kt">QueryDocumentSnapshot&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">options&lt;/span>: &lt;span class="kt">SnapshotOptions&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">Book&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">snapshot&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">options&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Book オブジェクトの id プロパティには Firestore ドキュメントの id を入れる。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">id&lt;/span>: &lt;span class="kt">snapshot.id&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">title&lt;/span>: &lt;span class="kt">data.title&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">price&lt;/span>: &lt;span class="kt">data.price&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>あとは、次のように、&lt;code>doc&lt;/code> や &lt;code>collection&lt;/code> で Firestore のデータを参照するときに、&lt;code>withConverter&lt;/code> で上記のコンバーターオブジェクトを渡してやります。&lt;/p></description></item><item><title>Firebase CLI でコマンドラインから Firebase を操作する</title><link>https://maku.blog/p/pamw7hr/</link><pubDate>Sat, 08 Jan 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/pamw7hr/</guid><description>&lt;h2 id="firebase-cli-のインストール">Firebase CLI のインストール&lt;/h2>
+&lt;p>&lt;a href="https://firebase.google.com/docs/cli">Firebase CLI&lt;/a> をインストールすると、&lt;strong>&lt;code>firebase&lt;/code>&lt;/strong> というコマンドで Firebase の各種サービスを操作できるようになります。
+インストール用に各 OS 用のバイナリが用意されていますが、どの OS でも共通で使える &lt;a href="https://nodejs.org/">Node.js&lt;/a> の &lt;code>npm&lt;/code> でインストールすることをお勧めします。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install -g firebase-tools
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Firebase CLI をバージョンアップしたいときも同じコマンドでいけます。
+インストールが終わったら、&lt;code>firebase&lt;/code> コマンドを実行できるか確認しておきます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> firebase --version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">10.0.1
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="firebase-コマンドの使い方">firebase コマンドの使い方&lt;/h2>
+&lt;p>&lt;code>firebase&lt;/code> コマンドは、&lt;strong>&lt;code>firebase &amp;lt;サブコマンド&amp;gt;&lt;/code>&lt;/strong> という形で使用します。
+&lt;code>firebase&lt;/code> コマンドを引数なしで実行するとヘルプを表示できますが、&lt;a href="https://firebase.google.com/docs/cli#command_reference">公式サイトのコマンドリファレンス&lt;/a> の方がわかりやすいです。
+以下に、いくつかのサブコマンドを紹介しておきます。&lt;/p>
+&lt;h3 id="サインイン-firebase-login">サインイン (firebase login)&lt;/h3>
+&lt;p>Firebase プロジェクトの情報を取得するには、まずは Firebase アカウントにサインインしておく必要があります。
+次のように実行すると、Web ブラウザが開き、Firebase にサインインできます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> firebase login
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>サインインとアクセス権限が終わったら、Web ブラウザは閉じて大丈夫です。&lt;/p>
+&lt;h3 id="firebase-プロジェクトの一覧を取得する-projectslist">Firebase プロジェクトの一覧を取得する (projects:list)&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> firebase projects:list
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">✔ Preparing the list of your Firebase projects
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">┌──────────────────────┬──────────────┬────────────────┬──────────────────────┐
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">│ Project Display Name │ Project ID │ Project Number │ Resource Location ID │
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">├──────────────────────┼──────────────┼────────────────┼──────────────────────┤
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">│ MyApp1 │ myapp1-12345 │ 123456789001 │ asia-northeast1 │
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">├──────────────────────┼──────────────┼────────────────┼──────────────────────┤
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">│ MyApp2 │ myapp2-12345 │ 123456789002 │ asia-northeast1 │
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">└──────────────────────┴──────────────┴────────────────┴──────────────────────┘
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">2 project(s) total.
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>firebase&lt;/code> コマンドで操作対象のプロジェクトを指定するときは、&lt;strong>&lt;code>--project&lt;/code>&lt;/strong> オプションで上記の Project ID の欄に表示されている ID を指定します。
+ただし、&lt;code>firebase init&lt;/code> で初期化したディレクトリ内でコマンド実行する場合は、通常は &lt;code>--project&lt;/code> オプションは省略できます（デフォルトで操作対象とする Firebase プロジェクトが &lt;code>.firebaserc&lt;/code> に保存されるため）。&lt;/p></description></item><item><title>Firebase Admin SDK で Firebase の各種サービスを操作する</title><link>https://maku.blog/p/yfov4bi/</link><pubDate>Fri, 31 Dec 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yfov4bi/</guid><description>&lt;h2 id="firebase-admin-sdk-とは">Firebase Admin SDK とは&lt;/h2>
+&lt;p>&lt;a href="https://firebase.google.com/docs/reference/admin">Firebase Admin SDK&lt;/a> を使うと、Firebase の管理者（おそらくあなた）用に提供された API キーを使って、Firebase 上のデータを管理することができます。
+例えば、ローカル PC にある JSON データを解析して Firestore データベースのドキュメントとして登録するといったことができます。&lt;/p>
+&lt;p>Firebase Admin SDK がサポートしている言語としては、Node.js、Java、Python、Go、C# などがありますが、Node.js から順番に機能提供されていくようです。
+ここでは Node.js (TypeScript) で Firestore の API を呼び出してみます。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ サーバーライブラリとクライアントライブラリ&lt;/span>
+ &lt;span class="xNote_body">Firebase Admin SDK はしばしば &lt;strong>サーバーライブラリ&lt;/strong> とも呼ばれます。
+一方で、Web アプリやモバイルアプリなどで使う SDK は &lt;strong>クライアントライブラリ&lt;/strong> と呼ばれ、Firebase が提供するセキュリティルールという仕組みでアクセス制御を行います。
+具体的には、Firebase Auth などでユーザー認証を行うことで、各クライアントに対してアクセス権限を付与します。
+これに対して、Firebase Admin SDK はあらかじめローカルに保持しているアクセスキーを使って API を呼び出すので、セキュリティルールを無視した特権アクセスが可能です。&lt;/span>
+&lt;/div>
+&lt;h2 id="秘密鍵のダウンロード">秘密鍵のダウンロード&lt;/h2>
+&lt;p>Firebase Admin SDK を使って API 呼び出しを行うには、秘密鍵（API キー）を取得する必要があります。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="600" height="439" src="../../p/yfov4bi/img-001_hu6271846898749822272.png" alt="/p/yfov4bi/img-001.png" />
+&lt;/figure>
+
+&lt;ol>
+&lt;li>&lt;a href="https://console.firebase.google.com/">Firebase コンソール&lt;/a> にサインインして、対象のプロジェクトを選択する。&lt;/li>
+&lt;li>&lt;strong>プロジェクトの設定&lt;/strong> を開き、&lt;strong>サービスアカウント&lt;/strong> タブを選択する。&lt;/li>
+&lt;li>&lt;strong>新しい秘密鍵の生成&lt;/strong> をクリックして、秘密鍵ファイル (.json) をダウンロード。&lt;/li>
+&lt;/ol>
+&lt;p>ダウンロードされる .json ファイルは、次のような感じの内容になっています。
+このファイルは、&lt;strong>Credential ファイル&lt;/strong> や &lt;strong>Configuration ファイル&lt;/strong> と呼ばれます。&lt;/p></description></item><item><title>Next.js で Firebase: Cloud Firestore データベースを使う</title><link>https://maku.blog/p/m3bjrz7/</link><pubDate>Thu, 30 Dec 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/m3bjrz7/</guid><description>&lt;h2 id="何をするか">何をするか&lt;/h2>
+&lt;p>&lt;a href="https://firebase.google.com/docs/firestore">Cloud Firestore&lt;/a> は、Firebase サービス（あるいは GCP）が提供するサーバーレスな NoSQL データベースです。
+Firestore データベースには様々な環境からアクセスできますが、ここでは Web サイトからアクセスすることを想定して、Firebase が提供する JavaScript SDK（クライアントサイド SDK）を使って Firestore データベースを操作してみます。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ Firebase と GCP の使い分け&lt;/span>
+ &lt;span class="xNote_body">Firebase と GCP (Google Cloud Platform) の両方に Firestore の記載があるので混乱しますが、どちらのプロジェクトで作った Firestore データベースも内部的には共有されているようです。
+Firebase プロジェクトも、GCP プロジェクトとして参照できるようになっています。
+一方で、SDK は共通化されておらず、主に Firebase はクライアントサイド用の SDK を提供し、GCP はサーバーサイド用の SDK を提供しています。&lt;/span>
+&lt;/div>
+&lt;p>前提条件として、Firebase プロジェクトの作成は完了し、&lt;code>FirebaseApp&lt;/code> インスタンスの初期化コードは準備できているものとします。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/73eq2cm">Next.js で Firebase: プロジェクトの作成と接続準備&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="firestore-データベースの作成">Firestore データベースの作成&lt;/h2>
+&lt;p>クライアントアプリの実装を始める前に、Firebase プロジェクトに Firestore データベースを作成します。&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://console.firebase.google.com/">Firebase コンソール&lt;/a> にサインインして、対象のプロジェクトを開く。&lt;/li>
+&lt;li>サイドバーから &lt;strong>&lt;code>Firestore Database&lt;/code>&lt;/strong> を選択し、&lt;strong>&lt;code>データベースの作成&lt;/code>&lt;/strong> をクリックする。
+&lt;ul>
+&lt;li>保護ルールは &lt;code>本番環境モード&lt;/code> を選んでおけば OK&lt;/li>
+&lt;li>ロケーションは &lt;code>asia-northeast1&lt;/code>（東京）を選んでおけば OK&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;p>次のように空っぽのデータベースが作成されれば準備 OK です。&lt;/p></description></item><item><title>Next.js で Firebase: Authentication 機能でユーザー認証できるようにする</title><link>https://maku.blog/p/8t6gq2b/</link><pubDate>Sun, 26 Dec 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/8t6gq2b/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>&lt;a href="https://firebase.google.com/docs/auth">Firebase の Authentication 機能&lt;/a> を使用すると、ウェブアプリ（やモバイルアプリ）にユーザー認証機能を付けて、各種リソースへのアクセスを制御できるようになります。
+例えば、「Firestore に格納されているユーザー情報の編集は、そのユーザーにのみ許可する」といったことができます。
+Firebase のクライアントアプリでユーザーデータを扱う場合は、Firebase Authentication はほぼ必須の機能だといえます。&lt;/p>
+&lt;p>ここでは、Next.js (React) アプリで Firebase Authentication を使い、ユーザー認証を行えるようにしてみます。
+ユーザー認証に使う UI は、Firebase が用意している &lt;a href="https://firebase.google.com/docs/auth/web/firebaseui">FirebaseUI&lt;/a> を使って表示します。&lt;/p>
+&lt;p>事前準備として、Firebase プロジェクトの作成は済んでおり、Next.js アプリから各種 Firestore 関連インスタンスを取得できるようになっていると想定します。&lt;/p>
+&lt;ul>
+&lt;li>参考: &lt;a href="../../p/73eq2cm">Next.js で Firebase: プロジェクトの作成と接続準備&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="ログインプロバイダの設定">ログインプロバイダの設定&lt;/h2>
+&lt;p>Firebase Authentication では、サインイン方法として、新規に登録するメールアドレスや電話番号を使う方法（ネイティブプロバイダ）と、既存の Google アカウントや Facebook アカウントなどを使う方法（追加のプロバイダ）が準備されています。
+まずは、シンプルに「メールアドレス」でユーザー登録できるようにしてみます。&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;a href="https://console.firebase.google.com/">Firebase コンソール&lt;/a> の &lt;strong>Authentication&lt;/strong> タブを選択して機能を有効化する。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>ログインプロバイダ (Sign-in method) で &lt;strong>メール／パスワード&lt;/strong> を選択する。&lt;/p>
+
+ 
+ &lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="700" height="343" src="../../p/8t6gq2b/img-001_hu14103644858394531459.png" alt="/p/8t6gq2b/img-001.png" />
+ &lt;/figure>
+
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>有効にする&lt;/strong> にチェックを入れて &lt;strong>保存&lt;/strong> をクリック。&lt;/p>
+
+ 
+ &lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="500" height="194" src="../../p/8t6gq2b/img-002_hu3421018065957438752.png" alt="/p/8t6gq2b/img-002.png" />
+ &lt;/figure>
+
+&lt;/li>
+&lt;/ol>
+&lt;p>これで、Firebase Authentication で「メールアドレス」による認証を行えるようになります。&lt;/p>
+&lt;h2 id="サインイン状態を扱う-react-フックを作成する">サインイン状態を扱う React フックを作成する&lt;/h2>
+&lt;p>Next.js (React) アプリから Firebase Authentication を使う場合は、サインイン状態を扱うためのカスタムフックを作成しておくと便利です。
+サインインボタンなどの UI を先に作りたいところですが、ボタンを表示すべきかどうかの判断のために結局このカスタムフックが必要になるので、先にカスタムフックを作成します。&lt;/p></description></item><item><title>Next.js で Firebase: プロジェクトの作成と接続準備</title><link>https://maku.blog/p/73eq2cm/</link><pubDate>Sun, 26 Dec 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/73eq2cm/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>ここでは、&lt;strong>Firebase を Next.js (React) ウェブアプリから使用するための準備&lt;/strong> として、「Firebase プロジェクトの作成」「Next.js アプリの作成」「&lt;code>FirebaseApp&lt;/code> インスタンスの初期化」までを行います。
+なお、ここでは Firebase JS SDK ver.9 以降を対象とします（ver.8 以前は初期化方法が若干異なります）。&lt;/p>
+&lt;p>Firebase サービスを使うと、Web アプリやモバイルアプリに必要なバックエンド環境を簡単に整えることができます。
+例えば、Firebase は次のような機能を提供しており、小規模のアプリであれば無料の Spark プランで動かすことができます（参考: &lt;a href="https://firebase.google.com/pricing">Firebase の料金プラン&lt;/a>）。&lt;/p>
+&lt;ul>
+&lt;li>Firebase Authentication &amp;hellip; ユーザー管理と認証（ログイン UI もある）&lt;/li>
+&lt;li>Firebase Hosting &amp;hellip; Web アプリのホスティング（独自ドメインにも対応）&lt;/li>
+&lt;li>Cloud Firestore &amp;hellip; NoSQL データベース&lt;/li>
+&lt;li>Cloud Function &amp;hellip; サーバレス関数&lt;/li>
+&lt;li>Cloud Storage for Firebase &amp;hellip; ファイル管理&lt;/li>
+&lt;/ul>
+&lt;p>Web アプリから上記のような機能にアクセスするには、まずは &lt;code>FirebaseApp&lt;/code> インスタンスの設定（初期化）が必要になります。
+以下では、Next.js アプリから各種 Firebase インスタンスにアクセスするところまでの準備を行います。&lt;/p>
+&lt;h2 id="firebase-プロジェクトの作成">Firebase プロジェクトの作成&lt;/h2>
+&lt;ol>
+&lt;li>&lt;a href="https://console.firebase.google.com">Firebase コンソールにサインイン&lt;/a> して、Firebase のプロジェクトを作成します。&lt;/li>
+&lt;/ol>
+&lt;p>プロジェクト名は、自分の Google アカウント内で一意の名前になっていれば OK です。
+例えば、&lt;code>MyApp&lt;/code> のような名前を付けて作成してください。
+Google アナリティクスは有効にしなくても OK です。&lt;/p></description></item></channel></rss>

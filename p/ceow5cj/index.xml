@@ -1,6 +1,163 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>各種 Linux のファイアウォール設定ツール on まくろぐ</title><link>https://maku.blog/p/ceow5cj/</link><description>Recent content in 各種 Linux のファイアウォール設定ツール on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sat, 09 Jul 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/ceow5cj/index.xml" rel="self" type="application/rss+xml"/><item><title>Linuxメモ: firewalld による Linux のファイアウォール設定</title><link>https://maku.blog/p/ij6kxeq/</link><pubDate>Wed, 06 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ij6kxeq/</guid><description>Red Hat 系 Linux のネットワークのアクセス制御には、従来 iptables が用いられていましたが、現在は firewalld に置き換えられています。 Fedora 18 や CentOS 7、および CentOS の後継的な位置付けの Rocky Linux 8、AlmaLinux 8 には firewalld が標準搭載されています（nftables というのもあります）。
-CentOS 6 の頃は iptables が使われていました。 iptables のルールは /etc/sysconfig/iptables というファイルに保存され、システム再起動時にはこのファイルから設定を復帰させるという動作をしていました。 iptables はコマンド体系が煩雑すぎるという問題があり、より直感的な設定が可能な firewalld が作成されました。 firewalld では「一時的な」ルール設定などにも対応しています。
-ファイアウォールの設定ツールは変化してきていますが、下回りとして Linux カーネルの Netfilter (netfilter firewall) が使用されていることに変わりはありません。
-firewalld のインストール apt でのインストール $ sudo apt install firewalld firewalld の使い方 firewalld の起動・停止と自動起動設定 firewalld は、systemd のサービスとして自動起動できます。
-$ systemctl status firewalld # 現在の状態を確認 $ systemctl start firewalld # 直ちに firewalld を起動 $ systemctl stop firewalld # 直ちに firewalld を停止 $ systemctl enable firewalld # 自動起動する $ systemctl disable firewalld # 自動起動しない firewalld の設定を確認する $ firewall-cmd --list-all firewalld の設定を変更する firewalld で HTTP 通信を許可するには次のようにします。</description></item><item><title>Linux コマンド: ufw による Ubuntu のファイアウォール設定</title><link>https://maku.blog/p/drar8o4/</link><pubDate>Mon, 04 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/drar8o4/</guid><description>ufw とは ufw (Uncomplicated Firewall) は Debian/Ubuntu 系 Linux でパケットフィルタリングの設定（ファイアウォール設定）を行うためのツールです。 従来、パケットフィルタリングのツールとしては iptables が使われていましたが、iptables は設定が煩雑で扱いづらいという問題を抱えていたため、直感的な設定を行うためのツールとして ufw が開発されました。 ufw は Ubuntu 8.04 LTS 以降で使用することができます。
-ufw のサブコマンド 通常コマンド コマンド 説明 ufw enable enables the firewall ufw disable disables the firewall ufw default ARG set default policy ufw logging LEVEL set logging to LEVEL ufw allow ARGS add allow rule ufw deny ARGS add deny rule ufw reject ARGS add reject rule ufw limit ARGS add limit rule ufw delete RULE|NUM delete RULE ufw insert NUM RULE insert RULE at NUM ufw prepend RULE prepend RULE ufw route RULE add route RULE ufw route delete RULE|NUM delete route RULE ufw route insert NUM RULE insert route RULE at NUM ufw reload reload firewall ufw reset reset firewall ufw status show firewall status ufw status numbered show firewall status as numbered list of RULES ufw status verbose show verbose firewall status ufw show ARG show firewall report ufw version display version information アプリケーションプロファイル コマンド 説明 ufw app list list application profiles ufw app info PROFILE show information on PROFILE ufw app update PROFILE update PROFILE ufw app default ARG set default application policy ufw の基本的な使い方 ufw で現在の設定を確認する (ufw status) $ sudo ufw status Status: active To Action From -- ------ ---- OpenSSH ALLOW Anywhere OpenSSH (v6) ALLOW Anywhere (v6) 1 行目の表示で、ufw によるファイアウォールが有効 (Status: active) になっているか、無効 (Status: inactive) になっているかを確認することができます。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>各種 Linux のファイアウォール設定ツール on まくろぐ</title><link>https://maku.blog/p/ceow5cj/</link><description>Recent content in 各種 Linux のファイアウォール設定ツール on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Wed, 06 Jul 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/ceow5cj/index.xml" rel="self" type="application/rss+xml"/><item><title>Linuxメモ: firewalld による Linux のファイアウォール設定</title><link>https://maku.blog/p/ij6kxeq/</link><pubDate>Wed, 06 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ij6kxeq/</guid><description>&lt;p>Red Hat 系 Linux のネットワークのアクセス制御には、従来 &lt;code>iptables&lt;/code> が用いられていましたが、現在は &lt;strong>&lt;code>firewalld&lt;/code>&lt;/strong> に置き換えられています。
+Fedora 18 や CentOS 7、および CentOS の後継的な位置付けの Rocky Linux 8、AlmaLinux 8 には &lt;code>firewalld&lt;/code> が標準搭載されています（&lt;code>nftables&lt;/code> というのもあります）。&lt;/p>
+&lt;p>CentOS 6 の頃は &lt;code>iptables&lt;/code> が使われていました。
+&lt;code>iptables&lt;/code> のルールは &lt;code>/etc/sysconfig/iptables&lt;/code> というファイルに保存され、システム再起動時にはこのファイルから設定を復帰させるという動作をしていました。
+&lt;code>iptables&lt;/code> はコマンド体系が煩雑すぎるという問題があり、より直感的な設定が可能な &lt;code>firewalld&lt;/code> が作成されました。
+&lt;code>firewalld&lt;/code> では「一時的な」ルール設定などにも対応しています。&lt;/p>
+&lt;p>ファイアウォールの設定ツールは変化してきていますが、下回りとして Linux カーネルの Netfilter (netfilter firewall) が使用されていることに変わりはありません。&lt;/p>
+&lt;h2 id="firewalld-のインストール">firewalld のインストール&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">apt でのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo apt install firewalld
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="firewalld-の使い方">firewalld の使い方&lt;/h2>
+&lt;h3 id="firewalld-の起動停止と自動起動設定">firewalld の起動・停止と自動起動設定&lt;/h3>
+&lt;p>&lt;code>firewalld&lt;/code> は、&lt;code>systemd&lt;/code> のサービスとして自動起動できます。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> systemctl status firewalld &lt;span class="c1"># 現在の状態を確認&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> systemctl start firewalld &lt;span class="c1"># 直ちに firewalld を起動&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> systemctl stop firewalld &lt;span class="c1"># 直ちに firewalld を停止&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> systemctl &lt;span class="nb">enable&lt;/span> firewalld &lt;span class="c1"># 自動起動する&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> systemctl disable firewalld &lt;span class="c1"># 自動起動しない&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="firewalld-の設定を確認する">firewalld の設定を確認する&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> firewall-cmd --list-all
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="firewalld-の設定を変更する">firewalld の設定を変更する&lt;/h3>
+&lt;p>firewalld で HTTP 通信を許可するには次のようにします。&lt;/p></description></item><item><title>Linux コマンド: ufw による Ubuntu のファイアウォール設定</title><link>https://maku.blog/p/drar8o4/</link><pubDate>Mon, 04 Jul 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/drar8o4/</guid><description>&lt;h2 id="ufw-とは">ufw とは&lt;/h2>
+&lt;p>&lt;strong>ufw (Uncomplicated Firewall)&lt;/strong> は Debian/Ubuntu 系 Linux でパケットフィルタリングの設定（ファイアウォール設定）を行うためのツールです。
+従来、パケットフィルタリングのツールとしては iptables が使われていましたが、iptables は設定が煩雑で扱いづらいという問題を抱えていたため、直感的な設定を行うためのツールとして ufw が開発されました。
+ufw は Ubuntu 8.04 LTS 以降で使用することができます。&lt;/p>
+&lt;h2 id="ufw-のサブコマンド">ufw のサブコマンド&lt;/h2>
+&lt;h3 id="通常コマンド">通常コマンド&lt;/h3>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>コマンド&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;a href="#ufw-enable">&lt;code>ufw enable&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>enables the firewall&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="#ufw-disable">&lt;code>ufw disable&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>disables the firewall&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw default ARG&lt;/code>&lt;/td>
+ &lt;td>set default policy&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw logging LEVEL&lt;/code>&lt;/td>
+ &lt;td>set logging to LEVEL&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="#ufw-allow">&lt;code>ufw allow ARGS&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>add allow rule&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw deny ARGS&lt;/code>&lt;/td>
+ &lt;td>add deny rule&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw reject ARGS&lt;/code>&lt;/td>
+ &lt;td>add reject rule&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="#ufw-limit">&lt;code>ufw limit ARGS&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>add limit rule&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="#ufw-delete">&lt;code>ufw delete RULE|NUM&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>delete RULE&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw insert NUM RULE&lt;/code>&lt;/td>
+ &lt;td>insert RULE at NUM&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw prepend RULE&lt;/code>&lt;/td>
+ &lt;td>prepend RULE&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw route RULE&lt;/code>&lt;/td>
+ &lt;td>add route RULE&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw route delete RULE|NUM&lt;/code>&lt;/td>
+ &lt;td>delete route RULE&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw route insert NUM RULE&lt;/code>&lt;/td>
+ &lt;td>insert route RULE at NUM&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw reload&lt;/code>&lt;/td>
+ &lt;td>reload firewall&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw reset&lt;/code>&lt;/td>
+ &lt;td>reset firewall&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;a href="#ufw-status">&lt;code>ufw status&lt;/code>&lt;/a>&lt;/td>
+ &lt;td>show firewall status&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw status numbered&lt;/code>&lt;/td>
+ &lt;td>show firewall status as numbered list of RULES&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw status verbose&lt;/code>&lt;/td>
+ &lt;td>show verbose firewall status&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw show ARG&lt;/code>&lt;/td>
+ &lt;td>show firewall report&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw version&lt;/code>&lt;/td>
+ &lt;td>display version information&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h3 id="アプリケーションプロファイル">アプリケーションプロファイル&lt;/h3>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>コマンド&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>ufw app list&lt;/code>&lt;/td>
+ &lt;td>list application profiles&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw app info PROFILE&lt;/code>&lt;/td>
+ &lt;td>show information on PROFILE&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw app update PROFILE&lt;/code>&lt;/td>
+ &lt;td>update PROFILE&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ufw app default ARG&lt;/code>&lt;/td>
+ &lt;td>set default application policy&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="ufw-の基本的な使い方">ufw の基本的な使い方&lt;/h2>
+&lt;h3 id="ufw-status">ufw で現在の設定を確認する (ufw status)&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> sudo ufw status
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">Status: active
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="go">To Action From
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">-- ------ ----
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">OpenSSH ALLOW Anywhere
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">OpenSSH (v6) ALLOW Anywhere (v6)
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>1 行目の表示で、ufw によるファイアウォールが有効 (&lt;code>Status: active&lt;/code>) になっているか、無効 (&lt;code>Status: inactive&lt;/code>) になっているかを確認することができます。&lt;/p></description></item></channel></rss>

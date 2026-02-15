@@ -1,51 +1,569 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>TypeScriptの環境/設定について on まくろぐ</title><link>https://maku.blog/p/tx6md39/</link><description>Recent content in TypeScriptの環境/設定について on まくろぐ</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Wed, 02 Oct 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/tx6md39/index.xml" rel="self" type="application/rss+xml"/><item><title>TypeScriptの環境: tsconfig.json の基本</title><link>https://maku.blog/p/27m3brm/</link><pubDate>Tue, 01 Oct 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/27m3brm/</guid><description>tsconfig.json があれば TypeScript プロジェクト tsconfig.json は TypeScript の設定ファイルであり、このファイルが置かれたディレクトリが TypeScript プロジェクトのルートディレクトリだとみなされます。 tsconfig.json の記述内容は空っぽ（{} の2文字）でも正しい設定ファイルであり、その場合は、すべてデフォルトの設定値で動作することになります。
-TypeScript のトランスパイラである tsc コマンドを実行すると、カレントディレクトリにある tsconfig.json が読み込まれてトランスパイラの動作設定が行われます。 tsconfig.json が見つからない場合は、親ディレクトリを上りながらファイルを探します。 つまり、tsc コマンドは TypeScript のプロジェクト内であれば、どのディレクトリからでも実行できます。
-変換対象とするファイルを指定する (files/include/exclude) 最も大切な設定は、TypeScript のトランスパイラがどのファイルを変換対象とみなすかの設定です。 入力ファイルの指定は、設定ファイルの最上位プロパティとして指定する files、include、exclude プロパティを使って行います。
-ファイル名を 1 つずつ指定する (files) tsconfig.json { &amp;#34;files&amp;#34;: [ &amp;#34;index.ts&amp;#34;, &amp;#34;module1.ts&amp;#34;, &amp;#34;module2.ts&amp;#34; ] } files プロパティを使って、変換対象の TypeScript ファイルを 1 ファイルずつ指定することができます。
-ファイル名のパターン（グロブ）で指定する (include) tsconfig.json { &amp;#34;includes&amp;#34;: [ &amp;#34;src/**/*&amp;#34; ], &amp;#34;exclude&amp;#34;: [ &amp;#34;node_modules&amp;#34;, &amp;#34;**/*.spec.ts&amp;#34; ] } include プロパティを使用すると、ファイルグロブを使って変換対象とするファイルを指定できます。 ファイルグロブは、下記のようなワイルドカードを使ってファイル名をパターン指定する仕組みです。
-** は 0 文字以上の任意の文字にマッチします（ディレクトリセパレータも含みます） * は 0 文字以上の任意の文字にマッチします（ディレクトリセパレータは含みません） ?</description></item><item><title>TypeScriptの環境: Visual Studio Code で TypeScript の開発環境を構築する</title><link>https://maku.blog/p/ak7u3h3/</link><pubDate>Tue, 24 Sep 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ak7u3h3/</guid><description>はじめに TypeScript は Microsoft が開発している言語で、同じく Microsoft が開発している IDE である Visual Studio Code（以下 VS Code）が TypeScript コードの編集に適しています。
-VS Code による TypeScript の開発環境を構築するには、下記をインストールする必要があります。
-Visual Studio Code Node.js（npm コマンド） TypeScript（tsc コマンド) 開発環境をインストールする Visual Studio Code のインストール VS Code は下記からインストーラーをダウンロードしてインストールできます。
-Download Visual Studio Code TypeScript のソースコード (.ts) ファイルは、単純なテキストエディタでも編集できますが、この VS Code を使って編集すると、プロパティ名の自動補完などができて効率的に開発を行えます。
-コマンドラインから code と入力して、VS Code を起動できるようになれば OK です。 VS Code をインストールしたのに code コマンドが認識されない場合は、こちらの記事 を参考にしてパスを通してください。
-Node.js のインストール TypeScript のトランスパイラである tsc コマンドは、Node.js のパッケージとして提供されているため、先に Node.js をインストールしておく必要があります。 Node.js は下記からインストーラーをダウンロードしてインストールできます。</description></item><item><title>TypeScript プロジェクトに ESLint を導入する</title><link>https://maku.blog/p/xz9iry9/</link><pubDate>Thu, 20 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xz9iry9/</guid><description>ESLint とは ESLint は JavaScript/TypeScript 向けの Lint ツール（静的解析ツール）です。 プロジェクト内のソースコードに対して eslint コマンドを実行することで、コーディングルールに従っていない部分や、不具合の原因になりそうな部分を検出してくれます。
-☝️ eslint vs tslint もともと TypeScript 用には tslint という Lint ツールが提供されていましたが、Microsoft の TypeScript チームが eslint への統合を 公式に発表 してから（2019年以降）は、TypeScript においても eslint が事実上の標準 Lint ツールとなっています。参考: TypeScript の ESLint 対応プロジェクト ESLint のインストール eslint コマンドは npm でインストールできます。 TypeScript プロジェクトのディレクトリ内で、次のように開発用にインストールすることが推奨されています（package.json は作成済みだと想定します）。
-ESLint のインストール $ npm install eslint --save-dev ESLint の初期設定 eslint コマンドを実行するためには、設定ファイル .eslintrc.{js,yml,json} を作成しておく必要があります。
-設定ファイルの生成 $ npx eslint --init 上記のように実行すると、ウィザード形式でどのような用途に使用するかを質問されるので、順番に答えていくだけで設定ファイルを生成できます。 最後にその構成に必要なモジュールをまとめてインストールできます。 ここでは、eslint v7.26.0 における表示例を示しています。</description></item><item><title>ESLint の設定ファイル (.eslintrc) の各プロパティの意味を理解する</title><link>https://maku.blog/p/j6iu7it/</link><pubDate>Sat, 22 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j6iu7it/</guid><description>何を説明するか 下記は、TypeScript を使った React アプリ実装用に用意した ESLint 設定ファイル (.eslint.yml) の例です。 トップレベルのプロパティとして、env や extends などがありますが、これらが何を意味しているかをざっと説明します。
-.eslint.yml（例） root: true env: browser: true es2021: true parser: &amp;#39;@typescript-eslint/parser&amp;#39; parserOptions: ecmaVersion: 2021 project: ./tsconfig.json plugins: - react - react-hooks - &amp;#39;@typescript-eslint&amp;#39; extends: - eslint:recommended - plugin:react/recommended - plugin:react-hooks/recommended - plugin:@typescript-eslint/recommended - plugin:@typescript-eslint/recommended-requiring-type-checking rules: react/react-in-jsx-scope: off 各プロパティの説明 root: true ESLint は、実行時のカレントディレクトリを起点にして、上位のディレクトリの設定ファイル (.eslintrc.*) を探していきます。 root: true の指定があると、この検索の振る舞いをそこで停止できます。 プロジェクトのトップディレクトリに置く .eslintrc.* には、この指定をしておくとよいです。
-env: 実行環境の指示 どのようなグローバルオブジェクトを宣言なしで参照可能にするかを ESLint に知らせるための設定です。 例えば、Web ブラウザ上で動作させる JavaScript コードであれば browser、Node.</description></item><item><title>ESLint + Prettier の設定方法まとめ</title><link>https://maku.blog/p/yfow6dk/</link><pubDate>Sun, 23 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yfow6dk/</guid><description>ここでは、とにかく混乱しがちな ESLint + Prettier の設定方法をまとめておきます。 まず、基本的な構成として、TypeScript (with React) の Lint をかけられるようにして、必要に応じて Airbnb スタイル を追加で設定する、という流れにしたいと思います。
-TypeScript プロジェクトの準備 前提条件として、TypeScript (+ React) のプロジェクト自体は作成済みとします。 何も準備できていなければ、Next.js の create-next-app コマンドを使うと簡単に作成できます（typescript および @types/node、@types/react、@types/react-dom などの型情報が導入された状態のプロジェクトが作成されます）。
-2 つやり方あるけど、大体中身は同じ # テンプレートを使う方法 $ create-next-app myapp --example with-typescript # typescript オプションを使う方法 $ create-next-app myapp --typescript 参考 Next.js で HelloWorld（プロジェクト作成からサーバー起動まで） Next.js のプロジェクトを TypeScript 化する Prettier + ESLint の基本設定 (for TypeScript with React) 必要なパッケージのインストール # Prettier 本体 $ yarn add --dev --exact prettier # ESLint 本体 $ yarn add --dev eslint # ESLint 用のプラグインおよび共有設定 $ yarn add --dev @typescript-eslint/eslint-plugin $ yarn add --dev @typescript-eslint/parser $ yarn add --dev eslint-plugin-react $ yarn add --dev eslint-plugin-react-hooks $ yarn add --dev eslint-config-prettier # npm スクリプトの並列実行用 $ yarn add --dev npm-run-all npm の場合 # Prettier 本体 $ npm install prettier --save-dev --save-exact # ESLint 本体 $ npm install eslint --save-dev # ESLint 用のプラグインおよび共有設定 $ npm install @typescript-eslint/eslint-plugin --save-dev $ npm install @typescript-eslint/parser --save-dev $ npm install eslint-plugin-react --save-dev $ npm install eslint-plugin-react-hooks --save-dev $ npm install eslint-config-prettier --save-dev # npm スクリプトの並列実行用 $ npm install npm-run-all --save-dev .</description></item><item><title>ESLint (4) ESLint の設定方法まとめ (for Next.js 11)</title><link>https://maku.blog/p/dexgg8o/</link><pubDate>Mon, 19 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dexgg8o/</guid><description>Next.js 11 が ESLint を組み込みサポート Next.js 11 で ESLint を Next.js が組み込みでサポートしました。 これで、create-next-app で新規作成するアプリでは、ESLint に関してもゼロコンフィグで next eslint とするだけで実行できるようになります。
-ただ、ESLint には色々な共有設定 (config) があるわけで、Next.js がデフォルトで設定してくれているもの以外（TypeScript や Prettier 関連）は自分で設定する必要があります。 ここでは、Next.js 11 がデフォルトで提供する .eslintrc にそれらの設定を追加します。
-Next.js 11 デフォルトの ESLint 設定 Next.js 11 が生成する .eslintrc ファイルは次のようなシンプルなものです。
-.eslintrc { &amp;#34;extends&amp;#34;: [&amp;#34;next&amp;#34;, &amp;#34;next/core-web-vitals&amp;#34;] } 問題はこれらがどのような共有設定を含んでいるかですが、eslint-config-next のコードを見ると、次のような感じになっています。
-module.exports = { extends: [ &amp;#39;plugin:react/recommended&amp;#39;, &amp;#39;plugin:react-hooks/recommended&amp;#39;, &amp;#39;plugin:@next/next/recommended&amp;#39;, ], // ... } React 系の共有設定はここに含まれているので、&amp;quot;extends&amp;quot;: [&amp;quot;next&amp;quot;] だけでカバーできそうです。 公式ドキュメントの ESLint - Base Configuration にも同様の説明が書かれています。 逆に、TypeScript 関連や、Prettier 関連の共有設定は自分で追加しなければいけません。</description></item><item><title>Vite で複数の TypeScript ファイルやリソースファイルを 1 つの JavaScript ライブラリとしてバンドルする</title><link>https://maku.blog/p/59mfj7b/</link><pubDate>Wed, 02 Oct 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/59mfj7b/</guid><description>何をするか Vite は TypeScript ビルドや、開発用サーバー、バンドリングなどの機能を備えた統合的なフロントエンド開発ツールです。 ここでは、Vite で複数の TypeScript ファイルを 1 つの JavaScript ファイルの形にビルドする方法を説明します（この作業をバンドルと呼びます）。
-図: 複数の .ts/.css/.svg ファイルを 1 つの JavaScript ファイルに結合 最終的な成果物として、複数の Web サイトから &amp;lt;script&amp;gt; 要素で読み込み可能な JavaScript ライブラリ を作成することを想定しています。 画像ファイルやスタイルシート (CSS) などのリソースファイルも、単一の JavaScript に埋め込む形でバンドルできます。
-Vite プロジェクトの作成 npm create vite コマンドを使って Vite のプロジェクトを作成します。 React などのフレームワークを使わず、純粋な TypeScript ファイルをビルドするだけであれば、ウィザードに従って、Vinilla → TypeScript と選択していきます。
-Vite プロジェクト (myscript) を生成する $ npm create vite@latest myscript ✔ Select a framework: › Vanilla ✔ Select a variant: › TypeScript $ cd myscript 次のようなファイルが生成されます。</description></item><item><title>Jest で TypeScript コードのユニットテストを記述する</title><link>https://maku.blog/p/9xxpe4t/</link><pubDate>Mon, 04 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9xxpe4t/</guid><description>Jest とは Jest は Facebook が公開した JavaScript 用のシンプルなテストフレームワークで、Node.js 環境で実行することができます。
-Jest · 🃏 Delightful JavaScript Testing Jest は下記のような特徴を持っています。
-ゼロコンフィグで使い始められる（設定ファイルなしで実行可能） テストを並列実行するので高速 コードカバレッジレポートの出力を標準搭載 わかりやすいマッチャー表現 (expect ～ toBe、toContain など、自然な文章として読める） TypeScript に対応（ts-jest を利用） Jest 用のテストコードは、次のようなコードジェネレーターでも採用されており、利用者は増え続けています（2022 年現在）。
-create-react-app &amp;hellip; React アプリのジェネレーター cdk init app &amp;hellip; AWS のインフラ生成コードのジェネレーター Jest のインストール Jest 本体の jest モジュールをインストールします。 TypeScript を使用する場合は、Jest ライブラリの型情報である @types/jest と、Jest 用の TypeScript プロセッサ (ts-jest) もインストールする必要があります。 これらはすべてテスト時のみ使用する NPM モジュールなので、devDependencies としてインストールします。
-Jest 本体と TypeScript 関連モジュールをインストール ### npm の場合 $ npm install --save-dev jest @types/jest ts-jest ### yarn の場合 $ yarn add --dev jest @types/jest ts-jest package.</description></item><item><title>TypeScript コードを Prettier で自動整形する</title><link>https://maku.blog/p/au8iu6u/</link><pubDate>Wed, 26 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/au8iu6u/</guid><description>Prettier とは？ Prettier は、TypeScript や JavaScript などのソースコードを自動フォーマットするためのツールです。 HTML や CSS など様々なファイルに対応していますが、主に TypeScript や JavaScript のフォーマッターとして使用されています。 実際にどのようにフォーマットされるかは、Playground のページ で試すことができます。
-特徴と思想 Prettier の一番の特徴は、Opinionated（独断的な） コードフォーマッターであることを標榜していることです。 これは、ユーザーに自由なカスタマイズを許さず、「Prettier 自身が定義しているスタイルに強制的にフォーマットするよ」ということです（セミコロンの有無など最低限の設定はできます）。 これにより、コーディングスタイルに関する 不毛な議論を避ける ことができ、プロジェクト内のコーディングスタイルを簡単に統一することができます。
-もちろん、自分がベストだと思っているスタイルでフォーマットすることはできなくなるかもしれませんが、そんな些細なことよりも、アプリケーション（成果物）を作り上げることに集中すべきだという考え方です。
-Prettier がやらないこと Prettier はあくまでコードのフォーマットのみを行います。 コードの意味を解析して危険な部分（潜在的バグ）を検出してくれたりはしないので、そういったことを行いたい場合は、他の静的解析ツール（ESLint など）を使う必要があります。 ESLint にもコードフォーマット機能がありますが、フォーマッターとしては Prettier が優れており、「Prettier による整形 ＋ ESLint による静的解析」という形で組み合わせて使うのが一般的です。
-あと、import 文のソートなど、一見やってくれてもよさそうなフォーマットもしてくれなかったりします。 これは、その import 順序がロジック的に意味を持っていたりする場合に、Prettier が判断できないからです。 このように、いろいろと想像と異なるフォーマット結果になることがありますが、そこにはちゃんと理由があります（参考: Rationale）。 あまり気にせずにそんなものだと考えるのがよいです。 ちなみに、ESLint の方には import 文のソートを行うプラグイン (eslint-plugin-import) があります。
-Prettier をインストールする Prettier は npm で簡単にインストールすることができます。 TypeScript のプロジェクトは作成済み で、package.json がすでに存在すると想定します。
-### yarn の場合 $ yarn add prettier --dev --exact ### npm の場合 $ npm install prettier --save-dev --save-exact Prettier は、パッチバージョンが上がるだけで、出力結果に微妙な差分が生まれる可能性があります。 そのため、インストール時のオプションとして --save-exact を指定することで、明確なバージョンを package.</description></item><item><title>webpack と TypeScript を組み合わせて使用する</title><link>https://maku.blog/p/ucnv6en/</link><pubDate>Sun, 05 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ucnv6en/</guid><description>はじめに TypeScript は JavaScript コードに型付けすることができる優れたトランスパイラですが、変換後の .js ファイル群をまとめる（バンドルする）機能は備えていません。 また、モダンな Web サイトを構築するときは、CSS Modules や Sass/Less/Stylus といった仕組みを使用するのが常套手段となっています。
-そのため、Web サイト用の .js ファイルを TypeScript を使って作成する場合、webpack などのバンドルツールを組み合わせて使用する必要があります。
-TypeScript &amp;hellip; .ts ファイルから .js ファイルへの変換 webpack &amp;hellip; Web サイト用の各種リソースをバンドルする バンドルツールには様々なものがありますが、大きなシェアを占めているのは webpack なので（2020年現在）、ここでは TypeScript と webpack を組み合わせて使用する方法を説明します。
-☝️ webpack は必要なくなる？ ES Module の仕組みにより、Web ブラウザからモジュール化された .js ファイルをインポートすることが可能になりつつあります。 しかし、Web サイトの最終的なデプロイ時には、各種リソースを最適化（minify など）する必要があるため、まだまだ webpack などのバンドルツールが必要です。 関連パッケージのインストール TypeScript のインストール プロジェクト用のディレクトリと package.json を作成し、TypeScript をインストールします。
-$ mkdir myapp &amp;amp;&amp;amp; cd $_ $ npm init -y $ npm install --save-dev typescript webpack のインストール webpack 関連のパッケージをインストールします。</description></item><item><title>TypeScriptの環境/設定: 厳格な型チェックを有効にする (strict)</title><link>https://maku.blog/p/7b9432m/</link><pubDate>Fri, 08 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7b9432m/</guid><description>厳格モードに関するオプション TypeScript の設定ファイル (tsconfig.json) には、厳格な型チェックを有効にするための strict オプションが用意されています。
-プロパティ名 デフォルト値 説明 strict false Enable all strict type checking options. コンパイル時の様々な厳格な型チェック機能を有効にします。 tsconfig.json の記述例 { &amp;#34;include&amp;#34;: [ &amp;#34;src/**/*&amp;#34; ], &amp;#34;compilerOptions&amp;#34;: { &amp;#34;target&amp;#34;: &amp;#34;ES2015&amp;#34;, &amp;#34;module&amp;#34;: &amp;#34;commonjs&amp;#34;, &amp;#34;allowJs&amp;#34;: true, &amp;#34;outDir&amp;#34;: &amp;#34;./build&amp;#34;, &amp;#34;strict&amp;#34;: true /* Enable all strict type-checking options. */ } } 上記の例では、tsconfig.json で strict オプションを有効にしていますが、tsc コマンドのオプションで --strict と直接指定する方法もあります。
-$ tsc --strict 実は、strict オプションは、下記のようなオプション群をまとめて true にするためのオプションです。
-プロパティ名 デフォルト値 説明 noImplicitAny false Raise error on expressions and declarations with an implied any type.</description></item><item><title>TypeScriptの環境: tsc-watch で ts ファイルの変更監視＆アプリの再起動を自動化する</title><link>https://maku.blog/p/nxzsnkf/</link><pubDate>Thu, 17 Oct 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nxzsnkf/</guid><description>TypeScript の監視と JavaScript の監視の両立 tsc --watch コマンドを使うと、TypeScript (.ts) ファイルの変更を監視して自動的に tsc （トランスパイル）を実行してくれるようになります。 nodemon コマンドを使うと、JavaScript (.js) ファイルの変更を監視して自動的に node コマンドを再起動してくれるようになります。
-これらを組みあわせれば、TypeScript (.ts) ファイルの変更時に、自動的に Node.js アプリを再起動できそうな気がしますが、一連のコマンドとしてこれら 2 つを組み合わせて実行するのにはみんな苦労しているようです（もちろんコマンドシェルを 2 つ立ち上げればできますが）。
-そこで便利なのが tsc-watch コマンド です。
-tsc-watch パッケージでまるごと解決 tsc-watch という NPM パッケージ（コマンド）を使用すると、TypeScript の変更監視と Node アプリの再起動の連動を簡単に行えるようになります。 まず、必要なパッケージを下記のようにインストールします。 nodemon は使わなくて済むので、ここでは依存パッケージとして typescript と tsc-watch をインストールしておきます。 --save-dev オプションを付加して、package.json の devDependencies に登録するのを忘れないようにしましょう。
-$ npm install --save-dev typescript $ npm install --save-dev tsc-watch tsc-watch コマンドはほとんど tsc --watch のラッパーなので、そのまま実行すると、TypeScript ファイルの変更を監視してトランスパイルを実行するという動作になります。 これだけの用途であれば tsc コマンドで十分なのですが、tsc-watch コマンドに追加されている --onSuccess オプションを使うと、トランスパイル後に任意の追加コマンドを実行することができます。 この追加コマンドとして npm start などを実行するように設定しておけば、TypeScript のトランスパイル後に Node.</description></item><item><title>TypeScriptの環境: 既存の JavaScript プロジェクトを TypeScript に乗り換える</title><link>https://maku.blog/p/3eccb2t/</link><pubDate>Tue, 01 Oct 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3eccb2t/</guid><description>TypeScript プロジェクトへの移行は簡単！ TypeScript の構文は、JavaScript のコードとの互換性を考慮して仕様が決められているため、既存の JavaScript プロジェクトを簡単に TypeScript プロジェクトに移行することができます。 後述するように設定をうまく行えば、JavaScript ファイルの拡張子を .ts に変える必要すらありません。
-TypeScript の構文を使わないと意味がないのでは？と思うかもしれませんが、TypeScript のトランスパイラ (tsc) には、強力な静的解析の仕組みが備わっているため、この機能を既存の JavaScript ファイルに適用するだけでも TypeScript を導入する価値があります。
-ここでは、tsc コマンドは下記のようにグローバルにインストールしてあることを前提とします。
-$ npm install -g typescript おすすめのディレクトリ構成 既存の JavaScript コードを TypeScript トランスパイラ (tsc) の変換対象にする場合は、入力ファイルとなる .js ファイルと、生成される .js ファイルのディレクトリを明確に区別しておくべきです。 そうしておかないと、どのファイルが自分が作成したファイルで、どのファイルが自動生成されたファイルなのか分かりにくくなってしまいます。
-ここでは、既存の JavaScript プロジェクトのソースコード (.js) を、下記のように src ディレクトリに格納します。 このディレクトリには、最終的に .js ファイルと .ts ファイルが混在していても構いません。
-project/ +-- tsconfig.js （設定ファイル） +-- build/ （出力用ディレクトリ） +-- src/ （入力用ディレクトリ） +-- main.js +-- module1.js +-- module2.js 上記では、src ディレクトリの直下に .</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>TypeScriptの環境/設定について on まくろぐ</title><link>https://maku.blog/p/tx6md39/</link><description>Recent content in TypeScriptの環境/設定について on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sun, 06 Oct 2024 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/p/tx6md39/index.xml" rel="self" type="application/rss+xml"/><item><title>TypeScriptの環境: tsconfig.json の基本</title><link>https://maku.blog/p/27m3brm/</link><pubDate>Tue, 01 Oct 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/27m3brm/</guid><description>&lt;h2 id="tsconfigjson-があれば-typescript-プロジェクト">tsconfig.json があれば TypeScript プロジェクト&lt;/h2>
+&lt;p>&lt;strong>&lt;code>tsconfig.json&lt;/code>&lt;/strong> は TypeScript の設定ファイルであり、このファイルが置かれたディレクトリが TypeScript プロジェクトのルートディレクトリだとみなされます。
+&lt;code>tsconfig.json&lt;/code> の記述内容は空っぽ（&lt;code>{}&lt;/code> の2文字）でも正しい設定ファイルであり、その場合は、すべてデフォルトの設定値で動作することになります。&lt;/p>
+&lt;p>TypeScript のトランスパイラである &lt;strong>&lt;code>tsc&lt;/code>&lt;/strong> コマンドを実行すると、カレントディレクトリにある &lt;code>tsconfig.json&lt;/code> が読み込まれてトランスパイラの動作設定が行われます。
+&lt;code>tsconfig.json&lt;/code> が見つからない場合は、親ディレクトリを上りながらファイルを探します。
+つまり、&lt;code>tsc&lt;/code> コマンドは TypeScript のプロジェクト内であれば、どのディレクトリからでも実行できます。&lt;/p>
+&lt;h2 id="変換対象とするファイルを指定する-filesincludeexclude">変換対象とするファイルを指定する (files/include/exclude)&lt;/h2>
+&lt;p>最も大切な設定は、TypeScript のトランスパイラがどのファイルを変換対象とみなすかの設定です。
+入力ファイルの指定は、設定ファイルの最上位プロパティとして指定する &lt;code>files&lt;/code>、&lt;code>include&lt;/code>、&lt;code>exclude&lt;/code> プロパティを使って行います。&lt;/p>
+&lt;h3 id="ファイル名を-1-つずつ指定する-files">ファイル名を 1 つずつ指定する (files)&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">tsconfig.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;files&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;index.ts&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;module1.ts&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;module2.ts&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;strong>&lt;code>files&lt;/code>&lt;/strong> プロパティを使って、変換対象の TypeScript ファイルを 1 ファイルずつ指定することができます。&lt;/p>
+&lt;h3 id="ファイル名のパターングロブで指定する-include">ファイル名のパターン（グロブ）で指定する (include)&lt;/h3>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">tsconfig.json&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;includes&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;src/**/*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;exclude&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;node_modules&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;**/*.spec.ts&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;strong>&lt;code>include&lt;/code>&lt;/strong> プロパティを使用すると、ファイルグロブを使って変換対象とするファイルを指定できます。
+ファイルグロブは、下記のようなワイルドカードを使ってファイル名をパターン指定する仕組みです。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>**&lt;/code> は 0 文字以上の任意の文字にマッチします（ディレクトリセパレータも含みます）&lt;/li>
+&lt;li>&lt;code>*&lt;/code> は 0 文字以上の任意の文字にマッチします（ディレクトリセパレータは含みません）&lt;/li>
+&lt;li>&lt;code>?&lt;/code> は 1 文字の任意の文字にマッチします&lt;/li>
+&lt;/ul>
+&lt;p>つまり、上記の &lt;code>src/**/*&lt;/code> という表現は、&lt;code>src&lt;/code> ディレクトリ以下のすべてのファイルにマッチします。
+ただし、パスの末尾が &lt;code>*&lt;/code> で終わっている場合、&lt;strong>デフォルトでは TypeScript の拡張子 (&lt;code>.ts&lt;/code> / &lt;code>.tsx&lt;/code> / &lt;code>.d.ts&lt;/code>) を持つファイルにだけマッチする&lt;/strong>ようになっています。&lt;/p></description></item><item><title>TypeScriptの環境: Visual Studio Code で TypeScript の開発環境を構築する</title><link>https://maku.blog/p/ak7u3h3/</link><pubDate>Tue, 24 Sep 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ak7u3h3/</guid><description>&lt;h2 id="はじめに">はじめに&lt;/h2>
+&lt;p>TypeScript は Microsoft が開発している言語で、同じく Microsoft が開発している IDE である Visual Studio Code（以下 VS Code）が TypeScript コードの編集に適しています。&lt;/p>
+&lt;p>VS Code による TypeScript の開発環境を構築するには、下記をインストールする必要があります。&lt;/p>
+&lt;ul>
+&lt;li>Visual Studio Code&lt;/li>
+&lt;li>Node.js（npm コマンド）&lt;/li>
+&lt;li>TypeScript（tsc コマンド)&lt;/li>
+&lt;/ul>
+&lt;h2 id="開発環境をインストールする">開発環境をインストールする&lt;/h2>
+&lt;h3 id="visual-studio-code-のインストール">Visual Studio Code のインストール&lt;/h3>
+&lt;p>VS Code は下記からインストーラーをダウンロードしてインストールできます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://code.visualstudio.com/download">Download Visual Studio Code&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>TypeScript のソースコード (.ts) ファイルは、単純なテキストエディタでも編集できますが、この VS Code を使って編集すると、&lt;strong>プロパティ名の自動補完などができて効率的&lt;/strong>に開発を行えます。&lt;/p>
+&lt;p>コマンドラインから &lt;code>code&lt;/code> と入力して、VS Code を起動できるようになれば OK です。
+VS Code をインストールしたのに &lt;code>code&lt;/code> コマンドが認識されない場合は、&lt;a href="../../p/f5iv9kx">こちらの記事&lt;/a> を参考にしてパスを通してください。&lt;/p>
+&lt;h3 id="nodejs-のインストール">Node.js のインストール&lt;/h3>
+&lt;p>TypeScript のトランスパイラである &lt;code>tsc&lt;/code> コマンドは、Node.js のパッケージとして提供されているため、先に Node.js をインストールしておく必要があります。
+Node.js は下記からインストーラーをダウンロードしてインストールできます。&lt;/p></description></item><item><title>TypeScript プロジェクトに ESLint を導入する</title><link>https://maku.blog/p/xz9iry9/</link><pubDate>Thu, 20 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xz9iry9/</guid><description>&lt;h2 id="eslint-とは">ESLint とは&lt;/h2>
+&lt;p>&lt;a href="https://eslint.org/">ESLint&lt;/a> は JavaScript/TypeScript 向けの Lint ツール（静的解析ツール）です。
+プロジェクト内のソースコードに対して &lt;strong>&lt;code>eslint&lt;/code>&lt;/strong> コマンドを実行することで、コーディングルールに従っていない部分や、不具合の原因になりそうな部分を検出してくれます。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ eslint vs tslint&lt;/span>
+ &lt;span class="xNote_body">もともと TypeScript 用には &lt;code>tslint&lt;/code> という Lint ツールが提供されていましたが、Microsoft の TypeScript チームが &lt;code>eslint&lt;/code> への統合を &lt;a href="https://eslint.org/blog/2019/01/future-typescript-eslint">公式に発表&lt;/a> してから（2019年以降）は、TypeScript においても &lt;code>eslint&lt;/code> が事実上の標準 Lint ツールとなっています。参考: &lt;a href="https://typescript-eslint.io/">TypeScript の ESLint 対応プロジェクト&lt;/a>&lt;/span>
+&lt;/div>
+&lt;h2 id="eslint-のインストール">ESLint のインストール&lt;/h2>
+&lt;p>&lt;code>eslint&lt;/code> コマンドは &lt;code>npm&lt;/code> でインストールできます。
+TypeScript プロジェクトのディレクトリ内で、次のように開発用にインストールすることが推奨されています（&lt;code>package.json&lt;/code> は作成済みだと想定します）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">ESLint のインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install eslint --save-dev&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="eslint-の初期設定">ESLint の初期設定&lt;/h2>
+&lt;p>&lt;code>eslint&lt;/code> コマンドを実行するためには、設定ファイル &lt;strong>&lt;code>.eslintrc.{js,yml,json}&lt;/code>&lt;/strong> を作成しておく必要があります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">設定ファイルの生成&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npx eslint --init&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記のように実行すると、ウィザード形式でどのような用途に使用するかを質問されるので、順番に答えていくだけで設定ファイルを生成できます。
+最後にその構成に必要なモジュールをまとめてインストールできます。
+ここでは、eslint v7.26.0 における表示例を示しています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">質問1&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">? How would you like to use ESLint? …
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> To check syntax only
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> To check syntax and find problems
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">❯ To check syntax, find problems, and enforce code style&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>ここでは「構文チェック」「問題の発見」「スタイル強制」をすべて行いたいので、カーソルキーで一番下の項目を選んで &lt;code>Enter&lt;/code> キーを押します。&lt;/p></description></item><item><title>ESLint の設定ファイル (.eslintrc) の各プロパティの意味を理解する</title><link>https://maku.blog/p/j6iu7it/</link><pubDate>Sat, 22 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/j6iu7it/</guid><description>&lt;h2 id="何を説明するか">何を説明するか&lt;/h2>
+&lt;p>下記は、TypeScript を使った React アプリ実装用に用意した ESLint 設定ファイル (&lt;code>.eslint.yml&lt;/code>) の例です。
+トップレベルのプロパティとして、&lt;code>env&lt;/code> や &lt;code>extends&lt;/code> などがありますが、これらが何を意味しているかをざっと説明します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.eslint.yml（例）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">root&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">env&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">browser&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">es2021&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">parser&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;@typescript-eslint/parser&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">parserOptions&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ecmaVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">2021&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">project&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">./tsconfig.json&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">plugins&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">react&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">react-hooks&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s1">&amp;#39;@typescript-eslint&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">extends&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">eslint:recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:react/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:react-hooks/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:@typescript-eslint/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:@typescript-eslint/recommended-requiring-type-checking&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">rules&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">react/react-in-jsx-scope&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">off&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="各プロパティの説明">各プロパティの説明&lt;/h2>
+&lt;h3 id="root-true">&lt;code>root: true&lt;/code>&lt;/h3>
+&lt;p>ESLint は、実行時のカレントディレクトリを起点にして、上位のディレクトリの設定ファイル (&lt;code>.eslintrc.*&lt;/code>) を探していきます。
+&lt;code>root: true&lt;/code> の指定があると、この検索の振る舞いをそこで停止できます。
+プロジェクトのトップディレクトリに置く &lt;code>.eslintrc.*&lt;/code> には、この指定をしておくとよいです。&lt;/p>
+&lt;h3 id="env-実行環境の指示">&lt;code>env&lt;/code>: 実行環境の指示&lt;/h3>
+&lt;p>どのようなグローバルオブジェクトを宣言なしで参照可能にするかを ESLint に知らせるための設定です。
+例えば、Web ブラウザ上で動作させる JavaScript コードであれば &lt;code>browser&lt;/code>、Node.js 環境で動作させるコードであれば &lt;code>node&lt;/code> を &lt;code>true&lt;/code> に設定します。
+内部的には、選択した環境ごとに &lt;code>globals&lt;/code> オプションの設定が行われます。&lt;/p></description></item><item><title>ESLint + Prettier の設定方法まとめ</title><link>https://maku.blog/p/yfow6dk/</link><pubDate>Sun, 23 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/yfow6dk/</guid><description>&lt;p>ここでは、とにかく混乱しがちな &lt;strong>ESLint + Prettier&lt;/strong> の設定方法をまとめておきます。
+まず、基本的な構成として、&lt;strong>TypeScript (with React)&lt;/strong> の Lint をかけられるようにして、&lt;strong>必要に応じて Airbnb スタイル&lt;/strong> を追加で設定する、という流れにしたいと思います。&lt;/p>
+&lt;h2 id="typescript-プロジェクトの準備">TypeScript プロジェクトの準備&lt;/h2>
+&lt;p>前提条件として、TypeScript (+ React) のプロジェクト自体は作成済みとします。
+何も準備できていなければ、Next.js の &lt;code>create-next-app&lt;/code> コマンドを使うと簡単に作成できます（&lt;code>typescript&lt;/code> および &lt;code>@types/node&lt;/code>、&lt;code>@types/react&lt;/code>、&lt;code>@types/react-dom&lt;/code> などの型情報が導入された状態のプロジェクトが作成されます）。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">2 つやり方あるけど、大体中身は同じ&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl"># テンプレートを使う方法
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ create-next-app myapp --example with-typescript
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># typescript オプションを使う方法
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ create-next-app myapp --typescript&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;aside style="display: flex; border: thin dashed gray;">
+&lt;div style="align-self: stretch; writing-mode: vertical-lr; text-align: center; letter-spacing: 0.2em; color: #666; border-right: thin dashed gray; padding: 0.4em 0; line-height: 1.5;">参考&lt;/div>
+&lt;div style="align-self: center; padding: 0.6em 0; line-height: 1.2 !important;">&lt;ul>
+&lt;li>&lt;a href="../../p/ubmu3bj">Next.js で HelloWorld（プロジェクト作成からサーバー起動まで）&lt;/a>&lt;/li>
+&lt;li>&lt;a href="../../p/ny9fmty">Next.js のプロジェクトを TypeScript 化する&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/aside>
+&lt;h2 id="prettier--eslint-の基本設定-for-typescript-with-react">Prettier + ESLint の基本設定 (for TypeScript with React)&lt;/h2>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">必要なパッケージのインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl"># Prettier 本体
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev --exact prettier
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ESLint 本体
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev eslint
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ESLint 用のプラグインおよび共有設定
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev @typescript-eslint/eslint-plugin
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev @typescript-eslint/parser
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev eslint-plugin-react
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev eslint-plugin-react-hooks
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev eslint-config-prettier
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># npm スクリプトの並列実行用
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add --dev npm-run-all&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;div class="xAccordion">
+ &lt;input id="id-987236451" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-987236451">npm の場合&lt;/label>
+ &lt;div class="xAccordion_body">
+ 
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl"># Prettier 本体
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install prettier --save-dev --save-exact
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ESLint 本体
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install eslint --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># ESLint 用のプラグインおよび共有設定
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install @typescript-eslint/eslint-plugin --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install @typescript-eslint/parser --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install eslint-plugin-react --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install eslint-plugin-react-hooks --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install eslint-config-prettier --save-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># npm スクリプトの並列実行用
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install npm-run-all --save-dev&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+ &lt;/div>
+&lt;/div>
+
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.prettierrc（必要に応じて Prettier フォーマット設定）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">semi&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 行末のセミコロンは省略する&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">singleQuote&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 引用符にはシングルクォートを使う&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.prettierignore（Prettier の無視設定）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">.next/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">build/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">*.html&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.eslintrc.yml（ESLint 設定）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">root&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">env&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">browser&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">es2021&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">extends&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">eslint:recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:react/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:react-hooks/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:@typescript-eslint/recommended&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">plugin:@typescript-eslint/recommended-requiring-type-checking&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">prettier&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">parser&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;@typescript-eslint/parser&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">parserOptions&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ecmaVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">12&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ecmaFeatures&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">jsx&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">project&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">./tsconfig.json&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">plugins&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">react&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">react-hooks&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;@typescript-eslint&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">rules&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">react/react-in-jsx-scope&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">off&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">package.json（npm スクリプト設定）&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">scripts&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;lint&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;run-p -c -l lint:**&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;lint:prettier&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;prettier --check .&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;lint:eslint&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;eslint . --ext .ts,.tsx&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;lint:tsc&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;tsc&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;fix&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;run-s -l fix:**&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;fix:prettier&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;prettier --write .&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;fix:eslint&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;eslint . --ext .ts,.tsx --fix&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>これで、次のようにして Prettier + ESLint による Lint チェックと自動修正をかけられるようになります。&lt;/p></description></item><item><title>ESLint (4) ESLint の設定方法まとめ (for Next.js 11)</title><link>https://maku.blog/p/dexgg8o/</link><pubDate>Mon, 19 Jul 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/dexgg8o/</guid><description>&lt;h2 id="nextjs-11-が-eslint-を組み込みサポート">Next.js 11 が ESLint を組み込みサポート&lt;/h2>
+&lt;p>&lt;a href="https://nextjs.org/docs/basic-features/eslint">Next.js 11 で ESLint を Next.js が組み込みでサポートしました&lt;/a>。
+これで、&lt;code>create-next-app&lt;/code> で新規作成するアプリでは、ESLint に関してもゼロコンフィグで &lt;code>next eslint&lt;/code> とするだけで実行できるようになります。&lt;/p>
+&lt;p>ただ、ESLint には色々な共有設定 (config) があるわけで、Next.js がデフォルトで設定してくれているもの以外（TypeScript や Prettier 関連）は自分で設定する必要があります。
+ここでは、Next.js 11 がデフォルトで提供する &lt;code>.eslintrc&lt;/code> にそれらの設定を追加します。&lt;/p>
+&lt;h2 id="nextjs-11-デフォルトの-eslint-設定">Next.js 11 デフォルトの ESLint 設定&lt;/h2>
+&lt;p>Next.js 11 が生成する &lt;code>.eslintrc&lt;/code> ファイルは次のようなシンプルなものです。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">.eslintrc&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;extends&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;next&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;next/core-web-vitals&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>問題はこれらがどのような共有設定を含んでいるかですが、&lt;a href="https://github.com/vercel/next.js/blob/canary/packages/eslint-config-next/index.js">eslint-config-next&lt;/a> のコードを見ると、次のような感じになっています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">module&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">exports&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">extends&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;plugin:react/recommended&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;plugin:react-hooks/recommended&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;plugin:@next/next/recommended&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>React 系の共有設定はここに含まれているので、&lt;code>&amp;quot;extends&amp;quot;: [&amp;quot;next&amp;quot;]&lt;/code> だけでカバーできそうです。
+&lt;a href="https://nextjs.org/docs/basic-features/eslint#base-configuration">公式ドキュメントの ESLint - Base Configuration&lt;/a> にも同様の説明が書かれています。
+逆に、TypeScript 関連や、Prettier 関連の共有設定は自分で追加しなければいけません。&lt;/p>
+&lt;h2 id="eslint-設定を追加する">ESLint 設定を追加する&lt;/h2>
+&lt;p>ここでは、下記のような ESLint extends 設定を手動で追加してやります。&lt;/p></description></item><item><title>Vite で複数の TypeScript ファイルやリソースファイルを 1 つの JavaScript ライブラリとしてバンドルする</title><link>https://maku.blog/p/59mfj7b/</link><pubDate>Wed, 02 Oct 2024 00:00:00 +0900</pubDate><guid>https://maku.blog/p/59mfj7b/</guid><description>&lt;h2 id="何をするか">何をするか&lt;/h2>
+&lt;p>&lt;a href="https://vitejs.dev/">Vite&lt;/a> は TypeScript ビルドや、開発用サーバー、バンドリングなどの機能を備えた統合的なフロントエンド開発ツールです。
+ここでは、Vite で複数の TypeScript ファイルを 1 つの JavaScript ファイルの形にビルドする方法を説明します（この作業をバンドルと呼びます）。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="300" height="auto" src="../../p/59mfj7b/img-001.drawio.svg" alt="/p/59mfj7b/img-001.drawio.svg" />
+ &lt;figcaption>図: 複数の .ts/.css/.svg ファイルを 1 つの JavaScript ファイルに結合&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>最終的な成果物として、複数の Web サイトから &lt;strong>&lt;code>&amp;lt;script&amp;gt;&lt;/code> 要素で読み込み可能な JavaScript ライブラリ&lt;/strong> を作成することを想定しています。
+画像ファイルやスタイルシート (CSS) などのリソースファイルも、単一の JavaScript に埋め込む形でバンドルできます。&lt;/p>
+&lt;h2 id="vite-プロジェクトの作成">Vite プロジェクトの作成&lt;/h2>
+&lt;p>&lt;strong>&lt;code>npm create vite&lt;/code>&lt;/strong> コマンドを使って Vite のプロジェクトを作成します。
+React などのフレームワークを使わず、純粋な TypeScript ファイルをビルドするだけであれば、ウィザードに従って、&lt;strong>&lt;code>Vinilla&lt;/code>&lt;/strong> → &lt;strong>&lt;code>TypeScript&lt;/code>&lt;/strong> と選択していきます。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Vite プロジェクト (myscript) を生成する&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm create vite@latest myscript
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">✔ Select a framework: › Vanilla
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">✔ Select a variant: › TypeScript
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">&lt;/span>&lt;span class="gp">$&lt;/span> &lt;span class="nb">cd&lt;/span> myscript
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>次のようなファイルが生成されます。&lt;/p></description></item><item><title>Jest で TypeScript コードのユニットテストを記述する</title><link>https://maku.blog/p/9xxpe4t/</link><pubDate>Mon, 04 Apr 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/9xxpe4t/</guid><description>&lt;h2 id="jest-とは">Jest とは&lt;/h2>
+&lt;p>Jest は Facebook が公開した JavaScript 用のシンプルなテストフレームワークで、Node.js 環境で実行することができます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://jestjs.io/">Jest · 🃏 Delightful JavaScript Testing&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Jest は下記のような特徴を持っています。&lt;/p>
+&lt;ul>
+&lt;li>ゼロコンフィグで使い始められる（設定ファイルなしで実行可能）&lt;/li>
+&lt;li>テストを並列実行するので高速&lt;/li>
+&lt;li>コードカバレッジレポートの出力を標準搭載&lt;/li>
+&lt;li>わかりやすいマッチャー表現 (expect ～ toBe、toContain など、自然な文章として読める）&lt;/li>
+&lt;li>TypeScript に対応（ts-jest を利用）&lt;/li>
+&lt;/ul>
+&lt;p>Jest 用のテストコードは、次のようなコードジェネレーターでも採用されており、利用者は増え続けています（2022 年現在）。&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>create-react-app&lt;/code> &amp;hellip; React アプリのジェネレーター&lt;/li>
+&lt;li>&lt;code>cdk init app&lt;/code> &amp;hellip; AWS のインフラ生成コードのジェネレーター&lt;/li>
+&lt;/ul>
+&lt;h2 id="jest-のインストール">Jest のインストール&lt;/h2>
+&lt;p>Jest 本体の &lt;strong>&lt;code>jest&lt;/code>&lt;/strong> モジュールをインストールします。
+TypeScript を使用する場合は、Jest ライブラリの型情報である &lt;strong>&lt;code>@types/jest&lt;/code>&lt;/strong> と、Jest 用の TypeScript プロセッサ (&lt;a href="https://kulshekhar.github.io/ts-jest/">ts-jest&lt;/a>) もインストールする必要があります。
+これらはすべてテスト時のみ使用する NPM モジュールなので、&lt;code>devDependencies&lt;/code> としてインストールします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">Jest 本体と TypeScript 関連モジュールをインストール&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">#&lt;/span>&lt;span class="c1">## npm の場合&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> npm install --save-dev jest @types/jest ts-jest
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="gp">#&lt;/span>&lt;span class="c1">## yarn の場合&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> yarn add --dev jest @types/jest ts-jest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="packagejson-の修正">package.json の修正&lt;/h2>
+&lt;p>Jest によるテストを簡単に起動できるように、&lt;code>package.json&lt;/code> に NPM スクリプト (&lt;code>test&lt;/code>) を定義しておきます。
+あと、Jest が TypeScript のコードを理解できるように、&lt;code>jest.preset&lt;/code> に &lt;strong>&lt;code>ts-jest&lt;/code>&lt;/strong> を設定しておきます。
+これを設定しておかないと、&lt;code>import&lt;/code> 構文などを理解できなくてエラーになります。&lt;/p></description></item><item><title>TypeScript コードを Prettier で自動整形する</title><link>https://maku.blog/p/au8iu6u/</link><pubDate>Wed, 26 May 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/au8iu6u/</guid><description>&lt;h2 id="prettier-とは">Prettier とは？&lt;/h2>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="1618" height="472" src="../../p/au8iu6u/img-001.png" alt="/p/au8iu6u/img-001.png" />
+&lt;/figure>
+
+&lt;p>&lt;a href="https://prettier.io/">Prettier&lt;/a> は、TypeScript や JavaScript などのソースコードを自動フォーマットするためのツールです。
+HTML や CSS など様々なファイルに対応していますが、主に TypeScript や JavaScript のフォーマッターとして使用されています。
+実際にどのようにフォーマットされるかは、&lt;a href="https://prettier.io/playground/">Playground のページ&lt;/a> で試すことができます。&lt;/p>
+&lt;h3 id="特徴と思想">特徴と思想&lt;/h3>
+&lt;p>Prettier の一番の特徴は、&lt;strong>Opinionated（独断的な）&lt;/strong> コードフォーマッターであることを標榜していることです。
+これは、ユーザーに自由なカスタマイズを許さず、「Prettier 自身が定義しているスタイルに強制的にフォーマットするよ」ということです（セミコロンの有無など最低限の設定はできます）。
+これにより、コーディングスタイルに関する &lt;strong>不毛な議論を避ける&lt;/strong> ことができ、プロジェクト内のコーディングスタイルを簡単に統一することができます。&lt;/p>
+&lt;p>もちろん、自分がベストだと思っているスタイルでフォーマットすることはできなくなるかもしれませんが、そんな些細なことよりも、アプリケーション（成果物）を作り上げることに集中すべきだという考え方です。&lt;/p>
+&lt;h3 id="prettier-がやらないこと">Prettier がやらないこと&lt;/h3>
+&lt;p>Prettier はあくまでコードのフォーマットのみを行います。
+コードの意味を解析して危険な部分（潜在的バグ）を検出してくれたりはしないので、そういったことを行いたい場合は、他の静的解析ツール（ESLint など）を使う必要があります。
+ESLint にもコードフォーマット機能がありますが、フォーマッターとしては Prettier が優れており、「Prettier による整形 ＋ ESLint による静的解析」という形で組み合わせて使うのが一般的です。&lt;/p>
+&lt;p>あと、import 文のソートなど、一見やってくれてもよさそうなフォーマットもしてくれなかったりします。
+これは、その import 順序がロジック的に意味を持っていたりする場合に、Prettier が判断できないからです。
+このように、いろいろと想像と異なるフォーマット結果になることがありますが、そこにはちゃんと理由があります（参考: &lt;a href="https://prettier.io/docs/en/rationale.html">Rationale&lt;/a>）。
+あまり気にせずにそんなものだと考えるのがよいです。
+ちなみに、ESLint の方には import 文のソートを行うプラグイン (&lt;code>eslint-plugin-import&lt;/code>) があります。&lt;/p>
+&lt;h2 id="prettier-をインストールする">Prettier をインストールする&lt;/h2>
+&lt;p>Prettier は &lt;code>npm&lt;/code> で簡単にインストールすることができます。
+&lt;a href="../../p/ak7u3h3">TypeScript のプロジェクトは作成済み&lt;/a> で、&lt;code>package.json&lt;/code> がすでに存在すると想定します。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">### yarn の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ yarn add prettier --dev --exact
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">### npm の場合
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install prettier --save-dev --save-exact&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>Prettier は、パッチバージョンが上がるだけで、出力結果に微妙な差分が生まれる可能性があります。
+そのため、インストール時のオプションとして &lt;strong>&lt;code>--save-exact&lt;/code>&lt;/strong> を指定することで、明確なバージョンを &lt;code>package.json&lt;/code> の依存情報として保存することが推奨されています。
+これにより、チームメンバー全員のフォーマット結果を確実に一致させることができます。&lt;/p></description></item><item><title>webpack と TypeScript を組み合わせて使用する</title><link>https://maku.blog/p/ucnv6en/</link><pubDate>Sun, 05 Jul 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/ucnv6en/</guid><description>&lt;h2 id="はじめに">はじめに&lt;/h2>
+&lt;p>&lt;a href="https://www.typescriptlang.org/">TypeScript&lt;/a> は JavaScript コードに型付けすることができる優れたトランスパイラですが、変換後の &lt;code>.js&lt;/code> ファイル群をまとめる（バンドルする）機能は備えていません。
+また、モダンな Web サイトを構築するときは、CSS Modules や Sass/Less/Stylus といった仕組みを使用するのが常套手段となっています。&lt;/p>
+&lt;p>そのため、Web サイト用の &lt;code>.js&lt;/code> ファイルを TypeScript を使って作成する場合、&lt;a href="https://webpack.js.org/">webpack&lt;/a> などのバンドルツールを組み合わせて使用する必要があります。&lt;/p>
+&lt;ul>
+&lt;li>TypeScript &amp;hellip; &lt;code>.ts&lt;/code> ファイルから &lt;code>.js&lt;/code> ファイルへの変換&lt;/li>
+&lt;li>webpack &amp;hellip; Web サイト用の各種リソースをバンドルする&lt;/li>
+&lt;/ul>
+&lt;p>バンドルツールには様々なものがありますが、大きなシェアを占めているのは webpack なので（2020年現在）、ここでは TypeScript と webpack を組み合わせて使用する方法を説明します。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ webpack は必要なくなる？&lt;/span>
+ &lt;span class="xNote_body">&lt;a href="https://ja.javascript.info/modules-intro">ES Module&lt;/a> の仕組みにより、Web ブラウザからモジュール化された &lt;code>.js&lt;/code> ファイルをインポートすることが可能になりつつあります。
+しかし、Web サイトの最終的なデプロイ時には、各種リソースを最適化（minify など）する必要があるため、まだまだ webpack などのバンドルツールが必要です。&lt;/span>
+&lt;/div>
+
+&lt;h2 id="関連パッケージのインストール">関連パッケージのインストール&lt;/h2>
+&lt;h3 id="typescript-のインストール">TypeScript のインストール&lt;/h3>
+&lt;p>プロジェクト用のディレクトリと package.json を作成し、TypeScript をインストールします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ mkdir myapp &amp;amp;&amp;amp; cd $_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm init -y
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install --save-dev typescript&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h3 id="webpack-のインストール">webpack のインストール&lt;/h3>
+&lt;p>webpack 関連のパッケージをインストールします。&lt;/p></description></item><item><title>TypeScriptの環境/設定: 厳格な型チェックを有効にする (strict)</title><link>https://maku.blog/p/7b9432m/</link><pubDate>Fri, 08 May 2020 00:00:00 +0900</pubDate><guid>https://maku.blog/p/7b9432m/</guid><description>&lt;h2 id="厳格モードに関するオプション">厳格モードに関するオプション&lt;/h2>
+&lt;p>TypeScript の設定ファイル (&lt;code>tsconfig.json&lt;/code>) には、厳格な型チェックを有効にするための &lt;strong>&lt;code>strict&lt;/code>&lt;/strong> オプションが用意されています。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th style="text-align: center">プロパティ名&lt;/th>
+ &lt;th style="text-align: center">デフォルト値&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td style="text-align: center">&lt;a href="https://www.typescriptlang.org/v2/ja/tsconfig#strict">strict&lt;/a>&lt;/td>
+ &lt;td style="text-align: center">&lt;code>false&lt;/code>&lt;/td>
+ &lt;td>Enable all strict type checking options. &lt;br>コンパイル時の様々な厳格な型チェック機能を有効にします。&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">tsconfig.json の記述例&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;include&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;src/**/*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;compilerOptions&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;target&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;ES2015&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;module&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;commonjs&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;allowJs&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;outDir&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;./build&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;strict&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">true&lt;/span> &lt;span class="cm">/* Enable all strict type-checking options. */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記の例では、&lt;code>tsconfig.json&lt;/code> で &lt;code>strict&lt;/code> オプションを有効にしていますが、&lt;code>tsc&lt;/code> コマンドのオプションで &lt;strong>&lt;code>--strict&lt;/code>&lt;/strong> と直接指定する方法もあります。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ tsc --strict&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>実は、&lt;code>strict&lt;/code> オプションは、下記のようなオプション群をまとめて &lt;code>true&lt;/code> にするためのオプションです。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>プロパティ名&lt;/th>
+ &lt;th style="text-align: center">デフォルト値&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>noImplicitAny&lt;/td>
+ &lt;td style="text-align: center">&lt;code>false&lt;/code>&lt;/td>
+ &lt;td>Raise error on expressions and declarations with an implied &lt;code>any&lt;/code> type.&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>noImplicitThis&lt;/td>
+ &lt;td style="text-align: center">&lt;code>false&lt;/code>&lt;/td>
+ &lt;td>Raise error on &lt;code>this&lt;/code> expressions with an implied &lt;code>any&lt;/code> type.&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>alwaysStrict&lt;/td>
+ &lt;td style="text-align: center">&lt;code>false&lt;/code>&lt;/td>
+ &lt;td>Parse in strict mode and emit "use strict" for each source file.&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>strictBindCallApply&lt;/td>
+ &lt;td style="text-align: center">&lt;code>false&lt;/code>&lt;/td>
+ &lt;td>Enable strict &lt;code>bind&lt;/code>, &lt;code>call&lt;/code>, and &lt;code>apply&lt;/code> methods on functions.&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>strictNullChecks&lt;/td>
+ &lt;td style="text-align: center">&lt;code>false&lt;/code>&lt;/td>
+ &lt;td>Enable strict null checks.&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>strictFunctionTypes&lt;/td>
+ &lt;td style="text-align: center">&lt;code>false&lt;/code>&lt;/td>
+ &lt;td>Enable strict checking of function types.&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>strictPropertyInitialization&lt;/td>
+ &lt;td style="text-align: center">&lt;code>false&lt;/code>&lt;/td>
+ &lt;td>Enable strict checking of property initialization in classes.&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;p>TypeScript 3.8 時点では、&lt;code>strict&lt;/code> オプションを有効にすることで、これらのオプション群がまとめて有効化されますが、将来の TypeScript (tsc) バージョンでは、これらのオプション群は、そのとき推奨される組み合わせに変更されるとされています。
+つまり、&lt;code>strict&lt;/code> オプションを有効にしておくと、TypeScript のバージョンを上げたときに、新しいエラーが表示されるようになる可能性があります。&lt;/p></description></item><item><title>TypeScriptの環境: tsc-watch で ts ファイルの変更監視＆アプリの再起動を自動化する</title><link>https://maku.blog/p/nxzsnkf/</link><pubDate>Thu, 17 Oct 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/nxzsnkf/</guid><description>&lt;h2 id="typescript-の監視と-javascript-の監視の両立">TypeScript の監視と JavaScript の監視の両立&lt;/h2>
+&lt;p>&lt;code>tsc --watch&lt;/code> コマンドを使うと、TypeScript (&lt;code>.ts&lt;/code>) ファイルの変更を監視して自動的に &lt;code>tsc&lt;/code> （トランスパイル）を実行してくれるようになります。
+&lt;code>nodemon&lt;/code> コマンドを使うと、JavaScript (&lt;code>.js&lt;/code>) ファイルの変更を監視して自動的に &lt;code>node&lt;/code> コマンドを再起動してくれるようになります。&lt;/p>
+&lt;p>これらを組みあわせれば、TypeScript (&lt;code>.ts&lt;/code>) ファイルの変更時に、自動的に Node.js アプリを再起動できそうな気がしますが、一連のコマンドとしてこれら 2 つを組み合わせて実行するのにはみんな苦労しているようです（もちろんコマンドシェルを 2 つ立ち上げればできますが）。&lt;/p>
+&lt;p>そこで便利なのが &lt;a href="https://www.npmjs.com/package/tsc-watch">tsc-watch コマンド&lt;/a> です。&lt;/p>
+&lt;h2 id="tsc-watch-パッケージでまるごと解決">tsc-watch パッケージでまるごと解決&lt;/h2>
+&lt;p>&lt;strong>&lt;code>tsc-watch&lt;/code>&lt;/strong> という NPM パッケージ（コマンド）を使用すると、TypeScript の変更監視と Node アプリの再起動の連動を簡単に行えるようになります。
+まず、必要なパッケージを下記のようにインストールします。
+&lt;code>nodemon&lt;/code> は使わなくて済むので、ここでは依存パッケージとして &lt;code>typescript&lt;/code> と &lt;code>tsc-watch&lt;/code> をインストールしておきます。
+&lt;code>--save-dev&lt;/code> オプションを付加して、&lt;code>package.json&lt;/code> の &lt;code>devDependencies&lt;/code> に登録するのを忘れないようにしましょう。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install --save-dev typescript
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ npm install --save-dev tsc-watch&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>&lt;code>tsc-watch&lt;/code> コマンドはほとんど &lt;code>tsc --watch&lt;/code> のラッパーなので、そのまま実行すると、TypeScript ファイルの変更を監視してトランスパイルを実行するという動作になります。
+これだけの用途であれば &lt;code>tsc&lt;/code> コマンドで十分なのですが、&lt;code>tsc-watch&lt;/code> コマンドに追加されている &lt;strong>&lt;code>--onSuccess&lt;/code>&lt;/strong> オプションを使うと、トランスパイル後に任意の追加コマンドを実行することができます。
+この追加コマンドとして &lt;code>npm start&lt;/code> などを実行するように設定しておけば、TypeScript のトランスパイル後に Node.js アプリを起動するところまでを自動化することができます。
+すでに Node.js アプリが起動している場合は、そのプロセスを終了してから立ち上げ直してくれるので、サーバー系の Node.js アプリを作成している場合も安心です。&lt;/p></description></item><item><title>TypeScriptの環境: 既存の JavaScript プロジェクトを TypeScript に乗り換える</title><link>https://maku.blog/p/3eccb2t/</link><pubDate>Tue, 01 Oct 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/3eccb2t/</guid><description>&lt;h2 id="typescript-プロジェクトへの移行は簡単">TypeScript プロジェクトへの移行は簡単！&lt;/h2>
+&lt;p>TypeScript の構文は、JavaScript のコードとの互換性を考慮して仕様が決められているため、既存の JavaScript プロジェクトを簡単に TypeScript プロジェクトに移行することができます。
+後述するように設定をうまく行えば、JavaScript ファイルの拡張子を &lt;code>.ts&lt;/code> に変える必要すらありません。&lt;/p>
+&lt;p>TypeScript の構文を使わないと意味がないのでは？と思うかもしれませんが、TypeScript のトランスパイラ (&lt;code>tsc&lt;/code>) には、強力な&lt;strong>静的解析の仕組みが備わっている&lt;/strong>ため、この機能を既存の JavaScript ファイルに適用するだけでも TypeScript を導入する価値があります。&lt;/p>
+&lt;p>ここでは、&lt;code>tsc&lt;/code> コマンドは下記のようにグローバルにインストールしてあることを前提とします。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ npm install -g typescript&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;h2 id="おすすめのディレクトリ構成">おすすめのディレクトリ構成&lt;/h2>
+&lt;p>既存の JavaScript コードを TypeScript トランスパイラ (&lt;code>tsc&lt;/code>) の変換対象にする場合は、入力ファイルとなる .js ファイルと、生成される .js ファイルのディレクトリを明確に区別しておくべきです。
+そうしておかないと、どのファイルが自分が作成したファイルで、どのファイルが自動生成されたファイルなのか分かりにくくなってしまいます。&lt;/p>
+&lt;p>ここでは、既存の JavaScript プロジェクトのソースコード (.js) を、下記のように &lt;code>src&lt;/code> ディレクトリに格納します。
+このディレクトリには、最終的に .js ファイルと .ts ファイルが混在していても構いません。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">project/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- tsconfig.js （設定ファイル）
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- build/ （出力用ディレクトリ）
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- src/ （入力用ディレクトリ）
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- main.js
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- module1.js
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> +-- module2.js&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>上記では、&lt;code>src&lt;/code> ディレクトリの直下に .js ファイルを入れていますが、ディレクトリ構造を保ったまま入れてしまって大丈夫です。
+出力先のディレクトリ (&lt;code>build&lt;/code>) には、このディレクトリ階層を再現する形で JavaScript ファイルが出力されます。&lt;/p></description></item></channel></rss>
