@@ -2,10 +2,11 @@
 title: "WezTerm を使いこなすためのメモ"
 url: "p/adcz2mf/"
 date: "2025-11-08"
-lastmodSage: "2026-01-12"
+lastmodSage: "2026-02-22"
 tags: ["PC設定"]
 changes:
   - "2026-01-12: タブにカレントディレクトリ名を表示する方法を追加"
+  - "2026-02-22: wezterm コマンドの使い方を追加"
 ---
 
 [WezTerm](https://wezterm.org) は、クロスプラットフォームのターミナルエミュレーターです。
@@ -179,4 +180,27 @@ WezTerm 内で 1 秒おきに [`update-status` イベント](https://wezterm.org
 [`set_right_status()`](https://wezterm.org/config/lua/window/set_right_status.html) で、タブバーの右端に任意のテキストを表示することができます。
 
 WezTerm の設定楽しいなぁ ٩(๑❛ᴗ❛๑)۶
+
+
+wezterm コマンドで WezTerm を操作する
+----
+
+**`wezterm`** コマンドを使うと、コマンドラインから WezTerm を操作できます。
+`wezterm` コマンドを認識させるために、次のようにパスを通しておきます。
+
+{{% code lang="zsh" title="macOS の例（~/.zshrc）" %}}
+# wezterm コマンドにパスを通す
+export PATH="$PATH:/Applications/WezTerm.app/Contents/MacOS"
+{{% /code %}}
+
+例えば次のようなコマンドが使えます。
+
+| コマンド例 | 説明 |
+| ---- | ---- |
+| `wezterm cli split-pane [--bottom]` | ペーンを分割する（上下） |
+| `wezterm cli split-pane --right` | ペーンを分割する（左右） |
+| `wezterm cli split-pane --cwd /path/to/dir` | ペーンを分割する（カレントディレクトリを指定） |
+| `wezterm cli spawn --cwd /path/to/dir` | 新しいタブで開く（カレントディレクトリを指定） |
+| `wezterm cli spawn nvim ~/.zshrc` | 新しいタブを開く（任意のコマンド〔ここでは`nvim`〕を実行する） |
+| `wezterm imgcat hoge.png` | 画像ファイルをターミナルに表示する |
 
