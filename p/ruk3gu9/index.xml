@@ -188,7 +188,45 @@
 &lt;figcaption class="xCodeBlock_title">1 日前の日付を調べる&lt;/figcaption>
 &lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">$ date -d &amp;#39;-1 day&amp;#39; # GNU/Linux
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ date -v-1d # macOS&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
-&lt;/figure></description></item><item><title>Linuxメモ: apt (apt-get) コマンドの使い方メモ</title><link>https://maku.blog/p/rdq2cnx/</link><pubDate>Tue, 21 Feb 2012 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rdq2cnx/</guid><description>&lt;h2 id="apt-と-dpkg-の違い">apt と dpkg の違い&lt;/h2>
+&lt;/figure></description></item><item><title>Linuxメモ: セキュリティ/ユーザIDとグループIDを理解する</title><link>https://maku.blog/p/kntdnhi/</link><pubDate>Mon, 18 Jun 2012 00:00:00 +0900</pubDate><guid>https://maku.blog/p/kntdnhi/</guid><description>&lt;h2 id="3-つの-id">3 つの ID&lt;/h2>
+&lt;p>Linux プロセスには、ユーザ ID（UID）とグループ ID（GID）がそれぞれ 3 種類ずつ割り当てられています。
+これらの ID は、プロセスがどのユーザやグループの権限で動作しているかを示すもので、セキュリティやアクセス制御の観点から重要な役割を果たします。&lt;/p>
+&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>種類&lt;/th>
+ &lt;th>英語名&lt;/th>
+ &lt;th>説明&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;strong>実ユーザ ID（実グループ ID）&lt;/strong>&lt;/td>
+ &lt;td>Real UID (GID)&lt;/td>
+ &lt;td>プロセスを起動したユーザ（グループ）を示す&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>実効ユーザ ID（実効グループ ID）&lt;/strong>&lt;/td>
+ &lt;td>Effective UID (GID)&lt;/td>
+ &lt;td>実際のアクセス権限の判定に使われる&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;strong>保存ユーザ ID（保存グループ ID）&lt;/strong>&lt;/td>
+ &lt;td>Saved set-user-ID (set-group-ID)&lt;/td>
+ &lt;td>権限の一時的な切り替えを可能にするために保存された ID&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h3 id="実効ユーザ-id-がアクセス権限を決める">実効ユーザ ID がアクセス権限を決める&lt;/h3>
+&lt;p>プロセスがあるファイルにアクセスできるかどうかは、そのプロセスの &lt;strong>実効ユーザ ID（Effective UID）&lt;/strong> によって決まります。
+つまり、実効ユーザ ID が、プロセスの実際の権限を表しています。&lt;/p>
+&lt;h3 id="実ユーザ-id-と実効ユーザ-id-の関係">実ユーザ ID と実効ユーザ ID の関係&lt;/h3>
+&lt;p>&lt;strong>実ユーザ ID（Real UID）&lt;/strong> は、そのプロセスを起動したユーザの UID です。
+通常のプログラムでは、実効ユーザ ID も実ユーザ ID と同じ値に設定されます。&lt;/p>
+&lt;h3 id="setuid-ビットによる権限昇格">setuid ビットによる権限昇格&lt;/h3>
+&lt;p>setuid ビットがセットされたプログラムを実行すると、そのプログラムファイルの所有ユーザの UID が「実効ユーザ ID」として設定されます。
+例えば、所有ユーザが root のプログラムに setuid ビットが設定されている場合、一般ユーザが起動しても実効ユーザ ID は root (=0) になります。
+ただし、実ユーザ ID は変わらず、起動したユーザの UID がそのまま引き継がれます。&lt;/p></description></item><item><title>Linuxメモ: apt (apt-get) コマンドの使い方メモ</title><link>https://maku.blog/p/rdq2cnx/</link><pubDate>Tue, 21 Feb 2012 00:00:00 +0900</pubDate><guid>https://maku.blog/p/rdq2cnx/</guid><description>&lt;h2 id="apt-と-dpkg-の違い">apt と dpkg の違い&lt;/h2>
 &lt;p>Debian/Ubuntu 系 Linux のパッケージ管理には &lt;code>apt&lt;/code> (&lt;code>apt-get&lt;/code>) コマンドを使いますが、 Low-Level なパッケージ管理コマンドとして &lt;code>dpkg&lt;/code> コマンドも備えています。&lt;/p>
 &lt;ul>
 &lt;li>参考: &lt;a href="https://wiki.debian.org/DebianPackageManagement">DebianPackageManagement - Debian Wiki&lt;/a>&lt;/li>
