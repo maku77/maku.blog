@@ -1,0 +1,62 @@
+{{/*
+  gg ショートコード: Guilty Gear コマンド表記を色付きで表示する
+  例: {{< gg "5K 2S 236K" >}}
+
+  ボタン色（dustloop 準拠）:
+    P  = 青  (#6aabff)
+    K  = 赤  (#ff6060)
+    S  = 橙  (#ffaa44)
+    HS = 紫  (#cc66ff)
+    D  = 緑  (#55cc55)
+
+  トークン末尾のボタン文字でトークン全体を色付けする。
+  例: 2K → 赤、jc.K → 赤、dc.236HS → 紫
+  ボタンなし（数字のみ等）: グレー (#aaaaaa)
+  セパレータ (> , |): 薄グレー (#888888)
+*/}}
+{{- $raw := .Get 0 -}}
+
+{{- $colors := dict
+  "P"  "#ff88bb"
+  "K"  "#6aabff"
+  "S"  "#55cc55"
+  "HS" "#ff4444"
+  "D"  "#ff9933"
+-}}
+
+{{- $tokens := split $raw " " -}}
+
+<span style="font-family:monospace; white-space:nowrap; background-color:#1e1e2e; border-radius:6px; padding:4px 6px; font-size:1.1em;" aria-label="{{ $raw }}">
+  {{- range $i, $tok := $tokens -}}
+    {{- if gt $i 0 -}}<span style="margin:0 2px;"> </span>{{- end -}}
+
+    {{- if or (eq $tok ">") (eq $tok "|") (eq $tok ",") -}}
+      <b style="color:#888888;">{{ $tok }}</b>
+    {{- else -}}
+      {{/* 末尾の (...) を除いた部分でボタン判定する */}}
+      {{- $base := replaceRE `\([^)]*\)$` "" $tok -}}
+
+      {{/* ロマンキャンセル系 (RC / RCC) は優先して目立つ色で表示 */}}
+      {{- if or (hasSuffix $base "RCC") (hasSuffix $base "RC") -}}
+        <b style="color:#cc0077;">{{ $tok }}</b>
+      {{- else -}}
+        {{- $btn := "" -}}
+        {{- if hasSuffix $base "HS" -}}
+          {{- $btn = "HS" -}}
+        {{- else if hasSuffix $base "S" -}}
+          {{- $btn = "S" -}}
+        {{- else if hasSuffix $base "K" -}}
+          {{- $btn = "K" -}}
+        {{- else if hasSuffix $base "P" -}}
+          {{- $btn = "P" -}}
+        {{- else if hasSuffix $base "D" -}}
+          {{- $btn = "D" -}}
+        {{- end -}}
+
+        {{- $color := index $colors $btn -}}
+        {{- if not $color -}}{{- $color = "#aaaaaa" -}}{{- end -}}
+        <b style="color:{{ $color }};">{{ $tok }}</b>
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+</span>
