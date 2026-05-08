@@ -96,9 +96,9 @@ Cloudflare のネームサーバー設定は以下から行います。
 Cloudflare Pages で Web サイトを作る
 ----
 
-{{% note %}}
+{{% private %}}
 https://developers.cloudflare.com/pages/get-started/git-integration/
-{{% /note %}}
+{{% /private %}}
 
 以上の設定で、独自ドメインが Cloudflare のネームサーバーで処理されるようになりました。
 ただ、肝心の Web サイト（Web サーバー）がまだないので、Cloudflare Pages を使って簡単な Web サイトを作っておきます。
@@ -139,7 +139,8 @@ Cloudflare Pages に独自ドメインを結びつける
 1. **`カスタムドメイン (Custom domain)`** を選択し、登録済みの独自ドメイン（例: `example.com`）を入力します。
 
 これだけで、独自ドメイン (`https://example.com` など）で Web サイトにアクセスできるようになります。
-https によるアクセスも自動で有効になるので、SSL 証明書の設定なども不要です。
+サブドメイン（例: `hello.example.com`）を割り当てたいときは、上記のカスタムドメイン設定でサブドメインをそのまま入力するだけです。
+https によるアクセスも自動で有効になるので、証明書の設定など面倒なことは一切不要です。
 
-٩(๑❛ᴗ❛๑)۶ やったー
+٩(๑❛ᴗ❛๑)۶ Cloudflare 便利すぎでしょ！
 
