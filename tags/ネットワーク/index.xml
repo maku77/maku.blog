@@ -71,8 +71,8 @@ Docker の Ubuntu コンテナなどで &lt;code>ip&lt;/code> コマンドが見
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> apt install -y iproute2
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>iproute2 パッケージには、&lt;code>ip&lt;/code> コマンド以外にもいろいろなコマンドが含まれています（参考: iproute2 に含まれるファイルのリスト ─ &lt;a href="https://packages.debian.org/sid/amd64/iproute2/filelist">Debian&lt;/a> / &lt;a href="https://archlinux.org/packages/core/x86_64/iproute2/files/">archlinux&lt;/a>）。&lt;/p>
 &lt;div class="xAccordion">
- &lt;input id="id-962187453" type="checkbox">
- &lt;label class="xAccordion_title" for="id-962187453">iproute2 のインストールで使えるようになるコマンド&lt;/label>
+ &lt;input id="id-493681752" type="checkbox">
+ &lt;label class="xAccordion_title" for="id-493681752">iproute2 のインストールで使えるようになるコマンド&lt;/label>
  &lt;div class="xAccordion_body">
 &lt;ul>
 &lt;li>
@@ -118,11 +118,11 @@ Docker の Ubuntu コンテナなどで &lt;code>ip&lt;/code> コマンドが見
 &lt;/ul>
 &lt;p>というファイルがある場合、&lt;code>50-cloud-init.yaml&lt;/code> で設定された値は &lt;code>99-custom.yaml&lt;/code> の設定値によって上書きされます。&lt;/p></description></item><item><title>ドメイン管理と DNS 管理の違いを理解する</title><link>https://maku.blog/p/bwamwgp/</link><pubDate>Sun, 25 Apr 2021 00:00:00 +0900</pubDate><guid>https://maku.blog/p/bwamwgp/</guid><description>&lt;h2 id="ドメイン管理と-dns-サーバー">ドメイン管理と DNS サーバー&lt;/h2>
 &lt;p>「独自ドメイン＋レンタルサーバー」を契約してブログサイトなどを立ち上げようとすると、どうしてもドメイン管理や DNS 設定を行う必要が出てきます。
-同じ会社で一括契約すると、まとめて設定できたりしますが、これらは本来別々のサービスなので、ここで簡単に整理しておきます。&lt;/p>
+同じ会社で一括契約すると、まとめて設定できる場合もありますが、これらは本来別々のサービスなので、ここで簡単に整理しておきます。&lt;/p>
 
 
 &lt;figure class="xImage">
- &lt;img style="" width="" height="auto" src="../../p/bwamwgp/img-001.svg" alt="/p/bwamwgp/img-001.svg" />
+ &lt;img style="" width="" height="auto" src="../../p/bwamwgp/img-001.drawio.svg" alt="/p/bwamwgp/img-001.drawio.svg" />
 &lt;/figure>
 
 &lt;p>ドメイン取得・管理は、レジストラ（およびその委託先会社）が行っており、世界で一意なドメインを運用します。
@@ -130,44 +130,29 @@ Docker の Ubuntu コンテナなどで &lt;code>ip&lt;/code> コマンドが見
 &lt;img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=3NCT8C+EVU582+50+2HHVNM" alt="">
  などが有名ですね。
 一方で、DNS サービスは、このドメイン名を具体的な IP アドレスに関連づける機能を提供します。&lt;/p>
-&lt;p>レジストラ（ドメイン管理会社）が提供するドメイン管理サービスは、あくまでドメイン名を管理しているだけであり、DNS の機能を提供しているわけではありません。
-なので、ドメイン管理会社でドメインを取得したら、そのドメインの名前解決に使用する DNS サーバーのアドレスを教えてあげる必要があります。
+&lt;p>レジストラのドメイン管理サービスは、あくまでドメイン名の登録・管理が主な役割であり、DNS サービスは別の機能として提供されています。
+そのため、ドメイン管理会社でドメインを取得したら、そのドメインの名前解決に使用する DNS サーバーのアドレスを教えてあげる必要があります（&lt;strong>NS 設定&lt;/strong> と呼ばれます）。
 上の図では、&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8C+EVU582+50+2HHVNM" rel="nofollow">お名前.com&lt;/a>
 &lt;img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=3NCT8C+EVU582+50+2HHVNM" alt="">
- のドメイン管理設定で、さくらインターネットの DNS サーバー (ns1/2.dns.ne.jp) のアドレスを設定する例を示しています。&lt;/p>
+ のドメイン管理設定で、さくらインターネットの DNS サーバー (ns1/2.dns.ne.jp) のアドレスを設定する例を示しています。
+お名前.com 自体も DNS サーバー機能を提供しているので、そちらを使うこともできます。&lt;/p>
 &lt;p>この設定により、ユーザーが &lt;code>example.com&lt;/code> にアクセスしようとすると、DNS サーバー (ns1.dns.ne.jp) によって IP アドレス (12.34.56.78) に変換され、そのアドレスの Web サーバーにアクセスできるという仕組みになっています。&lt;/p>
-&lt;h2 id="組み合わせの例">組み合わせの例&lt;/h2>
-&lt;table>
- &lt;thead>
- &lt;tr>
- &lt;th>ドメイン取得・管理&lt;/th>
- &lt;th>DNS サーバー&lt;/th>
- &lt;th>Web サーバー&lt;/th>
- &lt;/tr>
- &lt;/thead>
- &lt;tbody>
- &lt;tr>
- &lt;td>お名前.com&lt;/td>
- &lt;td>お名前.com&lt;/td>
- &lt;td>お名前.com&lt;/td>
- &lt;/tr>
- &lt;tr>
- &lt;td>お名前.com&lt;/td>
- &lt;td>さくらインターネット&lt;/td>
- &lt;td>さくらインターネット&lt;/td>
- &lt;/tr>
- &lt;tr>
- &lt;td>お名前.com&lt;/td>
- &lt;td>AWS (R53)&lt;/td>
- &lt;td>AWS (EC2)&lt;/td>
- &lt;/tr>
- &lt;/tbody>
-&lt;/table>
-&lt;p>多くの場合、こんな感じで DNS サーバーと Web サーバーは同じ会社のものを使います。
-レンタルサーバーのアドレスなどを自動で設定できたりして便利だからです。
-DNS サーバーの使用料金はレンタルサーバーの使用料金に含まれていることが多いですが、AWS の R53 などは個別に使用料金がかかります。&lt;/p>
-&lt;p>一方、ドメイン取得・管理会社の方は、年ごとの更新費用などが安い「お名前.com」などを選ぶことが多いです。
-Amazon (AWS) などのクラウドサービスでもドメイン取得できたりしますが、ちょっとお値段高めです。&lt;/p></description></item><item><title>Linuxコマンド: scp コマンドでファイルやディレクトリを転送する</title><link>https://maku.blog/p/buvv4fz/</link><pubDate>Sat, 09 Nov 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/buvv4fz/</guid><description>&lt;p>ここでは、&lt;code>scp&lt;/code> を使ったファイル転送の方法を示していますが、ディレクトリ単位のファイルコピーやバックアップを行いたい場合は、&lt;a href="../../p/c3s7wyx">rsync&lt;/a> コマンドを使用したほうが効率的です。&lt;/p>
+&lt;div class="xNote">
+ &lt;span class="xNote_title">☝️ 「DNS サーバー」と「ネームサーバー」&lt;/span>
+ &lt;span class="xNote_body">&lt;p>ここでは、&lt;code>example.com&lt;/code> のアドレスを管理しているサーバーを DNS サーバーと呼んでいますが、より具体的には、ドメインの正式なレコードを保持・回答するサーバーは &lt;strong>ネームサーバー（権威 DNS サーバー）&lt;/strong> と呼ばれます。
+英語では "Authoritative DNS Server" です。
+DNS サーバーは、ネームサーバー以外にも、ユーザーの DNS クエリに対してキャッシュされたレコードを返すリゾルバーなどがあります。&lt;/p>
+&lt;dl>
+&lt;dt>ルートサーバー&lt;/dt>
+&lt;dd>ルートゾーン（&lt;code>.&lt;/code>） の情報（&lt;code>.com&lt;/code> や &lt;code>.jp&lt;/code> を誰が管理しているか）を管理。&lt;/dd>
+&lt;dt>TLD サーバー（トップレベルドメインサーバー）&lt;/dt>
+&lt;dd>&lt;code>.com&lt;/code> や &lt;code>.jp&lt;/code> などのゾーン情報（&lt;code>example.com&lt;/code> を誰が管理しているかの情報）を管理。&lt;/dd>
+&lt;dt>ネームサーバー（権威 DNS サーバー）&lt;/dt>
+&lt;dd>特定のドメイン（&lt;code>example.com&lt;/code> など）の正式な A レコード・MX レコードなどを管理。&lt;/dd>
+&lt;dt>リゾルバー&lt;/dt>
+&lt;dd>ユーザーの DNS クエリに対して、キャッシュされたレコードを返す。キャッシュがなければルートサーバーから順に再帰的に問い合わせて解決する。&lt;/dd>
+&lt;/dl>
+&lt;p>お名前.com などのレジストラの Web サイトでの NS 設定では、上記の「ネームサーバー」のアドレスを「TLD サーバー」に登録するという処理を行っています。&lt;/p></description></item><item><title>Linuxコマンド: scp コマンドでファイルやディレクトリを転送する</title><link>https://maku.blog/p/buvv4fz/</link><pubDate>Sat, 09 Nov 2013 00:00:00 +0900</pubDate><guid>https://maku.blog/p/buvv4fz/</guid><description>&lt;p>ここでは、&lt;code>scp&lt;/code> を使ったファイル転送の方法を示していますが、ディレクトリ単位のファイルコピーやバックアップを行いたい場合は、&lt;a href="../../p/c3s7wyx">rsync&lt;/a> コマンドを使用したほうが効率的です。&lt;/p>
 &lt;h2 id="ファイル送信">ファイル送信&lt;/h2>
 &lt;pre tabindex="0">&lt;code>$ scp &amp;lt;localFile&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;host&amp;gt;:&amp;lt;remoteFile&amp;gt;
 &lt;/code>&lt;/pre>&lt;h2 id="ファイル受信">ファイル受信&lt;/h2>
