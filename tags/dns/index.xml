@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Dns on まくろぐ</title><link>https://maku.blog/tags/dns/</link><description>Recent content in Dns on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Fri, 08 May 2026 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/dns/index.xml" rel="self" type="application/rss+xml"/><item><title>Cloudflare Pages で独自ドメインで Web サイト公開</title><link>https://maku.blog/p/efcf8xn/</link><pubDate>Fri, 08 May 2026 00:00:00 +0900</pubDate><guid>https://maku.blog/p/efcf8xn/</guid><description>&lt;h2 id="何をするか">何をするか&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Dns on まくろぐ</title><link>https://maku.blog/tags/dns/</link><description>Recent content in Dns on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Fri, 08 May 2026 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/dns/index.xml" rel="self" type="application/rss+xml"/><item><title>Cloudflare Pages で独自ドメインで Web サイトを公開する</title><link>https://maku.blog/p/efcf8xn/</link><pubDate>Fri, 08 May 2026 00:00:00 +0900</pubDate><guid>https://maku.blog/p/efcf8xn/</guid><description>&lt;h2 id="何をするか">何をするか&lt;/h2>
 &lt;p>Web アプリをホスティングしたいとき、なんだかんだ言ってやっぱり &lt;strong>Cloudflare&lt;/strong> が簡単かつ安価で高速です。
 今後もこの図式が崩れることはしばらくなさそうです。
 ということで、Cloudflare を使って独自ドメインの Web サイトを公開する手順をまとめておきます。
@@ -14,16 +14,17 @@
 &lt;li>参考: &lt;a href="https://maku.blog/p/bwamwgp/">ドメイン管理と DNS 管理の違いを理解する&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;p>ドメインはお名前.com で取得済みのものがあったので、とりあえずそれを使うことにします。
-ここでは、&lt;strong>&lt;code>example.com&lt;/code>&lt;/strong> という独自ドメインを取得したものとして説明します。&lt;/p>
+ここでは、&lt;strong>&lt;code>example.com&lt;/code>&lt;/strong> という独自ドメインを取得済みとして説明します。&lt;/p>
 &lt;div class="xNote">
- &lt;span class="xNote_title">☝️ ワンポイント&lt;/span>
- &lt;span class="xNote_body">実はドメイン管理（レジストラ）も Cloudflare Registrar を使った方がお財布に優しく（純粋にレジストリやICANNからの請求額しかかからない）、設定画面もわかりやすいらしいので、あとでレジストラを移管するつもりです。
-確かにお名前.com は「サービス維持調整費」みたいな値上げメールがよく来てどんどん更新料金が上がってる気がします。
-ドメイン取得時だけ割引しておいて更新料金は高い、というモデルもいまいちですね。&lt;/span>
+ &lt;span class="xNote_title">☝️ Cloudflare Registrar でドメイン取得&lt;/span>
+ &lt;span class="xNote_body">&lt;p>独自ドメインを持っていない場合は、&lt;a href="https://www.cloudflare.com/ja-jp/products/registrar/">Cloudflare Registrar&lt;/a> でドメインを取得するのもおすすめです。
+Cloudflare Registrar でドメインを取得した場合は、そのドメインのネームサーバーとして自動的に Cloudflare DNS が使われることになります。&lt;/p>
+&lt;p>日本でのドメイン運用会社（レジストラ）としては、お名前.com が有名ですが、実はレジストラも Cloudflare Registrar を使った方がお財布に優しく、設定画面もわかりやすいらしいので、あとでレジストラを移管するつもりです。→ &lt;a href="../../p/ead67i7/">しました&lt;/a>&lt;/p>
+&lt;/span>
 &lt;/div>
-&lt;p>ちなみに、ネームサーバーが正しく設定されていない状態だと、下記のように &lt;code>nslookup&lt;/code> でのドメイン名の解決結果が &lt;code>SERVFAIL&lt;/code> エラーになります。
+&lt;p>ちなみに、ネームサーバーが正しく設定されていない状態だと、下記のように &lt;code>nslookup&lt;/code> コマンドによるドメイン名の解決結果が &lt;code>SERVFAIL&lt;/code> エラーになります。
 ドメイン自体が存在しない場合は &lt;code>NXDOMAIN&lt;/code> エラーになります。
-ネームサーバーが正しく設定されているけど、A レコードなどの情報がない場合は、&lt;code>No answer&lt;/code> 表示になります。&lt;/p>
+ネームサーバーが正しく設定されているが、A レコードなどの情報がない場合は、&lt;code>No answer&lt;/code> 表示になります。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> nslookup example.com
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> ;; Got SERVFAIL reply from 1.1.1.1, trying next server
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go"> Server: 1.0.0.1
