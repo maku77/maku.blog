@@ -2,10 +2,11 @@
 title: "rg (ripgrep) コマンドの使い方まとめ"
 url: "p/4jhbtm3/"
 date: "2025-09-15"
-lastmod: "2026-02-28"
+lastmod: "2026-06-02"
 tags: ["cheatsheet", "ripgrep"]
 changes:
   - 2026-02-28: トラブルシュートを追加
+  - 2026-06-02: OR 条件や含まない条件での検索方法を追加
 ---
 
 超高速なテキスト検索コマンド [**rg (ripgrep)**](https://github.com/BurntSushi/ripgrep) にはずっとお世話になっていますが、ちょっと凝った検索をしようとしたときに、オプションを忘れてしまうことが多いので、チートシートの形でまとめておきます。
@@ -17,15 +18,27 @@ Ripgrep チートシート
 
 ### 検索パターン
 
-`rg "^def "`
-: カレントディレクトリ以下のすべてのファイルから、行頭が `def ` で始まる行を検索します。
-`rg` はデフォルトで、**入力パターンを正規表現として扱います**。
+<code>rg "PATTERN"</code><br><code>rg <strong>-e</strong> "PATTERN"</code>
+: カレントディレクトリ以下のすべてのファイルから、`PATTERN` にマッチする行を検索します。
+  入力パターンは **正規表現として扱われる** ため、例えば `^def ` と指定すれば、`def ` で始まる行を検索できます。
+  本来、パターンの指定には `-e` オプションを使いますが、このような単純なケースでは省略できます。
+
+<code>rg "PATTERN1|PATTERN2"</code><br><code>rg <strong>-e</strong> "PATTERN1" <strong>-e</strong> "PATTERN2"</code>
+: OR 条件による検索を行うときは、正規表現の OR 演算子 **`|`** を使用するか、`-e` オプションを複数回使用します。
+  上記の例では、`PATTERN1` または `PATTERN2` にマッチする行を検索します。
+
+<code>rg "PATTERN1" <strong>|</strong> rg "PATTERN2"</code>
+: AND 条件による検索を行うときは、単純に `rg` コマンドをパイプで繋げて実行します。
+
+<code>rg <strong>-v</strong> "PATTERN"</code>
+: `PATTERN` を含まない行のみを出力します。
+  例えば、`rg "https://" | rg -v "example"` とすると、`example` ドメイン以外の URL を検索できます。
 
 <code>rg <strong>-F</strong> "*****"</code>
 : 検索文字列を正規表現として解釈せず、そのままの文字列 (Fixed String) として検索します。上記の例では、`*****` という文字列を検索します。
 
 <code>rg <strong>-i</strong> "PATTERN"</code>
-: 大文字・小文字を区別せずに「PATTERN」を検索します。
+: 大文字・小文字を区別せずに `PATTERN` を検索します。
 
 <code>rg <strong>-w</strong> "PATTERN"</code>
 : 単語単位で「PATTERN」を検索します。例えば `PATTERNS` や `MYPATTERN` はマッチしません（安心してください、`TODO:` にはマッチします）。
