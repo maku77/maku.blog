@@ -9,7 +9,7 @@ Guilty Gear Strive のキャラ別対策メモ。
 少しずつ対策していきます。
 
 
-<img src="/assets/img/ggst/face-axl.jpg" width="40px" height="40px"> アクセル・ロー (AXL LOW)
+<img src="/assets/img/ggst/face-axl.jpg" width="40px" height="40px"> アクセル＝ロー (AXL LOW)
 ----
 
 - 地上から近づくときは、**ダッシュ＆しゃがみガード**。
@@ -24,7 +24,12 @@ Guilty Gear Strive のキャラ別対策メモ。
   遠距離で出されたら、飛び道具だけジャンプでかわしてコンボへ。
   中距離で出されたら、最初から前ジャンプ入れていると自分から1段目に当たりに行ってしまうので、一瞬しゃがみガードして体の周りの炎が見えた瞬間に前ジャンプすること（開幕位置がちょうどこの距離）
 
-<img src="/assets/img/ggst/face-aba.jpg" width="40px" height="40px"> A.B.A
+
+<img src="/assets/img/ggst/face-ask.jpg" width="40px" height="40px"> 飛鳥＝R♯ (ASUKA R♯)
+----
+
+
+<img src="/assets/img/ggst/face-aba.jpg" width="40px" height="40px"> アバ (A.B.A)
 ----
 
 - 特徴
@@ -82,7 +87,7 @@ Guilty Gear Strive のキャラ別対策メモ。
   ガードしてもヴェノム有利というトンデモ技だけど、FD で離さないことには始まらない。
 
 
-<img src="/assets/img/ggst/face-elp.jpg" width="40px" height="40px"> エルフェルト・ヴァレンタイン (ELPHELT VALENTINE)
+<img src="/assets/img/ggst/face-elp.jpg" width="40px" height="40px"> エルフェルト＝ヴァレンタイン (ELPHELT VALENTINE)
 ----
 
 - 特徴
@@ -95,7 +100,7 @@ Guilty Gear Strive のキャラ別対策メモ。
     - {{< gg "2HS" >}} の膝滑り込みは立ちガードできる。
 - 連携にボンボン・ショコラを入れられたらジャンプ
   - ジャンプ攻撃がカウンターヒットになるので、ボンボン・ショコラを見切れれば実はチャンス。
-    - 例: ジオ・ヴァーナ: {{< gg "j.HS j.D air-dash j.D > 236236HS(テンペスターヂ)" >}}
+    - 例: ジオヴァーナ: {{< gg "j.HS j.D air-dash j.D > 236236HS(テンペスターヂ)" >}}
   - 地面ぎわの爆弾は立ちガードできるので惑わされない。
 - 飛び道具を打つのが見えたら、{{< gg "6P" >}} ですり抜けられる。
 
@@ -124,14 +129,14 @@ Guilty Gear Strive のキャラ別対策メモ。
   - 対空必殺技（例: メイのイルカさん・縦 {{< gg "[2]8S" >}} など）なら簡単に返せるキャラもいるが、ジオのソウ・ナセンテ {{< gg "623S" >}} などは最速で出さないと負けor相打ちになる。返した場合は空中コンボへ。
 
 
-<img src="/assets/img/ggst/face-zat.jpg" width="40px" height="40px"> ザトー
+<img src="/assets/img/ggst/face-zat.jpg" width="40px" height="40px"> ザトー＝ONE（ZATO=ONE)
 ----
 
 - エディは攻撃して消すことができる。
 - {{< gg "236HS(張り合う)" >}} は攻撃しない。ダッシュ投げ or 覚醒必殺技で攻撃するのは OK。
 
 
-<img src="/assets/img/ggst/face-gio.jpg" width="40px" height="40px"> ジオヴァーナ (GIOVANA)
+<img src="/assets/img/ggst/face-gio.jpg" width="40px" height="40px"> ジオヴァーナ (GIOVANNA)
 ----
 
 - 特徴
@@ -145,7 +150,7 @@ Guilty Gear Strive のキャラ別対策メモ。
 - {{< gg "f.S" >}} の後は下段がないので立ちガード安定。投げは注意。
 
 
-<img src="/assets/img/ggst/face-jam.jpg" width="40px" height="40px"> ジャム (蔵土縁紗夢) (KURADOBERI JAM)
+<img src="/assets/img/ggst/face-jam.jpg" width="40px" height="40px"> ジャム (蔵土縁 紗夢) (JAM KURADOBERI)
 ----
 
 - 特徴
@@ -172,7 +177,23 @@ Guilty Gear Strive のキャラ別対策メモ。
   - スロット2: {{< gg "c.S f.S 236HS(龍鎚)" >}} → 空投げで反撃（ムズイ）
 
 
-<img src="/assets/img/ggst/face-sin.jpg" width="40px" height="40px"> シン・キスク
+<img src="/assets/img/ggst/face-jhn.jpg" width="40px" height="40px"> ジョニー (JOHNNY)
+----
+
+- ミストファイナーによる横方向の攻撃が主体なので、ジャンプ攻撃で攻めたい。
+- ミストファイナー {{< gg "214P(上)" >}} {{< gg "214K(中)" >}} {{< gg "214S(下)" >}}
+  - ジョニーが後ろを向くのが見えたらたら、ミストの発射準備なので、低ダで攻めてみる。
+  - ミストはガードすればジョニー不利 (**-15F**)。
+  - ミスト構え中は前後にあるけるし、ステップ打ちもできることに注意。Kミストのステップ内はどの距離からでもほぼ届く。
+- ダッシュ蹴り上げ ({{< gg "2K" >}}) は、ガードしてもジョニーは -5F くらいしか不利にならない。
+- テリーボガードのクラックシュートみたいに飛んでくる、{{< gg "236HS(跳躍) ~ HS(空中ディール)" >}} は、ガード位置によってジョニーが -1〜-4F。
+  攻撃を出さずにそのまま投げに来ることもある。
+- 炎を出す飛び蹴り {{< gg "214HS(燕穿牙/えんせんが)" >}} は中段技。
+  ガードすればジョニーやや不利 (**-4F**)。
+  空振りなら **-40F** なので必ずとがめること。
+
+
+<img src="/assets/img/ggst/face-sin.jpg" width="40px" height="40px"> シン＝キスク (SIN KISKE)
 ----
 
 ガトリングからの中段・下段の二択に慣れる。
@@ -223,7 +244,10 @@ Guilty Gear Strive のキャラ別対策メモ。
 - 初段 FD → 立ちガードが安定。距離を離すことで下段が届かなくなる。
 
 
-<img src="/assets/img/ggst/face-dzy.jpg" width="40px" height="40px"> ディズィー
+<img src="/assets/img/ggst/face-tst.jpg" width="40px" height="40px"> テスタメント (TESTAMENT)
+
+
+<img src="/assets/img/ggst/face-dzy.jpg" width="40px" height="40px"> クイーン・ディズィー (QUEEN DIZZY)
 ----
 
 - HS ミカエルソードは上に振りかぶる動作が見えたら {{< gg "dash 6P" >}} で撃ち落とす。
@@ -272,6 +296,18 @@ Guilty Gear Strive のキャラ別対策メモ。
   垂直ジャンプなどでやり過ごして、煙が消えてから反撃する。
 
 
+<img src="/assets/img/ggst/face-may.jpg" width="40px" height="40px"> メイ (MAY)
+----
+
+- 有栖川スパークル
+  - 近くに落ちる {{< gg "214P" >}} と遠くに落ちる {{< gg "214K" >}} があるが、**垂直ジャンプで避けられる**。
+    バウンド時に上に攻撃判定が伸びるので注意。
+  - ガードするとメイ側が相当有利なので、避けるか攻める。
+  - 中距離で牽制的に出された場合は、前ジャンプからの空中ダッシュで攻撃しにいける。
+    低ダにすると当たることがあるので、**ジャンプ頂点近くで空中ダッシュ** がよい。
+  - 間に合うようであれば、攻撃発生前に **ダッシュ攻撃** で割り込むのもあり。
+
+
 <img src="/assets/img/ggst/face-ram.jpg" width="40px" height="40px"> ラムレザル・ヴァレンタイン (RAMLETHAL VALENTINE)
 ----
 
@@ -281,6 +317,8 @@ Guilty Gear Strive のキャラ別対策メモ。
   - {{< gg "236HS(HSバヨネート)" >}} 水平方向の大剣飛ばし。ワンテンポ遅れて爆発。
   - {{< gg "623P(ダウロ/Dauro)" >}} 素早い突進攻撃。ガード時ラムレザル **-12F**。
   - {{< gg "214K(シルドデトルオ)" >}} 前方に高速ジャンプ中段攻撃。ガード時ラムレザル **-10F**。
+- ラムレザルの {{< gg "j.S" >}} は横方向に長いが、早めの {{< gg "6P" >}} で問題なく落とせる。
+  上方向に判定の強い {{< gg "2HS" >}} 系の攻撃を早めに置いておくことでもカウンターを取れる。
 
 
 <img src="/assets/img/ggst/face-luc.jpg" width="40px" height="40px"> ルーシー (LUCY)
@@ -311,6 +349,10 @@ Guilty Gear Strive のキャラ別対策メモ。
     - オプティクス阻害: ルーシーの姿が視認しにくくなる。
 
 
+ロボカイ (Robo-Ky)
+----
+
+
 <img src="/assets/img/ggst/face-uni.jpg" width="40px" height="40px"> ユニカ (UNIKA)
 ----
 
@@ -334,7 +376,7 @@ Guilty Gear Strive のキャラ別対策メモ。
 {{% /private %}}
 
 
-<img src="/assets/img/ggst/face-leo.jpg" width="40px" height="40px"> LEO（レオ）
+<img src="/assets/img/ggst/face-leo.jpg" width="40px" height="40px"> レオ＝ホワイトファング (LEO WHITEFANG)
 ----
 
 - 特徴
