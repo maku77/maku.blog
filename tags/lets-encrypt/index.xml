@@ -1,1 +1,96 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Let's Encrypt on まくろぐ</title><link>https://maku.blog/tags/lets-encrypt/</link><description>Recent content in Let's Encrypt on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><atom:link href="https://maku.blog/tags/lets-encrypt/index.xml" rel="self" type="application/rss+xml"/></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Let's Encrypt on まくろぐ</title><link>https://maku.blog/tags/lets-encrypt/</link><description>Recent content in Let's Encrypt on まくろぐ</description><generator>Hugo</generator><language>ja-jp</language><lastBuildDate>Sat, 03 Dec 2022 00:00:00 +0900</lastBuildDate><atom:link href="https://maku.blog/tags/lets-encrypt/index.xml" rel="self" type="application/rss+xml"/><item><title>Certbot で Let's Encrypt の SSL 証明書を取得する（Web サーバーの HTTPS 対応）</title><link>https://maku.blog/p/io4gs6h/</link><pubDate>Sat, 03 Dec 2022 00:00:00 +0900</pubDate><guid>https://maku.blog/p/io4gs6h/</guid><description>&lt;h2 id="何をするか">何をするか？&lt;/h2>
+&lt;p>数年前に Google が Web サイトの常時 SSL 化を推奨し始めて、今では多くの Web サイトが HTTPS によるアクセスに対応しています。
+Web サーバーを HTTPS (SSL) 対応するには、第三者機関となる認証局 (CA: Certificate Authority) から SSL 証明書を発行してもらう必要があるのですが、&lt;strong>Let&amp;rsquo;s Encrypt という認証局を使うと、SSL 証明書を無料で発行してもらえます&lt;/strong>（感謝！）。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="" width="600" height="138" src="../../p/io4gs6h/img-001_hu17967330365113016649.png" alt="/p/io4gs6h/img-001.png" />
+ &lt;figcaption>図: Let&amp;#39;s Encrypt &amp;#43; Certbot による HTTPS 対応&lt;/figcaption>
+&lt;/figure>
+
+&lt;p>レンタルサーバー側で提供されている WordPress 環境などを使用している人は、知らないうちに Let&amp;rsquo;s Encrypt を使った HTTPS 化の恩恵を受けているかもしれません。
+ここでは、VPS などで自力で Web サーバーを立ち上げている人が、HTTPS (SSL) 対応する方法を説明します。&lt;/p>
+&lt;p>&lt;strong>Let&amp;rsquo;s Encrypt からの SSL 証明書の発行には、Certbot というツールを使うのが一般的です&lt;/strong>。
+Certbot による証明書取得や、Web サーバー (nginx) のヴァーチャルホスト設定をまとめて行ってしまう Docker イメージなども存在しますが、ここでは、Certbot の基本的な振る舞いを理解するために、&lt;code>certbot&lt;/code> コマンドを直接実行する前提で説明していきます。&lt;/p>
+&lt;h2 id="certbot-とは">Certbot とは&lt;/h2>
+&lt;p>&lt;a href="https://certbot.eff.org/">Certbot&lt;/a> は、Let&amp;rsquo;s Encrypt 認証局から SSL 証明書を発行してもらうためのクライアントツールで、以下のような作業を自動で行ってくれます。&lt;/p></description></item><item><title>Let's Encrypt certificate expiration notice が来たら</title><link>https://maku.blog/p/cniq5vr/</link><pubDate>Thu, 21 Mar 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/cniq5vr/</guid><description>&lt;h2 id="lets-encrypt-expiry-bot-からの証明書期限切れメール">Let&amp;rsquo;s Encrypt Expiry Bot からの証明書期限切れメール&lt;/h2>
+&lt;p>2 ヶ月ほど前に、&lt;a href="../../p/xkpjfcf">Sakura VPS レンタルサーバーを Let&amp;rsquo;s Encrypt で SSL 対応&lt;/a>していたら、こんなメールが来ました。&lt;/p>
+&lt;blockquote>
+&lt;p>Your certificate (or certificates) for the names listed below will expire in 20 days (on 10 Apr 19 07:02 +0000). Please make sure to renew your certificate before then, or visitors to your website will encounter errors.&lt;/p>
+&lt;p>We recommend renewing certificates automatically when they have a third of their
+total lifetime left. For Let&amp;rsquo;s Encrypt&amp;rsquo;s current 90-day certificates, that means
+renewing 30 days before expiration. See
+&lt;a href="https://letsencrypt.org/docs/integration-guide/">https://letsencrypt.org/docs/integration-guide/&lt;/a> for details.&lt;/p></description></item><item><title>お名前.com の共用サーバーを Let's Encrypt で SSL 対応</title><link>https://maku.blog/p/s46j9sq/</link><pubDate>Sat, 12 Jan 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/s46j9sq/</guid><description>&lt;p>Chrome で https に対応していない Web サイトにアクセスすると、アドレスバーに「&lt;strong>保護されていない通信&lt;/strong>」という警告が出るようになりました。
+Web サーバーの管理者は、https (SSL) への対応がほぼ必須になっています。
+ここでは、&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8K+3X3R5E+50+35L2SI" rel="nofollow">お名前.com&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=3NCT8K+3X3R5E+50+35L2SI" alt="">
+ の共用サーバー（SD-11、SD-12 プランなど）で、SSL を有効にし、http によるアクセスがあったときに https なアドレスにリダイレクトする設定方法を説明します。&lt;/p>
+&lt;h2 id="lets-encrypt-による-ssl-対応">Let&amp;rsquo;s Encrypt による SSL 対応&lt;/h2>
+&lt;p>&lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8K+3X3R5E+50+35L2SI" rel="nofollow">お名前.com&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=3NCT8K+3X3R5E+50+35L2SI" alt="">
+ の共用サーバーで Web サイトを運用している場合は、下記のコントロールパネルからポチポチやるだけで、簡単に SSL (https) によるアクセスを有効にすることができます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://cp.rentalserver.jp/">共用サーバーSD コントロールパネル https://cp.rentalserver.jp/&lt;/a>&lt;/li>
+&lt;/ul>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="500" height="209" src="../../p/s46j9sq/onamae-ssl_hu17515249465528903562.png" alt="/p/s46j9sq/onamae-ssl.png" />
+&lt;/figure>
+
+&lt;p>自前の Web サーバで SSL 設定を行おうとすると、証明書の発行手続きや設定などが結構面倒ですが、このコンパネからポチポチやれば 1 分で設定完了です。
+無料証明書で有名な Let&amp;rsquo;s Encrypt のサービスに対応しているので、無料で SSL 対応することができます。&lt;/p>
+&lt;h2 id="http-アクセスを-https-にリダイレクトする">http アクセスを https にリダイレクトする&lt;/h2>
+&lt;p>数時間待って、無事 SSL の設定が反映されると、&lt;code>https://&lt;/code> によるウェブサイトへのアクセスが可能になります。
+ただし、そのままだと古い &lt;code>http://&lt;/code> のサイトも残ったままです。&lt;/p>
+&lt;p>ここでは、Web サーバー (Apache) の設定ファイルである &lt;code>.htaccess&lt;/code> を修正（なければ新規作成）することで http から https へのリダイレクト設定を行います。
+ここでは、下記のような手順で修正することにしましょう。&lt;/p></description></item><item><title>Sakura VPS レンタルサーバーを Let's Encrypt で SSL 対応</title><link>https://maku.blog/p/xkpjfcf/</link><pubDate>Thu, 10 Jan 2019 00:00:00 +0900</pubDate><guid>https://maku.blog/p/xkpjfcf/</guid><description>&lt;p>今更ですが、さくらインターネットでレンタルしている &lt;a href="https://px.a8.net/svt/ejp?a8mat=3NCT8K+4T95TE+D8Y+C9YHU" rel="nofollow">Sakura VPS&lt;/a>
+&lt;img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=3NCT8K+4T95TE+D8Y+C9YHU" alt="">
+ の Web サーバーを SSL (https) に対応しました。
+とりあえず今回は無料の Let&amp;rsquo;s Encrypt の証明書を、nginx サーバに設定します。&lt;/p>
+&lt;p>使っている OS が CentOS6 だったので、ついでに CentOS7 をクリーンインストールすることにしました。
+といっても、さくらインターネットの VPS の設定画面でポチポチとやっていくだけ。
+ここで、&lt;strong>[public] CentOS_LetsEncrypt&lt;/strong> というスタートアップスクリプトを選んだら、自動的に SSL の証明書などの対応が完了します。
+入力するパラメータはドメイン（&lt;code>example.com&lt;/code> など）と連絡用のメールアドレスだけ。&lt;/p>
+
+
+&lt;figure class="xImage">
+ &lt;img style="border: solid #ccc 2px;" width="400" height="492" src="../../p/xkpjfcf/sakura-vps-ssl_hu679047552611147805.png" alt="/p/xkpjfcf/sakura-vps-ssl.png" />
+&lt;/figure>
+
+&lt;p>Web サーバの nginx も自動的にインストールされて、Web サーバにアクセスできる状態で起動するのですが、nginx の設定は少しだけ調整する必要があります（ドキュメントルートなど）。&lt;/p>
+&lt;p>数分で OS の再インストールが完了し、下記のような nginx の設定ファイルが自動生成されていました（ドメイン名は &lt;code>example.com&lt;/code> に置換してあります）。
+SSL の設定も完了した状態になっています。&lt;/p>
+
+&lt;figure class="xCodeBlock">
+&lt;figcaption class="xCodeBlock_title">/etc/nginx/conf.d/https.conf&lt;/figcaption>
+&lt;div class="xCodeBlock_code">&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-plain" data-lang="plain">&lt;span class="line">&lt;span class="cl">map $http_upgrade $connection_upgrade {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> default upgrade;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#39;&amp;#39; close;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">server {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> listen 443 ssl http2;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server_name example.com;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> location / {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> root /usr/share/nginx/html;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> index index.html index.htm;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_protocols TLSv1.2;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_ciphers EECDH+AESGCM:EECDH+AES;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_ecdh_curve prime256v1;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_prefer_server_ciphers on;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_session_cache shared:SSL:10m;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> error_page 500 502 503 504 /50x.html;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> location = /50x.html {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> root /usr/share/nginx/html;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/figure>
+
+&lt;p>HTML ファイルの格納ディレクトリ（ドキュメントルート）が、デフォルトでは上記のように &lt;code>/usr/share/nginx/html&lt;/code> になっているので、ここを適切なディレクトリパス（&lt;code>/home/maku/website&lt;/code> など）に置き換えてやれば完了です。&lt;/p></description></item></channel></rss>
