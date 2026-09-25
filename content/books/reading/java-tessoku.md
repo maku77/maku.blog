@@ -3,8 +3,8 @@ title: "読書メモ『Javaの鉄則』ピーター・ハガー"
 linkTitle: "『Javaの鉄則』ピーター・ハガー"
 url: "/p/kojyx2x"
 date: "2010-11-22"
+lastmodSage: "2026-09-25"
 tags: ["読書", "Java"]
-working: true
 ---
 
 {{< amazon
@@ -71,7 +71,7 @@ mCircle.setRadius(6.0);  // OK
 
 多態を用いることでほとんどの `instanceof` の誤用を避けることができる。
 **`instanceof` を使用しているコードを見たら、それを除去できないか考えるべき**。
-`instanceof` は効率的でないし、簡素でなく、拡張性がない。
+`instanceof` は効率的でなく、簡素でもなく、拡張性もない。
 `instanceof` のような処理は本来 Java のランタイムシステムがやるべきである。
 
 ### 鉄則6 絶対必要なときにしか instanceof を使わない
@@ -161,7 +161,7 @@ public boolean equals(Object obj) {
 
 ### 鉄則11 よく考えてから equals メソッドを実装する
 
-2つのオブジェクトがメモリ上で同じ空間を占めていなくても、**意味的に同じだと判断できることがある場合は `equals` メソッドを実装する**。
+2つのオブジェクトがメモリ上で同じ空間を占めていなくても、**意味的に同じだと判断できる場合は `equals` メソッドを実装する**。
 
 ### 鉄則12 equals メソッドの実装には getClass を使うのがよい
 
@@ -295,7 +295,7 @@ JIT が最適化してくれる場合もあるが、それには頼らない。
 ### 鉄則27 オブジェクトを有効な状態に戻してから例外をスローすること
 
 例外をスローする前に、オブジェクトのプロパティを整合性の取れた状態にまで戻すこと。
-そうしないと、がんばってエラーからの復帰処理を実装しても再度オブジェクトを参照することができなくなってしまう。
+そうしないと、せっかくエラーからの復帰処理を実装しても再度オブジェクトを参照することができなくなってしまう。
 例外から回復可能な強固なクラスにするためには、トランザクションにおける「コミットとロールバック」のようなプランが必要だということ。
 こういった仕組みは、コーディングの初期段階から留意しておかないと、後から追加するのは難しい。
 
@@ -320,7 +320,7 @@ JIT による実行時最適化よりも、コンパイルの時点で最適化�
 
 ### 鉄則31 連結には String よりも StringBuffer を使う
 
-文字列を動的に連結するときは、immutable な `String` を使うのではなく、効率の良い `StringBuider` や `StringBuffer` を使う。
+文字列を動的に連結するときは、immutable な `String` を使うのではなく、効率の良い `StringBuilder` や `StringBuffer` を使う。
 
 - `StringBuilder` ... 動的な文字列の連結に使用する（スレッドセーフではないが `StringBuffer` より高速）
 - `StringBuffer` ... 動的な文字列の連結に使用する（スレッドセーフ）
@@ -778,17 +778,268 @@ Java はクラスの多重継承をサポートしていないが、インタフ
 
 ### 鉄則61 部分実装を提供するのが適切な場合は抽象クラスを使う
 
+クラスの実装の一部だけを提供したいときは抽象クラスを使う。
+実装を持たないメソッドはすべて抽象メソッドであり、派生クラスで実装する必要がある。
+
 ### 鉄則62 インタフェース、抽象クラス、具象クラスを区別する
+
+インタフェースは実装を伴わない「契約の表現」であり、抽象クラスは実装を伴う「契約の表現」である。
 
 ### 鉄則63 不変クラスの定義と実装は慎重に
 
+不変オブジェクトは状態が変化しないので初めからスレッドセーフが保証されており、同期化の必要がない。
+Java には不変性を指定するキーワードがないため、次のように明示的にコーディングする必要がある。
+
+- クラスを `final` 宣言する
+- クラス内のデータをすべて `private` 宣言する
+- セッターメソッドを提供しない
+- クラスに含まれるデータはすべてコンストラクタで設定する
+- ゲッターメソッドで内部の可変オブジェクトを返すときは、クローンしてから返す（→鉄則64）
+
 ### 鉄則64 不変オブジェクトが可変オブジェクトへのオブジェクト参照をやりとりするときは、クローンを使用する
+
+不変オブジェクトのメソッドで可変オブジェクトの参照を返す場合は、クローンしてから返すようにする。
+そのオブジェクトの `clone()` メソッドで正しく複製できるようであればそれを使えばよい。
+そうでなければ、ヘルパーメソッドなどを作って深いクローニングを行うようにする。
 
 ### 鉄則65 不変クラスの定義には継承または委譲を使用する
 
+可変クラス (mutable class) と不変クラス (immutable class) の 2 種類を提供したい場合は、共通インタフェースを使う方法と、不変委譲クラスを作る方法がある。
+
+#### 共通インタフェースを使う方法
+
+```java
+/** 不変メソッドを定義する共通インターフェース */
+public interface User {
+    /**
+     * ユーザー名を取得する。
+     */
+    String getName();
+}
+
+/** 不変クラス */
+public final class ImmutableUser implements User {
+    private final String name;
+
+    public ImmutableUser(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+}
+
+/** 可変クラス */
+public class MutableUser implements User {
+    private String name;
+
+    public MutableUser(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+```
+
+共通インタフェースを使う方法は、2 つのクラスで同様の実装を行う必要があるため実装量が増える傾向がある。
+
+#### 不変委譲クラスを作る方法
+
+```java
+/** 可変クラス */
+public class MutableUser {
+    private String name;
+
+    public MutableUser(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+
+/** 不変クラス */
+public final class ImmutableUser {
+    private final MutableUser delegate;
+
+    public ImmutableUser(String name) {
+        this.delegate = new MutableUser(name);
+    }
+
+    public String getName() {
+        return delegate.getName();
+    }
+}
+```
+
+不変委譲クラスを作る方法は、既存の可変クラスのソースを変更できない場合にも使用できる。
+ただし、常に内部で委譲処理が発生するため、性能上のペナルティがある。
+
 ### 鉄則66 clone メソッドを実装する時は super.clone を呼び出す
+
+あるクラスで `clone()` をサポートしていることを示すには `implements Cloneable` を宣言する。
+`Cloneable` はマーカーインタフェースであり、`clone()` メソッドを宣言していないので、`Object` に定義された protected な `clone()` メソッドを public メソッドとしてオーバーライドする。
+`clone()` の実装では、**`super.clone()`** を呼び出すことで、`java.lang.Object.clone()` を間接的に呼び出し、オブジェクトのフィールドが正しくコピーされるようにする。
+
+{{< code lang="java" hl_lines="6" >}}
+public class House implements Cloneable {
+    // ...
+    @Override
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Cloneable を実装しているのでこの例外は発生しない
+            throw new InternalError();
+        }
+    }
+}
+{{< /code >}}
+
+ただし、`Object.clone()` は浅いコピーを行うので、参照型フィールドを持つクラスでは、自分で深いコピーを実装する必要がある。
+
+{{< code lang="java" title="深いコピーの例" >}}
+public class House implements Cloneable {
+    private Room room;
+
+    @Override
+    public Object clone() {
+        try {
+            House cloned = (House) super.clone();
+            // Room クラスも Cloneable を実装している必要がある
+            cloned.room = (Room) room.clone();
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError();
+        }
+    }
+}
+{{< /code >}}
+
 
 ### 鉄則67 非メモリリソースのクリーンアップを finalize メソッドに頼らないこと
 
+非メモリリソース（ファイルハンドル、ソケット、データベース接続など）のクリーンナップを必要とするクラスでは、必ずリソースを解放するための public メソッドを提供し、そのクラスの `finalize` メソッドからも呼び出されるようにしておく。
+プログラム自体が終了する前に `finalize` メソッドが実行されるということは保証されていない。
+
+```java
+public class Communication {
+    private ServerSocket socket;
+
+    public synchronized void cleanup() throws IOException {
+        if (socket != null) {
+            socket.close();
+            socket = null;
+        }
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+            cleanup();
+        } finally {
+            super.finalize();
+        }
+    }
+}
+```
+
+注記: 現在は **`AutoCloseable`** を使って次のように try-with-resources の構文を使うことが推奨されている。
+
+```java
+import java.io.IOException;
+import java.net.ServerSocket;
+
+public final class Communication implements AutoCloseable {
+    private ServerSocket socket;
+
+    public Communication(int port) throws IOException {
+        this.socket = new ServerSocket(port);
+    }
+
+    @Override
+    public synchronized void close() throws IOException {
+        if (socket != null) {
+            socket.close();
+            socket = null;
+        }
+    }
+}
+
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        try (Communication communication = new Communication(8080)) {
+            // ...
+        }
+        // ここで close() が自動的に呼び出される
+    }
+}
+```
+
 ### 鉄則68 非 final メソッドをコンストラクタから呼び出すときは注意を怠らない
+
+コンストラクタ内で非 final メソッドを呼び出すと、サブクラスでのオーバーライドによって不可解な動作を引き起こす可能性がある。
+
+```java
+public class Base {
+    public Base() {
+        // サブクラスでオーバーライドされたメソッドが呼び出される
+        doSomething();
+    }
+
+    public void doSomething() {
+        System.out.println("Base");
+    }
+}
+
+public class Derived extends Base {
+    private String name;
+
+    public Derived(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void doSomething() {
+        // コンストラクタがまだ実行されていないので、name は null
+        System.out.println("Derived: " + name);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        new Derived("Alice");
+    }
+}
+```
+
+{{< code title="実行結果" >}}
+Derived: null
+{{< /code >}}
+
+`Derived` のインスタンスを生成すると次のような順序で処理が行われる。
+
+1. `Derived` のインスタンス領域が確保され、各フィールドにデフォルト値が設定される（`String` 型の `name` には `null` が設定される）。
+1. `Derived` のコンストラクタから暗黙的に `super()` が呼び出され、`Base` のコンストラクタが実行される。
+1. `Base` のコンストラクタ内で `doSomething()` が呼び出され、`Derived.doSomething()` が実行される。
+1. この時点では `Derived` のコンストラクタ本体がまだ実行されていないため、**`name` は `null` のままである**。
+1. `Base` のコンストラクタが終了した後、`Derived` のコンストラクタ本体が実行され、`name` に `"Alice"` が代入される。
+
+このように、コンストラクタからオーバーライド可能なインスタンスメソッドを呼び出すと、サブクラスの初期化が完了する前にサブクラスのメソッドが実行される可能性がある。
+そのため、コンストラクタからは、原則として private または final のメソッドだけを呼び出し、サブクラスでオーバーライド可能なメソッドの呼び出しは避けるべきである。
 
