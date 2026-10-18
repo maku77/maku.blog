@@ -3,7 +3,7 @@ title: "GGST ジオヴァーナ (Giovanna) 練習メモ"
 url: "p/ivnmzmq/"
 date: "2026-04-18"
 tags: ["Guilty Gear"]
-categoryIcon: "_icon-giovanna.jpg"
+categoryIcon: "/assets/img/ggst/face-gio.jpg"
 ---
 
 Guilty Gear Strive のジオヴァーナ練習メモです。
@@ -208,13 +208,15 @@ Guilty Gear Strive のジオヴァーナ練習メモです。
     - 空中ジャンプは確実に前ジャンプになるように、気持ち {{< gg "6 8" >}} の順番で入力すること。
 
 - 投げ → 赤ロマキャンから
-  - （どこからでも）{{< gg "投げ 66RRC 溜めD ..." >}}
-  - （中央）{{< gg "投げ 88RRC walk※  c.S 2HS > 214S(ポエンチ) c.S f.S(x3) HS > 214K(セパル) 張付" >}}
-    - ※ダッシュで近づくとくぐってしまうので歩いて近づく
+  - （中央）{{< gg "投げ 66RRCC 2HS > 214S(ポエンチ) c.S f.S(x3) HS > 214HS~4K(シャビセパ) 張付" >}}
+     - 相手が中央くらいなら壁割りできる。ロマキャンキャンでテンションゲージを節約できる。
+  - （中央より遠い）{{< gg "投げ 66RRC dash 2K j.D(x2) air-dash j.D(x2) land 5HS > 214HS~6S(シャビナセ) 張付" >}}
+    - j.D は最速で出して最後の 5HS で拾う。
   - （端背負い）{{< gg "投げ RRC ダッシュでくぐる c.S 2HS > 214S(ポエンチ) c.S f.S(x3) HS > 214K(セパル) 張付" >}} 
   - （画面端）{{< gg "投げ RRC c.S 2HS > 214S(ポエンチ) c.S D 張付" >}}
-  - （おまけ）魅せコンボ
-    - （画面端）{{< gg "投げ RRC delay hj j.S j.HS j.D(x2) jdc.j.K j.D 張付" >}}
+  - （どこからでも）{{< gg "投げ 66RRC 溜めD ..." >}}
+  - （おまけ）すごい上の方に貼り付ける魅せコンボ
+    - {{< gg "投げ 66RRC dash 6K jc.S j.HS j.D(x2) jdc.HS j.D(x2) 張付" >}}
 
 - （おまけ）テンション100%からの削り
   - {{< gg "d.K 6HS(x3) RRC j.HS j.D c.S 6HS(x3) RRC" >}}
